@@ -1,0 +1,237 @@
+/**
+ * Accordion Component — pure-CSS native <details>/<summary>
+ *
+ * Each item is a `<details class="accordion-item">` and the trigger is a
+ * `<summary class="accordion-item__trigger">`. Browsers give us keyboard
+ * navigation, ARIA semantics, find-in-page (Chrome 122+) and screen-reader
+ * announcement for free.
+ *
+ *   <details class="accordion-item" name="faq">
+ *     <summary class="accordion-item__trigger">
+ *       <span>Question</span>
+ *       <span class="accordion-item__icon" aria-hidden="true"></span>
+ *     </summary>
+ *     <div class="accordion-item__body">Answer</div>
+ *   </details>
+ *
+ * Smooth open/close height animation uses `interpolate-size: allow-keywords`
+ * (set on :root in _variables.css) plus the `::details-content` pseudo and
+ * `transition-behavior: allow-discrete`. Browsers without those features
+ * fall back to the native snap behaviour — still works, still accessible.
+ *
+ * Sharing the same `name` attribute across siblings turns the accordion
+ * into an exclusive group — only one open at a time, free of JS.
+ */
+
+.accordion-item {
+  --_accent: var(--accent-primary);
+  --_icon-size: 1.75rem;
+  --_icon-mark: 0.625rem;
+  --_icon-stroke: 1.5px;
+
+  position: relative;
+  border-block-end: 1px solid var(--border-light);
+  transition:
+    background-color var(--motion-standard),
+    border-color var(--motion-standard);
+
+  &:first-child {
+    border-block-start: 1px solid var(--border-light);
+  }
+
+  /* Accent bar — marks the open item from the inline-start edge */
+  &::before {
+    position: absolute;
+    inset-block: var(--space-sm);
+    inset-inline-start: 0;
+    inline-size: 2px;
+    pointer-events: none;
+    content: '';
+    background: var(--_accent);
+    border-radius: var(--radius-full);
+    opacity: 0;
+    transform: scaleY(0.4);
+    transition:
+      opacity var(--motion-standard),
+      transform var(--motion-standard);
+  }
+
+  &[open] {
+    background: color-mix(in oklch, var(--accent-primary) 4%, transparent);
+    border-block-end-color: color-mix(
+      in oklch,
+      var(--accent-primary) 35%,
+      var(--border-light)
+    );
+
+    &::before {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+}
+
+/* ============================================
+   Trigger — <summary>
+   ============================================ */
+.accordion-item__trigger {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  justify-content: space-between;
+  inline-size: 100%;
+  padding-block: var(--space-md);
+  padding-inline: var(--space-sm);
+  font-size: var(--text-lg);
+  color: var(--text-primary);
+  text-align: start;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  outline: none;
+
+  /* Hide the default disclosure triangle — we render our own glyph */
+  list-style: none;
+  background: none;
+  border: none;
+  transition: color var(--motion-quick);
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: var(--_accent);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--_accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+}
+
+[open] > .accordion-item__trigger {
+  color: var(--_accent);
+}
+
+/* Keep the plus glyph in step with the trigger text it sits beside — on a
+   closed item, hovering the row warms the icon toward the accent too. */
+@media (hover: hover) and (pointer: fine) {
+  .accordion-item:not([open])
+    > .accordion-item__trigger:hover
+    .accordion-item__icon {
+    background: color-mix(in oklch, var(--_accent) 12%, transparent);
+    border-color: var(--_accent);
+
+    &::before,
+    &::after {
+      background: var(--_accent);
+    }
+  }
+}
+
+/* ============================================
+   Icon (plus → minus by rotating the vertical stroke)
+   ============================================ */
+.accordion-item__icon {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_icon-size);
+  block-size: var(--_icon-size);
+  background: color-mix(in oklch, var(--color-earth-warm) 12%, transparent);
+  border: 1px solid var(--color-earth-warm);
+  border-radius: var(--radius-full);
+  transition:
+    background-color var(--motion-standard),
+    border-color var(--motion-standard);
+
+  &::before,
+  &::after {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    content: '';
+    background: var(--color-earth-warm);
+    border-radius: var(--radius-full);
+    transform: translate(-50%, -50%);
+    transition:
+      background-color var(--motion-standard),
+      transform var(--motion-standard);
+  }
+
+  /* horizontal stroke */
+  &::before {
+    inline-size: var(--_icon-mark);
+    block-size: var(--_icon-stroke);
+  }
+
+  /* vertical stroke — rotates flat on open */
+  &::after {
+    inline-size: var(--_icon-stroke);
+    block-size: var(--_icon-mark);
+  }
+}
+
+[open] > .accordion-item__trigger .accordion-item__icon {
+  background: var(--_accent);
+  border-color: var(--_accent);
+
+  &::before,
+  &::after {
+    background: var(--color-bone);
+  }
+
+  &::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+}
+
+/* ============================================
+   Body — native `<details>` height animation
+   ============================================ */
+.accordion-item::details-content {
+  block-size: 0;
+  overflow: clip;
+  opacity: 0;
+  transition:
+    block-size var(--motion-standard),
+    content-visibility var(--motion-standard) allow-discrete,
+    opacity var(--motion-standard);
+}
+
+.accordion-item[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+
+.accordion-item__body {
+  font-size: 0.95em;
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+
+  p:last-child {
+    margin-block-end: 0;
+  }
+}
+
+.accordion-item__content {
+  padding-block-end: var(--space-md);
+  padding-inline: var(--space-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion-item,
+  .accordion-item::before,
+  .accordion-item__trigger,
+  .accordion-item__icon,
+  .accordion-item__icon::before,
+  .accordion-item__icon::after,
+  .accordion-item::details-content {
+    transition: none;
+  }
+}

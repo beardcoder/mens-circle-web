@@ -1,0 +1,296 @@
+/**
+ * Button Component System
+ *
+ * Single token-driven base (`.btn`) with variant + size modifiers. Every
+ * surface that previously rolled its own button (WhatsApp section, breathing
+ * controls, etc.) overrides the `--btn-*` tokens instead of redefining the
+ * geometry.
+ *
+ *   <a class="btn btn--primary"           — solid accent, default CTA
+ *   <a class="btn btn--secondary"         — outlined, light surfaces
+ *   <a class="btn btn--outline"           — outlined on dark surfaces
+ *   <a class="btn btn--ghost"             — text-only, low-emphasis
+ *   <a class="btn btn--whatsapp"          — sage-green community CTA
+ *   <a class="btn btn--large"             — denser presence
+ *   <a class="btn btn--icon"              — circular, icon-only
+ */
+
+/* ============================================
+   Base
+   ============================================ */
+.btn {
+  --btn-bg: var(--accent-primary);
+  --btn-color: var(--color-bone);
+  --btn-border: transparent;
+  --btn-hover-bg: color-mix(
+    in oklch,
+    var(--accent-primary) 78%,
+    var(--color-ink)
+  );
+  --btn-hover-color: var(--color-bone);
+  --btn-hover-border: var(--btn-hover-bg);
+  --btn-shadow: var(--shadow-md);
+  --btn-shadow-hover: var(--shadow-lg), var(--shadow-glow-accent);
+  --btn-padding-block: 1.1rem;
+  --btn-padding-inline: 2.25rem;
+  --btn-gap: var(--space-xs);
+  --btn-font-size: var(--text-caption);
+  --btn-tracking: 0.12em;
+  --btn-tracking-hover: 0.12em;
+  --btn-radius: var(--radius-full);
+  --btn-border-width: 1.5px;
+  --btn-lift: -2px;
+
+  position: relative;
+  display: inline-flex;
+  gap: var(--btn-gap);
+  align-items: center;
+  justify-content: center;
+  padding-block: var(--btn-padding-block);
+  padding-inline: var(--btn-padding-inline);
+  overflow: hidden;
+  font-family: var(--font-body);
+  font-size: var(--btn-font-size);
+  font-weight: 700;
+  color: var(--btn-color);
+  text-transform: uppercase;
+  letter-spacing: var(--btn-tracking);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: var(--btn-bg);
+  border: var(--btn-border-width) solid var(--btn-border);
+  border-radius: var(--btn-radius);
+  box-shadow: var(--btn-shadow);
+  isolation: isolate;
+  transition:
+    background-color 420ms var(--ease-settle),
+    color var(--motion-standard),
+    border-color var(--motion-standard),
+    box-shadow 420ms var(--ease-settle),
+    letter-spacing 420ms var(--ease-settle),
+    translate 420ms var(--ease-settle),
+    scale var(--duration-fast) var(--ease-precise),
+    filter var(--motion-quick);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    color: var(--btn-hover-color);
+    letter-spacing: var(--btn-tracking-hover);
+    background-color: var(--btn-hover-bg);
+    border-color: var(--btn-hover-border);
+    box-shadow: var(--btn-shadow-hover);
+    translate: 0 var(--btn-lift);
+  }
+}
+
+/* Diagonal shimmer sweep on hover. Hidden when reduced motion is requested. */
+.btn::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in oklch, white 18%, transparent) 50%,
+    transparent 70%
+  );
+  opacity: 0;
+  transform: translateX(-120%) skewX(-20deg);
+  transition: opacity 150ms ease-in;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover::before {
+    opacity: 1;
+    transform: translateX(220%) skewX(-20deg);
+    transition: transform 500ms var(--ease-settle);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn::before {
+    display: none;
+  }
+}
+
+.btn:active {
+  box-shadow: var(--shadow-sm);
+  filter: saturate(0.98);
+  scale: 0.975;
+  transition-duration: var(--duration-fast);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn svg {
+  flex-shrink: 0;
+  inline-size: 1em;
+  block-size: 1em;
+}
+
+/* ============================================
+   Variants
+   ============================================ */
+
+.btn--primary {
+  --btn-bg: var(--accent-primary);
+  --btn-color: var(--color-bone);
+  --btn-hover-bg: color-mix(
+    in oklch,
+    var(--accent-primary) 75%,
+    var(--color-ink)
+  );
+  --btn-hover-color: var(--color-bone);
+}
+
+/* Outlined for light surfaces */
+.btn--secondary {
+  --btn-bg: transparent;
+  --btn-color: var(--text-primary);
+  --btn-border: var(--text-primary);
+  --btn-hover-bg: var(--text-primary);
+  --btn-hover-color: var(--bg-primary);
+  --btn-hover-border: var(--text-primary);
+  --btn-shadow: none;
+  --btn-shadow-hover: var(--shadow-md);
+}
+
+/* Outlined for dark surfaces (replaces ad-hoc overrides in breathing controls) */
+.btn--outline {
+  --btn-bg: color-mix(in oklch, var(--color-sand) 8%, transparent);
+  --btn-color: var(--text-on-dark);
+  --btn-border: color-mix(in oklch, var(--color-sand) 20%, transparent);
+  --btn-hover-bg: color-mix(in oklch, var(--color-sand) 14%, transparent);
+  --btn-hover-color: var(--text-on-dark);
+  --btn-hover-border: color-mix(in oklch, var(--color-sand) 30%, transparent);
+  --btn-shadow: none;
+  --btn-shadow-hover: var(--shadow-sm);
+
+  backdrop-filter: blur(8px);
+}
+
+/* Low-emphasis text button; never lifts or glows */
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-color: color-mix(in oklch, var(--text-on-dark) 60%, transparent);
+  --btn-border: transparent;
+  --btn-hover-bg: transparent;
+  --btn-hover-color: var(--text-on-dark);
+  --btn-hover-border: transparent;
+  --btn-shadow: none;
+  --btn-shadow-hover: none;
+  --btn-tracking: 0.08em;
+  --btn-tracking-hover: 0.08em;
+  --btn-padding-block: var(--space-xs);
+  --btn-padding-inline: var(--space-sm);
+  --btn-font-size: 0.75rem;
+  --btn-lift: 0;
+}
+
+/* Sage-green community CTA — used by WhatsApp section */
+.btn--whatsapp {
+  --btn-bg: oklch(60% 0.15 145deg);
+  --btn-color: var(--color-bone);
+  --btn-hover-bg: oklch(55% 0.16 145deg);
+  --btn-hover-color: var(--color-bone);
+  --btn-hover-border: oklch(55% 0.16 145deg);
+  --btn-shadow:
+    0 4px 14px color-mix(in oklch, oklch(40% 0.1 145deg) 30%, transparent),
+    0 2px 6px color-mix(in oklch, oklch(40% 0.1 145deg) 20%, transparent);
+  --btn-shadow-hover:
+    0 6px 20px color-mix(in oklch, oklch(40% 0.1 145deg) 40%, transparent),
+    0 4px 10px color-mix(in oklch, oklch(40% 0.1 145deg) 30%, transparent);
+  --btn-tracking: 0.02em;
+  --btn-tracking-hover: 0.02em;
+  --btn-font-size: var(--text-lg);
+  --btn-padding-block: var(--space-sm);
+  --btn-padding-inline: var(--space-md);
+
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* ============================================
+   Sizes
+   ============================================ */
+
+.btn--large {
+  --btn-padding-block: 1.375rem;
+  --btn-padding-inline: 2.75rem;
+  --btn-font-size: var(--text-sm);
+}
+
+/* Circular, icon-only — used by the breathing start button */
+.btn--icon {
+  --btn-padding-block: 0;
+  --btn-padding-inline: 0;
+  --btn-tracking: 0;
+  --btn-tracking-hover: 0;
+
+  inline-size: var(--btn-size, 72px);
+  min-inline-size: var(--btn-size, 72px);
+  block-size: var(--btn-size, 72px);
+  min-block-size: var(--btn-size, 72px);
+  aspect-ratio: 1;
+}
+
+.btn--icon svg {
+  inline-size: var(--btn-icon-size, 28px);
+  block-size: var(--btn-icon-size, 28px);
+}
+
+/* ============================================
+   Social / Icon Buttons (small circular)
+   ============================================ */
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 40px;
+  block-size: 40px;
+  color: var(--color-sand);
+  background: color-mix(in oklch, var(--color-sand) 10%, transparent);
+  border-radius: var(--radius-full);
+  transition:
+    background-color var(--motion-quick),
+    color var(--motion-quick),
+    translate var(--motion-quick),
+    box-shadow var(--motion-quick);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .social-icon:hover {
+    color: var(--color-bone);
+    background: color-mix(in oklch, var(--color-sand) 25%, transparent);
+    box-shadow: var(--shadow-sm);
+    translate: 0 -2px;
+  }
+}
+
+.social-icon:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+.social-icon:active {
+  scale: 0.96;
+  translate: 0;
+}
+
+.social-icon svg {
+  inline-size: 20px;
+  block-size: 20px;
+}

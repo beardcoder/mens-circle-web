@@ -1,0 +1,14 @@
+node_modules
+dist
+.astro
+.git
+.github
+.vscode
+.idea
+docs
+pocketbase/pb_data
+pocketbase/pocketbase
+*.log
+.env
+.env.*
+.DS_Store

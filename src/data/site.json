@@ -1,0 +1,23 @@
+{
+  "siteName": "Männerkreis Niederbayern",
+  "tagline": "Ein Raum für echte Begegnung",
+  "description": "Der Männerkreis ist ein geschützter Ort, an dem du dich zeigen kannst, wie du wirklich bist.",
+  "footerDescription": "Ein Raum für echte Begegnung unter Männern. Authentischer Austausch, Gemeinschaft und persönliches Wachstum in Niederbayern.",
+  "contactEmail": "hallo@mens-circle.de",
+  "contactPhone": "",
+  "location": "Niederbayern",
+  "whatsappCommunityLink": "",
+  "footerText": "© 2026 Männerkreis Niederbayern. Alle Rechte vorbehalten.",
+  "socialLinks": [
+    { "type": "email", "value": "hallo@mens-circle.de", "label": "E-Mail" }
+  ],
+  "geo": {
+    "lat": 48.8777,
+    "lng": 12.5731,
+    "locality": "Straubing",
+    "region": "Bayern",
+    "postalCode": "94315",
+    "country": "DE"
+  },
+  "themeColor": "#3d2817"
+}

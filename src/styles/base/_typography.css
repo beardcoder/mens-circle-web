@@ -1,0 +1,186 @@
+/**
+ * Typography System
+ * Modern fluid typography with CSS clamp()
+ */
+
+/* ============================================
+   Heading Styles
+   ============================================ */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+h1 {
+  font-size: var(--text-5xl);
+  line-height: 0.88;
+}
+
+h2 {
+  font-size: var(--text-4xl);
+  line-height: 0.93;
+}
+
+h3 {
+  font-size: var(--text-2xl);
+}
+
+h4 {
+  font-size: var(--text-xl);
+}
+
+h5 {
+  font-size: var(--text-lg);
+}
+
+h6 {
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+/* ============================================
+   Body Text
+   ============================================ */
+p {
+  margin-block-end: 1.5em;
+}
+
+p:last-child {
+  margin-block-end: 0;
+}
+
+/* ============================================
+   Font Style Modifiers
+   ============================================ */
+.text-italic {
+  margin-inline: -0.05em 0.08em;
+  font-style: italic;
+}
+
+/* ============================================
+   Section Header
+   Shared wrapper for the eyebrow + title + intro block at the top of
+   every section. Sets text-block width and the gap to the section body
+   so each section breathes the same way.
+   ============================================ */
+.section-header {
+  max-inline-size: var(--container-prose);
+  margin-block-end: var(--rhythm-block);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.section-header--start {
+  margin-inline: 0;
+  text-align: start;
+}
+
+.section-header--on-dark {
+  color: var(--text-on-dark);
+}
+
+/* ============================================
+   Eyebrow / Label Style
+   Reusable component for section labels
+   ============================================ */
+.eyebrow {
+  --eyebrow-line: color-mix(in oklch, currentcolor 72%, transparent);
+
+  position: relative;
+  display: inline-flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-block-end: var(--rhythm-stack);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-accent);
+  text-align: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+}
+
+.eyebrow::before {
+  inline-size: clamp(2.5rem, 5vw, 5rem);
+  block-size: 1.5px;
+  content: '';
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--eyebrow-line) 24%,
+    var(--eyebrow-line)
+  );
+  transform: scaleX(1);
+  transform-origin: right;
+}
+
+.eyebrow--secondary {
+  --eyebrow-line: color-mix(in oklch, var(--accent-secondary) 72%, transparent);
+
+  color: var(--accent-secondary);
+}
+
+/* ============================================
+   Section Title Pattern
+   Large display titles with italic accent. The tight `--rhythm-stack`
+   end-margin pairs the title with its intro paragraph; the gap to the
+   section body is owned by `.section-header`.
+   ============================================ */
+.section-title {
+  margin-block-end: var(--rhythm-stack);
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  line-height: 1.05;
+}
+
+.section-title--lg {
+  font-size: clamp(2.75rem, 7vw, 6rem);
+  line-height: 1;
+}
+
+.section-title .text-italic,
+.section-title .highlight {
+  margin-inline: -0.05em 0.08em;
+  font-style: italic;
+  color: var(--accent-primary);
+}
+
+.section-title--light .text-italic,
+.section-title--light .highlight {
+  color: var(--accent-secondary);
+}
+
+/* Intro paragraph sitting under a .section-title — drops the trailing
+   1.5em from the typography reset so the header's own block margin
+   owns the rhythm to the body. */
+.section-header > p:last-child,
+.section-intro {
+  margin-block-end: 0;
+  font-size: var(--text-section-body-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+}
+
+.section-header--on-dark .section-intro,
+.section-header--on-dark > p:last-child {
+  color: var(--text-on-dark-secondary);
+}
+
+/* ============================================
+   Links
+   ============================================ */
+.link {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--motion-quick);
+}
+
+.link:hover {
+  color: var(--color-earth-warm);
+}

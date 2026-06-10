@@ -1,0 +1,17 @@
+# robots.txt for Männerkreis Niederbayern
+
+# Allow all crawlers by default
+User-agent: *
+
+# Disallow admin panel
+Disallow: /admin
+Disallow: /admin/*
+
+# Disallow internal/private paths
+Disallow: /livewire/*
+
+# Allow everything else
+Allow: /
+
+# Sitemap location
+Sitemap: https://mens-circle.de/sitemap.xml

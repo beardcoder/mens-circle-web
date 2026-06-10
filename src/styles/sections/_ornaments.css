@@ -1,0 +1,55 @@
+/**
+ * Decorative rings and ambient ornaments shared across dark visual sections.
+ */
+
+:where(
+  .hero__circles,
+  .event-register__circles,
+  .event-about__circles,
+  .event-cta__circles
+) {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:where(
+  .hero__circle,
+  .event-register__circle,
+  .event-about__circle,
+  .event-cta__circle
+) {
+  position: absolute;
+  border: 1px solid var(--_ornament-ring-color, var(--color-sand));
+  border-radius: var(--radius-full);
+}
+
+.intro__image-circles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--_ornament-opacity, 0.2);
+}
+
+.intro__image-ring {
+  position: absolute;
+  border: 1px solid var(--_ornament-ring-color, var(--color-sand));
+  border-radius: var(--radius-full);
+}
+
+.intro__image-ring--outer {
+  inset-block-start: -20%;
+  inset-inline-start: -20%;
+  inline-size: 140%;
+  block-size: 140%;
+  animation: breathe-slow 26s var(--ease-ambient) infinite;
+}
+
+.intro__image-ring--inner {
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 80%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  animation: breathe 22s var(--ease-ambient) infinite -6s;
+}

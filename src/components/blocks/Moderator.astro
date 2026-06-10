@@ -1,0 +1,64 @@
+---
+import Sprite from '../Sprite.astro';
+
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    name?: string;
+    bio?: string;
+    quote?: string;
+    photo?: string;
+  };
+}
+
+const { data } = Astro.props;
+const anchor = data.anchor ?? 'moderator';
+---
+
+<section class="section moderator-section" id={anchor}>
+  <span class="moderator__ornament" aria-hidden="true">BEGLEITER</span>
+  <div class="container">
+    <div class="moderator__layout">
+      <div class="moderator__photo-wrapper" data-reveal="right">
+        <div class="moderator__photo" data-motion="image">
+          {
+            data.photo ? (
+              <img src={data.photo} loading="lazy" decoding="async" alt="" />
+            ) : (
+              <div class="moderator__photo-placeholder">
+                <Sprite name="user" />
+                <span>Foto</span>
+              </div>
+            )
+          }
+        </div>
+        <div class="moderator__photo-accent"></div>
+      </div>
+
+      <div class="moderator__content" data-reveal-group="100">
+        {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+
+        {
+          data.name && (
+            <h2 class="moderator__name" data-reveal="blur" set:html={data.name} />
+          )
+        }
+
+        {
+          data.bio && (
+            <div class="moderator__bio" data-reveal="up" set:html={data.bio} />
+          )
+        }
+
+        {
+          data.quote && (
+            <blockquote class="moderator__quote" data-reveal="up">
+              <p>{data.quote}</p>
+            </blockquote>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+{
+  "header": {
+    "links": [
+      { "label": "Über", "url": "#ueber", "umamiTarget": "ueber" },
+      { "label": "Die Reise", "url": "#reise", "umamiTarget": "reise" },
+      { "label": "Fragen", "url": "#faq", "umamiTarget": "faq" },
+      { "label": "Atemübung", "url": "/atemuebung", "umamiTarget": "atemuebung" }
+    ],
+    "cta": [
+      { "label": "Nächster Termin", "url": "/event", "umamiTarget": "naechster-termin" }
+    ],
+    "meta": "Atme durch. Du bist angekommen."
+  },
+  "footerPrimary": [
+    { "label": "Über uns", "url": "#ueber" },
+    { "label": "Die Reise", "url": "#reise" },
+    { "label": "FAQ", "url": "#faq" },
+    { "label": "Atemübung", "url": "/atemuebung" },
+    { "label": "Nächster Termin", "url": "/event" }
+  ],
+  "footerContact": [
+    { "label": "Newsletter", "url": "/#newsletter" }
+  ],
+  "footerLegal": [
+    { "label": "Impressum", "url": "/impressum" },
+    { "label": "Datenschutz", "url": "/datenschutz" }
+  ]
+}

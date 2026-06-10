@@ -1,0 +1,61 @@
+/**
+ * CTA Section
+ * Call-to-action section
+ */
+
+/* ============================================
+   CTA Section Base
+   ============================================ */
+.cta-section {
+  position: relative;
+
+  /* `clip` keeps decorative bleed contained without establishing a
+     scroll container that would freeze descendant view-timelines. */
+  overflow: clip;
+  text-align: center;
+  background: var(--bg-tertiary);
+}
+
+/* Decorative circles */
+.cta__ornament {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  pointer-events: none;
+  border: 1px solid var(--color-sand);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cta__ornament--outer {
+  inline-size: 50vw;
+  block-size: 50vw;
+  opacity: 0.3;
+  animation: breathe-slow 24s var(--ease-ambient) infinite;
+}
+
+.cta__ornament--inner {
+  inline-size: 35vw;
+  block-size: 35vw;
+  opacity: 0.2;
+  animation: breathe 20s var(--ease-ambient) infinite -8s;
+}
+
+/* ============================================
+   CTA Content
+   ============================================ */
+.cta__content {
+  position: relative;
+  z-index: 1;
+  max-inline-size: var(--content-max-wide);
+  margin-inline: auto;
+}
+
+/* Eyebrow + .section-title use the shared rhythm. CTA only adds the
+   gap between the intro paragraph and the action button. */
+.cta__text {
+  margin-block-end: var(--rhythm-block);
+  font-size: var(--text-section-body-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+}

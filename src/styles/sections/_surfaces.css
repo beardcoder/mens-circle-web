@@ -1,0 +1,104 @@
+/**
+ * Shared surface treatments
+ *
+ * Keeps repeated texture, glow, and divider-grid behavior out of page sections.
+ */
+
+:where(
+  .hero__bg,
+  .breathing-section,
+  .moderator__photo,
+  .journey-section,
+  .newsletter-section,
+  .whatsapp-section,
+  .event-register-section,
+  .event-about__quote-area,
+  .event-cta-section,
+  .no-event-info__quote-area,
+  .testimonial-form-hero .hero__bg
+)::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  background-image: var(--surface-noise);
+  opacity: var(--_surface-noise-opacity, var(--surface-noise-opacity));
+}
+
+:where(.hero__bg, .breathing-section, .event-about__quote-area)::before {
+  mix-blend-mode: overlay;
+}
+
+.moderator__photo::before {
+  z-index: 1;
+}
+
+:where(.newsletter-section, .whatsapp-section)::after {
+  position: absolute;
+  inset-block-start: -30%;
+  inline-size: 70%;
+  block-size: 160%;
+  pointer-events: none;
+  content: '';
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(
+        in oklch,
+        var(--_surface-glow-color, var(--accent-primary))
+          var(--_surface-glow-strength, var(--surface-glow-strength)),
+        transparent
+      )
+      0%,
+    transparent 50%
+  );
+  animation: breathe-slow var(--_surface-glow-duration, 20s) var(--ease-ambient)
+    infinite var(--_surface-glow-delay, 0s);
+}
+
+.newsletter-section::after {
+  inset-inline-end: -20%;
+}
+
+.whatsapp-section::after {
+  inset-inline-start: -20%;
+}
+
+:where(.archetypes__grid, .testimonials__grid) {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-block: 1px solid var(--border-light);
+}
+
+:where(.archetype-card, .testimonial-item):nth-child(odd) {
+  border-inline-start: none;
+}
+
+:where(.archetype-card, .testimonial-item):nth-child(n + 3) {
+  border-block-start: 1px solid var(--border-light);
+}
+
+:where(.archetype-card, .testimonial-item):last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@media (width <= 900px) {
+  :where(.archetypes__grid, .testimonials__grid) {
+    grid-template-columns: 1fr;
+  }
+
+  :where(.archetype-card, .testimonial-item) {
+    min-block-size: auto;
+    border-block-start: 1px solid var(--border-light);
+    border-inline-start: none;
+  }
+
+  :where(.archetype-card, .testimonial-item):first-child {
+    border-block-start: none;
+  }
+
+  :where(.archetype-card, .testimonial-item):last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}

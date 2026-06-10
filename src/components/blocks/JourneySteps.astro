@@ -1,0 +1,80 @@
+---
+interface Step {
+  number?: string;
+  title?: string;
+  description?: string;
+}
+
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    subtitle?: string;
+    steps?: Step[];
+  };
+}
+
+const { data } = Astro.props;
+const anchor = data.anchor ?? 'reise';
+const steps = data.steps ?? [];
+---
+
+<section
+  class="section section--large journey-section"
+  id={anchor}
+  aria-labelledby="journey-title"
+>
+  <div class="journey__glow" aria-hidden="true"></div>
+  <div class="container">
+    <div class="section-header section-header--on-dark" data-reveal-group>
+      {
+        data.eyebrow && (
+          <p class="eyebrow eyebrow--secondary" data-reveal="up">
+            {data.eyebrow}
+          </p>
+        )
+      }
+
+      {
+        data.title && (
+          <h2
+            class="section-title"
+            id="journey-title"
+            data-reveal="blur"
+            set:html={data.title}
+          />
+        )
+      }
+
+      {
+        data.subtitle && (
+          <p class="journey__subtitle" data-reveal="up">{data.subtitle}</p>
+        )
+      }
+    </div>
+
+    {
+      steps.length > 0 && (
+        <div class="journey__steps" data-reveal-group="110">
+          <div class="journey__thread" aria-hidden="true" />
+          {steps.map((step) => (
+            <div class="journey__step" data-reveal="up">
+              {step.number && (
+                <div class="journey__step-number" aria-hidden="true">
+                  {step.number}
+                </div>
+              )}
+              {step.title && (
+                <h3 class="journey__step-title">{step.title}</h3>
+              )}
+              {step.description && (
+                <p class="journey__step-text">{step.description}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>

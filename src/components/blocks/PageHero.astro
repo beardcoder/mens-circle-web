@@ -1,0 +1,70 @@
+---
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    lead?: string;
+    align?: 'left' | 'center';
+    buttonText?: string;
+    buttonLink?: string;
+    image?: string;
+  };
+}
+
+const { data } = Astro.props;
+const align = data.align === 'left' ? 'left' : 'center';
+const hasImage = Boolean(data.image);
+const hasButton = Boolean(data.buttonText && data.buttonLink);
+const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
+---
+
+<section
+  class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`}
+  id={data.anchor}
+>
+  <div class="page-hero__ornaments" aria-hidden="true">
+    <span class="page-hero__ornament page-hero__ornament--1"></span>
+    <span class="page-hero__ornament page-hero__ornament--2"></span>
+  </div>
+
+  <div class="container">
+    <div class="page-hero__layout">
+      <div class="page-hero__content">
+        {data.eyebrow && <p class="eyebrow page-hero__eyebrow">{data.eyebrow}</p>}
+        {data.title && <h1 class="page-hero__title" set:html={data.title} />}
+        {data.lead && <p class="page-hero__lead">{data.lead}</p>}
+
+        {
+          hasButton && (
+            <div class="page-hero__cta">
+              <a
+                href={data.buttonLink}
+                class="btn btn--primary btn--large"
+                target={buttonExternal ? '_blank' : undefined}
+                rel={buttonExternal ? 'noopener noreferrer' : undefined}
+              >
+                {data.buttonText}
+              </a>
+            </div>
+          )
+        }
+      </div>
+
+      {
+        hasImage && (
+          <div class="page-hero__media">
+            <img
+              src={data.image}
+              class="page-hero__image"
+              loading="eager"
+              fetchpriority="high"
+              aria-hidden="true"
+              alt=""
+            />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>

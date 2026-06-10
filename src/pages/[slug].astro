@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/blocks/PageHero.astro';
+import TextSection from '../components/blocks/TextSection.astro';
+import impressum from '../content/legal/impressum.json';
+import datenschutz from '../content/legal/datenschutz.json';
+
+export function getStaticPaths() {
+  const pages = { impressum, datenschutz };
+  return Object.entries(pages).map(([slug, page]) => ({
+    params: { slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+---
+
+<Layout
+  title={page.meta?.title ?? page.title}
+  description={page.meta?.description}
+  robots={page.robots ?? 'noindex, nofollow'}
+>
+  <PageHero data={{ title: page.title, align: 'center' }} />
+  <TextSection data={{ content: page.content, anchor: '' }} />
+</Layout>

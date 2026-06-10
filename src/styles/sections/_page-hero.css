@@ -1,0 +1,183 @@
+/**
+ * Page Hero (subpages)
+ *
+ * Compact hero for CMS subpages. Unlike the homepage `.hero`, this one
+ * sits inside the document flow rather than taking the full viewport,
+ * so it works on pages that already have plenty of content below.
+ *
+ * Two layouts are supported via modifier classes:
+ *   .page-hero--center  text centered, optional image floats above title
+ *   .page-hero--left    text left-aligned, optional image on the right
+ */
+
+.page-hero {
+  position: relative;
+  padding-block: clamp(var(--space-xl), 14vh, calc(var(--space-xl) * 1.5))
+    clamp(var(--space-lg), 8vh, var(--space-xl));
+  overflow: hidden;
+  color: var(--text-on-dark);
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 75% 35%,
+      color-mix(in oklch, var(--accent-primary) 22%, transparent) 0%,
+      transparent 55%
+    ),
+    linear-gradient(
+      135deg,
+      var(--color-earth-deep) 0%,
+      var(--color-earth-dark) 60%,
+      var(--color-earth-mid) 100%
+    );
+  isolation: isolate;
+}
+
+/* The header floats above the page-hero on every subpage, so the hero
+   reserves enough top padding for it on every viewport. */
+body:not(:has(.hero)) .page-hero {
+  margin-block-start: 0;
+}
+
+/* ============================================
+   Decorative ornaments
+   ============================================ */
+.page-hero__ornaments {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.page-hero__ornament {
+  position: absolute;
+  border: 1px solid
+    color-mix(in oklch, var(--accent-secondary) 25%, transparent);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.page-hero__ornament--1 {
+  inset-block-start: -10%;
+  inset-inline-end: -8%;
+  inline-size: clamp(220px, 28vw, 480px);
+  aspect-ratio: 1;
+}
+
+.page-hero__ornament--2 {
+  inset-block-end: -30%;
+  inset-inline-start: -6%;
+  inline-size: clamp(180px, 22vw, 360px);
+  aspect-ratio: 1;
+  opacity: 0.3;
+}
+
+/* ============================================
+   Layout
+   ============================================ */
+.page-hero__layout {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+.page-hero--center .page-hero__layout {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  max-inline-size: 64ch;
+  margin-inline: auto;
+}
+
+.page-hero--center .page-hero__content {
+  text-align: center;
+}
+
+/* With image, the centered variant stacks the image above the text. */
+.page-hero--center.page-hero--with-image .page-hero__layout {
+  grid-template-rows: auto auto;
+}
+
+.page-hero--center.page-hero--with-image .page-hero__media {
+  order: -1;
+  max-inline-size: clamp(180px, 26vw, 280px);
+}
+
+.page-hero--left .page-hero__layout {
+  grid-template-columns: 1fr;
+}
+
+@media (width >= 800px) {
+  .page-hero--left.page-hero--with-image .page-hero__layout {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+}
+
+.page-hero--left .page-hero__content {
+  text-align: start;
+}
+
+/* ============================================
+   Content
+   ============================================ */
+.page-hero__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.page-hero__eyebrow {
+  color: var(--accent-secondary);
+}
+
+.page-hero__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.5rem + 3vw, 4rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.page-hero__lead {
+  max-inline-size: 56ch;
+  margin: 0;
+  font-size: clamp(1rem, 0.95rem + 0.4vw, 1.25rem);
+  line-height: 1.55;
+  color: color-mix(in oklch, var(--text-on-dark) 90%, transparent);
+}
+
+.page-hero--center .page-hero__lead {
+  margin-inline: auto;
+}
+
+.page-hero__cta {
+  margin-block-start: var(--space-xs);
+}
+
+/* ============================================
+   Media
+   ============================================ */
+.page-hero__media {
+  display: block;
+  inline-size: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-lg, 1.5rem);
+  box-shadow: 0 24px 50px -20px
+    color-mix(in oklch, var(--color-ink) 50%, transparent);
+}
+
+.page-hero__image {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+/* ============================================
+   Reduced motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .page-hero__ornament {
+    transition: none;
+  }
+}

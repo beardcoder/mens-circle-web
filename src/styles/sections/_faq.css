@@ -1,0 +1,52 @@
+/**
+ * FAQ Section
+ * Accordion-style FAQ layout
+ */
+
+/* ============================================
+   FAQ Section — sticky-sidebar layout lives on the .container itself
+   so the grid is one level shallower in the DOM.
+   ============================================ */
+.faq-section {
+  /* `clip` keeps decorative bleed contained without establishing a
+     scroll container that would freeze descendant view-timelines. */
+  overflow: clip;
+  background: var(--bg-primary);
+
+  & > .container {
+    display: grid;
+    grid-template-columns: 0.35fr 0.65fr;
+    gap: var(--space-xl);
+    align-items: start;
+
+    @media (width <= 900px) {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+    }
+  }
+}
+
+/* ============================================
+   FAQ Header — sticky sidebar layout. Uses `.section-header` for
+   typography rhythm; FAQ adds the sticky behavior on top.
+   ============================================ */
+.faq__header {
+  position: sticky;
+  inset-block-start: var(--header-clearance);
+  margin-block-end: 0; /* sidebar layout owns spacing, not the header */
+  text-align: start;
+
+  @media (width <= 900px) {
+    position: relative;
+    inset-block-start: 0;
+    margin-block-end: var(--rhythm-block);
+  }
+}
+
+/* ============================================
+   FAQ List
+   ============================================ */
+.faq__list {
+  display: flex;
+  flex-direction: column;
+}

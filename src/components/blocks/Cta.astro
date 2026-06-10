@@ -1,0 +1,47 @@
+---
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    text?: string;
+    buttonText?: string;
+    buttonLink?: string;
+  };
+}
+
+const { data } = Astro.props;
+---
+
+<section class="section section--large cta-section" id={data.anchor}>
+  <div class="cta__ornament cta__ornament--outer" aria-hidden="true"></div>
+  <div class="cta__ornament cta__ornament--inner" aria-hidden="true"></div>
+  <div class="container">
+    <div class="cta__content" data-reveal-group="100">
+      {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+
+      {
+        data.title && (
+          <h2 class="section-title cta__title" data-reveal="blur" set:html={data.title} />
+        )
+      }
+
+      {data.text && <p class="cta__text" data-reveal="up">{data.text}</p>}
+
+      {
+        data.buttonText && data.buttonLink && (
+          <a
+            href={data.buttonLink}
+            class="btn btn--primary btn--large"
+            data-reveal="up"
+            data-umami-event="cta-click"
+            data-umami-event-location="cta-block"
+            data-umami-event-text={data.buttonText}
+          >
+            {data.buttonText}
+          </a>
+        )
+      }
+    </div>
+  </div>
+</section>
