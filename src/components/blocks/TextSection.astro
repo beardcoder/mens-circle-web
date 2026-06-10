@@ -1,0 +1,37 @@
+---
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    content?: string;
+  };
+}
+
+const { data } = Astro.props;
+const slug = (data.title ?? '')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '');
+const anchor = data.anchor ?? slug;
+---
+
+<section class="section" id={anchor || undefined}>
+  <div class="container--narrow container">
+    <div class="section-header section-header--start" data-reveal-group>
+      {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+      {data.title && <h2 class="section-title" data-reveal="blur">{data.title}</h2>}
+    </div>
+
+    {
+      data.content && (
+        <div
+          class="section__content"
+          data-reveal="up"
+          data-reveal-delay="120"
+          set:html={data.content}
+        />
+      )
+    }
+  </div>
+</section>

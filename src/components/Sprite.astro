@@ -1,0 +1,30 @@
+---
+// Renders a single icon by reference to the inline SVG sprite (SpriteDefs.astro).
+// Outputs only <svg><use/></svg> — two DOM nodes per icon regardless of path
+// complexity.
+//
+// Usage:
+//   <Sprite name="play" />
+//   <Sprite name="calendar" size={18} class="event-info__icon" />
+//   <Sprite name="logo" title="Männerkreis" />
+interface Props {
+  name: string;
+  size?: number;
+  title?: string;
+  class?: string;
+}
+
+const { name, size, title, class: className = 'icon' } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'}
+  focusable={title ? undefined : 'false'}
+  class={className}
+>
+  {title && <title>{title}</title>}
+  <use href={`#icon-${name}`}></use>
+</svg>

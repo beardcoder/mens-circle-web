@@ -1,0 +1,313 @@
+/**
+ * Motion System — the single source of truth for frontend animation
+ * ─────────────────────────────────────────────────────────────────
+ *
+ * Three orthogonal vocabularies, each with one responsibility:
+ *
+ *   data-reveal   — scroll-triggered entrance (granular, staggered)
+ *   data-hover    — pointer micro-interaction (lift / glow / scale / press)
+ *   data-motion   — intrinsic surface behaviour (image clip-scale, link underline)
+ *
+ * Plus the hero page-load entrance — the one above-the-fold moment.
+ *
+ * Principles
+ *   • Prefer small, granular motion (eyebrow, headline, button, card, list
+ *     item) over fading whole blocks in one generic move.
+ *   • Composited only — opacity, translate, scale, filter, box-shadow.
+ *     Never animate layout properties.
+ *   • Timing, easing and stagger come from the shared tokens in
+ *     base/_variables.css so every section feels the same.
+ *   • Everything decorative is wrapped in `prefers-reduced-motion:
+ *     no-preference`; the reduce branch leaves content visible and still.
+ */
+
+/* ============================================
+   Hero entrance — page-load only
+   ============================================
+   The one above-the-fold animated entry. Children rise in sequence on
+   initial load (no scroll trigger), a subtle blur burn-off carrying the
+   eye into the title. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero__label,
+  .hero__title,
+  .hero__bottom,
+  .hero__scroll {
+    animation: hero-rise var(--duration-cinematic) var(--ease-emphasised) both;
+  }
+
+  .hero__label {
+    animation-duration: 800ms;
+    animation-delay: var(--stagger-1);
+  }
+
+  .hero__title {
+    animation-duration: 1200ms;
+    animation-delay: var(--stagger-2);
+  }
+
+  .hero__bottom {
+    animation-delay: var(--stagger-3);
+  }
+
+  .hero__scroll {
+    animation-duration: 900ms;
+    animation-delay: var(--stagger-4);
+  }
+
+  /* Inner-page hero (page-hero block) — same signature entrance, lighter
+     stagger. Above-the-fold, so it plays on load rather than on scroll. */
+  .page-hero__eyebrow,
+  .page-hero__title,
+  .page-hero__lead,
+  .page-hero__cta,
+  .page-hero__media {
+    animation: hero-rise var(--duration-slower) var(--ease-emphasised) both;
+  }
+
+  .page-hero__eyebrow {
+    animation-delay: var(--stagger-1);
+  }
+
+  .page-hero__title {
+    animation-duration: var(--duration-cinematic);
+    animation-delay: var(--stagger-2);
+  }
+
+  .page-hero__lead {
+    animation-delay: var(--stagger-3);
+  }
+
+  .page-hero__cta {
+    animation-delay: var(--stagger-4);
+  }
+
+  .page-hero__media {
+    animation-duration: var(--duration-cinematic);
+    animation-delay: var(--stagger-2);
+  }
+}
+
+/* ============================================
+   Reveal-on-scroll — the entrance vocabulary
+   ============================================
+   JS (utils/motion.ts) drives the motion through Motion One's mini
+   `animate()`, triggered by an IntersectionObserver as the element enters
+   the viewport. CSS owns only the *hidden start state* below — a flat
+   `opacity: 0` — so nothing flashes before the script runs. Motion owns the
+   `transform` and `filter` keyframes entirely, so this stylesheet must NOT
+   set `translate` / `scale` / `filter` here (they would compose with the
+   shorthand Motion animates and double the offset).
+
+   The start state is gated behind `.motion-ready` (added synchronously to
+   <html> in the <head>) *and* `prefers-reduced-motion: no-preference`.
+   Without JS — and under reduced motion — every element stays visible and
+   still, with no animation at all.
+
+     data-reveal                  fade + rise (default = "up")
+     data-reveal="up|down|left|right|zoom|fade|blur"
+     data-reveal-delay="120"      ms, individual offset
+     data-reveal-duration="900"   ms, override
+     data-reveal-repeat           replay on every entry
+     data-reveal-group[="110"]    on a parent — auto-stagger its
+                                  direct [data-reveal] children (ms step) */
+
+@media (prefers-reduced-motion: no-preference) {
+  .motion-ready [data-reveal] {
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   Surface primitives — data-motion
+   ============================================ */
+
+/* Any image inside a clipped frame: the frame hides overflow so the image
+   can scale on hover without nudging neighbours. */
+[data-motion='image'] {
+  overflow: clip;
+}
+
+/* Magnetic link — the underline grows from the inline-start edge on hover
+   instead of fading in. For footer links and prose `<a>`. */
+[data-motion='link'] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  transition: color var(--motion-quick);
+}
+
+[data-motion='link']::after {
+  position: absolute;
+  inset-block-end: -2px;
+  inset-inline: 0;
+  block-size: 1px;
+  pointer-events: none;
+  content: '';
+  background: currentcolor;
+  opacity: 0.45;
+  transform: scaleX(0.2);
+  transform-origin: left;
+  transition:
+    transform 380ms var(--ease-settle),
+    opacity var(--motion-quick);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-motion='link']:hover::after,
+  [data-motion='link']:focus-visible::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* ============================================
+   Micro-interactions — data-hover
+   ============================================
+   Compositor-only pointer feedback for interactive surfaces. Gated to
+   real hover devices so touch never sticks in a hover state. */
+
+/* Lift: subtle vertical rise with shadow depth — cards, tiles. */
+[data-hover='lift'] {
+  --hover-lift-y: -4px;
+  --hover-lift-shadow: var(--shadow-lg);
+
+  transition:
+    translate var(--motion-standard),
+    box-shadow var(--motion-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-hover='lift']:hover {
+    box-shadow: var(--hover-lift-shadow);
+    translate: 0 var(--hover-lift-y);
+  }
+
+  [data-hover='lift']:active {
+    translate: 0;
+  }
+}
+
+/* Glow: accent ring radiates on hover — feature surfaces. */
+[data-hover='glow'] {
+  --hover-glow-color: var(--accent-primary);
+
+  transition:
+    box-shadow var(--motion-standard),
+    translate var(--motion-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-hover='glow']:hover {
+    box-shadow:
+      0 0 0 3px color-mix(in oklch, var(--hover-glow-color) 25%, transparent),
+      0 8px 24px -8px
+        color-mix(in oklch, var(--hover-glow-color) 45%, transparent);
+    translate: 0 -2px;
+  }
+
+  [data-hover='glow']:active {
+    translate: 0;
+  }
+}
+
+/* Scale: gentle pulse — icon buttons and badges. */
+[data-hover='scale'] {
+  transition: scale var(--motion-standard) var(--ease-settle);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-hover='scale']:hover {
+    scale: 1.06;
+  }
+
+  [data-hover='scale']:active {
+    scale: 0.96;
+  }
+}
+
+/* Press: tactile scale-down — interactive tiles that respond to touch too. */
+[data-hover='press'] {
+  transition: scale var(--motion-quick) var(--ease-precise);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-hover='press']:hover {
+    scale: 0.98;
+  }
+}
+
+[data-hover='press']:active {
+  scale: 0.95;
+  transition-duration: var(--duration-fast);
+}
+
+/* Touch feedback — on devices without hover, the lift/glow/scale surfaces
+   would otherwise give no response at all. A subtle press-in on `:active`
+   makes every interactive card feel tappable, the way a native app does. */
+@media (hover: none) {
+  [data-hover='lift']:active,
+  [data-hover='glow']:active,
+  [data-hover='scale']:active {
+    scale: 0.97;
+    transition: scale var(--duration-fast) var(--ease-precise);
+  }
+}
+
+/* ============================================
+   Reduced motion — strip anything decorative
+   ============================================
+   Keep colour/shadow feedback, drop all positional motion. The global cap
+   is a safety net for any ambient `infinite` keyframe; elements tagged
+   `data-motion-essential` (the breathing meditation app, where motion *is*
+   the feature) opt out. */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__label,
+  .hero__title,
+  .hero__bottom,
+  .hero__scroll,
+  .hero__scroll-line,
+  .page-hero__eyebrow,
+  .page-hero__title,
+  .page-hero__lead,
+  .page-hero__cta,
+  .page-hero__media {
+    animation: none;
+  }
+
+  [data-motion='image'] > img,
+  [data-motion='image'] > picture > img {
+    transition: none;
+  }
+
+  [data-hover='lift'] {
+    transition:
+      box-shadow var(--motion-standard),
+      background-color var(--motion-standard),
+      color var(--motion-standard);
+  }
+
+  [data-hover='lift']:hover,
+  [data-hover='lift']:active,
+  [data-hover='glow']:hover,
+  [data-hover='glow']:active,
+  [data-hover='scale']:hover,
+  [data-hover='scale']:active,
+  [data-hover='press']:hover,
+  [data-hover='press']:active {
+    scale: 1;
+    translate: 0;
+  }
+
+  [data-hover='glow']:hover {
+    box-shadow: 0 0 0 3px
+      color-mix(in oklch, var(--hover-glow-color) 25%, transparent);
+  }
+
+  *:not([data-motion-essential], [data-motion-essential] *),
+  *:not([data-motion-essential], [data-motion-essential] *)::before,
+  *:not([data-motion-essential], [data-motion-essential] *)::after {
+    animation-iteration-count: 1 !important;
+  }
+}

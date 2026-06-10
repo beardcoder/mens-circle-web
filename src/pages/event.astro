@@ -1,0 +1,13 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EventPage from '../components/islands/EventPage.svelte';
+import site from '../data/site.json';
+---
+
+<Layout
+  title="Termin & Anmeldung – Männerkreis Niederbayern/ Straubing"
+  description="Der nächste Männerkreis in Straubing. Sieh dir den Termin an und sichere dir deinen Platz."
+  ogType="event"
+>
+  <EventPage client:only="svelte" whatsappLink={site.whatsappCommunityLink} />
+</Layout>

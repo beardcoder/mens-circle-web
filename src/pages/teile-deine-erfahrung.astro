@@ -1,0 +1,64 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TestimonialForm from '../components/islands/TestimonialForm.svelte';
+
+const schemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Startseite', item: '/' },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Teile deine Erfahrung',
+        item: '/teile-deine-erfahrung',
+      },
+    ],
+  },
+];
+---
+
+<Layout
+  title="Teile deine Erfahrung – Männerkreis Niederbayern/ Straubing"
+  description="Teile deine Erfahrung mit dem Männerkreis Niederbayern/ Straubing. Hilf anderen Männern zu verstehen, was der Kreis bedeuten kann."
+  schemas={schemas}
+>
+  <section class="hero testimonial-form-hero">
+    <div class="hero__bg"></div>
+    <div class="container">
+      <div class="hero__content">
+        <p class="hero__label">Community Stimmen</p>
+        <h1 class="hero__title">
+          Teile deine <span class="highlight">Erfahrung</span>
+        </h1>
+        <p class="hero__subtitle">
+          Deine Geschichte kann anderen Männern Mut machen, den ersten Schritt
+          zu wagen.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section testimonial-form-section">
+    <div class="container">
+      <div class="testimonial-form__wrapper">
+        <div class="testimonial-form__intro">
+          <h2>Deine Stimme zählt</h2>
+          <p>
+            Der Männerkreis lebt von authentischen Begegnungen. Wenn du Teil
+            unserer Community bist und deine Erfahrung teilen möchtest, würden
+            wir uns freuen, von dir zu hören.
+          </p>
+          <p>
+            Dein Testimonial wird nach Prüfung auf unserer Website
+            veröffentlicht und kann anderen Männern helfen zu verstehen, was der
+            Kreis bedeuten kann.
+          </p>
+        </div>
+
+        <TestimonialForm client:visible />
+      </div>
+    </div>
+  </section>
+</Layout>

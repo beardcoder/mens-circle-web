@@ -1,0 +1,21 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# pocketbase runtime data (persisted in a Coolify volume, never committed)
+pocketbase/pb_data/
+pocketbase/pocketbase
+
+# logs / env
+*.log
+.env
+.env.local
+.env.production
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/

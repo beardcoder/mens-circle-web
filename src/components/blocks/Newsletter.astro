@@ -1,0 +1,48 @@
+---
+import NewsletterForm from '../islands/NewsletterForm.svelte';
+
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    text?: string;
+  };
+}
+
+const { data } = Astro.props;
+const anchor = data.anchor ?? 'newsletter';
+---
+
+<section class="section newsletter-section" id={anchor} aria-labelledby="newsletter-title">
+  <div class="container">
+    <div class="newsletter__layout">
+      <div class="newsletter__content" data-reveal-group="100">
+        {
+          data.eyebrow && (
+            <p class="eyebrow eyebrow--secondary" data-reveal="up">
+              {data.eyebrow}
+            </p>
+          )
+        }
+
+        {
+          data.title && (
+            <h2
+              class="section-title newsletter__title"
+              id="newsletter-title"
+              data-reveal="blur"
+              set:html={data.title}
+            />
+          )
+        }
+
+        {data.text && <p class="newsletter__text" data-reveal="up">{data.text}</p>}
+      </div>
+
+      <div class="newsletter__form-wrapper" data-reveal="left" data-reveal-delay="120">
+        <NewsletterForm client:visible context={{ location: 'newsletter-block' }} />
+      </div>
+    </div>
+  </div>
+</section>

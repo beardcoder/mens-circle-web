@@ -1,0 +1,69 @@
+/**
+ * Error Pages Styles
+ * ==================
+ */
+
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 60vh;
+  padding-block: var(--space-lg);
+  text-align: center;
+}
+
+.error-page__content {
+  max-inline-size: var(--content-max-description);
+  margin-inline: auto;
+}
+
+.error-page__code {
+  margin-block-end: var(--space-sm);
+  font-size: clamp(4rem, 15vw, 6rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-earth-deep);
+}
+
+.error-page__title {
+  margin-block-end: var(--space-md);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 500;
+  color: var(--color-earth-deep);
+}
+
+.error-page__text {
+  margin-block-end: var(--space-md);
+  font-size: var(--text-section-body-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--text-muted);
+}
+
+.error-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.error-page__contact {
+  margin-block-start: var(--space-md);
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.error-page__contact a,
+.error-page__text a {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--motion-quick);
+}
+
+.error-page__contact a:hover,
+.error-page__contact a:focus-visible,
+.error-page__text a:hover,
+.error-page__text a:focus-visible {
+  color: var(--color-earth-warm);
+}

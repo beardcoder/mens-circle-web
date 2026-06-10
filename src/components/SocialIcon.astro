@@ -1,0 +1,33 @@
+---
+import Sprite from './Sprite.astro';
+import { resolveSocialLink, type SocialLink } from '../lib/social';
+
+interface Props {
+  link: SocialLink;
+  variant?: 'icon' | 'link';
+}
+
+const { link, variant = 'icon' } = Astro.props;
+const { href, title, iconName, type, internal } = resolveSocialLink(link);
+
+const isText = variant === 'link';
+const linkClass = isText ? 'social-link' : 'social-icon';
+const iconClass = isText ? 'social-link__icon' : 'social-icon__svg';
+---
+
+<a
+  href={href}
+  title={title}
+  target={internal ? '_self' : '_blank'}
+  rel={internal ? undefined : 'noopener noreferrer'}
+  data-umami-event="social-click"
+  data-umami-event-platform={type}
+  class={linkClass}
+>
+  <Sprite name={iconName} class={iconClass} />
+  {isText ? (
+    <span class="social-link__label">{title}</span>
+  ) : (
+    <span class="sr-only">{title}</span>
+  )}
+</a>

@@ -1,0 +1,30 @@
+/**
+ * Font fallback metrics
+ *
+ * Declares local-only fallback faces whose metrics are adjusted to match the
+ * webfonts above them in the stack. With `size-adjust` and ascent/descent
+ * overrides, the fallback paints at nearly identical dimensions to the final
+ * webfont — so the initial text paint becomes the stable LCP and the eventual
+ * font swap triggers no layout shift and no new LCP candidate.
+ *
+ * Values approximated from font-metric tooling (fontaine / next/font) for
+ * Playfair Display over Georgia and DM Sans over Arial.
+ */
+
+@font-face {
+  font-family: 'Playfair Display Fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 108.78%;
+  ascent-override: 93.58%;
+  descent-override: 26.42%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial'), local('Helvetica');
+  size-adjust: 98.26%;
+  ascent-override: 100.8%;
+  descent-override: 32.7%;
+  line-gap-override: 0%;
+}

@@ -1,0 +1,200 @@
+/**
+ * Event Map Section
+ *
+ * Container styles for the lazy-loaded Leaflet map. The Leaflet stylesheet is
+ * imported dynamically by JS, so these rules only style the wrapper, marker
+ * skin, and popup chrome — never override Leaflet's internal layout classes.
+ */
+
+.event-map-section {
+  position: relative;
+  padding: var(--space-2xl) 0;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.event-map-section .event-map__header {
+  margin-block-end: var(--space-lg);
+  text-align: center;
+}
+
+.event-map-section .event-map__title {
+  margin-block: 0 var(--space-xs);
+}
+
+.event-map-section .event-map__subtitle {
+  max-inline-size: 60ch;
+  margin-inline: auto;
+  color: var(--text-secondary);
+}
+
+.event-map {
+  position: relative;
+  display: block;
+  contain: paint;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-sand) 35%, transparent),
+    color-mix(in oklch, var(--color-parchment) 60%, transparent)
+  );
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 40px -20px
+    color-mix(in oklch, var(--color-ink) 30%, transparent);
+  isolation: isolate;
+}
+
+.event-map[hidden] {
+  display: none;
+}
+
+.event-map__canvas {
+  inline-size: 100%;
+  block-size: clamp(320px, 50vh, 520px);
+  background: color-mix(
+    in oklch,
+    var(--color-sand-light) 50%,
+    var(--color-parchment)
+  );
+}
+
+/* Skeleton state — visible until Leaflet finishes loading. The .leaflet-container
+   class is applied to the canvas by Leaflet on init; once present the skeleton
+   stripes fade out. */
+.event-map[data-state='idle'] .event-map__canvas::before,
+.event-map[data-state='loading'] .event-map__canvas::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-sand) 25%, transparent) 0 12px,
+    transparent 12px 24px
+  );
+  animation: event-map-skeleton 2s var(--ease-ambient) infinite;
+}
+
+.event-map__canvas:has(.leaflet-container)::before {
+  display: none;
+}
+
+@keyframes event-map-skeleton {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Marker — div icon with inline SVG, themed to terracotta accent. */
+.event-map__marker {
+  background: none;
+  border: 0;
+  filter: drop-shadow(
+    0 4px 6px color-mix(in oklch, var(--color-ink) 40%, transparent)
+  );
+}
+
+.event-map__marker svg {
+  inline-size: 100%;
+  block-size: 100%;
+  color: var(--color-terracotta);
+  fill: currentcolor;
+}
+
+/* Leaflet popup overrides — match site typography. */
+.event-map .leaflet-popup-content-wrapper {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px -10px
+    color-mix(in oklch, var(--color-ink) 40%, transparent);
+}
+
+.event-map .leaflet-popup-content {
+  margin: var(--space-sm) var(--space-md);
+  font-size: var(--text-body-compact);
+  line-height: 1.5;
+}
+
+.event-map .leaflet-popup-content strong {
+  display: inline-block;
+  margin-block-end: var(--space-3xs);
+  font-family: var(--font-display);
+  font-size: var(--text-section-body);
+  font-weight: 600;
+}
+
+.event-map .leaflet-popup-tip {
+  background: var(--bg-elevated);
+}
+
+.event-map__directions {
+  display: inline-block;
+  margin-block-start: var(--space-xs);
+  font-weight: 600;
+  color: var(--accent-primary, var(--color-terracotta));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.event-map__directions:hover,
+.event-map__directions:focus-visible {
+  color: var(--color-terracotta);
+}
+
+/* External actions row below the map — directions + open in OSM. */
+.event-map__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin-block-start: var(--space-md);
+}
+
+.event-map__attribution {
+  margin-block-start: var(--space-xs);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.event-map__attribution a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Mobile adjustments — full-bleed map for easier touch interaction. */
+@media (width <= 640px) {
+  .event-map-section {
+    padding: var(--space-xl) 0;
+  }
+
+  .event-map__canvas {
+    block-size: clamp(280px, 60vh, 420px);
+  }
+}
+
+/* Leaflet zoom & attribution tweaks — soften the default skin to fit our look. */
+.event-map .leaflet-control-zoom a {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+}
+
+.event-map .leaflet-control-zoom a:hover,
+.event-map .leaflet-control-zoom a:focus-visible {
+  background: var(--bg-secondary);
+}
+
+.event-map .leaflet-control-attribution {
+  font-size: var(--text-caption);
+  background: color-mix(in oklch, var(--color-bone) 80%, transparent);
+}

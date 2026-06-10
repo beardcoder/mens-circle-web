@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageContent from '../components/PageContent.astro';
+import home from '../content/home.json';
+import type { Block } from '../components/PageContent.astro';
+
+const blocks = home.blocks as Block[];
+
+// Strip inline HTML from titles for schema text.
+const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
+
+// Build per-page structured data from the content blocks (mirrors the
+// original HowTo + FAQPage @push behavior).
+const schemas: Record<string, unknown>[] = [];
+
+const journey = blocks.find((b) => b.type === 'journey-steps');
+if (journey?.data?.steps?.length) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: strip(journey.data.title) || 'Deine Reise zum Männerkreis',
+    description: journey.data.subtitle ?? 'Wie du Teil des Männerkreis wirst',
+    step: journey.data.steps.map((s: any, i: number) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: s.title ?? '',
+      text: s.description ?? '',
+    })),
+  });
+}
+
+const faq = blocks.find((b) => b.type === 'faq');
+if (faq?.data?.items?.length) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.data.items
+      .filter((i: any) => i.question && i.answer)
+      .map((i: any) => ({
+        '@type': 'Question',
+        name: i.question,
+        acceptedAnswer: { '@type': 'Answer', text: strip(i.answer) },
+      })),
+  });
+}
+---
+
+<Layout
+  title={home.meta.title}
+  description={home.meta.description}
+  keywords={home.meta.keywords}
+  schemas={schemas}
+>
+  <PageContent blocks={blocks} />
+</Layout>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="100" cy="100" r="94"/>
+  <line x1="100" y1="160" x2="100" y2="76"/>
+  <path d="M100 80 Q74 64 46 32"/>
+  <path d="M100 80 Q126 64 154 32"/>
+  <path d="M100 98 Q76 86 48 70"/>
+  <path d="M100 98 Q124 86 152 70"/>
+  <path d="M70 52 Q62 46 50 50"/>
+  <path d="M130 52 Q138 46 150 50"/>
+  <path d="M66 64 Q56 58 44 60"/>
+  <path d="M134 64 Q144 58 156 60"/>
+  <path d="M100 160 Q80 168 54 180"/>
+  <path d="M100 160 Q120 168 146 180"/>
+  <path d="M100 160 Q88 170 70 182"/>
+  <path d="M100 160 Q112 170 130 182"/>
+</svg>

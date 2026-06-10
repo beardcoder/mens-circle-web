@@ -1,0 +1,144 @@
+---
+import site from '../data/site.json';
+
+interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  ogType?: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  robots?: string;
+  /** Extra JSON-LD objects to embed (HowTo, FAQPage, Event, …). */
+  schemas?: Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = 'Authentischer Austausch, Gemeinschaft und persönliches Wachstum für Männer in Niederbayern.',
+  keywords = 'Männerkreis, Niederbayern, Männergruppe, persönliches Wachstum, Gemeinschaft, Männer',
+  ogType = 'website',
+  ogImage,
+  ogImageAlt = 'Männerkreis Niederbayern/ Straubing - Gemeinschaft für Männer',
+  robots = 'index, follow',
+  schemas = [],
+} = Astro.props;
+
+const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
+const fullTitle =
+  title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
+const ogImageUrl = new URL(ogImage ?? '/images/logo-color.png', siteUrl).href;
+
+// Global structured data (mirrors the original LocalBusiness/Organization/WebSite).
+const sameAs = site.socialLinks
+  .filter((l) => !['email', 'phone'].includes(l.type))
+  .map((l) => l.value);
+
+const localBusiness = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': `${siteUrl.origin}/#organization`,
+  name: 'Männerkreis Niederbayern/ Straubing',
+  description: site.description,
+  url: siteUrl.origin,
+  logo: new URL('/images/logo-color.png', siteUrl).href,
+  image: new URL('/images/logo-color.png', siteUrl).href,
+  email: site.contactEmail,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: site.geo.locality,
+    addressRegion: site.geo.region,
+    postalCode: site.geo.postalCode,
+    addressCountry: site.geo.country,
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: site.geo.lat,
+    longitude: site.geo.lng,
+  },
+  areaServed: {
+    '@type': 'GeoCircle',
+    geoMidpoint: {
+      '@type': 'GeoCoordinates',
+      latitude: site.geo.lat,
+      longitude: site.geo.lng,
+    },
+    geoRadius: 50000,
+  },
+  priceRange: '€',
+  ...(sameAs.length ? { sameAs } : {}),
+};
+
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${siteUrl.origin}/#website`,
+  name: site.siteName,
+  url: siteUrl.origin,
+  description: site.description,
+  inLanguage: 'de-DE',
+  publisher: { '@id': `${siteUrl.origin}/#organization` },
+};
+
+const allSchemas = [localBusiness, website, ...schemas];
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>{fullTitle}</title>
+<meta name="title" content={fullTitle} />
+<meta name="description" content={description} />
+<meta name="keywords" content={keywords} />
+<meta name="author" content="Markus Sommer" />
+<link rel="canonical" href={canonical} />
+
+<link rel="alternate" hreflang="de" href={canonical} />
+<link rel="alternate" hreflang="x-default" href={canonical} />
+
+<meta name="theme-color" content={site.themeColor} />
+<meta name="color-scheme" content="light" />
+<meta name="msapplication-TileColor" content={site.themeColor} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={title ?? site.siteName} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={ogImageAlt} />
+<meta property="og:locale" content="de_DE" />
+<meta property="og:site_name" content={site.siteName} />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonical} />
+<meta name="twitter:title" content={title ?? site.siteName} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
+
+<!-- Robots -->
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={robots} />
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png" />
+<link rel="manifest" href="/manifest.json" />
+
+<!-- Structured data -->
+{
+  allSchemas.map((schema) => (
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(schema)}
+    />
+  ))
+}

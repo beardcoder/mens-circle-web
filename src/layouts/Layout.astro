@@ -1,0 +1,63 @@
+---
+import '../styles/app.css';
+import SeoHead from '../components/SeoHead.astro';
+import SpriteDefs from '../components/SpriteDefs.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ScrollToTop from '../components/ScrollToTop.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  ogType?: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  robots?: string;
+  schemas?: Record<string, unknown>[];
+}
+
+const props = Astro.props;
+---
+
+<!doctype html>
+<html lang="de" dir="ltr">
+  <head>
+    {/* Flag JS synchronously so reveals only hide their elements when JS is
+        available — without JS, all [data-reveal] content stays visible. */}
+    <script is:inline>
+      document.documentElement.classList.add('motion-ready');
+    </script>
+    <SeoHead {...props} />
+  </head>
+  <body>
+    {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
+    <span id="top" aria-hidden="true"></span>
+
+    <SpriteDefs />
+
+    {/* Editorial side rails — decorative magazine framing, hidden on small screens */}
+    <aside class="side-rail side-rail--left" aria-hidden="true">
+      <span class="side-rail__text">Männerkreis · Niederbayern</span>
+    </aside>
+    <aside class="side-rail side-rail--right" aria-hidden="true">
+      <span class="side-rail__text">Straubing · Bayern</span>
+    </aside>
+
+    <a href="#main" class="skip-link">Zum Inhalt springen</a>
+
+    <Header />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <ScrollToTop />
+
+    <script>
+      import '../lib/client';
+    </script>
+  </body>
+</html>
