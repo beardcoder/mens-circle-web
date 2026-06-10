@@ -26,6 +26,23 @@ const {
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = new URL(Astro.url.pathname, siteUrl).href;
+
+// Only third-party origin we ever load: the Umami analytics endpoint (when
+// configured). Preconnect to it so the tracker script connects faster.
+// Everything else (fonts, CSS, JS, API) is same-origin, so no other
+// preconnect candidates exist.
+const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
+const umamiOrigin = umamiId
+  ? (() => {
+      try {
+        return new URL(
+          import.meta.env.PUBLIC_UMAMI_ENDPOINT || 'https://cloud.umami.is',
+        ).origin;
+      } catch {
+        return null;
+      }
+    })()
+  : null;
 const fullTitle =
   title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
 const ogImageUrl = new URL(ogImage ?? '/images/logo-color.png', siteUrl).href;
@@ -100,6 +117,8 @@ const allSchemas = [localBusiness, website, ...schemas];
 <meta name="theme-color" content={site.themeColor} />
 <meta name="color-scheme" content="light" />
 <meta name="msapplication-TileColor" content={site.themeColor} />
+
+{umamiOrigin && <link rel="preconnect" href={umamiOrigin} crossorigin />}
 
 <!-- Open Graph -->
 <meta property="og:type" content={ogType} />

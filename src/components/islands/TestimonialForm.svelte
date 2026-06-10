@@ -9,6 +9,7 @@
   let role = $state('');
   let email = $state('');
   let privacy = $state(false);
+  let website = $state(''); // honeypot
   let submitting = $state(false);
 
   const charCount = $derived(quote.length);
@@ -53,6 +54,7 @@
         role: roleValue || null,
         email: mail,
         privacy: true,
+        website,
       });
 
       if (success) {
@@ -78,6 +80,12 @@
 </script>
 
 <form class="testimonial-form" onsubmit={handleSubmit}>
+  <div class="hp-field" aria-hidden="true">
+    <label>
+      Website
+      <input type="text" name="website" tabindex="-1" autocomplete="off" bind:value={website} />
+    </label>
+  </div>
   <div class="form-field form-field--spaced">
     <label for="quote" class="form-label form-label--plain">
       Deine Erfahrung <span class="form-required">*</span>

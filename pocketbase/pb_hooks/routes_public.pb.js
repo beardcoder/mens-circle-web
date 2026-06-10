@@ -16,6 +16,16 @@ routerAdd("POST", "/api/event/register", (e) => {
     const phone = (data.phone_number || "").trim();
     const privacy = data.privacy;
 
+    // Honeypot: the form ships a hidden "website" field real users leave empty.
+    // If a bot filled it, fake success (no record, no email) so it thinks it won.
+    if (typeof data.website === "string" && data.website.trim() !== "") {
+      const firstNameSafe = (data.first_name || "").trim();
+      return e.json(200, {
+        success: true,
+        message: `Vielen Dank, ${firstNameSafe}! Deine Anmeldung war erfolgreich. Du erhältst in Kürze eine Bestätigung per E-Mail.`,
+      });
+    }
+
     if (privacy !== true && privacy !== "true" && privacy !== 1 && privacy !== "1") {
       return e.json(422, {
         success: false,
@@ -136,13 +146,10 @@ function sendRegistrationEmails(lib, event, participant, status) {
       });
     } else {
       const tpl = lib.renderRegistrationConfirmation(event, participant);
-      const ics = lib.buildIcs(event);
       lib.sendMail($app, {
         to: participant.getString("email"),
         subject: tpl.subject,
         html: tpl.html,
-        icsFilename: `event-${event.getString("slug")}.ics`,
-        icsContent: ics,
       });
     }
     const activeCount = lib.countActiveRegistrations($app, event.id);
@@ -165,6 +172,15 @@ routerAdd("POST", "/api/newsletter/subscribe", (e) => {
   try {
     const data = e.requestInfo().body || {};
     const email = (data.email || "").trim().toLowerCase();
+
+    // Honeypot: hidden "website" field; bots fill it. Fake success silently.
+    if (typeof data.website === "string" && data.website.trim() !== "") {
+      return e.json(200, {
+        success: true,
+        message:
+          "Vielen Dank! Du hast dich erfolgreich für unseren Newsletter angemeldet. Schau in dein Postfach.",
+      });
+    }
 
     if (!email || email.indexOf("@") === -1) {
       return e.json(422, {
@@ -251,6 +267,16 @@ routerAdd("POST", "/api/testimonial/submit", (e) => {
     const role = (data.role || "").trim();
     const email = (data.email || "").trim().toLowerCase();
     const privacy = data.privacy;
+
+    // Honeypot: hidden "website" field; bots fill it. Fake success silently
+    // (no testimonial record created).
+    if (typeof data.website === "string" && data.website.trim() !== "") {
+      return e.json(200, {
+        success: true,
+        message:
+          "Vielen Dank! Dein Testimonial wurde eingereicht und wird nach Prüfung veröffentlicht.",
+      });
+    }
 
     if (privacy !== true && privacy !== "true" && privacy !== 1 && privacy !== "1") {
       return e.json(422, {
@@ -356,6 +382,50 @@ routerAdd("GET", "/api/public/events/{slug}", (e) => {
     return e.json(200, { event: lib.eventDto($app, rec) });
   } catch (err) {
     $app.logger().error("/api/public/events/{slug} failed", "error", String(err));
+    return e.json(404, { event: null });
+  }
+});
+
+// -------------------------------------------------------------------------
+// GET /api/public/events/{slug}/ics
+// Hosted iCalendar (.ics) download for a published event. Replaces the broken
+// email attachment path: confirmation/promotion emails link here instead.
+// -------------------------------------------------------------------------
+routerAdd("GET", "/api/public/events/{slug}/ics", (e) => {
+  const lib = require(`${__hooks}/lib.js`);
+  try {
+    const slug = e.request.pathValue("slug");
+    let rec = null;
+    try {
+      rec = $app.findFirstRecordByFilter(
+        "events",
+        "slug = {:slug} && is_published = true && deleted = null",
+        { slug: slug }
+      );
+    } catch (none) {
+      rec = null;
+    }
+
+    if (!rec) {
+      return e.json(404, { event: null });
+    }
+
+    const ics = lib.buildIcs(rec);
+    if (!ics) {
+      return e.json(404, { event: null });
+    }
+
+    // Set the filename via Content-Disposition; the calendar MIME type is set
+    // explicitly through e.blob (which writes the Content-Type header for us).
+    e.response
+      .header()
+      .set(
+        "Content-Disposition",
+        `attachment; filename="termin-${slug}.ics"`
+      );
+    return e.blob(200, "text/calendar; charset=utf-8", ics);
+  } catch (err) {
+    $app.logger().error("/api/public/events/{slug}/ics failed", "error", String(err));
     return e.json(404, { event: null });
   }
 });

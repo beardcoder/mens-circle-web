@@ -29,6 +29,12 @@ export default defineConfig({
     '/home': '/',
     '/events': '/event',
   },
+  // Prefetch in-viewport internal links for instant navigation. Pairs with the
+  // CSS cross-document view transitions (styles/utilities/_view-transitions.css).
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'viewport',
+  },
   build: {
     // Keep asset URLs stable and cache-friendly.
     assets: 'assets',

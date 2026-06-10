@@ -16,6 +16,7 @@
   let email = $state('');
   let phone = $state('');
   let privacy = $state(false);
+  let website = $state(''); // honeypot
   let submitting = $state(false);
 
   const submitLabel = $derived(
@@ -59,6 +60,7 @@
         email: mail,
         phone_number: tel || null,
         privacy: true,
+        website,
       });
 
       if (success) {
@@ -88,6 +90,12 @@
   autocomplete="on"
   onsubmit={handleSubmit}
 >
+  <div class="hp-field" aria-hidden="true">
+    <label>
+      Website
+      <input type="text" name="website" tabindex="-1" autocomplete="off" bind:value={website} />
+    </label>
+  </div>
   <div class="form-row">
     <div class="form-group">
       <label for="firstName">Vorname</label>

@@ -37,13 +37,10 @@ onRecordAfterCreateSuccess((e) => {
         });
       } else {
         const tpl = lib.renderRegistrationConfirmation(event, participant);
-        const ics = lib.buildIcs(event);
         lib.sendMail($app, {
           to: participant.getString("email"),
           subject: tpl.subject,
           html: tpl.html,
-          icsFilename: `event-${event.getString("slug")}.ics`,
-          icsContent: ics,
         });
       }
 
@@ -104,13 +101,10 @@ onRecordAfterUpdateSuccess((e) => {
           const event = $app.findRecordById("events", eventId);
           const participant = $app.findRecordById("participants", next.getString("participant"));
           const tpl = lib.renderWaitlistPromotion(event, participant);
-          const ics = lib.buildIcs(event);
           lib.sendMail($app, {
             to: participant.getString("email"),
             subject: tpl.subject,
             html: tpl.html,
-            icsFilename: `event-${event.getString("slug")}.ics`,
-            icsContent: ics,
           });
         } catch (mailErr) {
           $app.logger().error("promotion email failed", "error", String(mailErr));
