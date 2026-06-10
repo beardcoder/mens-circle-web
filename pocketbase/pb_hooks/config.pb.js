@@ -27,13 +27,17 @@ onBootstrap((e) => {
   // Turnkey config: seed SMTP + sender identity + app URL from environment
   // variables on every boot so a Coolify deployment works by setting env vars
   // alone (no manual admin clicking). Only applies values that are present.
+  // Also enables anti-spam rate limiting on the public POST routes. Both are
+  // applied to a single settings object and saved once.
   try {
+    const settings = $app.settings();
+    let dirty = false;
+
     const smtpHost = $os.getenv("SMTP_HOST");
     const fromAddress = $os.getenv("MAIL_FROM_ADDRESS");
     const fromName = $os.getenv("MAIL_FROM_NAME");
     const appUrl = $os.getenv("APP_URL");
     if (smtpHost || fromAddress || appUrl) {
-      const settings = $app.settings();
       if (appUrl) settings.meta.appURL = appUrl;
       if (fromName) settings.meta.senderName = fromName;
       if (fromAddress) settings.meta.senderAddress = fromAddress;
@@ -46,8 +50,29 @@ onBootstrap((e) => {
         // PocketBase TLS = implicit TLS (port 465). For STARTTLS (587) leave false.
         settings.smtp.tls = ($os.getenv("SMTP_TLS") || "false") === "true";
       }
+      dirty = true;
+    }
+
+    // Anti-spam rate limiting on the public submission endpoints. Idempotent:
+    // we replace the rules array each boot so the config is fully driven here.
+    // RateLimitRule = { label, audience, duration (seconds), maxRequests }.
+    // An empty audience ("") applies the rule to all callers (guests + auth).
+    try {
+      settings.rateLimits.enabled = true;
+      settings.rateLimits.rules = [
+        { label: "POST /api/event/register", maxRequests: 5, duration: 3600, audience: "" },
+        { label: "POST /api/newsletter/subscribe", maxRequests: 5, duration: 3600, audience: "" },
+        { label: "POST /api/testimonial/submit", maxRequests: 3, duration: 3600, audience: "" },
+      ];
+      dirty = true;
+      $app.logger().info("Applied rate-limit rules from hooks");
+    } catch (rlErr) {
+      $app.logger().error("Failed to apply rate limits", "error", String(rlErr));
+    }
+
+    if (dirty) {
       $app.save(settings);
-      $app.logger().info("Applied SMTP/sender settings from environment");
+      $app.logger().info("Applied SMTP/sender/rate-limit settings");
     }
   } catch (err) {
     $app.logger().error("Failed to apply env settings", "error", String(err));
