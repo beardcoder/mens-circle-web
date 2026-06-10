@@ -14,9 +14,19 @@ JS migrations (`pb_migrations/`) and JS-VM hooks (`pb_hooks/`).
 | `newsletter_subscribers` | base | no (superuser) | One per participant (unique). Unique `token` for the unsubscribe link. |
 | `newsletters` | base | no (superuser) | Admin-authored campaigns. Status: `draft` / `sending` / `sent`. |
 | `testimonials` | base | only `is_published = true` | Submitted via custom route, forced unpublished for moderation. |
+| `next_event_registrations` | **view** (read-only) | no (superuser) | Dashboard view: everyone registered for the **next** upcoming event with participant details. |
 
 A single published sample event (`maennerkreis-test-termin`) is seeded so the public
 `/event` page works out of the box (guarded against duplicate seeding).
+
+### `next_event_registrations` view
+
+A read-only SQL view collection (browse it in the admin under
+Collections → `next_event_registrations`) listing every active registration
+(`registered` / `waitlist` / `attended`, excluding soft-deleted/cancelled) for the
+next published, non-deleted, future event. Columns: `first_name`, `last_name`,
+`email`, `phone`, `status`, `registered_at`, `event_title`, `event_date`. Ordered
+registered → attended → waitlist, then by signup time. Superuser-only (PII).
 
 ### Capacity / waitlist logic (all computed, never stored)
 
