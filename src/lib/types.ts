@@ -62,6 +62,8 @@ export interface RegistrationPayload {
   email: string;
   phone_number: string | null;
   privacy: boolean;
+  /** Honeypot anti-spam field — real users leave it empty. */
+  website?: string;
 }
 
 /** Payload for the testimonial form → POST /api/testimonial/submit */
@@ -71,6 +73,8 @@ export interface TestimonialPayload {
   role: string | null;
   email: string;
   privacy: boolean;
+  /** Honeypot anti-spam field — real users leave it empty. */
+  website?: string;
 }
 
 declare global {

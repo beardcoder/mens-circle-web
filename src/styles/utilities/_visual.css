@@ -19,6 +19,20 @@
 }
 
 /* ============================================
+   Honeypot anti-spam field
+   Pushed far off-screen (not display:none, which some bots skip) and hidden
+   from assistive tech + keyboard. Real users never interact with it; bots that
+   auto-fill every input give themselves away.
+   ============================================ */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+}
+
+/* ============================================
    Global Paper Noise Overlay
    Warm organic texture applied over all surfaces.
    mix-blend-mode: overlay lifts light areas on dark

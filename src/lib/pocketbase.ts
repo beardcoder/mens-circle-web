@@ -60,8 +60,11 @@ export function registerForEvent(
   return postJson('/api/event/register', payload);
 }
 
-export function subscribeNewsletter(email: string): Promise<ApiResponse> {
-  return postJson('/api/newsletter/subscribe', { email });
+export function subscribeNewsletter(
+  email: string,
+  website = '',
+): Promise<ApiResponse> {
+  return postJson('/api/newsletter/subscribe', { email, website });
 }
 
 export function submitTestimonial(

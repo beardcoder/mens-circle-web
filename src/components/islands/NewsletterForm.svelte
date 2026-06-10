@@ -12,6 +12,7 @@
   const { context = {} }: Props = $props();
 
   let email = $state('');
+  let website = $state(''); // honeypot — bots fill it, humans never see it
   let submitting = $state(false);
 
   async function handleSubmit(event: SubmitEvent): Promise<void> {
@@ -28,7 +29,7 @@
     submitting = true;
 
     try {
-      const { success, message } = await subscribeNewsletter(value);
+      const { success, message } = await subscribeNewsletter(value, website);
 
       if (success) {
         showToast('success', message);
@@ -53,6 +54,18 @@
 </script>
 
 <form class="newsletter__form" onsubmit={handleSubmit}>
+  <div class="hp-field" aria-hidden="true">
+    <label>
+      Website
+      <input
+        type="text"
+        name="website"
+        tabindex="-1"
+        autocomplete="off"
+        bind:value={website}
+      />
+    </label>
+  </div>
   <input
     type="email"
     name="email"
