@@ -49,7 +49,7 @@ const ogImageUrl = new URL(ogImage ?? '/images/logo-color.png', siteUrl).href;
 
 // Global structured data (mirrors the original LocalBusiness/Organization/WebSite).
 const sameAs = site.socialLinks
-  .filter((l) => !['email', 'phone'].includes(l.type))
+  .filter((l) => !['email', 'phone', 'whatsapp'].includes(l.type))
   .map((l) => l.value);
 
 const localBusiness = {
