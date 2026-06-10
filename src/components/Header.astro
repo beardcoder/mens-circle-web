@@ -1,0 +1,83 @@
+---
+import Logo from './Logo.astro';
+import site from '../data/site.json';
+import nav from '../data/navigation.json';
+
+const links = nav.header.links;
+const ctaLinks = nav.header.cta;
+---
+
+<header class="header" id="header" data-lume="site-header">
+  <div class="container">
+    <div class="header__inner">
+      <a href="/" class="header__logo logo" aria-label={`${site.siteName} - Startseite`}>
+        <Logo class="logo__icon" />
+        <span class="logo__text">Männerkreis</span>
+      </a>
+
+      <nav class="nav" id="nav" data-lume-part="nav" aria-label="Hauptnavigation">
+        <span class="nav__ambient" aria-hidden="true">
+          <span class="nav__ring"></span>
+          <span class="nav__ring"></span>
+          <span class="nav__ring"></span>
+        </span>
+
+        <ul class="nav__list">
+          {
+            links.map((link, i) => (
+              <li class="nav__item">
+                <a
+                  href={link.url}
+                  class="nav__link"
+                  data-lume-part="nav-link"
+                  data-umami-event="nav-click"
+                  data-umami-event-target={link.umamiTarget}
+                >
+                  <span class="nav__index" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span class="nav__label">{link.label}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="nav__meta">{nav.header.meta}</p>
+      </nav>
+
+      <div class="header__actions">
+        {
+          ctaLinks.map((link) => (
+            <a
+              href={link.url}
+              class="btn btn--primary nav__cta"
+              data-lume-part="nav-link"
+              data-umami-event="cta-click"
+              data-umami-event-location="header"
+              data-umami-event-target={link.umamiTarget}
+            >
+              {link.label}
+            </a>
+          ))
+        }
+
+        <button
+          class="nav-toggle"
+          id="navToggle"
+          type="button"
+          data-lume-part="toggle"
+          aria-controls="nav"
+          aria-expanded="false"
+          aria-label="Menü öffnen"
+        >
+          <span class="nav-toggle__bars" aria-hidden="true">
+            <span class="nav-toggle__bar"></span>
+            <span class="nav-toggle__bar"></span>
+            <span class="nav-toggle__bar"></span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

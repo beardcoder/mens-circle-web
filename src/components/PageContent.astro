@@ -1,0 +1,63 @@
+---
+import Hero from './blocks/Hero.astro';
+import Intro from './blocks/Intro.astro';
+import Moderator from './blocks/Moderator.astro';
+import JourneySteps from './blocks/JourneySteps.astro';
+import Faq from './blocks/Faq.astro';
+import Newsletter from './blocks/Newsletter.astro';
+import Cta from './blocks/Cta.astro';
+import ValueItems from './blocks/ValueItems.astro';
+import Archetypes from './blocks/Archetypes.astro';
+import Testimonials from './blocks/Testimonials.astro';
+import WhatsappCommunity from './blocks/WhatsappCommunity.astro';
+import PageHero from './blocks/PageHero.astro';
+import TextSection from './blocks/TextSection.astro';
+import testimonialsData from '../data/testimonials.json';
+
+export interface Block {
+  type: string;
+  data?: Record<string, any>;
+}
+
+interface Props {
+  blocks: Block[];
+}
+
+const { blocks } = Astro.props;
+---
+
+{
+  blocks.map((block) => {
+    const data = block.data ?? {};
+    switch (block.type) {
+      case 'hero':
+        return <Hero data={data} />;
+      case 'intro':
+        return <Intro data={data} />;
+      case 'moderator':
+        return <Moderator data={data} />;
+      case 'journey-steps':
+        return <JourneySteps data={data} />;
+      case 'faq':
+        return <Faq data={data} />;
+      case 'newsletter':
+        return <Newsletter data={data} />;
+      case 'cta':
+        return <Cta data={data} />;
+      case 'value-items':
+        return <ValueItems data={data} />;
+      case 'archetypes':
+        return <Archetypes data={data} />;
+      case 'testimonials':
+        return <Testimonials data={data} testimonials={testimonialsData} />;
+      case 'whatsapp-community':
+        return <WhatsappCommunity data={data} />;
+      case 'page-hero':
+        return <PageHero data={data} />;
+      case 'text-section':
+        return <TextSection data={data} />;
+      default:
+        return null;
+    }
+  })
+}

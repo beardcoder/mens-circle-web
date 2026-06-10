@@ -1,0 +1,111 @@
+/**
+ * Print Styles
+ * Optimized printing for all pages
+ */
+
+@media print {
+  /* Reset */
+  *,
+  *::before,
+  *::after {
+    color: #000 !important;
+    text-shadow: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide non-essential elements */
+  .header,
+  .footer,
+  .nav,
+  .newsletter-section,
+  .cta-section,
+  .hero__scroll,
+  .skip-link,
+  .modal,
+  .calendar-modal,
+  .btn,
+  button:not([type='submit']) {
+    display: none !important;
+  }
+
+  /* Body */
+  body {
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Sections */
+  .section {
+    padding: 2rem 0;
+    break-inside: avoid;
+  }
+
+  /* Typography */
+  h1 {
+    font-size: 24pt;
+    break-after: avoid;
+  }
+
+  h2 {
+    font-size: 18pt;
+    break-after: avoid;
+  }
+
+  h3 {
+    font-size: 14pt;
+    break-after: avoid;
+  }
+
+  p,
+  li {
+    widows: 3;
+    orphans: 3;
+  }
+
+  /* Links */
+  a[href]::after {
+    font-size: 0.8em;
+    color: #666 !important;
+    content: ' (' attr(href) ')';
+  }
+
+  a[href^='#']::after,
+  a[href^='javascript:']::after {
+    content: '';
+  }
+
+  /* Images */
+  img {
+    max-inline-size: 100% !important;
+    break-inside: avoid;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 2cm;
+  }
+
+  @page :first {
+    margin-top: 3cm; /* stylelint-disable-line csstools/use-logical -- @page rules don't support logical properties */
+  }
+}

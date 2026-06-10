@@ -1,0 +1,71 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BreathingApp from '../components/islands/BreathingApp.svelte';
+
+const schemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Startseite', item: '/' },
+      { '@type': 'ListItem', position: 2, name: 'Atemübung', item: '/atemuebung' },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Atemübung',
+    description: 'Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode.',
+  },
+];
+---
+
+<Layout
+  title="Atemübung – Männerkreis Niederbayern/ Straubing"
+  description="Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode. Drei Runden bewusster Atem für Klarheit, Energie und innere Ruhe."
+  schemas={schemas}
+>
+  <section class="hero breathing-hero">
+    <div class="hero__bg"></div>
+    <div class="container">
+      <div class="hero__content">
+        <p class="hero__label">Bewusster Atem</p>
+        <h1 class="hero__title">Atem<span class="highlight">übung</span></h1>
+        <p class="hero__subtitle">
+          Drei Runden bewusster Atem im Stil der Wim-Hof-Methode. Für Klarheit,
+          Energie und innere Ruhe.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section breathing-section">
+    <div class="container">
+      <div class="breathing__wrapper">
+        <div class="breathing__intro">
+          <h2>So funktioniert es</h2>
+          <ol class="breathing__steps">
+            <li>
+              <strong>Tief atmen:</strong> 35 kräftige Atemzüge — vollständig
+              einatmen, locker ausatmen.
+            </li>
+            <li>
+              <strong>Halten:</strong> Nach der letzten Ausatmung den Atem so
+              lange wie möglich anhalten.
+            </li>
+            <li>
+              <strong>Erholung:</strong> Tief einatmen und 15 Sekunden halten.
+              Dann normal weiteratmen.
+            </li>
+          </ol>
+          <p class="breathing__warning">
+            <strong>Wichtig:</strong> Übe niemals im Wasser oder beim Autofahren.
+            Setze oder lege dich entspannt hin.
+          </p>
+        </div>
+
+        <BreathingApp client:visible />
+      </div>
+    </div>
+  </section>
+</Layout>

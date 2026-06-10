@@ -1,0 +1,58 @@
+---
+interface FaqItem {
+  question?: string;
+  answer?: string;
+}
+
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    intro?: string;
+    items?: FaqItem[];
+  };
+}
+
+const { data } = Astro.props;
+const anchor = data.anchor ?? 'faq';
+const items = (data.items ?? []).filter((i) => i.question && i.answer);
+---
+
+<section class="section section--large faq-section" id={anchor}>
+  <div class="container">
+    <div class="section-header section-header--start faq__header" data-reveal-group>
+      {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+
+      {
+        data.title && (
+          <h2 class="section-title" data-reveal="blur" set:html={data.title} />
+        )
+      }
+
+      {data.intro && <p class="section-intro" data-reveal="up">{data.intro}</p>}
+    </div>
+
+    {
+      items.length > 0 && (
+        <div class="faq__list" data-reveal-group="80">
+          {items.map((item) => (
+            <details class="accordion-item" name={anchor} data-reveal="up">
+              <summary
+                class="accordion-item__trigger"
+                data-umami-event="faq-expand"
+                data-umami-event-question={item.question!.slice(0, 50)}
+              >
+                <span>{item.question}</span>
+                <span class="accordion-item__icon" aria-hidden="true" />
+              </summary>
+              <div class="accordion-item__body">
+                <div class="accordion-item__content" set:html={item.answer} />
+              </div>
+            </details>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>

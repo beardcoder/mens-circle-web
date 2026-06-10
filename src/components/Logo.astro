@@ -1,0 +1,11 @@
+---
+import Sprite from './Sprite.astro';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = 'logo__icon' } = Astro.props;
+---
+
+<Sprite name="logo" class={className} />

@@ -1,0 +1,50 @@
+---
+interface Item {
+  number?: string;
+  title?: string;
+  description?: string;
+}
+
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    items?: Item[];
+  };
+}
+
+const { data } = Astro.props;
+const items = data.items ?? [];
+---
+
+<section class="section values-section" id={data.anchor}>
+  <div class="container">
+    <div class="section-header" data-reveal-group>
+      {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+      {
+        data.title && (
+          <h2 class="section-title" data-reveal="blur" set:html={data.title} />
+        )
+      }
+    </div>
+
+    {
+      items.length > 0 && (
+        <div class="intro__values" data-reveal-group="90">
+          {items.map((item) => (
+            <div class="value-item" data-reveal="up">
+              {item.number && (
+                <span class="value-item__number">{item.number}</span>
+              )}
+              {item.title && <h3 class="value-item__title">{item.title}</h3>}
+              {item.description && (
+                <p class="value-item__description">{item.description}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>

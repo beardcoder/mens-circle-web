@@ -1,0 +1,83 @@
+---
+import warrior from '../../../public/images/archetypes/warrior.svg?raw';
+import lover from '../../../public/images/archetypes/lover.svg?raw';
+import magician from '../../../public/images/archetypes/magician.svg?raw';
+import king from '../../../public/images/archetypes/king.svg?raw';
+import father from '../../../public/images/archetypes/father.svg?raw';
+import neutral from '../../../public/images/archetypes/neutral.svg?raw';
+
+const ICONS: Record<string, string> = {
+  warrior,
+  lover,
+  magician,
+  king,
+  father,
+  neutral,
+};
+
+interface Item {
+  title?: string;
+  description?: string;
+}
+
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    intro?: string;
+    items?: Item[];
+  };
+}
+
+const { data } = Astro.props;
+const anchor = data.anchor ?? 'archetypen';
+const items = data.items ?? [];
+
+function detectIcon(title = ''): string {
+  const t = title.toLowerCase();
+  if (t.includes('krieger')) return 'warrior';
+  if (t.includes('liebhaber')) return 'lover';
+  if (t.includes('zauberer')) return 'magician';
+  if (t.includes('könig') || t.includes('koenig')) return 'king';
+  if (t.includes('vater')) return 'father';
+  return 'neutral';
+}
+---
+
+{
+  items.length > 0 && (
+    <section
+      class="section section--large archetypes-section"
+      id={anchor}
+      aria-labelledby="archetypes-title"
+    >
+      <div class="container">
+        <div class="section-header" data-reveal-group>
+          {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+          {data.title && (
+            <h2 class="section-title" id="archetypes-title" data-reveal="blur" set:html={data.title} />
+          )}
+          {data.intro && <p class="section-intro" data-reveal="up">{data.intro}</p>}
+        </div>
+
+        <div class="archetypes__grid" data-reveal-group="90">
+          {items.map((item) => {
+            const icon = detectIcon(item.title);
+            return (
+              <article class={`archetype-card archetype-card--${icon}`} data-reveal="up" data-hover="lift">
+                <div class="archetype-card__background-icon" aria-hidden="true" set:html={ICONS[icon]} />
+                <div class="archetype-card__content">
+                  {item.title && <h3 class="archetype-card__title">{item.title}</h3>}
+                  {item.description && (
+                    <p class="archetype-card__description">{item.description}</p>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}

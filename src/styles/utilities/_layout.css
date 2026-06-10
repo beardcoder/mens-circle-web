@@ -1,0 +1,36 @@
+/**
+ * Layout Utilities
+ * Modern CSS Layout with Logical Properties
+ */
+
+/* ============================================
+   Container System
+   ============================================ */
+.container {
+  inline-size: 100%;
+  max-inline-size: var(--container-width);
+  padding-inline: var(--space-md);
+  margin-inline: auto;
+}
+
+.container--narrow {
+  max-inline-size: var(--container-narrow);
+}
+
+.container--prose {
+  max-inline-size: var(--container-prose);
+}
+
+/* ============================================
+   Section System
+   Block padding wired to the semantic rhythm scale so every section
+   feels evenly weighted regardless of theme.
+   ============================================ */
+.section {
+  position: relative;
+  padding-block: var(--rhythm-section);
+}
+
+.section--large {
+  padding-block: var(--rhythm-section-lg);
+}

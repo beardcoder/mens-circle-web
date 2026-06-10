@@ -1,0 +1,88 @@
+/**
+ * Animation Utilities
+ *
+ * Scroll-to-top button — driven by the page's scroll position via
+ * `animation-timeline: scroll(root block)`. No JS, no event listener,
+ * no `getBoundingClientRect`. Reads like a CSS animation triggered by
+ * scroll, not time.
+ *
+ * Browsers without scroll-driven animations get the always-visible
+ * fallback styled below; the `@supports` block layers the reveal
+ * behaviour only where it actually works.
+ */
+
+@keyframes scroll-to-top-reveal {
+  0%,
+  8% {
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  16%,
+  100% {
+    pointer-events: auto;
+    opacity: 1;
+  }
+}
+
+.scroll-to-top {
+  position: fixed;
+  inset-block-end: var(--space-md);
+  inset-inline-end: var(--space-md);
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 48px;
+  block-size: 48px;
+  color: var(--text-on-dark);
+  cursor: pointer;
+  background: var(--accent-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 0 1px color-mix(in oklch, var(--color-bone) 10%, transparent) inset;
+  transition:
+    background-color var(--motion-quick),
+    transform var(--motion-quick),
+    box-shadow var(--motion-quick);
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-to-top {
+    pointer-events: none;
+    opacity: 0;
+    animation: scroll-to-top-reveal linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+
+.scroll-to-top:hover {
+  background: var(--bg-dark);
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px color-mix(in oklch, var(--color-bone) 12%, transparent) inset;
+  transform: translateY(-1px);
+}
+
+.scroll-to-top:active {
+  transform: translateY(0);
+}
+
+.scroll-to-top svg {
+  inline-size: 20px;
+  block-size: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @supports (animation-timeline: scroll()) {
+    .scroll-to-top {
+      pointer-events: auto;
+      opacity: 1;
+      transform: none;
+      transition: none;
+      animation: none;
+    }
+  }
+}

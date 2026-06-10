@@ -1,0 +1,77 @@
+/**
+ * Männerkreis Niederbayern / Straubing — Main Stylesheet
+ * =======================================================
+ *
+ * Cascade architecture. Every stylesheet is loaded into a named layer so
+ * the cascade order is explicit and predictable. Un-layered styles beat
+ * all layers, so we keep the top-level file clean of loose rules.
+ *
+ *   reset      — normalize browser defaults
+ *   tokens     — design tokens (colors, spacing, type, motion)
+ *   base       — element defaults (typography, fonts)
+ *   layout     — page-level layout utilities
+ *   components — reusable UI (buttons, header, footer, accordion, forms, modal)
+ *   sections   — page sections (hero, intro, faq, etc.)
+ *   utilities  — single-purpose helpers, animations, reveal, print
+ *
+ * Modern features in use across the codebase:
+ *   - OKLCH color space (perceptually uniform)
+ *   - Logical properties for internationalisation
+ *   - @property with animatable custom properties
+ *   - color-mix(in oklch, …) for blending
+ *   - Native CSS nesting
+ *   - @starting-style + transition-behavior: allow-discrete (toast entry/exit)
+ *   - animation-timeline: scroll() (scroll-to-top reveal)
+ *   - IntersectionObserver-driven reveals (utilities/_motion.css)
+ *   - View Transitions API (cross-document fade)
+ *   - prefers-color-scheme, prefers-reduced-motion
+ *   - :has(), :focus-visible
+ */
+
+@layer reset, tokens, base, layout, components, sections, utilities;
+
+@import '@fontsource-variable/playfair-display';
+@import '@fontsource-variable/dm-sans';
+
+/* Global @keyframes — kept unlayered so the animation lookup never has to
+   cross cascade layer boundaries. Used by ambient breathing circles in
+   hero / intro / cta / newsletter / whatsapp / event sections. */
+@import url('base/_keyframes.css');
+@import url('base/_reset.css') layer(reset);
+@import url('base/_variables.css') layer(tokens);
+@import url('base/_fonts.css') layer(tokens);
+@import url('base/_typography.css') layer(base);
+@import url('utilities/_layout.css') layer(layout);
+@import url('components/_buttons.css') layer(components);
+@import url('components/_header.css') layer(components);
+@import url('components/_footer.css') layer(components);
+@import url('components/_cards.css') layer(components);
+@import url('components/_accordion.css') layer(components);
+@import url('components/_forms.css') layer(components);
+@import url('components/_modal.css') layer(components);
+@import url('components/_toast.css') layer(components);
+@import url('sections/_hero.css') layer(sections);
+@import url('sections/_page-hero.css') layer(sections);
+@import url('sections/_intro.css') layer(sections);
+@import url('sections/_moderator.css') layer(sections);
+@import url('sections/_journey.css') layer(sections);
+@import url('sections/_archetypes.css') layer(sections);
+@import url('sections/_testimonials.css') layer(sections);
+@import url('sections/_testimonial-form.css') layer(sections);
+@import url('sections/_breathing.css') layer(sections);
+@import url('sections/_faq.css') layer(sections);
+@import url('sections/_newsletter.css') layer(sections);
+@import url('sections/_whatsapp.css') layer(sections);
+@import url('sections/_cta.css') layer(sections);
+@import url('sections/_event.css') layer(sections);
+@import url('sections/_event-map.css') layer(sections);
+@import url('sections/_no-event.css') layer(sections);
+@import url('sections/_error.css') layer(sections);
+@import url('sections/_legal.css') layer(sections);
+@import url('sections/_surfaces.css') layer(sections);
+@import url('sections/_ornaments.css') layer(sections);
+@import url('utilities/_animations.css') layer(utilities);
+@import url('utilities/_motion.css') layer(utilities);
+@import url('utilities/_visual.css') layer(utilities);
+@import url('utilities/_view-transitions.css') layer(utilities);
+@import url('utilities/_print.css') layer(utilities);

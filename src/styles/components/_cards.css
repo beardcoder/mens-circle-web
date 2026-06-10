@@ -1,0 +1,79 @@
+/**
+ * Card Components
+ * Value item cards
+ */
+
+/* ============================================
+   Value Item Card
+   2-column / 2-row grid: number spans both rows on the inline-start
+   side; title and description stack on the inline-end side as direct
+   children — no wrapper element needed.
+   ============================================ */
+.value-item {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: 80px 1fr;
+  gap: 0.5rem var(--space-md);
+  align-items: start;
+  padding-block: var(--space-md);
+  padding-inline: var(--space-sm);
+  margin-inline: calc(var(--space-sm) * -1);
+  border-block-start: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  transition: background-color var(--motion-standard);
+}
+
+.value-item:last-child {
+  border-block-end: 1px solid var(--border-light);
+}
+
+/* The number slides in from a hair to the inline-start as the row warms,
+   so the otherwise-static list rewards a hover without becoming busy. */
+.value-item__number {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  line-height: 0.85;
+  color: var(--text-accent);
+  letter-spacing: -0.04em;
+  opacity: 1;
+  transition:
+    color var(--motion-standard),
+    translate 420ms var(--ease-settle);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .value-item:hover {
+    background-color: color-mix(
+      in oklch,
+      var(--accent-primary) 4%,
+      transparent
+    );
+  }
+
+  .value-item:hover .value-item__number {
+    color: var(--accent-primary);
+    translate: 0.15em 0;
+  }
+}
+
+.value-item__title {
+  grid-row: 1;
+  grid-column: 2;
+  margin-block-end: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.value-item__description {
+  grid-row: 2;
+  grid-column: 2;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}

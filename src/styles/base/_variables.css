@@ -1,0 +1,398 @@
+/**
+ * CSS Custom Properties (Variables)
+ * Modern 2025 approach with @property for animatable values
+ * Using OKLCH for perceptually uniform colors
+ */
+
+/* Define animatable custom properties */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --glow-opacity {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+@property --circle-scale {
+  syntax: '<number>';
+  initial-value: 1;
+  inherits: false;
+}
+
+:root {
+  /* ============================================
+     Color Palette - Using OKLCH for 2025
+     OKLCH provides perceptually uniform colors
+     ============================================ */
+
+  /* Base Earth Tones */
+  --color-earth-deep: oklch(18% 0.026 68deg);
+  --color-earth-dark: oklch(24% 0.033 68deg);
+  --color-earth-mid: oklch(35% 0.04 68deg);
+  --color-earth-warm: oklch(46% 0.05 68deg);
+
+  /* Terracotta Accents */
+  --color-terracotta: oklch(61% 0.16 44deg);
+  --color-terracotta-light: oklch(72% 0.14 45deg);
+
+  /* Neutral Sand Tones */
+  --color-sand: oklch(76% 0.04 75deg);
+  --color-sand-light: oklch(89% 0.02 75deg);
+
+  /* Light Backgrounds */
+  --color-parchment: oklch(95% 0.01 75deg);
+  --color-bone: oklch(98% 0.005 75deg);
+
+  /* Dark Text */
+  --color-ink: oklch(13% 0.01 68deg);
+  --color-ink-soft: oklch(24% 0.02 68deg);
+
+  /* Additional Colors for Contrast */
+  --color-sage: oklch(45% 0.08 145deg);
+  --color-sage-light: oklch(55% 0.06 145deg);
+
+  /* ============================================
+     Semantic Color Tokens - Light Theme
+     ============================================ */
+
+  /* Backgrounds */
+  --bg-primary: var(--color-bone);
+  --bg-secondary: var(--color-parchment);
+  --bg-tertiary: var(--color-sand-light);
+  --bg-dark: var(--color-earth-deep);
+  --bg-dark-alt: var(--color-earth-dark);
+  --bg-elevated: var(--color-parchment);
+  --bg-section-alt: var(--color-earth-mid);
+  --bg-input: color-mix(in oklch, var(--color-bone) 8%, transparent);
+  --bg-input-focus: color-mix(in oklch, var(--color-bone) 12%, transparent);
+  --bg-overlay: color-mix(in oklch, var(--color-ink) 70%, transparent);
+  --surface-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  --surface-noise-opacity: 0.035;
+  --surface-glow-strength: 16%;
+
+  /* Text */
+  --text-primary: var(--color-ink);
+  --text-secondary: var(--color-ink-soft);
+  --text-muted: oklch(55% 0.02 68deg);
+  --text-on-dark: var(--color-parchment);
+  --text-on-dark-secondary: var(--color-sand);
+  --text-accent: var(--color-earth-warm);
+  --text-dark: var(--color-ink);
+  --text-light: var(--color-parchment);
+
+  /* Light mode specific */
+  --bg-light: var(--color-parchment);
+
+  /* Accents */
+  --accent-primary: var(--color-terracotta);
+  --accent-secondary: var(--color-terracotta-light);
+
+  /* Status Colors */
+  --color-success: oklch(58% 0.15 145deg);
+  --color-error: oklch(55% 0.18 25deg);
+  --color-info: oklch(60% 0.12 240deg);
+  --color-warning: oklch(68% 0.16 75deg);
+
+  /* Borders */
+  --border-light: var(--color-sand-light);
+  --border-medium: color-mix(in oklch, var(--color-sand) 30%, transparent);
+  --border-dark: var(--color-earth-mid);
+  --border-on-dark: color-mix(in oklch, var(--color-sand) 15%, transparent);
+  --focus-ring: 0 0 0 3px
+    color-mix(in oklch, var(--accent-primary) 22%, transparent);
+
+  /* ============================================
+     Typography Scale
+     ============================================ */
+  --font-display:
+    'Playfair Display Variable', 'Playfair Display Fallback', georgia, serif;
+  --font-body: 'DM Sans Variable', 'DM Sans Fallback', system-ui, sans-serif;
+  --font-accent:
+    'Playfair Display Variable', 'Playfair Display Fallback', georgia, serif;
+
+  /* Fluid Type Scale using clamp() */
+  --text-xs: clamp(0.625rem, 0.5rem + 0.25vw, 0.75rem);
+  --text-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --text-xl: clamp(1.25rem, 1rem + 1vw, 2rem);
+  --text-2xl: clamp(1.5rem, 1rem + 2vw, 3rem);
+  --text-3xl: clamp(2rem, 1rem + 3vw, 4rem);
+  --text-4xl: clamp(2.5rem, 1rem + 5vw, 6rem);
+  --text-5xl: clamp(3rem, 1rem + 7vw, 8rem);
+  --text-6xl: clamp(4rem, 1rem + 10vw, 12rem);
+  --text-massive: clamp(5rem, 2rem + 15vw, 18rem);
+
+  /* Section body text - consistent sizes for content blocks */
+  --text-section-body: 1.0625rem;
+  --text-section-body-lg: 1.125rem;
+
+  /* Compact sizes — fill the gap between --text-sm and --text-base */
+  --text-body-compact: 0.9375rem; /* author names, compact list items */
+  --text-caption: 0.8125rem; /* captions, meta labels, roles */
+
+  /* Line height scale */
+  --leading-tight: 1.5;
+  --leading-normal: 1.7;
+  --leading-relaxed: 1.8;
+
+  /* Content max widths — 4-tier scale in 60px increments */
+  --content-max-form: 480px; /* form wrappers, compact layout areas */
+  --content-max-text: 540px; /* paragraph / intro body copy */
+  --content-max-description: 600px; /* section descriptions, error/hero text */
+  --content-max-wide: 700px; /* section titles, wide prose blocks */
+
+  /* Form controls */
+  --control-padding-block: var(--space-sm);
+  --control-padding-inline: 1.125rem;
+  --control-radius: var(--radius-md);
+  --control-border-width: 1px;
+  --control-border-color: var(--border-medium);
+  --control-bg: var(--bg-input);
+  --control-bg-hover: var(--bg-input-focus);
+  --control-bg-light: var(--bg-primary);
+  --control-color: var(--text-on-dark);
+  --control-placeholder: color-mix(
+    in oklch,
+    var(--color-sand) 60%,
+    transparent
+  );
+
+  /* ============================================
+     Spacing Scale - Fluid with clamp()
+     Small values stay fixed, large values scale
+     ============================================ */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.375rem;
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: clamp(1.5rem, 1rem + 1.5vw, 2rem);
+  --space-lg: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  --space-xl: clamp(4.5rem, 2rem + 6vw, 9rem);
+  --space-2xl: clamp(7rem, 3rem + 8vw, 14rem);
+  --space-3xl: clamp(9rem, 4rem + 10vw, 18rem);
+
+  /* ============================================
+     Semantic Rhythm Tokens
+     One source of truth for vertical rhythm so every section feels
+     the same regardless of which file styles it.
+     ============================================ */
+  --rhythm-section: var(--space-xl); /* default section block padding */
+  --rhythm-section-lg: var(--space-2xl); /* prominent section padding */
+  --rhythm-block: var(--space-lg); /* header → body of a section */
+  --rhythm-stack: var(--space-sm); /* eyebrow → title → intro inside a header */
+  --rhythm-cluster: var(--space-xs); /* tight inline groups */
+
+  /* ============================================
+     Motion System — Settled Weight
+     Four semantic easings. No spring, no bounce.
+     ============================================ */
+
+  /* Canonical easings */
+  --ease-settle: cubic-bezier(
+    0.22,
+    1,
+    0.36,
+    1
+  ); /* Content arriving: page-load entrance, overlays */
+
+  --ease-precise: cubic-bezier(
+    0.4,
+    0,
+    0.2,
+    1
+  ); /* Interactive: hover, press, toggles */
+
+  --ease-release: cubic-bezier(
+    0.2,
+    0,
+    0,
+    1
+  ); /* Content leaving: collapse, dismiss */
+
+  --ease-ambient: cubic-bezier(
+    0.43,
+    0.13,
+    0.23,
+    0.96
+  ); /* Ambient motion: breathing circles only */
+
+  --ease-emphasised: cubic-bezier(
+    0.16,
+    1,
+    0.3,
+    1
+  ); /* Signature hero entrance: long, deep, confident */
+
+  --ease-reveal: cubic-bezier(
+    0.33,
+    0,
+    0.2,
+    1
+  ); /* Scroll reveals: soft start so motion reads across its full duration,
+        not the front-loaded snap of --ease-emphasised */
+
+  /* Duration scale */
+  --duration-instant: 90ms;
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 700ms;
+  --duration-cinematic: 1100ms;
+
+  /* Composite shorthands */
+  --motion-quick: var(--duration-fast) var(--ease-precise);
+  --motion-standard: var(--duration-normal) var(--ease-precise);
+  --motion-enter: var(--duration-slow) var(--ease-settle);
+  --motion-slow: var(--duration-slower) var(--ease-settle);
+  --motion-cinematic: var(--duration-cinematic) var(--ease-emphasised);
+
+  /* ─── Stagger scale — used for hero entrance + mobile nav cascade ─── */
+  --stagger-1: 80ms;
+  --stagger-2: 160ms;
+  --stagger-3: 280ms;
+  --stagger-4: 420ms;
+  --stagger-5: 560ms;
+
+  /* ============================================
+     Layout
+     ============================================ */
+  --container-width: 1400px;
+  --container-narrow: 900px;
+  --container-wide: 1800px;
+  --container-prose: 760px; /* centered text blocks (section headers, intros) */
+
+  /* Fixed header height + breathing room — used for sticky/offset calculations */
+  --header-clearance: 140px;
+
+  /* Safe area insets for mobile */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+
+  /* ============================================
+     Shadows & Effects
+     Layered shadows for perceptual depth
+     ============================================ */
+  --shadow-sm: 0 1px 2px color-mix(in oklch, var(--color-ink) 5%, transparent);
+  --shadow-md:
+    0 2px 4px color-mix(in oklch, var(--color-ink) 4%, transparent),
+    0 6px 12px -2px color-mix(in oklch, var(--color-ink) 8%, transparent);
+  --shadow-lg:
+    0 2px 6px color-mix(in oklch, var(--color-ink) 5%, transparent),
+    0 12px 24px -6px color-mix(in oklch, var(--color-ink) 10%, transparent);
+  --shadow-xl:
+    0 4px 8px color-mix(in oklch, var(--color-ink) 5%, transparent),
+    0 20px 40px -10px color-mix(in oklch, var(--color-ink) 12%, transparent);
+  --shadow-2xl:
+    0 6px 12px color-mix(in oklch, var(--color-ink) 6%, transparent),
+    0 28px 56px -14px color-mix(in oklch, var(--color-ink) 22%, transparent);
+  --shadow-glow-accent: 0 8px 32px
+    color-mix(in oklch, var(--accent-primary) 18%, transparent);
+  --shadow-inset: inset 0 1px 0
+    color-mix(in oklch, var(--color-bone) 12%, transparent);
+
+  /* ============================================
+     Border Radius
+     ============================================ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ============================================
+     Z-Index Scale
+     ============================================ */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-sticky: 100;
+  --z-header: 1000;
+  --z-dropdown: 1100;
+  --z-modal-backdrop: 1200;
+  --z-modal: 1300;
+  --z-tooltip: 1400;
+  --z-toast: 1500;
+}
+
+/* ============================================
+   Dark Mode Theme
+   Using color-scheme for native dark mode support
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    /* Dark Theme Backgrounds */
+    --bg-primary: var(--color-ink);
+    --bg-secondary: var(--color-earth-deep);
+    --bg-tertiary: var(--color-earth-dark);
+    --bg-dark: var(--color-earth-deep);
+    --bg-dark-alt: var(--color-earth-dark);
+    --bg-elevated: var(--color-earth-deep);
+    --bg-section-alt: var(--color-earth-deep);
+    --bg-light: var(--color-earth-dark);
+    --bg-input: color-mix(in oklch, var(--color-earth-dark) 80%, transparent);
+    --bg-input-focus: color-mix(
+      in oklch,
+      var(--color-earth-mid) 90%,
+      transparent
+    );
+    --bg-overlay: color-mix(in oklch, var(--color-ink) 85%, transparent);
+
+    /* Dark Theme Text - Enhanced Contrast */
+    --text-primary: var(--color-parchment);
+    --text-secondary: oklch(80% 0.02 75deg);
+    --text-muted: oklch(65% 0.02 75deg);
+    --text-on-dark: var(--color-parchment);
+    --text-on-dark-secondary: var(--color-sand-light);
+    --text-accent: var(--color-terracotta-light);
+    --text-dark: var(--color-parchment);
+    --text-light: var(--color-ink);
+
+    /* Dark Theme Borders */
+    --border-light: color-mix(
+      in oklch,
+      var(--color-earth-mid) 40%,
+      transparent
+    );
+    --border-medium: color-mix(
+      in oklch,
+      var(--color-earth-mid) 50%,
+      transparent
+    );
+    --border-dark: var(--color-earth-warm);
+    --border-on-dark: color-mix(in oklch, var(--color-sand) 30%, transparent);
+
+    /* Adjusted shadows for dark mode - deeper, more contrast */
+    --shadow-sm: 0 1px 2px color-mix(in oklch, black 24%, transparent);
+    --shadow-md:
+      0 2px 4px color-mix(in oklch, black 20%, transparent),
+      0 6px 12px -2px color-mix(in oklch, black 30%, transparent);
+    --shadow-lg:
+      0 2px 6px color-mix(in oklch, black 25%, transparent),
+      0 12px 24px -6px color-mix(in oklch, black 35%, transparent);
+    --shadow-xl:
+      0 4px 8px color-mix(in oklch, black 25%, transparent),
+      0 20px 40px -10px color-mix(in oklch, black 40%, transparent);
+    --shadow-2xl:
+      0 6px 12px color-mix(in oklch, black 30%, transparent),
+      0 28px 56px -14px color-mix(in oklch, black 55%, transparent);
+    --shadow-inset: inset 0 1px 0
+      color-mix(in oklch, var(--color-sand) 8%, transparent);
+  }
+}
+
+/* ============================================
+   Smooth auto-height transitions (progressive)
+   ============================================ */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+}

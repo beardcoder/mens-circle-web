@@ -1,0 +1,66 @@
+---
+interface Props {
+  data: {
+    label?: string;
+    title?: string;
+    description?: string;
+    buttonText?: string;
+    buttonLink?: string;
+    anchor?: string;
+    backgroundImage?: string;
+  };
+}
+
+const { data } = Astro.props;
+const anchor = data.anchor;
+---
+
+<section class="hero" id={anchor}>
+  <div class="hero__bg">
+    {
+      data.backgroundImage && (
+        <img
+          src={data.backgroundImage}
+          class="hero__bg-image"
+          loading="eager"
+          fetchpriority="high"
+          aria-hidden="true"
+          alt=""
+        />
+      )
+    }
+    <div class="hero__bg-glow" aria-hidden="true"></div>
+  </div>
+
+  <div class="hero__circles" aria-hidden="true">
+    <div class="hero__circle hero__circle--1"></div>
+    <div class="hero__circle hero__circle--2"></div>
+    <div class="hero__circle hero__circle--3"></div>
+    <div class="hero__circle hero__circle--4"></div>
+  </div>
+
+  <div class="container">
+    <div class="hero__content">
+      {data.label && <p class="hero__label">{data.label}</p>}
+
+      {data.title && <h1 class="hero__title" set:html={data.title} />}
+
+      <div class="hero__bottom">
+        {data.description && <p class="hero__description">{data.description}</p>}
+
+        {
+          data.buttonText && data.buttonLink && (
+            <div class="hero__cta">
+              <a href={data.buttonLink} class="btn btn--primary btn--large">
+                {data.buttonText}
+              </a>
+              <span class="hero__scroll" aria-hidden="true">
+                Entdecken<span class="hero__scroll-line" aria-hidden="true" />
+              </span>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>

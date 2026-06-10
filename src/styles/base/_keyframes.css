@@ -1,0 +1,253 @@
+/**
+ * Global Keyframes
+ *
+ * Defined OUTSIDE any cascade layer so the animation lookup never has
+ * to cross layer boundaries. Per spec `@keyframes` are looked up
+ * globally, but real-world Vite/lightningcss builds have shipped subtle
+ * regressions when the rule lives inside `@layer`. Keeping them
+ * unlayered is the recommended defensive pattern.
+ *
+ * Grouped by domain so the file stays scannable.
+ */
+
+/* ============================================
+   Ambient breathing — used by decorative circles in hero / intro /
+   cta / newsletter / whatsapp / event sections.
+   ============================================ */
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: scale(0.92);
+  }
+
+  50% {
+    opacity: 0.34;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes breathe-slow {
+  0%,
+  100% {
+    opacity: 0.1;
+    transform: scale(0.94) rotate(-0.4deg);
+  }
+
+  50% {
+    opacity: 0.28;
+    transform: scale(1.06) rotate(0.6deg);
+  }
+}
+
+/* Ambient thread — slow horizontal pulse for decorative section
+   lines (e.g. journey divider). */
+@keyframes thread-drift {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translate3d(-8%, 0, 0) scaleX(0.9);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+}
+
+/* ============================================
+   Header — scroll-driven color morph and overlay fade.
+   ============================================ */
+@keyframes header-color-morph {
+  to {
+    padding-block: calc(var(--space-md) * 0.78);
+    color: var(--text-primary);
+  }
+}
+
+@keyframes header-overlay-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes nav-pulse {
+  0% {
+    box-shadow: 0 0 0 0
+      color-mix(in oklch, var(--accent-primary) 25%, transparent);
+    opacity: 0.35;
+  }
+
+  60% {
+    box-shadow: 0 0 0 24px
+      color-mix(in oklch, var(--accent-primary) 0%, transparent);
+    opacity: 0.12;
+  }
+
+  100% {
+    box-shadow: 0 0 0 32px transparent;
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   Modal / dialog enter animations.
+   ============================================ */
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ============================================
+   Breathing meditation app — phase-based ring animations.
+   ============================================ */
+@keyframes breathing-idle {
+  0%,
+  100% {
+    transform: scale(0.98);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes breathing-idle-inner {
+  0%,
+  100% {
+    transform: scale(0.95);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+@keyframes breathing-wave-outer {
+  0%,
+  100% {
+    transform: scale(0.98);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes breathing-wave-mid {
+  0%,
+  100% {
+    transform: scale(0.92);
+  }
+
+  50% {
+    transform: scale(1.5);
+  }
+}
+
+@keyframes breathing-wave-inner {
+  0%,
+  100% {
+    transform: scale(0.88);
+  }
+
+  50% {
+    transform: scale(2.5);
+  }
+}
+
+/* ============================================
+   Float — gentle rhythmic levitation. Used by the moderator photo
+   for a living, present quality. Compositor-only (transform only).
+   ============================================ */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-0.625rem) scale(1.005);
+  }
+}
+
+/* ============================================
+   Scroll line pulse — the hero scroll indicator line sweeps
+   downward in a loop to invite the eye to scroll.
+   ============================================ */
+@keyframes scroll-line-sweep {
+  0% {
+    opacity: 1;
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+
+  45% {
+    opacity: 1;
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+
+  55% {
+    opacity: 1;
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+
+  100% {
+    opacity: 0.3;
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
+/* ============================================
+   Hero entrance — one-shot page-load sequence for above-the-fold
+   content. Children opt-in by setting `animation-name: hero-rise`
+   and a stagger delay; see utilities/_motion.css.
+   ============================================ */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translate3d(0, 1.25rem, 0);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ============================================
+   View transitions — root crossfade and directional variants.
+   ============================================ */
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}

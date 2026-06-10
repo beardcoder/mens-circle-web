@@ -1,0 +1,54 @@
+/**
+ * View Transitions — Native Cross-Document Fade
+ *
+ * Enables a cinematic cross-document transition using the View Transitions
+ * API. Requires Chrome 126+ / Edge 126+ / Safari 18.2+; gracefully ignored
+ * elsewhere.
+ *
+ * Functional overlays (scroll progress, scroll-to-top, calendar modal)
+ * are opted out so they don't flash on every navigation.
+ */
+
+@view-transition {
+  navigation: auto;
+}
+
+.scroll-progress,
+.scroll-to-top,
+.calendar-modal {
+  view-transition-name: none;
+}
+
+::view-transition-group(root) {
+  animation-duration: 520ms;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  mix-blend-mode: plus-lighter;
+  animation-duration: 520ms;
+  animation-timing-function: var(--ease-settle, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: vt-fade-in;
+}
+
+/* The site header keeps its identity across navigations so the brand
+   doesn't flicker. Apply only when the user has not requested reduced
+   motion — otherwise the morph itself can feel like motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .header {
+    view-transition-name: site-header;
+  }
+}
+
+::view-transition-old(site-header),
+::view-transition-new(site-header) {
+  animation-duration: 380ms;
+  animation-timing-function: var(--ease-precise, cubic-bezier(0.4, 0, 0.2, 1));
+}
