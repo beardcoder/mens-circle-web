@@ -4,12 +4,14 @@
   "description": "Der Männerkreis ist ein geschützter Ort, an dem du dich zeigen kannst, wie du wirklich bist.",
   "footerDescription": "Ein Raum für echte Begegnung unter Männern. Authentischer Austausch, Gemeinschaft und persönliches Wachstum in Niederbayern.",
   "contactEmail": "hallo@mens-circle.de",
-  "contactPhone": "",
+  "contactPhone": "0151 26072643",
   "location": "Niederbayern",
-  "whatsappCommunityLink": "",
+  "whatsappCommunityLink": "https://chat.whatsapp.com/BHxhiej3uUg5syYzLCSKn4",
   "footerText": "© 2026 Männerkreis Niederbayern. Alle Rechte vorbehalten.",
   "socialLinks": [
-    { "type": "email", "value": "hallo@mens-circle.de", "label": "E-Mail" }
+    { "type": "whatsapp", "value": "https://chat.whatsapp.com/BHxhiej3uUg5syYzLCSKn4", "label": "WhatsApp Community" },
+    { "type": "email", "value": "hallo@mens-circle.de", "label": "E-Mail" },
+    { "type": "phone", "value": "015126072643", "label": "Telefon" }
   ],
   "geo": {
     "lat": 48.8777,
