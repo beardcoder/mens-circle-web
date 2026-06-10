@@ -40,7 +40,14 @@
   </td></tr>
 </table>
 
-<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">Im Anhang findest du eine iCal-Datei – damit landet der Termin direkt in deinem Kalender.</p>
+{{if .icsUrl}}
+<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">Damit der Termin direkt in deinem Kalender landet, lade dir die Termin-Datei (.ics) herunter:</p>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 16px;">
+  <tr><td align="center">
+    <a href="{{.icsUrl}}" style="display:inline-block;background-color:#b86f52;color:#ffffff;text-decoration:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;padding:14px 28px;border-radius:6px;">📅 Zum Kalender hinzufügen (.ics)</a>
+  </td></tr>
+</table>
+{{end}}
 
 <h2 style="font-family:Georgia,'Times New Roman',serif;font-size:19px;color:#2c2418;margin:32px 0 12px;">Was dich erwartet</h2>
 <p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">{{.description|raw}}</p>

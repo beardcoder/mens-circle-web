@@ -224,8 +224,14 @@ function buildIcs(ev) {
 // ---------------------------------------------------------------------------
 // Mail helper
 // ---------------------------------------------------------------------------
-// Send an email. options: { to, subject, html, icsFilename, icsContent }
+// Send an email. options: { to, subject, html }
 // Never throws — logs and returns false on failure so callers don't 500.
+//
+// NOTE: We deliberately do NOT attach the .ics file. On the target PocketBase
+// 0.39.3 JSVM, MailerMessage.attachments is map[string]io.Reader and the
+// $filesystem.fileFromBytes(...) result cannot be converted to an io.Reader,
+// which throws. Instead, the event calendar file is offered as a hosted
+// download link (icsUrl) rendered inside the email templates.
 function sendMail(app, options) {
   try {
     const msg = new MailerMessage({
@@ -235,23 +241,6 @@ function sendMail(app, options) {
       html: options.html,
     });
 
-    if (options.icsContent && options.icsFilename) {
-      // ATTACHMENT API: PocketBase JSVM MailerMessage.attachments expects a map of
-      // { filename: io.Reader }. We use the $filesystem helper to wrap bytes in a reader.
-      // If this API differs on the target build, the HTML already contains a
-      // "Zum Kalender hinzufügen" note, so mail still delivers.
-      try {
-        msg.attachments = {};
-        msg.attachments[options.icsFilename] = $filesystem.fileFromBytes(
-          toBytes(options.icsContent),
-          options.icsFilename
-        );
-      } catch (attErr) {
-        // TODO: verify .ics attachment API against running PocketBase build.
-        app.logger().warn("ICS attachment failed, sending without it", "error", String(attErr));
-      }
-    }
-
     app.newMailClient().send(msg);
     return true;
   } catch (e) {
@@ -260,19 +249,9 @@ function sendMail(app, options) {
   }
 }
 
-// Convert a JS string to a byte array (UTF-8) for filesystem helpers.
-function toBytes(str) {
-  // PocketBase JSVM exposes Go-style helpers; toString -> []byte via TextEncoder-like path.
-  // Fallback: build a simple UTF-8 byte array.
-  try {
-    return new TextEncoder().encode(str);
-  } catch (e) {
-    const out = [];
-    for (let i = 0; i < str.length; i++) {
-      out.push(str.charCodeAt(i) & 0xff);
-    }
-    return out;
-  }
+// Build the public hosted-download URL for an event's calendar (.ics) file.
+function icsUrlFor(slug) {
+  return `${config.APP_URL}/api/public/events/${slug}/ics`;
 }
 
 // ---------------------------------------------------------------------------
@@ -333,6 +312,7 @@ function renderRegistrationConfirmation(ev, participant) {
     contactEmail: config.CONTACT_EMAIL,
     siteName: config.SITE_NAME,
     recipientEmail: participant.getString("email"),
+    icsUrl: icsUrlFor(ev.getString("slug")),
   });
   return { subject, html: renderEmail("registration-confirmation", data) };
 }
@@ -383,6 +363,7 @@ function renderWaitlistPromotion(ev, participant) {
     contactEmail: config.CONTACT_EMAIL,
     siteName: config.SITE_NAME,
     recipientEmail: participant.getString("email"),
+    icsUrl: icsUrlFor(ev.getString("slug")),
   });
   return { subject, html: renderEmail("waitlist-promotion", data) };
 }
@@ -569,6 +550,7 @@ module.exports = {
   formatDateShortDE,
   fullAddress,
   buildIcs,
+  icsUrlFor,
   sendMail,
   // domain helpers
   countActiveRegistrations,
