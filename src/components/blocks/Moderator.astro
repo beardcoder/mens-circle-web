@@ -37,11 +37,21 @@ const anchor = data.anchor ?? 'moderator';
       </div>
 
       <div class="moderator__content" data-reveal-group="100">
-        {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+        {
+          data.eyebrow && (
+            <p class="eyebrow" data-reveal="up">
+              {data.eyebrow}
+            </p>
+          )
+        }
 
         {
           data.name && (
-            <h2 class="moderator__name" data-reveal="blur" set:html={data.name} />
+            <h2
+              class="moderator__name"
+              data-reveal="blur"
+              set:html={data.name}
+            />
           )
         }
 

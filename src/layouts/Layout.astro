@@ -23,20 +23,26 @@ const props = Astro.props;
 <!doctype html>
 <html lang="de" dir="ltr">
   <head>
-    {/* Flag JS synchronously so reveals only hide their elements when JS is
-        available — without JS, all [data-reveal] content stays visible. */}
+    {
+      /* Flag JS synchronously so reveals only hide their elements when JS is
+        available — without JS, all [data-reveal] content stays visible. */
+    }
     <script is:inline>
       document.documentElement.classList.add('motion-ready');
     </script>
     <SeoHead {...props} />
   </head>
   <body>
-    {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
+    {
+      /* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */
+    }
     <span id="top" aria-hidden="true"></span>
 
     <SpriteDefs />
 
-    {/* Editorial side rails — decorative magazine framing, hidden on small screens */}
+    {
+      /* Editorial side rails — decorative magazine framing, hidden on small screens */
+    }
     <aside class="side-rail side-rail--left" aria-hidden="true">
       <span class="side-rail__text">Männerkreis · Niederbayern</span>
     </aside>

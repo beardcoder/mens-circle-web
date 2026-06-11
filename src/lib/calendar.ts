@@ -31,7 +31,7 @@ export function buildIcsString(event: EventData): string {
   const end = formatICSDate(event.endDate, event.endTime);
   const stamp = formatICSDate(
     new Date().toISOString().slice(0, 10),
-    new Date().toISOString().slice(11, 16)
+    new Date().toISOString().slice(11, 16),
   );
 
   return [

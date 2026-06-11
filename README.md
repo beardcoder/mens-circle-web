@@ -83,20 +83,20 @@ bun run build        # → dist/   (NICHT `bun --bun run build`, das bricht Roll
 3. Port **8090** exposen.
 4. Environment-Variablen setzen (siehe `.env.example`):
 
-| Variable | Zweck |
-|---|---|
-| `APP_URL` | öffentliche URL (E-Mail-Links, iCal, Unsubscribe) |
-| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` | Absender transaktionaler Mails |
-| `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME` | Empfänger der Admin-Benachrichtigungen |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_TLS` | SMTP-Versand (wird beim Boot in PocketBase übernommen) |
-| `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD` | legt beim ersten Start den Admin an |
-| `PB_URL` | **Build-Arg**: Live-PocketBase, aus der Events + Testimonials beim Build geholt werden |
-| `PUBLIC_SITE_URL` | Build-Zeit: Canonical/Sitemap (Default `https://mens-circle.de`) |
-| `DEPLOY_WEBHOOK_URL` | Deploy-Hook, der bei Event-/Testimonial-Änderung einen Rebuild auslöst |
-| `DEPLOY_WEBHOOK_METHOD` | HTTP-Methode des Hooks (Coolify: `GET`, Default `POST`) |
-| `DEPLOY_WEBHOOK_TOKEN` | wird als `Authorization: Bearer <token>` gesendet (Coolify-API-Token) |
-| `DEPLOY_COOLDOWN_SEC` | Mindestabstand zwischen Rebuilds (Default 60) |
-| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT` | optional: Umami-Analytics |
+| Variable                                                               | Zweck                                                                                  |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `APP_URL`                                                              | öffentliche URL (E-Mail-Links, iCal, Unsubscribe)                                      |
+| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`                                  | Absender transaktionaler Mails                                                         |
+| `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME`                                | Empfänger der Admin-Benachrichtigungen                                                 |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_TLS` | SMTP-Versand (wird beim Boot in PocketBase übernommen)                                 |
+| `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`                                  | legt beim ersten Start den Admin an                                                    |
+| `PB_URL`                                                               | **Build-Arg**: Live-PocketBase, aus der Events + Testimonials beim Build geholt werden |
+| `PUBLIC_SITE_URL`                                                      | Build-Zeit: Canonical/Sitemap (Default `https://mens-circle.de`)                       |
+| `DEPLOY_WEBHOOK_URL`                                                   | Deploy-Hook, der bei Event-/Testimonial-Änderung einen Rebuild auslöst                 |
+| `DEPLOY_WEBHOOK_METHOD`                                                | HTTP-Methode des Hooks (Coolify: `GET`, Default `POST`)                                |
+| `DEPLOY_WEBHOOK_TOKEN`                                                 | wird als `Authorization: Bearer <token>` gesendet (Coolify-API-Token)                  |
+| `DEPLOY_COOLDOWN_SEC`                                                  | Mindestabstand zwischen Rebuilds (Default 60)                                          |
+| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                             | optional: Umami-Analytics                                                              |
 
 SMTP/Absender werden bei jedem Boot aus den Env-Variablen in die PocketBase-
 Einstellungen geschrieben — kein manuelles Klicken im Admin nötig.
