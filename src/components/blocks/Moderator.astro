@@ -14,6 +14,13 @@ interface Props {
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
+// Derive a meaningful alt from the (HTML) name for the portrait.
+const photoAlt = data.name
+  ? data.name
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  : 'Begleiter';
 ---
 
 <section class="section moderator-section" id={anchor}>
@@ -24,7 +31,12 @@ const anchor = data.anchor ?? 'moderator';
         <div class="moderator__photo" data-motion="image">
           {
             data.photo ? (
-              <img src={data.photo} loading="lazy" decoding="async" alt="" />
+              <img
+                src={data.photo}
+                loading="lazy"
+                decoding="async"
+                alt={photoAlt}
+              />
             ) : (
               <div class="moderator__photo-placeholder">
                 <Sprite name="user" />
