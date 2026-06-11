@@ -76,20 +76,6 @@ export function submitTestimonial(
   return postJson('/api/testimonial/submit', payload);
 }
 
-/** Fetch the next upcoming published event, or null if none is scheduled. */
-export async function getNextEvent(): Promise<EventDTO | null> {
-  try {
-    const res = await fetch(`${PB_BASE_URL}/api/public/events/next`, {
-      headers: { Accept: 'application/json' },
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { event: EventDTO | null };
-    return data.event ?? null;
-  } catch {
-    return null;
-  }
-}
-
 /** Fetch a single event by slug (past or upcoming), or null if not found. */
 export async function getEventBySlug(slug: string): Promise<EventDTO | null> {
   try {
