@@ -15,6 +15,13 @@
 globals {
 	// Listen on all IPv4 interfaces so Coolify's proxy can reach the container.
 	listen_ip "0.0.0.0"
+
+	// Trust the X-Forwarded-For set by Coolify's outer proxy so {client_ip}
+	// (and the XFF forwarded to PocketBase) resolves to the real visitor instead
+	// of Coolify's proxy IP. Safe here because the container is only reachable
+	// through Coolify. This is what makes PocketBase's per-visitor rate limiting
+	// work (see pb_hooks/config.pb.js → trustedProxies + useLeftmostIP).
+	trust_x_forwarded_for #true
 }
 
 // ── Reusable snippets (applied with `use`) ──────────────────────────────────
