@@ -73,11 +73,16 @@
         privacy = false;
       } else {
         showToast('error', message);
-        trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_ERROR, { error: message });
+        trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_ERROR, {
+          error: message,
+        });
       }
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Network error';
-      showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
+      showToast(
+        'error',
+        'Ein Fehler ist aufgetreten. Bitte versuche es erneut.',
+      );
       trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_ERROR, { error: msg });
     } finally {
       submitting = false;
@@ -85,15 +90,17 @@
   }
 </script>
 
-<form
-  class="event-register__form"
-  autocomplete="on"
-  onsubmit={handleSubmit}
->
+<form class="event-register__form" autocomplete="on" onsubmit={handleSubmit}>
   <div class="hp-field" aria-hidden="true">
     <label>
       Website
-      <input type="text" name="website" tabindex="-1" autocomplete="off" bind:value={website} />
+      <input
+        type="text"
+        name="website"
+        tabindex="-1"
+        autocomplete="off"
+        bind:value={website}
+      />
     </label>
   </div>
   <div class="form-row">
@@ -156,11 +163,19 @@
       bind:value={phone}
       disabled={submitting}
     />
-    <span class="form-helper">Für Erinnerungen per SMS am Veranstaltungstag</span>
+    <span class="form-helper"
+      >Für Erinnerungen per SMS am Veranstaltungstag</span
+    >
   </div>
 
   <label class="form-checkbox">
-    <input type="checkbox" name="privacy" required bind:checked={privacy} disabled={submitting} />
+    <input
+      type="checkbox"
+      name="privacy"
+      required
+      bind:checked={privacy}
+      disabled={submitting}
+    />
     <span
       >Ich habe die
       <a href="/datenschutz" target="_blank">Datenschutzerklärung</a>

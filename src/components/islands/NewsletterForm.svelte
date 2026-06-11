@@ -43,10 +43,15 @@
         });
       }
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Network error';
-      showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
-      trackEvent(TRACKING_EVENTS.NEWSLETTER_ERROR, { ...context, error: message });
+      const message = error instanceof Error ? error.message : 'Network error';
+      showToast(
+        'error',
+        'Ein Fehler ist aufgetreten. Bitte versuche es erneut.',
+      );
+      trackEvent(TRACKING_EVENTS.NEWSLETTER_ERROR, {
+        ...context,
+        error: message,
+      });
     } finally {
       submitting = false;
     }

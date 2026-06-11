@@ -31,9 +31,7 @@
     const m = Math.floor(safeSeconds / 60);
     const s = safeSeconds % 60;
 
-    return `${m.toString().padStart(2, '0')}:${s
-      .toString()
-      .padStart(2, '0')}`;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   }
 
   function circleMotion(phase: Phase): string | undefined {

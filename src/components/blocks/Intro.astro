@@ -23,7 +23,13 @@ const anchor = data.anchor ?? 'ueber';
 <section class="intro-section" id={anchor} aria-labelledby="intro-title">
   <div class="intro__layout">
     <div class="intro__left">
-      {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+      {
+        data.eyebrow && (
+          <p class="eyebrow" data-reveal="up">
+            {data.eyebrow}
+          </p>
+        )
+      }
 
       {
         data.title && (

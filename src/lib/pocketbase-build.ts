@@ -19,18 +19,18 @@
  * returns an empty result. This keeps the very first deploy working even when
  * no PocketBase is reachable yet (the pages render their graceful empty state).
  */
-import type { EventDTO, Testimonial } from "./types";
+import type { EventDTO, Testimonial } from './types';
 
 const BUILD_PB_URL = (
   process.env.PB_URL ||
   process.env.PUBLIC_PB_URL ||
-  "http://localhost:8090"
-).replace(/\/$/, "");
+  'http://localhost:8090'
+).replace(/\/$/, '');
 
 async function getJson<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`${BUILD_PB_URL}${path}`, {
-      headers: { Accept: "application/json" },
+      headers: { Accept: 'application/json' },
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -42,15 +42,15 @@ async function getJson<T>(path: string): Promise<T | null> {
 /** Published testimonials, sorted, for static rendering. Empty on failure. */
 export async function fetchTestimonials(): Promise<Testimonial[]> {
   const data = await getJson<{ items?: Array<Record<string, unknown>> }>(
-    "/api/collections/testimonials/records" +
-      "?perPage=200&filter=" +
-      encodeURIComponent("is_published = true") +
-      "&sort=" +
-      encodeURIComponent("sort_order,-published_at"),
+    '/api/collections/testimonials/records' +
+      '?perPage=200&filter=' +
+      encodeURIComponent('is_published = true') +
+      '&sort=' +
+      encodeURIComponent('sort_order,-published_at'),
   );
   const items = data?.items ?? [];
   return items.map((r) => ({
-    quote: String(r.quote ?? ""),
+    quote: String(r.quote ?? ''),
     author: r.author_name ? String(r.author_name) : null,
     role: r.role ? String(r.role) : null,
   }));
@@ -58,14 +58,14 @@ export async function fetchTestimonials(): Promise<Testimonial[]> {
 
 /** All published events (past + upcoming) as DTOs. Empty on failure. */
 export async function fetchAllEvents(): Promise<EventDTO[]> {
-  const data = await getJson<{ events?: EventDTO[] }>("/api/public/events");
+  const data = await getJson<{ events?: EventDTO[] }>('/api/public/events');
   return data?.events ?? [];
 }
 
 /** The next upcoming published event, or null if none is scheduled. */
 export async function fetchNextEvent(): Promise<EventDTO | null> {
   const data = await getJson<{ event: EventDTO | null }>(
-    "/api/public/events/next",
+    '/api/public/events/next',
   );
   return data?.event ?? null;
 }

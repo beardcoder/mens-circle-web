@@ -156,11 +156,11 @@ function collect(tuning: Tuning): Map<HTMLElement, RevealConfig> {
   const staggered = new Set<HTMLElement>();
 
   for (const group of document.querySelectorAll<HTMLElement>(
-    '[data-reveal-group]'
+    '[data-reveal-group]',
   )) {
     const step = ms(group.dataset.revealGroup) ?? tuning.step;
     const children = group.querySelectorAll<HTMLElement>(
-      ':scope > [data-reveal]'
+      ':scope > [data-reveal]',
     );
 
     children.forEach((child, index) => {
@@ -239,7 +239,7 @@ export function initMotion(): void {
       // else returns nothing, so `inView` unobserves it after the first play.
       return config.repeat ? () => hide(el, config) : undefined;
     },
-    { margin: '0px 0px -12% 0px', amount: 'some' }
+    { margin: '0px 0px -12% 0px', amount: 'some' },
   );
 }
 
