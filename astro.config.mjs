@@ -38,6 +38,14 @@ export default defineConfig({
   build: {
     // Keep asset URLs stable and cache-friendly.
     assets: 'assets',
+    // Inline the bundled CSS into each page's <head> instead of emitting a
+    // separate <link rel="stylesheet">. The external stylesheet was a
+    // render-blocking second request (~400ms: HTML must arrive and be parsed
+    // before the browser even discovers the link). Inlining ships the CSS with
+    // the HTML in one request, so first paint no longer waits on a round-trip.
+    // Pages are gzip/brotli-compressed on the wire and prefetched, which
+    // absorbs the cost of repeating the CSS per document.
+    inlineStylesheets: 'always',
   },
   integrations: [
     svelte(),
