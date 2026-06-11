@@ -14,7 +14,6 @@
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';
 import { initUmamiKit } from './umami-kit';
-import { initEventCtas } from './event-cta';
 
 let initialised = false;
 
@@ -43,11 +42,8 @@ function init(): void {
     console.error('[client] initUmamiKit failed:', error);
   }
 
-  // Async — hides the "next event" CTAs if no termin is scheduled.
-  initEventCtas().catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error('[client] initEventCtas failed:', error);
-  });
+  // The "next event" CTAs are gated statically at build time (see the
+  // `has-upcoming-event` body class), so there is nothing to wire up here.
 }
 
 if (document.readyState === 'loading') {

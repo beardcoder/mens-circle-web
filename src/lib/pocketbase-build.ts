@@ -69,3 +69,22 @@ export async function fetchNextEvent(): Promise<EventDTO | null> {
   );
   return data?.event ?? null;
 }
+
+/**
+ * Whether an upcoming event is scheduled — resolved once at build time so the
+ * "next event" CTAs can be hidden statically (instead of every visitor making
+ * a runtime `/api/public/events/next` request, which sat on the critical
+ * request path and delayed the page).
+ *
+ * Returns `null` when PocketBase is unreachable so callers can *fail open*
+ * (keep the CTAs visible), matching the old runtime behaviour. The result is
+ * memoised for the whole build so all pages share a single request.
+ */
+let upcomingEventState: Promise<boolean | null> | undefined;
+
+export function hasUpcomingEvent(): Promise<boolean | null> {
+  upcomingEventState ??= getJson<{ event: EventDTO | null }>(
+    '/api/public/events/next',
+  ).then((data) => (data === null ? null : data.event !== null));
+  return upcomingEventState;
+}
