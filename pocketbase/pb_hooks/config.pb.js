@@ -53,11 +53,11 @@ onBootstrap((e) => {
       dirty = true;
     }
 
-    // Behind the in-container Ferron proxy every request originates from
-    // 127.0.0.1, so trust Ferron's X-Forwarded-For to recover the upstream
-    // client IP. Without this the rate limiting below would bucket ALL callers
-    // into a single (loopback) IP. Note: Ferron overwrites any incoming XFF, so
-    // behind Coolify this resolves to Coolify's proxy IP, not the end visitor's.
+    // Recover the real client IP from X-Forwarded-For for per-visitor rate
+    // limiting. Ferron (trust_x_forwarded_for, see ferron.kdl) forwards the
+    // visitor IP that Coolify's outer proxy put in XFF, with the original
+    // client as the left-most entry — so useLeftmostIP picks the real visitor.
+    // Without trusting XFF, every request would share one (loopback) IP bucket.
     try {
       settings.trustedProxies.headers = ["X-Forwarded-For"];
       settings.trustedProxies.useLeftmostIP = true;
