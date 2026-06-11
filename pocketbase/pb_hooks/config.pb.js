@@ -53,10 +53,12 @@ onBootstrap((e) => {
       dirty = true;
     }
 
-    // Behind the in-container Caddy proxy every request originates from
-    // 127.0.0.1, so trust Caddy's X-Forwarded-For to recover the real client
-    // IP. Without this the rate limiting below would bucket ALL callers into a
-    // single (loopback) IP. Caddy is the only hop and sets XFF itself.
+    // Behind the in-container Ferron proxy every request originates from
+    // 127.0.0.1, so trust Ferron's X-Forwarded-For to recover the upstream
+    // client IP. Without this the rate limiting below would bucket ALL callers
+    // into a single (loopback) IP. Ferron is the only in-container hop and sets
+    // XFF itself (note: it overwrites any incoming XFF, so behind Coolify this
+    // resolves to Coolify's proxy IP rather than the end visitor's).
     try {
       settings.trustedProxies.headers = ["X-Forwarded-For"];
       settings.trustedProxies.useLeftmostIP = true;
