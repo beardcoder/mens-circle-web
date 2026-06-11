@@ -506,6 +506,123 @@ function eventDto(app, ev) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Deploy trigger — rebuild the static frontend when statically-rendered content
+// (events, testimonials) changes.
+//
+// Events and testimonials are baked into the HTML at build time, so a change
+// only appears after the site is rebuilt + redeployed. These helpers ping a
+// configurable deploy webhook, debounced via the `deploy_state` singleton
+// record (leading edge on the first change, a cron sweep covers the trailing
+// edge of a burst). State is persisted because PocketBase JSVM hook handlers
+// run in isolated scopes and cannot share in-memory variables.
+//
+// Env: DEPLOY_WEBHOOK_URL (enables it), DEPLOY_WEBHOOK_METHOD (default POST,
+// Coolify uses GET), DEPLOY_WEBHOOK_TOKEN (Bearer auth), DEPLOY_COOLDOWN_SEC
+// (default 60).
+// ---------------------------------------------------------------------------
+
+// Fire the deploy webhook. No-op (returns false) if no URL is configured.
+function fireDeployWebhook(app) {
+  const url = env("DEPLOY_WEBHOOK_URL", "");
+  if (!url) return false;
+  const method = (env("DEPLOY_WEBHOOK_METHOD", "POST") || "POST").toUpperCase();
+  const token = env("DEPLOY_WEBHOOK_TOKEN", "");
+  // Coolify's deploy API is GET with a Bearer token; generic webhooks are POST.
+  const isBodyless = method === "GET" || method === "HEAD";
+  const headers = {};
+  if (!isBodyless) headers["Content-Type"] = "application/json";
+  if (token) headers["Authorization"] = "Bearer " + token;
+  try {
+    const res = $http.send({
+      url: url,
+      method: method,
+      headers: headers,
+      body: isBodyless ? "" : JSON.stringify({ event: "content.changed" }),
+      timeout: 20,
+    });
+    app
+      .logger()
+      .info("deploy webhook sent", "status", res.statusCode, "method", method);
+    return true;
+  } catch (e) {
+    app.logger().error("deploy webhook failed", "error", String(e));
+    return false;
+  }
+}
+
+// Load (or lazily create) the deploy_state singleton record.
+function loadDeployState(app) {
+  try {
+    return app.findFirstRecordByFilter("deploy_state", "key = 'singleton'");
+  } catch (notFound) {
+    try {
+      const col = app.findCollectionByNameOrId("deploy_state");
+      const rec = new Record(col);
+      rec.set("key", "singleton");
+      app.save(rec);
+      return rec;
+    } catch (e) {
+      app.logger().error("deploy_state create failed", "error", String(e));
+      return null;
+    }
+  }
+}
+
+// Record a content change and fire immediately if outside the cooldown window
+// (leading edge). Otherwise just mark it pending; the cron sweep handles it.
+function requestDeploy(app, reason) {
+  if (!env("DEPLOY_WEBHOOK_URL", "")) return;
+  const rec = loadDeployState(app);
+  if (!rec) return;
+  const cooldownMs =
+    (parseInt(env("DEPLOY_COOLDOWN_SEC", "60"), 10) || 60) * 1000;
+  const now = Date.now();
+  const trgD = toDate(rec.getString("triggered_at"));
+  const triggered = trgD ? trgD.getTime() : 0;
+
+  rec.set("requested_at", new Date(now).toISOString());
+  let fired = false;
+  if (!triggered || now - triggered >= cooldownMs) {
+    if (fireDeployWebhook(app)) {
+      rec.set("triggered_at", new Date(now).toISOString());
+      fired = true;
+    }
+  }
+  try {
+    app.save(rec);
+  } catch (e) {
+    app.logger().error("deploy_state save failed", "error", String(e));
+  }
+  app.logger().info("deploy requested", "reason", String(reason || ""), "fired", fired);
+}
+
+// Trailing-edge sweep (run by cron): if a change came in after the last trigger
+// and things have settled, fire the rebuild now.
+function sweepDeploy(app) {
+  if (!env("DEPLOY_WEBHOOK_URL", "")) return;
+  const rec = loadDeployState(app);
+  if (!rec) return;
+  const now = Date.now();
+  const reqD = toDate(rec.getString("requested_at"));
+  const trgD = toDate(rec.getString("triggered_at"));
+  const requested = reqD ? reqD.getTime() : 0;
+  const triggered = trgD ? trgD.getTime() : 0;
+  const QUIET_MS = 15000; // wait for a burst of edits to settle
+
+  if (requested > triggered && now - requested >= QUIET_MS) {
+    if (fireDeployWebhook(app)) {
+      rec.set("triggered_at", new Date(now).toISOString());
+      try {
+        app.save(rec);
+      } catch (e) {
+        app.logger().error("deploy_state save failed", "error", String(e));
+      }
+      app.logger().info("deploy trailing sweep fired");
+    }
+  }
+}
+
 // Find or create a participant by email; update name/phone on hit.
 function upsertParticipant(app, email, fields) {
   let participant = null;
@@ -557,6 +674,10 @@ module.exports = {
   isEventPast,
   eventDto,
   upsertParticipant,
+  // deploy trigger
+  fireDeployWebhook,
+  requestDeploy,
+  sweepDeploy,
   // renderers
   renderRegistrationConfirmation,
   renderWaitlistConfirmation,

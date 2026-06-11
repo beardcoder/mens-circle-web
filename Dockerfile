@@ -15,6 +15,16 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
+# Build-time data source: events + testimonials are fetched from the LIVE
+# PocketBase and baked into the static HTML. Point PB_URL at the running
+# instance (e.g. https://mens-circle.de) via a Coolify build arg. If it is unset
+# or unreachable (e.g. the very first deploy), the fetchers return empty and the
+# pages render their graceful "no content" state — the next content change
+# triggers a rebuild that picks the data up.
+ARG PB_URL
+ARG PUBLIC_SITE_URL
+ENV PB_URL=$PB_URL
+ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 # Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks
 # Astro's Rollup build, while `bun run` still uses Bun for everything else.
 RUN bun run build
