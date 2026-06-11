@@ -53,10 +53,12 @@
         attributionControl: true,
       }).setView([lat, lng], 16);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
         maxZoom: 19,
+        subdomains: 'abcd',
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
+          ' &copy; <a href="https://carto.com/attributions">CARTO</a>',
       }).addTo(map);
 
       const icon = L.divIcon({
