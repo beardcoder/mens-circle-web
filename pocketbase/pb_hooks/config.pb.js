@@ -53,6 +53,18 @@ onBootstrap((e) => {
       dirty = true;
     }
 
+    // Behind the in-container Caddy proxy every request originates from
+    // 127.0.0.1, so trust Caddy's X-Forwarded-For to recover the real client
+    // IP. Without this the rate limiting below would bucket ALL callers into a
+    // single (loopback) IP. Caddy is the only hop and sets XFF itself.
+    try {
+      settings.trustedProxies.headers = ["X-Forwarded-For"];
+      settings.trustedProxies.useLeftmostIP = true;
+      dirty = true;
+    } catch (tpErr) {
+      $app.logger().error("Failed to set trusted proxies", "error", String(tpErr));
+    }
+
     // Anti-spam rate limiting on the public submission endpoints. Idempotent:
     // we replace the rules array each boot so the config is fully driven here.
     // RateLimitRule = { label, audience, duration (seconds), maxRequests }.
