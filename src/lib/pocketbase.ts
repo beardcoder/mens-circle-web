@@ -10,19 +10,20 @@
  * that perform validation, capacity/waitlist logic and transactional email
  * server-side, returning a uniform { success, message } body.
  */
-import PocketBase from 'pocketbase';
+import PocketBase from "pocketbase";
 import type {
   ApiResponse,
   EventDTO,
   RegistrationPayload,
+  Testimonial,
   TestimonialPayload,
-} from './types';
+} from "./types";
 
 function resolveBaseUrl(): string {
   const configured = import.meta.env.PUBLIC_PB_URL;
   if (configured) return configured;
-  if (typeof window !== 'undefined') return window.location.origin;
-  return 'http://localhost:8090';
+  if (globalThis.window !== undefined) return globalThis.location.origin;
+  return "http://localhost:8090";
 }
 
 export const PB_BASE_URL = resolveBaseUrl();
@@ -32,8 +33,8 @@ export const pb = new PocketBase(PB_BASE_URL);
 /** POST a JSON body to a custom route and normalise the response/errors. */
 async function postJson(path: string, body: object): Promise<ApiResponse> {
   const res = await fetch(`${PB_BASE_URL}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(body),
   });
 
@@ -49,35 +50,35 @@ async function postJson(path: string, body: object): Promise<ApiResponse> {
     message:
       data.message ??
       (res.ok
-        ? 'Erfolgreich.'
-        : 'Etwas ist schiefgelaufen. Bitte versuche es später erneut.'),
+        ? "Erfolgreich."
+        : "Etwas ist schiefgelaufen. Bitte versuche es später erneut."),
   };
 }
 
 export function registerForEvent(
   payload: RegistrationPayload,
 ): Promise<ApiResponse> {
-  return postJson('/api/event/register', payload);
+  return postJson("/api/event/register", payload);
 }
 
 export function subscribeNewsletter(
   email: string,
-  website = '',
+  website = "",
 ): Promise<ApiResponse> {
-  return postJson('/api/newsletter/subscribe', { email, website });
+  return postJson("/api/newsletter/subscribe", { email, website });
 }
 
 export function submitTestimonial(
   payload: TestimonialPayload,
 ): Promise<ApiResponse> {
-  return postJson('/api/testimonial/submit', payload);
+  return postJson("/api/testimonial/submit", payload);
 }
 
 /** Fetch the next upcoming published event, or null if none is scheduled. */
 export async function getNextEvent(): Promise<EventDTO | null> {
   try {
     const res = await fetch(`${PB_BASE_URL}/api/public/events/next`, {
-      headers: { Accept: 'application/json' },
+      headers: { Accept: "application/json" },
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { event: EventDTO | null };
@@ -87,12 +88,29 @@ export async function getNextEvent(): Promise<EventDTO | null> {
   }
 }
 
+/** Fetch published testimonials (public read rule = is_published = true). */
+export async function getTestimonials(): Promise<Testimonial[]> {
+  try {
+    const records = await pb.collection("testimonials").getFullList({
+      filter: "is_published = true",
+      sort: "sort_order,-published_at",
+    });
+    return records.map((r) => ({
+      quote: String(r.quote ?? ""),
+      author: r.author_name ? String(r.author_name) : null,
+      role: r.role ? String(r.role) : null,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 /** Fetch a single event by slug (past or upcoming), or null if not found. */
 export async function getEventBySlug(slug: string): Promise<EventDTO | null> {
   try {
     const res = await fetch(
       `${PB_BASE_URL}/api/public/events/${encodeURIComponent(slug)}`,
-      { headers: { Accept: 'application/json' } },
+      { headers: { Accept: "application/json" } },
     );
     if (!res.ok) return null;
     const data = (await res.json()) as { event: EventDTO | null };

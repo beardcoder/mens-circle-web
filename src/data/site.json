@@ -9,7 +9,11 @@
   "whatsappCommunityLink": "https://chat.whatsapp.com/BHxhiej3uUg5syYzLCSKn4",
   "footerText": "© 2026 Männerkreis Niederbayern. Alle Rechte vorbehalten.",
   "socialLinks": [
-    { "type": "whatsapp", "value": "https://chat.whatsapp.com/BHxhiej3uUg5syYzLCSKn4", "label": "WhatsApp Community" },
+    {
+      "type": "whatsapp",
+      "value": "https://chat.whatsapp.com/BHxhiej3uUg5syYzLCSKn4",
+      "label": "WhatsApp Community"
+    },
     { "type": "email", "value": "hallo@mens-circle.de", "label": "E-Mail" },
     { "type": "phone", "value": "015126072643", "label": "Telefon" }
   ],
