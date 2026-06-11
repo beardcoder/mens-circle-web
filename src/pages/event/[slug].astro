@@ -1,0 +1,32 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import EventPage from '../../components/islands/EventPage.svelte';
+import site from '../../data/site.json';
+import { fetchAllEvents } from '@lib/pocketbase-build';
+import type { EventDTO } from '@lib/types';
+
+// One statically built page per event (date-based slug, e.g. /event/2026-06-12),
+// covering past and upcoming events. The list comes from PocketBase at build
+// time; a record change triggers a rebuild so new/edited events get a page.
+export async function getStaticPaths() {
+  const events = await fetchAllEvents();
+  return events
+    .filter((event) => event.slug)
+    .map((event) => ({ params: { slug: event.slug }, props: { event } }));
+}
+
+interface Props {
+  event: EventDTO;
+}
+
+const { event } = Astro.props;
+const cleanTitle = event.title?.trim() || 'Termin';
+---
+
+<Layout
+  title={`${cleanTitle} – Männerkreis Niederbayern/ Straubing`}
+  description={`${cleanTitle} in ${event.location || 'Straubing'}. Sieh dir den Termin an und sichere dir deinen Platz.`}
+  ogType="event"
+>
+  <EventPage client:load event={event} whatsappLink={site.whatsappCommunityLink} />
+</Layout>

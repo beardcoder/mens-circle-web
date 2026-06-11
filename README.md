@@ -90,11 +90,35 @@ bun run build        # → dist/   (NICHT `bun --bun run build`, das bricht Roll
 | `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME` | Empfänger der Admin-Benachrichtigungen |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_TLS` | SMTP-Versand (wird beim Boot in PocketBase übernommen) |
 | `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD` | legt beim ersten Start den Admin an |
+| `PB_URL` | **Build-Arg**: Live-PocketBase, aus der Events + Testimonials beim Build geholt werden |
 | `PUBLIC_SITE_URL` | Build-Zeit: Canonical/Sitemap (Default `https://mens-circle.de`) |
+| `DEPLOY_WEBHOOK_URL` | Deploy-Hook, der bei Event-/Testimonial-Änderung einen Rebuild auslöst |
+| `DEPLOY_WEBHOOK_METHOD` | HTTP-Methode des Hooks (Coolify: `GET`, Default `POST`) |
+| `DEPLOY_WEBHOOK_TOKEN` | wird als `Authorization: Bearer <token>` gesendet (Coolify-API-Token) |
+| `DEPLOY_COOLDOWN_SEC` | Mindestabstand zwischen Rebuilds (Default 60) |
 | `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT` | optional: Umami-Analytics |
 
 SMTP/Absender werden bei jedem Boot aus den Env-Variablen in die PocketBase-
 Einstellungen geschrieben — kein manuelles Klicken im Admin nötig.
+
+### Rebuild bei Content-Änderung (Coolify-Auth)
+
+Events und Testimonials werden zur **Build-Zeit** ins HTML gerendert. Ändert sich
+ein solcher Datensatz, pingt der PocketBase-Hook `pb_hooks/deploy.pb.js` den
+Deploy-Webhook → Coolify baut neu (Astro holt dabei via `PB_URL` die aktuellen
+Daten) → Redeploy. Mehrere schnelle Änderungen fallen zu max. 2 Builds zusammen
+(Leading-Edge sofort + Trailing-Sweep per Minuten-Cron).
+
+Coolify-Setup: API-Token unter **Keys & Tokens → API Tokens** anlegen, Ressourcen-
+UUID aus der App-URL nehmen, dann:
+
+```
+DEPLOY_WEBHOOK_URL=https://<coolify-host>/api/v1/deploy?uuid=<resource-uuid>&force=false
+DEPLOY_WEBHOOK_METHOD=GET
+DEPLOY_WEBHOOK_TOKEN=<coolify-api-token>
+```
+
+Ohne `DEPLOY_WEBHOOK_URL` ist der Trigger ein No-op (z. B. lokal).
 
 Die PocketBase-Version ist als Docker-`ARG PB_VERSION` (Default aktuell
 `0.39.3`) überschreibbar.
@@ -105,13 +129,14 @@ Die PocketBase-Version ist als Docker-`ARG PB_VERSION` (Default aktuell
 - **Globale Einstellungen** (Name, Social-Links, WhatsApp-Link, Footer):
   `src/data/site.json`
 - **Navigation:** `src/data/navigation.json`
-- **Testimonials (statisch angezeigt):** `src/data/testimonials.json`
 - **Impressum / Datenschutz:** `src/content/legal/*.json`
-- **Events, Anmeldungen, Newsletter, eingereichte Testimonials:** im
-  PocketBase-Admin (`/_/`).
+- **Events, Anmeldungen, Newsletter, Testimonials:** im PocketBase-Admin (`/_/`).
 
-Nach Content-Änderungen am JSON: neu deployen (Coolify-Rebuild). Event-Daten
-ändern sich live über PocketBase ohne Rebuild.
+Nach Content-Änderungen am **JSON**: neu deployen (Coolify-Rebuild). **Events und
+Testimonials** werden zur Build-Zeit ins HTML gerendert; eine Änderung im
+PocketBase-Admin löst über den Deploy-Webhook automatisch einen Rebuild aus
+(siehe oben). Anmeldungen/Kapazität bleiben live (die Event-Seite aktualisiert
+die freien Plätze clientseitig).
 
 ## E-Mails
 
