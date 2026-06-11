@@ -1,0 +1,82 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Männerkreis — edge config.
+#
+# Caddy is the single entrypoint inside the container. It serves the pre-built
+# static Astro site DIRECTLY (full control over Cache-Control + security
+# headers) and reverse-proxies only the dynamic paths to PocketBase, which
+# listens on a loopback-only port.
+#
+#   Coolify (TLS) ──http──▶ Caddy :8090 ─┬─ static /srv/site  (Astro dist)
+#                                         └─ proxy  127.0.0.1:8091  (PocketBase)
+#
+# TLS is terminated by Coolify's reverse proxy, so Caddy speaks plain HTTP and
+# auto-HTTPS is disabled.
+# ─────────────────────────────────────────────────────────────────────────────
+{
+	admin off
+	auto_https off
+	# Behind Coolify's proxy: derive the real client IP / scheme from the
+	# X-Forwarded-* headers it sets.
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+:8090 {
+	log {
+		output stdout
+		format console
+	}
+
+	# Compress text responses (HTML, CSS, JS, SVG, JSON, …).
+	encode zstd gzip
+
+	# ── Dynamic paths owned by PocketBase ───────────────────────────────────
+	# API + admin UI + the HTML routes defined in pb_hooks (newsletter
+	# unsubscribe page, /events/{slug} → /event/{slug} redirect).
+	@pocketbase path /api/* /_ /_/* /newsletter/* /events/*
+	handle @pocketbase {
+		reverse_proxy 127.0.0.1:8091
+	}
+
+	# ── Static Astro site ───────────────────────────────────────────────────
+	handle {
+		root * /srv/site
+
+		# Security headers on every static response.
+		header {
+			X-Content-Type-Options "nosniff"
+			Referrer-Policy "strict-origin-when-cross-origin"
+			X-Frame-Options "SAMEORIGIN"
+			# Don't leak the server software.
+			-Server
+		}
+
+		# Cache-Control by asset class. The four matchers are mutually
+		# exclusive so exactly one applies to any request (no duplicate
+		# headers) — extensionless clean routes (/event, /impressum) fall
+		# through to @revalidate.
+		@immutable path /assets/* *.woff *.woff2 *.ttf *.otf *.eot
+		@images path *.png *.jpg *.jpeg *.gif *.svg *.webp *.avif *.ico
+		@meta path *.xml /manifest.json /manifest.webmanifest /robots.txt /browserconfig.xml
+		@revalidate {
+			not path /assets/* *.woff *.woff2 *.ttf *.otf *.eot
+			not path *.png *.jpg *.jpeg *.gif *.svg *.webp *.avif *.ico
+			not path *.xml /manifest.json /manifest.webmanifest /robots.txt /browserconfig.xml
+		}
+
+		# Content-hashed assets + fonts never change under a given URL.
+		header @immutable Cache-Control "public, max-age=31536000, immutable"
+		# Images change infrequently.
+		header @images Cache-Control "public, max-age=604800"
+		# Manifests, feeds, robots.
+		header @meta Cache-Control "public, max-age=86400"
+		# HTML & clean routes must reflect new deploys → always revalidate.
+		header @revalidate Cache-Control "public, max-age=0, must-revalidate"
+
+		# Astro builds clean URLs as directory indexes (/event/index.html).
+		# Resolve /event → /event/index.html, /foo.html direct hits, etc.
+		try_files {path} {path}/index.html {path}.html
+		file_server
+	}
+}
