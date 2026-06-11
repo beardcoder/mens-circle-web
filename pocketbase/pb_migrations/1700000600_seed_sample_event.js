@@ -2,7 +2,7 @@
 
 // Seed ONE published sample event so the public /event page works out of the box.
 // Guarded against duplicate seeding (find-by-slug first).
-const SAMPLE_SLUG = "maennerkreis-test-termin";
+const SAMPLE_SLUG = "2026-07-15";
 
 migrate((app) => {
   // Skip if already seeded.
