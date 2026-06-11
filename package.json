@@ -17,7 +17,7 @@
     "@fontsource-variable/dm-sans": "^5.2.8",
     "@fontsource-variable/playfair-display": "^5.2.8",
     "@yeskunall/astro-umami": "^0.0.9",
-    "astro": "^6.4.5",
+    "astro": "^6.4.6",
     "leaflet": "^1.9.4",
     "motion": "^12.40.0",
     "pocketbase": "^0.27.0",
