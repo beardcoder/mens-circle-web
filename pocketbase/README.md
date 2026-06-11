@@ -9,7 +9,7 @@ JS migrations (`pb_migrations/`) and JS-VM hooks (`pb_hooks/`).
 | Collection | Type | Public read | Notes |
 |---|---|---|---|
 | `participants` | base | no (superuser) | Shared, deduped by **unique email**. PII. |
-| `events` | base | only `is_published = true && deleted = null` | Slug unique. Soft-delete via `deleted` date. |
+| `events` | base | only `is_published = true && deleted = null` | Slug unique, auto-generated from `event_date` as `YYYY-MM-DD` (e.g. `/event/2026-06-12`) when left empty — same-day collisions get a `-2`/`-3` suffix; a manual slug is respected (`events.pb.js`). Soft-delete via `deleted` date. |
 | `registrations` | base | no (superuser) | Unique `(participant, event)`. Status: `registered` / `waitlist` / `cancelled` / `attended`. Created via the custom route, not public record create. |
 | `newsletter_subscribers` | base | no (superuser) | One per participant (unique). Unique `token` for the unsubscribe link. |
 | `newsletters` | base | no (superuser) | Admin-authored campaigns. Status: `draft` / `sending` / `sent`. |
