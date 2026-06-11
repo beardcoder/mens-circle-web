@@ -39,7 +39,11 @@ const phoneHref = site.contactPhone
           {
             nav.footerPrimary.map((item) => (
               <li>
-                <a href={item.url} data-umami-event="footer-link">
+                <a
+                  href={item.url}
+                  data-umami-event="footer-link"
+                  data-event-cta={item.url === '/event' ? '' : undefined}
+                >
                   {item.label}
                 </a>
               </li>
