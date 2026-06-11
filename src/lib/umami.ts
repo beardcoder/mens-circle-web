@@ -14,7 +14,7 @@ export interface UmamiEventData {
  */
 export function trackEvent(
   eventName: string,
-  eventData?: UmamiEventData
+  eventData?: UmamiEventData,
 ): void {
   if (typeof window.umami === 'undefined') {
     if (import.meta.env.DEV) {

@@ -28,7 +28,7 @@ const EXIT_FALLBACK_MS = 400;
 function buildToast(
   type: ToastType,
   message: string,
-  title?: string
+  title?: string,
 ): HTMLDivElement {
   const toast = document.createElement('div');
 
@@ -65,7 +65,7 @@ function buildToast(
 export function showToast(
   type: ToastType,
   message: string,
-  title?: string
+  title?: string,
 ): void {
   const toast = buildToast(type, message, title);
 

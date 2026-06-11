@@ -53,13 +53,16 @@
         attributionControl: true,
       }).setView([lat, lng], 16);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd',
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
-          ' &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      }).addTo(map);
+      L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+        {
+          maxZoom: 19,
+          subdomains: 'abcd',
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
+            ' &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        },
+      ).addTo(map);
 
       const icon = L.divIcon({
         className: 'event-map__marker',
