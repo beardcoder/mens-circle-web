@@ -3,16 +3,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Männerkreis — single-image deploy for Coolify.
 #
-# A tiny, sustainable footprint: the production image is Alpine + the PocketBase
-# Go binary, with nginx (Alpine package) as the lightweight edge in front.
+# A tiny, sustainable footprint: the production image is Alpine + two static
+# binaries — Ferron (Rust) and PocketBase (Go).
 #
-#   nginx (edge, :8090)  ─┬─ serves the pre-built static Astro site (/srv/site)
+#   Ferron (edge, :8090) ─┬─ serves the pre-built static Astro site (/srv/site)
 #                         │   with full Cache-Control / security-header control
 #                         └─ reverse-proxies the dynamic paths to PocketBase
 #   PocketBase (127.0.0.1:8091)  API, admin UI, email (pb_hooks), cron, DB
 #
-# nginx keeps the RAM overhead minimal (one worker, a few MB) compared to a
-# Go-based edge. There is NO Node/Bun runtime in production — Bun only builds.
+# There is NO Node/Bun runtime in production — Bun is only the build tool.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # 1) Build the static frontend with Bun.
@@ -50,27 +49,43 @@ RUN set -eux; \
     unzip /tmp/pb.zip -d /pb; \
     rm /tmp/pb.zip
 
+# 2b) Fetch the Ferron (statically-linked, musl) binary for the target arch.
+FROM alpine:3.21 AS ferron
+ARG FERRON_VERSION=2.7.0
+ARG TARGETARCH
+RUN apk add --no-cache ca-certificates unzip wget
+RUN set -eux; \
+    case "${TARGETARCH:-amd64}" in \
+      amd64) FER_TARGET=x86_64-unknown-linux-musl ;; \
+      arm64) FER_TARGET=aarch64-unknown-linux-musl ;; \
+      *)     FER_TARGET=x86_64-unknown-linux-musl ;; \
+    esac; \
+    wget -q "https://dl.ferron.sh/${FERRON_VERSION}/ferron-${FERRON_VERSION}-${FER_TARGET}.zip" -O /tmp/ferron.zip; \
+    unzip /tmp/ferron.zip -d /ferron; \
+    rm /tmp/ferron.zip
+
 # 3) Final runtime image.
 FROM alpine:3.21
-RUN apk add --no-cache ca-certificates tzdata wget nginx
+RUN apk add --no-cache ca-certificates tzdata wget
 ENV TZ=Europe/Berlin
 WORKDIR /pb
 
+COPY --from=ferron /ferron/ferron /usr/local/bin/ferron
 COPY --from=pocketbase /pb/pocketbase /usr/local/bin/pocketbase
 COPY pocketbase/pb_hooks ./pb_hooks
 COPY pocketbase/pb_migrations ./pb_migrations
-# Astro static site is served by nginx (not PocketBase) for full header control.
+# Astro static site is served by Ferron (not PocketBase) for full header control.
 COPY --from=build /app/dist /srv/site
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY ferron.kdl /etc/ferron.kdl
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Persisted data (database, uploaded files) — mount a Coolify volume here.
 VOLUME ["/pb/pb_data"]
-# nginx is the edge; PocketBase stays on loopback 8091 (not exposed).
+# Ferron is the edge; PocketBase stays on loopback 8091 (not exposed).
 EXPOSE 8090
 
-# Hits nginx, which proxies to PocketBase — validates the whole chain.
+# Hits Ferron, which proxies to PocketBase — validates the whole chain.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -qO- http://127.0.0.1:8090/api/health >/dev/null 2>&1 || exit 1
 
