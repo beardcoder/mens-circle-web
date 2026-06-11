@@ -57,8 +57,7 @@ export function resolveSocialLink(link: SocialLink): ResolvedSocialLink {
   const title = link.label || meta.label;
 
   let href = link.value;
-  let internal =
-    href.startsWith('mailto:') || href.startsWith('tel:');
+  let internal = href.startsWith('mailto:') || href.startsWith('tel:');
 
   if (!internal) {
     if (isEmail(href)) {

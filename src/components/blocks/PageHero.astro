@@ -31,7 +31,11 @@ const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
   <div class="container">
     <div class="page-hero__layout">
       <div class="page-hero__content">
-        {data.eyebrow && <p class="eyebrow page-hero__eyebrow">{data.eyebrow}</p>}
+        {
+          data.eyebrow && (
+            <p class="eyebrow page-hero__eyebrow">{data.eyebrow}</p>
+          )
+        }
         {data.title && <h1 class="page-hero__title" set:html={data.title} />}
         {data.lead && <p class="page-hero__lead">{data.lead}</p>}
 

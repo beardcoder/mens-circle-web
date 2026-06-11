@@ -42,8 +42,12 @@ const testimonials = await fetchTestimonials();
               <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
               {(t.author || t.role) && (
                 <div class="testimonial-item__author">
-                  {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
-                  {t.role && <span class="testimonial-item__role">{t.role}</span>}
+                  {t.author && (
+                    <cite class="testimonial-item__name">{t.author}</cite>
+                  )}
+                  {t.role && (
+                    <span class="testimonial-item__role">{t.role}</span>
+                  )}
                 </div>
               )}
             </article>

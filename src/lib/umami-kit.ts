@@ -207,10 +207,10 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
 
         scrollDebounceTimer = window.setTimeout(
           checkScrollDepth,
-          opts.scrollDebounceMs
+          opts.scrollDebounceMs,
         );
       },
-      { passive: true, signal }
+      { passive: true, signal },
     );
 
     checkScrollDepth();
@@ -237,7 +237,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
       if (state.isIdle) {
         const idleDurationSeconds = Math.max(
           1,
-          Math.round((now - state.lastActivityAt) / 1000)
+          Math.round((now - state.lastActivityAt) / 1000),
         );
 
         state.isIdle = false;
@@ -307,7 +307,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
           page: window.location.pathname,
         });
       },
-      { passive: true, signal }
+      { passive: true, signal },
     );
   };
 
@@ -315,7 +315,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
     if (!('IntersectionObserver' in window)) return;
 
     const elements = document.querySelectorAll<HTMLElement>(
-      opts.visibilitySelector
+      opts.visibilitySelector,
     );
 
     if (elements.length === 0) return;
@@ -343,7 +343,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
           });
         }
       },
-      { threshold: opts.visibilityThreshold }
+      { threshold: opts.visibilityThreshold },
     );
 
     for (const element of elements) visibilityObserver.observe(element);

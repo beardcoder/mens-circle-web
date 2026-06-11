@@ -71,7 +71,10 @@
       }
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Network error';
-      showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
+      showToast(
+        'error',
+        'Ein Fehler ist aufgetreten. Bitte versuche es erneut.',
+      );
       trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: msg });
     } finally {
       submitting = false;
@@ -83,7 +86,13 @@
   <div class="hp-field" aria-hidden="true">
     <label>
       Website
-      <input type="text" name="website" tabindex="-1" autocomplete="off" bind:value={website} />
+      <input
+        type="text"
+        name="website"
+        tabindex="-1"
+        autocomplete="off"
+        bind:value={website}
+      />
     </label>
   </div>
   <div class="form-field form-field--spaced">
@@ -156,7 +165,8 @@
       bind:value={email}
       disabled={submitting}
     />
-    <span class="form-hint">Wird nicht veröffentlicht. Nur für Rückfragen.</span>
+    <span class="form-hint">Wird nicht veröffentlicht. Nur für Rückfragen.</span
+    >
   </div>
 
   <div class="form-field form-field--checkbox">
@@ -171,9 +181,11 @@
       />
       <span class="form-checkbox-text">
         Ich habe die
-        <a href="/datenschutz" target="_blank" class="link">Datenschutzerklärung</a>
-        zur Kenntnis genommen und bin damit einverstanden, dass meine Daten zum
-        Zwecke der Veröffentlichung gespeichert werden.
+        <a href="/datenschutz" target="_blank" class="link"
+          >Datenschutzerklärung</a
+        >
+        zur Kenntnis genommen und bin damit einverstanden, dass meine Daten zum Zwecke
+        der Veröffentlichung gespeichert werden.
         <span class="form-required">*</span>
       </span>
     </label>
@@ -187,7 +199,8 @@
 
   <p class="testimonial-form__note">
     <small>
-      Alle Felder mit <span class="form-required">*</span> sind Pflichtfelder.<br />
+      Alle Felder mit <span class="form-required">*</span> sind Pflichtfelder.<br
+      />
       Dein Testimonial wird nach Prüfung durch uns veröffentlicht.
     </small>
   </p>

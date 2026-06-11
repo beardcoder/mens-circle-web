@@ -26,7 +26,11 @@
 
 @media (hover: hover) and (pointer: fine) {
   .archetype-card:hover {
-    background-color: color-mix(in oklch, var(--accent-primary) 5%, var(--bg-secondary));
+    background-color: color-mix(
+      in oklch,
+      var(--accent-primary) 5%,
+      var(--bg-secondary)
+    );
   }
 
   .archetype-card:hover .archetype-card__title {

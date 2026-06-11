@@ -19,8 +19,20 @@ const anchor = data.anchor ?? slug;
 <section class="section" id={anchor || undefined}>
   <div class="container--narrow container">
     <div class="section-header section-header--start" data-reveal-group>
-      {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
-      {data.title && <h2 class="section-title" data-reveal="blur">{data.title}</h2>}
+      {
+        data.eyebrow && (
+          <p class="eyebrow" data-reveal="up">
+            {data.eyebrow}
+          </p>
+        )
+      }
+      {
+        data.title && (
+          <h2 class="section-title" data-reveal="blur">
+            {data.title}
+          </h2>
+        )
+      }
     </div>
 
     {
