@@ -126,6 +126,12 @@
       }
     },
     {
+      "type": "whatsapp-community",
+      "data": {
+        "anchor": "whatsapp-community"
+      }
+    },
+    {
       "type": "newsletter",
       "data": {
         "anchor": "newsletter",
