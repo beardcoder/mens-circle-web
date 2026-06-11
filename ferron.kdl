@@ -23,9 +23,7 @@ globals {
 	header "Referrer-Policy" "strict-origin-when-cross-origin"
 	header "X-Frame-Options" "SAMEORIGIN"
 
-	// Compress text responses (HTML, CSS, JS, SVG, JSON, …).
-	brotli #true
-	gzip #true
+	// Compression is left to Coolify's edge proxy — we don't configure it here.
 
 	// Static Astro site + default cache policy. HTML and extensionless clean
 	// routes (/event, /impressum) must reflect new deploys, so they revalidate.
