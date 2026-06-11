@@ -8,9 +8,9 @@
 
 .event-map-section {
   position: relative;
+  background: var(--bg-secondary);
   padding: var(--space-2xl) 0;
   overflow: hidden;
-  background: var(--bg-secondary);
 }
 
 .event-map-section .event-map__header {
@@ -23,26 +23,26 @@
 }
 
 .event-map-section .event-map__subtitle {
-  max-inline-size: 60ch;
   margin-inline: auto;
+  max-inline-size: 60ch;
   color: var(--text-secondary);
 }
 
 .event-map {
-  position: relative;
   display: block;
+  position: relative;
   contain: paint;
-  overflow: hidden;
+  box-shadow: 0 12px 40px -20px
+    color-mix(in oklch, var(--color-ink) 30%, transparent);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
   background: linear-gradient(
     135deg,
     color-mix(in oklch, var(--color-sand) 35%, transparent),
     color-mix(in oklch, var(--color-parchment) 60%, transparent)
   );
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 12px 40px -20px
-    color-mix(in oklch, var(--color-ink) 30%, transparent);
   isolation: isolate;
+  overflow: hidden;
 }
 
 .event-map[hidden] {
@@ -50,30 +50,30 @@
 }
 
 .event-map__canvas {
-  inline-size: 100%;
-  block-size: clamp(320px, 50vh, 520px);
   background: color-mix(
     in oklch,
     var(--color-sand-light) 50%,
     var(--color-parchment)
   );
+  inline-size: 100%;
+  block-size: clamp(320px, 50vh, 520px);
 }
 
 /* Skeleton state — visible until Leaflet finishes loading. The .leaflet-container
    class is applied to the canvas by Leaflet on init; once present the skeleton
    stripes fade out. */
-.event-map[data-state='idle'] .event-map__canvas::before,
-.event-map[data-state='loading'] .event-map__canvas::before {
+.event-map[data-state="idle"] .event-map__canvas::before,
+.event-map[data-state="loading"] .event-map__canvas::before {
   position: absolute;
+  animation: event-map-skeleton 2s var(--ease-ambient) infinite;
   inset: 0;
-  pointer-events: none;
-  content: '';
   background: repeating-linear-gradient(
     135deg,
     color-mix(in oklch, var(--color-sand) 25%, transparent) 0 12px,
     transparent 12px 24px
   );
-  animation: event-map-skeleton 2s var(--ease-ambient) infinite;
+  pointer-events: none;
+  content: "";
 }
 
 .event-map__canvas:has(.leaflet-container)::before {
@@ -93,28 +93,28 @@
 
 /* Marker — div icon with inline SVG, themed to terracotta accent. */
 .event-map__marker {
-  background: none;
-  border: 0;
   filter: drop-shadow(
     0 4px 6px color-mix(in oklch, var(--color-ink) 40%, transparent)
   );
+  border: 0;
+  background: none;
 }
 
 .event-map__marker svg {
+  fill: currentcolor;
   inline-size: 100%;
   block-size: 100%;
   color: var(--color-terracotta);
-  fill: currentcolor;
 }
 
 /* Leaflet popup overrides — match site typography. */
 .event-map .leaflet-popup-content-wrapper {
-  font-family: var(--font-body);
-  color: var(--text-primary);
-  background: var(--bg-elevated);
-  border-radius: var(--radius-md);
   box-shadow: 0 8px 24px -10px
     color-mix(in oklch, var(--color-ink) 40%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-family: var(--font-body);
 }
 
 .event-map .leaflet-popup-content {
@@ -126,9 +126,9 @@
 .event-map .leaflet-popup-content strong {
   display: inline-block;
   margin-block-end: var(--space-3xs);
-  font-family: var(--font-display);
-  font-size: var(--text-section-body);
   font-weight: 600;
+  font-size: var(--text-section-body);
+  font-family: var(--font-display);
 }
 
 .event-map .leaflet-popup-tip {
@@ -138,8 +138,8 @@
 .event-map__directions {
   display: inline-block;
   margin-block-start: var(--space-xs);
-  font-weight: 600;
   color: var(--accent-primary, var(--color-terracotta));
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -153,15 +153,15 @@
 .event-map__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
   justify-content: center;
+  gap: var(--space-sm);
   margin-block-start: var(--space-md);
 }
 
 .event-map__attribution {
   margin-block-start: var(--space-xs);
-  font-size: var(--text-xs);
   color: var(--text-muted);
+  font-size: var(--text-xs);
   text-align: center;
 }
 
@@ -182,11 +182,16 @@
   }
 }
 
+/* Tile warmth — nudge CartoDB Voyager tiles towards our earthy palette. */
+.event-map .leaflet-tile-pane {
+  filter: sepia(12%) saturate(0.88) brightness(0.97);
+}
+
 /* Leaflet zoom & attribution tweaks — soften the default skin to fit our look. */
 .event-map .leaflet-control-zoom a {
-  color: var(--text-primary);
-  background: var(--bg-elevated);
   border: 1px solid var(--border-light);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
 }
 
 .event-map .leaflet-control-zoom a:hover,
@@ -195,6 +200,6 @@
 }
 
 .event-map .leaflet-control-attribution {
-  font-size: var(--text-caption);
   background: color-mix(in oklch, var(--color-bone) 80%, transparent);
+  font-size: var(--text-caption);
 }
