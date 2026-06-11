@@ -359,6 +359,35 @@ routerAdd("GET", "/api/public/events/next", (e) => {
 });
 
 // -------------------------------------------------------------------------
+// GET /api/public/events
+// All published events (past + upcoming) as public DTOs. Consumed by the
+// static build to generate one page per event slug (getStaticPaths).
+// -------------------------------------------------------------------------
+routerAdd("GET", "/api/public/events", (e) => {
+  const lib = require(`${__hooks}/lib.js`);
+  try {
+    let recs = [];
+    try {
+      recs = $app.findRecordsByFilter(
+        "events",
+        "is_published = true && deleted = null",
+        "event_date",
+        500,
+        0,
+        {}
+      );
+    } catch (qErr) {
+      recs = [];
+    }
+    const events = (recs || []).map((r) => lib.eventDto($app, r));
+    return e.json(200, { events: events });
+  } catch (err) {
+    $app.logger().error("/api/public/events failed", "error", String(err));
+    return e.json(200, { events: [] });
+  }
+});
+
+// -------------------------------------------------------------------------
 // GET /api/public/events/{slug}
 // -------------------------------------------------------------------------
 routerAdd("GET", "/api/public/events/{slug}", (e) => {
@@ -500,16 +529,14 @@ routerAdd("GET", "/newsletter/unsubscribe/{token}", (e) => {
 });
 
 // ---------------------------------------------------------------------------
-// Pretty deep-links for a specific event: /event/{slug} and /events/{slug}.
-// The static site only ships /event/index.html (the "next event" shell). For a
-// specific slug we redirect to that shell with a ?slug= query param, which the
-// EventPage island reads to fetch and render the right event. Without this, the
-// static SPA fallback would serve the home page for /event/{slug}.
+// Legacy deep-link redirect: /events/{slug} -> /event/{slug}.
+// Each event now has its own statically built page at /event/{slug} (generated
+// by Astro's getStaticPaths and served directly from pb_public). We only keep a
+// redirect for the old plural prefix so existing /events/<slug> links still work.
+// (Note: do NOT register /event/{slug} here — that path is a real static file
+// now; a route would shadow it.)
 // ---------------------------------------------------------------------------
-function redirectToEventShell(e) {
+routerAdd("GET", "/events/{slug}", (e) => {
   const slug = e.request.pathValue("slug");
-  return e.redirect(302, "/event/?slug=" + encodeURIComponent(slug || ""));
-}
-
-routerAdd("GET", "/event/{slug}", redirectToEventShell);
-routerAdd("GET", "/events/{slug}", redirectToEventShell);
+  return e.redirect(301, "/event/" + encodeURIComponent(slug || ""));
+});
