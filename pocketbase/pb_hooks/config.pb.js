@@ -53,11 +53,11 @@ onBootstrap((e) => {
       dirty = true;
     }
 
-    // Recover the real client IP from X-Forwarded-For for per-visitor rate
-    // limiting. Ferron (trust_x_forwarded_for, see ferron.kdl) forwards the
-    // visitor IP that Coolify's outer proxy put in XFF, with the original
-    // client as the left-most entry — so useLeftmostIP picks the real visitor.
-    // Without trusting XFF, every request would share one (loopback) IP bucket.
+    // Behind the in-container nginx proxy every request originates from
+    // 127.0.0.1, so trust nginx's X-Forwarded-For to recover the real client
+    // IP. Without this the rate limiting below would bucket ALL callers into a
+    // single (loopback) IP. nginx appends to XFF (proxy_add_x_forwarded_for),
+    // preserving the client IP forwarded by Coolify's outer proxy.
     try {
       settings.trustedProxies.headers = ["X-Forwarded-For"];
       settings.trustedProxies.useLeftmostIP = true;
