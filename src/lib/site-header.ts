@@ -40,7 +40,7 @@ type Controls = ReturnType<typeof animate>;
  */
 const headerOffset = (): number => {
   const raw = getComputedStyle(document.documentElement).getPropertyValue(
-    '--header-clearance'
+    '--header-clearance',
   );
   const parsed = Number.parseInt(raw, 10);
 
@@ -88,25 +88,25 @@ const coverRadius = (ox: number, oy: number): number => {
  */
 export function initSiteHeader(): () => void {
   const root = document.querySelector<HTMLElement>(
-    'header.header#header[data-lume="site-header"]'
+    'header.header#header[data-lume="site-header"]',
   );
 
   if (!root) return () => {};
 
   const nav = root.querySelector<HTMLElement>('[data-lume-part="nav"]');
   const toggle = root.querySelector<HTMLButtonElement>(
-    '[data-lume-part="toggle"]'
+    '[data-lume-part="toggle"]',
   );
 
   if (!nav || !toggle) return () => {};
 
   const navLinks = Array.from(
-    root.querySelectorAll<HTMLAnchorElement>('[data-lume-part="nav-link"]')
+    root.querySelectorAll<HTMLAnchorElement>('[data-lume-part="nav-link"]'),
   );
   const heroEl = document.querySelector<HTMLElement>('.hero');
 
   const bars = Array.from(
-    toggle.querySelectorAll<HTMLElement>('.nav-toggle__bar')
+    toggle.querySelectorAll<HTMLElement>('.nav-toggle__bar'),
   );
 
   // Everything that cascades into / out of the open panel.
@@ -121,7 +121,7 @@ export function initSiteHeader(): () => void {
     target: EventTarget,
     type: K | string,
     handler: EventListenerOrEventListenerObject,
-    options?: AddEventListenerOptions
+    options?: AddEventListenerOptions,
   ): void => {
     target.addEventListener(type, handler, options);
     teardown.push(() => target.removeEventListener(type, handler, options));
@@ -181,12 +181,12 @@ export function initSiteHeader(): () => void {
           ? 'translateY(8px) rotate(45deg)'
           : 'translateY(0px) rotate(0deg)',
       },
-      { duration: 0.42, ease }
+      { duration: 0.42, ease },
     );
     animate(
       mid,
       { opacity: open ? 0 : 1, transform: open ? 'scaleX(0.3)' : 'scaleX(1)' },
-      { duration: open ? 0.22 : 0.34, ease }
+      { duration: open ? 0.22 : 0.34, ease },
     );
     animate(
       bottom,
@@ -195,7 +195,7 @@ export function initSiteHeader(): () => void {
           ? 'translateY(-8px) rotate(-45deg)'
           : 'translateY(0px) rotate(0deg)',
       },
-      { duration: 0.42, ease }
+      { duration: 0.42, ease },
     );
   };
 
@@ -220,7 +220,7 @@ export function initSiteHeader(): () => void {
             opacity: [0, 1],
             transform: ['translateY(28px)', 'translateY(0px)'],
           },
-          { duration: 0.62, delay: 0.14 + index * 0.06, ease: EASE_SETTLE }
+          { duration: 0.62, delay: 0.14 + index * 0.06, ease: EASE_SETTLE },
         );
 
         controls.finished
@@ -230,7 +230,7 @@ export function initSiteHeader(): () => void {
         animate(
           el,
           { opacity: 0, transform: 'translateY(18px)' },
-          { duration: 0.26, ease: EASE_INHALE }
+          { duration: 0.26, ease: EASE_INHALE },
         );
       }
     });
@@ -274,7 +274,7 @@ export function initSiteHeader(): () => void {
       {
         duration: 0.72,
         ease: EASE_EMPHASISED,
-      }
+      },
     );
     panelAnim.finished
       .then(() => (nav.style.willChange = ''))
@@ -328,7 +328,7 @@ export function initSiteHeader(): () => void {
         duration: 0.5,
         delay: 0.05,
         ease: EASE_INHALE,
-      }
+      },
     );
     panelAnim.finished.then(finalize).catch(finalize);
   };
@@ -352,7 +352,7 @@ export function initSiteHeader(): () => void {
       isScrolled = next;
       renderScroll();
     },
-    { passive: true }
+    { passive: true },
   );
 
   // ─── Interactions ──────────────────────────────────────────────────

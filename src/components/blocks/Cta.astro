@@ -18,15 +18,31 @@ const { data } = Astro.props;
   <div class="cta__ornament cta__ornament--inner" aria-hidden="true"></div>
   <div class="container">
     <div class="cta__content" data-reveal-group="100">
-      {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
-
       {
-        data.title && (
-          <h2 class="section-title cta__title" data-reveal="blur" set:html={data.title} />
+        data.eyebrow && (
+          <p class="eyebrow" data-reveal="up">
+            {data.eyebrow}
+          </p>
         )
       }
 
-      {data.text && <p class="cta__text" data-reveal="up">{data.text}</p>}
+      {
+        data.title && (
+          <h2
+            class="section-title cta__title"
+            data-reveal="blur"
+            set:html={data.title}
+          />
+        )
+      }
+
+      {
+        data.text && (
+          <p class="cta__text" data-reveal="up">
+            {data.text}
+          </p>
+        )
+      }
 
       {
         data.buttonText && data.buttonLink && (
@@ -34,7 +50,9 @@ const { data } = Astro.props;
             href={data.buttonLink}
             class="btn btn--primary btn--large"
             data-reveal="up"
-            data-event-cta={data.buttonLink?.startsWith('/event') ? '' : undefined}
+            data-event-cta={
+              data.buttonLink?.startsWith('/event') ? '' : undefined
+            }
             data-umami-event="cta-click"
             data-umami-event-location="cta-block"
             data-umami-event-text={data.buttonText}

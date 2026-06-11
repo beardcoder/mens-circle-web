@@ -98,7 +98,13 @@
   <section class="hero event-hero">
     <div class="hero__bg">
       {#if e.image_url}
-        <img class="hero__bg-image" src={e.image_url} loading="eager" aria-hidden="true" alt={e.title} />
+        <img
+          class="hero__bg-image"
+          src={e.image_url}
+          loading="eager"
+          aria-hidden="true"
+          alt={e.title}
+        />
       {/if}
     </div>
     <div class="hero__circles" aria-hidden="true">
@@ -110,17 +116,22 @@
 
     <div class="container">
       <div class="hero__content">
-        <p class="hero__label">{e.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}</p>
+        <p class="hero__label">
+          {e.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}
+        </p>
         <h1 class="hero__title">
           <span class="hero__title-line">{e.title}</span>
         </h1>
         <div class="hero__bottom">
           <p class="hero__description">
-            {weekday(e.event_date)}, {shortDate(e.event_date)} · {e.start_time} Uhr · {e.location}
+            {weekday(e.event_date)}, {shortDate(e.event_date)} · {e.start_time} Uhr
+            · {e.location}
           </p>
           {#if !e.is_past}
             <div class="hero__cta">
-              <a href="#anmeldung" class="btn btn--primary btn--large">Jetzt anmelden</a>
+              <a href="#anmeldung" class="btn btn--primary btn--large"
+                >Jetzt anmelden</a
+              >
             </div>
           {/if}
         </div>
@@ -138,8 +149,12 @@
             <div class="event-register__circle event-register__circle--2"></div>
           </div>
           <p class="eyebrow eyebrow--secondary">Rückblick</p>
-          <h2 class="section-title section-title--lg section-title--light event-register__title">
-            Dieses Treffen <br /><span class="text-italic">hat stattgefunden</span>
+          <h2
+            class="section-title section-title--lg section-title--light event-register__title"
+          >
+            Dieses Treffen <br /><span class="text-italic"
+              >hat stattgefunden</span
+            >
           </h2>
           <p class="event-register__spots">
             <span>Am {shortDate(e.event_date)}</span>
@@ -149,13 +164,17 @@
         <div class="event-register__form-wrap">
           <div class="event-register__past-info">
             <p class="event-register__past-text">
-              Dieses Treffen liegt in der Vergangenheit. Eine Anmeldung ist nicht mehr möglich.
+              Dieses Treffen liegt in der Vergangenheit. Eine Anmeldung ist
+              nicht mehr möglich.
             </p>
             <p class="event-register__past-text">
-              Möchtest du beim nächsten Männerkreis dabei sein? Dann trag dich in unseren Newsletter
-              ein, um über kommende Termine informiert zu werden.
+              Möchtest du beim nächsten Männerkreis dabei sein? Dann trag dich
+              in unseren Newsletter ein, um über kommende Termine informiert zu
+              werden.
             </p>
-            <a href="/#newsletter" class="btn btn--primary btn--large">Zum Newsletter anmelden</a>
+            <a href="/#newsletter" class="btn btn--primary btn--large"
+              >Zum Newsletter anmelden</a
+            >
           </div>
         </div>
       </div>
@@ -171,22 +190,31 @@
           </div>
           {#if e.is_full}
             <p class="eyebrow eyebrow--secondary">Warteliste</p>
-            <h2 class="section-title section-title--lg section-title--light event-register__title">
-              Trag dich auf die <br /><span class="text-italic">Warteliste ein</span>
+            <h2
+              class="section-title section-title--lg section-title--light event-register__title"
+            >
+              Trag dich auf die <br /><span class="text-italic"
+                >Warteliste ein</span
+              >
             </h2>
             <p class="event-register__spots">
               <span class="event-register__spots-full">Ausgebucht</span>
             </p>
             <p class="event-register__spots-hint">
-              Bei Absagen rückt die Warteliste automatisch nach. Du wirst sofort per E-Mail informiert.
+              Bei Absagen rückt die Warteliste automatisch nach. Du wirst sofort
+              per E-Mail informiert.
             </p>
           {:else}
             <p class="eyebrow eyebrow--secondary">Sei dabei</p>
-            <h2 class="section-title section-title--lg section-title--light event-register__title">
+            <h2
+              class="section-title section-title--lg section-title--light event-register__title"
+            >
               Sichere dir <br /><span class="text-italic">deinen Platz</span>
             </h2>
             <p class="event-register__spots">
-              <span class="event-register__spots-available">{e.available_spots}</span>
+              <span class="event-register__spots-available"
+                >{e.available_spots}</span
+              >
               <span>von {e.max_participants} Plätzen frei</span>
             </p>
           {/if}
@@ -291,8 +319,10 @@
 
         <p class="event-map__attribution">
           Karte von
-          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener"
-            >OpenStreetMap</a
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noopener">OpenStreetMap</a
           >-Mitwirkenden
         </p>
       </div>
@@ -319,10 +349,12 @@
             <div class="event-about__circle event-about__circle--2"></div>
             <div class="event-about__circle event-about__circle--3"></div>
           </div>
-          <p class="event-about__quote">»Gemeinsam<br />
+          <p class="event-about__quote">
+            »Gemeinsam<br />
             <span class="text-italic">wachsen</span>,<br />
             einander<br />
-            <span class="text-italic">stärken</span>«</p>
+            <span class="text-italic">stärken</span>«
+          </p>
         </div>
       </div>
     </div>
@@ -341,13 +373,17 @@
           <h2 class="section-title event-cta__title">
             Bleib <span class="text-italic">informiert</span>
           </h2>
-          <a href="/#newsletter" class="btn btn--primary btn--large">Newsletter abonnieren</a>
+          <a href="/#newsletter" class="btn btn--primary btn--large"
+            >Newsletter abonnieren</a
+          >
         {:else}
           <p class="eyebrow">Bereit?</p>
           <h2 class="section-title event-cta__title">
             Melde dich <span class="text-italic">jetzt</span> an
           </h2>
-          <a href="#anmeldung" class="btn btn--primary btn--large">Zur Anmeldung</a>
+          <a href="#anmeldung" class="btn btn--primary btn--large"
+            >Zur Anmeldung</a
+          >
         {/if}
       </div>
     </div>
@@ -367,15 +403,20 @@
         <p class="hero__label">Männerkreis Niederbayern/ Straubing</p>
         <h1 class="hero__title">
           <span class="hero__title-line">Aktuell ist kein</span>
-          <span class="hero__title-line"><span class="text-italic">Termin</span> geplant</span>
+          <span class="hero__title-line"
+            ><span class="text-italic">Termin</span> geplant</span
+          >
         </h1>
         <div class="hero__bottom">
           <p class="hero__description">
-            Wir planen gerade unser nächstes Treffen. Melde dich für unseren Newsletter an oder tritt
-            unserer WhatsApp-Community bei, um als Erster zu erfahren, wann es weitergeht.
+            Wir planen gerade unser nächstes Treffen. Melde dich für unseren
+            Newsletter an oder tritt unserer WhatsApp-Community bei, um als
+            Erster zu erfahren, wann es weitergeht.
           </p>
           <div class="hero__cta">
-            <a href="#newsletter" class="btn btn--primary btn--large">Zum Newsletter</a>
+            <a href="#newsletter" class="btn btn--primary btn--large"
+              >Zum Newsletter</a
+            >
             <div class="hero__scroll">
               <span>Mehr erfahren</span>
               <div class="hero__scroll-line"></div>
@@ -396,10 +437,10 @@
             Ein Raum für <span class="text-italic">echte Begegnung</span>
           </h2>
           <p class="no-event-info__text">
-            Der Männerkreis Niederbayern/ Straubing bietet dir einen geschützten Raum, in dem du dich
-            mit anderen Männern austauschen, wachsen und echte Verbindungen aufbauen kannst. Unsere
-            Treffen finden regelmäßig statt – sobald der nächste Termin feststeht, informieren wir
-            dich.
+            Der Männerkreis Niederbayern/ Straubing bietet dir einen geschützten
+            Raum, in dem du dich mit anderen Männern austauschen, wachsen und
+            echte Verbindungen aufbauen kannst. Unsere Treffen finden regelmäßig
+            statt – sobald der nächste Termin feststeht, informieren wir dich.
           </p>
         </div>
         <div class="no-event-info__visual">
@@ -409,8 +450,10 @@
               <div class="event-about__circle event-about__circle--2"></div>
               <div class="event-about__circle event-about__circle--3"></div>
             </div>
-            <p class="event-about__quote">»Bleib<br />
-              <span class="text-italic">verbunden</span>«</p>
+            <p class="event-about__quote">
+              »Bleib<br />
+              <span class="text-italic">verbunden</span>«
+            </p>
           </div>
         </div>
       </div>
@@ -427,8 +470,8 @@
             Bleib <span class="text-italic">informiert</span>
           </h2>
           <p class="newsletter__text">
-            Erhalte als Erster Bescheid, wenn unser nächstes Treffen stattfindet. Kein Spam, nur
-            relevante Informationen zum Männerkreis.
+            Erhalte als Erster Bescheid, wenn unser nächstes Treffen
+            stattfindet. Kein Spam, nur relevante Informationen zum Männerkreis.
           </p>
         </div>
 
@@ -450,9 +493,9 @@
               Tritt unserer <span class="text-italic">WhatsApp Community</span> bei
             </h2>
             <p class="whatsapp__text">
-              Bleibe mit anderen Männern in Verbindung, erhalte Erinnerungen zu unseren Treffen und
-              tausche dich zwischen den Kreisen aus. Ein Raum für Austausch und gegenseitige
-              Unterstützung.
+              Bleibe mit anderen Männern in Verbindung, erhalte Erinnerungen zu
+              unseren Treffen und tausche dich zwischen den Kreisen aus. Ein
+              Raum für Austausch und gegenseitige Unterstützung.
             </p>
           </div>
 
@@ -481,7 +524,8 @@
           Entdecke den <span class="text-italic">Männerkreis</span>
         </h2>
         <p class="no-event-cta__text">
-          Erfahre mehr über uns, unsere Werte und was dich bei einem Treffen erwartet.
+          Erfahre mehr über uns, unsere Werte und was dich bei einem Treffen
+          erwartet.
         </p>
         <a href="/" class="btn btn--primary btn--large">Zur Startseite</a>
       </div>

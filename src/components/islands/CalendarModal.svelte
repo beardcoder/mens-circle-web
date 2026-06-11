@@ -40,7 +40,9 @@
   }
 
   function trackGoogle(): void {
-    trackEvent(TRACKING_EVENTS.CALENDAR_DOWNLOAD_GOOGLE, { event: event.title });
+    trackEvent(TRACKING_EVENTS.CALENDAR_DOWNLOAD_GOOGLE, {
+      event: event.title,
+    });
   }
 
   function trackIcs(): void {
@@ -52,7 +54,9 @@
 
 <div class="event-info__calendar">
   <button type="button" class="btn btn--secondary" onclick={open}>
-    <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-calendar"></use></svg>
+    <svg class="icon" aria-hidden="true" focusable="false"
+      ><use href="#icon-calendar"></use></svg
+    >
     In Kalender speichern
   </button>
 

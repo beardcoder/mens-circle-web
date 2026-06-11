@@ -62,8 +62,8 @@
 /* Skeleton state — visible until Leaflet finishes loading. The .leaflet-container
    class is applied to the canvas by Leaflet on init; once present the skeleton
    stripes fade out. */
-.event-map[data-state="idle"] .event-map__canvas::before,
-.event-map[data-state="loading"] .event-map__canvas::before {
+.event-map[data-state='idle'] .event-map__canvas::before,
+.event-map[data-state='loading'] .event-map__canvas::before {
   position: absolute;
   animation: event-map-skeleton 2s var(--ease-ambient) infinite;
   inset: 0;
@@ -73,7 +73,7 @@
     transparent 12px 24px
   );
   pointer-events: none;
-  content: "";
+  content: '';
 }
 
 .event-map__canvas:has(.leaflet-container)::before {

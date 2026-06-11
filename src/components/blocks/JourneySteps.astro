@@ -49,7 +49,9 @@ const steps = data.steps ?? [];
 
       {
         data.subtitle && (
-          <p class="journey__subtitle" data-reveal="up">{data.subtitle}</p>
+          <p class="journey__subtitle" data-reveal="up">
+            {data.subtitle}
+          </p>
         )
       }
     </div>
@@ -65,9 +67,7 @@ const steps = data.steps ?? [];
                   {step.number}
                 </div>
               )}
-              {step.title && (
-                <h3 class="journey__step-title">{step.title}</h3>
-              )}
+              {step.title && <h3 class="journey__step-title">{step.title}</h3>}
               {step.description && (
                 <p class="journey__step-text">{step.description}</p>
               )}

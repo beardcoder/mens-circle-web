@@ -21,7 +21,13 @@ const items = data.items ?? [];
 <section class="section values-section" id={data.anchor}>
   <div class="container">
     <div class="section-header" data-reveal-group>
-      {data.eyebrow && <p class="eyebrow" data-reveal="up">{data.eyebrow}</p>}
+      {
+        data.eyebrow && (
+          <p class="eyebrow" data-reveal="up">
+            {data.eyebrow}
+          </p>
+        )
+      }
       {
         data.title && (
           <h2 class="section-title" data-reveal="blur" set:html={data.title} />
