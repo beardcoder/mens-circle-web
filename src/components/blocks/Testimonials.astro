@@ -1,16 +1,55 @@
 ---
-// Testimonials are dynamic: published entries are fetched from PocketBase at
-// runtime by the island (the section hides itself when there are none).
-import TestimonialsList from '../islands/TestimonialsList.svelte';
+// Testimonials are rendered statically at build time: published entries are
+// fetched from PocketBase during the build and baked into the HTML (great SEO,
+// no client fetch / loading flash). When a testimonial is added, edited,
+// published or removed, a PocketBase hook triggers a site rebuild so the change
+// goes live (see pocketbase/pb_hooks/deploy.pb.js).
+//
+// The section renders nothing when there are no published testimonials.
+import { fetchTestimonials } from '@lib/pocketbase-build';
 
 interface Props {
   data?: { anchor?: string };
 }
 
 const { data } = Astro.props;
+const anchor = data?.anchor ?? 'stimmen';
+const testimonials = await fetchTestimonials();
 ---
 
-<!-- client:idle (not client:visible): the island renders nothing until its
-     PocketBase fetch resolves, so a visibility observer would have no sized
-     target to trigger on. idle hydration guarantees it loads. -->
-<TestimonialsList client:idle anchor={data?.anchor ?? 'stimmen'} />
+{
+  testimonials.length > 0 && (
+    <section
+      class="section section--large testimonials-section"
+      id={anchor}
+      aria-labelledby="testimonials-title"
+    >
+      <div class="testimonials__pattern" aria-hidden="true" />
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Community Stimmen</p>
+          <h2 class="section-title" id="testimonials-title">
+            Was <span class="highlight">Teilnehmer</span> sagen
+          </h2>
+          <p class="testimonials__subtitle">
+            Authentische Einblicke von Männern, die den Kreis erleben
+          </p>
+        </div>
+
+        <div class="testimonials__grid">
+          {testimonials.map((t) => (
+            <article class="testimonial-item" data-hover="lift">
+              <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
+              {(t.author || t.role) && (
+                <div class="testimonial-item__author">
+                  {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
+                  {t.role && <span class="testimonial-item__role">{t.role}</span>}
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

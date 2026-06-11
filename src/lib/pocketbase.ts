@@ -1,5 +1,11 @@
 /**
- * PocketBase client + typed API helpers.
+ * Client-side PocketBase API helpers (runtime, browser).
+ *
+ * Static content (events, testimonials) is fetched at BUILD time in
+ * `pocketbase-build.ts`. The helpers here cover the parts that must stay live
+ * in the browser: form submissions (register / newsletter / testimonial) and
+ * the event page's live capacity refresh. They use plain `fetch` against the
+ * custom PocketBase routes — no PocketBase JS SDK is shipped to the client.
  *
  * In production the Astro build is served BY PocketBase on the same origin,
  * so the default base URL is the current origin. For local dev set
@@ -10,12 +16,10 @@
  * that perform validation, capacity/waitlist logic and transactional email
  * server-side, returning a uniform { success, message } body.
  */
-import PocketBase from "pocketbase";
 import type {
   ApiResponse,
   EventDTO,
   RegistrationPayload,
-  Testimonial,
   TestimonialPayload,
 } from "./types";
 
@@ -27,8 +31,6 @@ function resolveBaseUrl(): string {
 }
 
 export const PB_BASE_URL = resolveBaseUrl();
-
-export const pb = new PocketBase(PB_BASE_URL);
 
 /** POST a JSON body to a custom route and normalise the response/errors. */
 async function postJson(path: string, body: object): Promise<ApiResponse> {
@@ -85,23 +87,6 @@ export async function getNextEvent(): Promise<EventDTO | null> {
     return data.event ?? null;
   } catch {
     return null;
-  }
-}
-
-/** Fetch published testimonials (public read rule = is_published = true). */
-export async function getTestimonials(): Promise<Testimonial[]> {
-  try {
-    const records = await pb.collection("testimonials").getFullList({
-      filter: "is_published = true",
-      sort: "sort_order,-published_at",
-    });
-    return records.map((r) => ({
-      quote: String(r.quote ?? ""),
-      author: r.author_name ? String(r.author_name) : null,
-      role: r.role ? String(r.role) : null,
-    }));
-  } catch {
-    return [];
   }
 }
 
