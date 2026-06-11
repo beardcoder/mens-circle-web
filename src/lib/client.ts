@@ -14,6 +14,7 @@
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';
 import { initUmamiKit } from './umami-kit';
+import { initEventCtas } from './event-cta';
 
 let initialised = false;
 
@@ -41,6 +42,12 @@ function init(): void {
     // eslint-disable-next-line no-console
     console.error('[client] initUmamiKit failed:', error);
   }
+
+  // Async — hides the "next event" CTAs if no termin is scheduled.
+  initEventCtas().catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error('[client] initEventCtas failed:', error);
+  });
 }
 
 if (document.readyState === 'loading') {
