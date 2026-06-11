@@ -53,10 +53,11 @@ onBootstrap((e) => {
       dirty = true;
     }
 
-    // Behind the in-container Caddy proxy every request originates from
-    // 127.0.0.1, so trust Caddy's X-Forwarded-For to recover the real client
+    // Behind the in-container nginx proxy every request originates from
+    // 127.0.0.1, so trust nginx's X-Forwarded-For to recover the real client
     // IP. Without this the rate limiting below would bucket ALL callers into a
-    // single (loopback) IP. Caddy is the only hop and sets XFF itself.
+    // single (loopback) IP. nginx appends to XFF (proxy_add_x_forwarded_for),
+    // preserving the client IP forwarded by Coolify's outer proxy.
     try {
       settings.trustedProxies.headers = ["X-Forwarded-For"];
       settings.trustedProxies.useLeftmostIP = true;

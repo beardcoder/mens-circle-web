@@ -3,15 +3,16 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Männerkreis — single-image deploy for Coolify.
 #
-# A tiny, sustainable footprint: the production image is Alpine + two static Go
-# binaries — Caddy and PocketBase.
+# A tiny, sustainable footprint: the production image is Alpine + the PocketBase
+# Go binary, with nginx (Alpine package) as the lightweight edge in front.
 #
-#   Caddy (edge, :8090)  ─┬─ serves the pre-built static Astro site (/srv/site)
+#   nginx (edge, :8090)  ─┬─ serves the pre-built static Astro site (/srv/site)
 #                         │   with full Cache-Control / security-header control
 #                         └─ reverse-proxies the dynamic paths to PocketBase
 #   PocketBase (127.0.0.1:8091)  API, admin UI, email (pb_hooks), cron, DB
 #
-# There is NO Node/Bun runtime in production — Bun is only the build tool.
+# nginx keeps the RAM overhead minimal (one worker, a few MB) compared to a
+# Go-based edge. There is NO Node/Bun runtime in production — Bun only builds.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # 1) Build the static frontend with Bun.
@@ -51,29 +52,25 @@ RUN set -eux; \
 
 # 3) Final runtime image.
 FROM alpine:3.21
-RUN apk add --no-cache ca-certificates tzdata wget
+RUN apk add --no-cache ca-certificates tzdata wget nginx
 ENV TZ=Europe/Berlin
-# Caddy stores its (ephemeral) data/config under XDG dirs; keep them in /tmp.
-ENV XDG_DATA_HOME=/tmp/caddy XDG_CONFIG_HOME=/tmp/caddy
 WORKDIR /pb
 
-# Static Caddy binary from the official image.
-COPY --from=caddy:2-alpine /usr/bin/caddy /usr/local/bin/caddy
 COPY --from=pocketbase /pb/pocketbase /usr/local/bin/pocketbase
 COPY pocketbase/pb_hooks ./pb_hooks
 COPY pocketbase/pb_migrations ./pb_migrations
-# Astro static site is served by Caddy (not PocketBase) for full header control.
+# Astro static site is served by nginx (not PocketBase) for full header control.
 COPY --from=build /app/dist /srv/site
-COPY Caddyfile /etc/caddy/Caddyfile
+COPY nginx.conf /etc/nginx/nginx.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Persisted data (database, uploaded files) — mount a Coolify volume here.
 VOLUME ["/pb/pb_data"]
-# Caddy is the edge; PocketBase stays on loopback 8091 (not exposed).
+# nginx is the edge; PocketBase stays on loopback 8091 (not exposed).
 EXPOSE 8090
 
-# Hits Caddy, which proxies to PocketBase — validates the whole chain.
+# Hits nginx, which proxies to PocketBase — validates the whole chain.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -qO- http://127.0.0.1:8090/api/health >/dev/null 2>&1 || exit 1
 
