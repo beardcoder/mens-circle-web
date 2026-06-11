@@ -1,16 +1,16 @@
 # Männerkreis Niederbayern / Straubing
 
 Schnelle, leichtgewichtige Website für den Männerkreis — **Astro 5/6 + Svelte 5** im
-Frontend, **PocketBase** als Backend, **[Ferron](https://www.ferron.sh)** als
-schlanker Edge davor. Alles zusammen in **einem** Docker-Image, deploybar mit
-Coolify. Paketmanager & Build-Tool ist **Bun**.
+Frontend, **PocketBase** als Backend, **nginx** als schlanker Edge davor. Alles
+zusammen in **einem** Docker-Image, deploybar mit Coolify. Paketmanager &
+Build-Tool ist **Bun**.
 
 ## Architektur
 
 ```
 ┌─────────────────────────── ein Docker-Container ───────────────────────────┐
 │                                                                             │
-│   Ferron (Edge, :8090 — der nach außen exposte Port)                        │
+│   nginx (Edge, :8090 — der nach außen exposte Port)                         │
 │   ├─ liefert die statische Astro-Site direkt aus  → /srv/site (dist)        │
 │   │    mit voller Kontrolle über Cache-Control + Security-Header            │
 │   └─ reverse-proxyt die dynamischen Pfade an PocketBase:                     │
@@ -27,17 +27,18 @@ Coolify. Paketmanager & Build-Tool ist **Bun**.
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- **Warum Ferron davor?** PocketBase kann beim Ausliefern statischer Dateien
-  keine `Cache-Control`- oder sonstigen Header setzen. Ferron (schneller,
-  speichersicherer Webserver in Rust, winziger Footprint) serviert die
+- **Warum nginx davor?** PocketBase kann beim Ausliefern statischer Dateien
+  keine `Cache-Control`- oder sonstigen Header setzen. nginx serviert die
   Astro-Site daher direkt und setzt die Cache-Zeiten je Asset-Klasse (gehashte
   Assets/Fonts inkl. Astro-optimierter avif/webp `immutable` 1 Jahr, sonstige
   Bilder 7 Tage, Manifeste/Feeds 1 Tag, HTML `must-revalidate`) plus
-  Security-Header und ETags. Die Konfiguration steht — über wiederverwendbare
-  `snippet`-Blöcke — zentral in [`ferron.kdl`](ferron.kdl).
+  Security-Header. nginx wurde gewählt, weil es mit einem Worker nur wenige MB
+  RAM braucht — deutlich weniger als ein Go-basierter Edge. Die Konfiguration
+  steht zentral in [`nginx.conf`](nginx.conf). Kompression übernimmt der
+  Coolify-Edge.
 - **Kein Node/Bun zur Laufzeit.** Bun baut nur die statische Site; ausgeliefert
-  werden zur Laufzeit nur zwei statische Binaries (Ferron + PocketBase).
-  Minimaler Footprint, nachhaltig.
+  werden zur Laufzeit nur nginx (winzig) + das PocketBase-Binary. Minimaler
+  Footprint, nachhaltig.
 - **Statischer Content** (Texte, FAQ, Hero, Moderator …) liegt als **JSON** im
   Repo (`src/content/`, `src/data/`) und wird direkt in Astro eingepflegt.
 - **Dynamische Teile** (Event, Anmeldung, Warteliste, Newsletter, Testimonial,
@@ -83,9 +84,9 @@ bun run dev
 ```
 
 Im Dev-Modus sprechen Astro (4321) und PocketBase (8090) über verschiedene Ports,
-daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin hinter Ferron: der
-Browser spricht den Edge-Port an, Ferron proxyt `/api/*` an PocketBase — dann
-bleibt `PUBLIC_PB_URL` leer. (Ferron braucht es lokal nicht; der Edge wird nur im
+daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin hinter nginx: der
+Browser spricht den Edge-Port an, nginx proxyt `/api/*` an PocketBase — dann
+bleibt `PUBLIC_PB_URL` leer. (nginx braucht es lokal nicht; der Edge wird nur im
 Docker-Image gestartet.)
 
 ### Build
@@ -98,7 +99,7 @@ bun run build        # → dist/   (NICHT `bun --bun run build`, das bricht Roll
 
 1. Neue Ressource → **Dockerfile**-basiert, dieses Repo.
 2. **Persistent Volume** mounten auf `/pb/pb_data` (Datenbank + Uploads).
-3. Port **8090** exposen (das ist der Ferron-Edge; PocketBase läuft intern auf
+3. Port **8090** exposen (das ist der nginx-Edge; PocketBase läuft intern auf
    `127.0.0.1:8091`). Coolify terminiert TLS und leitet per HTTP weiter.
 4. Environment-Variablen setzen (siehe `.env.example`):
 
