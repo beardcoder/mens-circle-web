@@ -1,6 +1,17 @@
 ---
 import site from '../data/site.json';
 
+// Preload the above-the-fold webfont subsets (latin covers German, incl.
+// äöüß). Importing the woff2 files lets Vite resolve them to the same hashed
+// URLs the bundled @font-face rules reference, so the preload primes the
+// exact request the font swap needs — shrinking the swap window for the hero
+// heading (the LCP) instead of triggering a second, unused download.
+import playfairLatin from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2';
+import playfairLatinItalic from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-italic.woff2';
+import dmSansLatin from '@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2';
+
+const fontPreloads = [playfairLatin, playfairLatinItalic, dmSansLatin];
+
 interface Props {
   title?: string;
   description?: string;
@@ -103,6 +114,12 @@ const allSchemas = [localBusiness, website, ...schemas];
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+{
+  fontPreloads.map((href) => (
+    <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />
+  ))
+}
 
 <title>{fullTitle}</title>
 <meta name="title" content={fullTitle} />
