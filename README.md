@@ -1,16 +1,23 @@
 # Männerkreis Niederbayern / Straubing
 
 Schnelle, leichtgewichtige Website für den Männerkreis — **Astro 5/6 + Svelte 5** im
-Frontend, **PocketBase** als Backend. Beides zusammen in **einem** Docker-Image,
-deploybar mit Coolify. Paketmanager & Build-Tool ist **Bun**.
+Frontend, **PocketBase** als Backend, **Caddy** als schlanker Edge davor. Alles
+zusammen in **einem** Docker-Image, deploybar mit Coolify. Paketmanager &
+Build-Tool ist **Bun**.
 
 ## Architektur
 
 ```
 ┌─────────────────────────── ein Docker-Container ───────────────────────────┐
 │                                                                             │
-│   PocketBase (ein Go-Binary, winziger RAM-Footprint)                        │
-│   ├─ serviert die statische Astro-Site            → pb_public/ (dist)       │
+│   Caddy (Edge, :8090 — der nach außen exposte Port)                         │
+│   ├─ liefert die statische Astro-Site direkt aus  → /srv/site (dist)        │
+│   │    mit voller Kontrolle über Cache-Control + Security-Header            │
+│   └─ reverse-proxyt die dynamischen Pfade an PocketBase:                     │
+│        /api/*  ·  /_/*  ·  /newsletter/*  ·  /events/*                       │
+│                          │                                                  │
+│                          ▼                                                  │
+│   PocketBase (Go-Binary, 127.0.0.1:8091 — nur intern)                       │
 │   ├─ REST API + Admin-UI (/_/)                                              │
 │   ├─ Custom-Routen (Anmeldung, Newsletter, …)     → pb_hooks/               │
 │   ├─ Transaktionale E-Mails (Go-Templates)        → pb_hooks/views/emails/  │
@@ -20,8 +27,15 @@ deploybar mit Coolify. Paketmanager & Build-Tool ist **Bun**.
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
+- **Warum Caddy davor?** PocketBase kann beim Ausliefern statischer Dateien
+  keine `Cache-Control`- oder sonstigen Header setzen. Caddy serviert die
+  Astro-Site daher direkt und setzt die Cache-Zeiten je Asset-Klasse
+  (gehashte Assets/Fonts `immutable` 1 Jahr, Bilder 7 Tage, Manifeste/Feeds
+  1 Tag, HTML `must-revalidate`) plus Security-Header und gzip/zstd-Kompression.
+  Die Konfiguration steht zentral im [`Caddyfile`](Caddyfile).
 - **Kein Node/Bun zur Laufzeit.** Bun baut nur die statische Site; ausgeliefert
-  wird alles vom PocketBase-Binary. Minimaler Footprint, nachhaltig.
+  werden zur Laufzeit nur die beiden Go-Binaries (Caddy + PocketBase). Minimaler
+  Footprint, nachhaltig.
 - **Statischer Content** (Texte, FAQ, Hero, Moderator …) liegt als **JSON** im
   Repo (`src/content/`, `src/data/`) und wird direkt in Astro eingepflegt.
 - **Dynamische Teile** (Event, Anmeldung, Warteliste, Newsletter, Testimonial,
@@ -67,8 +81,10 @@ bun run dev
 ```
 
 Im Dev-Modus sprechen Astro (4321) und PocketBase (8090) über verschiedene Ports,
-daher `PUBLIC_PB_URL`. In Produktion liefert PocketBase die Site selbst aus — dann
-bleibt `PUBLIC_PB_URL` leer (same-origin).
+daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin hinter Caddy: der
+Browser spricht den Edge-Port an, Caddy proxyt `/api/*` an PocketBase — dann
+bleibt `PUBLIC_PB_URL` leer. (Caddy braucht es lokal nicht; der Edge wird nur im
+Docker-Image gestartet.)
 
 ### Build
 
@@ -80,7 +96,8 @@ bun run build        # → dist/   (NICHT `bun --bun run build`, das bricht Roll
 
 1. Neue Ressource → **Dockerfile**-basiert, dieses Repo.
 2. **Persistent Volume** mounten auf `/pb/pb_data` (Datenbank + Uploads).
-3. Port **8090** exposen.
+3. Port **8090** exposen (das ist der Caddy-Edge; PocketBase läuft intern auf
+   `127.0.0.1:8091`). Coolify terminiert TLS und leitet per HTTP weiter.
 4. Environment-Variablen setzen (siehe `.env.example`):
 
 | Variable                                                               | Zweck                                                                                  |
