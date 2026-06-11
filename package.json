@@ -11,6 +11,7 @@
     "check": "astro check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "import:live": "bun run scripts/import-live-data.ts",
     "pb:dev": "./pocketbase/pocketbase serve --dir ./pocketbase/pb_data --hooksDir ./pocketbase/pb_hooks --migrationsDir ./pocketbase/pb_migrations --publicDir ./dist"
   },
   "dependencies": {
