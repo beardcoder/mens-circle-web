@@ -12,7 +12,6 @@ import Testimonials from './blocks/Testimonials.astro';
 import WhatsappCommunity from './blocks/WhatsappCommunity.astro';
 import PageHero from './blocks/PageHero.astro';
 import TextSection from './blocks/TextSection.astro';
-import testimonialsData from '../data/testimonials.json';
 
 export interface Block {
   type: string;
@@ -49,7 +48,7 @@ const { blocks } = Astro.props;
       case 'archetypes':
         return <Archetypes data={data} />;
       case 'testimonials':
-        return <Testimonials data={data} testimonials={testimonialsData} />;
+        return <Testimonials data={data} />;
       case 'whatsapp-community':
         return <WhatsappCommunity data={data} />;
       case 'page-hero':
