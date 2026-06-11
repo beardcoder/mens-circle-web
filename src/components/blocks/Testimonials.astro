@@ -1,52 +1,16 @@
 ---
-import type { Testimonial } from '../../lib/types';
+// Testimonials are dynamic: published entries are fetched from PocketBase at
+// runtime by the island (the section hides itself when there are none).
+import TestimonialsList from '../islands/TestimonialsList.svelte';
 
 interface Props {
   data?: { anchor?: string };
-  testimonials: Testimonial[];
 }
 
-const { data, testimonials } = Astro.props;
-const anchor = data?.anchor ?? 'stimmen';
+const { data } = Astro.props;
 ---
 
-{
-  testimonials.length > 0 && (
-    <section
-      class="section section--large testimonials-section"
-      id={anchor}
-      aria-labelledby="testimonials-title"
-    >
-      <div class="testimonials__pattern" aria-hidden="true" />
-      <div class="container">
-        <div class="section-header" data-reveal-group>
-          <p class="eyebrow" data-reveal="up">Community Stimmen</p>
-          <h2 class="section-title" id="testimonials-title" data-reveal="blur">
-            Was <span class="highlight">Teilnehmer</span> sagen
-          </h2>
-          <p class="testimonials__subtitle" data-reveal="up">
-            Authentische Einblicke von Männern, die den Kreis erleben
-          </p>
-        </div>
-
-        <div class="testimonials__grid" data-reveal-group="100">
-          {testimonials.map((t) => (
-            <article class="testimonial-item" data-reveal="up" data-hover="lift">
-              <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
-              {(t.author || t.role) && (
-                <div class="testimonial-item__author">
-                  {t.author && (
-                    <cite class="testimonial-item__name">{t.author}</cite>
-                  )}
-                  {t.role && (
-                    <span class="testimonial-item__role">{t.role}</span>
-                  )}
-                </div>
-              )}
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
+<!-- client:idle (not client:visible): the island renders nothing until its
+     PocketBase fetch resolves, so a visibility observer would have no sized
+     target to trigger on. idle hydration guarantees it loads. -->
+<TestimonialsList client:idle anchor={data?.anchor ?? 'stimmen'} />
