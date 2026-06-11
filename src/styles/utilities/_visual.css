@@ -4,6 +4,23 @@
  */
 
 /* ============================================
+   "Next event" CTAs — statically gated
+   ============================================
+   Every link/button that points at the next event carries `data-event-cta`.
+   Whether an upcoming event exists is resolved at BUILD time (the site is
+   rebuilt via the PocketBase deploy webhook whenever events change), and the
+   `<body>` is tagged `has-upcoming-event` only when one is confirmed.
+
+   The CTAs are hidden by DEFAULT and revealed only on that confirmation, so
+   there is no runtime request, no flicker, and no dead button in the empty or
+   build-unreachable state. For CTAs that sit inside a list (footer nav) the
+   whole row is dropped so no empty bullet remains. */
+body:not(.has-upcoming-event) [data-event-cta],
+body:not(.has-upcoming-event) :is(li):has(> [data-event-cta]) {
+  display: none;
+}
+
+/* ============================================
    Screen Reader Only
    ============================================ */
 .sr-only {
