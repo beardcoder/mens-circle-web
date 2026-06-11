@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getNextEvent, getEventBySlug } from '@lib/pocketbase';
+  import { getEventBySlug } from '@lib/pocketbase';
   import type { EventDTO, EventData } from '@lib/types';
   import RegistrationForm from './RegistrationForm.svelte';
   import CalendarModal from './CalendarModal.svelte';
@@ -8,14 +8,19 @@
   import NewsletterForm from './NewsletterForm.svelte';
 
   interface Props {
+    /** Event rendered at build time (null = no upcoming event scheduled). */
+    event: EventDTO | null;
     /** WhatsApp community link, passed from Astro site data. */
     whatsappLink?: string;
   }
 
-  const { whatsappLink }: Props = $props();
+  const { event: initialEvent, whatsappLink }: Props = $props();
 
-  let loading = $state(true);
-  let event = $state<EventDTO | null>(null);
+  // The event content is baked in at build time (SEO + instant first paint).
+  // For an upcoming event we refresh the *volatile* capacity (available spots /
+  // full / waitlist) live on mount, since registrations change it between
+  // rebuilds (a rebuild is only triggered when the event record itself changes).
+  let event = $state<EventDTO | null>(initialEvent);
 
   // ─── Date formatting (de-DE, Europe/Berlin) ────────────────────────
   const TZ = 'Europe/Berlin';
@@ -78,28 +83,16 @@
   }
 
   onMount(() => {
+    const current = event;
+    if (!current || current.is_past) return;
     void (async () => {
-      const params = new URLSearchParams(location.search);
-      const match = /^\/event\/([^/]+)\/?$/.exec(location.pathname);
-      const slug = match?.[1] ?? params.get('slug') ?? null;
-
-      event = slug
-        ? await getEventBySlug(decodeURIComponent(slug))
-        : await getNextEvent();
-      loading = false;
+      const fresh = await getEventBySlug(current.slug);
+      if (fresh) event = fresh;
     })();
   });
 </script>
 
-{#if loading}
-  <section class="hero">
-    <div class="container">
-      <div class="hero__content">
-        <p class="hero__label">Einen Moment…</p>
-      </div>
-    </div>
-  </section>
-{:else if event}
+{#if event}
   {@const e = event}
   <!-- Event Hero -->
   <section class="hero event-hero">

@@ -2,6 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import EventPage from '../components/islands/EventPage.svelte';
 import site from '../data/site.json';
+import { fetchNextEvent } from '@lib/pocketbase-build';
+
+// The next upcoming event is resolved at build time and rendered into the HTML.
+// When events change, a PocketBase hook triggers a rebuild (pb_hooks/deploy.pb.js)
+// so /event always reflects the current "next" event. The island refreshes live
+// capacity on mount. `null` renders the graceful "no termin scheduled" state.
+const event = await fetchNextEvent();
 ---
 
 <Layout
@@ -9,5 +16,5 @@ import site from '../data/site.json';
   description="Der nächste Männerkreis in Straubing. Sieh dir den Termin an und sichere dir deinen Platz."
   ogType="event"
 >
-  <EventPage client:only="svelte" whatsappLink={site.whatsappCommunityLink} />
+  <EventPage client:load event={event} whatsappLink={site.whatsappCommunityLink} />
 </Layout>
