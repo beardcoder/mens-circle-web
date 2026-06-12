@@ -19,7 +19,10 @@ const anchor = data.anchor ?? 'faq';
 const items = (data.items ?? []).filter((i) => i.question && i.answer);
 ---
 
-<section class="section section--large faq-section" id={anchor}>
+<section
+  class="section section--large faq-section"
+  id={anchor}
+>
   <div class="container">
     <div
       class="section-header section-header--start faq__header"
@@ -27,7 +30,10 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
     >
       {
         data.eyebrow && (
-          <p class="eyebrow" data-reveal="up">
+          <p
+            class="eyebrow"
+            data-reveal="up"
+          >
             {data.eyebrow}
           </p>
         )
@@ -35,13 +41,20 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 
       {
         data.title && (
-          <h2 class="section-title" data-reveal="blur" set:html={data.title} />
+          <h2
+            class="section-title"
+            data-reveal="blur"
+            set:html={data.title}
+          />
         )
       }
 
       {
         data.intro && (
-          <p class="section-intro" data-reveal="up">
+          <p
+            class="section-intro"
+            data-reveal="up"
+          >
             {data.intro}
           </p>
         )
@@ -50,19 +63,32 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 
     {
       items.length > 0 && (
-        <div class="faq__list" data-reveal-group="80">
+        <div
+          class="faq__list"
+          data-reveal-group="80"
+        >
           {items.map((item) => (
-            <details class="accordion-item" name={anchor} data-reveal="up">
+            <details
+              class="accordion-item"
+              name={anchor}
+              data-reveal="up"
+            >
               <summary
                 class="accordion-item__trigger"
                 data-umami-event="faq-expand"
                 data-umami-event-question={item.question!.slice(0, 50)}
               >
                 <span>{item.question}</span>
-                <span class="accordion-item__icon" aria-hidden="true" />
+                <span
+                  class="accordion-item__icon"
+                  aria-hidden="true"
+                />
               </summary>
               <div class="accordion-item__body">
-                <div class="accordion-item__content" set:html={item.answer} />
+                <div
+                  class="accordion-item__content"
+                  set:html={item.answer}
+                />
               </div>
             </details>
           ))}
@@ -71,3 +97,241 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
     }
   </div>
 </section>
+
+<style is:global>
+  @layer components {
+    .accordion-item {
+      --_accent: var(--accent-primary);
+      --_icon-size: 1.75rem;
+      --_icon-mark: 0.625rem;
+      --_icon-stroke: 1.5px;
+
+      position: relative;
+      border-block-end: 1px solid var(--border-light);
+      transition:
+        background-color var(--motion-standard),
+        border-color var(--motion-standard);
+
+      &:first-child {
+        border-block-start: 1px solid var(--border-light);
+      }
+
+      &::before {
+        position: absolute;
+        inset-block: var(--space-sm);
+        inset-inline-start: 0;
+        inline-size: 2px;
+        pointer-events: none;
+        content: '';
+        background: var(--_accent);
+        border-radius: var(--radius-full);
+        opacity: 0;
+        transform: scaleY(0.4);
+        transition:
+          opacity var(--motion-standard),
+          transform var(--motion-standard);
+      }
+
+      &[open] {
+        background: color-mix(in oklch, var(--accent-primary) 4%, transparent);
+        border-block-end-color: color-mix(
+          in oklch,
+          var(--accent-primary) 35%,
+          var(--border-light)
+        );
+
+        &::before {
+          opacity: 1;
+          transform: scaleY(1);
+        }
+      }
+    }
+
+    .accordion-item__trigger {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      justify-content: space-between;
+      inline-size: 100%;
+      padding-block: var(--space-md);
+      padding-inline: var(--space-sm);
+      font-size: var(--text-lg);
+      color: var(--text-primary);
+      text-align: start;
+      letter-spacing: -0.02em;
+      cursor: pointer;
+      outline: none;
+      list-style: none;
+      background: none;
+      border: none;
+      transition: color var(--motion-quick);
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          color: var(--_accent);
+        }
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--_accent);
+        outline-offset: 2px;
+        border-radius: var(--radius-sm);
+      }
+    }
+
+    [open] > .accordion-item__trigger {
+      color: var(--_accent);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .accordion-item:not([open])
+        > .accordion-item__trigger:hover
+        .accordion-item__icon {
+        background: color-mix(in oklch, var(--_accent) 12%, transparent);
+        border-color: var(--_accent);
+
+        &::before,
+        &::after {
+          background: var(--_accent);
+        }
+      }
+    }
+
+    .accordion-item__icon {
+      position: relative;
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      inline-size: var(--_icon-size);
+      block-size: var(--_icon-size);
+      background: color-mix(in oklch, var(--color-earth-warm) 12%, transparent);
+      border: 1px solid var(--color-earth-warm);
+      border-radius: var(--radius-full);
+      transition:
+        background-color var(--motion-standard),
+        border-color var(--motion-standard);
+
+      &::before,
+      &::after {
+        position: absolute;
+        inset-block-start: 50%;
+        inset-inline-start: 50%;
+        content: '';
+        background: var(--color-earth-warm);
+        border-radius: var(--radius-full);
+        transform: translate(-50%, -50%);
+        transition:
+          background-color var(--motion-standard),
+          transform var(--motion-standard);
+      }
+
+      &::before {
+        inline-size: var(--_icon-mark);
+        block-size: var(--_icon-stroke);
+      }
+
+      &::after {
+        inline-size: var(--_icon-stroke);
+        block-size: var(--_icon-mark);
+      }
+    }
+
+    [open] > .accordion-item__trigger .accordion-item__icon {
+      background: var(--_accent);
+      border-color: var(--_accent);
+
+      &::before,
+      &::after {
+        background: var(--color-bone);
+      }
+
+      &::after {
+        transform: translate(-50%, -50%) rotate(90deg);
+      }
+    }
+
+    .accordion-item::details-content {
+      block-size: 0;
+      overflow: clip;
+      opacity: 0;
+      transition:
+        block-size var(--motion-standard),
+        content-visibility var(--motion-standard) allow-discrete,
+        opacity var(--motion-standard);
+    }
+
+    .accordion-item[open]::details-content {
+      block-size: auto;
+      opacity: 1;
+    }
+
+    .accordion-item__body {
+      font-size: 0.95em;
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+
+      p:last-child {
+        margin-block-end: 0;
+      }
+    }
+
+    .accordion-item__content {
+      padding-block-end: var(--space-md);
+      padding-inline: var(--space-sm);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .accordion-item,
+      .accordion-item::before,
+      .accordion-item__trigger,
+      .accordion-item__icon,
+      .accordion-item__icon::before,
+      .accordion-item__icon::after,
+      .accordion-item::details-content {
+        transition: none;
+      }
+    }
+  }
+
+  @layer sections {
+    .faq-section {
+      overflow: clip;
+      background: var(--bg-primary);
+
+      & > .container {
+        display: grid;
+        grid-template-columns: 0.35fr 0.65fr;
+        gap: var(--space-xl);
+        align-items: start;
+
+        @media (width <= 900px) {
+          grid-template-columns: 1fr;
+          gap: var(--space-lg);
+        }
+      }
+    }
+
+    .faq__header {
+      position: sticky;
+      inset-block-start: var(--header-clearance);
+      margin-block-end: 0;
+      text-align: start;
+
+      @media (width <= 900px) {
+        position: relative;
+        inset-block-start: 0;
+        margin-block-end: var(--rhythm-block);
+      }
+    }
+
+    .faq__list {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+</style>
