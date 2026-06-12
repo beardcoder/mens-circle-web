@@ -21,10 +21,16 @@ const anchor = data.anchor ?? 'newsletter';
 >
   <div class="container">
     <div class="newsletter__layout">
-      <div class="newsletter__content" data-reveal-group="100">
+      <div
+        class="newsletter__content"
+        data-reveal-group="100"
+      >
         {
           data.eyebrow && (
-            <p class="eyebrow eyebrow--secondary" data-reveal="up">
+            <p
+              class="eyebrow eyebrow--secondary"
+              data-reveal="up"
+            >
               {data.eyebrow}
             </p>
           )
@@ -43,7 +49,10 @@ const anchor = data.anchor ?? 'newsletter';
 
         {
           data.text && (
-            <p class="newsletter__text" data-reveal="up">
+            <p
+              class="newsletter__text"
+              data-reveal="up"
+            >
               {data.text}
             </p>
           )
@@ -63,3 +72,48 @@ const anchor = data.anchor ?? 'newsletter';
     </div>
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .newsletter-section {
+      --_surface-noise-opacity: 0.04;
+      --_surface-glow-strength: 15%;
+
+      position: relative;
+      overflow: clip;
+      color: var(--text-on-dark);
+      background: var(--bg-section-alt);
+    }
+
+    .newsletter__layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    @media (width <= 800px) {
+      .newsletter__layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+    }
+
+    .newsletter__title {
+      color: var(--text-on-dark);
+    }
+
+    .newsletter__text {
+      margin-block-end: 0;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--color-sand);
+    }
+
+    .newsletter__form-wrapper {
+      position: relative;
+    }
+  }
+</style>
