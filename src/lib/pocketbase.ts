@@ -1,16 +1,16 @@
 /**
  * Client-side PocketBase API helpers (runtime, browser).
  *
- * Static content (events, testimonials) is fetched at BUILD time in
- * `pocketbase-build.ts`. The helpers here cover the parts that must stay live
- * in the browser: form submissions (register / newsletter / testimonial) and
- * the event page's live capacity refresh. They use plain `fetch` against the
- * custom PocketBase routes — no PocketBase JS SDK is shipped to the client.
+ * Page content (events, testimonials) is server-rendered (see
+ * `pocketbase-server.ts`). The helpers here cover the parts that must run in
+ * the browser: the form submissions (register / newsletter / testimonial).
+ * They use plain `fetch` against the custom PocketBase routes — no PocketBase
+ * JS SDK is shipped to the client.
  *
- * In production the Astro build is served BY PocketBase on the same origin,
- * so the default base URL is the current origin. For local dev set
- * `PUBLIC_PB_URL` (e.g. http://localhost:8090) because Astro's dev server
- * runs on a different port than PocketBase.
+ * In production the Bun edge server serves the site and reverse-proxies
+ * `/api/*` to PocketBase on the same origin, so the default base URL is the
+ * current origin. For local dev set `PUBLIC_PB_URL` (e.g. http://localhost:8090)
+ * because Astro's dev server runs on a different port than PocketBase.
  *
  * All write endpoints are custom PocketBase routes (see pocketbase/pb_hooks)
  * that perform validation, capacity/waitlist logic and transactional email
@@ -18,7 +18,6 @@
  */
 import type {
   ApiResponse,
-  EventDTO,
   RegistrationPayload,
   TestimonialPayload,
 } from './types';
@@ -74,19 +73,4 @@ export function submitTestimonial(
   payload: TestimonialPayload,
 ): Promise<ApiResponse> {
   return postJson('/api/testimonial/submit', payload);
-}
-
-/** Fetch a single event by slug (past or upcoming), or null if not found. */
-export async function getEventBySlug(slug: string): Promise<EventDTO | null> {
-  try {
-    const res = await fetch(
-      `${PB_BASE_URL}/api/public/events/${encodeURIComponent(slug)}`,
-      { headers: { Accept: 'application/json' } },
-    );
-    if (!res.ok) return null;
-    const data = (await res.json()) as { event: EventDTO | null };
-    return data.event ?? null;
-  } catch {
-    return null;
-  }
 }
