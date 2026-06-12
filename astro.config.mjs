@@ -3,6 +3,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
 import umami from '@yeskunall/astro-umami';
+import bun from './adapter/index.mjs';
 
 // Umami analytics is opt-in: it only loads when a website id is configured.
 // Self-hosted instances set PUBLIC_UMAMI_ENDPOINT (e.g. https://umami.example.com).
@@ -17,17 +18,23 @@ const analytics = umamiId
     ]
   : [];
 
-// Static site. The build output (./dist) is served as static files by
-// PocketBase (pb_public) in production — a single, tiny Go process serves
-// the whole frontend plus the API/admin/email backend.
+// SSR on the Bun runtime. The built server (dist/server) is run by Bun via a
+// thin custom entry (server/entry.ts) that also reverse-proxies the dynamic
+// PocketBase paths — so a single Bun process is the public edge (replacing
+// nginx) and PocketBase stays on loopback for the API/admin/email backend.
+// Most pages are prerendered (static, RAM-friendly); only the event pages and
+// the home testimonials render on demand from PocketBase.
 // https://astro.build/config
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://mens-circle.de',
-  output: 'static',
+  output: 'server',
+  adapter: bun(),
   trailingSlash: 'ignore',
   redirects: {
     '/home': '/',
     '/events': '/event',
+    // Legacy plural deep-links → the per-event page (was a PocketBase route).
+    '/events/[slug]': '/event/[slug]',
   },
   // Prefetch in-viewport internal links for instant navigation. Pairs with the
   // CSS cross-document view transitions (styles/utilities/_view-transitions.css).

@@ -1,20 +1,23 @@
 # Männerkreis Niederbayern / Straubing
 
-Schnelle, leichtgewichtige Website für den Männerkreis — **Astro 5/6 + Svelte 5** im
-Frontend, **PocketBase** als Backend, **nginx** als schlanker Edge davor. Alles
-zusammen in **einem** Docker-Image, deploybar mit Coolify. Paketmanager &
-Build-Tool ist **Bun**.
+Schnelle, leichtgewichtige Website für den Männerkreis — **Astro 6 + Svelte 5**,
+**SSR in der Bun-Runtime** als schlanker Edge, **PocketBase** als Backend. Alles
+zusammen in **einem** Docker-Image, deploybar mit Coolify. Paketmanager,
+Build-Tool **und** Laufzeit ist **Bun**.
 
 ## Architektur
 
 ```
 ┌─────────────────────────── ein Docker-Container ───────────────────────────┐
 │                                                                             │
-│   nginx (Edge, :8090 — der nach außen exposte Port)                         │
-│   ├─ liefert die statische Astro-Site direkt aus  → /srv/site (dist)        │
-│   │    mit voller Kontrolle über Cache-Control + Security-Header            │
+│   Bun-Edge (server, :8090 — der nach außen exposte Port)                    │
+│   ├─ liefert die Astro-Site aus:                                            │
+│   │    · vorgerenderte Seiten (statisch) — Recht/Atemübung/…                │
+│   │    · On-Demand-SSR — Startseite (Testimonials) + Event-Seiten,          │
+│   │      die live aus PocketBase rendern (kein Rebuild nötig)               │
+│   │    · setzt Cache-Control je Asset-Klasse + Security-Header              │
 │   └─ reverse-proxyt die dynamischen Pfade an PocketBase:                     │
-│        /api/*  ·  /_/*  ·  /newsletter/*  ·  /events/*                       │
+│        /api/*  ·  /_  ·  /_/*  ·  /newsletter/*                             │
 │                          │                                                  │
 │                          ▼                                                  │
 │   PocketBase (Go-Binary, 127.0.0.1:8091 — nur intern)                       │
@@ -27,21 +30,24 @@ Build-Tool ist **Bun**.
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- **Warum nginx davor?** PocketBase kann beim Ausliefern statischer Dateien
-  keine `Cache-Control`- oder sonstigen Header setzen. nginx serviert die
-  Astro-Site daher direkt und setzt die Cache-Zeiten je Asset-Klasse (gehashte
-  Assets/Fonts inkl. Astro-optimierter avif/webp `immutable` 1 Jahr, sonstige
-  Bilder 7 Tage, Manifeste/Feeds 1 Tag, HTML `must-revalidate`) plus
-  Security-Header. nginx wurde gewählt, weil es mit einem Worker nur wenige MB
-  RAM braucht — deutlich weniger als ein Go-basierter Edge. Die Konfiguration
-  steht zentral in [`nginx.conf`](nginx.conf). Kompression übernimmt der
+- **Bun-Edge statt nginx.** Ein einziger Bun-Prozess ist der öffentliche Edge:
+  er rendert/liefert die Astro-Site und proxyt die dynamischen Pfade an
+  PocketBase auf Loopback. Der Adapter dafür ist lokal und minimal
+  ([`adapter/`](adapter/)) — die offiziellen Bun-Adapter unterstützen nur
+  Astro ≤5. Cache-Control wird je Asset-Klasse gesetzt (gehashte Assets/Fonts
+  `immutable` 1 Jahr, sonstige Bilder 7 Tage, Manifeste/Feeds 1 Tag, HTML
+  `must-revalidate`), dazu Security-Header. Kompression übernimmt der
   Coolify-Edge.
-- **Kein Node/Bun zur Laufzeit.** Bun baut nur die statische Site; ausgeliefert
-  werden zur Laufzeit nur nginx (winzig) + das PocketBase-Binary. Minimaler
-  Footprint, nachhaltig.
+- **RAM-schonend & nachhaltig.** Die meisten Seiten sind vorgerendert (statisch)
+  und werden nur ausgeliefert; nur Event-Seiten und die Testimonials der
+  Startseite rendern serverseitig live aus PocketBase. Ein kleiner In-Memory-
+  Cache (60 s) hält die SSR-Abfragen niedrig. Ein Rebuild bei Content-Änderung
+  entfällt komplett — neue Events/Testimonials sind sofort sichtbar.
+- **Bun zur Laufzeit (nicht Node).** Das gebaute Server-Bundle wird mit `bun`
+  ausgeführt. Footprint: ein Bun-Prozess + das PocketBase-Binary.
 - **Statischer Content** (Texte, FAQ, Hero, Moderator …) liegt als **JSON** im
   Repo (`src/content/`, `src/data/`) und wird direkt in Astro eingepflegt.
-- **Dynamische Teile** (Event, Anmeldung, Warteliste, Newsletter, Testimonial,
+- **Dynamische Teile** (Anmeldung, Warteliste, Newsletter, Testimonial,
   Atemübung) sind **Svelte-5-Islands**, die per `fetch` mit PocketBase sprechen.
 
 ## Projektstruktur
@@ -58,7 +64,8 @@ src/
 pocketbase/
   pb_migrations/  Collection-Schema (events, registrations, …)
   pb_hooks/       E-Mail-Logik, Custom-Routen, Cron, Templates
-Dockerfile        Multi-Stage: Bun-Build → Alpine + PocketBase
+adapter/          lokaler Astro-6-Bun-Adapter (Edge-Server + PocketBase-Proxy)
+Dockerfile        Multi-Stage: Bun-Build → Bun-Runtime + PocketBase
 ```
 
 ## Lokale Entwicklung
@@ -84,61 +91,42 @@ bun run dev
 ```
 
 Im Dev-Modus sprechen Astro (4321) und PocketBase (8090) über verschiedene Ports,
-daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin hinter nginx: der
-Browser spricht den Edge-Port an, nginx proxyt `/api/*` an PocketBase — dann
-bleibt `PUBLIC_PB_URL` leer. (nginx braucht es lokal nicht; der Edge wird nur im
-Docker-Image gestartet.)
+daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin hinter dem Bun-Edge:
+der Browser spricht den Edge-Port an, der Edge proxyt `/api/*` an PocketBase —
+dann bleibt `PUBLIC_PB_URL` leer. (Der Edge läuft nur im Docker-Image; lokal
+nutzt man `bun run dev`.)
 
-### Build
+### Build & lokal ausführen
 
 ```bash
 bun run build        # → dist/   (NICHT `bun --bun run build`, das bricht Rollup)
+
+# Das gebaute Server-Bundle in der Bun-Runtime starten (wie in Produktion).
+# Edge auf :3000, PocketBase (lokal auf :8090) als Datenquelle/Proxy-Ziel.
+PORT=3000 PB_INTERNAL_URL=http://127.0.0.1:8090 bun run start
 ```
 
 ## Deployment mit Coolify
 
 1. Neue Ressource → **Dockerfile**-basiert, dieses Repo.
 2. **Persistent Volume** mounten auf `/pb/pb_data` (Datenbank + Uploads).
-3. Port **8090** exposen (das ist der nginx-Edge; PocketBase läuft intern auf
+3. Port **8090** exposen (das ist der Bun-Edge; PocketBase läuft intern auf
    `127.0.0.1:8091`). Coolify terminiert TLS und leitet per HTTP weiter.
 4. Environment-Variablen setzen (siehe `.env.example`):
 
-| Variable                                                               | Zweck                                                                                  |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `APP_URL`                                                              | öffentliche URL (E-Mail-Links, iCal, Unsubscribe)                                      |
-| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`                                  | Absender transaktionaler Mails                                                         |
-| `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME`                                | Empfänger der Admin-Benachrichtigungen                                                 |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_TLS` | SMTP-Versand (wird beim Boot in PocketBase übernommen)                                 |
-| `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`                                  | legt beim ersten Start den Admin an                                                    |
-| `PB_URL`                                                               | **Build-Arg**: Live-PocketBase, aus der Events + Testimonials beim Build geholt werden |
-| `PUBLIC_SITE_URL`                                                      | Build-Zeit: Canonical/Sitemap (Default `https://mens-circle.de`)                       |
-| `DEPLOY_WEBHOOK_URL`                                                   | Deploy-Hook, der bei Event-/Testimonial-Änderung einen Rebuild auslöst                 |
-| `DEPLOY_WEBHOOK_METHOD`                                                | HTTP-Methode des Hooks (Coolify: `GET`, Default `POST`)                                |
-| `DEPLOY_WEBHOOK_TOKEN`                                                 | wird als `Authorization: Bearer <token>` gesendet (Coolify-API-Token)                  |
-| `DEPLOY_COOLDOWN_SEC`                                                  | Mindestabstand zwischen Rebuilds (Default 60)                                          |
-| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                             | optional: Umami-Analytics                                                              |
+| Variable                                                               | Zweck                                                            |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `APP_URL`                                                              | öffentliche URL (E-Mail-Links, iCal, Unsubscribe)               |
+| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`                                  | Absender transaktionaler Mails                                  |
+| `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME`                                | Empfänger der Admin-Benachrichtigungen                          |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_TLS` | SMTP-Versand (wird beim Boot in PocketBase übernommen)          |
+| `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`                                  | legt beim ersten Start den Admin an                             |
+| `PUBLIC_SITE_URL`                                                      | **Build-Arg**: Canonical/Sitemap (Default `https://mens-circle.de`) |
+| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                             | optional: Umami-Analytics                                       |
 
 SMTP/Absender werden bei jedem Boot aus den Env-Variablen in die PocketBase-
-Einstellungen geschrieben — kein manuelles Klicken im Admin nötig.
-
-### Rebuild bei Content-Änderung (Coolify-Auth)
-
-Events und Testimonials werden zur **Build-Zeit** ins HTML gerendert. Ändert sich
-ein solcher Datensatz, pingt der PocketBase-Hook `pb_hooks/deploy.pb.js` den
-Deploy-Webhook → Coolify baut neu (Astro holt dabei via `PB_URL` die aktuellen
-Daten) → Redeploy. Mehrere schnelle Änderungen fallen zu max. 2 Builds zusammen
-(Leading-Edge sofort + Trailing-Sweep per Minuten-Cron).
-
-Coolify-Setup: API-Token unter **Keys & Tokens → API Tokens** anlegen, Ressourcen-
-UUID aus der App-URL nehmen, dann:
-
-```
-DEPLOY_WEBHOOK_URL=https://<coolify-host>/api/v1/deploy?uuid=<resource-uuid>&force=false
-DEPLOY_WEBHOOK_METHOD=GET
-DEPLOY_WEBHOOK_TOKEN=<coolify-api-token>
-```
-
-Ohne `DEPLOY_WEBHOOK_URL` ist der Trigger ein No-op (z. B. lokal).
+Einstellungen geschrieben — kein manuelles Klicken im Admin nötig. `PB_INTERNAL_URL`
+setzt der Entrypoint automatisch auf die Loopback-Adresse — nicht nötig zu setzen.
 
 Die PocketBase-Version ist als Docker-`ARG PB_VERSION` (Default aktuell
 `0.39.3`) überschreibbar.
@@ -153,10 +141,9 @@ Die PocketBase-Version ist als Docker-`ARG PB_VERSION` (Default aktuell
 - **Events, Anmeldungen, Newsletter, Testimonials:** im PocketBase-Admin (`/_/`).
 
 Nach Content-Änderungen am **JSON**: neu deployen (Coolify-Rebuild). **Events und
-Testimonials** werden zur Build-Zeit ins HTML gerendert; eine Änderung im
-PocketBase-Admin löst über den Deploy-Webhook automatisch einen Rebuild aus
-(siehe oben). Anmeldungen/Kapazität bleiben live (die Event-Seite aktualisiert
-die freien Plätze clientseitig).
+Testimonials** werden serverseitig (SSR) live aus PocketBase gerendert — eine
+Änderung im PocketBase-Admin ist **sofort** sichtbar, ohne Rebuild. Auch
+Anmeldungen/Kapazität sind dadurch immer live.
 
 ## E-Mails
 

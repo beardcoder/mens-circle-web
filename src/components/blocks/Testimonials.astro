@@ -1,12 +1,11 @@
 ---
-// Testimonials are rendered statically at build time: published entries are
-// fetched from PocketBase during the build and baked into the HTML (great SEO,
-// no client fetch / loading flash). When a testimonial is added, edited,
-// published or removed, a PocketBase hook triggers a site rebuild so the change
-// goes live (see pocketbase/pb_hooks/deploy.pb.js).
+// Testimonials are rendered server-side: this block lives on the SSR home page,
+// so published entries are fetched from PocketBase per request (cached briefly
+// in pocketbase-server.ts) and rendered into the HTML — great SEO, no client
+// fetch / loading flash, and new testimonials go live with no rebuild.
 //
 // The section renders nothing when there are no published testimonials.
-import { fetchTestimonials } from '@lib/pocketbase-build';
+import { fetchTestimonials } from '@lib/pocketbase-server';
 
 interface Props {
   data?: { anchor?: string };

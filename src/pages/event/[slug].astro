@@ -2,24 +2,16 @@
 import Layout from '../../layouts/Layout.astro';
 import EventPage from '../../components/islands/EventPage.svelte';
 import site from '../../data/site.json';
-import { fetchAllEvents } from '@lib/pocketbase-build';
-import type { EventDTO } from '@lib/types';
+import { getEventBySlug } from '@lib/pocketbase-server';
 
-// One statically built page per event (date-based slug, e.g. /event/2026-06-12),
-// covering past and upcoming events. The list comes from PocketBase at build
-// time; a record change triggers a rebuild so new/edited events get a page.
-export async function getStaticPaths() {
-  const events = await fetchAllEvents();
-  return events
-    .filter((event) => event.slug)
-    .map((event) => ({ params: { slug: event.slug }, props: { event } }));
-}
+// SSR: one page per event (date-based slug, e.g. /event/2026-06-12), covering
+// past and upcoming events. The record is fetched from PocketBase per request,
+// so new/edited events get a live page with no rebuild. An unknown slug falls
+// back to /event (the current "next" event).
+const { slug } = Astro.params;
+const event = slug ? await getEventBySlug(slug) : null;
+if (!event) return Astro.redirect('/event', 302);
 
-interface Props {
-  event: EventDTO;
-}
-
-const { event } = Astro.props;
 const cleanTitle = event.title?.trim() || 'Termin';
 ---
 
