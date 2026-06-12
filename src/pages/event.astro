@@ -2,12 +2,11 @@
 import Layout from '../layouts/Layout.astro';
 import EventPage from '../components/islands/EventPage.svelte';
 import site from '../data/site.json';
-import { fetchNextEvent } from '@lib/pocketbase-build';
+import { fetchNextEvent } from '@lib/pocketbase-server';
 
-// The next upcoming event is resolved at build time and rendered into the HTML.
-// When events change, a PocketBase hook triggers a rebuild (pb_hooks/deploy.pb.js)
-// so /event always reflects the current "next" event. The island refreshes live
-// capacity on mount. `null` renders the graceful "no termin scheduled" state.
+// SSR: the next upcoming event (incl. live capacity) is fetched from PocketBase
+// per request, so /event always reflects the current "next" event with no
+// rebuild. `null` renders the graceful "no termin scheduled" state.
 const event = await fetchNextEvent();
 ---
 

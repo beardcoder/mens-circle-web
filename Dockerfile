@@ -3,33 +3,33 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Männerkreis — single-image deploy for Coolify.
 #
-# A tiny, sustainable footprint: the production image is Alpine + the PocketBase
-# Go binary, with nginx (Alpine package) as the lightweight edge in front.
+# One small, sustainable footprint built around two co-located processes:
 #
-#   nginx (edge, :8090)  ─┬─ serves the pre-built static Astro site (/srv/site)
-#                         │   with full Cache-Control / security-header control
-#                         └─ reverse-proxies the dynamic paths to PocketBase
-#   PocketBase (127.0.0.1:8091)  API, admin UI, email (pb_hooks), cron, DB
+#   Bun edge (server/entry.ts, :8090 — the exposed port)
+#   ├─ serves the Astro site: prerendered static pages + on-demand SSR
+#   │   (event pages + home testimonials render live from PocketBase), with
+#   │   security + Cache-Control headers applied per asset class
+#   └─ reverse-proxies the dynamic paths to PocketBase on loopback:
+#        /api/*  ·  /_  ·  /_/*  ·  /newsletter/*
+#   PocketBase (127.0.0.1:8091)  REST API, admin UI, transactional email
+#                                (pb_hooks), cron, DB — never exposed directly.
 #
-# nginx keeps the RAM overhead minimal (one worker, a few MB) compared to a
-# Go-based edge. There is NO Node/Bun runtime in production — Bun only builds.
+# The frontend runs in the Bun runtime (NOT Node). nginx is gone: the Bun edge
+# is the single entrypoint. PocketBase keeps the data + email + cron logic.
 # ─────────────────────────────────────────────────────────────────────────────
 
-# 1) Build the static frontend with Bun.
+# 1) Install dependencies + build the Astro server bundle with Bun.
+#    NB: the build path is baked into the bundle (the adapter records the
+#    absolute client dir), so the runtime stage MUST use the same WORKDIR.
 FROM oven/bun:1 AS build
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
-# Build-time data source: events + testimonials are fetched from the LIVE
-# PocketBase and baked into the static HTML. Point PB_URL at the running
-# instance (e.g. https://mens-circle.de) via a Coolify build arg. If it is unset
-# or unreachable (e.g. the very first deploy), the fetchers return empty and the
-# pages render their graceful "no content" state — the next content change
-# triggers a rebuild that picks the data up.
-ARG PB_URL
+# Canonical URL for sitemap / OG tags (build-time). Events + testimonials are
+# NO LONGER fetched at build time — they render on demand from PocketBase, so
+# there is no PB_URL build arg and no rebuild-on-content-change anymore.
 ARG PUBLIC_SITE_URL
-ENV PB_URL=$PB_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 # Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks
 # Astro's Rollup build, while `bun run` still uses Bun for everything else.
@@ -50,27 +50,34 @@ RUN set -eux; \
     unzip /tmp/pb.zip -d /pb; \
     rm /tmp/pb.zip
 
-# 3) Final runtime image.
-FROM alpine:3.21
-RUN apk add --no-cache ca-certificates tzdata wget nginx
+# 3) Final runtime image — Bun runtime + the PocketBase binary.
+FROM oven/bun:1
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
+    && rm -rf /var/lib/apt/lists/*
 ENV TZ=Europe/Berlin
-WORKDIR /pb
+# Same WORKDIR as the build stage so the adapter's baked client path resolves.
+WORKDIR /app
 
+# The Astro server bundle (our edge entry is bundled into it) + its runtime
+# dependencies. The build path is baked into the bundle, so /app must match.
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
+
+# PocketBase: binary + hooks + migrations (data lives in the mounted volume).
 COPY --from=pocketbase /pb/pocketbase /usr/local/bin/pocketbase
-COPY pocketbase/pb_hooks ./pb_hooks
-COPY pocketbase/pb_migrations ./pb_migrations
-# Astro static site is served by nginx (not PocketBase) for full header control.
-COPY --from=build /app/dist /srv/site
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY pocketbase/pb_hooks /pb/pb_hooks
+COPY pocketbase/pb_migrations /pb/pb_migrations
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Persisted data (database, uploaded files) — mount a Coolify volume here.
 VOLUME ["/pb/pb_data"]
-# nginx is the edge; PocketBase stays on loopback 8091 (not exposed).
+# The Bun edge is the public port; PocketBase stays on loopback 8091.
 EXPOSE 8090
 
-# Hits nginx, which proxies to PocketBase — validates the whole chain.
+# Hits the Bun edge, which proxies /api to PocketBase — validates the chain.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -qO- http://127.0.0.1:8090/api/health >/dev/null 2>&1 || exit 1
 

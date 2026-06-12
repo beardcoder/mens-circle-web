@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { getEventBySlug } from '@lib/pocketbase';
   import type { EventDTO, EventData } from '@lib/types';
   import RegistrationForm from './RegistrationForm.svelte';
   import CalendarModal from './CalendarModal.svelte';
@@ -16,11 +14,10 @@
 
   const { event: initialEvent, whatsappLink }: Props = $props();
 
-  // The event content is baked in at build time (SEO + instant first paint).
-  // For an upcoming event we refresh the *volatile* capacity (available spots /
-  // full / waitlist) live on mount, since registrations change it between
-  // rebuilds (a rebuild is only triggered when the event record itself changes).
-  let event = $state<EventDTO | null>(initialEvent);
+  // The page is server-rendered per request, so the event content AND its
+  // volatile capacity (available spots / full / waitlist) are already live at
+  // first paint — no client-side refresh needed.
+  const event = initialEvent;
 
   // ─── Date formatting (de-DE, Europe/Berlin) ────────────────────────
   const TZ = 'Europe/Berlin';
@@ -81,15 +78,6 @@
       .replace(/>/g, '&gt;');
     return escaped.replace(/\r\n|\r|\n/g, '<br />');
   }
-
-  onMount(() => {
-    const current = event;
-    if (!current || current.is_past) return;
-    void (async () => {
-      const fresh = await getEventBySlug(current.slug);
-      if (fresh) event = fresh;
-    })();
-  });
 </script>
 
 {#if event}
