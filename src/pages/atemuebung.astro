@@ -75,3 +75,602 @@ const schemas = [
     </div>
   </section>
 </Layout>
+
+<style is:global>
+  /* @property kept unlayered — must be at top level for interpolation to work */
+  @property --ring-scale {
+    syntax: '<number>';
+    initial-value: 1;
+    inherits: true;
+  }
+
+  @layer sections {
+    .breathing-hero,
+    .breathing-section {
+      --breathing-bg: var(--color-earth-deep);
+      --breathing-bg-deep: var(--color-ink);
+      --breathing-accent: var(--color-terracotta-light);
+      --breathing-accent-dim: var(--color-terracotta);
+      --breathing-warm: var(--color-sand);
+      --_surface-noise-opacity: 0.04;
+    }
+
+    .breathing-hero {
+      position: relative;
+      block-size: auto;
+      min-block-size: 0;
+      padding-block: clamp(6rem, 12vh, 9rem) clamp(2.5rem, 5vh, 5rem);
+      color: var(--text-on-dark);
+      background:
+        radial-gradient(
+          ellipse at 20% 10%,
+          color-mix(in oklch, var(--breathing-accent-dim) 22%, transparent),
+          transparent 60%
+        ),
+        radial-gradient(
+          ellipse at 90% 90%,
+          color-mix(in oklch, var(--breathing-warm) 12%, transparent),
+          transparent 55%
+        ),
+        linear-gradient(
+          160deg,
+          var(--breathing-bg) 0%,
+          var(--breathing-bg-deep) 100%
+        );
+    }
+
+    .breathing-section {
+      --_surface-noise-opacity: 0.03;
+
+      position: relative;
+      padding-block: clamp(2rem, 5vh, 5rem);
+      overflow: hidden;
+      background:
+        radial-gradient(
+          ellipse at 50% 0%,
+          color-mix(in oklch, var(--breathing-accent-dim) 12%, transparent),
+          transparent 60%
+        ),
+        var(--breathing-bg);
+    }
+
+    .breathing-section::before {
+      z-index: 0;
+    }
+
+    .breathing-section > .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .breathing__wrapper {
+      display: grid;
+      gap: clamp(var(--space-md), 4vw, var(--space-lg));
+      max-inline-size: 640px;
+      margin-inline: auto;
+    }
+
+    .breathing__intro {
+      order: 2;
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid
+        color-mix(in oklch, var(--color-sand) 10%, transparent);
+    }
+
+    .breathing__intro h2 {
+      margin-block-end: var(--space-md);
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 500;
+      color: var(--text-on-dark);
+      text-align: center;
+      letter-spacing: -0.01em;
+    }
+
+    .breathing__steps {
+      padding-inline-start: 1.25rem;
+      margin-block-end: var(--space-md);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: color-mix(in oklch, var(--text-on-dark) 72%, transparent);
+    }
+
+    .breathing__steps li {
+      margin-block-end: var(--space-xs);
+    }
+
+    .breathing__steps strong {
+      color: var(--text-on-dark);
+    }
+
+    .breathing__warning {
+      padding: var(--space-sm) var(--space-md);
+      font-size: 0.9375rem;
+      color: var(--text-on-dark);
+      background: color-mix(in oklch, var(--color-warning) 12%, transparent);
+      border-inline-start: 3px solid var(--color-warning);
+      border-radius: var(--radius-md);
+    }
+
+    .breathing-app {
+      --breathing-cycle-ms: 3600ms;
+
+      position: relative;
+      display: grid;
+      grid-template-rows: 1fr auto auto auto;
+      gap: clamp(var(--space-sm), 3vw, var(--space-md));
+      order: 1;
+      min-block-size: min(82svh, 640px);
+      color: var(--text-on-dark);
+    }
+
+    .breathing-app__stage {
+      display: grid;
+      place-items: center;
+      min-block-size: 0;
+    }
+
+    .breathing-app__circle {
+      --size: min(82vw, 56svh, 440px);
+
+      position: relative;
+      display: grid;
+      place-items: center;
+      inline-size: var(--size);
+      block-size: var(--size);
+      text-align: center;
+      cursor: pointer;
+      isolation: isolate;
+      transition: filter var(--duration-slower) var(--ease-settle);
+    }
+
+    .breathing-app[data-phase='breathing'] .breathing-app__circle,
+    .breathing-app[data-phase='retention'] .breathing-app__circle,
+    .breathing-app[data-phase='recovery'] .breathing-app__circle {
+      cursor: default;
+    }
+
+    .breathing-app__ring {
+      position: absolute;
+      background: radial-gradient(
+        circle at 32% 28%,
+        color-mix(in oklch, var(--breathing-accent) 38%, transparent) 0%,
+        color-mix(in oklch, var(--breathing-accent-dim) 22%, transparent) 45%,
+        color-mix(in oklch, var(--breathing-accent-dim) 8%, transparent) 75%,
+        transparent 100%
+      );
+      border-radius: var(--radius-full);
+      box-shadow:
+        inset 0 0 50px
+          color-mix(in oklch, var(--breathing-accent) 22%, transparent),
+        inset 0 0 2px
+          color-mix(in oklch, var(--breathing-accent) 38%, transparent);
+      mix-blend-mode: screen;
+      transform: scale(var(--ring-scale));
+      transition:
+        --ring-scale var(--duration-slower) var(--ease-settle),
+        background var(--duration-slower) var(--ease-settle),
+        box-shadow var(--duration-slower) var(--ease-settle);
+      will-change: transform;
+    }
+
+    .breathing-app__ring--1 {
+      inset: 0;
+      opacity: 0.42;
+    }
+
+    .breathing-app__ring--2 {
+      inset: 22%;
+      opacity: 0.6;
+    }
+
+    .breathing-app__ring--3 {
+      inset: 42%;
+      opacity: 0.85;
+    }
+
+    .breathing-app[data-phase='idle'] .breathing-app__ring--1,
+    .breathing-app[data-phase='complete'] .breathing-app__ring--1 {
+      animation: breathing-idle 7s var(--ease-precise) infinite;
+    }
+
+    .breathing-app[data-phase='idle'] .breathing-app__ring--2,
+    .breathing-app[data-phase='complete'] .breathing-app__ring--2 {
+      animation: breathing-idle 7s var(--ease-precise) infinite -0.6s;
+    }
+
+    .breathing-app[data-phase='idle'] .breathing-app__ring--3,
+    .breathing-app[data-phase='complete'] .breathing-app__ring--3 {
+      animation: breathing-idle-inner 7s var(--ease-precise) infinite -1.2s;
+    }
+
+    .breathing-app__circle[data-motion='wave'] .breathing-app__ring--1 {
+      transition: none;
+      animation: breathing-wave-outer var(--breathing-cycle-ms)
+        var(--ease-precise) infinite;
+    }
+
+    .breathing-app__circle[data-motion='wave'] .breathing-app__ring--2 {
+      transition: none;
+      animation: breathing-wave-mid var(--breathing-cycle-ms)
+        var(--ease-precise) infinite;
+    }
+
+    .breathing-app__circle[data-motion='wave'] .breathing-app__ring--3 {
+      transition: none;
+      animation: breathing-wave-inner var(--breathing-cycle-ms)
+        var(--ease-precise) infinite;
+    }
+
+    .breathing-app__circle[data-motion='hold-high'] .breathing-app__ring--1 {
+      --ring-scale: 1.04;
+    }
+
+    .breathing-app__circle[data-motion='hold-high'] .breathing-app__ring--2 {
+      --ring-scale: 1.3;
+    }
+
+    .breathing-app__circle[data-motion='hold-high'] .breathing-app__ring--3 {
+      --ring-scale: 1.9;
+    }
+
+    .breathing-app__circle[data-motion='hold-low'] .breathing-app__ring--1 {
+      --ring-scale: 0.98;
+    }
+
+    .breathing-app__circle[data-motion='hold-low'] .breathing-app__ring--2 {
+      --ring-scale: 0.95;
+    }
+
+    .breathing-app__circle[data-motion='hold-low'] .breathing-app__ring--3 {
+      --ring-scale: 0.9;
+    }
+
+    .breathing-app__core {
+      position: absolute;
+      inset: 48%;
+      background: radial-gradient(
+        circle at 35% 30%,
+        color-mix(in oklch, var(--breathing-accent) 92%, var(--color-bone) 8%),
+        color-mix(in oklch, var(--breathing-accent) 70%, transparent) 60%,
+        color-mix(in oklch, var(--breathing-accent-dim) 50%, transparent) 100%
+      );
+      border-radius: var(--radius-full);
+      box-shadow:
+        0 0 60px color-mix(in oklch, var(--breathing-accent) 55%, transparent),
+        0 0 120px color-mix(in oklch, var(--breathing-accent) 25%, transparent);
+      mix-blend-mode: screen;
+      transition:
+        background var(--duration-slower) var(--ease-settle),
+        box-shadow var(--duration-slower) var(--ease-settle);
+    }
+
+    .breathing-app[data-phase='retention'] {
+      --breathing-accent: var(--color-sage-light);
+      --breathing-accent-dim: var(--color-sage);
+    }
+
+    .breathing-app[data-phase='recovery'] {
+      --breathing-accent: var(--color-sand-light);
+      --breathing-accent-dim: var(--color-sand);
+    }
+
+    .breathing-app[data-phase='complete'] {
+      --breathing-accent: var(--color-terracotta-light);
+      --breathing-accent-dim: var(--color-terracotta);
+    }
+
+    .breathing-app__label {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: var(--space-2xs);
+      padding: var(--space-sm) var(--space-md);
+      pointer-events: none;
+    }
+
+    .breathing-app__phase {
+      display: block;
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 6vw, 2.5rem);
+      font-weight: 500;
+      color: var(--text-on-dark);
+      letter-spacing: 0.01em;
+      text-shadow: 0 2px 24px color-mix(in oklch, black 70%, transparent);
+    }
+
+    .breathing-app__counter {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: color-mix(in oklch, var(--text-on-dark) 70%, transparent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .breathing-app__meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-sm);
+      text-align: center;
+    }
+
+    .breathing-app__meta-item {
+      display: grid;
+      gap: var(--space-3xs);
+      padding-block: var(--space-xs);
+      border-block-start: 1px solid
+        color-mix(in oklch, var(--color-sand) 14%, transparent);
+    }
+
+    .breathing-app__meta-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: color-mix(in oklch, var(--text-on-dark) 48%, transparent);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .breathing-app__meta-value {
+      font-family: var(--font-display);
+      font-size: clamp(1.125rem, 3vw, 1.375rem);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-on-dark);
+    }
+
+    .breathing-app__controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .breathing-app__controls .btn {
+      min-block-size: 52px;
+    }
+
+    .breathing-app__start svg {
+      margin-inline-start: 3px;
+    }
+
+    .breathing-app__settings {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-md) var(--space-lg);
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid
+        color-mix(in oklch, var(--color-sand) 10%, transparent);
+    }
+
+    .breathing-app__setting {
+      display: grid;
+      gap: var(--space-xs);
+      align-content: start;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .breathing-app__setting--wheel {
+      grid-column: 1 / -1;
+    }
+
+    .breathing-app__setting-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: color-mix(in oklch, var(--text-on-dark) 60%, transparent);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .breathing-stepper {
+      display: inline-grid;
+      grid-template-columns: auto minmax(3.5rem, auto) auto;
+      gap: var(--space-sm);
+      align-items: center;
+      padding: var(--space-3xs) var(--space-xs);
+      background: color-mix(in oklch, var(--color-sand) 6%, transparent);
+      border: 1px solid color-mix(in oklch, var(--color-sand) 14%, transparent);
+      border-radius: var(--radius-full);
+    }
+
+    .breathing-stepper__btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: 40px;
+      block-size: 40px;
+      padding: 0;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 500;
+      line-height: 1;
+      color: var(--text-on-dark);
+      cursor: pointer;
+      background: color-mix(in oklch, var(--color-sand) 10%, transparent);
+      border: none;
+      border-radius: var(--radius-full);
+      transition:
+        background-color var(--motion-quick),
+        color var(--motion-quick),
+        transform var(--duration-fast) var(--ease-settle);
+    }
+
+    .breathing-stepper__btn:hover {
+      color: var(--breathing-bg-deep);
+      background: var(--breathing-accent);
+    }
+
+    .breathing-stepper__btn:active {
+      transform: scale(0.92);
+    }
+
+    .breathing-stepper__btn:focus-visible {
+      outline: 2px solid var(--breathing-accent);
+      outline-offset: 2px;
+    }
+
+    .breathing-stepper__btn[disabled],
+    .breathing-stepper__btn[aria-disabled='true'] {
+      pointer-events: none;
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    .breathing-stepper__value {
+      min-inline-size: 2.5ch;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-on-dark);
+      text-align: center;
+    }
+
+    .breathing-picker {
+      --picker-item-width: 72px;
+      --picker-height: 72px;
+
+      position: relative;
+      inline-size: min(100%, 360px);
+      block-size: var(--picker-height);
+      overflow: hidden;
+      background: color-mix(in oklch, var(--color-sand) 6%, transparent);
+      border: 1px solid color-mix(in oklch, var(--color-sand) 14%, transparent);
+      border-radius: var(--radius-full);
+      box-shadow:
+        inset 0 1px 0 color-mix(in oklch, var(--color-bone) 4%, transparent),
+        inset 0 -1px 0 color-mix(in oklch, black 20%, transparent);
+    }
+
+    .breathing-picker:focus-visible {
+      outline: 2px solid var(--breathing-accent);
+      outline-offset: 3px;
+    }
+
+    .breathing-picker__indicator {
+      position: absolute;
+      inset-block: 8px;
+      inset-inline-start: 50%;
+      inline-size: var(--picker-item-width);
+      pointer-events: none;
+      background: color-mix(in oklch, var(--breathing-accent) 20%, transparent);
+      border: 1px solid
+        color-mix(in oklch, var(--breathing-accent) 55%, transparent);
+      border-radius: var(--radius-full);
+      box-shadow:
+        0 4px 14px -4px
+          color-mix(in oklch, var(--breathing-accent) 35%, transparent),
+        inset 0 1px 0 color-mix(in oklch, var(--color-bone) 12%, transparent);
+      transform: translateX(-50%);
+      transition: background-color var(--duration-normal) var(--ease-settle);
+    }
+
+    .breathing-picker__track {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: calc(50% - var(--picker-item-width) / 2);
+      display: flex;
+      align-items: center;
+      block-size: 100%;
+      touch-action: pan-y;
+      cursor: grab;
+      user-select: none;
+      transform: translate3d(0, 0, 0);
+      transition: transform 220ms var(--ease-settle);
+      will-change: transform;
+    }
+
+    .breathing-picker.is-dragging .breathing-picker__track {
+      cursor: grabbing;
+    }
+
+    .breathing-picker__item {
+      display: inline-flex;
+      flex: 0 0 var(--picker-item-width);
+      align-items: center;
+      justify-content: center;
+      inline-size: var(--picker-item-width);
+      block-size: 100%;
+      padding: 0;
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: color-mix(in oklch, var(--text-on-dark) 45%, transparent);
+      text-align: center;
+      pointer-events: auto;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      transition:
+        color var(--duration-normal) var(--ease-settle),
+        font-size var(--duration-normal) var(--ease-settle),
+        opacity var(--duration-normal) var(--ease-settle);
+    }
+
+    .breathing-picker__item:focus-visible {
+      color: var(--text-on-dark);
+      outline: 2px solid var(--breathing-accent);
+      outline-offset: 4px;
+      border-radius: var(--radius-sm);
+    }
+
+    .breathing-picker__item.is-active {
+      font-size: 1.75rem;
+      color: var(--text-on-dark);
+      opacity: 1;
+    }
+
+    .breathing-picker__fade {
+      position: absolute;
+      inset-block: 0;
+      z-index: 1;
+      inline-size: 64px;
+      pointer-events: none;
+    }
+
+    .breathing-picker__fade--start {
+      inset-inline-start: 0;
+      background: linear-gradient(
+        to right,
+        color-mix(in oklch, var(--breathing-bg) 95%, transparent) 0%,
+        transparent 100%
+      );
+      border-start-start-radius: var(--radius-full);
+      border-end-start-radius: var(--radius-full);
+    }
+
+    .breathing-picker__fade--end {
+      inset-inline-end: 0;
+      background: linear-gradient(
+        to left,
+        color-mix(in oklch, var(--breathing-bg) 95%, transparent) 0%,
+        transparent 100%
+      );
+      border-start-end-radius: var(--radius-full);
+      border-end-end-radius: var(--radius-full);
+    }
+
+    .breathing-picker[aria-disabled='true'] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    @media (width < 480px) {
+      .breathing-app__circle {
+        --size: min(88vw, 52svh);
+      }
+
+      .breathing-app__controls .btn {
+        min-block-size: 48px;
+        padding-inline: var(--space-sm);
+      }
+
+      .breathing-app__start {
+        --btn-size: 64px;
+      }
+    }
+  }
+</style>

@@ -31,7 +31,10 @@ const showEventCtas = (await hasUpcomingEvent()) === true;
 ---
 
 <!doctype html>
-<html lang="de" dir="ltr">
+<html
+  lang="de"
+  dir="ltr"
+>
   <head>
     {
       /* Flag JS synchronously so reveals only hide their elements when JS is
@@ -46,21 +49,34 @@ const showEventCtas = (await hasUpcomingEvent()) === true;
     {
       /* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */
     }
-    <span id="top" aria-hidden="true"></span>
+    <span
+      id="top"
+      aria-hidden="true"
+    ></span>
 
     <SpriteDefs />
 
     {
       /* Editorial side rails — decorative magazine framing, hidden on small screens */
     }
-    <aside class="side-rail side-rail--left" aria-hidden="true">
+    <aside
+      class="side-rail side-rail--left"
+      aria-hidden="true"
+    >
       <span class="side-rail__text">Männerkreis · Niederbayern</span>
     </aside>
-    <aside class="side-rail side-rail--right" aria-hidden="true">
+    <aside
+      class="side-rail side-rail--right"
+      aria-hidden="true"
+    >
       <span class="side-rail__text">Straubing · Bayern</span>
     </aside>
 
-    <a href="#main" class="skip-link">Zum Inhalt springen</a>
+    <a
+      href="#main"
+      class="skip-link"
+      >Zum Inhalt springen</a
+    >
 
     <Header />
 
@@ -77,3 +93,25 @@ const showEventCtas = (await hasUpcomingEvent()) === true;
     </script>
   </body>
 </html>
+
+<style is:global>
+  @layer components {
+    .skip-link {
+      position: absolute;
+      inset-block-start: -100%;
+      inset-inline-start: 50%;
+      z-index: var(--z-toast);
+      padding: 1rem 2rem;
+      font-size: 0.875rem;
+      color: var(--text-on-dark);
+      background: var(--bg-section-alt);
+      border-radius: var(--radius-full);
+      transform: translateX(-50%);
+      transition: inset-block-start var(--motion-quick);
+    }
+
+    .skip-link:focus {
+      inset-block-start: var(--space-sm);
+    }
+  }
+</style>

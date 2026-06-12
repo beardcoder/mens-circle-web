@@ -53,9 +53,15 @@ function detectIcon(title = ''): string {
       aria-labelledby="archetypes-title"
     >
       <div class="container">
-        <div class="section-header" data-reveal-group>
+        <div
+          class="section-header"
+          data-reveal-group
+        >
           {data.eyebrow && (
-            <p class="eyebrow" data-reveal="up">
+            <p
+              class="eyebrow"
+              data-reveal="up"
+            >
               {data.eyebrow}
             </p>
           )}
@@ -68,13 +74,19 @@ function detectIcon(title = ''): string {
             />
           )}
           {data.intro && (
-            <p class="section-intro" data-reveal="up">
+            <p
+              class="section-intro"
+              data-reveal="up"
+            >
               {data.intro}
             </p>
           )}
         </div>
 
-        <div class="archetypes__grid" data-reveal-group="90">
+        <div
+          class="archetypes__grid"
+          data-reveal-group="90"
+        >
           {items.map((item) => {
             const icon = detectIcon(item.title);
             return (
@@ -106,3 +118,117 @@ function detectIcon(title = ''): string {
     </section>
   )
 }
+
+<style is:global>
+  @layer sections {
+    .archetypes-section {
+      position: relative;
+      overflow: clip;
+      background: var(--bg-secondary);
+    }
+
+    .archetype-card {
+      position: relative;
+      min-block-size: 15rem;
+      padding: var(--space-lg) var(--space-md);
+      overflow: hidden;
+      border-inline-start: 1px solid var(--border-light);
+      transition: background-color var(--motion-standard);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .archetype-card:hover {
+        background-color: color-mix(
+          in oklch,
+          var(--accent-primary) 5%,
+          var(--bg-secondary)
+        );
+      }
+
+      .archetype-card:hover .archetype-card__title {
+        color: var(--accent-primary);
+      }
+    }
+
+    .archetype-card__content {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: var(--space-xs);
+      padding-inline-end: clamp(4rem, 9vw, 8rem);
+    }
+
+    .archetype-card__background-icon {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-end: clamp(-5.5rem, -4.2vw, -2.6rem);
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.16;
+    }
+
+    .archetype-card__background-icon svg {
+      inline-size: clamp(16rem, 32vw, 22rem);
+      block-size: clamp(16rem, 32vw, 22rem);
+      transform: translateY(-50%) rotate(-8deg);
+    }
+
+    .archetype-card__title {
+      margin-block-end: var(--space-xs);
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+      line-height: 1.1;
+      color: var(--text-primary);
+      letter-spacing: -0.025em;
+      transition: color var(--motion-standard);
+    }
+
+    .archetype-card__description {
+      max-inline-size: 39ch;
+      margin: 0;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+
+    .archetype-card--warrior .archetype-card__background-icon svg {
+      transform: translateY(-50%) rotate(-14deg);
+    }
+
+    .archetype-card--lover .archetype-card__background-icon svg {
+      transform: translateY(-50%) rotate(-6deg);
+    }
+
+    .archetype-card--magician .archetype-card__background-icon svg {
+      transform: translateY(-50%) rotate(-3deg);
+    }
+
+    .archetype-card--king .archetype-card__background-icon svg {
+      transform: translateY(-50%) rotate(-12deg);
+    }
+
+    .archetype-card--father .archetype-card__background-icon svg {
+      transform: translateY(-50%) rotate(-4deg);
+    }
+
+    @media (width <= 600px) {
+      .archetype-card {
+        padding: var(--space-sm);
+      }
+
+      .archetype-card__content {
+        padding-inline-end: clamp(2.8rem, 8vw, 4rem);
+      }
+
+      .archetype-card__background-icon {
+        inset-inline-end: -3.4rem;
+        opacity: 0.14;
+      }
+
+      .archetype-card__background-icon svg {
+        inline-size: 12.5rem;
+        block-size: 12.5rem;
+      }
+    }
+  }
+</style>
