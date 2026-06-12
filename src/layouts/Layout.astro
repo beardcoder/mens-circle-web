@@ -1,5 +1,6 @@
 ---
 import '../styles/app.css';
+import { Font } from 'astro:assets';
 import SeoHead from '../components/SeoHead.astro';
 import SpriteDefs from '../components/SpriteDefs.astro';
 import Header from '../components/Header.astro';
@@ -43,6 +44,15 @@ const showEventCtas = (await hasUpcomingEvent()) === true;
     <script is:inline>
       document.documentElement.classList.add('motion-ready');
     </script>
+    {
+      /* Native Astro fonts (config in astro.config.mjs). Preload Playfair —
+        the hero heading is the LCP; DM Sans loads without a preload race. */
+    }
+    <Font
+      cssVariable="--font-playfair"
+      preload
+    />
+    <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
   </head>
   <body class:list={{ 'has-upcoming-event': showEventCtas }}>

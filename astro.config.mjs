@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
 import umami from '@yeskunall/astro-umami';
@@ -47,6 +47,37 @@ export default defineConfig({
     // absorbs the cost of repeating the CSS per document.
     inlineStylesheets: 'always',
   },
+  // Native Astro Fonts API (stable since Astro 6). Replaces the former
+  // `@fontsource-variable/*` CSS @imports + the hand-maintained fallback faces
+  // in styles/base/_fonts.css. Astro self-hosts and subsets the woff2, emits
+  // the @font-face rules inline (no render-blocking @import), and auto-derives
+  // metric-matched fallback faces (`optimizedFallbacks`, on by default) from the
+  // trailing generic family — so the first paint is dimensionally stable and the
+  // eventual swap shifts nothing. The <Font> component in the layout head wires
+  // up the CSS variables and the preloads (see src/layouts/Layout.astro).
+  fonts: [
+    {
+      // Display / headings — the hero heading (incl. its big italic accent) is
+      // the LCP, so this family is preloaded.
+      name: 'Playfair Display',
+      cssVariable: '--font-playfair',
+      provider: fontProviders.fontsource(),
+      weights: ['400 900'], // variable range
+      styles: ['normal', 'italic'],
+      subsets: ['latin'], // covers German äöüß
+      fallbacks: ['Georgia', 'serif'],
+    },
+    {
+      // Body / UI text.
+      name: 'DM Sans',
+      cssVariable: '--font-dm-sans',
+      provider: fontProviders.fontsource(),
+      weights: ['100 1000'], // variable range
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+  ],
   integrations: [
     svelte(),
     sitemap({
@@ -56,5 +87,4 @@ export default defineConfig({
     }),
     ...analytics,
   ],
-  vite: {},
 });
