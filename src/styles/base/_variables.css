@@ -108,11 +108,13 @@
   /* ============================================
      Typography Scale
      ============================================ */
-  --font-display:
-    'Playfair Display Variable', 'Playfair Display Fallback', georgia, serif;
-  --font-body: 'DM Sans Variable', 'DM Sans Fallback', system-ui, sans-serif;
-  --font-accent:
-    'Playfair Display Variable', 'Playfair Display Fallback', georgia, serif;
+  /* --font-playfair / --font-dm-sans are defined by the Astro <Font>
+     components (astro.config.mjs `fonts`) and already expand to the full
+     stack: the webfont, an auto-generated metric-matched fallback face, then
+     the configured generic fallbacks. */
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-dm-sans);
+  --font-accent: var(--font-playfair);
 
   /* Fluid Type Scale using clamp() */
   --text-xs: clamp(0.625rem, 0.5rem + 0.25vw, 0.75rem);
