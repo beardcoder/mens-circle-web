@@ -6,7 +6,7 @@ import SpriteDefs from '../components/SpriteDefs.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ScrollToTop from '../components/ScrollToTop.astro';
-import { hasUpcomingEvent } from '../lib/pocketbase-build';
+import { hasUpcomingEvent } from '../lib/pocketbase-server';
 
 interface Props {
   title?: string;
@@ -21,14 +21,13 @@ interface Props {
 
 const props = Astro.props;
 
-// Resolve once at build time whether a "next event" is scheduled, so the
-// event CTAs can be shown/hidden statically. This removes the per-visitor
-// runtime `/api/public/events/next` request that previously sat on the
-// critical path (~400ms) and made the header CTA flicker (it rendered, then
-// JS removed it). The CTAs default to HIDDEN; the class below opts them in
-// only when an upcoming event is confirmed, so an empty/unknown state never
-// flashes a dead button.
-const showEventCtas = (await hasUpcomingEvent()) === true;
+// Whether to show the event CTAs. On the SSR pages (home, event) this is
+// resolved live from PocketBase per request (cached briefly), so the CTAs
+// reflect reality with no client-side fetch/flicker. On the prerendered pages
+// PocketBase is unreachable at build time and the helper returns `null`, so we
+// *fail open* (`!== false`) and keep the CTAs visible — they link to /event,
+// which gracefully renders its "no termin scheduled" state when needed.
+const showEventCtas = (await hasUpcomingEvent()) !== false;
 ---
 
 <!doctype html>

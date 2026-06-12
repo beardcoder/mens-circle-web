@@ -527,16 +527,3 @@ routerAdd("GET", "/newsletter/unsubscribe/{token}", (e) => {
     );
   }
 });
-
-// ---------------------------------------------------------------------------
-// Legacy deep-link redirect: /events/{slug} -> /event/{slug}.
-// Each event now has its own statically built page at /event/{slug} (generated
-// by Astro's getStaticPaths and served directly from pb_public). We only keep a
-// redirect for the old plural prefix so existing /events/<slug> links still work.
-// (Note: do NOT register /event/{slug} here — that path is a real static file
-// now; a route would shadow it.)
-// ---------------------------------------------------------------------------
-routerAdd("GET", "/events/{slug}", (e) => {
-  const slug = e.request.pathValue("slug");
-  return e.redirect(301, "/event/" + encodeURIComponent(slug || ""));
-});

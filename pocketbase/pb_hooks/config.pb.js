@@ -53,11 +53,11 @@ onBootstrap((e) => {
       dirty = true;
     }
 
-    // Behind the in-container nginx proxy every request originates from
-    // 127.0.0.1, so trust nginx's X-Forwarded-For to recover the real client
+    // Behind the in-container Bun edge proxy every request originates from
+    // 127.0.0.1, so trust the X-Forwarded-For chain to recover the real client
     // IP. Without this the rate limiting below would bucket ALL callers into a
-    // single (loopback) IP. nginx appends to XFF (proxy_add_x_forwarded_for),
-    // preserving the client IP forwarded by Coolify's outer proxy.
+    // single (loopback) IP. The Bun edge (server/entry.ts) appends its hop to
+    // XFF, preserving the client IP forwarded by Coolify's outer proxy.
     try {
       settings.trustedProxies.headers = ["X-Forwarded-For"];
       settings.trustedProxies.useLeftmostIP = true;
