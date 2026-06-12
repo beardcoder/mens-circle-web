@@ -48,7 +48,10 @@ const { blocks } = Astro.props;
       case 'archetypes':
         return <Archetypes data={data} />;
       case 'testimonials':
-        return <Testimonials data={data} />;
+        // Server island: the host page is prerendered (static), but published
+        // testimonials are fetched live from PocketBase per request, so new
+        // ones appear without a rebuild. Renders nothing until it resolves.
+        return <Testimonials data={data} server:defer />;
       case 'whatsapp-community':
         return <WhatsappCommunity data={data} />;
       case 'page-hero':
