@@ -17,8 +17,6 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "@astrojs/svelte": "^8.1.2",
-    "@fontsource-variable/dm-sans": "^5.2.8",
-    "@fontsource-variable/playfair-display": "^5.2.8",
     "@yeskunall/astro-umami": "^0.0.9",
     "astro": "^6.4.6",
     "leaflet": "^1.9.4",
