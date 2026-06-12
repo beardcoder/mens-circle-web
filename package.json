@@ -3,16 +3,17 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "description": "Männerkreis Niederbayern/ Straubing — Astro 5 + Svelte 5 frontend, served by PocketBase.",
+  "description": "Männerkreis Niederbayern/ Straubing — Astro 6 + Svelte 5, SSR on the Bun runtime, with PocketBase as the backend.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "start": "bun run dist/server/entry.mjs",
     "check": "astro check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "import:live": "bun run scripts/import-live-data.ts",
-    "pb:dev": "./pocketbase/pocketbase serve --dir ./pocketbase/pb_data --hooksDir ./pocketbase/pb_hooks --migrationsDir ./pocketbase/pb_migrations --publicDir ./dist"
+    "pb:dev": "./pocketbase/pocketbase serve --dir ./pocketbase/pb_data --hooksDir ./pocketbase/pb_hooks --migrationsDir ./pocketbase/pb_migrations"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
