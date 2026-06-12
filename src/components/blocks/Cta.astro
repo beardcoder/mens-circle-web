@@ -13,31 +13,14 @@ interface Props {
 const { data } = Astro.props;
 ---
 
-<section
-  class="section section--large cta-section"
-  id={data.anchor}
->
-  <div
-    class="cta__ornament cta__ornament--outer"
-    aria-hidden="true"
-  >
-  </div>
-  <div
-    class="cta__ornament cta__ornament--inner"
-    aria-hidden="true"
-  >
-  </div>
+<section class="section section--large cta-section" id={data.anchor}>
+  <div class="cta__ornament cta__ornament--outer" aria-hidden="true"></div>
+  <div class="cta__ornament cta__ornament--inner" aria-hidden="true"></div>
   <div class="container">
-    <div
-      class="cta__content"
-      data-reveal-group="100"
-    >
+    <div class="cta__content" data-reveal-group="100">
       {
         data.eyebrow && (
-          <p
-            class="eyebrow"
-            data-reveal="up"
-          >
+          <p class="eyebrow" data-reveal="up">
             {data.eyebrow}
           </p>
         )
@@ -55,10 +38,7 @@ const { data } = Astro.props;
 
       {
         data.text && (
-          <p
-            class="cta__text"
-            data-reveal="up"
-          >
+          <p class="cta__text" data-reveal="up">
             {data.text}
           </p>
         )

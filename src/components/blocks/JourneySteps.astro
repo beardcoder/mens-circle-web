@@ -25,22 +25,12 @@ const steps = data.steps ?? [];
   id={anchor}
   aria-labelledby="journey-title"
 >
-  <div
-    class="journey__glow"
-    aria-hidden="true"
-  >
-  </div>
+  <div class="journey__glow" aria-hidden="true"></div>
   <div class="container">
-    <div
-      class="section-header section-header--on-dark"
-      data-reveal-group
-    >
+    <div class="section-header section-header--on-dark" data-reveal-group>
       {
         data.eyebrow && (
-          <p
-            class="eyebrow eyebrow--secondary"
-            data-reveal="up"
-          >
+          <p class="eyebrow eyebrow--secondary" data-reveal="up">
             {data.eyebrow}
           </p>
         )
@@ -59,10 +49,7 @@ const steps = data.steps ?? [];
 
       {
         data.subtitle && (
-          <p
-            class="journey__subtitle"
-            data-reveal="up"
-          >
+          <p class="journey__subtitle" data-reveal="up">
             {data.subtitle}
           </p>
         )
@@ -71,24 +58,12 @@ const steps = data.steps ?? [];
 
     {
       steps.length > 0 && (
-        <div
-          class="journey__steps"
-          data-reveal-group="110"
-        >
-          <div
-            class="journey__thread"
-            aria-hidden="true"
-          />
+        <div class="journey__steps" data-reveal-group="110">
+          <div class="journey__thread" aria-hidden="true" />
           {steps.map((step) => (
-            <div
-              class="journey__step"
-              data-reveal="up"
-            >
+            <div class="journey__step" data-reveal="up">
               {step.number && (
-                <div
-                  class="journey__step-number"
-                  aria-hidden="true"
-                >
+                <div class="journey__step-number" aria-hidden="true">
                   {step.number}
                 </div>
               )}

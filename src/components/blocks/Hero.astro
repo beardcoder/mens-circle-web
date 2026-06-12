@@ -15,10 +15,7 @@ const { data } = Astro.props;
 const anchor = data.anchor;
 ---
 
-<section
-  class="hero"
-  id={anchor}
->
+<section class="hero" id={anchor}>
   <div class="hero__bg">
     {
       data.backgroundImage && (
@@ -32,17 +29,10 @@ const anchor = data.anchor;
         />
       )
     }
-    <div
-      class="hero__bg-glow"
-      aria-hidden="true"
-    >
-    </div>
+    <div class="hero__bg-glow" aria-hidden="true"></div>
   </div>
 
-  <div
-    class="hero__circles"
-    aria-hidden="true"
-  >
+  <div class="hero__circles" aria-hidden="true">
     <div class="hero__circle hero__circle--1"></div>
     <div class="hero__circle hero__circle--2"></div>
     <div class="hero__circle hero__circle--3"></div>
@@ -53,14 +43,7 @@ const anchor = data.anchor;
     <div class="hero__content">
       {data.label && <p class="hero__label">{data.label}</p>}
 
-      {
-        data.title && (
-          <h1
-            class="hero__title"
-            set:html={data.title}
-          />
-        )
-      }
+      {data.title && <h1 class="hero__title" set:html={data.title} />}
 
       <div class="hero__bottom">
         {
@@ -77,21 +60,12 @@ const anchor = data.anchor;
                 data.buttonLink?.startsWith('/event') ? '' : undefined
               }
             >
-              <a
-                href={data.buttonLink}
-                class="btn btn--primary btn--large"
-              >
+              <a href={data.buttonLink} class="btn btn--primary btn--large">
                 {data.buttonText}
               </a>
-              <span
-                class="hero__scroll"
-                aria-hidden="true"
-              >
+              <span class="hero__scroll" aria-hidden="true">
                 Entdecken
-                <span
-                  class="hero__scroll-line"
-                  aria-hidden="true"
-                />
+                <span class="hero__scroll-line" aria-hidden="true" />
               </span>
             </div>
           )

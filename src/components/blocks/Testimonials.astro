@@ -23,17 +23,11 @@ const testimonials = await fetchTestimonials();
       id={anchor}
       aria-labelledby="testimonials-title"
     >
-      <div
-        class="testimonials__pattern"
-        aria-hidden="true"
-      />
+      <div class="testimonials__pattern" aria-hidden="true" />
       <div class="container">
         <div class="section-header">
           <p class="eyebrow">Community Stimmen</p>
-          <h2
-            class="section-title"
-            id="testimonials-title"
-          >
+          <h2 class="section-title" id="testimonials-title">
             Was <span class="highlight">Teilnehmer</span> sagen
           </h2>
           <p class="testimonials__subtitle">
@@ -43,10 +37,7 @@ const testimonials = await fetchTestimonials();
 
         <div class="testimonials__grid">
           {testimonials.map((t) => (
-            <article
-              class="testimonial-item"
-              data-hover="lift"
-            >
+            <article class="testimonial-item" data-hover="lift">
               <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
               {(t.author || t.role) && (
                 <div class="testimonial-item__author">
