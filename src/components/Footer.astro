@@ -15,10 +15,7 @@ const phoneHref = site.contactPhone
   <div class="container">
     <div class="footer__top">
       <div class="footer__brand">
-        <a
-          href="/"
-          class="footer__logo"
-        >
+        <a href="/" class="footer__logo">
           <Logo class="footer__logo-icon" />
           <span>{site.siteName}</span>
         </a>
@@ -28,10 +25,7 @@ const phoneHref = site.contactPhone
             <ul class="footer__social-links">
               {socialLinks.map((link) => (
                 <li>
-                  <SocialIcon
-                    link={link}
-                    variant="link"
-                  />
+                  <SocialIcon link={link} variant="link" />
                 </li>
               ))}
             </ul>
@@ -90,10 +84,7 @@ const phoneHref = site.contactPhone
           {
             nav.footerContact.map((item) => (
               <li>
-                <a
-                  href={item.url}
-                  data-umami-event="footer-link"
-                >
+                <a href={item.url} data-umami-event="footer-link">
                   {item.label}
                 </a>
               </li>
@@ -108,10 +99,7 @@ const phoneHref = site.contactPhone
       <div class="footer__legal">
         {
           nav.footerLegal.map((item) => (
-            <a
-              href={item.url}
-              data-umami-event="footer-link"
-            >
+            <a href={item.url} data-umami-event="footer-link">
               {item.label}
             </a>
           ))

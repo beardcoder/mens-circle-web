@@ -2,14 +2,13 @@
  * Server entrypoint for the local "mens-circle-edge" adapter (see ./index.mjs).
  * Bundled into dist/server at build time and run by the Bun runtime.
  *
- *   Bun.serve (:8090, the exposed port)
- *   ├─ serves the Astro site: prerendered static files + on-demand SSR
- *   │  (via astro/app's `App`), with security + Cache-Control headers
- *   └─ reverse-proxies the dynamic PocketBase paths to loopback:
- *        /api/*  ·  /_  ·  /_/*  ·  /newsletter/*
+ * Serves the Astro site via astro/app's `App`: prerendered static files +
+ * on-demand SSR, with security + Cache-Control headers. It binds to loopback
+ * and does NOT proxy — nginx is the public edge in front (it routes the
+ * PocketBase paths to PocketBase and everything else here).
  *
  * Astro auto-invokes `start(manifest, args)` from its generated entry, so
- * `bun run dist/server/entry.mjs` boots the whole edge.
+ * `bun run dist/server/entry.mjs` boots the Astro server.
  */
 import { App } from 'astro/app';
 import path from 'node:path';
@@ -112,51 +111,6 @@ function createHandler(app, args) {
   };
 }
 
-// ── PocketBase reverse proxy ────────────────────────────────────────────────
-/** Paths owned by PocketBase (REST API, admin UI, newsletter-unsubscribe page). */
-function isPocketBasePath(pathname) {
-  return (
-    pathname === '/_' ||
-    pathname.startsWith('/_/') ||
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/newsletter/')
-  );
-}
-
-/** Reverse-proxy a request to PocketBase, streaming the response straight back. */
-async function proxyToPocketBase(request, server, pbUrl) {
-  const url = new URL(request.url);
-  const headers = new Headers(request.headers);
-
-  // Recover the real client IP for PocketBase's rate limiting (config.pb.js
-  // trusts the leftmost X-Forwarded-For), keeping Coolify's chain and adding us.
-  const peer = server?.requestIP?.(request)?.address;
-  if (peer) {
-    const prior = headers.get('X-Forwarded-For');
-    headers.set('X-Forwarded-For', prior ? `${prior}, ${peer}` : peer);
-  }
-  headers.set('X-Forwarded-Proto', url.protocol.replace(':', ''));
-  headers.set('X-Forwarded-Host', url.host);
-
-  const init = {
-    method: request.method,
-    headers,
-    redirect: 'manual', // pass PocketBase's redirects through verbatim
-  };
-  if (request.method !== 'GET' && request.method !== 'HEAD') {
-    init.body = request.body;
-    init.duplex = 'half'; // required to stream a request body
-  }
-
-  try {
-    // Returned directly so all upstream headers (incl. multiple Set-Cookie)
-    // and the streamed body are preserved unchanged.
-    return await fetch(`${pbUrl}${url.pathname}${url.search}`, init);
-  } catch {
-    return new Response('Bad Gateway', { status: 502 });
-  }
-}
-
 // ── Adapter exports ─────────────────────────────────────────────────────────
 /** Astro calls this to build the exported handlers. */
 export function createExports(manifest, args) {
@@ -164,7 +118,15 @@ export function createExports(manifest, args) {
   return { handle: createHandler(app, args) };
 }
 
-/** Auto-invoked by Astro's generated entry: boots the Bun edge server. */
+/**
+ * Auto-invoked by Astro's generated entry: boots the Astro server.
+ *
+ * This process serves ONLY the Astro app (prerendered files + on-demand SSR).
+ * nginx is the public edge in front of it: nginx routes the PocketBase paths
+ * (/api, /_, /newsletter) straight to PocketBase and everything else here, so
+ * this server binds to loopback and never proxies. SSR data is fetched from
+ * PocketBase directly via PB_INTERNAL_URL (see src/lib/pocketbase-server.ts).
+ */
 export function start(manifest, args) {
   const Bun = globalThis.Bun;
   if (!Bun?.serve) {
@@ -175,27 +137,17 @@ export function start(manifest, args) {
 
   const app = new App(manifest);
   const handler = createHandler(app, args);
-  const pbUrl = (
-    process.env.PB_INTERNAL_URL || 'http://127.0.0.1:8091'
-  ).replace(/\/$/, '');
   const hostname = process.env.HOST || '0.0.0.0';
-  const port = Number.parseInt(process.env.PORT || '8090', 10);
+  const port = Number.parseInt(process.env.PORT || '4321', 10);
 
   const server = Bun.serve({
     hostname,
     port,
-    idleTimeout: 120, // accommodate PocketBase admin's SSE/realtime stream
-    fetch(request, srv) {
-      const { pathname } = new URL(request.url);
-      return isPocketBasePath(pathname)
-        ? proxyToPocketBase(request, srv, pbUrl)
-        : handler(request, srv);
-    },
+    idleTimeout: 120,
+    fetch: (request, srv) => handler(request, srv),
   });
 
-  console.log(
-    `→ Edge listening on http://${hostname}:${port} (PocketBase: ${pbUrl})`,
-  );
+  console.log(`→ Astro server listening on http://${hostname}:${port}`);
 
   const stop = () => {
     try {
