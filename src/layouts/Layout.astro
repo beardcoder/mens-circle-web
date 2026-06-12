@@ -31,10 +31,7 @@ const showEventCtas = (await hasUpcomingEvent()) !== false;
 ---
 
 <!doctype html>
-<html
-  lang="de"
-  dir="ltr"
->
+<html lang="de" dir="ltr">
   <head>
     {
       /* Flag JS synchronously so reveals only hide their elements when JS is
@@ -47,10 +44,7 @@ const showEventCtas = (await hasUpcomingEvent()) !== false;
       /* Native Astro fonts (config in astro.config.mjs). Preload Playfair —
         the hero heading is the LCP; DM Sans loads without a preload race. */
     }
-    <Font
-      cssVariable="--font-playfair"
-      preload
-    />
+    <Font cssVariable="--font-playfair" preload />
     <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
   </head>
@@ -58,34 +52,21 @@ const showEventCtas = (await hasUpcomingEvent()) !== false;
     {
       /* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */
     }
-    <span
-      id="top"
-      aria-hidden="true"
-    ></span>
+    <span id="top" aria-hidden="true"></span>
 
     <SpriteDefs />
 
     {
       /* Editorial side rails — decorative magazine framing, hidden on small screens */
     }
-    <aside
-      class="side-rail side-rail--left"
-      aria-hidden="true"
-    >
+    <aside class="side-rail side-rail--left" aria-hidden="true">
       <span class="side-rail__text">Männerkreis · Niederbayern</span>
     </aside>
-    <aside
-      class="side-rail side-rail--right"
-      aria-hidden="true"
-    >
+    <aside class="side-rail side-rail--right" aria-hidden="true">
       <span class="side-rail__text">Straubing · Bayern</span>
     </aside>
 
-    <a
-      href="#main"
-      class="skip-link"
-      >Zum Inhalt springen</a
-    >
+    <a href="#main" class="skip-link">Zum Inhalt springen</a>
 
     <Header />
 

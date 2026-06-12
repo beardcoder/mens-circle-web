@@ -36,25 +36,12 @@ const photoKey = data.photo
 const photoAsset = photoKey ? (assetImages[photoKey]?.default ?? null) : null;
 ---
 
-<section
-  class="section moderator-section"
-  id={anchor}
->
-  <span
-    class="moderator__ornament"
-    aria-hidden="true"
-    >BEGLEITER</span
-  >
+<section class="section moderator-section" id={anchor}>
+  <span class="moderator__ornament" aria-hidden="true">BEGLEITER</span>
   <div class="container">
     <div class="moderator__layout">
-      <div
-        class="moderator__photo-wrapper"
-        data-reveal="right"
-      >
-        <div
-          class="moderator__photo"
-          data-motion="image"
-        >
+      <div class="moderator__photo-wrapper" data-reveal="right">
+        <div class="moderator__photo" data-motion="image">
           {
             photoAsset ? (
               <Picture
@@ -84,16 +71,10 @@ const photoAsset = photoKey ? (assetImages[photoKey]?.default ?? null) : null;
         <div class="moderator__photo-accent"></div>
       </div>
 
-      <div
-        class="moderator__content"
-        data-reveal-group="100"
-      >
+      <div class="moderator__content" data-reveal-group="100">
         {
           data.eyebrow && (
-            <p
-              class="eyebrow"
-              data-reveal="up"
-            >
+            <p class="eyebrow" data-reveal="up">
               {data.eyebrow}
             </p>
           )
@@ -111,20 +92,13 @@ const photoAsset = photoKey ? (assetImages[photoKey]?.default ?? null) : null;
 
         {
           data.bio && (
-            <div
-              class="moderator__bio"
-              data-reveal="up"
-              set:html={data.bio}
-            />
+            <div class="moderator__bio" data-reveal="up" set:html={data.bio} />
           )
         }
 
         {
           data.quote && (
-            <blockquote
-              class="moderator__quote"
-              data-reveal="up"
-            >
+            <blockquote class="moderator__quote" data-reveal="up">
               <p>{data.quote}</p>
             </blockquote>
           )

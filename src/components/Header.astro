@@ -7,11 +7,7 @@ const links = nav.header.links;
 const ctaLinks = nav.header.cta;
 ---
 
-<header
-  class="header"
-  id="header"
-  data-lume="site-header"
->
+<header class="header" id="header" data-lume="site-header">
   <div class="container">
     <div class="header__inner">
       <a
@@ -29,10 +25,7 @@ const ctaLinks = nav.header.cta;
         data-lume-part="nav"
         aria-label="Hauptnavigation"
       >
-        <span
-          class="nav__ambient"
-          aria-hidden="true"
-        >
+        <span class="nav__ambient" aria-hidden="true">
           <span class="nav__ring"></span>
           <span class="nav__ring"></span>
           <span class="nav__ring"></span>
@@ -49,10 +42,7 @@ const ctaLinks = nav.header.cta;
                   data-umami-event="nav-click"
                   data-umami-event-target={link.umamiTarget}
                 >
-                  <span
-                    class="nav__index"
-                    aria-hidden="true"
-                  >
+                  <span class="nav__index" aria-hidden="true">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span class="nav__label">{link.label}</span>
@@ -91,10 +81,7 @@ const ctaLinks = nav.header.cta;
           aria-expanded="false"
           aria-label="Menü öffnen"
         >
-          <span
-            class="nav-toggle__bars"
-            aria-hidden="true"
-          >
+          <span class="nav-toggle__bars" aria-hidden="true">
             <span class="nav-toggle__bar"></span>
             <span class="nav-toggle__bar"></span>
             <span class="nav-toggle__bar"></span>

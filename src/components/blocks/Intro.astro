@@ -20,19 +20,12 @@ const { data } = Astro.props;
 const anchor = data.anchor ?? 'ueber';
 ---
 
-<section
-  class="intro-section"
-  id={anchor}
-  aria-labelledby="intro-title"
->
+<section class="intro-section" id={anchor} aria-labelledby="intro-title">
   <div class="intro__layout">
     <div class="intro__left">
       {
         data.eyebrow && (
-          <p
-            class="eyebrow"
-            data-reveal="up"
-          >
+          <p class="eyebrow" data-reveal="up">
             {data.eyebrow}
           </p>
         )
@@ -52,11 +45,7 @@ const anchor = data.anchor ?? 'ueber';
 
       {
         data.text && (
-          <p
-            class="intro__text"
-            data-reveal="up"
-            data-reveal-delay="180"
-          >
+          <p class="intro__text" data-reveal="up" data-reveal-delay="180">
             {data.text}
           </p>
         )
@@ -64,15 +53,9 @@ const anchor = data.anchor ?? 'ueber';
 
       {
         data.values && data.values.length > 0 && (
-          <div
-            class="intro__values"
-            data-reveal-group="90"
-          >
+          <div class="intro__values" data-reveal-group="90">
             {data.values.map((value) => (
-              <div
-                class="value-item"
-                data-reveal="up"
-              >
+              <div class="value-item" data-reveal="up">
                 {value.number && (
                   <span class="value-item__number">{value.number}</span>
                 )}
@@ -89,26 +72,12 @@ const anchor = data.anchor ?? 'ueber';
       }
     </div>
 
-    <div
-      class="intro__image-area"
-      data-reveal="left"
-      data-reveal-delay="120"
-    >
-      <div
-        class="intro__image-circles"
-        aria-hidden="true"
-      >
+    <div class="intro__image-area" data-reveal="left" data-reveal-delay="120">
+      <div class="intro__image-circles" aria-hidden="true">
         <div class="intro__image-ring intro__image-ring--outer"></div>
         <div class="intro__image-ring intro__image-ring--inner"></div>
       </div>
-      {
-        data.quote && (
-          <p
-            class="intro__image-text"
-            set:html={data.quote}
-          />
-        )
-      }
+      {data.quote && <p class="intro__image-text" set:html={data.quote} />}
     </div>
   </div>
 </section>

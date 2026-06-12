@@ -19,10 +19,7 @@ const anchor = data.anchor ?? 'faq';
 const items = (data.items ?? []).filter((i) => i.question && i.answer);
 ---
 
-<section
-  class="section section--large faq-section"
-  id={anchor}
->
+<section class="section section--large faq-section" id={anchor}>
   <div class="container">
     <div
       class="section-header section-header--start faq__header"
@@ -30,10 +27,7 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
     >
       {
         data.eyebrow && (
-          <p
-            class="eyebrow"
-            data-reveal="up"
-          >
+          <p class="eyebrow" data-reveal="up">
             {data.eyebrow}
           </p>
         )
@@ -41,20 +35,13 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 
       {
         data.title && (
-          <h2
-            class="section-title"
-            data-reveal="blur"
-            set:html={data.title}
-          />
+          <h2 class="section-title" data-reveal="blur" set:html={data.title} />
         )
       }
 
       {
         data.intro && (
-          <p
-            class="section-intro"
-            data-reveal="up"
-          >
+          <p class="section-intro" data-reveal="up">
             {data.intro}
           </p>
         )
@@ -63,32 +50,19 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 
     {
       items.length > 0 && (
-        <div
-          class="faq__list"
-          data-reveal-group="80"
-        >
+        <div class="faq__list" data-reveal-group="80">
           {items.map((item) => (
-            <details
-              class="accordion-item"
-              name={anchor}
-              data-reveal="up"
-            >
+            <details class="accordion-item" name={anchor} data-reveal="up">
               <summary
                 class="accordion-item__trigger"
                 data-umami-event="faq-expand"
                 data-umami-event-question={item.question!.slice(0, 50)}
               >
                 <span>{item.question}</span>
-                <span
-                  class="accordion-item__icon"
-                  aria-hidden="true"
-                />
+                <span class="accordion-item__icon" aria-hidden="true" />
               </summary>
               <div class="accordion-item__body">
-                <div
-                  class="accordion-item__content"
-                  set:html={item.answer}
-                />
+                <div class="accordion-item__content" set:html={item.answer} />
               </div>
             </details>
           ))}
