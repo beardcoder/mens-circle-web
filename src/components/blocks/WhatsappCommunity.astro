@@ -13,18 +13,33 @@ const link = site.whatsappCommunityLink;
 
 {
   link && (
-    <section class="section whatsapp-section" id={anchor}>
+    <section
+      class="section whatsapp-section"
+      id={anchor}
+    >
       <div class="container">
         <div class="whatsapp__layout">
-          <div class="whatsapp__content" data-reveal-group="100">
-            <p class="eyebrow whatsapp__eyebrow" data-reveal="up">
+          <div
+            class="whatsapp__content"
+            data-reveal-group="100"
+          >
+            <p
+              class="eyebrow whatsapp__eyebrow"
+              data-reveal="up"
+            >
               Community
             </p>
-            <h2 class="section-title whatsapp__title" data-reveal="blur">
+            <h2
+              class="section-title whatsapp__title"
+              data-reveal="blur"
+            >
               Tritt unserer <span class="text-italic">WhatsApp Community</span>{' '}
               bei
             </h2>
-            <p class="whatsapp__text" data-reveal="up">
+            <p
+              class="whatsapp__text"
+              data-reveal="up"
+            >
               Bleibe mit anderen Männern in Verbindung, erhalte Erinnerungen zu
               unseren Treffen und tausche dich zwischen den Kreisen aus. Ein
               Raum für Austausch und gegenseitige Unterstützung.
@@ -44,7 +59,10 @@ const link = site.whatsappCommunityLink;
               data-umami-event="whatsapp-click"
               data-umami-event-type="community-join"
             >
-              <Sprite name="social-whatsapp" class="whatsapp__icon" />
+              <Sprite
+                name="social-whatsapp"
+                class="whatsapp__icon"
+              />
               <span>Community beitreten</span>
             </a>
             <p class="whatsapp__hint">Kostenlos und unverbindlich</p>
@@ -54,3 +72,102 @@ const link = site.whatsappCommunityLink;
     </section>
   )
 }
+
+<style is:global>
+  @layer sections {
+    .whatsapp-section {
+      --wa-bg-start: oklch(35% 0.08 145deg);
+      --wa-bg-end: oklch(28% 0.06 150deg);
+      --wa-glow: oklch(50% 0.15 145deg);
+      --wa-text-eyebrow: oklch(80% 0.12 145deg);
+      --wa-text-accent: oklch(75% 0.15 145deg);
+      --wa-text-body: oklch(85% 0.03 145deg);
+      --wa-text-hint: oklch(70% 0.05 145deg);
+      --_surface-noise-opacity: 0.03;
+      --_surface-glow-color: var(--wa-glow);
+      --_surface-glow-strength: 20%;
+      --_surface-glow-duration: 22s;
+      --_surface-glow-delay: -4s;
+
+      position: relative;
+      overflow: clip;
+      color: var(--text-on-dark);
+      background: linear-gradient(
+        135deg,
+        var(--wa-bg-start) 0%,
+        var(--wa-bg-end) 100%
+      );
+    }
+
+    .whatsapp__layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    @media (width <= 800px) {
+      .whatsapp__layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        text-align: center;
+      }
+    }
+
+    .whatsapp__eyebrow {
+      color: var(--wa-text-eyebrow);
+    }
+
+    .whatsapp__title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.2;
+      color: var(--text-on-dark);
+    }
+
+    .whatsapp__title .text-italic {
+      color: var(--wa-text-accent);
+    }
+
+    .whatsapp__text {
+      max-inline-size: var(--content-max-text);
+      margin-block-end: 0;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--wa-text-body);
+    }
+
+    @media (width <= 800px) {
+      .whatsapp__text {
+        margin-inline: auto;
+      }
+    }
+
+    .whatsapp__action {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      align-items: flex-start;
+    }
+
+    @media (width <= 800px) {
+      .whatsapp__action {
+        align-items: center;
+      }
+    }
+
+    .whatsapp__button .whatsapp__icon,
+    .whatsapp__icon {
+      flex-shrink: 0;
+      inline-size: 1.5rem;
+      block-size: 1.5rem;
+    }
+
+    .whatsapp__hint {
+      margin: 0;
+      font-size: var(--text-sm);
+      color: var(--wa-text-hint);
+    }
+  }
+</style>

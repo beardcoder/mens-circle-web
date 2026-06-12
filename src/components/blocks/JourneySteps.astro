@@ -25,12 +25,22 @@ const steps = data.steps ?? [];
   id={anchor}
   aria-labelledby="journey-title"
 >
-  <div class="journey__glow" aria-hidden="true"></div>
+  <div
+    class="journey__glow"
+    aria-hidden="true"
+  >
+  </div>
   <div class="container">
-    <div class="section-header section-header--on-dark" data-reveal-group>
+    <div
+      class="section-header section-header--on-dark"
+      data-reveal-group
+    >
       {
         data.eyebrow && (
-          <p class="eyebrow eyebrow--secondary" data-reveal="up">
+          <p
+            class="eyebrow eyebrow--secondary"
+            data-reveal="up"
+          >
             {data.eyebrow}
           </p>
         )
@@ -49,7 +59,10 @@ const steps = data.steps ?? [];
 
       {
         data.subtitle && (
-          <p class="journey__subtitle" data-reveal="up">
+          <p
+            class="journey__subtitle"
+            data-reveal="up"
+          >
             {data.subtitle}
           </p>
         )
@@ -58,12 +71,24 @@ const steps = data.steps ?? [];
 
     {
       steps.length > 0 && (
-        <div class="journey__steps" data-reveal-group="110">
-          <div class="journey__thread" aria-hidden="true" />
+        <div
+          class="journey__steps"
+          data-reveal-group="110"
+        >
+          <div
+            class="journey__thread"
+            aria-hidden="true"
+          />
           {steps.map((step) => (
-            <div class="journey__step" data-reveal="up">
+            <div
+              class="journey__step"
+              data-reveal="up"
+            >
               {step.number && (
-                <div class="journey__step-number" aria-hidden="true">
+                <div
+                  class="journey__step-number"
+                  aria-hidden="true"
+                >
                   {step.number}
                 </div>
               )}
@@ -78,3 +103,176 @@ const steps = data.steps ?? [];
     }
   </div>
 </section>
+<style is:global>
+  @layer sections {
+    .journey-section {
+      --_surface-noise-opacity: 0.03;
+
+      position: relative;
+      overflow: clip;
+      color: var(--text-on-dark);
+      background: var(--bg-dark);
+    }
+
+    .journey__glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(
+        ellipse 80% 60% at 50% 100%,
+        color-mix(in oklch, var(--accent-primary) 16%, transparent) 0%,
+        transparent 50%
+      );
+    }
+
+    .journey-section .section-header {
+      position: relative;
+      z-index: 1;
+    }
+
+    .journey__subtitle {
+      margin-block: 0;
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      font-style: italic;
+      color: var(--color-sand);
+      opacity: 0.8;
+    }
+
+    .journey__steps {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      overflow: hidden;
+    }
+
+    .journey__thread {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline: 0;
+      block-size: 1px;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        color-mix(in oklch, var(--accent-secondary) 68%, transparent),
+        transparent
+      );
+      opacity: 0.7;
+      transform-origin: left;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .journey__thread {
+        animation: thread-drift 7s var(--ease-ambient) infinite;
+      }
+    }
+
+    @media (width <= 1000px) {
+      .journey__steps {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (width <= 600px) {
+      .journey__steps {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .journey__step {
+      position: relative;
+      padding: var(--space-lg) var(--space-md);
+      border-inline-start: 1px solid var(--border-on-dark);
+      transition: background-color var(--motion-standard);
+    }
+
+    .journey__step:first-child {
+      border-inline-start: none;
+    }
+
+    .journey__step::after {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: '';
+      background: radial-gradient(
+        ellipse 90% 70% at 50% 100%,
+        color-mix(in oklch, var(--accent-primary) 14%, transparent),
+        transparent 70%
+      );
+      opacity: 0;
+      transition: opacity var(--motion-standard);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .journey__step:hover::after {
+        opacity: 1;
+      }
+
+      .journey__step:hover .journey__step-number {
+        color: var(--accent-secondary);
+        opacity: 0.55;
+        translate: 0 -6px;
+      }
+
+      .journey__step:hover .journey__step-title {
+        color: var(--accent-secondary);
+      }
+    }
+
+    @media (width <= 1000px) {
+      .journey__step {
+        border-block-start: 1px solid var(--border-on-dark);
+        border-inline-start: none;
+      }
+
+      .journey__step:nth-child(-n + 2) {
+        border-block-start: none;
+      }
+    }
+
+    @media (width <= 600px) {
+      .journey__step {
+        border-block-start: 1px solid var(--border-on-dark);
+      }
+
+      .journey__step:first-child {
+        border-block-start: none;
+      }
+    }
+
+    .journey__step-number {
+      margin-block-end: var(--space-md);
+      font-family: var(--font-display);
+      font-size: clamp(5.5rem, 12vw, 10rem);
+      line-height: 0.78;
+      color: var(--accent-primary);
+      letter-spacing: -0.05em;
+      opacity: 0.3;
+      transition:
+        color var(--motion-standard),
+        opacity var(--motion-standard),
+        translate 420ms var(--ease-settle);
+    }
+
+    .journey__step-title {
+      margin-block-end: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 2.2vw, 2.25rem);
+      color: var(--text-on-dark);
+      letter-spacing: -0.025em;
+      transition: color var(--motion-standard);
+    }
+
+    .journey__step-text {
+      margin: 0;
+      font-size: 0.9375rem;
+      line-height: var(--leading-normal);
+      color: var(--color-sand);
+      opacity: 0.9;
+    }
+  }
+</style>
