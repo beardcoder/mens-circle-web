@@ -1,8 +1,8 @@
 # Männerkreis Niederbayern / Straubing
 
 Schnelle, leichtgewichtige Website für den Männerkreis — **Astro 6 + Svelte 5**,
-**SSR in der Bun-Runtime** als schlanker Edge, **PocketBase** als Backend. Alles
-zusammen in **einem** Docker-Image, deploybar mit Coolify. Paketmanager,
+**SSR in der Bun-Runtime**, **PocketBase** als Backend, **nginx** als Edge davor.
+Alles zusammen in **einem** Docker-Image, deploybar mit Coolify. Paketmanager,
 Build-Tool **und** Laufzeit ist **Bun**.
 
 ## Architektur
@@ -10,41 +10,42 @@ Build-Tool **und** Laufzeit ist **Bun**.
 ```
 ┌─────────────────────────── ein Docker-Container ───────────────────────────┐
 │                                                                             │
-│   Bun-Edge (server, :8090 — der nach außen exposte Port)                    │
-│   ├─ liefert die Astro-Site aus:                                            │
-│   │    · vorgerenderte Seiten (statisch) — Recht/Atemübung/…                │
-│   │    · On-Demand-SSR — Startseite (Testimonials) + Event-Seiten,          │
-│   │      die live aus PocketBase rendern (kein Rebuild nötig)               │
-│   │    · setzt Cache-Control je Asset-Klasse + Security-Header              │
-│   └─ reverse-proxyt die dynamischen Pfade an PocketBase:                     │
-│        /api/*  ·  /_  ·  /_/*  ·  /newsletter/*                             │
-│                          │                                                  │
-│                          ▼                                                  │
-│   PocketBase (Go-Binary, 127.0.0.1:8091 — nur intern)                       │
-│   ├─ REST API + Admin-UI (/_/)                                              │
-│   ├─ Custom-Routen (Anmeldung, Newsletter, …)     → pb_hooks/               │
-│   ├─ Transaktionale E-Mails (Go-Templates)        → pb_hooks/views/emails/  │
-│   ├─ Cron (Event-Erinnerungen)                    → pb_hooks/cron.pb.js     │
-│   └─ Collections / Schema                         → pb_migrations/          │
+│   nginx (Edge, :8090 — der nach außen exposte Port)                         │
+│   ├─ liefert die statischen Assets direkt aus  → /app/dist/client           │
+│   │    (gehashte Assets immutable, Security-Header)                         │
+│   ├─ /api · /_ · /newsletter   → PocketBase                                 │
+│   └─ alles andere (HTML/SSR)   → Astro-Server (Bun)                         │
+│            │                              │                                 │
+│            ▼                              ▼                                 │
+│   Astro-Server (Bun, 127.0.0.1:4321)   PocketBase (Go, 127.0.0.1:8091)      │
+│   ├─ vorgerenderte Seiten (statisch)   ├─ REST API + Admin-UI (/_/)         │
+│   └─ On-Demand-SSR: Startseite         ├─ Custom-Routen      → pb_hooks/     │
+│      (Testimonials) + Event-Seiten,    ├─ Transakt. E-Mails  → views/emails/│
+│      live aus PocketBase (kein         ├─ Cron               → cron.pb.js    │
+│      Rebuild nötig)                    └─ Schema             → pb_migrations/│
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- **Bun-Edge statt nginx.** Ein einziger Bun-Prozess ist der öffentliche Edge:
-  er rendert/liefert die Astro-Site und proxyt die dynamischen Pfade an
-  PocketBase auf Loopback. Der Adapter dafür ist lokal und minimal
-  ([`adapter/`](adapter/)) — die offiziellen Bun-Adapter unterstützen nur
-  Astro ≤5. Cache-Control wird je Asset-Klasse gesetzt (gehashte Assets/Fonts
-  `immutable` 1 Jahr, sonstige Bilder 7 Tage, Manifeste/Feeds 1 Tag, HTML
-  `must-revalidate`), dazu Security-Header. Kompression übernimmt der
-  Coolify-Edge.
+- **nginx als Edge.** Ein einziger nginx-Prozess ist der öffentliche Einstieg:
+  er liefert die gehashten Assets **und die vorgerenderten HTML-Seiten** direkt
+  von Platte aus (volle Kontrolle über Cache-Control je Asset-Klasse — gehashte
+  Assets/Fonts `immutable` 1 Jahr, Bilder 7 Tage, Manifeste/Feeds 1 Tag, HTML
+  `must-revalidate` — plus Security-Header) und routet die dynamischen Pfade an
+  die zwei Loopback-Upstreams: `/api · /_ · /newsletter` an PocketBase, die
+  SSR-Routen (Startseite, Event-Seiten) an den Astro-Server. So trifft nur
+  echter SSR-Traffic den Bun-Prozess. Config: [`nginx.conf`](nginx.conf).
+  Kompression übernimmt der Coolify-Edge.
+- **Astro-Server in der Bun-Runtime (nicht Node).** Das gebaute Server-Bundle
+  läuft mit `bun --smol` (kleiner Heap → wenig RAM) auf Loopback (`:4321`). Der
+  Adapter dafür ist lokal und minimal ([`adapter/`](adapter/)) — die offiziellen
+  Bun-Adapter unterstützen nur Astro ≤5.
 - **RAM-schonend & nachhaltig.** Die meisten Seiten sind vorgerendert (statisch)
-  und werden nur ausgeliefert; nur Event-Seiten und die Testimonials der
-  Startseite rendern serverseitig live aus PocketBase. Ein kleiner In-Memory-
-  Cache (60 s) hält die SSR-Abfragen niedrig. Ein Rebuild bei Content-Änderung
-  entfällt komplett — neue Events/Testimonials sind sofort sichtbar.
-- **Bun zur Laufzeit (nicht Node).** Das gebaute Server-Bundle wird mit `bun`
-  ausgeführt. Footprint: ein Bun-Prozess + das PocketBase-Binary.
+  und werden von nginx ausgeliefert (kein Bun nötig); nur Event-Seiten und die
+  Testimonials der Startseite rendern serverseitig live aus PocketBase. Ein
+  kleiner In-Memory-Cache (60 s) hält die SSR-Abfragen niedrig. Ein Rebuild bei
+  Content-Änderung entfällt komplett — neue Events/Testimonials sind sofort
+  sichtbar.
 - **Statischer Content** (Texte, FAQ, Hero, Moderator …) liegt als **JSON** im
   Repo (`src/content/`, `src/data/`) und wird direkt in Astro eingepflegt.
 - **Dynamische Teile** (Anmeldung, Warteliste, Newsletter, Testimonial,
@@ -64,8 +65,9 @@ src/
 pocketbase/
   pb_migrations/  Collection-Schema (events, registrations, …)
   pb_hooks/       E-Mail-Logik, Custom-Routen, Cron, Templates
-adapter/          lokaler Astro-6-Bun-Adapter (Edge-Server + PocketBase-Proxy)
-Dockerfile        Multi-Stage: Bun-Build → Bun-Runtime + PocketBase
+adapter/          lokaler Astro-6-Bun-Adapter (Server-Entrypoint für die Runtime)
+nginx.conf        Edge: statische Assets + Routing zu Astro/PocketBase
+Dockerfile        Multi-Stage: Bun-Build → nginx + Bun-Runtime + PocketBase
 ```
 
 ## Lokale Entwicklung
@@ -91,18 +93,19 @@ bun run dev
 ```
 
 Im Dev-Modus sprechen Astro (4321) und PocketBase (8090) über verschiedene Ports,
-daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin hinter dem Bun-Edge:
-der Browser spricht den Edge-Port an, der Edge proxyt `/api/*` an PocketBase —
-dann bleibt `PUBLIC_PB_URL` leer. (Der Edge läuft nur im Docker-Image; lokal
-nutzt man `bun run dev`.)
+daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin hinter nginx: der
+Browser spricht den nginx-Port an, nginx proxyt `/api/*` an PocketBase — dann
+bleibt `PUBLIC_PB_URL` leer. (nginx läuft nur im Docker-Image; lokal nutzt man
+`bun run dev`.)
 
 ### Build & lokal ausführen
 
 ```bash
 bun run build        # → dist/   (NICHT `bun --bun run build`, das bricht Rollup)
 
-# Das gebaute Server-Bundle in der Bun-Runtime starten (wie in Produktion).
-# Edge auf :3000, PocketBase (lokal auf :8090) als Datenquelle/Proxy-Ziel.
+# Den gebauten Astro-Server in der Bun-Runtime starten (wie in Produktion,
+# nur ohne nginx davor). Liefert statische + SSR-Seiten; SSR holt Daten aus
+# PocketBase (PB_INTERNAL_URL). Die /api-Pfade übernimmt in Prod nginx.
 PORT=3000 PB_INTERNAL_URL=http://127.0.0.1:8090 bun run start
 ```
 
@@ -110,19 +113,20 @@ PORT=3000 PB_INTERNAL_URL=http://127.0.0.1:8090 bun run start
 
 1. Neue Ressource → **Dockerfile**-basiert, dieses Repo.
 2. **Persistent Volume** mounten auf `/pb/pb_data` (Datenbank + Uploads).
-3. Port **8090** exposen (das ist der Bun-Edge; PocketBase läuft intern auf
-   `127.0.0.1:8091`). Coolify terminiert TLS und leitet per HTTP weiter.
+3. Port **8090** exposen (das ist nginx; Astro/Bun läuft intern auf `:4321`,
+   PocketBase auf `127.0.0.1:8091`). Coolify terminiert TLS und leitet per HTTP
+   weiter.
 4. Environment-Variablen setzen (siehe `.env.example`):
 
-| Variable                                                               | Zweck                                                            |
-| ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `APP_URL`                                                              | öffentliche URL (E-Mail-Links, iCal, Unsubscribe)               |
-| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`                                  | Absender transaktionaler Mails                                  |
-| `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME`                                | Empfänger der Admin-Benachrichtigungen                          |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_TLS` | SMTP-Versand (wird beim Boot in PocketBase übernommen)          |
-| `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`                                  | legt beim ersten Start den Admin an                             |
+| Variable                                                               | Zweck                                                               |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `APP_URL`                                                              | öffentliche URL (E-Mail-Links, iCal, Unsubscribe)                   |
+| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`                                  | Absender transaktionaler Mails                                      |
+| `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME`                                | Empfänger der Admin-Benachrichtigungen                              |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_TLS` | SMTP-Versand (wird beim Boot in PocketBase übernommen)              |
+| `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`                                  | legt beim ersten Start den Admin an                                 |
 | `PUBLIC_SITE_URL`                                                      | **Build-Arg**: Canonical/Sitemap (Default `https://mens-circle.de`) |
-| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                             | optional: Umami-Analytics                                       |
+| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                             | optional: Umami-Analytics                                           |
 
 SMTP/Absender werden bei jedem Boot aus den Env-Variablen in die PocketBase-
 Einstellungen geschrieben — kein manuelles Klicken im Admin nötig. `PB_INTERNAL_URL`

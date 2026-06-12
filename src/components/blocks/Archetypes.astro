@@ -53,15 +53,9 @@ function detectIcon(title = ''): string {
       aria-labelledby="archetypes-title"
     >
       <div class="container">
-        <div
-          class="section-header"
-          data-reveal-group
-        >
+        <div class="section-header" data-reveal-group>
           {data.eyebrow && (
-            <p
-              class="eyebrow"
-              data-reveal="up"
-            >
+            <p class="eyebrow" data-reveal="up">
               {data.eyebrow}
             </p>
           )}
@@ -74,19 +68,13 @@ function detectIcon(title = ''): string {
             />
           )}
           {data.intro && (
-            <p
-              class="section-intro"
-              data-reveal="up"
-            >
+            <p class="section-intro" data-reveal="up">
               {data.intro}
             </p>
           )}
         </div>
 
-        <div
-          class="archetypes__grid"
-          data-reveal-group="90"
-        >
+        <div class="archetypes__grid" data-reveal-group="90">
           {items.map((item) => {
             const icon = detectIcon(item.title);
             return (

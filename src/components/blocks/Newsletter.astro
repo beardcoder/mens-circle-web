@@ -21,16 +21,10 @@ const anchor = data.anchor ?? 'newsletter';
 >
   <div class="container">
     <div class="newsletter__layout">
-      <div
-        class="newsletter__content"
-        data-reveal-group="100"
-      >
+      <div class="newsletter__content" data-reveal-group="100">
         {
           data.eyebrow && (
-            <p
-              class="eyebrow eyebrow--secondary"
-              data-reveal="up"
-            >
+            <p class="eyebrow eyebrow--secondary" data-reveal="up">
               {data.eyebrow}
             </p>
           )
@@ -49,10 +43,7 @@ const anchor = data.anchor ?? 'newsletter';
 
         {
           data.text && (
-            <p
-              class="newsletter__text"
-              data-reveal="up"
-            >
+            <p class="newsletter__text" data-reveal="up">
               {data.text}
             </p>
           )

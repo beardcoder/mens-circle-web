@@ -23,10 +23,7 @@ const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
   class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`}
   id={data.anchor}
 >
-  <div
-    class="page-hero__ornaments"
-    aria-hidden="true"
-  >
+  <div class="page-hero__ornaments" aria-hidden="true">
     <span class="page-hero__ornament page-hero__ornament--1"></span>
     <span class="page-hero__ornament page-hero__ornament--2"></span>
   </div>
@@ -39,14 +36,7 @@ const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
             <p class="eyebrow page-hero__eyebrow">{data.eyebrow}</p>
           )
         }
-        {
-          data.title && (
-            <h1
-              class="page-hero__title"
-              set:html={data.title}
-            />
-          )
-        }
+        {data.title && <h1 class="page-hero__title" set:html={data.title} />}
         {data.lead && <p class="page-hero__lead">{data.lead}</p>}
 
         {
