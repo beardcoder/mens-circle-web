@@ -4,9 +4,11 @@ name: Renovate
 # installed on the repo. It reads ./renovate.json and opens/updates dependency
 # PRs on a schedule (and on demand via "Run workflow").
 #
-# Requires a repository secret `RENOVATE_TOKEN`: a fine-grained PAT (or classic
+# Prefer a repository secret `RENOVATE_TOKEN`: a fine-grained PAT (or classic
 # token with `repo` + `workflow` scope) that may open PRs and update workflow
-# files. The default GITHUB_TOKEN cannot create branches that touch workflows.
+# files. Without it, the workflow falls back to the repository GITHUB_TOKEN so
+# the Renovate job still runs, but workflow-file updates may still require the
+# custom PAT.
 #
 # If you instead use the hosted Renovate App, you can delete this file —
 # renovate.json and the auto-merge workflow are all that's needed.
@@ -30,7 +32,9 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   renovate:
@@ -42,7 +46,7 @@ jobs:
       - name: Run Renovate
         uses: renovatebot/github-action@v46.1.15
         with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
+          token: ${{ secrets.RENOVATE_TOKEN || github.token }}
           configurationFile: renovate.json
         env:
           RENOVATE_REPOSITORIES: ${{ github.repository }}
