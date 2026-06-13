@@ -1,15 +1,12 @@
 /**
- * Server-side PocketBase data fetchers (SSR + build, never the browser).
+ * Server-side PocketBase data fetchers (SSR, never the browser).
  *
- * Events and testimonials are rendered on the server: the SSR pages (`/event`,
- * `/event/[slug]`, `/`) fetch live data from PocketBase at request time, so a
- * content change in the admin shows up immediately — no rebuild, no deploy
- * webhook. The prerendered pages (legal, atemübung, testimonial form) call
- * these at build time; PocketBase is usually unreachable then, so every fetch
- * fails open (see below) and the layout keeps the event CTAs visible.
+ * Events are rendered on the SSR pages (`/event`, `/event/[slug]`) at request
+ * time, and testimonials in the home page's server island — so a content change
+ * in the admin shows up immediately, no rebuild, no deploy webhook.
  *
- * This module is imported ONLY from `.astro` frontmatter — it runs in the Bun
- * runtime on the server, never in the client bundle.
+ * This module is imported ONLY from `.astro` frontmatter / server islands — it
+ * runs in the Bun runtime on the server, never in the client bundle.
  *
  * Base URL resolution:
  *   1. PB_INTERNAL_URL — runtime loopback to the co-located PocketBase
@@ -92,19 +89,4 @@ export async function getEventBySlug(slug: string): Promise<EventDTO | null> {
     `/api/public/events/${encodeURIComponent(slug)}`,
   );
   return data?.event ?? null;
-}
-
-/**
- * Whether an upcoming event is scheduled — drives the event CTAs in the shared
- * layout. Cached for {@link TTL_MS} since it is queried on every page.
- *
- * Returns `null` when PocketBase is unreachable (e.g. at build time for the
- * prerendered pages) so callers can *fail open* and keep the CTAs visible.
- */
-export function hasUpcomingEvent(): Promise<boolean | null> {
-  return cached('has-upcoming-event', () =>
-    getJson<{ event: EventDTO | null }>('/api/public/events/next').then(
-      (data) => (data === null ? null : data.event !== null),
-    ),
-  );
 }

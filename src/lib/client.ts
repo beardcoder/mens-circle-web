@@ -14,6 +14,7 @@
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';
 import { initUmamiKit } from './umami-kit';
+import { initEventCtas } from './event-cta';
 
 let initialised = false;
 
@@ -42,8 +43,10 @@ function init(): void {
     console.error('[client] initUmamiKit failed:', error);
   }
 
-  // The "next event" CTAs are gated statically at build time (see the
-  // `has-upcoming-event` body class), so there is nothing to wire up here.
+  // Reveal the "next event" CTAs only if an upcoming event is actually
+  // scheduled. The pages carrying them are prerendered (static), so this is a
+  // runtime check; CTAs are hidden by default, so it never flashes a dead one.
+  void initEventCtas();
 }
 
 if (document.readyState === 'loading') {
