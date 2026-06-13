@@ -8,8 +8,10 @@
  *
  * Idempotent: records get deterministic 15-char IDs derived from their old
  * integer IDs, so re-running updates in place instead of duplicating. Relations
- * (registrations → participant/event, subscribers → participant) are resolved
- * through the same derivation.
+ * (registrations → participant/event) are resolved through the same derivation.
+ *
+ * Note: newsletters + subscribers are NOT imported here — they live in listmonk
+ * now. Import the historical newsletter CSVs into listmonk directly instead.
  *
  * Maps the dynamic collections only. Static content (pages, content_blocks,
  * navigation_items, settings) already lives in the Astro JSON files.
@@ -285,29 +287,6 @@ async function main(): Promise<void> {
   );
 
   await importCollection(
-    'newsletters',
-    'newsletters.csv',
-    'newsletters',
-    (r) => {
-      const status = ['draft', 'sending', 'sent'].includes(r.status)
-        ? r.status
-        : r.sent_at
-          ? 'sent'
-          : 'draft';
-      return {
-        id: id('m', r.id),
-        data: {
-          subject: r.subject || '(ohne Betreff)',
-          content: r.content || '<p></p>',
-          status,
-          sent_at: date(r.sent_at),
-          recipient_count: num(r.recipient_count) ?? 0,
-        },
-      };
-    },
-  );
-
-  await importCollection(
     'registrations',
     'registrations.csv',
     'registrations',
@@ -339,27 +318,6 @@ async function main(): Promise<void> {
           cancelled_at: date(r.cancelled_at),
           reminder_sent_at: date(r.reminder_sent_at),
           sms_reminder_sent_at: date(r.sms_reminder_sent_at),
-        },
-      };
-    },
-  );
-
-  await importCollection(
-    'newsletter_subscribers',
-    'newsletter_subscriptions.csv',
-    'newsletter_subscribers',
-    (r) => {
-      if (isDeleted(r)) return null;
-      const participant = id('p', r.participant_id);
-      if (!importedParticipants.has(participant)) return null;
-      return {
-        id: id('n', r.id),
-        data: {
-          participant,
-          token: r.token || crypto.randomUUID().replace(/-/g, ''),
-          subscribed_at: date(r.subscribed_at),
-          confirmed_at: date(r.confirmed_at),
-          unsubscribed_at: date(r.unsubscribed_at),
         },
       };
     },
