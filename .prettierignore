@@ -8,6 +8,9 @@ bun.lock
 # (double quotes, /// <reference> headers) — not part of the Astro frontend.
 pocketbase
 
+# listmonk templates use Go template syntax that Prettier rewrites incorrectly.
+listmonk/*.html
+
 # Generated / data
 *.min.js
 public

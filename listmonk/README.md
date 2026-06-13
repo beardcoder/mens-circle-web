@@ -5,10 +5,10 @@ Migration den Newsletter übernimmt (Abonnenten, Double-Opt-In, Versand,
 Abmeldung). Design 1:1 aus den früheren PocketBase-Mailvorlagen abgeleitet
 (Farben `#efe9dd` / `#2c2418` / Akzent `#b86f52`, 600px-Card, DM Sans + Georgia).
 
-| Datei | Typ in listmonk | Zweck |
-|---|---|---|
-| [`campaign.html`](campaign.html) | **Campaign**-Template | Rahmen (Card, Gruß, Footer, Tracking) um jeden Newsletter. Enthält `{{ template "content" . }}` — dort wird der im Editor verfasste Kampagnentext eingesetzt. |
-| [`optin.html`](optin.html) | Opt-In-/Willkommens-**Content** | Inhalt der Double-Opt-In-Bestätigungsmail mit „Anmeldung bestätigen"-Button (`{{ .OptinURL }}`). Wird vom Rahmen-Template umschlossen. |
+| Datei                            | Typ in listmonk                 | Zweck                                                                                                                                                         |
+| -------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`campaign.html`](campaign.html) | **Campaign**-Template           | Rahmen (Card, Gruß, Footer, Tracking) um jeden Newsletter. Enthält `{{ template "content" . }}` — dort wird der im Editor verfasste Kampagnentext eingesetzt. |
+| [`optin.html`](optin.html)       | Opt-In-/Willkommens-**Content** | Inhalt der Double-Opt-In-Bestätigungsmail mit „Anmeldung bestätigen"-Button (`{{ .OptinURL }}`). Wird vom Rahmen-Template umschlossen.                        |
 
 ## Einrichten
 
@@ -26,21 +26,21 @@ Funktionsbibliothek** (siehe listmonk-Doku „Templating"). Verfügbar sind also
 
 **listmonk-eigene Variablen / Funktionen**
 
-| Ausdruck | Bedeutung |
-|---|---|
-| `{{ template "content" . }}` | Kampagnentext (Pflicht im Campaign-Template) |
-| `{{ .Subscriber.Email }}` | E-Mail-Adresse des Empfängers |
-| `{{ .Subscriber.Name }}` | voller Name |
-| `{{ .Subscriber.FirstName }}` | erstes Wort des Namens (kann leer sein) |
-| `{{ .Subscriber.UUID }}` | eindeutige Abonnenten-ID |
+| Ausdruck                        | Bedeutung                                           |
+| ------------------------------- | --------------------------------------------------- |
+| `{{ template "content" . }}`    | Kampagnentext (Pflicht im Campaign-Template)        |
+| `{{ .Subscriber.Email }}`       | E-Mail-Adresse des Empfängers                       |
+| `{{ .Subscriber.Name }}`        | voller Name                                         |
+| `{{ .Subscriber.FirstName }}`   | erstes Wort des Namens (kann leer sein)             |
+| `{{ .Subscriber.UUID }}`        | eindeutige Abonnenten-ID                            |
 | `{{ .Subscriber.Attribs.xyz }}` | benutzerdefinierte Attribute (z. B. aus dem Import) |
-| `{{ .UnsubscribeURL }}` | Abmelde-Link (pro Empfänger) |
-| `{{ .MessageURL }}` | „Im Browser ansehen"-Link |
-| `{{ .OptinURL }}` | Bestätigungslink (nur Opt-In-Mail) |
-| `{{ TrackView }}` | Öffnungs-Tracking-Pixel |
-| `{{ TrackLink "https://…" }}` | Link für Klick-Tracking umschließen |
-| `{{ Date "2006-01-02" }}` | formatiertes Datum |
-| `{{ Safe "<b>html</b>" }}` | HTML ungeescaped ausgeben |
+| `{{ .UnsubscribeURL }}`         | Abmelde-Link (pro Empfänger)                        |
+| `{{ .MessageURL }}`             | „Im Browser ansehen"-Link                           |
+| `{{ .OptinURL }}`               | Bestätigungslink (nur Opt-In-Mail)                  |
+| `{{ TrackView }}`               | Öffnungs-Tracking-Pixel                             |
+| `{{ TrackLink "https://…" }}`   | Link für Klick-Tracking umschließen                 |
+| `{{ Date "2006-01-02" }}`       | formatiertes Datum                                  |
+| `{{ Safe "<b>html</b>" }}`      | HTML ungeescaped ausgeben                           |
 
 **Sprig-Funktionen** (Auswahl)
 
