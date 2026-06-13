@@ -6,7 +6,6 @@ import SpriteDefs from '../components/SpriteDefs.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import ScrollToTop from '../components/ScrollToTop.astro';
-import { hasUpcomingEvent } from '../lib/pocketbase-server';
 
 interface Props {
   title?: string;
@@ -21,13 +20,10 @@ interface Props {
 
 const props = Astro.props;
 
-// Whether to show the event CTAs. On the SSR pages (home, event) this is
-// resolved live from PocketBase per request (cached briefly), so the CTAs
-// reflect reality with no client-side fetch/flicker. On the prerendered pages
-// PocketBase is unreachable at build time and the helper returns `null`, so we
-// *fail open* (`!== false`) and keep the CTAs visible — they link to /event,
-// which gracefully renders its "no termin scheduled" state when needed.
-const showEventCtas = (await hasUpcomingEvent()) !== false;
+// The "next event" CTAs ([data-event-cta]) are HIDDEN by default (CSS) and
+// revealed at runtime by the client only when an upcoming event is actually
+// scheduled (see lib/event-cta.ts). They can't be gated at build time because
+// these pages are prerendered and PocketBase isn't reachable during the build.
 ---
 
 <!doctype html>
@@ -48,7 +44,7 @@ const showEventCtas = (await hasUpcomingEvent()) !== false;
     <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
   </head>
-  <body class:list={{ 'has-upcoming-event': showEventCtas }}>
+  <body>
     {
       /* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */
     }
