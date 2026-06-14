@@ -19,17 +19,22 @@ const analytics = umamiId
   : [];
 
 // SSR on the Bun runtime. The built server (dist/server) is run by Bun via a
-// thin custom entry (server/entry.ts) that also reverse-proxies the dynamic
-// PocketBase paths — so a single Bun process is the public edge (replacing
-// nginx) and PocketBase stays on loopback for the API/admin/email backend.
-// Most pages are prerendered (static, RAM-friendly); only the event pages and
-// the home testimonials render on demand from PocketBase.
+// thin custom entry (adapter/server.mjs) that also handles the API routes via
+// the embedded EmDash backend (bun:sqlite) — a single Bun process serves
+// everything: static files, SSR pages, and the API. Most pages are prerendered
+// (static, RAM-friendly); only the event pages and the home testimonials render
+// on demand from the database.
 // https://astro.build/config
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://mens-circle.de',
   output: 'server',
   adapter: bun(),
   trailingSlash: 'ignore',
+  vite: {
+    // bun:sqlite is a Bun-native module — it must not be bundled by Vite.
+    // It is only executed at runtime (Bun), never during the Node.js build.
+    ssr: { external: ['bun:sqlite'] },
+  },
   redirects: {
     '/home': '/',
     '/events': '/event',
