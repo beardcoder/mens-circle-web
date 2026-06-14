@@ -167,6 +167,48 @@
     }
   }
 
+  // ─── Audio cues ────────────────────────────────────────────────────
+  // Short, gentle chimes mark each new stage (next round, breath-hold,
+  // recovery, finish). Pure Web Audio — no files. The context is created
+  // lazily on the first user gesture (the start press) and reused; sound can
+  // be muted with the toggle.
+  let soundEnabled = $state(true);
+  let audioCtx: AudioContext | null = null;
+
+  function chime(freqs: number[], step = 0.14, duration = 0.22): void {
+    if (!soundEnabled || typeof window === 'undefined') return;
+
+    const Ctor =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+
+    if (!Ctor) return;
+
+    audioCtx ??= new Ctor();
+    if (audioCtx.state === 'suspended') void audioCtx.resume();
+
+    const ctx = audioCtx;
+
+    freqs.forEach((freq, i) => {
+      const start = ctx.currentTime + i * step;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      // Soft attack, gentle exponential release — a calm "ping", not a beep.
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.16, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + duration + 0.03);
+    });
+  }
+
   // ─── Phase transitions ─────────────────────────────────────────────
   function enterIdle(): void {
     clearScheduled();
@@ -184,6 +226,8 @@
     phase = 'complete';
     breath = 0;
     timerSeconds = 0;
+
+    chime([523, 659, 784], 0.16, 0.32); // gentle closing arpeggio
   }
 
   function beginSession(): void {
@@ -207,6 +251,8 @@
     round += 1;
     breath = 1;
     timerSeconds = 0;
+
+    chime([660, 880]); // rising cue: a (new) round of breathing begins
 
     const startedAt = performance.now();
     const breathLimit = currentSession.breaths;
@@ -238,6 +284,8 @@
     phase = 'retention';
     timerSeconds = 0;
 
+    chime([392], 0, 0.6); // calm low tone: hold your breath
+
     const startedAt = performance.now();
 
     const loop = (): void => {
@@ -255,6 +303,8 @@
 
     phase = 'recovery';
     timerSeconds = currentSession.recoveryHold;
+
+    chime([523]); // mid tone: recovery breath
 
     const tick = (): void => {
       if (phase !== 'recovery') return;
@@ -420,7 +470,10 @@
     }
   }
 
-  onDestroy(clearScheduled);
+  onDestroy(() => {
+    clearScheduled();
+    void audioCtx?.close();
+  });
 </script>
 
 <div
@@ -498,6 +551,36 @@
 
     <button type="button" class="btn btn--ghost" onclick={enterIdle}>
       Zurücksetzen
+    </button>
+
+    <button
+      type="button"
+      class="btn btn--ghost breathing-app__sound"
+      aria-pressed={soundEnabled}
+      aria-label={soundEnabled ? 'Ton ausschalten' : 'Ton einschalten'}
+      title={soundEnabled ? 'Ton aus' : 'Ton an'}
+      onclick={() => (soundEnabled = !soundEnabled)}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"></path>
+        {#if soundEnabled}
+          <path
+            d="M16 8.5a4 4 0 0 1 0 7"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          ></path>
+        {:else}
+          <path
+            d="M16.5 9.5l5 5M21.5 9.5l-5 5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          ></path>
+        {/if}
+      </svg>
     </button>
   </div>
 
