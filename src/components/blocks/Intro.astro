@@ -164,5 +164,26 @@ const anchor = data.anchor ?? 'ueber';
       flex-direction: column;
       gap: 0;
     }
+
+    /* Scroll-driven parallax inside the dark panel — the quote rises a touch
+       while the rings settle the other way, giving the flat panel depth as it
+       passes. Pure CSS, gated to scroll-driven browsers and allowed motion. */
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) {
+        .intro__image-area {
+          view-timeline: --intro-panel block;
+        }
+
+        .intro__image-text {
+          animation: intro-quote-rise linear both;
+          animation-timeline: --intro-panel;
+        }
+
+        .intro__image-circles {
+          animation: intro-rings-drift linear both;
+          animation-timeline: --intro-panel;
+        }
+      }
+    }
   }
 </style>

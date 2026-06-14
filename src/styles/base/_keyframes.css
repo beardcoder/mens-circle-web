@@ -86,6 +86,41 @@
   }
 }
 
+/* Gentle parallax for the intro panel: the quote drifts up while the rings
+   drift down behind it as the section passes through the viewport. */
+@keyframes intro-quote-rise {
+  from {
+    transform: translate3d(0, 1.75rem, 0);
+  }
+
+  to {
+    transform: translate3d(0, -1.75rem, 0);
+  }
+}
+
+@keyframes intro-rings-drift {
+  from {
+    transform: translate3d(0, -1.5rem, 0);
+  }
+
+  to {
+    transform: translate3d(0, 1.5rem, 0);
+  }
+}
+
+/* The big background word in the moderator section slides slowly across as
+   you scroll past — animates `translate` so the base rotate/centring on
+   `transform` is preserved and composes cleanly. */
+@keyframes moderator-word-drift {
+  from {
+    translate: 2.5rem 0;
+  }
+
+  to {
+    translate: -2.5rem 0;
+  }
+}
+
 /* ============================================
    Header — scroll-driven color morph and overlay fade.
    ============================================ */
