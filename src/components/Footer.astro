@@ -43,6 +43,12 @@ const phoneHref = site.contactPhone
                   href={item.url}
                   data-umami-event="footer-link"
                   data-event-cta={item.url === '/event' ? '' : undefined}
+                  target={'target' in item ? item.target : undefined}
+                  rel={
+                    'target' in item && item.target === '_blank'
+                      ? 'noopener'
+                      : undefined
+                  }
                 >
                   {item.label}
                 </a>
