@@ -56,6 +56,37 @@
 }
 
 /* ============================================
+   Scroll-driven parallax — gated behind @supports (animation-timeline)
+   at the call sites. The hero content lifts and fades as it scrolls away
+   while the ambient rings drift the opposite way for a sense of depth;
+   the journey thread draws itself across as the steps enter view.
+   ============================================ */
+@keyframes hero-content-leave {
+  to {
+    opacity: 0.3;
+    transform: translate3d(0, -4rem, 0);
+  }
+}
+
+@keyframes hero-rings-drift {
+  to {
+    transform: translate3d(0, 3rem, 0);
+  }
+}
+
+@keyframes journey-thread-draw {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  to {
+    opacity: 0.7;
+    transform: scaleX(1);
+  }
+}
+
+/* ============================================
    Header — scroll-driven color morph and overlay fade.
    ============================================ */
 @keyframes header-color-morph {
