@@ -20,6 +20,10 @@ interface Props {
   /** When set, the page advertises itself as an installable standalone web app
    *  (adds the iOS/Android web-app metas with this as the home-screen title). */
   webAppTitle?: string;
+  /** Viewport meta content. Defaults to a zoomable viewport with
+   *  `viewport-fit=cover` so `env(safe-area-inset-*)` actually resolves; an
+   *  app-like page can override it (e.g. to lock zoom). */
+  viewport?: string;
 }
 
 const {
@@ -33,6 +37,7 @@ const {
   schemas = [],
   manifest = '/manifest.json',
   webAppTitle,
+  viewport = 'width=device-width, initial-scale=1.0, viewport-fit=cover',
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
@@ -113,7 +118,7 @@ const allSchemas = [localBusiness, website, ...schemas];
 ---
 
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content={viewport} />
 
 <title>{fullTitle}</title>
 <meta name="title" content={fullTitle} />
