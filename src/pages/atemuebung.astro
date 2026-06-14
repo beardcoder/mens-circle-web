@@ -243,16 +243,16 @@ const schemas = [
       z-index: 0;
     }
 
-    /* One screen: the app fills the viewport top-to-bottom (no centring gap),
-       with only the notch/status bar cleared at the top. */
+    /* One screen: the app fills the viewport but with real breathing room top
+       and bottom, so the circle (and its rings) never touch the edges. */
     .breathing-screen {
       display: grid;
       grid-template-rows: 1fr;
       justify-items: center;
       min-block-size: 100svh;
       min-block-size: 100dvh;
-      padding-block: var(--safe-area-inset-top)
-        max(var(--space-sm), var(--safe-area-inset-bottom));
+      padding-block: max(var(--space-md), var(--safe-area-inset-top))
+        max(var(--space-md), var(--safe-area-inset-bottom));
       padding-inline: max(var(--space-md), var(--safe-area-inset-left))
         max(var(--space-md), var(--safe-area-inset-right));
     }
@@ -528,7 +528,7 @@ const schemas = [
     }
 
     .breathing-app__circle {
-      --size: min(82vw, 56svh, 440px);
+      --size: min(74vw, 46svh, 400px);
 
       position: relative;
       display: grid;
@@ -1000,7 +1000,7 @@ const schemas = [
 
     @media (width < 480px) {
       .breathing-app__circle {
-        --size: min(88vw, 52svh);
+        --size: min(78vw, 44svh);
       }
 
       .breathing-app__controls .btn {
