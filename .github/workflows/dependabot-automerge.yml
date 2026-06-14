@@ -7,6 +7,9 @@ name: Dependabot Auto-merge
 # Requirements (one-time, in the repo settings):
 #   • Settings → General → "Allow auto-merge" must be enabled.
 #   • A branch protection rule on `main` requiring the CI checks to pass.
+#   • Settings → Actions → General → "Allow GitHub Actions to create and
+#     approve pull requests" must be enabled if you want the workflow to
+#     also approve the PR (currently skipped to avoid permission errors).
 
 on:
   pull_request_target:
@@ -26,12 +29,6 @@ jobs:
         uses: dependabot/fetch-metadata@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Approve the pull request
-        run: gh pr review --approve "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Enable auto-merge
         run: gh pr merge --auto --squash "$PR_URL"
