@@ -26,6 +26,11 @@ html {
   /* Offset anchored navigation so the fixed header doesn't cover the target
      (applies to on-load fragments, back/forward, and cross-page anchors). */
   scroll-padding-top: var(--header-clearance);
+
+  /* Reserve the scrollbar gutter so short pages (e.g. the legal pages) and
+     long ones share the same content width — no horizontal jump as you
+     navigate between them or as content height changes. */
+  scrollbar-gutter: stable;
 }
 
 /* Drop the 300ms tap delay and double-tap zoom on controls — taps register

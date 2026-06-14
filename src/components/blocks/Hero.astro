@@ -362,5 +362,27 @@ const anchor = data.anchor;
       inline-size: 100%;
       block-size: 100%;
     }
+
+    /* Scroll-driven parallax. As the first viewport scrolls past, the content
+       lifts and fades away while the ambient rings drift down behind it — a
+       calm sense of depth, not a gimmick. Pure CSS (no scroll listener), gated
+       to browsers with scroll-driven animations and to users who allow motion.
+       The one-shot entrance lives on the content's *children*, so animating the
+       wrappers here never collides with it. */
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: scroll()) {
+        .hero__content {
+          animation: hero-content-leave linear both;
+          animation-timeline: scroll(root);
+          animation-range: 10vh 92vh;
+        }
+
+        .hero__circles {
+          animation: hero-rings-drift linear both;
+          animation-timeline: scroll(root);
+          animation-range: 0 92vh;
+        }
+      }
+    }
   }
 </style>
