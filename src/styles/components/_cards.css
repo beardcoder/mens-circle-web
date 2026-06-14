@@ -21,15 +21,12 @@
   margin-inline: calc(var(--space-sm) * -1);
   border-block-start: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  transition: background-color var(--motion-standard);
 }
 
 .value-item:last-child {
   border-block-end: 1px solid var(--border-light);
 }
 
-/* The number slides in from a hair to the inline-start as the row warms,
-   so the otherwise-static list rewards a hover without becoming busy. */
 .value-item__number {
   grid-row: 1 / span 2;
   grid-column: 1;
@@ -38,25 +35,6 @@
   line-height: 0.85;
   color: var(--text-accent);
   letter-spacing: -0.04em;
-  opacity: 1;
-  transition:
-    color var(--motion-standard),
-    translate 420ms var(--ease-settle);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .value-item:hover {
-    background-color: color-mix(
-      in oklch,
-      var(--accent-primary) 4%,
-      transparent
-    );
-  }
-
-  .value-item:hover .value-item__number {
-    color: var(--accent-primary);
-    translate: 0.15em 0;
-  }
 }
 
 .value-item__title {

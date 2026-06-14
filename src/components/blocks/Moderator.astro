@@ -137,6 +137,22 @@ const photoAsset = photoKey ? (assetImages[photoKey]?.default ?? null) : null;
       }
     }
 
+    /* The vertical background word drifts slowly across as the section scrolls
+       by, so the otherwise-static ornament breathes with the page. Animates
+       `translate` (not `transform`) to keep the rotate/centring intact. */
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) {
+        .moderator-section {
+          view-timeline: --moderator-panel block;
+        }
+
+        .moderator__ornament {
+          animation: moderator-word-drift linear both;
+          animation-timeline: --moderator-panel;
+        }
+      }
+    }
+
     .moderator__layout {
       display: grid;
       grid-template-columns: 1.2fr 1fr;

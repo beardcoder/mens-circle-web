@@ -37,7 +37,7 @@ const testimonials = await fetchTestimonials();
 
         <div class="testimonials__grid">
           {testimonials.map((t) => (
-            <article class="testimonial-item" data-hover="lift">
+            <article class="testimonial-item">
               <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
               {(t.author || t.role) && (
                 <div class="testimonial-item__author">
