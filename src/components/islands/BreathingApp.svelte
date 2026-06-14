@@ -65,7 +65,6 @@
 
   let dragPointerId: number | null = null;
   let dragStartX = 0;
-  let dragStartIndex = 0;
   let hasDragged = false;
 
   // ─── Scheduling handles ───────────────────────────────────────────
@@ -98,6 +97,27 @@
       ? 'none'
       : 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)',
   );
+
+  // Fractional position of the centre indicator over the track, in item units.
+  // pickerOffset is 0 at rest, so this collapses to breathIndex when idle.
+  const centerFloat = $derived(breathIndex - pickerOffset / PICKER_ITEM_WIDTH);
+
+  // The value nearest the centre indicator — the one we "activate". Updates
+  // live while dragging so the focused number lights up under the thumb.
+  const focusedIndex = $derived(
+    clamp(Math.round(centerFloat), 0, BREATH_VALUES.length - 1),
+  );
+
+  // Native picker-wheel depth: items scale and fade with their distance from
+  // the centre. Driven inline (not via :class) so it tracks the drag frame by
+  // frame; the CSS transition only kicks in on release to settle.
+  function itemDepth(index: number): string {
+    const distance = Math.abs(index - centerFloat);
+    const scale = clamp(1.18 - distance * 0.32, 0.62, 1.18);
+    const opacity = clamp(1 - distance * 0.32, 0.18, 1);
+
+    return `transform: scale(${scale.toFixed(3)}); opacity: ${opacity.toFixed(3)};`;
+  }
 
   const counterText = $derived.by(() => {
     switch (phase) {
@@ -305,7 +325,6 @@
 
     dragPointerId = event.pointerId;
     dragStartX = event.clientX;
-    dragStartIndex = breathIndex;
     hasDragged = false;
     isDraggingPicker = true;
 
@@ -324,19 +343,23 @@
     }
 
     pickerOffset = delta;
+
+    // Activate the value currently nearest the centre, live under the thumb.
+    settingBreaths = BREATH_VALUES[focusedIndex];
   }
 
   function onPickerPointerEnd(event: PointerEvent): void {
     if (dragPointerId !== event.pointerId) return;
 
-    const indexDelta = Math.round(-pickerOffset / PICKER_ITEM_WIDTH);
+    // Snap to whatever is in focus right now (read before the offset resets).
+    const target = focusedIndex;
 
     dragPointerId = null;
     pickerOffset = 0;
     isDraggingPicker = false;
 
     if (hasDragged) {
-      setBreathIndex(dragStartIndex + indexDelta);
+      setBreathIndex(target);
     }
   }
 
@@ -490,6 +513,7 @@
         aria-valuemin={BREATH_VALUES[0]}
         aria-valuemax={BREATH_VALUES[BREATH_VALUES.length - 1]}
         aria-valuenow={settingBreaths}
+        aria-valuetext={`${settingBreaths} Atemzüge`}
         aria-disabled={isActive ? 'true' : undefined}
         onkeydown={onPickerKeydown}
         onwheel={onPickerWheel}
@@ -508,9 +532,10 @@
             <button
               type="button"
               class={`breathing-picker__item ${
-                index === breathIndex ? 'is-active' : ''
+                index === focusedIndex ? 'is-active' : ''
               }`}
-              tabindex={index === breathIndex ? 0 : -1}
+              style={itemDepth(index)}
+              tabindex={index === focusedIndex ? 0 : -1}
               aria-label={`${value} Atemzüge`}
               onclick={(event) => onPickerClick(value, event)}
             >
