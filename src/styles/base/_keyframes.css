@@ -56,6 +56,62 @@
 }
 
 /* ============================================
+   Scroll-driven parallax — gated behind @supports (animation-timeline)
+   at the call sites. The hero content lifts and fades as it scrolls away
+   while the ambient rings drift the opposite way for a sense of depth;
+   the journey thread draws itself across as the steps enter view.
+   ============================================ */
+@keyframes hero-content-leave {
+  to {
+    opacity: 0.3;
+    transform: translate3d(0, -4rem, 0);
+  }
+}
+
+@keyframes hero-rings-drift {
+  to {
+    transform: translate3d(0, 3rem, 0);
+  }
+}
+
+@keyframes journey-thread-draw {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  to {
+    opacity: 0.7;
+    transform: scaleX(1);
+  }
+}
+
+/* Gentle parallax for the intro panel: the rings drift behind the quote as
+   the section passes through the viewport. */
+@keyframes intro-rings-drift {
+  from {
+    transform: translate3d(0, -1.5rem, 0);
+  }
+
+  to {
+    transform: translate3d(0, 1.5rem, 0);
+  }
+}
+
+/* The big background word in the moderator section slides slowly across as
+   you scroll past — animates `translate` so the base rotate/centring on
+   `transform` is preserved and composes cleanly. */
+@keyframes moderator-word-drift {
+  from {
+    translate: 2.5rem 0;
+  }
+
+  to {
+    translate: -2.5rem 0;
+  }
+}
+
+/* ============================================
    Header — scroll-driven color morph and overlay fade.
    ============================================ */
 @keyframes header-color-morph {
@@ -87,31 +143,6 @@
   100% {
     box-shadow: 0 0 0 32px transparent;
     opacity: 0;
-  }
-}
-
-/* ============================================
-   Modal / dialog enter animations.
-   ============================================ */
-@keyframes modal-backdrop-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(12px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
   }
 }
 
