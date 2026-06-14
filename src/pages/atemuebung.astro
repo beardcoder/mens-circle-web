@@ -244,18 +244,29 @@ const schemas = [
       z-index: 0;
     }
 
+    /* Keep the app to one screen: the global `body { min-block-size: 100dvh }`
+       would otherwise add a scrollable strip (the browser-toolbar delta) below
+       the 100svh screen. Pinning the bare body to svh removes it, so the page
+       doesn't scroll in the common case (it still can if content genuinely
+       overflows on very short screens). */
+    body.is-bare {
+      min-block-size: 100svh;
+    }
+
     /* One screen: the app fills the viewport but with real breathing room top
        and bottom, so the circle (and its rings) never touch the edges. */
     .breathing-screen {
       display: grid;
       grid-template-rows: 1fr;
       justify-items: center;
-      /* svh (not dvh): a stable, smallest-viewport height. dvh resolves to the
-         wrong value on iOS PWA cold-start until a rotation, and resize-jumps as
-         the browser toolbar shows/hides; svh fits the screen reliably in both
-         the installed app and the browser. 100vh is the old-browser fallback. */
-      min-block-size: 100vh;
-      min-block-size: 100svh;
+      /* Fixed to one viewport (svh, not dvh: dvh mis-resolves on iOS PWA cold
+         start and jumps as the toolbar shows/hides). `overflow: clip` plus the
+         flexible 1fr row means the app is sized to the screen and never makes
+         the page scroll — on a very short screen the circle compresses rather
+         than pushing content off. 100vh is the old-browser fallback. */
+      block-size: 100vh;
+      block-size: 100svh;
+      overflow: clip;
       padding-block: max(var(--space-md), var(--safe-area-inset-top))
         max(var(--space-md), var(--safe-area-inset-bottom));
       padding-inline: max(var(--space-md), var(--safe-area-inset-left))
@@ -521,8 +532,10 @@ const schemas = [
       gap: clamp(var(--space-sm), 3vw, var(--space-md));
       inline-size: 100%;
       max-inline-size: 640px;
-      /* Fill the full screen height it now owns, top to bottom. */
-      min-block-size: 100%;
+      /* Own the full screen height and let the inner 1fr stage absorb any
+         shortfall (min-block-size:0 lets it actually shrink). */
+      block-size: 100%;
+      min-block-size: 0;
       color: var(--text-on-dark);
     }
 
