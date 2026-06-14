@@ -250,8 +250,12 @@ const schemas = [
       display: grid;
       grid-template-rows: 1fr;
       justify-items: center;
+      /* svh (not dvh): a stable, smallest-viewport height. dvh resolves to the
+         wrong value on iOS PWA cold-start until a rotation, and resize-jumps as
+         the browser toolbar shows/hides; svh fits the screen reliably in both
+         the installed app and the browser. 100vh is the old-browser fallback. */
+      min-block-size: 100vh;
       min-block-size: 100svh;
-      min-block-size: 100dvh;
       padding-block: max(var(--space-md), var(--safe-area-inset-top))
         max(var(--space-md), var(--safe-area-inset-bottom));
       padding-inline: max(var(--space-md), var(--safe-area-inset-left))
