@@ -123,7 +123,7 @@ export function createExports(manifest, args) {
  *
  * This process serves ONLY the Astro app (prerendered files + on-demand SSR).
  * nginx is the public edge in front of it: nginx routes the PocketBase paths
- * (/api, /_, /newsletter) straight to PocketBase and everything else here, so
+ * (/api, /_) straight to PocketBase and everything else here, so
  * this server binds to loopback and never proxies. SSR data is fetched from
  * PocketBase directly via PB_INTERNAL_URL (see src/lib/pocketbase-server.ts).
  */

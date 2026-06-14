@@ -19,6 +19,19 @@ function env(key, fallback) {
   }
 }
 
+// Parse a comma-separated list of integers (e.g. "1,3,4") into a number array.
+function parseIntList(raw) {
+  if (!raw) return [];
+  return String(raw)
+    .split(",")
+    .map(function (s) {
+      return parseInt(s.trim(), 10);
+    })
+    .filter(function (n) {
+      return !isNaN(n);
+    });
+}
+
 const config = {
   APP_URL: env("APP_URL", "https://mens-circle.de"),
   SITE_NAME: env("SITE_NAME", "Männerkreis Niederbayern/ Straubing"),
@@ -27,6 +40,14 @@ const config = {
   MAIL_ADMIN_ADDRESS: env("MAIL_ADMIN_ADDRESS", "hallo@mens-circle.de"),
   MAIL_ADMIN_NAME: env("MAIL_ADMIN_NAME", "Männerkreis Admin"),
   CONTACT_EMAIL: env("MAIL_CONTACT_ADDRESS", "hallo@mens-circle.de"),
+
+  // listmonk — newsletter subscribers + campaigns now live here (not PocketBase).
+  // The public subscribe route forwards new sign-ups to listmonk's admin API;
+  // sending campaigns, double opt-in and unsubscribe are handled inside listmonk.
+  LISTMONK_URL: env("LISTMONK_URL", "").replace(/\/+$/, ""),
+  LISTMONK_API_USER: env("LISTMONK_API_USER", ""),
+  LISTMONK_API_TOKEN: env("LISTMONK_API_TOKEN", ""),
+  LISTMONK_LIST_IDS: parseIntList(env("LISTMONK_LIST_IDS", "")),
 };
 
 // ---------------------------------------------------------------------------
@@ -255,6 +276,88 @@ function icsUrlFor(slug) {
 }
 
 // ---------------------------------------------------------------------------
+// listmonk integration — newsletter subscribers + campaigns
+// ---------------------------------------------------------------------------
+// All newsletter data and sending lives in listmonk now. The public subscribe
+// route forwards a sign-up to listmonk's admin API; listmonk owns the double
+// opt-in confirmation, the campaign sending and the unsubscribe flow.
+
+// True only when the listmonk admin API is fully configured via env.
+function listmonkConfigured() {
+  return (
+    config.LISTMONK_URL.length > 0 &&
+    config.LISTMONK_API_USER.length > 0 &&
+    config.LISTMONK_API_TOKEN.length > 0 &&
+    config.LISTMONK_LIST_IDS.length > 0
+  );
+}
+
+// Low-level call to the listmonk admin API. Never throws — returns the raw
+// PocketBase $http response (or null on transport failure).
+function listmonkRequest(method, path, bodyObj) {
+  try {
+    return $http.send({
+      url: config.LISTMONK_URL + path,
+      method: method,
+      // listmonk v2+ supports API tokens via the "token user:token" scheme.
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "token " + config.LISTMONK_API_USER + ":" + config.LISTMONK_API_TOKEN,
+      },
+      body: bodyObj ? JSON.stringify(bodyObj) : undefined,
+      timeout: 15,
+    });
+  } catch (err) {
+    $app.logger().error("listmonk request failed", "path", path, "error", String(err));
+    return null;
+  }
+}
+
+// Subscribe an email to the configured listmonk list(s).
+// Returns { ok, status } where status is one of:
+//   "subscribed" — newly added (listmonk sends opt-in if the list is double opt-in)
+//   "exists"     — the address is already a subscriber
+//   "error"      — listmonk rejected the request or is unreachable
+function subscribeToListmonk(email, name) {
+  if (!listmonkConfigured()) {
+    $app.logger().error("listmonk not configured — set LISTMONK_URL / LISTMONK_API_USER / LISTMONK_API_TOKEN / LISTMONK_LIST_IDS");
+    return { ok: false, status: "error" };
+  }
+
+  // Adding without preconfirm lets listmonk drive the (double) opt-in flow per
+  // the list configuration. A non-empty name is required by some listmonk
+  // builds, so fall back to the address.
+  const res = listmonkRequest("POST", "/api/subscribers", {
+    email: email,
+    name: name && name.trim() ? name.trim() : email,
+    status: "enabled",
+    lists: config.LISTMONK_LIST_IDS,
+    preconfirm_subscriptions: false,
+  });
+
+  if (!res) return { ok: false, status: "error" };
+
+  if (res.statusCode >= 200 && res.statusCode < 300) {
+    return { ok: true, status: "subscribed" };
+  }
+
+  // 409 = the email is already a subscriber in listmonk.
+  if (res.statusCode === 409) {
+    return { ok: true, status: "exists" };
+  }
+
+  let detail = "";
+  try {
+    detail = JSON.stringify(res.json);
+  } catch (e) {
+    detail = "";
+  }
+  $app.logger().error("listmonk subscribe rejected", "email", email, "status", res.statusCode, "body", detail);
+  return { ok: false, status: "error" };
+}
+
+// ---------------------------------------------------------------------------
 // Email renderers — each returns { subject, html }
 //
 // The HTML body markup now lives in Go html/template files under
@@ -390,36 +493,11 @@ function renderEventReminder(ev, participant, isToday) {
   return { subject, html: renderEmail("event-reminder", data) };
 }
 
-// (6) Newsletter welcome
-function renderNewsletterWelcome(participant, token) {
-  const firstName = participant.getString("first_name") || "";
-  const subject = `Willkommen beim Männerkreis Niederbayern/ Straubing Newsletter`;
-  const eventUrl = `${config.APP_URL}/event?utm_source=email&utm_medium=newsletter&utm_campaign=welcome`;
-  const unsubUrl = `${config.APP_URL}/newsletter/unsubscribe/${token}?utm_source=email&utm_medium=newsletter&utm_campaign=welcome_unsubscribe`;
-  const data = {
-    firstName: firstName,
-    eventUrl: eventUrl,
-    unsubUrl: unsubUrl,
-    siteName: config.SITE_NAME,
-    recipientEmail: participant.getString("email"),
-  };
-  return { subject, html: renderEmail("newsletter-welcome", data) };
-}
+// Newsletter welcome + campaign emails now live in listmonk (subscriber
+// management, double opt-in confirmation and campaign sending), so the former
+// renderNewsletterWelcome / renderNewsletterCampaign renderers were removed.
 
-// (7) Newsletter campaign (per recipient). processedContent = admin-authored
-// HTML with {first_name} already replaced. Rendered UNESCAPED via the template's
-// `{{.content|raw}}` helper (the docs' supported way to emit trusted HTML).
-function renderNewsletterCampaign(subjectLine, processedContent, token) {
-  const unsubUrl = `${config.APP_URL}/newsletter/unsubscribe/${token}?utm_source=email&utm_medium=newsletter&utm_campaign=unsubscribe`;
-  const data = {
-    content: processedContent,
-    unsubUrl: unsubUrl,
-    siteName: config.SITE_NAME,
-  };
-  return { subject: subjectLine, html: renderEmail("newsletter-campaign", data) };
-}
-
-// (8) Event participant message. mailContent = admin-authored HTML with
+// (6) Event participant message. mailContent = admin-authored HTML with
 // {first_name} already replaced. Rendered UNESCAPED via `{{.content|raw}}`.
 function renderEventParticipantMessage(subjectLine, mailContent, ev) {
   const data = {
@@ -552,6 +630,9 @@ module.exports = {
   buildIcs,
   icsUrlFor,
   sendMail,
+  // listmonk
+  listmonkConfigured,
+  subscribeToListmonk,
   // domain helpers
   countActiveRegistrations,
   isEventPast,
@@ -563,7 +644,5 @@ module.exports = {
   renderAdminNotification,
   renderWaitlistPromotion,
   renderEventReminder,
-  renderNewsletterWelcome,
-  renderNewsletterCampaign,
   renderEventParticipantMessage,
 };
