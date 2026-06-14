@@ -35,6 +35,7 @@ const schemas = [
   schemas={schemas}
   manifest="/atemuebung.webmanifest"
   webAppTitle="Atemübung"
+  bare
 >
   <section class="hero breathing-hero">
     <div class="hero__bg"></div>
@@ -169,7 +170,13 @@ const schemas = [
       position: relative;
       block-size: auto;
       min-block-size: 0;
-      padding-block: clamp(6rem, 12vh, 9rem) clamp(2.5rem, 5vh, 5rem);
+      /* No fixed header in this chrome-less page — clear only the notch /
+         status bar (safe-area) plus a little breathing room. */
+      padding-block: max(
+          clamp(1.75rem, 6vh, 3.5rem),
+          var(--safe-area-inset-top)
+        )
+        clamp(2rem, 5vh, 4rem);
       color: var(--text-on-dark);
       background:
         radial-gradient(
@@ -193,7 +200,8 @@ const schemas = [
       --_surface-noise-opacity: 0.03;
 
       position: relative;
-      padding-block: clamp(2rem, 5vh, 5rem);
+      padding-block: clamp(2rem, 5vh, 5rem)
+        max(clamp(2rem, 5vh, 5rem), var(--safe-area-inset-bottom));
       overflow: hidden;
       background:
         radial-gradient(

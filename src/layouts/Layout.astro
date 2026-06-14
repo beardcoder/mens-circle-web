@@ -18,9 +18,13 @@ interface Props {
   schemas?: Record<string, unknown>[];
   manifest?: string;
   webAppTitle?: string;
+  /** Chrome-less shell: drop the header, footer, side rails and
+   *  scroll-to-top so a page can present as a focused, full-screen app
+   *  (used by the installable breathing exercise). */
+  bare?: boolean;
 }
 
-const props = Astro.props;
+const { bare = false, ...props } = Astro.props;
 
 // The "next event" CTAs ([data-event-cta]) are HIDDEN by default (CSS) and
 // revealed at runtime by the client only when an upcoming event is actually
@@ -46,35 +50,41 @@ const props = Astro.props;
     <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
   </head>
-  <body>
+  <body class:list={[{ 'is-bare': bare }]}>
     {
       /* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */
     }
-    <span id="top" aria-hidden="true"></span>
+    {!bare && <span id="top" aria-hidden="true" />}
 
     <SpriteDefs />
 
     {
       /* Editorial side rails — decorative magazine framing, hidden on small screens */
     }
-    <aside class="side-rail side-rail--left" aria-hidden="true">
-      <span class="side-rail__text">Männerkreis · Niederbayern</span>
-    </aside>
-    <aside class="side-rail side-rail--right" aria-hidden="true">
-      <span class="side-rail__text">Straubing · Bayern</span>
-    </aside>
+    {
+      !bare && (
+        <>
+          <aside class="side-rail side-rail--left" aria-hidden="true">
+            <span class="side-rail__text">Männerkreis · Niederbayern</span>
+          </aside>
+          <aside class="side-rail side-rail--right" aria-hidden="true">
+            <span class="side-rail__text">Straubing · Bayern</span>
+          </aside>
+        </>
+      )
+    }
 
     <a href="#main" class="skip-link">Zum Inhalt springen</a>
 
-    <Header />
+    {!bare && <Header />}
 
     <main id="main">
       <slot />
     </main>
 
-    <Footer />
+    {!bare && <Footer />}
 
-    <ScrollToTop />
+    {!bare && <ScrollToTop />}
 
     <script>
       import '../lib/client';
