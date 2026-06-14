@@ -72,12 +72,21 @@ const anchor = data.anchor ?? 'ueber';
       }
     </div>
 
-    <div class="intro__image-area" data-reveal="left" data-reveal-delay="120">
+    <div class="intro__image-area">
       <div class="intro__image-circles" aria-hidden="true">
         <div class="intro__image-ring intro__image-ring--outer"></div>
         <div class="intro__image-ring intro__image-ring--inner"></div>
       </div>
-      {data.quote && <p class="intro__image-text" set:html={data.quote} />}
+      {
+        data.quote && (
+          <p
+            class="intro__image-text"
+            data-reveal="up"
+            data-reveal-delay="120"
+            set:html={data.quote}
+          />
+        )
+      }
     </div>
   </div>
 </section>
@@ -165,18 +174,15 @@ const anchor = data.anchor ?? 'ueber';
       gap: 0;
     }
 
-    /* Scroll-driven parallax inside the dark panel — the quote rises a touch
-       while the rings settle the other way, giving the flat panel depth as it
-       passes. Pure CSS, gated to scroll-driven browsers and allowed motion. */
+    /* Scroll-driven parallax inside the dark panel — the rings drift gently as
+       the panel passes, giving the otherwise-flat surface depth. The quote
+       itself owns the entrance reveal (data-reveal), so it is deliberately left
+       out here to avoid two animations fighting over its transform. Pure CSS,
+       gated to scroll-driven browsers and allowed motion. */
     @media (prefers-reduced-motion: no-preference) {
       @supports (animation-timeline: view()) {
         .intro__image-area {
           view-timeline: --intro-panel block;
-        }
-
-        .intro__image-text {
-          animation: intro-quote-rise linear both;
-          animation-timeline: --intro-panel;
         }
 
         .intro__image-circles {

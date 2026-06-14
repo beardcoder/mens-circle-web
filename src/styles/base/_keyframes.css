@@ -86,18 +86,8 @@
   }
 }
 
-/* Gentle parallax for the intro panel: the quote drifts up while the rings
-   drift down behind it as the section passes through the viewport. */
-@keyframes intro-quote-rise {
-  from {
-    transform: translate3d(0, 1.75rem, 0);
-  }
-
-  to {
-    transform: translate3d(0, -1.75rem, 0);
-  }
-}
-
+/* Gentle parallax for the intro panel: the rings drift behind the quote as
+   the section passes through the viewport. */
 @keyframes intro-rings-drift {
   from {
     transform: translate3d(0, -1.5rem, 0);
