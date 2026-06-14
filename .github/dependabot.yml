@@ -1,11 +1,43 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# Dependabot version updates.
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Dependabot opens PRs for patch, minor AND major updates by default — they are
+# auto-merged once CI is green by .github/workflows/dependabot-automerge.yml.
 
 version: 2
 updates:
-  - package-ecosystem: "bun" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  # Frontend dependencies (Astro / Svelte) — Bun lockfile.
+  - package-ecosystem: 'bun'
+    directory: '/'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
+      timezone: 'Europe/Berlin'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+    # Collapse the low-risk noise into a single PR; keep majors separate so
+    # they can be reviewed (and auto-merged) on their own.
+    groups:
+      minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+
+  # The GitHub Actions used by the workflows in .github/workflows.
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '06:00'
+      timezone: 'Europe/Berlin'
+    labels:
+      - 'dependencies'
+      - 'github-actions'
+    groups:
+      actions:
+        update-types:
+          - 'minor'
+          - 'patch'
