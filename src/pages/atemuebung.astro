@@ -243,15 +243,16 @@ const schemas = [
       z-index: 0;
     }
 
-    /* One screen: the app fills the viewport and sits centred, with only
-       safe-area padding around it — nothing else competes for space. */
+    /* One screen: the app fills the viewport top-to-bottom (no centring gap),
+       with only the notch/status bar cleared at the top. */
     .breathing-screen {
       display: grid;
-      place-items: center;
+      grid-template-rows: 1fr;
+      justify-items: center;
       min-block-size: 100svh;
       min-block-size: 100dvh;
-      padding-block: max(var(--space-md), var(--safe-area-inset-top))
-        max(var(--space-md), var(--safe-area-inset-bottom));
+      padding-block: var(--safe-area-inset-top)
+        max(var(--space-sm), var(--safe-area-inset-bottom));
       padding-inline: max(var(--space-md), var(--safe-area-inset-left))
         max(var(--space-md), var(--safe-area-inset-right));
     }
@@ -515,8 +516,8 @@ const schemas = [
       gap: clamp(var(--space-sm), 3vw, var(--space-md));
       inline-size: 100%;
       max-inline-size: 640px;
-      /* Fills, but always fits, the single screen it now lives on. */
-      min-block-size: min(80svh, 620px);
+      /* Fill the full screen height it now owns, top to bottom. */
+      min-block-size: 100%;
       color: var(--text-on-dark);
     }
 
@@ -749,6 +750,18 @@ const schemas = [
 
     .breathing-app__start svg {
       margin-inline-start: 3px;
+    }
+
+    /* Sound toggle — compact, square ghost icon button. */
+    .breathing-app__sound {
+      --btn-padding-inline: var(--space-xs);
+
+      aspect-ratio: 1;
+    }
+
+    .breathing-app__sound svg {
+      inline-size: 1.4rem;
+      block-size: 1.4rem;
     }
 
     .breathing-app__settings {
