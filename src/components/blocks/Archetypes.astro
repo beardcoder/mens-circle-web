@@ -81,7 +81,6 @@ function detectIcon(title = ''): string {
               <article
                 class={`archetype-card archetype-card--${icon}`}
                 data-reveal="up"
-                data-hover="lift"
               >
                 <div
                   class="archetype-card__background-icon"
@@ -121,21 +120,6 @@ function detectIcon(title = ''): string {
       padding: var(--space-lg) var(--space-md);
       overflow: hidden;
       border-inline-start: 1px solid var(--border-light);
-      transition: background-color var(--motion-standard);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .archetype-card:hover {
-        background-color: color-mix(
-          in oklch,
-          var(--accent-primary) 5%,
-          var(--bg-secondary)
-        );
-      }
-
-      .archetype-card:hover .archetype-card__title {
-        color: var(--accent-primary);
-      }
     }
 
     .archetype-card__content {
@@ -168,7 +152,6 @@ function detectIcon(title = ''): string {
       line-height: 1.1;
       color: var(--text-primary);
       letter-spacing: -0.025em;
-      transition: color var(--motion-standard);
     }
 
     .archetype-card__description {
