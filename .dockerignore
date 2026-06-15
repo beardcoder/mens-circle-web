@@ -6,8 +6,7 @@ dist
 .vscode
 .idea
 docs
-pocketbase/pb_data
-pocketbase/pocketbase
+data
 *.log
 .env
 .env.*

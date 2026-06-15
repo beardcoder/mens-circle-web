@@ -3,20 +3,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Männerkreis — single-image deploy for Coolify.
 #
-# A small, sustainable footprint built around three co-located processes:
+# A minimal, sustainable footprint built around a single Bun process:
 #
-#   nginx (:8090 — the exposed port, the public edge)
+#   Bun (:4321 — the exposed port, the public edge)
 #   ├─ serves the build's static assets straight off disk (immutable caching)
-#   ├─ /api · /_ · /newsletter  → PocketBase (127.0.0.1:8091)
-#   └─ everything else          → Astro/Bun (127.0.0.1:4321)
-#   Astro server (Bun runtime, 127.0.0.1:4321)  prerendered pages + on-demand
-#                                SSR (event pages + home testimonials, live
-#                                from PocketBase). Loopback only.
-#   PocketBase (127.0.0.1:8091)  REST API, admin UI, transactional email
-#                                (pb_hooks), cron, DB — never exposed directly.
+#   ├─ /api · /newsletter  → EmDash API routes (bun:sqlite)
+#   └─ everything else     → Astro SSR (on-demand rendering)
 #
-# The frontend runs in the Bun runtime (NOT Node). nginx fronts both app
-# processes; PocketBase keeps the data + email + cron logic.
+# The entire application runs in a single Bun process using bun:sqlite as the
+# embedded database. No nginx, no PocketBase — just Bun.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # 1) Install dependencies + build the Astro server bundle with Bun.
@@ -28,59 +23,40 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
 # Canonical URL for sitemap / OG tags (build-time). Events + testimonials are
-# NO LONGER fetched at build time — they render on demand from PocketBase, so
-# there is no PB_URL build arg and no rebuild-on-content-change anymore.
+# rendered on demand from the embedded SQLite database, so there is no external
+# data fetch at build time.
 ARG PUBLIC_SITE_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 # Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks
 # Astro's Rollup build, while `bun run` still uses Bun for everything else.
 RUN bun run build
 
-# 2) Fetch the PocketBase binary for the target architecture.
-FROM alpine:3.21 AS pocketbase
-ARG PB_VERSION=0.39.3
-ARG TARGETARCH
-RUN apk add --no-cache ca-certificates unzip wget
-RUN set -eux; \
-    case "${TARGETARCH:-amd64}" in \
-      amd64) PB_ARCH=amd64 ;; \
-      arm64) PB_ARCH=arm64 ;; \
-      *)     PB_ARCH=amd64 ;; \
-    esac; \
-    wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${PB_ARCH}.zip" -O /tmp/pb.zip; \
-    unzip /tmp/pb.zip -d /pb; \
-    rm /tmp/pb.zip
-
-# 3) Final runtime image — Bun runtime + nginx + the PocketBase binary.
+# 2) Final runtime image — single Bun process, no nginx, no PocketBase.
 FROM oven/bun:1
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates tzdata wget nginx \
+    && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
     && rm -rf /var/lib/apt/lists/*
 ENV TZ=Europe/Berlin
 # Same WORKDIR as the build stage so the adapter's baked client path resolves.
 WORKDIR /app
 
-# The Astro server bundle + its runtime dependencies + the static client (also
-# served directly by nginx). The build path is baked in, so /app must match.
+# The Astro server bundle + its runtime dependencies + the static client.
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 
-# PocketBase: binary + hooks + migrations (data lives in the mounted volume).
-COPY --from=pocketbase /pb/pocketbase /usr/local/bin/pocketbase
-COPY pocketbase/pb_hooks /pb/pb_hooks
-COPY pocketbase/pb_migrations /pb/pb_migrations
-COPY nginx.conf /etc/nginx/nginx.conf
+# The server-side EmDash code (API, DB, cron, mailer).
+COPY --from=build /app/server ./server
+
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Persisted data (database, uploaded files) — mount a Coolify volume here.
-VOLUME ["/pb/pb_data"]
-# nginx is the public edge; Astro (4321) + PocketBase (8091) stay on loopback.
-EXPOSE 8090
+# Persisted data (SQLite database) — mount a Coolify volume here.
+VOLUME ["/app/data"]
+# Single Bun process is the public edge.
+EXPOSE 4321
 
-# Hits nginx, which proxies /api to PocketBase — validates the whole chain.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:8090/api/health >/dev/null 2>&1 || exit 1
+  CMD wget -qO- http://127.0.0.1:4321/api/health >/dev/null 2>&1 || exit 1
 
 ENTRYPOINT ["docker-entrypoint.sh"]

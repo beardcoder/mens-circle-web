@@ -3,16 +3,18 @@
  * Bundled into dist/server at build time and run by the Bun runtime.
  *
  * Serves the Astro site via astro/app's `App`: prerendered static files +
- * on-demand SSR, with security + Cache-Control headers. It binds to loopback
- * and does NOT proxy — nginx is the public edge in front (it routes the
- * PocketBase paths to PocketBase and everything else here).
+ * on-demand SSR, with security + Cache-Control headers. Also handles the API
+ * routes via the embedded EmDash backend (bun:sqlite) — a single Bun process
+ * replaces the former nginx + PocketBase + Astro three-process architecture.
  *
  * Astro auto-invokes `start(manifest, args)` from its generated entry, so
- * `bun run dist/server/entry.mjs` boots the Astro server.
+ * `bun run dist/server/entry.mjs` boots the server.
  */
 import { App } from 'astro/app';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { handleApiRequest } from '../server/api.ts';
+import { startCron } from '../server/cron.ts';
 
 // ── Headers (mirror the former nginx policy) ────────────────────────────────
 const SECURITY_HEADERS = {
@@ -93,11 +95,16 @@ async function serveStatic(pathname, clientDir) {
   return new Response('Not found', { status: 404, headers: SECURITY_HEADERS });
 }
 
-/** Build the Astro request handler: on-demand SSR, falling back to static files. */
+/** Build the Astro request handler: API routes first, then on-demand SSR, falling back to static files. */
 function createHandler(app, args) {
   const clientDir = fileURLToPath(args.client); // e.g. /app/dist/client/
   return async (request, server) => {
     const url = new URL(request.url);
+
+    // EmDash API routes (replaces PocketBase)
+    const apiResponse = await handleApiRequest(request, url);
+    if (apiResponse) return apiResponse;
+
     const routeData = app.match(request);
     if (routeData) {
       const response = await app.render(request, {
@@ -119,13 +126,11 @@ export function createExports(manifest, args) {
 }
 
 /**
- * Auto-invoked by Astro's generated entry: boots the Astro server.
+ * Auto-invoked by Astro's generated entry: boots the EmDash server.
  *
- * This process serves ONLY the Astro app (prerendered files + on-demand SSR).
- * nginx is the public edge in front of it: nginx routes the PocketBase paths
- * (/api, /_, /newsletter) straight to PocketBase and everything else here, so
- * this server binds to loopback and never proxies. SSR data is fetched from
- * PocketBase directly via PB_INTERNAL_URL (see src/lib/pocketbase-server.ts).
+ * This single Bun process serves everything: the Astro app (prerendered
+ * files + on-demand SSR) AND the API routes backed by bun:sqlite. No nginx,
+ * no PocketBase — one process, one binary, one port.
  */
 export function start(manifest, args) {
   const Bun = globalThis.Bun;
@@ -147,7 +152,10 @@ export function start(manifest, args) {
     fetch: (request, srv) => handler(request, srv),
   });
 
-  console.log(`→ Astro server listening on http://${hostname}:${port}`);
+  // Start the background cron jobs (event reminders).
+  startCron();
+
+  console.log(`→ EmDash server listening on http://${hostname}:${port}`);
 
   const stop = () => {
     try {

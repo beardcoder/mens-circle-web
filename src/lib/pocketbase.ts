@@ -1,20 +1,17 @@
 /**
- * Client-side PocketBase API helpers (runtime, browser).
+ * Client-side API helpers (runtime, browser).
  *
  * Page content (events, testimonials) is server-rendered (see
  * `pocketbase-server.ts`). The helpers here cover the parts that must run in
  * the browser: the form submissions (register / newsletter / testimonial).
- * They use plain `fetch` against the custom PocketBase routes — no PocketBase
- * JS SDK is shipped to the client.
+ * They use plain `fetch` against the EmDash API routes served by the same Bun
+ * process — no separate backend, no SDK shipped to the client.
  *
- * In production the Bun edge server serves the site and reverse-proxies
- * `/api/*` to PocketBase on the same origin, so the default base URL is the
- * current origin. For local dev set `PUBLIC_PB_URL` (e.g. http://localhost:8090)
- * because Astro's dev server runs on a different port than PocketBase.
+ * In production the single Bun process serves everything on the same origin.
+ * For local dev set `PUBLIC_API_URL` if needed (though it's the same origin).
  *
- * All write endpoints are custom PocketBase routes (see pocketbase/pb_hooks)
- * that perform validation, capacity/waitlist logic and transactional email
- * server-side, returning a uniform { success, message } body.
+ * All write endpoints perform validation, capacity/waitlist logic and
+ * transactional email server-side, returning a uniform { success, message } body.
  */
 import type {
   ApiResponse,
@@ -23,10 +20,11 @@ import type {
 } from './types';
 
 function resolveBaseUrl(): string {
-  const configured = import.meta.env.PUBLIC_PB_URL;
+  const configured =
+    import.meta.env.PUBLIC_API_URL || import.meta.env.PUBLIC_PB_URL;
   if (configured) return configured;
   if (globalThis.window !== undefined) return globalThis.location.origin;
-  return 'http://localhost:8090';
+  return 'http://localhost:4321';
 }
 
 export const PB_BASE_URL = resolveBaseUrl();

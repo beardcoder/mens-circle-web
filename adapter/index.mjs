@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
  * The published Bun adapters (@nurodev/astro-bun) only target Astro ≤5 and
  * crash on Astro 6's `App` API. Since all we need is a thin Bun server, this
  * minimal adapter wires Astro's stable `astro/app` `App` into our own server
- * entry (adapter/server.mjs), which serves the built site AND reverse-proxies
- * the PocketBase paths — replacing nginx with a single Bun process.
+ * entry (adapter/server.mjs), which serves the built site AND handles the
+ * EmDash API routes (bun:sqlite) — a single Bun process for everything.
  *
  * @returns {import('astro').AstroIntegration}
  */
