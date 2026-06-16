@@ -10,8 +10,10 @@
     "preview": "astro preview",
     "start": "bun run dist/server/entry.mjs",
     "check": "astro check",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "biome:check": "biome check .",
     "import:live": "bun run scripts/import-live-data.ts",
     "pb:dev": "./pocketbase/pocketbase serve --dir ./pocketbase/pb_data --hooksDir ./pocketbase/pb_hooks --migrationsDir ./pocketbase/pb_migrations"
   },
@@ -26,10 +28,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@biomejs/biome": "^2.5.0",
     "@types/leaflet": "^1.9.21",
-    "prettier": "^3.8.4",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-svelte": "^4.1.0",
     "typescript": "^6.0.3"
   }
 }

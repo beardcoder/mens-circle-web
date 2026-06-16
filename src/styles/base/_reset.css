@@ -38,7 +38,7 @@ html {
 button,
 summary,
 .btn,
-[role='button'] {
+[role="button"] {
   touch-action: manipulation;
 }
 
@@ -60,7 +60,8 @@ summary,
 /* Set core body defaults */
 body {
   min-block-size: 100vh;
-  min-block-size: 100dvh; /* Use dynamic viewport height */
+  /* biome-ignore lint/suspicious/noDuplicateProperties: dvh fallback for browsers without dynamic viewport support */
+  min-block-size: 100dvh;
 
   /* `clip` (not `hidden`) prevents accidental horizontal scrolling
      without making `body` a scroll container — `view()` timelines on
@@ -74,7 +75,7 @@ body {
 }
 
 /* Remove list styles on ul, ol with a list role */
-:where(ul, ol)[role='list'] {
+:where(ul, ol)[role="list"] {
   list-style: none;
 }
 

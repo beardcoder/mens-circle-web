@@ -172,6 +172,7 @@ routerAdd("POST", "/api/newsletter/subscribe", (e) => {
   try {
     const data = e.requestInfo().body || {};
     const email = (data.email || "").trim().toLowerCase();
+    const name = (data.name || "").trim();
 
     // Honeypot: hidden "website" field; bots fill it. Fake success silently.
     if (typeof data.website === "string" && data.website.trim() !== "") {
@@ -189,57 +190,22 @@ routerAdd("POST", "/api/newsletter/subscribe", (e) => {
       });
     }
 
-    const participant = lib.upsertParticipant($app, email, {});
+    // Subscribers + sending live entirely in listmonk now. Forward the sign-up
+    // to listmonk's admin API; it owns the (double) opt-in confirmation email.
+    const result = lib.subscribeToListmonk(email, name);
 
-    // Find an existing subscription (unique per participant), including soft-deleted.
-    let existing = null;
-    try {
-      existing = $app.findFirstRecordByFilter(
-        "newsletter_subscribers",
-        "participant = {:pid}",
-        { pid: participant.id }
-      );
-    } catch (none) {
-      existing = null;
-    }
-
-    const nowIso = new Date().toISOString();
-
-    if (existing && !existing.getString("deleted") && !existing.getString("unsubscribed_at")) {
+    if (result.status === "exists") {
       return e.json(409, {
         success: false,
         message: "Diese E-Mail-Adresse ist bereits für den Newsletter angemeldet.",
       });
     }
 
-    if (existing) {
-      // Reactivate / restore. The onCreate hook only fires on create, so send welcome inline.
-      existing.set("token", lib.randomToken(64));
-      existing.set("subscribed_at", nowIso);
-      existing.set("confirmed_at", nowIso);
-      existing.set("unsubscribed_at", null);
-      existing.set("deleted", null);
-      $app.save(existing);
-
-      try {
-        const tpl = lib.renderNewsletterWelcome(participant, existing.getString("token"));
-        lib.sendMail($app, {
-          to: participant.getString("email"),
-          subject: tpl.subject,
-          html: tpl.html,
-        });
-      } catch (mailErr) {
-        $app.logger().error("newsletter welcome (restore) failed", "error", String(mailErr));
-      }
-    } else {
-      // Fresh subscription; onCreate hook sends the welcome email.
-      const col = $app.findCollectionByNameOrId("newsletter_subscribers");
-      const sub = new Record(col);
-      sub.set("participant", participant.id);
-      sub.set("token", lib.randomToken(64));
-      sub.set("subscribed_at", nowIso);
-      sub.set("confirmed_at", nowIso);
-      $app.save(sub);
+    if (!result.ok) {
+      return e.json(502, {
+        success: false,
+        message: "Die Anmeldung ist momentan nicht möglich. Bitte versuche es später erneut.",
+      });
     }
 
     return e.json(200, {
@@ -459,71 +425,6 @@ routerAdd("GET", "/api/public/events/{slug}/ics", (e) => {
   }
 });
 
-// -------------------------------------------------------------------------
-// GET /newsletter/unsubscribe/{token}
-// -------------------------------------------------------------------------
-routerAdd("GET", "/newsletter/unsubscribe/{token}", (e) => {
-  const lib = require(`${__hooks}/lib.js`);
-  const pageStyle =
-    "font-family:'DM Sans',Helvetica,Arial,sans-serif;background-color:#efe9dd;color:#2c2418;" +
-    "margin:0;padding:0;";
-  const cardStyle =
-    "max-width:560px;margin:64px auto;background:#ffffff;border-radius:8px;padding:48px 40px;" +
-    "text-align:center;";
-
-  function page(title, message) {
-    return (
-      `<!doctype html><html lang="de"><head><meta charset="utf-8" />` +
-      `<meta name="viewport" content="width=device-width, initial-scale=1" />` +
-      `<title>${lib.escapeHtml(title)}</title></head>` +
-      `<body style="${pageStyle}"><div style="${cardStyle}">` +
-      `<h1 style="font-family:Georgia,serif;font-size:24px;color:#2c2418;margin:0 0 16px;">${lib.escapeHtml(title)}</h1>` +
-      `<p style="font-size:16px;line-height:1.7;color:#5c4a3a;margin:0;">${lib.escapeHtml(message)}</p>` +
-      `</div></body></html>`
-    );
-  }
-
-  try {
-    const token = e.request.pathValue("token");
-    let sub = null;
-    try {
-      sub = $app.findFirstRecordByFilter(
-        "newsletter_subscribers",
-        "token = {:token}",
-        { token: token }
-      );
-    } catch (none) {
-      sub = null;
-    }
-
-    if (!sub) {
-      return e.html(
-        404,
-        page(
-          "Link ungültig",
-          "Dieser Abmelde-Link ist leider ungültig oder abgelaufen."
-        )
-      );
-    }
-
-    sub.set("unsubscribed_at", new Date().toISOString());
-    $app.save(sub);
-
-    return e.html(
-      200,
-      page(
-        "Abgemeldet",
-        "Du wurdest erfolgreich vom Newsletter abgemeldet."
-      )
-    );
-  } catch (err) {
-    $app.logger().error("/newsletter/unsubscribe failed", "error", String(err));
-    return e.html(
-      500,
-      page(
-        "Fehler",
-        "Es ist ein Fehler aufgetreten. Bitte versuche es später erneut."
-      )
-    );
-  }
-});
+// The former GET /newsletter/unsubscribe/{token} route was removed: newsletter
+// subscriptions live in listmonk now, which renders its own unsubscribe page
+// and links it from every campaign footer.
