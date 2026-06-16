@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
+  <title>{{ .Campaign.Subject }}</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <![endif]-->
+  <style>
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    table { border-collapse: collapse !important; }
+    img { border: 0; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; max-width: 100%; }
+    a { color: #b24e1f; }
+
+    /* Authored campaign content (the admin writes arbitrary HTML — style by tag) */
+    .em-prose { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.7; color: #2b2118; }
+    .em-prose p { margin: 0 0 20px; }
+    .em-prose h1, .em-prose h2, .em-prose h3 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; line-height: 1.18; color: #1a1308; letter-spacing: -0.015em; margin: 32px 0 16px; }
+    .em-prose h1 { font-size: 32px; }
+    .em-prose h2 { font-size: 26px; }
+    .em-prose h3 { font-size: 21px; }
+    .em-prose h1 em, .em-prose h2 em, .em-prose h3 em { color: #ce5c22; font-style: italic; }
+    .em-prose strong { color: #1a1308; }
+    .em-prose a { color: #b24e1f; text-decoration: underline; text-underline-offset: 2px; }
+    .em-prose ul, .em-prose ol { margin: 22px 0; padding-left: 20px; }
+    .em-prose li { margin: 0 0 10px; }
+    .em-prose blockquote { margin: 28px 0; padding: 4px 0 4px 22px; border-left: 2px solid #ce5c22; font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 20px; line-height: 1.4; color: #1a1308; }
+    .em-prose img { border-radius: 10px; }
+    .em-prose hr { border: 0; border-top: 1px solid #ece3d6; margin: 32px 0; }
+
+    @media only screen and (max-width: 620px) {
+      .em-card { width: 100% !important; }
+      .em-pad { padding-left: 26px !important; padding-right: 26px !important; }
+      .em-hero { font-size: 30px !important; }
+      .em-quote { font-size: 22px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#f2eee7;">
+  <!-- Preheader -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#f2eee7; opacity:0;">{{ .Campaign.Subject }}</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f2eee7;">
+    <tr>
+      <td align="center" style="padding:36px 12px;">
+        <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+        <table role="presentation" class="em-card" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#faf8f5; border:1px solid #e3d9cd; border-radius:14px;">
+
+          <!-- Masthead -->
+          <tr>
+            <td class="em-pad" align="center" style="padding:36px 44px 0;">
+              <div style="font-family:Georgia,'Times New Roman',serif; font-size:24px; line-height:1; color:#1a1308; letter-spacing:-0.01em;">Männerkreis</div>
+              <div style="margin-top:10px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:11px; line-height:1; letter-spacing:0.22em; text-transform:uppercase; color:#a4724a;">Niederbayern&nbsp;/&nbsp;Straubing</div>
+            </td>
+          </tr>
+
+          <!-- Hero / brand line -->
+          <tr>
+            <td class="em-pad" align="center" style="padding:30px 56px 34px; border-bottom:1px solid #ece3d6;">
+              <h1 class="em-hero" style="margin:0; font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:36px; line-height:1.12; color:#1a1308; letter-spacing:-0.02em;">Atme durch.<br>Du bist <em style="color:#ce5c22; font-style:italic;">angekommen.</em></h1>
+            </td>
+          </tr>
+
+          <!-- Content (authored campaign body) -->
+          <tr>
+            <td class="em-pad em-prose" style="padding:42px 44px 8px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:16px; line-height:1.7; color:#2b2118;">
+              {{ template "content" . }}
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:38px 0 4px;">
+                <tr><td style="padding-top:24px; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; line-height:1.6; color:#7a7065;">
+                  Herzliche Grüße<br>
+                  <span style="color:#1a1308;">Markus</span>
+                </td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Quote band -->
+          <tr>
+            <td class="em-pad" align="center" style="padding:38px 56px; background-color:#f2eae0;">
+              <div class="em-quote" style="font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:25px; line-height:1.3; color:#1a1308;">„Im Kreis sitzen Männer, die sich trauen, <span style="color:#ce5c22;">echt zu sein.</span>“</div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="em-pad" align="center" style="padding:32px 44px 40px; border-top:1px solid #ece3d6;">
+              <div style="font-family:Georgia,'Times New Roman',serif; font-size:18px; line-height:1.2; color:#1a1308; letter-spacing:-0.01em;">Männerkreis Niederbayern/ Straubing</div>
+              <p style="margin:12px 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.7; color:#7a7065;">
+                Ein Raum für echte Begegnung unter Männern. Authentischer Austausch,
+                Gemeinschaft und persönliches Wachstum in Niederbayern.
+              </p>
+              <p style="margin:16px 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.7;">
+                <a href="{{ TrackLink "https://mens-circle.de" }}" target="_blank" style="color:#b24e1f; text-decoration:underline; text-underline-offset:2px;">Webseite</a>
+                &nbsp;·&nbsp;
+                <a href="{{ MessageURL }}" target="_blank" style="color:#b24e1f; text-decoration:underline; text-underline-offset:2px;">Im Browser ansehen</a>
+              </p>
+              <p style="margin:14px 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:12px; line-height:1.7; color:#9a8f80;">
+                Du bekommst diese E-Mail, weil du dich für den Männerkreis
+                Niederbayern/ Straubing eingetragen hast.<br>
+                <a href="{{ UnsubscribeURL }}" target="_blank" style="color:#7a7065; text-decoration:underline; text-underline-offset:2px;">Vom Newsletter abmelden</a>
+              </p>
+              <p style="margin:14px 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:12px; line-height:1.5; color:#b3a896;">
+                © {{ Date "2006" }} Männerkreis Niederbayern/ Straubing
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
+  {{ TrackView }}
+</body>
+</html>
