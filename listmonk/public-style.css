@@ -2,14 +2,19 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap");
 
 :root {
-  --mk-bg: #efe9dd;
-  --mk-ink: #2c2418;
-  --mk-muted: #5c4a3a;
-  --mk-faint: #7a6248;
-  --mk-accent: #b86f52;
-  --mk-accent-dark: #a25f44;
-  --mk-line: #e3dccb;
-  --mk-rule: #c4b49a;
+  /* Palette mirrors the website design tokens (src/styles/base/_variables.css),
+     converted from OKLCH to email/CSS-safe hex so the public pages, the
+     listmonk e-mails and mens-circle.de all share one warm, light identity. */
+  --mk-bg: #f2eee7; /* parchment */
+  --mk-ink: #1a1308; /* headings (near-black warm) */
+  --mk-muted: #3a3128; /* body copy */
+  --mk-faint: #7a7065; /* meta / footer */
+  --mk-accent: #b24e1f; /* links */
+  --mk-accent-dark: #983f17;
+  --mk-btn: #c1592a; /* button fill (terracotta) */
+  --mk-btn-dark: #a8481f;
+  --mk-line: #ece3d6;
+  --mk-rule: #e3d9cd;
   --mk-sans: "DM Sans", Helvetica, Arial, sans-serif;
   --mk-serif: "Playfair Display", Georgia, serif;
 }
@@ -124,9 +129,9 @@ textarea:focus {
 .button,
 button,
 input[type="submit"] {
-  background: var(--mk-accent) !important;
-  border: 1px solid var(--mk-accent) !important;
-  color: #fff !important;
+  background: var(--mk-btn) !important;
+  border: 1px solid var(--mk-btn) !important;
+  color: #faf8f5 !important;
   font-family: var(--mk-sans) !important;
   font-size: 15px !important;
   font-weight: 600 !important;
@@ -137,13 +142,13 @@ input[type="submit"] {
 .button:hover,
 button:hover,
 input[type="submit"]:hover {
-  background: var(--mk-accent-dark) !important;
-  border-color: var(--mk-accent-dark) !important;
+  background: var(--mk-btn-dark) !important;
+  border-color: var(--mk-btn-dark) !important;
 }
 
 .button.button-outline {
   background: transparent !important;
-  color: var(--mk-accent) !important;
+  color: var(--mk-btn) !important;
 }
 .button.button-outline:hover {
   background: var(--mk-accent) !important;

@@ -1,9 +1,17 @@
 # listmonk — Männerkreis Niederbayern/ Straubing
 
 E-Mail-Templates und Public-Page-CSS für die listmonk-Instanz (Newsletter:
-Abonnenten, Double-Opt-In, Versand, Abmeldung). Marke: sehr dunkler Hintergrund
-(`#090907`), warme Braun-/Kupfer-/Goldtöne (`#c98952`), große Serifenschrift
-(Georgia), Editorial-Look mit feinen Linien.
+Abonnenten, Double-Opt-In, Versand, Abmeldung). Marke wie auf **mens-circle.de**:
+heller, warmer Pergament-Hintergrund (`#f2eee7`) mit Karte in `#faf8f5`,
+Terracotta-/Kupfer-Akzent (`#ce5c22` / Links `#b24e1f`), Serifen-Headlines
+(Playfair Display → Fallback Georgia) und sans-serif Fließtext (DM Sans →
+Helvetica/Arial), Editorial-Look mit feinen Linien. Die Hex-Werte sind aus den
+Website-Tokens (`src/styles/base/_variables.css`, OKLCH) abgeleitet.
+
+Alle Mails sind **e-mail-client-robust** gebaut: table-basiertes Layout,
+durchgängig Inline-CSS, web-safe Fonts, MSO-Conditionals und „bulletproof"
+Buttons — damit sie auch in Gmail und Outlook solide aussehen (nicht zu 100 %
+pixelgleich, aber sauber).
 
 > Getestet gegen **listmonk v6.1.0** (`listmonk/listmonk:latest`, Stand der
 > Einrichtung). listmonk nutzt Go `html/template` + Sprig.
@@ -116,8 +124,8 @@ Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
 
 - **Opt-In:** Über das Newsletter-Formular (oder Admin → Subscribers → Add) eine
   Adresse zu einer Double-Opt-In-Liste hinzufügen → die Bestätigungsmail muss im
-  dunklen Männerkreis-Layout ankommen; „Anmeldung bestätigen" zeigt auf
-  `{{ .OptinURL }}`.
+  hellen Männerkreis-Layout (Pergament, Terracotta-Button) ankommen; „Anmeldung
+  bestätigen" zeigt auf `{{ .OptinURL }}`.
 - **Testkampagne:** Kampagne mit Template „Männerkreis Niederbayern" anlegen → Admin →
   „Send test message" an eine eigene Adresse. Prüfen: Hero/Quote/Footer,
   „Im Browser ansehen" (`MessageURL`), Abmeldelink (`UnsubscribeURL`),
