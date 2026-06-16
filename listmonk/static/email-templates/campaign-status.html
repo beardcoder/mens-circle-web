@@ -1,0 +1,31 @@
+{{ define "campaign-status" }}
+{{ template "header" . }}
+<h1>Kampagnenstatus</h1>
+<p>
+  Es gibt ein Update zu einer Listmonk-Kampagne.
+</p>
+<table>
+  <tr>
+    <td width="34%"><strong>Kampagne</strong></td>
+    <td><a href="{{ RootURL }}/admin/campaigns/{{ index . "ID" }}">{{ index . "Name" }}</a></td>
+  </tr>
+  <tr>
+    <td width="34%"><strong>Status</strong></td>
+    <td>{{ index . "Status" }}</td>
+  </tr>
+  <tr>
+    <td width="34%"><strong>Versendet</strong></td>
+    <td>{{ index . "Sent" }} / {{ index . "ToSend" }}</td>
+  </tr>
+  {{ if ne (index . "Reason") "" }}
+  <tr>
+    <td width="34%"><strong>Grund</strong></td>
+    <td>{{ index . "Reason" }}</td>
+  </tr>
+  {{ end }}
+</table>
+<p>
+  <a class="button" href="{{ RootURL }}/admin">Listmonk öffnen</a>
+</p>
+{{ template "footer" }}
+{{ end }}
