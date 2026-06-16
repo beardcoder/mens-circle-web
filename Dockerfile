@@ -42,20 +42,20 @@ ARG PB_VERSION=0.39.3
 ARG TARGETARCH
 RUN apk add --no-cache ca-certificates unzip wget
 RUN set -eux; \
-    case "${TARGETARCH:-amd64}" in \
-      amd64) PB_ARCH=amd64 ;; \
-      arm64) PB_ARCH=arm64 ;; \
-      *)     PB_ARCH=amd64 ;; \
-    esac; \
-    wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${PB_ARCH}.zip" -O /tmp/pb.zip; \
-    unzip /tmp/pb.zip -d /pb; \
-    rm /tmp/pb.zip
+  case "${TARGETARCH:-amd64}" in \
+  amd64) PB_ARCH=amd64 ;; \
+  arm64) PB_ARCH=arm64 ;; \
+  *)     PB_ARCH=amd64 ;; \
+  esac; \
+  wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${PB_ARCH}.zip" -O /tmp/pb.zip; \
+  unzip /tmp/pb.zip -d /pb; \
+  rm /tmp/pb.zip
 
 # 3) Final runtime image — Bun runtime + nginx + the PocketBase binary.
 FROM oven/bun:1
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates tzdata wget nginx \
-    && rm -rf /var/lib/apt/lists/*
+  && apt-get install -y --no-install-recommends ca-certificates tzdata wget nginx \
+  && rm -rf /var/lib/apt/lists/*
 ENV TZ=Europe/Berlin
 # Same WORKDIR as the build stage so the adapter's baked client path resolves.
 WORKDIR /app
@@ -78,9 +78,5 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 VOLUME ["/pb/pb_data"]
 # nginx is the public edge; Astro (4321) + PocketBase (8091) stay on loopback.
 EXPOSE 8090
-
-# Hits nginx, which proxies /api to PocketBase — validates the whole chain.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:8090/api/health >/dev/null 2>&1 || exit 1
 
 ENTRYPOINT ["docker-entrypoint.sh"]
