@@ -1,0 +1,77 @@
+name: mens-circle
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        PUBLIC_SITE_URL: ${SERVICE_URL_WEB:-https://mens-circle.de}
+    restart: unless-stopped
+    environment:
+      - SERVICE_FQDN_WEB_8090
+      - APP_URL=${SERVICE_URL_WEB}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-hallo@mens-circle.de}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME:-Männerkreis Niederbayern/ Straubing}
+      - MAIL_ADMIN_ADDRESS=${MAIL_ADMIN_ADDRESS:-hallo@mens-circle.de}
+      - MAIL_ADMIN_NAME=${MAIL_ADMIN_NAME:-Männerkreis Admin}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_TLS=${SMTP_TLS:-true}
+      - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
+      - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
+      - LISTMONK_URL=http://listmonk:9000
+      - LISTMONK_API_USER=${LISTMONK_API_USER}
+      - LISTMONK_API_TOKEN=${LISTMONK_API_TOKEN}
+      - LISTMONK_LIST_IDS=${LISTMONK_LIST_IDS}
+    volumes:
+      - pb-data:/pb/pb_data
+    depends_on:
+      - listmonk
+
+  listmonk:
+    image: listmonk/listmonk:latest
+    restart: unless-stopped
+    depends_on:
+      listmonk-db:
+        condition: service_healthy
+    environment:
+      - SERVICE_FQDN_LISTMONK_9000
+      - TZ=Europe/Berlin
+      - LISTMONK_app__address=0.0.0.0:9000
+      - LISTMONK_app__root_url=${SERVICE_URL_LISTMONK}
+      - LISTMONK_db__host=listmonk-db
+      - LISTMONK_db__port=5432
+      - LISTMONK_db__user=${SERVICE_USER_POSTGRES}
+      - LISTMONK_db__password=${SERVICE_PASSWORD_POSTGRES}
+      - LISTMONK_db__database=listmonk
+      - LISTMONK_db__ssl_mode=disable
+      - LISTMONK_ADMIN_USER=${SERVICE_USER_LISTMONKADMIN}
+      - LISTMONK_ADMIN_PASSWORD=${SERVICE_PASSWORD_LISTMONKADMIN}
+    command:
+      - sh
+      - -c
+      - "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"
+    volumes:
+      - listmonk-uploads:/listmonk/uploads:rw
+
+  listmonk-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${SERVICE_USER_POSTGRES}
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - POSTGRES_DB=listmonk
+    volumes:
+      - listmonk-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+volumes:
+  pb-data:
+  listmonk-uploads:
+  listmonk-db:

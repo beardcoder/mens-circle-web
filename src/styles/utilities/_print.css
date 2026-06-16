@@ -25,7 +25,7 @@
   .modal,
   .calendar-modal,
   .btn,
-  button:not([type='submit']) {
+  button:not([type="submit"]) {
     display: none !important;
   }
 
@@ -67,12 +67,12 @@
   a[href]::after {
     font-size: 0.8em;
     color: #666 !important;
-    content: ' (' attr(href) ')';
+    content: " (" attr(href) ")";
   }
 
-  a[href^='#']::after,
-  a[href^='javascript:']::after {
-    content: '';
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
   }
 
   /* Images */

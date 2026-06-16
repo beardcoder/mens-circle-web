@@ -1,8 +1,9 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
-import svelte from '@astrojs/svelte';
+
 import sitemap from '@astrojs/sitemap';
+import svelte from '@astrojs/svelte';
 import umami from '@yeskunall/astro-umami';
+import { defineConfig, fontProviders } from 'astro/config';
 import bun from './adapter/index.mjs';
 
 // Umami analytics is opt-in: it only loads when a website id is configured.
