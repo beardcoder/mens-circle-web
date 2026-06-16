@@ -29,6 +29,11 @@ services:
       - pb-data:/pb/pb_data
     depends_on:
       - listmonk
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:8090 || exit 1']
+      interval: 100s
+      timeout: 5s
+      retries: 6
 
   listmonk:
     image: listmonk/listmonk:latest
@@ -49,6 +54,11 @@ services:
       LISTMONK_db__ssl_mode: disable
       LISTMONK_ADMIN_USER: ${SERVICE_USER_LISTMONKADMIN}
       LISTMONK_ADMIN_PASSWORD: ${SERVICE_PASSWORD_LISTMONKADMIN}
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:9000 || exit 1']
+      interval: 100s
+      timeout: 5s
+      retries: 6
     command:
       - sh
       - -c
