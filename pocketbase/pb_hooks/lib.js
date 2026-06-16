@@ -22,14 +22,27 @@ function env(key, fallback) {
 // Parse a comma-separated list of integers (e.g. "1,3,4") into a number array.
 function parseIntList(raw) {
   if (!raw) return [];
-  return String(raw)
+  var out = [];
+  String(raw)
     .split(",")
-    .map(function (s) {
-      return parseInt(s.trim(), 10);
-    })
-    .filter(function (n) {
-      return !isNaN(n);
+    .forEach(function (s) {
+      var token = s.trim();
+      if (token === "") return;
+      var n = parseInt(token, 10);
+      // listmonk's admin API expects numeric list IDs, not UUIDs. A UUID here
+      // would silently become NaN and drop out — log it loudly so the
+      // misconfiguration is obvious instead of "nobody gets assigned".
+      if (isNaN(n) || String(n) !== token) {
+        $app.logger().warn(
+          "parseIntList: ignoring non-numeric list id — expected the numeric listmonk list ID, not a UUID",
+          "value",
+          token,
+        );
+        return;
+      }
+      out.push(n);
     });
+  return out;
 }
 
 const config = {
