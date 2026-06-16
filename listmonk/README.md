@@ -26,6 +26,10 @@ manuell nur `SMTP_*`, `PB_ADMIN_*` und nach dem Setup
 4. API-User anlegen → Token in der Web-App als `LISTMONK_API_USER` /
    `LISTMONK_API_TOKEN` + `LISTMONK_LIST_IDS` setzen. Die Web-App ruft listmonk
    intern über `http://listmonk:9000` auf.
+   - `LISTMONK_LIST_IDS` = **numerische** Listen-ID (z.B. `1`), wie in der URL
+     `.../admin/lists/<ID>`. **Nicht** die UUID der Liste — die Admin-API
+     (`POST /api/subscribers`) erwartet Integer-IDs, eine UUID wird verworfen
+     und die Person landet in keiner Liste.
 
 ## Template-Variablen
 
