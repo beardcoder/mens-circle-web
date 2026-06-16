@@ -1,0 +1,64 @@
+# ===========================================================================
+# listmonk — Männerkreis Niederbayern/ Straubing
+# All-in-one deploy: listmonk app + its required PostgreSQL.
+#
+# Easiest path on Coolify: New Resource → "Docker Compose" → point at this file
+# (base directory: listmonk/). Set the env vars from .env.example as Coolify
+# environment variables. Expose port 9000; Coolify terminates TLS and maps your
+# domain (e.g. listmonk.mens-circle.de) to it.
+#
+# listmonk REQUIRES PostgreSQL (no SQLite). The app container auto-installs +
+# migrates the schema on first start, then serves.
+# ===========================================================================
+name: listmonk
+
+services:
+  app:
+    image: listmonk/listmonk:latest
+    restart: unless-stopped
+    ports:
+      - '9000:9000'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      TZ: Europe/Berlin
+      # Bind inside the container; Coolify's proxy fronts it.
+      LISTMONK_app__address: '0.0.0.0:9000'
+      # Database connection (points at the db service below).
+      LISTMONK_db__host: db
+      LISTMONK_db__port: '5432'
+      LISTMONK_db__user: ${POSTGRES_USER:-listmonk}
+      LISTMONK_db__password: ${POSTGRES_PASSWORD:-listmonk}
+      LISTMONK_db__database: ${POSTGRES_DB:-listmonk}
+      LISTMONK_db__ssl_mode: disable
+      # Super admin, created on first boot (skip the install wizard).
+      LISTMONK_ADMIN_USER: ${LISTMONK_ADMIN_USER:-admin}
+      LISTMONK_ADMIN_PASSWORD: ${LISTMONK_ADMIN_PASSWORD:?set LISTMONK_ADMIN_PASSWORD}
+    # Install (idempotent) → run pending migrations → serve. --config '' makes
+    # listmonk read configuration from env vars only (no config.toml).
+    command:
+      - sh
+      - -c
+      - "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"
+    volumes:
+      - listmonk-uploads:/listmonk/uploads:rw
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-listmonk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-listmonk}
+      POSTGRES_DB: ${POSTGRES_DB:-listmonk}
+    volumes:
+      - listmonk-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-listmonk}']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+volumes:
+  listmonk-db:
+  listmonk-uploads:
