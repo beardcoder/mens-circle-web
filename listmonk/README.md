@@ -4,11 +4,11 @@ E-Mail-Templates und Public-Page-CSS für die listmonk-Instanz (Newsletter:
 Abonnenten, Double-Opt-In, Versand, Abmeldung). Marke: `#efe9dd` / `#2c2418` /
 Akzent `#b86f52`, DM Sans + Playfair.
 
-| Datei | Wohin in listmonk |
-| --- | --- |
-| `campaign.html` | Campaigns → Templates → neues **Campaign**-Template, als Standard setzen |
-| `optin.html` | Inhalt der Opt-In-Bestätigung (nutzt `{{ .OptinURL }}`) |
-| `public-style.css` | Settings → Appearance → **Custom CSS (public pages)** |
+| Datei              | Wohin in listmonk                                                        |
+| ------------------ | ------------------------------------------------------------------------ |
+| `campaign.html`    | Campaigns → Templates → neues **Campaign**-Template, als Standard setzen |
+| `optin.html`       | Inhalt der Opt-In-Bestätigung (nutzt `{{ .OptinURL }}`)                  |
+| `public-style.css` | Settings → Appearance → **Custom CSS (public pages)**                    |
 
 ## Deployment
 
