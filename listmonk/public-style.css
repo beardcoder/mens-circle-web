@@ -1,0 +1,176 @@
+/* listmonk public pages — Settings → Appearance → Custom CSS (public pages). */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap");
+
+:root {
+  --mk-bg: #efe9dd;
+  --mk-ink: #2c2418;
+  --mk-muted: #5c4a3a;
+  --mk-faint: #7a6248;
+  --mk-accent: #b86f52;
+  --mk-accent-dark: #a25f44;
+  --mk-line: #e3dccb;
+  --mk-rule: #c4b49a;
+  --mk-sans: "DM Sans", Helvetica, Arial, sans-serif;
+  --mk-serif: "Playfair Display", Georgia, serif;
+}
+
+body {
+  background-color: var(--mk-bg) !important;
+  color: var(--mk-ink) !important;
+  font-family: var(--mk-sans) !important;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 560px !important;
+  margin: 48px auto !important;
+  padding: 0 16px;
+}
+
+.wrap {
+  background: #fff !important;
+  color: var(--mk-ink) !important;
+  border: 1px solid var(--mk-line);
+  border-radius: 8px !important;
+  padding: 40px !important;
+  box-shadow: 0 10px 30px rgba(44, 36, 24, 0.08) !important;
+}
+
+@media (max-width: 600px) {
+  .container {
+    margin: 24px auto !important;
+  }
+  .wrap {
+    padding: 28px 22px !important;
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.header img,
+.logo img {
+  max-height: 56px;
+  width: auto;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--mk-serif) !important;
+  color: var(--mk-ink) !important;
+  font-weight: 700;
+  line-height: 1.25;
+}
+h1 {
+  font-size: 26px;
+  margin: 0 0 16px;
+}
+h2 {
+  font-size: 20px;
+  margin: 28px 0 12px;
+}
+h3 {
+  font-size: 17px;
+  margin: 24px 0 10px;
+}
+
+p,
+label,
+li {
+  color: var(--mk-muted) !important;
+  font-size: 15px;
+}
+
+a {
+  color: var(--mk-accent) !important;
+  text-decoration: none;
+}
+a:hover {
+  color: var(--mk-accent-dark) !important;
+  text-decoration: underline;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--mk-rule);
+  margin: 28px 0;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--mk-sans) !important;
+  font-size: 15px;
+  color: var(--mk-ink) !important;
+  background: #fbf9f4 !important;
+  border: 1px solid var(--mk-rule) !important;
+  border-radius: 6px !important;
+  padding: 12px 14px !important;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--mk-accent) !important;
+  box-shadow: 0 0 0 3px rgba(184, 111, 82, 0.18) !important;
+}
+
+.button,
+button,
+input[type="submit"] {
+  background: var(--mk-accent) !important;
+  border: 1px solid var(--mk-accent) !important;
+  color: #fff !important;
+  font-family: var(--mk-sans) !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  padding: 13px 26px !important;
+  cursor: pointer;
+}
+.button:hover,
+button:hover,
+input[type="submit"]:hover {
+  background: var(--mk-accent-dark) !important;
+  border-color: var(--mk-accent-dark) !important;
+}
+
+.button.button-outline {
+  background: transparent !important;
+  color: var(--mk-accent) !important;
+}
+.button.button-outline:hover {
+  background: var(--mk-accent) !important;
+  color: #fff !important;
+}
+
+.lists {
+  margin: 8px 0 0;
+}
+.lists li {
+  margin-bottom: 14px;
+}
+.lists .description {
+  color: var(--mk-faint) !important;
+  font-size: 13px;
+}
+
+.unsub-all {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--mk-line) !important;
+}
+
+.footer,
+footer {
+  margin-top: 28px;
+  color: var(--mk-faint) !important;
+  font-size: 12px;
+  text-align: center;
+}

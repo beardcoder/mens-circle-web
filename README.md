@@ -13,7 +13,7 @@ Build-Tool **und** Laufzeit ist **Bun**.
 │   nginx (Edge, :8090 — der nach außen exposte Port)                         │
 │   ├─ liefert die statischen Assets direkt aus  → /app/dist/client           │
 │   │    (gehashte Assets immutable, Security-Header)                         │
-│   ├─ /api · /_ · /newsletter   → PocketBase                                 │
+│   ├─ /api · /_                 → PocketBase                                 │
 │   └─ alles andere (HTML/SSR)   → Astro-Server (Bun)                         │
 │            │                              │                                 │
 │            ▼                              ▼                                 │
@@ -32,7 +32,7 @@ Build-Tool **und** Laufzeit ist **Bun**.
   von Platte aus (volle Kontrolle über Cache-Control je Asset-Klasse — gehashte
   Assets/Fonts `immutable` 1 Jahr, Bilder 7 Tage, Manifeste/Feeds 1 Tag, HTML
   `must-revalidate` — plus Security-Header) und routet die dynamischen Pfade an
-  die zwei Loopback-Upstreams: `/api · /_ · /newsletter` an PocketBase, die
+  die zwei Loopback-Upstreams: `/api · /_` an PocketBase, die
   SSR-Routen (Startseite, Event-Seiten) an den Astro-Server. So trifft nur
   echter SSR-Traffic den Bun-Prozess. Config: [`nginx.conf`](nginx.conf).
   Kompression übernimmt der Coolify-Edge.
@@ -50,6 +50,12 @@ Build-Tool **und** Laufzeit ist **Bun**.
   Repo (`src/content/`, `src/data/`) und wird direkt in Astro eingepflegt.
 - **Dynamische Teile** (Anmeldung, Warteliste, Newsletter, Testimonial,
   Atemübung) sind **Svelte-5-Islands**, die per `fetch` mit PocketBase sprechen.
+- **Newsletter über listmonk.** Abonnenten und Kampagnen liegen in einer
+  externen [listmonk](https://listmonk.app)-Instanz, nicht mehr in PocketBase.
+  Das Anmeldeformular postet weiterhin an `/api/newsletter/subscribe`; die
+  PocketBase-Route leitet die Anmeldung an die listmonk-Admin-API weiter.
+  Double-Opt-In, Versand und Abmeldung übernimmt listmonk (Config:
+  `LISTMONK_URL`, `LISTMONK_API_USER`, `LISTMONK_API_TOKEN`, `LISTMONK_LIST_IDS`).
 
 ## Projektstruktur
 
@@ -142,7 +148,8 @@ Die PocketBase-Version ist als Docker-`ARG PB_VERSION` (Default aktuell
   `src/data/site.json`
 - **Navigation:** `src/data/navigation.json`
 - **Impressum / Datenschutz:** `src/content/legal/*.json`
-- **Events, Anmeldungen, Newsletter, Testimonials:** im PocketBase-Admin (`/_/`).
+- **Events, Anmeldungen, Testimonials:** im PocketBase-Admin (`/_/`).
+- **Newsletter (Abonnenten + Kampagnen):** im listmonk-Admin der externen Instanz.
 
 Nach Content-Änderungen am **JSON**: neu deployen (Coolify-Rebuild). **Events und
 Testimonials** werden serverseitig (SSR) live aus PocketBase gerendert — eine
@@ -152,8 +159,8 @@ Anmeldungen/Kapazität sind dadurch immer live.
 ## E-Mails
 
 Automatisch (PocketBase-Hooks): Anmeldebestätigung, Wartelisten-Bestätigung,
-Admin-Benachrichtigung, Wartelisten-Nachrückung, Newsletter-Willkommen.
+Admin-Benachrichtigung, Wartelisten-Nachrückung.
 Geplant (Cron, alle 15 min): Event-Erinnerung (heute/morgen).
-Batch (Admin-Route): Newsletter-Kampagne an alle aktiven Abonnenten.
+Newsletter (Willkommen/Double-Opt-In + Kampagnen): über listmonk, nicht PocketBase.
 
 Details: siehe [`pocketbase/README.md`](pocketbase/README.md).
