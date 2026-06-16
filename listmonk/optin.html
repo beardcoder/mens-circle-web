@@ -1,24 +1,4 @@
-{{/*
-  Männerkreis Niederbayern/ Straubing — listmonk OPT-IN confirmation content.
-
-  This is the double opt-in / welcome email listmonk sends when someone signs up
-  on a double-opt-in list. It is a CONTENT fragment (no <html>/<body>): listmonk
-  wraps it in the base/campaign template, so it inherits the card chrome and the
-  unsubscribe footer from campaign.html.
-
-  Where it goes: listmonk admin → Campaigns → Templates → New template of type
-  "Campaign" (or the opt-in slot in your version) → paste this content. When
-  listmonk creates the built-in opt-in campaign it renders {{ .OptinURL }} +
-  the pending lists.
-
-  listmonk variables used:
-    {{ .Subscriber.FirstName }}  first word of the subscriber name (may be empty)
-    {{ .OptinURL }}              the subscription-confirmation link (REQUIRED)
-    {{ .Lists }}                 the lists awaiting confirmation (range)
-
-  listmonk also ships the Sprig function library, so the greeting below uses
-  Sprig's `default` to fall back to a neutral salutation when no name is set.
-*/}}
+{{/* Opt-in confirmation content. Uses {{ .OptinURL }}; wrapped by the campaign template. */}}
 <p style="text-align:center;margin:0 0 6px;font-family:'DM Sans',Helvetica,Arial,sans-serif;font-size:11px;font-weight:600;color:#b86f52;text-transform:uppercase;letter-spacing:0.2em;">
   Fast geschafft
 </p>

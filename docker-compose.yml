@@ -1,52 +1,26 @@
-# ===========================================================================
-# Männerkreis Niederbayern/ Straubing — full stack in one Compose (Coolify).
-#
-#   web          Astro (Bun) + PocketBase + nginx in one image (root Dockerfile).
-#                nginx is the public edge and routes the SAME domain by path:
-#                /api·/_·/newsletter → PocketBase, everything else → Astro.
-#                That same-origin path split is why these stay co-located.
-#   listmonk     Newsletter (subscribers, double opt-in, campaigns).
-#   listmonk-db  PostgreSQL for listmonk (required; listmonk has no SQLite).
-#
-# Uses Coolify "magic" variables:
-#   SERVICE_FQDN_<svc>_<port>  → Coolify generates a domain + routes the port.
-#   SERVICE_URL_<svc>          → the full https:// URL (for canonical/links).
-#   SERVICE_USER_*/PASSWORD_*  → auto-generated, persisted credentials.
-# Assign your real domains to `web` (8090) and `listmonk` (9000) in the Coolify
-# UI. Non-magic secrets (SMTP, listmonk API token, PB admin) are set as normal
-# Coolify env vars — see .env.example.
-# ===========================================================================
 name: mens-circle
 
 services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
       args:
-        # Canonical URL baked into the build (sitemap/OG). Falls back if the
-        # magic URL isn't available at build time.
         PUBLIC_SITE_URL: ${SERVICE_URL_WEB:-https://mens-circle.de}
     restart: unless-stopped
     environment:
-      # Coolify generates + routes the web domain to nginx on :8090.
       - SERVICE_FQDN_WEB_8090
-      # PocketBase hooks (config.pb.js) read these via $os.getenv().
       - APP_URL=${SERVICE_URL_WEB}
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-hallo@mens-circle.de}
       - MAIL_FROM_NAME=${MAIL_FROM_NAME:-Männerkreis Niederbayern/ Straubing}
       - MAIL_ADMIN_ADDRESS=${MAIL_ADMIN_ADDRESS:-hallo@mens-circle.de}
       - MAIL_ADMIN_NAME=${MAIL_ADMIN_NAME:-Männerkreis Admin}
-      # SMTP for transactional EVENT mails (seeded into PocketBase on boot).
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT:-587}
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_TLS=${SMTP_TLS:-true}
-      # First-run PocketBase superuser (optional).
       - PB_ADMIN_EMAIL=${PB_ADMIN_EMAIL}
       - PB_ADMIN_PASSWORD=${PB_ADMIN_PASSWORD}
-      # Newsletter → listmonk, server-side over the internal network.
       - LISTMONK_URL=http://listmonk:9000
       - LISTMONK_API_USER=${LISTMONK_API_USER}
       - LISTMONK_API_TOKEN=${LISTMONK_API_TOKEN}
@@ -63,11 +37,9 @@ services:
       listmonk-db:
         condition: service_healthy
     environment:
-      # Coolify generates + routes the listmonk domain to :9000.
       - SERVICE_FQDN_LISTMONK_9000
       - TZ=Europe/Berlin
       - LISTMONK_app__address=0.0.0.0:9000
-      # Public URL listmonk uses in links (opt-in / unsubscribe).
       - LISTMONK_app__root_url=${SERVICE_URL_LISTMONK}
       - LISTMONK_db__host=listmonk-db
       - LISTMONK_db__port=5432
@@ -75,7 +47,6 @@ services:
       - LISTMONK_db__password=${SERVICE_PASSWORD_POSTGRES}
       - LISTMONK_db__database=listmonk
       - LISTMONK_db__ssl_mode=disable
-      # Super admin, created on first boot.
       - LISTMONK_ADMIN_USER=${SERVICE_USER_LISTMONKADMIN}
       - LISTMONK_ADMIN_PASSWORD=${SERVICE_PASSWORD_LISTMONKADMIN}
     command:
