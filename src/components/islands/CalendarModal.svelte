@@ -1,133 +1,133 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { trackEvent, TRACKING_EVENTS } from '@lib/umami';
-  import type { EventData } from '@lib/types';
+import type { EventData } from '@lib/types';
+import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
+import { onDestroy, onMount } from 'svelte';
 
-  interface Props {
-    event: EventData;
-  }
+interface Props {
+  event: EventData;
+}
 
-  const { event }: Props = $props();
+const { event }: Props = $props();
 
-  let dialogEl = $state<HTMLDialogElement>();
-  let icsBlobUrl = $state('');
-  const googleUrl = $derived(buildGoogleCalendarUrl(event));
+let dialogEl = $state<HTMLDialogElement>();
+let icsBlobUrl = $state('');
+const googleUrl = $derived(buildGoogleCalendarUrl(event));
 
-  // ── Calendar helpers (inlined, single consumer) ──────────────
+// ── Calendar helpers (inlined, single consumer) ──────────────
 
-  function formatICSDate(date: string, time: string): string {
-    const d = new Date(`${date}T${time}:00`);
-    return d
-      .toISOString()
-      .replace(/[-:]/g, '')
-      .replace(/\.\d{3}/, '');
-  }
+function formatICSDate(date: string, time: string): string {
+  const d = new Date(`${date}T${time}:00`);
+  return d
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}/, '');
+}
 
-  function buildIcsString(ev: EventData): string {
-    const start = formatICSDate(ev.startDate, ev.startTime);
-    const end = formatICSDate(ev.endDate, ev.endTime);
-    const stamp = formatICSDate(
-      new Date().toISOString().slice(0, 10),
-      new Date().toISOString().slice(11, 16),
-    );
+function buildIcsString(ev: EventData): string {
+  const start = formatICSDate(ev.startDate, ev.startTime);
+  const end = formatICSDate(ev.endDate, ev.endTime);
+  const stamp = formatICSDate(
+    new Date().toISOString().slice(0, 10),
+    new Date().toISOString().slice(11, 16),
+  );
 
-    return [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Männerkreis Niederbayern/ Straubing//DE',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH',
-      'BEGIN:VEVENT',
-      `DTSTART:${start}`,
-      `DTEND:${end}`,
-      `DTSTAMP:${stamp}`,
-      `UID:${Date.now()}@maennerkreis-straubing.de`,
-      `SUMMARY:${ev.title}`,
-      `DESCRIPTION:${ev.description.replace(/\n/g, '\\n')}`,
-      `LOCATION:${ev.location}`,
-      'STATUS:CONFIRMED',
-      'END:VEVENT',
-      'END:VCALENDAR',
-    ].join('\n');
-  }
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Männerkreis Niederbayern/ Straubing//DE',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `DTSTART:${start}`,
+    `DTEND:${end}`,
+    `DTSTAMP:${stamp}`,
+    `UID:${Date.now()}@maennerkreis-straubing.de`,
+    `SUMMARY:${ev.title}`,
+    `DESCRIPTION:${ev.description.replace(/\n/g, '\\n')}`,
+    `LOCATION:${ev.location}`,
+    'STATUS:CONFIRMED',
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\n');
+}
 
-  function buildIcsBlobUrl(ev: EventData): string {
-    const blob = new Blob([buildIcsString(ev)], {
-      type: 'text/calendar;charset=utf-8',
-    });
-    return URL.createObjectURL(blob);
-  }
+function buildIcsBlobUrl(ev: EventData): string {
+  const blob = new Blob([buildIcsString(ev)], {
+    type: 'text/calendar;charset=utf-8',
+  });
+  return URL.createObjectURL(blob);
+}
 
-  function buildGoogleCalendarUrl(ev: EventData): string {
-    const formatDate = (date: string, time: string): string =>
-      `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
+function buildGoogleCalendarUrl(ev: EventData): string {
+  const formatDate = (date: string, time: string): string =>
+    `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
 
-    const params = new URLSearchParams({
-      action: 'TEMPLATE',
-      text: ev.title,
-      dates: `${formatDate(ev.startDate, ev.startTime)}/${formatDate(ev.endDate, ev.endTime)}`,
-      details: ev.description,
-      location: ev.location,
-      ctz: 'Europe/Berlin',
-    });
-
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
-  }
-
-  // ── Component logic ──────────────────────────────────────────
-  //
-  // Native <dialog> + showModal() gives us, for free, the things a hand-rolled
-  // role="dialog" never quite gets right: a focus trap, focus restoration to
-  // the trigger on close, Escape-to-dismiss, an inert background and top-layer
-  // rendering (no z-index battles). The open/close transition itself is pure
-  // CSS — `@starting-style` rises the card in, `allow-discrete` on `display` +
-  // `overlay` lets it fall back out instead of snapping shut.
-
-  onMount(() => {
-    icsBlobUrl = buildIcsBlobUrl(event);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: ev.title,
+    dates: `${formatDate(ev.startDate, ev.startTime)}/${formatDate(ev.endDate, ev.endTime)}`,
+    details: ev.description,
+    location: ev.location,
+    ctz: 'Europe/Berlin',
   });
 
-  onDestroy(() => {
-    if (icsBlobUrl) URL.revokeObjectURL(icsBlobUrl);
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+// ── Component logic ──────────────────────────────────────────
+//
+// Native <dialog> + showModal() gives us, for free, the things a hand-rolled
+// role="dialog" never quite gets right: a focus trap, focus restoration to
+// the trigger on close, Escape-to-dismiss, an inert background and top-layer
+// rendering (no z-index battles). The open/close transition itself is pure
+// CSS — `@starting-style` rises the card in, `allow-discrete` on `display` +
+// `overlay` lets it fall back out instead of snapping shut.
+
+onMount(() => {
+  icsBlobUrl = buildIcsBlobUrl(event);
+});
+
+onDestroy(() => {
+  if (icsBlobUrl) URL.revokeObjectURL(icsBlobUrl);
+});
+
+function open(): void {
+  if (!dialogEl || dialogEl.open) return;
+  dialogEl.showModal();
+  trackEvent(TRACKING_EVENTS.CALENDAR_OPEN, { event: event.title });
+}
+
+function close(): void {
+  dialogEl?.close();
+}
+
+// A click whose coordinates fall outside the dialog's box is a backdrop
+// click (the ::backdrop pseudo still targets the dialog element). Clicks on
+// the card itself land inside the rect and are ignored.
+function onBackdropClick(e: MouseEvent): void {
+  if (!dialogEl || e.target !== dialogEl) return;
+
+  const r = dialogEl.getBoundingClientRect();
+  const inside =
+    e.clientX >= r.left &&
+    e.clientX <= r.right &&
+    e.clientY >= r.top &&
+    e.clientY <= r.bottom;
+
+  if (!inside) close();
+}
+
+function trackGoogle(): void {
+  trackEvent(TRACKING_EVENTS.CALENDAR_DOWNLOAD_GOOGLE, {
+    event: event.title,
   });
+  close();
+}
 
-  function open(): void {
-    if (!dialogEl || dialogEl.open) return;
-    dialogEl.showModal();
-    trackEvent(TRACKING_EVENTS.CALENDAR_OPEN, { event: event.title });
-  }
-
-  function close(): void {
-    dialogEl?.close();
-  }
-
-  // A click whose coordinates fall outside the dialog's box is a backdrop
-  // click (the ::backdrop pseudo still targets the dialog element). Clicks on
-  // the card itself land inside the rect and are ignored.
-  function onBackdropClick(e: MouseEvent): void {
-    if (!dialogEl || e.target !== dialogEl) return;
-
-    const r = dialogEl.getBoundingClientRect();
-    const inside =
-      e.clientX >= r.left &&
-      e.clientX <= r.right &&
-      e.clientY >= r.top &&
-      e.clientY <= r.bottom;
-
-    if (!inside) close();
-  }
-
-  function trackGoogle(): void {
-    trackEvent(TRACKING_EVENTS.CALENDAR_DOWNLOAD_GOOGLE, {
-      event: event.title,
-    });
-    close();
-  }
-
-  function trackIcs(): void {
-    trackEvent(TRACKING_EVENTS.CALENDAR_DOWNLOAD_ICS, { event: event.title });
-    close();
-  }
+function trackIcs(): void {
+  trackEvent(TRACKING_EVENTS.CALENDAR_DOWNLOAD_ICS, { event: event.title });
+  close();
+}
 </script>
 
 <div class="event-info__calendar">

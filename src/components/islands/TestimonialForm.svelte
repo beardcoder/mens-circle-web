@@ -1,85 +1,82 @@
 <script lang="ts">
-  import { isValidEmail } from '@lib/helpers';
-  import { showToast } from '@lib/toast';
-  import { trackEvent, TRACKING_EVENTS } from '@lib/umami';
-  import { submitTestimonial } from '@lib/pocketbase';
+import { isValidEmail } from '@lib/helpers';
+import { submitTestimonial } from '@lib/pocketbase';
+import { showToast } from '@lib/toast';
+import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
 
-  let quote = $state('');
-  let authorName = $state('');
-  let role = $state('');
-  let email = $state('');
-  let privacy = $state(false);
-  let website = $state(''); // honeypot
-  let submitting = $state(false);
+let quote = $state('');
+let authorName = $state('');
+let role = $state('');
+let email = $state('');
+let privacy = $state(false);
+let website = $state(''); // honeypot
+let submitting = $state(false);
 
-  const charCount = $derived(quote.length);
+const charCount = $derived(quote.length);
 
-  async function handleSubmit(e: SubmitEvent): Promise<void> {
-    e.preventDefault();
+async function handleSubmit(e: SubmitEvent): Promise<void> {
+  e.preventDefault();
 
-    const text = quote.trim();
-    const name = authorName.trim();
-    const roleValue = role.trim();
-    const mail = email.trim();
+  const text = quote.trim();
+  const name = authorName.trim();
+  const roleValue = role.trim();
+  const mail = email.trim();
 
-    if (!text || text.length < 10) {
-      showToast(
-        'error',
-        'Bitte teile deine Erfahrung mit uns (mindestens 10 Zeichen).',
-      );
-      return;
-    }
-
-    if (!isValidEmail(mail)) {
-      showToast('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
-      return;
-    }
-
-    if (!privacy) {
-      showToast('error', 'Bitte bestätige die Datenschutzerklärung.');
-      return;
-    }
-
-    trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUBMIT, {
-      has_name: name ? 'yes' : 'no',
-      has_role: roleValue ? 'yes' : 'no',
-      char_count: text.length,
-    });
-    submitting = true;
-
-    try {
-      const { success, message } = await submitTestimonial({
-        quote: text,
-        author_name: name || null,
-        role: roleValue || null,
-        email: mail,
-        privacy: true,
-        website,
-      });
-
-      if (success) {
-        showToast('success', message);
-        trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUCCESS);
-        quote = '';
-        authorName = '';
-        role = '';
-        email = '';
-        privacy = false;
-      } else {
-        showToast('error', message);
-        trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: message });
-      }
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Network error';
-      showToast(
-        'error',
-        'Ein Fehler ist aufgetreten. Bitte versuche es erneut.',
-      );
-      trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: msg });
-    } finally {
-      submitting = false;
-    }
+  if (!text || text.length < 10) {
+    showToast(
+      'error',
+      'Bitte teile deine Erfahrung mit uns (mindestens 10 Zeichen).',
+    );
+    return;
   }
+
+  if (!isValidEmail(mail)) {
+    showToast('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
+    return;
+  }
+
+  if (!privacy) {
+    showToast('error', 'Bitte bestätige die Datenschutzerklärung.');
+    return;
+  }
+
+  trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUBMIT, {
+    has_name: name ? 'yes' : 'no',
+    has_role: roleValue ? 'yes' : 'no',
+    char_count: text.length,
+  });
+  submitting = true;
+
+  try {
+    const { success, message } = await submitTestimonial({
+      quote: text,
+      author_name: name || null,
+      role: roleValue || null,
+      email: mail,
+      privacy: true,
+      website,
+    });
+
+    if (success) {
+      showToast('success', message);
+      trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUCCESS);
+      quote = '';
+      authorName = '';
+      role = '';
+      email = '';
+      privacy = false;
+    } else {
+      showToast('error', message);
+      trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: message });
+    }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Network error';
+    showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
+    trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: msg });
+  } finally {
+    submitting = false;
+  }
+}
 </script>
 
 <form class="testimonial-form" onsubmit={handleSubmit}>

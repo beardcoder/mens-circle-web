@@ -18,8 +18,17 @@ onBootstrap((e) => {
         "from",
         lib.config.MAIL_FROM_ADDRESS,
         "admin",
-        lib.config.MAIL_ADMIN_ADDRESS
+        lib.config.MAIL_ADMIN_ADDRESS,
+        "listmonk",
+        lib.listmonkConfigured() ? "configured" : "NOT configured"
       );
+    if (!lib.listmonkConfigured()) {
+      $app
+        .logger()
+        .warn(
+          "listmonk is not fully configured — newsletter sign-ups will fail. Set LISTMONK_URL, LISTMONK_API_USER, LISTMONK_API_TOKEN and LISTMONK_LIST_IDS."
+        );
+    }
   } catch (err) {
     $app.logger().error("Failed to load lib.js config", "error", String(err));
   }
