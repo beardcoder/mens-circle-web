@@ -1,0 +1,25 @@
+{{ define "import-status" }}
+{{ template "header" . }}
+<h1>Import abgeschlossen</h1>
+<p>
+  Der Import in Listmonk wurde verarbeitet.
+</p>
+<table>
+  <tr>
+    <td width="34%"><strong>Datei</strong></td>
+    <td><a href="{{ RootURL }}/admin/subscribers/import">{{ .Name }}</a></td>
+  </tr>
+  <tr>
+    <td width="34%"><strong>Status</strong></td>
+    <td>{{ .Status }}</td>
+  </tr>
+  <tr>
+    <td width="34%"><strong>Datensätze</strong></td>
+    <td>{{ .Imported }} / {{ .Total }}</td>
+  </tr>
+</table>
+<p>
+  <a class="button" href="{{ RootURL }}/admin">Listmonk öffnen</a>
+</p>
+{{ template "footer" }}
+{{ end }}

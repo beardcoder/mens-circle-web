@@ -62,9 +62,12 @@ services:
     command:
       - sh
       - -c
-      - "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --config ''"
+      - "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --static-dir=/listmonk/static --config ''"
     volumes:
       - listmonk-uploads:/listmonk/uploads:rw
+      # Custom email-templates overlay the embedded defaults (per-file merge);
+      # missing files fall back to the binary. read-only on purpose.
+      - ./listmonk/static:/listmonk/static:ro
 
   listmonk-db:
     image: postgres:17-alpine
