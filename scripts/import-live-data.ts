@@ -88,7 +88,9 @@ function readCsv(name: string): Row[] {
   const header = rows[0];
   return rows.slice(1).map((r) => {
     const obj: Row = {};
-    header.forEach((h, i) => (obj[h] = r[i] ?? ''));
+    header.forEach((h, i) => {
+      obj[h] = r[i] ?? '';
+    });
     return obj;
   });
 }

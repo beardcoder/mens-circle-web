@@ -10,9 +10,10 @@
  * Astro auto-invokes `start(manifest, args)` from its generated entry, so
  * `bun run dist/server/entry.mjs` boots the Astro server.
  */
-import { App } from 'astro/app';
+
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { App } from 'astro/app';
 
 // ── Headers (mirror the former nginx policy) ────────────────────────────────
 const SECURITY_HEADERS = {

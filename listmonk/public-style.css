@@ -1,5 +1,5 @@
 /* listmonk public pages — Settings → Appearance → Custom CSS (public pages). */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap");
 
 :root {
   --mk-bg: #efe9dd;
@@ -10,8 +10,8 @@
   --mk-accent-dark: #a25f44;
   --mk-line: #e3dccb;
   --mk-rule: #c4b49a;
-  --mk-sans: 'DM Sans', Helvetica, Arial, sans-serif;
-  --mk-serif: 'Playfair Display', Georgia, serif;
+  --mk-sans: "DM Sans", Helvetica, Arial, sans-serif;
+  --mk-serif: "Playfair Display", Georgia, serif;
 }
 
 body {
@@ -98,9 +98,9 @@ hr {
   margin: 28px 0;
 }
 
-input[type='text'],
-input[type='email'],
-input[type='password'],
+input[type="text"],
+input[type="email"],
+input[type="password"],
 select,
 textarea {
   width: 100%;
@@ -123,7 +123,7 @@ textarea:focus {
 
 .button,
 button,
-input[type='submit'] {
+input[type="submit"] {
   background: var(--mk-accent) !important;
   border: 1px solid var(--mk-accent) !important;
   color: #fff !important;
@@ -136,7 +136,7 @@ input[type='submit'] {
 }
 .button:hover,
 button:hover,
-input[type='submit']:hover {
+input[type="submit"]:hover {
   background: var(--mk-accent-dark) !important;
   border-color: var(--mk-accent-dark) !important;
 }
