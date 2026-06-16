@@ -20,7 +20,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  content: '';
+  content: "";
   background-image: var(--surface-noise);
   opacity: var(--_surface-noise-opacity, var(--surface-noise-opacity));
 }
@@ -39,7 +39,7 @@
   inline-size: 70%;
   block-size: 160%;
   pointer-events: none;
-  content: '';
+  content: "";
   background: radial-gradient(
     ellipse at center,
     color-mix(

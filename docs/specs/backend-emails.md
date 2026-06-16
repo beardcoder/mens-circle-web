@@ -7,6 +7,15 @@ Laravel data model and email flows onto a PocketBase (latest single Go binary) b
 
 Site name (verbatim): **Männerkreis Niederbayern/ Straubing**
 
+> **Outdated for the newsletter.** This spec describes the original PocketBase-only
+> design. The newsletter (subscribers + campaigns) has since been migrated to an
+> external **listmonk** instance: the `newsletter_subscribers` and `newsletters`
+> collections are dropped (migration `1700000900`), the welcome/campaign emails and
+> the unsubscribe route are gone from PocketBase, and `POST /api/newsletter/subscribe`
+> now forwards sign-ups to listmonk's admin API (double opt-in, sending and
+> unsubscribe handled by listmonk). Sections §1.4, §1.5 and the newsletter rows in
+> the email/route tables below are historical. See the repo + `pocketbase/README.md`.
+
 ---
 
 ## 1. PocketBase Collection Schemas

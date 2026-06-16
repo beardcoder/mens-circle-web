@@ -1,8 +1,8 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import { fetchNextEvent } from '@lib/pocketbase-server';
 import EventPage from '../components/islands/EventPage.svelte';
 import site from '../data/site.json';
-import { fetchNextEvent } from '@lib/pocketbase-server';
+import Layout from '../layouts/Layout.astro';
 
 // SSR: the next upcoming event (incl. live capacity) is fetched from PocketBase
 // per request, so /event always reflects the current "next" event with no

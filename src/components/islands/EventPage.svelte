@@ -1,83 +1,83 @@
 <script lang="ts">
-  import type { EventDTO, EventData } from '@lib/types';
-  import RegistrationForm from './RegistrationForm.svelte';
-  import CalendarModal from './CalendarModal.svelte';
-  import EventMap from './EventMap.svelte';
-  import NewsletterForm from './NewsletterForm.svelte';
+import type { EventData, EventDTO } from '@lib/types';
+import CalendarModal from './CalendarModal.svelte';
+import EventMap from './EventMap.svelte';
+import NewsletterForm from './NewsletterForm.svelte';
+import RegistrationForm from './RegistrationForm.svelte';
 
-  interface Props {
-    /** Event rendered at build time (null = no upcoming event scheduled). */
-    event: EventDTO | null;
-    /** WhatsApp community link, passed from Astro site data. */
-    whatsappLink?: string;
-  }
+interface Props {
+  /** Event rendered at build time (null = no upcoming event scheduled). */
+  event: EventDTO | null;
+  /** WhatsApp community link, passed from Astro site data. */
+  whatsappLink?: string;
+}
 
-  const { event: initialEvent, whatsappLink }: Props = $props();
+const { event: initialEvent, whatsappLink }: Props = $props();
 
-  // The page is server-rendered per request, so the event content AND its
-  // volatile capacity (available spots / full / waitlist) are already live at
-  // first paint — no client-side refresh needed.
-  const event = initialEvent;
+// The page is server-rendered per request, so the event content AND its
+// volatile capacity (available spots / full / waitlist) are already live at
+// first paint — no client-side refresh needed.
+const event = initialEvent;
 
-  // ─── Date formatting (de-DE, Europe/Berlin) ────────────────────────
-  const TZ = 'Europe/Berlin';
+// ─── Date formatting (de-DE, Europe/Berlin) ────────────────────────
+const TZ = 'Europe/Berlin';
 
-  function eventDate(iso: string): Date {
-    return new Date(iso);
-  }
+function eventDate(iso: string): Date {
+  return new Date(iso);
+}
 
-  function weekday(iso: string): string {
-    return new Intl.DateTimeFormat('de-DE', {
-      weekday: 'long',
-      timeZone: TZ,
-    }).format(eventDate(iso));
-  }
+function weekday(iso: string): string {
+  return new Intl.DateTimeFormat('de-DE', {
+    weekday: 'long',
+    timeZone: TZ,
+  }).format(eventDate(iso));
+}
 
-  function shortDate(iso: string): string {
-    return new Intl.DateTimeFormat('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      timeZone: TZ,
-    }).format(eventDate(iso));
-  }
+function shortDate(iso: string): string {
+  return new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: TZ,
+  }).format(eventDate(iso));
+}
 
-  function longDate(iso: string): string {
-    return new Intl.DateTimeFormat('de-DE', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      timeZone: TZ,
-    }).format(eventDate(iso));
-  }
+function longDate(iso: string): string {
+  return new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    timeZone: TZ,
+  }).format(eventDate(iso));
+}
 
-  /** Build the EventData shape consumed by the calendar util. */
-  function calendarData(e: EventDTO): EventData {
-    const dateOnly = new Intl.DateTimeFormat('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      timeZone: TZ,
-    }).format(eventDate(e.event_date)); // YYYY-MM-DD
+/** Build the EventData shape consumed by the calendar util. */
+function calendarData(e: EventDTO): EventData {
+  const dateOnly = new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: TZ,
+  }).format(eventDate(e.event_date)); // YYYY-MM-DD
 
-    return {
-      title: e.title,
-      description: e.description,
-      location: e.location,
-      startDate: dateOnly,
-      startTime: e.start_time,
-      endDate: dateOnly,
-      endTime: e.end_time,
-    };
-  }
+  return {
+    title: e.title,
+    description: e.description,
+    location: e.location,
+    startDate: dateOnly,
+    startTime: e.start_time,
+    endDate: dateOnly,
+    endTime: e.end_time,
+  };
+}
 
-  function nl2brHtml(text: string): string {
-    const escaped = text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-    return escaped.replace(/\r\n|\r|\n/g, '<br />');
-  }
+function nl2brHtml(text: string): string {
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  return escaped.replace(/\r\n|\r|\n/g, '<br />');
+}
 </script>
 
 {#if event}

@@ -11,10 +11,10 @@
  * flag guards against double-initialisation (safe to re-run).
  */
 
+import { initEventCtas } from './event-cta';
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';
 import { initUmamiKit } from './umami-kit';
-import { initEventCtas } from './event-cta';
 
 let initialised = false;
 

@@ -6,19 +6,19 @@
 
 /* Define animatable custom properties */
 @property --gradient-angle {
-  syntax: '<angle>';
+  syntax: "<angle>";
   initial-value: 0deg;
   inherits: false;
 }
 
 @property --glow-opacity {
-  syntax: '<number>';
+  syntax: "<number>";
   initial-value: 0;
   inherits: false;
 }
 
 @property --circle-scale {
-  syntax: '<number>';
+  syntax: "<number>";
   initial-value: 1;
   inherits: false;
 }

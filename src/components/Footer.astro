@@ -1,9 +1,9 @@
 ---
+import nav from '../data/navigation.json';
+import site from '../data/site.json';
+import type { SocialLink } from '../lib/social';
 import Logo from './Logo.astro';
 import SocialIcon from './SocialIcon.astro';
-import site from '../data/site.json';
-import nav from '../data/navigation.json';
-import type { SocialLink } from '../lib/social';
 
 const socialLinks = site.socialLinks as SocialLink[];
 const phoneHref = site.contactPhone
