@@ -1,0 +1,33 @@
+{{ define "subscriber-optin" }}
+{{ template "header" . }}
+<h1>Bitte bestätige deine Anmeldung</h1>
+<p>
+  Servus {{ .Subscriber.FirstName }},
+</p>
+<p>
+  danke für deine Anmeldung zum Männerkreis Niederbayern.
+  Damit du unsere E-Mails wirklich erhalten darfst, bestätige bitte kurz deine Anmeldung.
+</p>
+<p>
+  Du wirst für folgende Liste eingetragen:
+</p>
+<ul>
+  {{ range $i, $l := .Lists }}
+    {{ if eq .Type "public" }}
+      <li>{{ .Name }}</li>
+    {{ else }}
+      <li>Private Liste</li>
+    {{ end }}
+  {{ end }}
+</ul>
+<p>
+  Erst nach deiner Bestätigung erhältst du weitere Nachrichten von uns.
+</p>
+<p>
+  <a class="button" href="{{ .OptinURL }}">Anmeldung bestätigen</a>
+</p>
+<p>
+  Falls du dich nicht angemeldet hast, kannst du diese E-Mail einfach ignorieren.
+</p>
+{{ template "footer" }}
+{{ end }}
