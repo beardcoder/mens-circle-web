@@ -1,31 +1,39 @@
 {{ define "campaign-status" }}
 {{ template "header" . }}
-<h1>Kampagnenstatus</h1>
-<p>
-  Es gibt ein Update zu einer Listmonk-Kampagne.
+<p style="margin:0 0 6px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:11px; line-height:1; letter-spacing:0.2em; text-transform:uppercase; color:#a4724a;">Benachrichtigung</p>
+<h1 class="em-h1" style="margin:0 0 22px; font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:31px; line-height:1.18; color:#1a1308; letter-spacing:-0.015em;">Kampagnenstatus</h1>
+
+<p style="margin:0 0 22px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:16px; line-height:1.7; color:#2b2118;">
+  Es gibt ein Update zu einer Kampagne.
 </p>
-<table>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px;">
   <tr>
-    <td width="34%"><strong>Kampagne</strong></td>
-    <td><a href="{{ RootURL }}/admin/campaigns/{{ index . "ID" }}">{{ index . "Name" }}</a></td>
+    <td width="34%" style="padding:11px 0; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#7a7065; vertical-align:top;">Kampagne</td>
+    <td style="padding:11px 0; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#1a1308; vertical-align:top;"><a class="em-link" href="{{ RootURL }}/admin/campaigns/{{ index . "ID" }}" target="_blank" style="color:#b24e1f; text-decoration:underline; text-underline-offset:2px;">{{ index . "Name" }}</a></td>
   </tr>
   <tr>
-    <td width="34%"><strong>Status</strong></td>
-    <td>{{ index . "Status" }}</td>
+    <td width="34%" style="padding:11px 0; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#7a7065; vertical-align:top;">Status</td>
+    <td style="padding:11px 0; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#1a1308; vertical-align:top;">{{ index . "Status" }}</td>
   </tr>
   <tr>
-    <td width="34%"><strong>Versendet</strong></td>
-    <td>{{ index . "Sent" }} / {{ index . "ToSend" }}</td>
+    <td width="34%" style="padding:11px 0; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#7a7065; vertical-align:top;">Versendet</td>
+    <td style="padding:11px 0; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#1a1308; vertical-align:top;">{{ index . "Sent" }} / {{ index . "ToSend" }}</td>
   </tr>
   {{ if ne (index . "Reason") "" }}
   <tr>
-    <td width="34%"><strong>Grund</strong></td>
-    <td>{{ index . "Reason" }}</td>
+    <td width="34%" style="padding:11px 0; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#7a7065; vertical-align:top;">Grund</td>
+    <td style="padding:11px 0; border-top:1px solid #ece3d6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; color:#1a1308; vertical-align:top;">{{ index . "Reason" }}</td>
   </tr>
   {{ end }}
 </table>
-<p>
-  <a class="button" href="{{ RootURL }}/admin">Listmonk öffnen</a>
-</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td align="center" bgcolor="#c1592a" style="border-radius:8px;">
+      <a href="{{ RootURL }}/admin" target="_blank" style="display:inline-block; padding:14px 30px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#faf8f5; text-decoration:none; border-radius:8px;">listmonk öffnen</a>
+    </td>
+  </tr>
+</table>
 {{ template "footer" }}
 {{ end }}

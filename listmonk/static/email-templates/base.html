@@ -1,208 +1,76 @@
-{{ define "header" }}
-<!doctype html>
-<html lang="de">
+{{ define "header" }}<!doctype html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <base target="_blank">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
+  <title>Männerkreis Niederbayern/ Straubing</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <![endif]-->
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #090907;
-      color: #eee7da;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.7;
-    }
-    a {
-      color: #c98952;
-      text-decoration: underline;
-      text-underline-offset: 4px;
-    }
-    img {
-      border: 0;
-      max-width: 100%;
-      height: auto;
-    }
-    .page {
-      width: 100%;
-      background:
-        radial-gradient(circle at 82% 8%, rgba(168, 101, 45, 0.22), transparent 28%),
-        radial-gradient(circle at 20% 0%, rgba(95, 68, 36, 0.18), transparent 30%),
-        linear-gradient(180deg, #1a1108 0%, #090907 38%, #171007 100%);
-      padding: 0;
-    }
-    .wrap {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 28px 24px 42px;
-    }
-    .brand {
-      text-align: center;
-      color: #efe6d4;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 17px;
-      margin-bottom: 46px;
-    }
-    .hero {
-      text-align: center;
-      padding: 20px 0 46px;
-      border-bottom: 1px solid rgba(201, 137, 82, 0.16);
-    }
-    .kicker {
-      margin: 0 0 18px;
-      color: #b7966d;
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-    }
-    .title {
-      margin: 0;
-      color: #f7efe2;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 46px;
-      line-height: 1;
-      font-weight: 400;
-      letter-spacing: -0.055em;
-    }
-    .title em {
-      color: #c98952;
-      font-style: italic;
-      font-weight: 400;
-    }
-    .content {
-      max-width: 560px;
-      margin: 0 auto;
-      padding: 46px 0 20px;
-      color: #cfc3b1;
-    }
-    .content h1,
-    .content h2,
-    .content h3 {
-      color: #f4eadb;
-      font-family: Georgia, "Times New Roman", serif;
-      font-weight: 400;
-      line-height: 1.08;
-      letter-spacing: -0.04em;
-      margin: 0 0 20px;
-    }
-    .content h1 {
-      font-size: 36px;
-    }
-    .content h2 {
-      font-size: 30px;
-    }
-    .content p {
-      margin: 0 0 22px;
-    }
-    .content ul {
-      padding-left: 0;
-      margin: 26px 0;
-      list-style: none;
-      border-top: 1px solid rgba(201, 137, 82, 0.16);
-    }
-    .content li {
-      padding: 13px 0;
-      border-bottom: 1px solid rgba(201, 137, 82, 0.12);
-    }
-    .content li:before {
-      content: "— ";
-      color: #c98952;
-    }
-    .content table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .content table td {
-      padding: 11px 0;
-      border-bottom: 1px solid rgba(201, 137, 82, 0.12);
-      color: #cfc3b1;
-      vertical-align: top;
-    }
-    .content table td strong {
-      color: #f4eadb;
-      font-weight: 600;
-    }
-    .button {
-      display: inline-block;
-      margin: 18px 0 24px;
-      padding: 14px 22px;
-      border: 1px solid rgba(201, 137, 82, 0.72);
-      color: #f2c08a !important;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-      text-decoration: none;
-    }
-    .footer {
-      max-width: 560px;
-      margin: 36px auto 0;
-      padding-top: 24px;
-      border-top: 1px solid rgba(201, 137, 82, 0.15);
-      text-align: center;
-      color: #8f8372;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-    .footer-title {
-      color: #f4eadb;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 22px;
-      margin: 0 0 12px;
-      letter-spacing: -0.04em;
-    }
-    .footer a {
-      color: #c98952;
-    }
-    @media only screen and (max-width: 600px) {
-      .wrap {
-        padding-left: 20px;
-        padding-right: 20px;
-      }
-      .title {
-        font-size: 38px;
-      }
-      .content h1 {
-        font-size: 31px;
-      }
+    /* Client resets */
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    table { border-collapse: collapse !important; }
+    img { border: 0; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    a { color: #b24e1f; }
+    .em-link { color: #b24e1f !important; text-decoration: underline; text-underline-offset: 2px; }
+    /* Mobile */
+    @media only screen and (max-width: 620px) {
+      .em-card { width: 100% !important; }
+      .em-pad { padding-left: 26px !important; padding-right: 26px !important; }
+      .em-h1 { font-size: 27px !important; }
     }
   </style>
 </head>
-<body>
-  <div class="page">
-    <div class="wrap">
-      <div class="brand">
-        Männerkreis
-      </div>
-      <div class="hero">
-        <p class="kicker">Männerkreis Niederbayern</p>
-        <h1 class="title">
-          Ein Raum für<br>
-          <em>echte</em> Begegnung
-        </h1>
-      </div>
-      <div class="content">
+<body style="margin:0; padding:0; background-color:#f2eee7;">
+  <!-- Preheader (kept empty for system mails; set per-template if useful) -->
+  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#f2eee7; opacity:0;">&nbsp;</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f2eee7;">
+    <tr>
+      <td align="center" style="padding:36px 12px;">
+        <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+        <table role="presentation" class="em-card" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#faf8f5; border:1px solid #e3d9cd; border-radius:14px;">
+
+          <!-- Masthead -->
+          <tr>
+            <td class="em-pad" align="center" style="padding:34px 40px 26px; border-bottom:1px solid #ece3d6;">
+              <div style="font-family:Georgia,'Times New Roman',serif; font-size:23px; line-height:1; color:#1a1308; letter-spacing:-0.01em;">Männerkreis</div>
+              <div style="margin-top:9px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:11px; line-height:1; letter-spacing:0.22em; text-transform:uppercase; color:#a4724a;">Niederbayern&nbsp;/&nbsp;Straubing</div>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td class="em-pad" style="padding:40px 40px 16px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:16px; line-height:1.7; color:#2b2118;">
 {{ end }}
 
 {{ define "footer" }}
-      </div>
-      <div class="footer">
-        <p class="footer-title">Männerkreis Niederbayern</p>
-        <p>
-          Ein geschützter Raum für ehrlichen Austausch,
-          echte Begegnung und persönliches Wachstum.
-        </p>
-        <p>
-          <a href="https://mens-circle.de">mens-circle.de</a>
-        </p>
-        <p>
-          Du bekommst diese E-Mail, weil du dich für den Männerkreis Niederbayern eingetragen hast.
-        </p>
-      </div>
-    </div>
-  </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="em-pad" style="padding:30px 40px 40px; border-top:1px solid #ece3d6;">
+              <div style="font-family:Georgia,'Times New Roman',serif; font-size:18px; line-height:1.2; color:#1a1308; letter-spacing:-0.01em;">Männerkreis Niederbayern/ Straubing</div>
+              <p style="margin:12px 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.7; color:#7a7065;">
+                Ein Raum für echte Begegnung unter Männern. Authentischer Austausch,
+                Gemeinschaft und persönliches Wachstum in Niederbayern.
+              </p>
+              <p style="margin:14px 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.7;">
+                <a class="em-link" href="https://mens-circle.de" target="_blank" style="color:#b24e1f; text-decoration:underline; text-underline-offset:2px;">mens-circle.de</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
 {{ end }}
