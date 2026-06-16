@@ -11,9 +11,11 @@ PocketBase-Mailvorlagen abgeleitet (Farben `#efe9dd` / `#2c2418` / Akzent
 | [`campaign.html`](campaign.html) | **Campaign**-Template           | Rahmen (Card, Gruß, Footer, Tracking) um jeden Newsletter. Enthält `{{ template "content" . }}` — dort wird der im Editor verfasste Kampagnentext eingesetzt. |
 | [`optin.html`](optin.html)       | Opt-In-/Willkommens-**Content** | Inhalt der Double-Opt-In-Bestätigungsmail mit „Anmeldung bestätigen"-Button (`{{ .OptinURL }}`). Wird vom Rahmen-Template umschlossen.                        |
 | [`public-style.css`](public-style.css) | **Custom CSS** (öffentliche Seiten) | Markenstyling für Anmelde-/Abmelde-/Opt-In-/Archiv-Seiten. Settings → Appearance → „Custom CSS (public pages)".                                        |
-| [`docker-compose.yml`](docker-compose.yml) | **Deploy** (App + PostgreSQL) | All-in-one-Stack für Coolify (empfohlen).                                                                                                              |
-| [`Dockerfile`](Dockerfile)       | **Deploy** (nur App)            | Standalone-Image; benötigt eine externe PostgreSQL.                                                                                                            |
-| [`.env.example`](.env.example)   | Env                             | DB-Zugang + Super-Admin für den Deploy.                                                                                                                        |
+
+> **Deployment:** listmonk + PostgreSQL laufen jetzt zusammen mit der Web-App in
+> der **einen** [`docker-compose.yml`](../docker-compose.yml) im Projekt-Root
+> (Coolify „Docker Compose"-Resource). DB-Zugang, Super-Admin und URLs erzeugt
+> Coolify automatisch über Magic-Variablen — kein separates listmonk-Setup mehr.
 
 ## Einrichten
 
@@ -75,28 +77,28 @@ listmonks Default-Selektoren (`.container`, `.wrap`, `.button`, `.lists`, …).
 
 ## Deployment
 
-listmonk braucht zwingend **PostgreSQL** (kein SQLite). Zwei Wege:
+Alles läuft über die **eine** [`docker-compose.yml`](../docker-compose.yml) im
+Projekt-Root: `web` (Astro + PocketBase + nginx), `listmonk` und `listmonk-db`
+(PostgreSQL — listmonk hat kein SQLite).
 
-**A) All-in-one mit Compose (empfohlen)** — `docker-compose.yml` (App + Postgres):
+1. Coolify → **New Resource → Docker Compose**, dieses Repo (Root).
+2. Coolify erzeugt Domains + Credentials automatisch über Magic-Variablen
+   (`SERVICE_FQDN_WEB_8090`, `SERVICE_FQDN_LISTMONK_9000`, `SERVICE_*_POSTGRES`,
+   `SERVICE_*_LISTMONKADMIN`). Den Services im UI die echten Domains zuweisen
+   (`web` → mens-circle.de, `listmonk` → listmonk.mens-circle.de).
+3. Manuelle Env-Variablen setzen (siehe Root-`.env.example`): `SMTP_*`,
+   `PB_ADMIN_*`, und nach dem listmonk-Setup `LISTMONK_API_USER/_TOKEN/_LIST_IDS`.
+4. Erststart legt das listmonk-Schema + den Super-Admin automatisch an.
 
-1. Coolify → **New Resource → Docker Compose**, dieses Repo, Base-Directory `listmonk/`.
-2. Env-Variablen aus `.env.example` setzen (v. a. starkes `POSTGRES_PASSWORD` +
-   `LISTMONK_ADMIN_PASSWORD`).
-3. Port **9000** exposen; Coolify terminiert TLS und mappt deine Domain
-   (z. B. `listmonk.mens-circle.de`).
-4. Erststart legt Schema + Super-Admin automatisch an (kein Install-Wizard).
+Nach dem Deploy in listmonk:
 
-**B) Nur-App-Image** — `Dockerfile` (`FROM listmonk/listmonk`), wenn du eine
-**externe** PostgreSQL betreibst. Dann zusätzlich die `LISTMONK_db__*`-Variablen
-setzen (siehe `.env.example`).
-
-Nach dem Deploy:
-
-1. Login mit `LISTMONK_ADMIN_USER` / `LISTMONK_ADMIN_PASSWORD`.
+1. Login als Super-Admin (das von Coolify generierte
+   `SERVICE_PASSWORD_LISTMONKADMIN` steht in den Coolify-Env-Variablen).
 2. **Settings → SMTP**: Mailversand konfigurieren (Absender
    `hallo@mens-circle.de`, „Männerkreis Niederbayern/ Straubing").
 3. Liste anlegen (Double-Opt-In), Templates (`campaign.html` / `optin.html`)
-   und das Public-CSS einfügen.
-4. In der Web-App die `LISTMONK_*`-Variablen setzen (`LISTMONK_URL`,
-   `LISTMONK_API_USER`, `LISTMONK_API_TOKEN`, `LISTMONK_LIST_IDS`) — die
-   Newsletter-Anmeldung leitet dorthin weiter.
+   und das Public-CSS (`public-style.css`) einfügen.
+4. API-User anlegen (Settings → API users) und dessen Token in der Web-App als
+   `LISTMONK_API_USER` / `LISTMONK_API_TOKEN` + die `LISTMONK_LIST_IDS` setzen.
+   Die Web-App ruft listmonk intern über `http://listmonk:9000` auf — die
+   Newsletter-Anmeldung der PocketBase-Route leitet dorthin weiter.
