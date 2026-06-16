@@ -31,24 +31,24 @@ const { page } = Astro.props;
 <style is:global>
   @layer sections {
     .legal-page {
-      min-block-size: 100vh;
-      padding-block-start: var(--header-clearance);
       background: var(--bg-primary);
+      padding-block-start: var(--header-clearance);
+      min-block-size: 100vh;
     }
 
     .legal-content {
-      max-inline-size: var(--container-prose);
-      padding-block-end: var(--space-xl);
-      padding-inline: var(--space-md);
       margin-inline: auto;
+      padding-inline: var(--space-md);
+      padding-block-end: var(--space-xl);
+      max-inline-size: var(--container-prose);
     }
 
     .legal-content h1 {
-      padding-block-end: var(--space-md);
       margin-block-end: var(--space-xl);
+      border-block-end: 1px solid var(--border-light);
+      padding-block-end: var(--space-md);
       font-size: clamp(2.5rem, 6vw, 4.5rem);
       letter-spacing: -0.03em;
-      border-block-end: 1px solid var(--border-light);
     }
 
     .legal-content h2 {
@@ -66,9 +66,9 @@ const { page } = Astro.props;
     .legal-content ul,
     .legal-content ol {
       margin-block-end: var(--space-sm);
+      color: var(--text-secondary);
       font-size: 1rem;
       line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
     }
 
     .legal-content ul,
@@ -91,26 +91,26 @@ const { page } = Astro.props;
     }
 
     .legal-content strong {
-      font-weight: 600;
       color: var(--text-primary);
+      font-weight: 600;
     }
 
     .legal-content table {
-      inline-size: 100%;
       margin-block: var(--space-md);
       border-collapse: collapse;
+      inline-size: 100%;
     }
 
     .legal-content th,
     .legal-content td {
+      border-block-end: 1px solid var(--border-light);
       padding: var(--space-sm);
       text-align: start;
-      border-block-end: 1px solid var(--border-light);
     }
 
     .legal-content th {
-      font-weight: 600;
       color: var(--text-primary);
+      font-weight: 600;
     }
   }
 </style>

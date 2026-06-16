@@ -72,9 +72,6 @@ const schemas = [
       --_surface-noise-opacity: 0.04;
 
       position: relative;
-      block-size: 100vh;
-      min-block-size: 50vh;
-      color: var(--text-on-dark);
       background: linear-gradient(
         135deg,
         var(--color-earth-deep) 0%,
@@ -85,6 +82,9 @@ const schemas = [
           )
           100%
       );
+      block-size: 100vh;
+      min-block-size: 50vh;
+      color: var(--text-on-dark);
     }
 
     .testimonial-form-section {
@@ -92,8 +92,8 @@ const schemas = [
     }
 
     .testimonial-form__wrapper {
-      max-inline-size: var(--content-max-wide);
       margin-inline: auto;
+      max-inline-size: var(--content-max-wide);
     }
 
     .testimonial-form__intro {
@@ -103,16 +103,16 @@ const schemas = [
 
     .testimonial-form__intro h2 {
       margin-block-end: var(--space-md);
-      font-family: var(--font-display);
-      font-size: clamp(1.75rem, 4vw, 2.5rem);
       color: var(--text-primary);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-family: var(--font-display);
     }
 
     .testimonial-form__intro p {
       margin-block-end: var(--space-md);
+      color: var(--text-muted);
       font-size: var(--text-section-body);
       line-height: var(--leading-relaxed);
-      color: var(--text-muted);
     }
 
     .testimonial-form__intro p:last-child {
@@ -120,10 +120,10 @@ const schemas = [
     }
 
     .testimonial-form {
-      padding: var(--space-lg);
-      background: var(--bg-elevated);
-      border-radius: var(--radius-lg);
       box-shadow: var(--shadow-md);
+      border-radius: var(--radius-lg);
+      background: var(--bg-elevated);
+      padding: var(--space-lg);
     }
 
     @media (width <= 600px) {
@@ -136,9 +136,9 @@ const schemas = [
       position: absolute;
       inset-block-end: calc(var(--space-sm) + var(--space-xs));
       inset-inline-end: var(--space-md);
-      font-size: 0.8125rem;
-      color: var(--text-muted);
       pointer-events: none;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
     }
 
     .testimonial-form .form-actions .btn {
@@ -147,9 +147,9 @@ const schemas = [
 
     .testimonial-form__note {
       margin-block-start: var(--space-md);
+      color: var(--text-muted);
       font-size: 0.875rem;
       line-height: 1.6;
-      color: var(--text-muted);
       text-align: center;
     }
   }
