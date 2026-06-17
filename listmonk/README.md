@@ -21,8 +21,7 @@ pixelgleich, aber sauber).
 
 ```
 listmonk/
-  seed/
-    seed-templates.sh            one-shot DB-Seeder (läuft als eigener Container)
+  Dockerfile                     baked Image: COPY static /listmonk/static
   static/
     email-templates/             ← überschreibt die eingebauten System-Templates
       base.html                  (define "header" + "footer" — gemeinsames Layout)
@@ -34,7 +33,7 @@ listmonk/
       forgot-password.html       (define "forgot-password" — Passwort-Reset)
       smtp-test.html             (define "smtp-test" — SMTP-Verbindungstest)
     campaign-templates/
-      mens-circle.html           Kampagnen-Template (Quelldatei, wird per Seeder in DB geladen)
+      mens-circle.html           Kampagnen-Template (Quelldatei, manuell in der UI anlegen)
   public-style.css               Settings → Appearance → Custom CSS (public pages)
 ```
 
@@ -74,21 +73,32 @@ nicht die Kampagnen-Funktionen:
   Status-Mails.
 - `{{ template "header" . }}` (mit Punkt) / `{{ template "footer" }}` (ohne).
 
-Der Container startet listmonk mit:
+### Auslieferung als gebackenes Image (kein Runtime-Bind-Mount)
+
+Die Templates werden **ins Image gebacken** (`listmonk/Dockerfile`), nicht zur
+Laufzeit per Bind-Mount eingehängt:
+
+```dockerfile
+FROM listmonk/listmonk:latest
+COPY static /listmonk/static
+```
+
+`docker-compose.yml` baut dieses Image und startet listmonk mit:
 
 ```
 ./listmonk --static-dir=/listmonk/static --config ''
 ```
 
-und mountet dieses Verzeichnis read-only (siehe `docker-compose.yml`):
-
-```yaml
-volumes:
-  - ./listmonk/static:/listmonk/static:ro
-```
-
 `--static-dir` steht nur am **finalen Run-Befehl**, nicht bei
 `--install`/`--upgrade`.
+
+> **Warum kein `./listmonk/static:/listmonk/static:ro`-Mount mehr?**
+> Repo-relative Bind-Mounts sind auf manchen Hosts (z.B. **Coolify**) fragil:
+> wenn der Mount nicht auflöst, fällt listmonk **still** auf seine eingebauten
+> englischen Default-Templates zurück — genau das Symptom „Templates gehen
+> nicht". Mit dem gebackenen Image liegen die Dateien immer im Container.
+> Nach Template-Änderungen daher **Image neu bauen** (`docker compose up
+> --build -d listmonk` bzw. Redeploy in Coolify).
 
 ## Kampagnen-Template (`campaign-templates/mens-circle.html`)
 
@@ -96,17 +106,12 @@ Kampagnen-Templates leben in listmonk in der **Datenbank**, nicht im Dateisystem
 — `--static-dir` überlagert nur die file-basierten **System**-Templates, **nicht**
 die Kampagnen-Templates.
 
-### Auto-Seed via `listmonk-seed`
+### Manuell in der UI anlegen (kein Auto-Seed)
 
-Der `listmonk-seed`-Container in `docker-compose.yml` schreibt das Template bei
-jedem Deploy automatisch in die DB (idempotent via `INSERT … WHERE NOT EXISTS` +
-`UPDATE`). Er wartet, bis listmonk healthy ist (Schema existiert), setzt das
-Template als Standard (`is_default = true`) und bleibt dann am Leben (`sleep`),
-damit Coolify den Container nicht wegen exit-0 ständig neu startet.
-
-- **Quelldatei**: `static/campaign-templates/mens-circle.html` — dort Änderungen
-  vornehmen; der Seeder liest sie beim nächsten Deploy ein.
-- **Manuell erzwingen** (ohne Redeploy): Container `listmonk-seed` neu starten.
+Das Kampagnen-Template wird **nicht** automatisch geseedet. Einmalig anlegen:
+Admin → Campaigns → Templates → „New" → Inhalt von
+`static/campaign-templates/mens-circle.html` einfügen → als Standard setzen
+(`Set as default`).
 
 Pflicht im Body: genau **einmal** `{{ template "content" . }}`. Verwendete
 Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
@@ -118,8 +123,8 @@ Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
 1. Als Super-Admin einloggen (Passwort = Coolify `SERVICE_PASSWORD_LISTMONKADMIN`).
 2. Settings → SMTP konfigurieren (Absender `hallo@mens-circle.de`).
 3. Liste (Double-Opt-In) anlegen, `public-style.css` unter Appearance einfügen.
-4. Kampagnen-Template: wird automatisch vom `listmonk-seed`-Container in die DB
-   geschrieben und als Standard gesetzt — kein manueller Schritt nötig.
+4. Kampagnen-Template einmalig in der UI anlegen (Campaigns → Templates) und als
+   Standard setzen — Quelldatei `static/campaign-templates/mens-circle.html`.
 5. API-User anlegen → Token in der Web-App als `LISTMONK_API_USER` /
    `LISTMONK_API_TOKEN` + `LISTMONK_LIST_IDS` setzen. Die Web-App ruft listmonk
    intern über `http://listmonk:9000` auf.
