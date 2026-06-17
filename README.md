@@ -1,47 +1,47 @@
 # Männerkreis Niederbayern / Straubing
 
 Schnelle, leichtgewichtige Website für den Männerkreis — **Astro 6 + Svelte 5**,
-**SSR in der Bun-Runtime**, **PocketBase** als Backend, **nginx** als Edge davor.
-Alles zusammen in **einem** Docker-Image, deploybar mit Coolify. Paketmanager,
-Build-Tool **und** Laufzeit ist **Bun**.
+**SSR in der Bun-Runtime**, **PocketBase** als Backend. Der Bun-Server ist selbst
+der öffentliche Edge (kein nginx). Alles zusammen in **einem** Docker-Image,
+deploybar mit Coolify. Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 
 ## Architektur
 
 ```
 ┌─────────────────────────── ein Docker-Container ───────────────────────────┐
 │                                                                             │
-│   nginx (Edge, :8090 — der nach außen exposte Port)                         │
-│   ├─ liefert die statischen Assets direkt aus  → /app/dist/client           │
+│   Astro-Server (Bun, Edge, :8090 — der nach außen exposte Port)             │
+│   ├─ liefert statische Assets + vorgerenderte HTML direkt  → /app/dist/client│
 │   │    (gehashte Assets immutable, Security-Header)                         │
-│   ├─ /api · /_                 → PocketBase                                 │
-│   └─ alles andere (HTML/SSR)   → Astro-Server (Bun)                         │
-│            │                              │                                 │
-│            ▼                              ▼                                 │
-│   Astro-Server (Bun, 127.0.0.1:4321)   PocketBase (Go, 127.0.0.1:8091)      │
-│   ├─ vorgerenderte Seiten (statisch)   ├─ REST API + Admin-UI (/_/)         │
-│   └─ On-Demand-SSR: Startseite         ├─ Custom-Routen      → pb_hooks/     │
-│      (Testimonials) + Event-Seiten,    ├─ Transakt. E-Mails  → views/emails/│
-│      live aus PocketBase (kein         ├─ Cron               → cron.pb.js    │
-│      Rebuild nötig)                    └─ Schema             → pb_migrations/│
+│   ├─ On-Demand-SSR: Startseite (Testimonials) + Event-Seiten, live aus PB   │
+│   └─ /api · /_   → proxyt an PocketBase                                     │
+│                                           │                                 │
+│                                           ▼                                 │
+│                                        PocketBase (Go, 127.0.0.1:8091)      │
+│                                        ├─ REST API + Admin-UI (/_/)         │
+│                                        ├─ Custom-Routen      → pb_hooks/     │
+│                                        ├─ Transakt. E-Mails  → views/emails/│
+│                                        ├─ Cron               → cron.pb.js    │
+│                                        └─ Schema             → pb_migrations/│
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-- **nginx als Edge.** Ein einziger nginx-Prozess ist der öffentliche Einstieg:
-  er liefert die gehashten Assets **und die vorgerenderten HTML-Seiten** direkt
-  von Platte aus (volle Kontrolle über Cache-Control je Asset-Klasse — gehashte
-  Assets/Fonts `immutable` 1 Jahr, Bilder 7 Tage, Manifeste/Feeds 1 Tag, HTML
-  `must-revalidate` — plus Security-Header) und routet die dynamischen Pfade an
-  die zwei Loopback-Upstreams: `/api · /_` an PocketBase, die
-  SSR-Routen (Startseite, Event-Seiten) an den Astro-Server. So trifft nur
-  echter SSR-Traffic den Bun-Prozess. Config: [`nginx.conf`](nginx.conf).
-  Kompression übernimmt der Coolify-Edge.
+- **Bun-Server als Edge.** Ein einziger Bun-Prozess ist der öffentliche
+  Einstieg: er liefert die gehashten Assets **und die vorgerenderten
+  HTML-Seiten** direkt von Platte aus (volle Kontrolle über Cache-Control je
+  Asset-Klasse — gehashte Assets/Fonts `immutable` 1 Jahr, Bilder 7 Tage,
+  Manifeste/Feeds 1 Tag, HTML `must-revalidate` — plus Security-Header), rendert
+  die SSR-Routen (Startseite, Event-Seiten) on demand und proxyt die
+  PocketBase-Pfade `/api · /_` an den Loopback-Upstream. Logik dafür im Adapter
+  ([`adapter/server.mjs`](adapter/server.mjs)). Kompression + TLS übernimmt der
+  Coolify-Edge.
 - **Astro-Server in der Bun-Runtime (nicht Node).** Das gebaute Server-Bundle
-  läuft mit `bun --smol` (kleiner Heap → wenig RAM) auf Loopback (`:4321`). Der
-  Adapter dafür ist lokal und minimal ([`adapter/`](adapter/)) — die offiziellen
-  Bun-Adapter unterstützen nur Astro ≤5.
+  läuft mit `bun --smol` (kleiner Heap → wenig RAM) auf dem exposten Port
+  (`:8090`). Der Adapter dafür ist lokal und minimal ([`adapter/`](adapter/)) —
+  die offiziellen Bun-Adapter unterstützen nur Astro ≤5.
 - **RAM-schonend & nachhaltig.** Die meisten Seiten sind vorgerendert (statisch)
-  und werden von nginx ausgeliefert (kein Bun nötig); nur Event-Seiten und die
+  und werden direkt von Platte ausgeliefert; nur Event-Seiten und die
   Testimonials der Startseite rendern serverseitig live aus PocketBase. Ein
   kleiner In-Memory-Cache (60 s) hält die SSR-Abfragen niedrig. Ein Rebuild bei
   Content-Änderung entfällt komplett — neue Events/Testimonials sind sofort
@@ -71,9 +71,8 @@ src/
 pocketbase/
   pb_migrations/  Collection-Schema (events, registrations, …)
   pb_hooks/       E-Mail-Logik, Custom-Routen, Cron, Templates
-adapter/          lokaler Astro-6-Bun-Adapter (Server-Entrypoint für die Runtime)
-nginx.conf        Edge: statische Assets + Routing zu Astro/PocketBase
-Dockerfile        Multi-Stage: Bun-Build → nginx + Bun-Runtime + PocketBase
+adapter/          lokaler Astro-6-Bun-Adapter (Server-Entrypoint: Edge, SSR, PB-Proxy)
+Dockerfile        Multi-Stage: Bun-Build → Bun-Runtime + PocketBase
 ```
 
 ## Lokale Entwicklung
@@ -99,19 +98,19 @@ bun run dev
 ```
 
 Im Dev-Modus sprechen Astro (4321) und PocketBase (8090) über verschiedene Ports,
-daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin hinter nginx: der
-Browser spricht den nginx-Port an, nginx proxyt `/api/*` an PocketBase — dann
-bleibt `PUBLIC_PB_URL` leer. (nginx läuft nur im Docker-Image; lokal nutzt man
-`bun run dev`.)
+daher `PUBLIC_PB_URL`. In Produktion läuft alles same-origin über den Bun-Server:
+der Browser spricht den exposten Port an, der Bun-Server proxyt `/api/*` an
+PocketBase — dann bleibt `PUBLIC_PB_URL` leer. (Den Proxy gibt es nur im
+Server-Bundle; lokal nutzt man `bun run dev`.)
 
 ### Build & lokal ausführen
 
 ```bash
 bun run build        # → dist/   (NICHT `bun --bun run build`, das bricht Rollup)
 
-# Den gebauten Astro-Server in der Bun-Runtime starten (wie in Produktion,
-# nur ohne nginx davor). Liefert statische + SSR-Seiten; SSR holt Daten aus
-# PocketBase (PB_INTERNAL_URL). Die /api-Pfade übernimmt in Prod nginx.
+# Den gebauten Astro-Server in der Bun-Runtime starten (wie in Produktion).
+# Liefert statische + SSR-Seiten, proxyt /api · /_ an PocketBase und holt
+# SSR-Daten aus PocketBase — beides über PB_INTERNAL_URL.
 PORT=3000 PB_INTERNAL_URL=http://127.0.0.1:8090 bun run start
 ```
 
@@ -119,9 +118,8 @@ PORT=3000 PB_INTERNAL_URL=http://127.0.0.1:8090 bun run start
 
 1. Neue Ressource → **Dockerfile**-basiert, dieses Repo.
 2. **Persistent Volume** mounten auf `/pb/pb_data` (Datenbank + Uploads).
-3. Port **8090** exposen (das ist nginx; Astro/Bun läuft intern auf `:4321`,
-   PocketBase auf `127.0.0.1:8091`). Coolify terminiert TLS und leitet per HTTP
-   weiter.
+3. Port **8090** exposen (das ist der Bun-Server/Edge; PocketBase läuft intern
+   auf `127.0.0.1:8091`). Coolify terminiert TLS und leitet per HTTP weiter.
 4. Environment-Variablen setzen (siehe `.env.example`):
 
 | Variable                                                               | Zweck                                                               |
