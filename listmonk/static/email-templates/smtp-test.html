@@ -1,0 +1,10 @@
+{{ define "smtp-test" }}
+{{ template "header" . }}
+<p style="margin:0 0 6px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:11px; line-height:1; letter-spacing:0.2em; text-transform:uppercase; color:#a4724a;">SMTP</p>
+<h1 class="em-h1" style="margin:0 0 22px; font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:31px; line-height:1.18; color:#1a1308; letter-spacing:-0.015em;">Verbindungstest erfolgreich</h1>
+
+<p style="margin:0 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:16px; line-height:1.7; color:#2b2118;">
+  Die SMTP-Konfiguration ist korrekt. E-Mails können über diesen Server versendet werden.
+</p>
+{{ template "footer" }}
+{{ end }}
