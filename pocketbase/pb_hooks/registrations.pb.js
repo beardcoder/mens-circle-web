@@ -27,31 +27,8 @@ onRecordAfterCreateSuccess((e) => {
     }
 
     if (event && participant) {
-      // Participant email
-      if (status === "waitlist") {
-        const tpl = lib.renderWaitlistConfirmation(event, participant);
-        lib.sendMail($app, {
-          to: participant.getString("email"),
-          subject: tpl.subject,
-          html: tpl.html,
-        });
-      } else {
-        const tpl = lib.renderRegistrationConfirmation(event, participant);
-        lib.sendMail($app, {
-          to: participant.getString("email"),
-          subject: tpl.subject,
-          html: tpl.html,
-        });
-      }
-
-      // Admin notification (every registration, incl. waitlist)
-      const activeCount = lib.countActiveRegistrations($app, event.id);
-      const adminTpl = lib.renderAdminNotification(event, participant, activeCount);
-      lib.sendMail($app, {
-        to: lib.config.MAIL_ADMIN_ADDRESS,
-        subject: adminTpl.subject,
-        html: adminTpl.html,
-      });
+      // Participant confirmation/waitlist email + admin notification.
+      lib.sendRegistrationEmails($app, event, participant, status);
     }
   } catch (err) {
     $app.logger().error("registrations onCreate hook failed", "error", String(err));
