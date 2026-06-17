@@ -25,12 +25,14 @@ if (journey?.data?.steps?.length) {
     '@type': 'HowTo',
     name: strip(journey.data.title) || 'Deine Reise zum Männerkreis',
     description: journey.data.subtitle ?? 'Wie du Teil des Männerkreis wirst',
-    step: journey.data.steps.map((s: any, i: number) => ({
-      '@type': 'HowToStep',
-      position: i + 1,
-      name: s.title ?? '',
-      text: s.description ?? '',
-    })),
+    step: journey.data.steps.map(
+      (s: { title?: string; description?: string }, i: number) => ({
+        '@type': 'HowToStep',
+        position: i + 1,
+        name: s.title ?? '',
+        text: s.description ?? '',
+      }),
+    ),
   });
 }
 
@@ -40,8 +42,10 @@ if (faq?.data?.items?.length) {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: faq.data.items
-      .filter((i: any) => i.question && i.answer)
-      .map((i: any) => ({
+      .filter(
+        (i: { question?: string; answer?: string }) => i.question && i.answer,
+      )
+      .map((i: { question?: string; answer?: string }) => ({
         '@type': 'Question',
         name: i.question,
         acceptedAnswer: { '@type': 'Answer', text: strip(i.answer) },

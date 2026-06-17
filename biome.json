@@ -14,7 +14,8 @@
       "!listmonk/*.html",
       "!**/*.min.js",
       "!public",
-      "!bun.lock"
+      "!bun.lock",
+      "!listmonk/static/*"
     ]
   },
   "formatter": {
