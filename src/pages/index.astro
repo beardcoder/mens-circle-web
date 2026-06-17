@@ -4,8 +4,8 @@ import PageContent from '../components/PageContent.astro';
 import home from '../content/home.json';
 import Layout from '../layouts/Layout.astro';
 
-// Prerendered (static): served straight off disk by nginx, and the Moderator
-// image is optimized at BUILD time (no runtime /_image endpoint). The only
+// Prerendered (static): served straight off disk by the Bun server, and the
+// Moderator image is optimized at BUILD time (no runtime /_image endpoint). The only
 // live part — the testimonials — is a server island (see PageContent.astro).
 export const prerender = true;
 

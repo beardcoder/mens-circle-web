@@ -1,22 +1,14 @@
 /**
- * Server entrypoint for the local "mens-circle-edge" adapter (see ./index.mjs).
- * With `entrypointResolution: 'auto'` THIS module is the server entry: Astro
- * builds it to dist/server/entry.mjs, and `bun run dist/server/entry.mjs` runs
- * its top-level code to boot the server.
- *
- * Serves the Astro site via `createApp()` (astro/app/entrypoint, which wires in
- * the build-time manifest): prerendered static files + on-demand SSR, with
- * security + Cache-Control headers. It binds to loopback and does NOT proxy —
- * nginx is the public edge in front (it routes the PocketBase paths to
- * PocketBase and everything else here).
+ * Server entry for the local "mens-circle-edge" adapter (see ./index.mjs).
+ * With `entrypointResolution: 'auto'` Astro builds this to dist/server/entry.mjs
+ * and runs its top-level code. It is the container's single public edge: serves
+ * static + SSR and proxies the PocketBase paths (/api, /_) to PB_INTERNAL_URL.
  */
 
 import path from 'node:path';
-// Build-time config (absolute dist/client path), injected by ./index.mjs.
 import { clientDir } from 'virtual:mens-circle-edge/config';
 import { createApp } from 'astro/app/entrypoint';
 
-// ── Headers (mirror the former nginx policy) ────────────────────────────────
 const SECURITY_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
@@ -38,11 +30,10 @@ function cacheControlFor(pathname) {
     )
   )
     return 'public, max-age=86400';
-  // HTML pages (and anything else): always revalidate.
   return 'public, max-age=0, must-revalidate';
 }
 
-/** Re-emit a response with security headers + a Cache-Control (if not already set). */
+/** Re-emit a response with security headers + a Cache-Control (if unset). */
 function withSiteHeaders(response, pathname) {
   const headers = new Headers(response.headers);
   for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
@@ -75,7 +66,7 @@ async function serveStatic(pathname, clientDir) {
   candidates.push(path.join(clientDir, rel, 'index.html'));
 
   for (const file of candidates) {
-    // Guard against path traversal (../) escaping the client dir.
+    // Guard against path traversal escaping the client dir.
     if (file !== clientDir && !file.startsWith(clientDir)) continue;
     const blob = Bun.file(file);
     if (await blob.exists())
@@ -95,15 +86,63 @@ async function serveStatic(pathname, clientDir) {
   return new Response('Not found', { status: 404, headers: SECURITY_HEADERS });
 }
 
-/** Build the Astro request handler: on-demand SSR, falling back to static files. */
+const PB_TARGET = (
+  process.env.PB_INTERNAL_URL || 'http://127.0.0.1:8091'
+).replace(/\/+$/, '');
+
+/** Paths owned by PocketBase: REST API (/api/…) and admin UI (/_, /_/…). */
+function ownedByPocketBase(pathname) {
+  return (
+    pathname.startsWith('/api/') ||
+    pathname === '/_' ||
+    pathname.startsWith('/_/')
+  );
+}
+
+/** Forward a request to PocketBase, streaming the response straight back. */
+function proxyToPocketBase(request, url, clientAddress) {
+  const headers = new Headers(request.headers);
+  // `Host` is a forbidden fetch header — it's set from the target URL.
+  const priorXff = headers.get('x-forwarded-for');
+  if (clientAddress) {
+    headers.set(
+      'x-forwarded-for',
+      priorXff ? `${priorXff}, ${clientAddress}` : clientAddress,
+    );
+    if (!headers.has('x-real-ip')) headers.set('x-real-ip', clientAddress);
+  }
+  if (!headers.has('x-forwarded-proto')) {
+    headers.set('x-forwarded-proto', url.protocol.replace(':', ''));
+  }
+  if (!headers.has('x-forwarded-host') && headers.has('host')) {
+    headers.set('x-forwarded-host', headers.get('host'));
+  }
+
+  const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
+  return fetch(`${PB_TARGET}${url.pathname}${url.search}`, {
+    method: request.method,
+    headers,
+    body: hasBody ? request.body : undefined,
+    duplex: hasBody ? 'half' : undefined,
+    redirect: 'manual',
+  });
+}
+
+/** Proxy PocketBase paths; otherwise SSR, falling back to static files. */
 function createHandler(app, clientDir) {
   return async (request, server) => {
     const url = new URL(request.url);
+    const clientAddress = server?.requestIP?.(request)?.address;
+
+    if (ownedByPocketBase(url.pathname)) {
+      return proxyToPocketBase(request, url, clientAddress);
+    }
+
     const routeData = app.match(request);
     if (routeData) {
       const response = await app.render(request, {
         addCookieHeader: true,
-        clientAddress: server?.requestIP?.(request)?.address,
+        clientAddress,
         routeData,
       });
       return withSiteHeaders(response, url.pathname);
@@ -112,28 +151,17 @@ function createHandler(app, clientDir) {
   };
 }
 
-// ── Server boot ─────────────────────────────────────────────────────────────
-// createApp() returns an `astro/app` App wired to the build-time manifest.
 const app = createApp();
 
-/** Astro request handler (exported for testing; the boot below uses it too). */
+/** Exported for testing; the boot below uses it too. */
 export const handle = createHandler(app, clientDir);
 
-/**
- * Boot the Bun server when this module is run as the entry
- * (`bun run dist/server/entry.mjs`). Guarded so importing the module (e.g. in
- * tooling) doesn't start a server, and so a non-Bun runtime fails loudly.
- *
- * This process serves ONLY the Astro app (prerendered files + on-demand SSR).
- * nginx is the public edge in front of it: nginx routes the PocketBase paths
- * (/api, /_, /newsletter) straight to PocketBase and everything else here, so
- * this server binds to loopback and never proxies. SSR data is fetched from
- * PocketBase directly via PB_INTERNAL_URL (see src/lib/pocketbase-server.ts).
- */
+// Boot when run as the entry (`bun run dist/server/entry.mjs`); guarded so a
+// bare import doesn't start a server and a non-Bun runtime fails loudly.
 const Bun = globalThis.Bun;
 if (Bun?.serve) {
   const hostname = process.env.HOST || '0.0.0.0';
-  const port = Number.parseInt(process.env.PORT || '4321', 10);
+  const port = Number.parseInt(process.env.PORT || '8090', 10);
 
   const server = Bun.serve({
     hostname,

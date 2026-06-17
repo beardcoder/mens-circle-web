@@ -3,20 +3,17 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Männerkreis — single-image deploy for Coolify.
 #
-# A small, sustainable footprint built around three co-located processes:
+# A small, sustainable footprint built around two co-located processes:
 #
-#   nginx (:8090 — the exposed port, the public edge)
-#   ├─ serves the build's static assets straight off disk (immutable caching)
-#   ├─ /api · /_ · /newsletter  → PocketBase (127.0.0.1:8091)
-#   └─ everything else          → Astro/Bun (127.0.0.1:4321)
-#   Astro server (Bun runtime, 127.0.0.1:4321)  prerendered pages + on-demand
-#                                SSR (event pages + home testimonials, live
-#                                from PocketBase). Loopback only.
+#   Astro server (Bun runtime, :8090 — the exposed port, the public edge)
+#   ├─ serves the build's static assets + prerendered HTML (immutable caching)
+#   ├─ on-demand SSR (event pages + home testimonials, live from PocketBase)
+#   └─ /api · /_  → proxied to PocketBase (127.0.0.1:8091)
 #   PocketBase (127.0.0.1:8091)  REST API, admin UI, transactional email
 #                                (pb_hooks), cron, DB — never exposed directly.
 #
-# The frontend runs in the Bun runtime (NOT Node). nginx fronts both app
-# processes; PocketBase keeps the data + email + cron logic.
+# The frontend runs in the Bun runtime (NOT Node). The Bun server is the single
+# public edge (no nginx); PocketBase keeps the data + email + cron logic.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # 1) Install dependencies + build the Astro server bundle with Bun.
@@ -51,17 +48,17 @@ RUN set -eux; \
   unzip /tmp/pb.zip -d /pb; \
   rm /tmp/pb.zip
 
-# 3) Final runtime image — Bun runtime + nginx + the PocketBase binary.
+# 3) Final runtime image — Bun runtime + the PocketBase binary.
 FROM oven/bun:1
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates tzdata wget nginx \
+  && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
   && rm -rf /var/lib/apt/lists/*
 ENV TZ=Europe/Berlin
 # Same WORKDIR as the build stage so the adapter's baked client path resolves.
 WORKDIR /app
 
-# The Astro server bundle + its runtime dependencies + the static client (also
-# served directly by nginx). The build path is baked in, so /app must match.
+# The Astro server bundle + its runtime dependencies + the static client (the
+# Bun server serves these). The build path is baked in, so /app must match.
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
@@ -70,13 +67,12 @@ COPY --from=build /app/package.json ./package.json
 COPY --from=pocketbase /pb/pocketbase /usr/local/bin/pocketbase
 COPY pocketbase/pb_hooks /pb/pb_hooks
 COPY pocketbase/pb_migrations /pb/pb_migrations
-COPY nginx.conf /etc/nginx/nginx.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Persisted data (database, uploaded files) — mount a Coolify volume here.
 VOLUME ["/pb/pb_data"]
-# nginx is the public edge; Astro (4321) + PocketBase (8091) stay on loopback.
+# The Bun server is the public edge on :8090; PocketBase (8091) stays loopback.
 EXPOSE 8090
 
 ENTRYPOINT ["docker-entrypoint.sh"]
