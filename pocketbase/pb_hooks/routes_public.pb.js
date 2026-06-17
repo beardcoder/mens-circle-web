@@ -120,6 +120,21 @@ routerAdd("POST", "/api/event/register", (e) => {
       $app.save(reg);
     }
 
+    // Best-effort: ensure this event's listmonk list exists and add the
+    // participant to it (deduped by email; a person can be on the newsletter
+    // and several event lists at once). Also sets the subscriber's name in
+    // listmonk if it was still missing (e.g. a prior no-name newsletter
+    // sign-up). Never blocks the registration response.
+    try {
+      const listId = lib.ensureEventListId($app, event);
+      if (listId) {
+        const fullName = `${firstName} ${lastName}`.trim();
+        lib.listmonkAddToLists(email, fullName, [listId], true);
+      }
+    } catch (lmErr) {
+      $app.logger().error("event listmonk assignment failed", "event", event.id, "error", String(lmErr));
+    }
+
     const message = isWaitlist
       ? `Du wurdest auf die Warteliste eingetragen, ${firstName}. Wir benachrichtigen dich per E-Mail, sobald ein Platz frei wird.`
       : `Vielen Dank, ${firstName}! Deine Anmeldung war erfolgreich. Du erhältst in Kürze eine Bestätigung per E-Mail.`;

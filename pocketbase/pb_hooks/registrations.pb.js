@@ -75,6 +75,26 @@ onRecordAfterUpdateSuccess((e) => {
 
     if (oldStatus !== "cancelled" && newStatus === "cancelled") {
       const eventId = reg.getString("event");
+
+      // Mirror the cancellation in listmonk: drop the participant from this
+      // event's list so it reflects only current participants. Best-effort;
+      // only this event's list is touched (newsletter + other events stay).
+      try {
+        const ev = $app.findRecordById("events", eventId);
+        let listId = 0;
+        try {
+          listId = ev.getInt("listmonk_list_id");
+        } catch (ignore) {
+          listId = 0;
+        }
+        if (listId && listId > 0) {
+          const p = $app.findRecordById("participants", reg.getString("participant"));
+          lib.listmonkRemoveFromList(p.getString("email"), listId);
+        }
+      } catch (rmErr) {
+        $app.logger().error("listmonk remove on cancel failed", "error", String(rmErr));
+      }
+
       let next = null;
       try {
         const candidates = $app.findRecordsByFilter(
