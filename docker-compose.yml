@@ -69,26 +69,6 @@ services:
       # missing files fall back to the binary. read-only on purpose.
       - ./listmonk/static:/listmonk/static:ro
 
-  # Idempotent: upserts the branded campaign template into listmonk's DB on
-  # every deploy, then stays alive (sleep) so Coolify does not treat exit-0
-  # as a crash and restart it in a loop. Campaign templates live in the DB,
-  # not in --static-dir, so this service is what makes them actually show up.
-  listmonk-seed:
-    image: postgres:17-alpine
-    restart: unless-stopped
-    depends_on:
-      listmonk-db:
-        condition: service_healthy
-    environment:
-      POSTGRES_USER: ${SERVICE_USER_POSTGRES}
-      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES}
-      POSTGRES_DB: listmonk
-      PGHOST: listmonk-db
-    entrypoint: ['sh', '/seed/seed-templates.sh']
-    volumes:
-      - ./listmonk/seed:/seed:ro
-      - ./listmonk/static/campaign-templates:/tpl:ro
-
   listmonk-db:
     image: postgres:17-alpine
     restart: unless-stopped
