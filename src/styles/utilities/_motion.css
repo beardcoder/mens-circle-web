@@ -308,6 +308,6 @@
   *:not([data-motion-essential], [data-motion-essential] *),
   *:not([data-motion-essential], [data-motion-essential] *)::before,
   *:not([data-motion-essential], [data-motion-essential] *)::after {
-    animation-iteration-count: 1 !important;
+    animation-iteration-count: 1;
   }
 }
