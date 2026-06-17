@@ -80,7 +80,7 @@ onMount(() => {
       '<strong>' +
       escapeHtml(title) +
       '</strong>' +
-      (address ? '<br>' + escapeHtml(address) : '') +
+      (address ? `<br>${escapeHtml(address)}` : '') +
       '<br><a class="event-map__directions" href="' +
       buildDirectionsUrl() +
       '" target="_blank" rel="noopener">Route planen</a>';
