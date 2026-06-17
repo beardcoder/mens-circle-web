@@ -20,7 +20,7 @@
 set -eu
 
 TPL_NAME="${TEMPLATE_NAME:-Männerkreis Niederbayern}"
-TPL_FILE="${TEMPLATE_FILE:-/seed/templates/mens-circle.html}"
+TPL_FILE="${TEMPLATE_FILE:-/tpl/mens-circle.html}"
 
 export PGPASSWORD="${POSTGRES_PASSWORD}"
 export PGHOST="${PGHOST:-listmonk-db}"
