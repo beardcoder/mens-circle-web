@@ -1,19 +1,20 @@
 /**
  * Server entrypoint for the local "mens-circle-edge" adapter (see ./index.mjs).
- * Bundled into dist/server at build time and run by the Bun runtime.
+ * With `entrypointResolution: 'auto'` THIS module is the server entry: Astro
+ * builds it to dist/server/entry.mjs, and `bun run dist/server/entry.mjs` runs
+ * its top-level code to boot the server.
  *
- * Serves the Astro site via astro/app's `App`: prerendered static files +
- * on-demand SSR, with security + Cache-Control headers. It binds to loopback
- * and does NOT proxy — nginx is the public edge in front (it routes the
- * PocketBase paths to PocketBase and everything else here).
- *
- * Astro auto-invokes `start(manifest, args)` from its generated entry, so
- * `bun run dist/server/entry.mjs` boots the Astro server.
+ * Serves the Astro site via `createApp()` (astro/app/entrypoint, which wires in
+ * the build-time manifest): prerendered static files + on-demand SSR, with
+ * security + Cache-Control headers. It binds to loopback and does NOT proxy —
+ * nginx is the public edge in front (it routes the PocketBase paths to
+ * PocketBase and everything else here).
  */
 
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { App } from 'astro/app';
+// Build-time config (absolute dist/client path), injected by ./index.mjs.
+import { clientDir } from 'virtual:mens-circle-edge/config';
+import { createApp } from 'astro/app/entrypoint';
 
 // ── Headers (mirror the former nginx policy) ────────────────────────────────
 const SECURITY_HEADERS = {
@@ -95,8 +96,7 @@ async function serveStatic(pathname, clientDir) {
 }
 
 /** Build the Astro request handler: on-demand SSR, falling back to static files. */
-function createHandler(app, args) {
-  const clientDir = fileURLToPath(args.client); // e.g. /app/dist/client/
+function createHandler(app, clientDir) {
   return async (request, server) => {
     const url = new URL(request.url);
     const routeData = app.match(request);
@@ -112,32 +112,26 @@ function createHandler(app, args) {
   };
 }
 
-// ── Adapter exports ─────────────────────────────────────────────────────────
-/** Astro calls this to build the exported handlers. */
-export function createExports(manifest, args) {
-  const app = new App(manifest);
-  return { handle: createHandler(app, args) };
-}
+// ── Server boot ─────────────────────────────────────────────────────────────
+// createApp() returns an `astro/app` App wired to the build-time manifest.
+const app = createApp();
+
+/** Astro request handler (exported for testing; the boot below uses it too). */
+export const handle = createHandler(app, clientDir);
 
 /**
- * Auto-invoked by Astro's generated entry: boots the Astro server.
+ * Boot the Bun server when this module is run as the entry
+ * (`bun run dist/server/entry.mjs`). Guarded so importing the module (e.g. in
+ * tooling) doesn't start a server, and so a non-Bun runtime fails loudly.
  *
  * This process serves ONLY the Astro app (prerendered files + on-demand SSR).
  * nginx is the public edge in front of it: nginx routes the PocketBase paths
- * (/api, /_) straight to PocketBase and everything else here, so
+ * (/api, /_, /newsletter) straight to PocketBase and everything else here, so
  * this server binds to loopback and never proxies. SSR data is fetched from
  * PocketBase directly via PB_INTERNAL_URL (see src/lib/pocketbase-server.ts).
  */
-export function start(manifest, args) {
-  const Bun = globalThis.Bun;
-  if (!Bun?.serve) {
-    throw new Error(
-      'mens-circle-edge must run in the Bun runtime (bun run …).',
-    );
-  }
-
-  const app = new App(manifest);
-  const handler = createHandler(app, args);
+const Bun = globalThis.Bun;
+if (Bun?.serve) {
   const hostname = process.env.HOST || '0.0.0.0';
   const port = Number.parseInt(process.env.PORT || '4321', 10);
 
@@ -145,7 +139,7 @@ export function start(manifest, args) {
     hostname,
     port,
     idleTimeout: 120,
-    fetch: (request, srv) => handler(request, srv),
+    fetch: (request, srv) => handle(request, srv),
   });
 
   console.log(`→ Astro server listening on http://${hostname}:${port}`);
@@ -159,6 +153,6 @@ export function start(manifest, args) {
   };
   process.on('SIGINT', stop);
   process.on('SIGTERM', stop);
-
-  return server;
+} else {
+  throw new Error('mens-circle-edge must run in the Bun runtime (bun run …).');
 }
