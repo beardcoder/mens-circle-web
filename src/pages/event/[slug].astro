@@ -1,8 +1,8 @@
 ---
+import Layout from '../../layouts/Layout.astro';
 import { getEventBySlug } from '@lib/pocketbase-server';
 import EventPage from '../../components/islands/EventPage.svelte';
 import site from '../../data/site.json';
-import Layout from '../../layouts/Layout.astro';
 
 // SSR: one page per event (date-based slug, e.g. /event/2026-06-12), covering
 // past and upcoming events. The record is fetched from PocketBase per request,
