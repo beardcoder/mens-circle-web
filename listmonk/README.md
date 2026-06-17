@@ -28,9 +28,8 @@ listmonk/
       subscriber-data.html  (define "subscriber-data" — DSGVO-Datenexport)
       campaign-status.html  (define "campaign-status" — Admin-Benachrichtigung)
       import-status.html    (define "import-status" — Admin-Benachrichtigung)
-  seed/
-    campaign-mens-circle.html  Kampagnen-Template (Newsletter-Body)
-    seed-templates.sh          schreibt es in die listmonk-DB (s.u.)
+    campaign-templates/
+      mens-circle.html      Kampagnen-Template (Newsletter-Body, manuell importieren)
   public-style.css          Settings → Appearance → Custom CSS (public pages)
 ```
 
@@ -79,25 +78,17 @@ volumes:
 `--static-dir` steht nur am **finalen Run-Befehl**, nicht bei
 `--install`/`--upgrade`.
 
-## Kampagnen-Template (`campaign-mens-circle.html`)
+## Kampagnen-Template (`campaign-templates/mens-circle.html`)
 
 Kampagnen-Templates leben in listmonk in der **Datenbank**, nicht im Dateisystem
 — `--static-dir` überlagert nur die file-basierten **System**-Templates, **nicht**
 die Kampagnen-Templates. Ein per Datei mitgeliefertes Kampagnen-Template würde
-also nie verwendet.
+also nie automatisch verwendet.
 
-Deshalb wird es automatisch geseedet: der One-Shot-Service **`listmonk-seed`**
-(siehe `docker-compose.yml`) läuft nach `listmonk` (`condition: service_healthy`,
-d.h. nach `--install`) und schreibt `listmonk/seed/campaign-mens-circle.html` per
-`seed-templates.sh` direkt in die `templates`-Tabelle:
-
-- **idempotent** — Upsert über den Namen (`Männerkreis Niederbayern`), hält den
-  Body bei jedem Deploy aktuell, läuft danach durch (`restart: "no"`).
-- setzt das Template als **Standard** (`is_default = true`) — neue Kampagnen
-  nutzen es automatisch. Der bei `--install` angelegte Default wird dabei
-  sauber entthront (der Unique-Index erlaubt nur **ein** `is_default = true`).
-
-Name/Datei sind über `TEMPLATE_NAME` / `TEMPLATE_FILE` überschreibbar.
+`mens-circle.html` ist daher die **Quelldatei** zum manuellen Import: in der
+listmonk-Admin unter **Campaigns → Templates → New** anlegen, den HTML-Body aus
+dieser Datei einfügen und das Template als **Standard** markieren. Bei
+Änderungen am Design den Body dort erneut einfügen.
 
 Pflicht im Body: genau **einmal** `{{ template "content" . }}`. Verwendete
 Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
@@ -109,9 +100,9 @@ Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
 1. Als Super-Admin einloggen (Passwort = Coolify `SERVICE_PASSWORD_LISTMONKADMIN`).
 2. Settings → SMTP konfigurieren (Absender `hallo@mens-circle.de`).
 3. Liste (Double-Opt-In) anlegen, `public-style.css` unter Appearance einfügen.
-4. Kampagnen-Template wird automatisch geseedet (`listmonk-seed`, siehe oben) —
-   unter **Campaigns → Templates** sollte „Männerkreis Niederbayern" als
-   Standard auftauchen.
+4. Kampagnen-Template manuell anlegen: **Campaigns → Templates → New**, den Body
+   aus `static/campaign-templates/mens-circle.html` einfügen und als Standard
+   markieren (siehe oben).
 5. API-User anlegen → Token in der Web-App als `LISTMONK_API_USER` /
    `LISTMONK_API_TOKEN` + `LISTMONK_LIST_IDS` setzen. Die Web-App ruft listmonk
    intern über `http://listmonk:9000` auf.
