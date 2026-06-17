@@ -8,10 +8,10 @@
   *,
   *::before,
   *::after {
-    color: #000 !important;
-    text-shadow: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    color: #000;
+    text-shadow: none;
+    background: transparent;
+    box-shadow: none;
   }
 
   /* Hide non-essential elements */
@@ -26,7 +26,7 @@
   .calendar-modal,
   .btn,
   button:not([type="submit"]) {
-    display: none !important;
+    display: none;
   }
 
   /* Body */
@@ -66,7 +66,7 @@
   /* Links */
   a[href]::after {
     font-size: 0.8em;
-    color: #666 !important;
+    color: #666;
     content: " (" attr(href) ")";
   }
 
@@ -77,7 +77,7 @@
 
   /* Images */
   img {
-    max-inline-size: 100% !important;
+    max-inline-size: 100%;
     break-inside: avoid;
   }
 

@@ -107,8 +107,8 @@ function id(prefix: string, oldId: string): string {
 function date(v: string): string | null {
   const s = (v || '').trim();
   if (!s) return null;
-  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) return s + '.000Z';
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s + ' 00:00:00.000Z';
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) return `${s}.000Z`;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return `${s} 00:00:00.000Z`;
   return s;
 }
 function bool(v: string): boolean {
@@ -128,7 +128,7 @@ function clean(v: string): string {
 // clean import omits them (this drops the junk/test testimonials and any
 // removed events instead of carrying soft-deleted cruft into the new DB).
 function isDeleted(r: Row): boolean {
-  return !!(r.deleted_at && r.deleted_at.trim());
+  return !!r.deleted_at?.trim();
 }
 
 // ── PocketBase REST helpers ─────────────────────────────────────────────────
