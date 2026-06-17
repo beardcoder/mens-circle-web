@@ -43,3 +43,49 @@ function autoSlug(e) {
 
 onRecordCreateRequest(autoSlug, "events");
 onRecordUpdateRequest(autoSlug, "events");
+
+// On create: give every event its own listmonk list up front so the admin can
+// see/prepare it even before the first registration. Idempotent + best-effort
+// (a no-op when listmonk isn't configured); registration also ensures it as a
+// fallback for events created before this hook existed.
+onRecordAfterCreateSuccess((e) => {
+  try {
+    const lib = require(`${__hooks}/lib.js`);
+    lib.ensureEventListId($app, e.record);
+  } catch (err) {
+    $app.logger().error("event listmonk list create failed", "error", String(err));
+  }
+  e.next();
+}, "events");
+
+// On update: keep the listmonk list label in sync when the event title or date
+// changes. Only renames an already-created list; never creates one here.
+onRecordAfterUpdateSuccess((e) => {
+  try {
+    const lib = require(`${__hooks}/lib.js`);
+    const rec = e.record;
+    let listId = 0;
+    try {
+      listId = rec.getInt("listmonk_list_id");
+    } catch (ignore) {
+      listId = 0;
+    }
+    if (listId && listId > 0) {
+      let changed = false;
+      try {
+        const orig = rec.original();
+        changed =
+          orig.getString("title") !== rec.getString("title") ||
+          String(orig.get("event_date")) !== String(rec.get("event_date"));
+      } catch (origErr) {
+        changed = false;
+      }
+      if (changed) {
+        lib.listmonkRenameList(listId, lib.eventListName(rec));
+      }
+    }
+  } catch (err) {
+    $app.logger().error("event listmonk list rename failed", "error", String(err));
+  }
+  e.next();
+}, "events");
