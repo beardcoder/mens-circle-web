@@ -133,6 +133,35 @@ Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
      (`POST /api/subscribers`) erwartet Integer-IDs, eine UUID wird verworfen
      und die Person landet in keiner Liste.
 
+## Pro-Veranstaltung-Listen (automatisch)
+
+Jede Veranstaltung bekommt automatisch ihre **eigene listmonk-Liste**, damit du
+genau die Teilnehmer einer Veranstaltung anschreiben kannst. Die Logik läuft in
+den PocketBase-Hooks (`pocketbase/pb_hooks/`), nicht in listmonk:
+
+- **Anlegen:** Beim Erstellen einer Veranstaltung wird eine private,
+  Single-Opt-In-Liste „**Event: \<Titel\> (\<TT.MM.JJJJ\>)**" erzeugt; die
+  numerische Listen-ID wird im Feld `events.listmonk_list_id` gespeichert
+  (Fallback: spätestens bei der ersten Anmeldung). Bei Titel-/Datumsänderung wird
+  der Listenname automatisch nachgezogen.
+- **Eintragen:** Bei jeder Event-Anmeldung wird die Person (dedupliziert über die
+  E-Mail) in diese Liste aufgenommen — als `confirmed`, da die Anmeldung selbst
+  das Opt-In ist. Eine Person kann gleichzeitig im Newsletter **und** in mehreren
+  Event-Listen stehen; es gibt **keine doppelten Abonnenten**.
+- **Name nachtragen:** War zuvor kein Name gesetzt (z.B. eine Newsletter-Anmeldung
+  ohne Namen, die die E-Mail als Namen hinterlegt), wird der bei der
+  Event-Anmeldung angegebene Name am bestehenden listmonk-Abonnenten ergänzt —
+  ohne den Bestätigungsstatus anderer Listen (z.B. den noch offenen Newsletter-
+  Double-Opt-In) zu verändern.
+- **Austragen:** Wird eine Anmeldung storniert (Status `cancelled`), wird die
+  Person aus **dieser** Event-Liste entfernt (Newsletter/andere Events bleiben).
+
+Es sind **keine neuen Env-Variablen** nötig — die Hooks nutzen denselben
+listmonk-Admin-API-Zugang (`LISTMONK_URL`, `LISTMONK_API_USER`,
+`LISTMONK_API_TOKEN`). `LISTMONK_LIST_IDS` betrifft nur den Newsletter. Ist
+listmonk nicht konfiguriert, laufen Anmeldungen normal weiter (Listen-Sync wird
+übersprungen und protokolliert).
+
 ## Testen
 
 - **Opt-In:** Über das Newsletter-Formular (oder Admin → Subscribers → Add) eine
