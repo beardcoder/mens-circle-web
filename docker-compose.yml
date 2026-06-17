@@ -8,7 +8,6 @@ services:
         PUBLIC_SITE_URL: ${SERVICE_URL_WEB:-https://mens-circle.de}
     restart: unless-stopped
     environment:
-      SERVICE_FQDN_WEB_8090:
       APP_URL: ${SERVICE_URL_WEB}
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-hallo@mens-circle.de}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Männerkreis Niederbayern/ Straubing}
