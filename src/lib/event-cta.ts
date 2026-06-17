@@ -58,7 +58,7 @@ export async function initEventCtas(): Promise<void> {
     });
     if (!res.ok) return; // leave hidden on error — no dead button
     const data = (await res.json()) as { event: unknown | null };
-    const has = Boolean(data && data.event);
+    const has = Boolean(data?.event);
     writeCache(has);
     if (has) reveal();
   } catch {
