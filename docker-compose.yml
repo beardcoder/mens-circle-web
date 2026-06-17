@@ -35,7 +35,14 @@ services:
       retries: 6
 
   listmonk:
-    image: listmonk/listmonk:latest
+    # Custom image that bakes the branded system email-templates into the
+    # container (see listmonk/Dockerfile). We intentionally do NOT bind-mount
+    # ./listmonk/static at runtime: repo-relative bind mounts are fragile on
+    # some hosts (e.g. Coolify) and a missing mount silently falls back to
+    # listmonk's embedded English defaults.
+    build:
+      context: ./listmonk
+    image: mens-circle-listmonk:latest
     restart: unless-stopped
     depends_on:
       listmonk-db:
@@ -65,9 +72,6 @@ services:
       - "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --static-dir=/listmonk/static --config ''"
     volumes:
       - listmonk-uploads:/listmonk/uploads:rw
-      # Custom email-templates overlay the embedded defaults (per-file merge);
-      # missing files fall back to the binary. read-only on purpose.
-      - ./listmonk/static:/listmonk/static:ro
 
   listmonk-db:
     image: postgres:17-alpine
