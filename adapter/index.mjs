@@ -11,25 +11,58 @@ import { fileURLToPath } from 'node:url';
  *
  * @returns {import('astro').AstroIntegration}
  */
+// Virtual module that hands the built server its build-time config (the client
+// output dir). Replaces the deprecated `args` channel of the Astro 5 adapter
+// API. The value is captured in `astro:config:done` and baked into the bundle.
+const VIRTUAL_CONFIG_ID = 'virtual:mens-circle-edge/config';
+const RESOLVED_VIRTUAL_CONFIG_ID = `\0${VIRTUAL_CONFIG_ID}`;
+
 export default function bunEdgeAdapter() {
+  // Absolute path to dist/client/, baked into the bundle (hence the build and
+  // runtime stages must share a WORKDIR — see Dockerfile). Computed relative to
+  // the entry is unreliable: the boot code is emitted into a hashed chunk under
+  // dist/server/chunks/, so import.meta.url does not point at dist/server/.
+  let clientDir = '';
+
   return {
     name: 'mens-circle-edge',
     hooks: {
+      'astro:config:setup': ({ updateConfig }) => {
+        updateConfig({
+          vite: {
+            plugins: [
+              {
+                name: 'mens-circle-edge:config',
+                resolveId(id) {
+                  if (id === VIRTUAL_CONFIG_ID)
+                    return RESOLVED_VIRTUAL_CONFIG_ID;
+                },
+                load(id) {
+                  // clientDir is set in astro:config:done, which runs before the
+                  // Vite build (and thus before this load) executes.
+                  if (id === RESOLVED_VIRTUAL_CONFIG_ID) {
+                    return `export const clientDir = ${JSON.stringify(clientDir)};`;
+                  }
+                },
+              },
+            ],
+          },
+        });
+      },
       'astro:config:done': ({ setAdapter, config }) => {
+        clientDir = fileURLToPath(config.build.client); // e.g. /app/dist/client/
         setAdapter({
           name: 'mens-circle-edge',
-          // Absolute path so Vite resolves it during the SSR build.
+          // With `entrypointResolution: 'auto'` Astro uses this module itself as
+          // the server entry (built to dist/server/entry.mjs): it imports the
+          // manifest via `astro/app/entrypoint` and boots the Bun server at top
+          // level — no `createExports()`/`start()`/`exports`/`args` (the
+          // deprecated Astro 5 adapter API). Absolute path so Vite resolves it
+          // during the SSR build.
           serverEntrypoint: fileURLToPath(
             new URL('./server.mjs', import.meta.url),
           ),
-          // `start` is auto-invoked by Astro's generated entry → boots the
-          // server. `handle` is exposed for completeness / testing.
-          exports: ['start', 'handle'],
-          // Baked into the bundle and read by server.mjs at runtime.
-          args: {
-            client: config.build.client.href, // file URL of dist/client/
-            assets: config.build.assets, // hashed-asset dir name (e.g. "assets")
-          },
+          entrypointResolution: 'auto',
           supportedAstroFeatures: {
             serverOutput: 'stable',
             staticOutput: 'stable',

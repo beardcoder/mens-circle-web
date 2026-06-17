@@ -27,31 +27,8 @@ onRecordAfterCreateSuccess((e) => {
     }
 
     if (event && participant) {
-      // Participant email
-      if (status === "waitlist") {
-        const tpl = lib.renderWaitlistConfirmation(event, participant);
-        lib.sendMail($app, {
-          to: participant.getString("email"),
-          subject: tpl.subject,
-          html: tpl.html,
-        });
-      } else {
-        const tpl = lib.renderRegistrationConfirmation(event, participant);
-        lib.sendMail($app, {
-          to: participant.getString("email"),
-          subject: tpl.subject,
-          html: tpl.html,
-        });
-      }
-
-      // Admin notification (every registration, incl. waitlist)
-      const activeCount = lib.countActiveRegistrations($app, event.id);
-      const adminTpl = lib.renderAdminNotification(event, participant, activeCount);
-      lib.sendMail($app, {
-        to: lib.config.MAIL_ADMIN_ADDRESS,
-        subject: adminTpl.subject,
-        html: adminTpl.html,
-      });
+      // Participant confirmation/waitlist email + admin notification.
+      lib.sendRegistrationEmails($app, event, participant, status);
     }
   } catch (err) {
     $app.logger().error("registrations onCreate hook failed", "error", String(err));
@@ -75,6 +52,26 @@ onRecordAfterUpdateSuccess((e) => {
 
     if (oldStatus !== "cancelled" && newStatus === "cancelled") {
       const eventId = reg.getString("event");
+
+      // Mirror the cancellation in listmonk: drop the participant from this
+      // event's list so it reflects only current participants. Best-effort;
+      // only this event's list is touched (newsletter + other events stay).
+      try {
+        const ev = $app.findRecordById("events", eventId);
+        let listId = 0;
+        try {
+          listId = ev.getInt("listmonk_list_id");
+        } catch (ignore) {
+          listId = 0;
+        }
+        if (listId && listId > 0) {
+          const p = $app.findRecordById("participants", reg.getString("participant"));
+          lib.listmonkRemoveFromList(p.getString("email"), listId);
+        }
+      } catch (rmErr) {
+        $app.logger().error("listmonk remove on cancel failed", "error", String(rmErr));
+      }
+
       let next = null;
       try {
         const candidates = $app.findRecordsByFilter(
