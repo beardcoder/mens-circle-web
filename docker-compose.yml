@@ -87,7 +87,7 @@ services:
     entrypoint: ['sh', '/seed/seed-templates.sh']
     volumes:
       - ./listmonk/seed:/seed:ro
-      - ./listmonk/static/campaign-templates:/seed/templates:ro
+      - ./listmonk/static/campaign-templates:/tpl:ro
 
   listmonk-db:
     image: postgres:17-alpine
