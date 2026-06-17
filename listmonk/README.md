@@ -21,16 +21,21 @@ pixelgleich, aber sauber).
 
 ```
 listmonk/
+  seed/
+    seed-templates.sh            one-shot DB-Seeder (läuft als eigener Container)
   static/
-    email-templates/        ← überschreibt die eingebauten System-Templates
-      base.html             (define "header" + "footer" — gemeinsames Layout)
-      subscriber-optin.html (define "subscriber-optin" — Double-Opt-In-Mail)
-      subscriber-data.html  (define "subscriber-data" — DSGVO-Datenexport)
-      campaign-status.html  (define "campaign-status" — Admin-Benachrichtigung)
-      import-status.html    (define "import-status" — Admin-Benachrichtigung)
+    email-templates/             ← überschreibt die eingebauten System-Templates
+      base.html                  (define "header" + "footer" — gemeinsames Layout)
+      subscriber-optin.html      (define "subscriber-optin" — Double-Opt-In-Mail)
+      subscriber-optin-campaign.html (define "optin-campaign" — Opt-In als Kampagne)
+      subscriber-data.html       (define "subscriber-data" — DSGVO-Datenexport)
+      campaign-status.html       (define "campaign-status" — Admin-Benachrichtigung)
+      import-status.html         (define "import-status" — Admin-Benachrichtigung)
+      forgot-password.html       (define "forgot-password" — Passwort-Reset)
+      smtp-test.html             (define "smtp-test" — SMTP-Verbindungstest)
     campaign-templates/
-      mens-circle.html      Kampagnen-Template (Newsletter-Body, manuell importieren)
-  public-style.css          Settings → Appearance → Custom CSS (public pages)
+      mens-circle.html           Kampagnen-Template (Quelldatei, wird per Seeder in DB geladen)
+  public-style.css               Settings → Appearance → Custom CSS (public pages)
 ```
 
 ## Eingebaute System-Templates überschreiben (`--static-dir`)
@@ -45,13 +50,20 @@ Wichtige Mechanik (geprüft in `cmd/init.go`, v6.1.0):
   `public/`. Nur vorhandene Unterverzeichnisse werden berücksichtigt.
 - Der Overlay ist ein **Per-Datei-Merge** (`fs.Merge`): nur die Dateien, die wir
   mitliefern, überschreiben das Embed. Die übrigen Default-Templates
-  (`default.tpl`, `smtp-test.html`, `forgot-password.html`,
-  `subscriber-optin-campaign.html` …) bleiben aus dem Binary erhalten. Wir
-  liefern daher bewusst nur die 5 gebrandeten Dateien — der Rest fällt sauber
-  zurück.
+  (`default.tpl`, `default-visual.tpl` …) bleiben aus dem Binary erhalten.
 - Dateinamen **und** `{{ define "…" }}`-Blocknamen müssen exakt den Defaults
-  entsprechen (`header`, `footer`, `subscriber-optin`, `subscriber-data`,
-  `campaign-status`, `import-status`), sonst greift der Override nicht.
+  entsprechen. Übersicht:
+
+  | Datei | define-Name |
+  |---|---|
+  | `base.html` | `"header"` + `"footer"` |
+  | `subscriber-optin.html` | `"subscriber-optin"` |
+  | `subscriber-optin-campaign.html` | `"optin-campaign"` |
+  | `subscriber-data.html` | `"subscriber-data"` |
+  | `campaign-status.html` | `"campaign-status"` |
+  | `import-status.html` | `"import-status"` |
+  | `forgot-password.html` | `"forgot-password"` |
+  | `smtp-test.html` | `"smtp-test"` |
 
 System-Templates benutzen **Felder/Funktionen aus dem Notification-Kontext**,
 nicht die Kampagnen-Funktionen:
@@ -82,13 +94,19 @@ volumes:
 
 Kampagnen-Templates leben in listmonk in der **Datenbank**, nicht im Dateisystem
 — `--static-dir` überlagert nur die file-basierten **System**-Templates, **nicht**
-die Kampagnen-Templates. Ein per Datei mitgeliefertes Kampagnen-Template würde
-also nie automatisch verwendet.
+die Kampagnen-Templates.
 
-`mens-circle.html` ist daher die **Quelldatei** zum manuellen Import: in der
-listmonk-Admin unter **Campaigns → Templates → New** anlegen, den HTML-Body aus
-dieser Datei einfügen und das Template als **Standard** markieren. Bei
-Änderungen am Design den Body dort erneut einfügen.
+### Auto-Seed via `listmonk-seed`
+
+Der `listmonk-seed`-Container in `docker-compose.yml` schreibt das Template bei
+jedem Deploy automatisch in die DB (idempotent via `INSERT … WHERE NOT EXISTS` +
+`UPDATE`). Er wartet, bis listmonk healthy ist (Schema existiert), setzt das
+Template als Standard (`is_default = true`) und bleibt dann am Leben (`sleep`),
+damit Coolify den Container nicht wegen exit-0 ständig neu startet.
+
+- **Quelldatei**: `static/campaign-templates/mens-circle.html` — dort Änderungen
+  vornehmen; der Seeder liest sie beim nächsten Deploy ein.
+- **Manuell erzwingen** (ohne Redeploy): Container `listmonk-seed` neu starten.
 
 Pflicht im Body: genau **einmal** `{{ template "content" . }}`. Verwendete
 Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
@@ -100,9 +118,8 @@ Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
 1. Als Super-Admin einloggen (Passwort = Coolify `SERVICE_PASSWORD_LISTMONKADMIN`).
 2. Settings → SMTP konfigurieren (Absender `hallo@mens-circle.de`).
 3. Liste (Double-Opt-In) anlegen, `public-style.css` unter Appearance einfügen.
-4. Kampagnen-Template manuell anlegen: **Campaigns → Templates → New**, den Body
-   aus `static/campaign-templates/mens-circle.html` einfügen und als Standard
-   markieren (siehe oben).
+4. Kampagnen-Template: wird automatisch vom `listmonk-seed`-Container in die DB
+   geschrieben und als Standard gesetzt — kein manueller Schritt nötig.
 5. API-User anlegen → Token in der Web-App als `LISTMONK_API_USER` /
    `LISTMONK_API_TOKEN` + `LISTMONK_LIST_IDS` setzen. Die Web-App ruft listmonk
    intern über `http://listmonk:9000` auf.
