@@ -4,11 +4,11 @@
  * builds it to dist/server/entry.mjs, and `bun run dist/server/entry.mjs` runs
  * its top-level code to boot the server.
  *
- * Serves the Astro site via `createApp()` (astro/app/entrypoint, which wires in
- * the build-time manifest): prerendered static files + on-demand SSR, with
- * security + Cache-Control headers. It binds to loopback and does NOT proxy —
- * nginx is the public edge in front (it routes the PocketBase paths to
- * PocketBase and everything else here).
+ * This single Bun process is the container's public edge (there is no nginx):
+ *   • proxies the PocketBase-owned paths (/api, /_) to PocketBase on loopback,
+ *   • serves prerendered static files + on-demand SSR for everything else,
+ * all with security + Cache-Control headers. PocketBase stays on loopback;
+ * SSR fetches it directly via PB_INTERNAL_URL (see src/lib/pocketbase-server.ts).
  */
 
 import path from 'node:path';
@@ -95,15 +95,71 @@ async function serveStatic(pathname, clientDir) {
   return new Response('Not found', { status: 404, headers: SECURITY_HEADERS });
 }
 
-/** Build the Astro request handler: on-demand SSR, falling back to static files. */
+// ── PocketBase reverse proxy ─────────────────────────────────────────────────
+// PocketBase listens on loopback; this process is the only thing the browser
+// talks to, so it forwards the PocketBase-owned paths to it (same origin → no
+// CORS). PB_INTERNAL_URL is the same env SSR uses (see pocketbase-server.ts).
+const PB_TARGET = (
+  process.env.PB_INTERNAL_URL || 'http://127.0.0.1:8091'
+).replace(/\/+$/, '');
+
+/** Paths owned by PocketBase: REST API (/api/…) and the admin UI (/_, /_/…). */
+function ownedByPocketBase(pathname) {
+  return (
+    pathname.startsWith('/api/') ||
+    pathname === '/_' ||
+    pathname.startsWith('/_/')
+  );
+}
+
+/** Forward a request to PocketBase, streaming the response straight back. */
+function proxyToPocketBase(request, url, clientAddress) {
+  const headers = new Headers(request.headers);
+  // Standard reverse-proxy hops so PocketBase sees the real client/scheme.
+  // (`Host` is a forbidden fetch header and is set from the target URL.)
+  const priorXff = headers.get('x-forwarded-for');
+  if (clientAddress) {
+    headers.set(
+      'x-forwarded-for',
+      priorXff ? `${priorXff}, ${clientAddress}` : clientAddress,
+    );
+    if (!headers.has('x-real-ip')) headers.set('x-real-ip', clientAddress);
+  }
+  if (!headers.has('x-forwarded-proto')) {
+    headers.set('x-forwarded-proto', url.protocol.replace(':', ''));
+  }
+  if (!headers.has('x-forwarded-host') && headers.has('host')) {
+    headers.set('x-forwarded-host', headers.get('host'));
+  }
+
+  const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
+  return fetch(`${PB_TARGET}${url.pathname}${url.search}`, {
+    method: request.method,
+    headers,
+    body: hasBody ? request.body : undefined,
+    duplex: hasBody ? 'half' : undefined,
+    redirect: 'manual',
+  });
+}
+
+/**
+ * Build the request handler: PocketBase paths are proxied; everything else is
+ * on-demand SSR, falling back to prerendered/static files.
+ */
 function createHandler(app, clientDir) {
   return async (request, server) => {
     const url = new URL(request.url);
+    const clientAddress = server?.requestIP?.(request)?.address;
+
+    if (ownedByPocketBase(url.pathname)) {
+      return proxyToPocketBase(request, url, clientAddress);
+    }
+
     const routeData = app.match(request);
     if (routeData) {
       const response = await app.render(request, {
         addCookieHeader: true,
-        clientAddress: server?.requestIP?.(request)?.address,
+        clientAddress,
         routeData,
       });
       return withSiteHeaders(response, url.pathname);
@@ -124,16 +180,15 @@ export const handle = createHandler(app, clientDir);
  * (`bun run dist/server/entry.mjs`). Guarded so importing the module (e.g. in
  * tooling) doesn't start a server, and so a non-Bun runtime fails loudly.
  *
- * This process serves ONLY the Astro app (prerendered files + on-demand SSR).
- * nginx is the public edge in front of it: nginx routes the PocketBase paths
- * (/api, /_, /newsletter) straight to PocketBase and everything else here, so
- * this server binds to loopback and never proxies. SSR data is fetched from
- * PocketBase directly via PB_INTERNAL_URL (see src/lib/pocketbase-server.ts).
+ * This is the container's public edge: it serves the Astro app (prerendered
+ * files + on-demand SSR) and proxies the PocketBase paths (see createHandler).
+ * It binds to the exposed port (PORT, default 8090); PocketBase stays on
+ * loopback and is reached via PB_INTERNAL_URL.
  */
 const Bun = globalThis.Bun;
 if (Bun?.serve) {
   const hostname = process.env.HOST || '0.0.0.0';
-  const port = Number.parseInt(process.env.PORT || '4321', 10);
+  const port = Number.parseInt(process.env.PORT || '8090', 10);
 
   const server = Bun.serve({
     hostname,
