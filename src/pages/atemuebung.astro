@@ -33,7 +33,6 @@ const schemas = [
   title="Atemübung – Männerkreis Niederbayern/ Straubing"
   description="Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode. Drei Runden bewusster Atem für Klarheit, Energie und innere Ruhe."
   schemas={schemas}
-  manifest="/atemuebung.webmanifest"
   webAppTitle="Atemübung"
   viewport="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
   bare
@@ -125,80 +124,12 @@ const schemas = [
           <strong>Wichtig:</strong> Übe niemals im Wasser oder beim Autofahren. Setze
           oder lege dich entspannt hin.
         </p>
-
-        <button
-          type="button"
-          id="pwa-install"
-          class="breathing__install"
-          hidden
-        >
-          <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path
-              d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            ></path>
-          </svg>
-          Als App installieren
-        </button>
       </div>
     </dialog>
   </section>
 </Layout>
 
 <script>
-  // Progressive web app wiring for the breathing exercise: register the service
-  // worker (offline + installability) and surface a native install prompt
-  // through an in-page button when the browser offers one.
-  type InstallPromptEvent = Event & {
-    prompt: () => void;
-    userChoice: Promise<{ outcome: string }>;
-  };
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {
-        /* registration is best-effort; the app works fine without it */
-      });
-    });
-  }
-
-  const installButton =
-    document.querySelector<HTMLButtonElement>('#pwa-install');
-
-  const isStandalone =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true;
-
-  let deferredPrompt: InstallPromptEvent | null = null;
-
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    deferredPrompt = event as InstallPromptEvent;
-
-    if (installButton && !isStandalone) installButton.hidden = false;
-  });
-
-  installButton?.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-
-    installButton.hidden = true;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-  });
-
-  window.addEventListener('appinstalled', () => {
-    if (installButton) installButton.hidden = true;
-  });
-
   // Instructions live in a native <dialog> opened from the floating info
   // button, so the main screen stays just the app. showModal() gives the
   // focus trap, Escape-to-close and backdrop for free; a click outside the
@@ -497,55 +428,6 @@ const schemas = [
       padding: var(--space-sm) var(--space-md);
       color: var(--text-on-dark);
       font-size: 0.9375rem;
-    }
-
-    /* Shown only when the browser offers a native install (beforeinstallprompt). */
-    .breathing__install {
-      display: inline-flex;
-      align-items: center;
-      align-self: start;
-      gap: var(--space-xs);
-      transition:
-        background-color var(--motion-quick),
-        border-color var(--motion-quick),
-        translate var(--motion-quick);
-      cursor: pointer;
-      margin-block-start: var(--space-md);
-      border: 1px solid
-        color-mix(in oklch, var(--breathing-accent) 45%, transparent);
-      border-radius: var(--radius-full);
-      background: color-mix(in oklch, var(--breathing-accent) 14%, transparent);
-      padding: var(--space-xs) var(--space-md);
-      color: var(--text-on-dark);
-      font-weight: 600;
-      font-size: 0.9375rem;
-      font-family: var(--font-body);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .breathing__install:hover {
-        translate: 0 -2px;
-        border-color: color-mix(
-          in oklch,
-          var(--breathing-accent) 60%,
-          transparent
-        );
-        background: color-mix(
-          in oklch,
-          var(--breathing-accent) 22%,
-          transparent
-        );
-      }
-    }
-
-    .breathing__install:focus-visible {
-      outline: 2px solid var(--breathing-accent);
-      outline-offset: 3px;
-    }
-
-    .breathing__install svg {
-      inline-size: 1.1rem;
-      block-size: 1.1rem;
     }
 
     .breathing-app {

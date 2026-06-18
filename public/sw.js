@@ -1,124 +1,26 @@
 /**
- * Service worker for the installable breathing app (Atemübung).
+ * Tombstone service worker.
  *
- * Scope is the whole origin (the file is served from the root), but the
- * strategy is deliberately conservative so the SSR site stays fresh:
+ * The breathing-app PWA (offline + installability) was removed. This file stays
+ * so browsers that still have the old service worker registered fetch it on
+ * their next update check, then unregister it and purge its caches — leaving the
+ * site under no service worker. Without this self-destruct, a missing /sw.js
+ * (404) would NOT remove the old worker; it would keep controlling the origin.
  *
- *   - navigations      → network-first, falling back to cache when offline,
- *                        then to the cached breathing app shell as a last resort
- *   - static, hashed   → stale-while-revalidate (immutable build assets, fonts,
- *     assets              images, icons)
- *   - everything else  → straight to the network (never cached: PocketBase API,
- *                        POST/PUT, cross-origin, etc.)
- *
- * The PocketBase backend (admin UI at /_/ and the API at /api/) is never
- * touched — the SW returns early so those requests hit the network directly.
- * Without that, the whole-origin navigation handler would shadow /_/ and serve
- * a cached site page instead of the admin dashboard.
- *
- * Bump CACHE to invalidate everything on the next activation.
+ * Safe to delete once enough time has passed that returning visitors have all
+ * updated (a release cycle or two).
  */
 
-const CACHE = 'mk-breath-v2';
-
-// The app shell needed to launch the breathing exercise offline. The page's CSS
-// is inlined into its HTML, so caching the document covers the styling; the
-// island's JS chunks and fonts are filled in by the runtime SWR handler below.
-const APP_SHELL = [
-  '/atemuebung',
-  '/atemuebung.webmanifest',
-  '/favicon.svg',
-  '/favicon-192x192.png',
-  '/favicon-512x512.png',
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches
-      .open(CACHE)
-      // Tolerate individual misses so one 404 can't abort the whole install.
-      .then((cache) =>
-        Promise.allSettled(APP_SHELL.map((url) => cache.add(url))),
-      )
-      .then(() => self.skipWaiting()),
-  );
-});
+self.addEventListener('install', () => self.skipWaiting());
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(
-          keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)),
-        ),
-      )
-      .then(() => self.clients.claim()),
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+      await self.registration.unregister();
+      const clients = await self.clients.matchAll({ type: 'window' });
+      for (const client of clients) client.navigate(client.url);
+    })(),
   );
-});
-
-function isStaticAsset(url) {
-  return (
-    /\/(?:_astro|assets)\//.test(url.pathname) ||
-    /\.(?:woff2?|css|js|mjs|svg|png|jpe?g|webp|avif|ico)$/.test(url.pathname)
-  );
-}
-
-self.addEventListener('fetch', (event) => {
-  const request = event.request;
-
-  if (request.method !== 'GET') return;
-
-  const url = new URL(request.url);
-
-  if (url.origin !== self.location.origin) return;
-
-  // PocketBase backend — never intercept. Letting these fall through to the
-  // network keeps the admin UI (/_/) and API (/api/) reachable; otherwise the
-  // navigation handler below would serve a cached site page for /_/.
-  if (
-    url.pathname === '/_' ||
-    url.pathname.startsWith('/_/') ||
-    url.pathname.startsWith('/api/')
-  ) {
-    return;
-  }
-
-  // Navigations: always prefer the live (SSR) response; cache it for offline.
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
-          return response;
-        })
-        .catch(() =>
-          caches
-            .match(request)
-            .then((hit) => hit || caches.match('/atemuebung')),
-        ),
-    );
-    return;
-  }
-
-  // Immutable build assets: serve from cache, refresh in the background.
-  if (isStaticAsset(url)) {
-    event.respondWith(
-      caches.open(CACHE).then((cache) =>
-        cache.match(request).then((hit) => {
-          const network = fetch(request)
-            .then((response) => {
-              if (response && response.status === 200) {
-                cache.put(request, response.clone());
-              }
-              return response;
-            })
-            .catch(() => hit);
-
-          return hit || network;
-        }),
-      ),
-    );
-  }
 });
