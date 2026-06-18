@@ -5,7 +5,10 @@ dist/
 # dependencies
 node_modules/
 
-# pocketbase runtime data (persisted in a Coolify volume, never committed)
+# app runtime data — SQLite database + uploaded images (persisted in a volume)
+data/
+
+# legacy pocketbase runtime data (kept for reference, never committed)
 pocketbase/pb_data/
 pocketbase/pocketbase
 

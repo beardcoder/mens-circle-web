@@ -1,0 +1,42 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getServices } from '../../server/container';
+
+const { events, testimonials } = getServices();
+const [allEvents, allTestimonials] = await Promise.all([
+  events.listAll(),
+  testimonials.listAll(),
+]);
+
+const now = Date.now();
+const upcoming = allEvents.filter((e) => e.eventDate.getTime() >= now).length;
+const pendingTestimonials = allTestimonials.filter(
+  (t) => !t.isPublished,
+).length;
+---
+
+<AdminLayout title="Übersicht" active="dashboard">
+  <h1>Übersicht</h1>
+  <div class="panel grid-cards">
+    <div>
+      <div class="card-num">{allEvents.length}</div>
+      <div class="muted">Events ({upcoming} kommend)</div>
+    </div>
+    <div>
+      <div class="card-num">{allTestimonials.length}</div>
+      <div class="muted">Testimonials</div>
+    </div>
+    <div>
+      <div class="card-num">{pendingTestimonials}</div>
+      <div class="muted">unmoderiert</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="actions">
+      <a class="btn" href="/admin/events/new">Neues Event</a>
+      <a class="btn secondary" href="/admin/events">Events verwalten</a>
+      <a class="btn secondary" href="/admin/testimonials">Testimonials moderieren</a>
+    </div>
+  </div>
+</AdminLayout>

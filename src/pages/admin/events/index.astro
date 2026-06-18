@@ -1,0 +1,56 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getServices } from '../../../server/container';
+import { formatDateShortDE } from '../../../server/format';
+
+const { events } = getServices();
+const list = await events.listAll();
+const now = Date.now();
+---
+
+<AdminLayout title="Events" active="events">
+  <h1>Events</h1>
+  <div class="panel">
+    <div class="actions" style="margin-bottom:1rem;">
+      <a class="btn" href="/admin/events/new">Neues Event</a>
+    </div>
+    {list.length === 0 ? (
+      <p class="muted">Noch keine Events angelegt.</p>
+    ) : (
+      <table>
+        <thead>
+          <tr><th>Termin</th><th>Titel</th><th>Status</th><th>Anmeldungen</th><th></th></tr>
+        </thead>
+        <tbody>
+          {list.map((e) => (
+            <tr>
+              <td>
+                {formatDateShortDE(e.eventDate)}
+                {e.eventDate.getTime() < now && <span class="badge grey" style="margin-left:0.5rem;">vergangen</span>}
+              </td>
+              <td><a href={`/admin/events/${e.id}`}>{e.title}</a></td>
+              <td>
+                {e.isPublished
+                  ? <span class="badge green">veröffentlicht</span>
+                  : <span class="badge amber">Entwurf</span>}
+              </td>
+              <td>{e.activeCount} / {e.maxParticipants}</td>
+              <td class="actions">
+                <a class="btn secondary small" href={`/admin/events/${e.id}`}>Bearbeiten</a>
+                <form
+                  class="inline"
+                  method="post"
+                  action="/api/admin/events/delete"
+                  onsubmit="return confirm('Dieses Event wirklich löschen? Alle Anmeldungen werden mitgelöscht.');"
+                >
+                  <input type="hidden" name="id" value={e.id} />
+                  <button class="btn danger small" type="submit">Löschen</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+</AdminLayout>

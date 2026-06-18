@@ -1,0 +1,14 @@
+---
+import EventForm from '../../../components/admin/EventForm.astro';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+
+const hasError = Astro.url.searchParams.has('error');
+---
+
+<AdminLayout title="Neues Event" active="events">
+  <h1>Neues Event</h1>
+  {hasError && <div class="panel" style="border-color:var(--danger);"><p style="margin:0;color:var(--danger);">Bitte Titel und Datum prüfen.</p></div>}
+  <div class="panel">
+    <EventForm />
+  </div>
+</AdminLayout>

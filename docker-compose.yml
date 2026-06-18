@@ -18,18 +18,22 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_TLS: ${SMTP_TLS:-true}
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+      # Admin login (the slim built-in admin at /admin).
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      # Signs the admin session cookie + guards the internal reminder-cron endpoint.
+      SESSION_SECRET: ${SESSION_SECRET}
+      CRON_SECRET: ${CRON_SECRET}
       LISTMONK_URL: http://listmonk:9000
       LISTMONK_API_USER: ${LISTMONK_API_USER}
       LISTMONK_API_TOKEN: ${LISTMONK_API_TOKEN}
       LISTMONK_LIST_IDS: ${LISTMONK_LIST_IDS}
     volumes:
-      - pb-data:/pb/pb_data
+      - app-data:/data
     depends_on:
       - listmonk
     healthcheck:
-      test: ['CMD-SHELL', 'curl -f http://localhost:8090 || exit 1']
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:8090 >/dev/null 2>&1 || exit 1']
       interval: 100s
       timeout: 5s
       retries: 6
@@ -89,6 +93,6 @@ services:
       retries: 6
 
 volumes:
-  pb-data:
+  app-data:
   listmonk-uploads:
   listmonk-db:

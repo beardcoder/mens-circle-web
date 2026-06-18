@@ -1,0 +1,112 @@
+---
+import type { EventRow } from '../../server/db/schema';
+import { config } from '../../server/config';
+
+interface Props {
+  event?: EventRow | null;
+}
+const { event } = Astro.props;
+
+/** Stored wall-clock (UTC parts) → datetime-local value "YYYY-MM-DDTHH:MM". */
+function toLocalInput(d: Date | null | undefined): string {
+  if (!d) return '';
+  const p = (n: number) => String(n).padStart(2, '0');
+  return (
+    `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}` +
+    `T${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`
+  );
+}
+
+const e = event ?? null;
+const imageUrl = e?.image
+  ? `${config.APP_URL}/api/files/${e.id}/${e.image}`
+  : null;
+---
+
+<form method="post" action="/api/admin/events/save" enctype="multipart/form-data">
+  {e && <input type="hidden" name="id" value={e.id} />}
+
+  <label for="title">Titel *</label>
+  <input id="title" name="title" type="text" required value={e?.title ?? ''} />
+
+  <label for="slug">Slug (leer = automatisch aus Datum)</label>
+  <input id="slug" name="slug" type="text" value={e?.slug ?? ''} placeholder="z. B. 2026-07-15" />
+
+  <div class="row">
+    <div>
+      <label for="event_date">Datum & Uhrzeit *</label>
+      <input id="event_date" name="event_date" type="datetime-local" required value={toLocalInput(e?.eventDate)} />
+    </div>
+    <div>
+      <label for="max_participants">Max. Teilnehmer</label>
+      <input id="max_participants" name="max_participants" type="number" min="0" value={e?.maxParticipants ?? 8} />
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label for="start_time">Beginn (HH:MM)</label>
+      <input id="start_time" name="start_time" type="time" value={e?.startTime ?? ''} />
+    </div>
+    <div>
+      <label for="end_time">Ende (HH:MM)</label>
+      <input id="end_time" name="end_time" type="time" value={e?.endTime ?? ''} />
+    </div>
+  </div>
+
+  <label for="description">Beschreibung</label>
+  <textarea id="description" name="description">{e?.description ?? ''}</textarea>
+
+  <label for="location">Ort</label>
+  <input id="location" name="location" type="text" value={e?.location ?? ''} placeholder="Straubing" />
+
+  <label for="location_details">Treffpunkt / Hinweis</label>
+  <textarea id="location_details" name="location_details">{e?.locationDetails ?? ''}</textarea>
+
+  <div class="row">
+    <div>
+      <label for="street">Straße</label>
+      <input id="street" name="street" type="text" value={e?.street ?? ''} />
+    </div>
+    <div>
+      <label for="city">Stadt</label>
+      <input id="city" name="city" type="text" value={e?.city ?? ''} />
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label for="postal_code">PLZ</label>
+      <input id="postal_code" name="postal_code" type="text" value={e?.postalCode ?? ''} />
+    </div>
+    <div>
+      <label for="cost_basis">Teilnahme</label>
+      <input id="cost_basis" name="cost_basis" type="text" value={e?.costBasis ?? ''} placeholder="Auf Spendenbasis" />
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <label for="latitude">Breitengrad</label>
+      <input id="latitude" name="latitude" type="text" inputmode="decimal" value={e?.latitude ?? ''} />
+    </div>
+    <div>
+      <label for="longitude">Längengrad</label>
+      <input id="longitude" name="longitude" type="text" inputmode="decimal" value={e?.longitude ?? ''} />
+    </div>
+  </div>
+
+  <label for="image">Bild {imageUrl && '(ersetzt das aktuelle)'}</label>
+  {imageUrl && <p><img src={imageUrl} alt="" style="max-height:120px;border-radius:6px;" /></p>}
+  <input id="image" name="image" type="file" accept="image/*" />
+
+  <div class="check">
+    <input id="is_published" name="is_published" type="checkbox" checked={e?.isPublished ?? false} />
+    <label for="is_published">Veröffentlicht</label>
+  </div>
+
+  <div class="actions" style="margin-top:1.5rem;">
+    <button class="btn" type="submit">Speichern</button>
+    <a class="btn secondary" href="/admin/events">Abbrechen</a>
+  </div>
+</form>

@@ -1,0 +1,83 @@
+---
+import EventForm from '../../../components/admin/EventForm.astro';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getServices } from '../../../server/container';
+import { REGISTRATION_STATUSES } from '../../../server/db/schema';
+import { formatDateShortDE } from '../../../server/format';
+
+const { id } = Astro.params;
+const { events, registrations } = getServices();
+const event = id ? await events.getById(id) : null;
+if (!event) return Astro.redirect('/admin/events', 302);
+
+const regs = await registrations.listForEvent(event.id);
+const hasError = Astro.url.searchParams.has('error');
+
+const STATUS_LABEL: Record<string, string> = {
+  registered: 'Angemeldet',
+  waitlist: 'Warteliste',
+  cancelled: 'Abgesagt',
+  attended: 'Teilgenommen',
+};
+const STATUS_BADGE: Record<string, string> = {
+  registered: 'green',
+  waitlist: 'amber',
+  cancelled: 'red',
+  attended: 'grey',
+};
+---
+
+<AdminLayout title={event.title} active="events">
+  <h1>{event.title}</h1>
+  <p class="muted">
+    {formatDateShortDE(event.eventDate)} ·
+    <a href={`/event/${event.slug}`} target="_blank" rel="noopener">Öffentliche Seite ↗</a>
+  </p>
+  {hasError && <div class="panel" style="border-color:var(--danger);"><p style="margin:0;color:var(--danger);">Bitte Titel und Datum prüfen.</p></div>}
+
+  <div class="panel">
+    <EventForm event={event} />
+  </div>
+
+  <h2>Anmeldungen ({regs.length})</h2>
+  <div class="panel">
+    {regs.length === 0 ? (
+      <p class="muted">Noch keine Anmeldungen.</p>
+    ) : (
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Kontakt</th><th>Status</th><th>Angemeldet</th><th>Ändern</th></tr>
+        </thead>
+        <tbody>
+          {regs.map((r) => (
+            <tr>
+              <td>{`${r.firstName ?? ''} ${r.lastName ?? ''}`.trim() || '—'}</td>
+              <td>
+                <a href={`mailto:${r.email}`}>{r.email}</a>
+                {r.phone && <div class="muted">{r.phone}</div>}
+              </td>
+              <td><span class={`badge ${STATUS_BADGE[r.status] ?? 'grey'}`}>{STATUS_LABEL[r.status] ?? r.status}</span></td>
+              <td>{r.registeredAt ? formatDateShortDE(r.registeredAt) : '—'}</td>
+              <td>
+                <form class="inline actions" method="post" action="/api/admin/registrations/status">
+                  <input type="hidden" name="id" value={r.id} />
+                  <input type="hidden" name="event_id" value={event.id} />
+                  <select name="status">
+                    {REGISTRATION_STATUSES.map((s) => (
+                      <option value={s} selected={s === r.status}>{STATUS_LABEL[s]}</option>
+                    ))}
+                  </select>
+                  <button class="btn secondary small" type="submit">OK</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+    <p class="muted" style="margin-bottom:0;font-size:0.85rem;">
+      Hinweis: Wird eine Anmeldung auf „Abgesagt" gesetzt, rückt die erste Person
+      auf der Warteliste automatisch nach und wird per E-Mail benachrichtigt.
+    </p>
+  </div>
+</AdminLayout>

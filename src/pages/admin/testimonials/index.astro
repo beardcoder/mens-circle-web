@@ -1,0 +1,58 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getServices } from '../../../server/container';
+import { formatDateShortDE } from '../../../server/format';
+
+const { testimonials } = getServices();
+const list = await testimonials.listAll();
+---
+
+<AdminLayout title="Testimonials" active="testimonials">
+  <h1>Testimonials</h1>
+  <div class="panel">
+    {list.length === 0 ? (
+      <p class="muted">Noch keine Testimonials eingereicht.</p>
+    ) : (
+      <table>
+        <thead>
+          <tr><th>Zitat</th><th>Autor</th><th>Status</th><th>Eingereicht</th><th></th></tr>
+        </thead>
+        <tbody>
+          {list.map((t) => (
+            <tr>
+              <td style="max-width:380px;">{t.quote}</td>
+              <td>
+                {t.authorName || '—'}
+                {t.role && <div class="muted">{t.role}</div>}
+                {t.email && <div class="muted" style="font-size:0.8rem;">{t.email}</div>}
+              </td>
+              <td>
+                {t.isPublished
+                  ? <span class="badge green">veröffentlicht</span>
+                  : <span class="badge amber">unmoderiert</span>}
+              </td>
+              <td>{formatDateShortDE(t.created)}</td>
+              <td class="actions">
+                <form class="inline" method="post" action="/api/admin/testimonials/action">
+                  <input type="hidden" name="id" value={t.id} />
+                  <input type="hidden" name="action" value={t.isPublished ? 'unpublish' : 'publish'} />
+                  <button class="btn small" type="submit">{t.isPublished ? 'Verbergen' : 'Freigeben'}</button>
+                </form>
+                <form
+                  class="inline"
+                  method="post"
+                  action="/api/admin/testimonials/action"
+                  onsubmit="return confirm('Dieses Testimonial löschen?');"
+                >
+                  <input type="hidden" name="id" value={t.id} />
+                  <input type="hidden" name="action" value="delete" />
+                  <button class="btn danger small" type="submit">Löschen</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+</AdminLayout>

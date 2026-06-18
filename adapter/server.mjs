@@ -2,7 +2,9 @@
  * Server entry for the local "mens-circle-edge" adapter (see ./index.mjs).
  * With `entrypointResolution: 'auto'` Astro builds this to dist/server/entry.mjs
  * and runs its top-level code. It is the container's single public edge: serves
- * static + SSR and proxies the PocketBase paths (/api, /_) to PB_INTERNAL_URL.
+ * static + SSR. The backend (API, DB, email) is now in-process via the Astro
+ * `/api/*` endpoints, so there is no PocketBase proxy anymore. A lightweight
+ * interval drives the event-reminder cron by hitting the internal endpoint.
  */
 
 import path from 'node:path';
@@ -86,74 +88,11 @@ async function serveStatic(pathname, clientDir) {
   return new Response('Not found', { status: 404, headers: SECURITY_HEADERS });
 }
 
-const PB_TARGET = (
-  process.env.PB_INTERNAL_URL || 'http://127.0.0.1:8091'
-).replace(/\/+$/, '');
-
-/** Paths owned by PocketBase: REST API (/api/…) and admin UI (/_, /_/…). */
-function ownedByPocketBase(pathname) {
-  return (
-    pathname.startsWith('/api/') ||
-    pathname === '/_' ||
-    pathname.startsWith('/_/')
-  );
-}
-
-/** Forward a request to PocketBase, streaming the response straight back. */
-async function proxyToPocketBase(request, url, clientAddress) {
-  const headers = new Headers(request.headers);
-  // `Host` is a forbidden fetch header — it's set from the target URL.
-  const priorXff = headers.get('x-forwarded-for');
-  if (clientAddress) {
-    headers.set(
-      'x-forwarded-for',
-      priorXff ? `${priorXff}, ${clientAddress}` : clientAddress,
-    );
-    if (!headers.has('x-real-ip')) headers.set('x-real-ip', clientAddress);
-  }
-  if (!headers.has('x-forwarded-proto')) {
-    headers.set('x-forwarded-proto', url.protocol.replace(':', ''));
-  }
-  if (!headers.has('x-forwarded-host') && headers.has('host')) {
-    headers.set('x-forwarded-host', headers.get('host'));
-  }
-  // Let fetch negotiate its own Accept-Encoding (gzip/deflate/br — all of which
-  // it can decode) instead of forwarding the browser's, which may ask for an
-  // encoding fetch won't decode (e.g. zstd) and leave the body still compressed.
-  headers.delete('accept-encoding');
-
-  const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
-  const upstream = await fetch(`${PB_TARGET}${url.pathname}${url.search}`, {
-    method: request.method,
-    headers,
-    body: hasBody ? request.body : undefined,
-    duplex: hasBody ? 'half' : undefined,
-    redirect: 'manual',
-  });
-
-  // fetch transparently decodes the body (it always sends Accept-Encoding) but
-  // leaves Content-Encoding/-Length on the response. Forwarding them verbatim
-  // would tell the browser to gunzip already-plain bytes against a stale length
-  // → ERR_CONTENT_DECODING_FAILED. Drop them; the decoded body is sent as-is.
-  const respHeaders = new Headers(upstream.headers);
-  respHeaders.delete('content-encoding');
-  respHeaders.delete('content-length');
-  return new Response(upstream.body, {
-    status: upstream.status,
-    statusText: upstream.statusText,
-    headers: respHeaders,
-  });
-}
-
-/** Proxy PocketBase paths; otherwise SSR, falling back to static files. */
+/** SSR the request, falling back to static files from dist/client. */
 function createHandler(app, clientDir) {
   return async (request, server) => {
     const url = new URL(request.url);
     const clientAddress = server?.requestIP?.(request)?.address;
-
-    if (ownedByPocketBase(url.pathname)) {
-      return proxyToPocketBase(request, url, clientAddress);
-    }
 
     const routeData = app.match(request);
     if (routeData) {
@@ -188,6 +127,37 @@ if (Bun?.serve) {
   });
 
   console.log(`→ Astro server listening on http://${hostname}:${port}`);
+
+  // Event-reminder cron: hit the internal endpoint every 15 minutes. Kept as an
+  // HTTP call (not a direct import) so the exact same job is host-agnostic — an
+  // external scheduler (e.g. a Cloudflare Cron Trigger) can drive it identically.
+  // Guarded by CRON_SECRET; skipped entirely when it isn't configured.
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const runReminders = async () => {
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:${port}/api/internal/cron/reminders`,
+          {
+            method: 'POST',
+            // application/json is exempt from Astro's CSRF origin check (unlike
+            // form content types), so this server-to-server call isn't blocked.
+            headers: {
+              'x-cron-secret': cronSecret,
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+        if (!res.ok) console.error(`✗ reminder cron returned ${res.status}`);
+      } catch (err) {
+        console.error('✗ reminder cron failed', String(err));
+      }
+    };
+    setTimeout(runReminders, 30_000);
+    setInterval(runReminders, 15 * 60 * 1000);
+  } else {
+    console.warn('→ CRON_SECRET unset — event-reminder cron disabled');
+  }
 
   const stop = () => {
     try {
