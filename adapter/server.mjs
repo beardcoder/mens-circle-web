@@ -100,7 +100,7 @@ function ownedByPocketBase(pathname) {
 }
 
 /** Forward a request to PocketBase, streaming the response straight back. */
-function proxyToPocketBase(request, url, clientAddress) {
+async function proxyToPocketBase(request, url, clientAddress) {
   const headers = new Headers(request.headers);
   // `Host` is a forbidden fetch header — it's set from the target URL.
   const priorXff = headers.get('x-forwarded-for');
@@ -117,14 +117,31 @@ function proxyToPocketBase(request, url, clientAddress) {
   if (!headers.has('x-forwarded-host') && headers.has('host')) {
     headers.set('x-forwarded-host', headers.get('host'));
   }
+  // Let fetch negotiate its own Accept-Encoding (gzip/deflate/br — all of which
+  // it can decode) instead of forwarding the browser's, which may ask for an
+  // encoding fetch won't decode (e.g. zstd) and leave the body still compressed.
+  headers.delete('accept-encoding');
 
   const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
-  return fetch(`${PB_TARGET}${url.pathname}${url.search}`, {
+  const upstream = await fetch(`${PB_TARGET}${url.pathname}${url.search}`, {
     method: request.method,
     headers,
     body: hasBody ? request.body : undefined,
     duplex: hasBody ? 'half' : undefined,
     redirect: 'manual',
+  });
+
+  // fetch transparently decodes the body (it always sends Accept-Encoding) but
+  // leaves Content-Encoding/-Length on the response. Forwarding them verbatim
+  // would tell the browser to gunzip already-plain bytes against a stale length
+  // → ERR_CONTENT_DECODING_FAILED. Drop them; the decoded body is sent as-is.
+  const respHeaders = new Headers(upstream.headers);
+  respHeaders.delete('content-encoding');
+  respHeaders.delete('content-length');
+  return new Response(upstream.body, {
+    status: upstream.status,
+    statusText: upstream.statusText,
+    headers: respHeaders,
   });
 }
 
