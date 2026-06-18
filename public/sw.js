@@ -11,10 +11,15 @@
  *   - everything else  → straight to the network (never cached: PocketBase API,
  *                        POST/PUT, cross-origin, etc.)
  *
+ * The PocketBase backend (admin UI at /_/ and the API at /api/) is never
+ * touched — the SW returns early so those requests hit the network directly.
+ * Without that, the whole-origin navigation handler would shadow /_/ and serve
+ * a cached site page instead of the admin dashboard.
+ *
  * Bump CACHE to invalidate everything on the next activation.
  */
 
-const CACHE = 'mk-breath-v1';
+const CACHE = 'mk-breath-v2';
 
 // The app shell needed to launch the breathing exercise offline. The page's CSS
 // is inlined into its HTML, so caching the document covers the styling; the
@@ -67,6 +72,17 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   if (url.origin !== self.location.origin) return;
+
+  // PocketBase backend — never intercept. Letting these fall through to the
+  // network keeps the admin UI (/_/) and API (/api/) reachable; otherwise the
+  // navigation handler below would serve a cached site page for /_/.
+  if (
+    url.pathname === '/_' ||
+    url.pathname.startsWith('/_/') ||
+    url.pathname.startsWith('/api/')
+  ) {
+    return;
+  }
 
   // Navigations: always prefer the live (SSR) response; cache it for offline.
   if (request.mode === 'navigate') {
