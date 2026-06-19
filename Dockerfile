@@ -75,4 +75,10 @@ VOLUME ["/pb/pb_data"]
 # The Bun server is the public edge on :8090; PocketBase (8091) stays loopback.
 EXPOSE 8090
 
+# Liveness probe for Coolify/Docker. Hits the Bun edge's /health SSR route via
+# wget (installed above — curl is NOT in this image). A 200 means the public
+# edge is serving; if it stops responding the orchestrator restarts the container.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8090/health || exit 1
+
 ENTRYPOINT ["docker-entrypoint.sh"]

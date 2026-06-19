@@ -29,10 +29,13 @@ services:
     depends_on:
       - listmonk
     healthcheck:
-      test: ['CMD-SHELL', 'curl -f http://localhost:8090 || exit 1']
-      interval: 100s
+      # wget, not curl — curl isn't installed in the Bun runtime image. Hits the
+      # lightweight /health SSR route on the Bun edge (see src/pages/health.ts).
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://localhost:8090/health || exit 1']
+      start_period: 20s
+      interval: 30s
       timeout: 5s
-      retries: 6
+      retries: 3
 
   listmonk:
     # Custom image that bakes the branded system email-templates into the
