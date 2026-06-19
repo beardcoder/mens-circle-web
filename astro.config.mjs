@@ -3,8 +3,16 @@
 import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import umami from '@yeskunall/astro-umami';
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, fontProviders, logHandlers } from 'astro/config';
 import bun from './adapter/index.mjs';
+
+// Structured logging (Astro 7). When LOG_FORMAT=json, bake a JSON log handler
+// into the SSR manifest so the Bun runtime emits one compact JSON object per log
+// line — SSR errors included — ready for Coolify/log aggregation. The config
+// runs at BUILD time and the runtime replays the baked handler, so the
+// production Dockerfile sets LOG_FORMAT=json in its build stage; local dev and
+// CI leave it unset and keep Astro's human-readable console output.
+const jsonLogger = process.env.LOG_FORMAT === 'json' ? { logger: logHandlers.json() } : {};
 
 // Umami analytics is opt-in: it only loads when a website id is configured.
 // Self-hosted instances set PUBLIC_UMAMI_ENDPOINT (e.g. https://umami.example.com).
@@ -31,6 +39,7 @@ export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://mens-circle.de',
   output: 'server',
   adapter: bun(),
+  ...jsonLogger,
   trailingSlash: 'ignore',
   redirects: {
     '/home': '/',
