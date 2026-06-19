@@ -101,6 +101,27 @@ export default defineConfig({
       subsets: ['latin'],
       fallbacks: ['system-ui', 'sans-serif'],
     },
+    {
+      // Admin display face — sturdy grotesque, for headings + the capacity-ring
+      // numerals. Deliberately not the public site's serif.
+      name: 'Bricolage Grotesque',
+      cssVariable: '--font-bricolage',
+      provider: fontProviders.fontsource(),
+      weights: ['400 800'], // variable range
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      // Admin data face — dates, times, counts, IDs read as a logbook.
+      name: 'IBM Plex Mono',
+      cssVariable: '--font-plex-mono',
+      provider: fontProviders.fontsource(),
+      weights: ['400', '500', '600'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['ui-monospace', 'monospace'],
+    },
   ],
   integrations: [
     svelte(),

@@ -1,6 +1,6 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
-import EventForm from '../../../components/admin/EventForm.svelte';
+import EventForm from '../../../components/admin/EventForm.astro';
 import { getEventById } from '@lib/server/events';
 
 export const prerender = false;
@@ -32,5 +32,5 @@ const data = {
 ---
 
 <AdminLayout title="Veranstaltung bearbeiten">
-  <EventForm client:load event={data} />
+  <EventForm event={data} />
 </AdminLayout>

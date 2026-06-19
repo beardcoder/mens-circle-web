@@ -1,0 +1,209 @@
+---
+interface EventData {
+  id?: string;
+  title?: string;
+  slug?: string;
+  description?: string;
+  eventDate?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  locationDetails?: string;
+  street?: string;
+  postalCode?: string;
+  city?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  maxParticipants?: number;
+  costBasis?: string;
+  isPublished?: boolean;
+  imageUrl?: string | null;
+}
+interface Props {
+  event?: EventData | null;
+}
+const { event = null } = Astro.props;
+
+const isEdit = !!event?.id;
+const isDuplicate = !!event && !event.id;
+const v = event ?? {};
+const dateValue = v.eventDate ? String(v.eventDate).slice(0, 10) : '';
+const num = (n: number | null | undefined) => (n == null ? '' : String(n));
+---
+
+<div class="pagehead">
+  <div class="pagehead__titles">
+    <p class="eyebrow">{isEdit ? 'Bearbeiten' : 'Anlegen'}</p>
+    <h1>{isEdit ? 'Veranstaltung bearbeiten' : 'Neue Veranstaltung'}</h1>
+  </div>
+  <a class="btn btn--ghost" href="/admin">Zurück</a>
+</div>
+
+{isDuplicate && <p class="dup-note mono">Aus Vorlage übernommen — Datum &amp; Sichtbarkeit bitte neu setzen.</p>}
+
+<form id="event-form" class="card" data-id={event?.id ?? ''} data-edit={isEdit ? '1' : ''}>
+  <div class="field">
+    <label for="title">Titel *</label>
+    <input id="title" name="title" type="text" value={v.title ?? ''} required />
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="eventDate">Datum *</label>
+      <input id="eventDate" name="eventDate" type="date" value={dateValue} required />
+    </div>
+    <div class="field">
+      <label for="startTime">Beginn</label>
+      <input id="startTime" name="startTime" type="time" value={v.startTime ?? ''} />
+    </div>
+    <div class="field">
+      <label for="endTime">Ende</label>
+      <input id="endTime" name="endTime" type="time" value={v.endTime ?? ''} />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="maxParticipants">Max. Teilnehmer</label>
+      <input id="maxParticipants" name="maxParticipants" type="number" min="0" value={v.maxParticipants ?? 8} />
+    </div>
+    <div class="field">
+      <label for="costBasis">Teilnahmebeitrag</label>
+      <input
+        id="costBasis"
+        name="costBasis"
+        type="text"
+        value={v.costBasis ?? ''}
+        placeholder="z. B. Auf Spendenbasis"
+      />
+    </div>
+    <div class="field">
+      <label for="slug">Slug</label>
+      <input id="slug" name="slug" type="text" value={v.slug ?? ''} placeholder="auto aus Datum" />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="location">Ort (Name)</label>
+    <input id="location" name="location" type="text" value={v.location ?? ''} />
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="street">Straße</label>
+      <input id="street" name="street" type="text" value={v.street ?? ''} />
+    </div>
+    <div class="field">
+      <label for="postalCode">PLZ</label>
+      <input id="postalCode" name="postalCode" type="text" value={v.postalCode ?? ''} />
+    </div>
+    <div class="field">
+      <label for="city">Stadt</label>
+      <input id="city" name="city" type="text" value={v.city ?? ''} />
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="latitude">Breitengrad (lat)</label>
+      <input id="latitude" name="latitude" type="number" step="any" value={num(v.latitude)} />
+    </div>
+    <div class="field">
+      <label for="longitude">Längengrad (lng)</label>
+      <input id="longitude" name="longitude" type="number" step="any" value={num(v.longitude)} />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="locationDetails">Hinweis zum Ort / Treffpunkt</label>
+    <textarea id="locationDetails" name="locationDetails">{v.locationDetails ?? ''}</textarea>
+  </div>
+
+  <div class="field">
+    <label for="description">Beschreibung</label>
+    <textarea id="description" name="description" rows="6">{v.description ?? ''}</textarea>
+  </div>
+
+  <div class="field">
+    <label for="imageUrl">Bild-URL</label>
+    <input id="imageUrl" name="imageUrl" type="url" value={v.imageUrl ?? ''} placeholder="https://…" />
+  </div>
+
+  <label class="check publish">
+    <input type="checkbox" name="isPublished" checked={v.isPublished ?? false} />
+    <span>Veröffentlicht (öffentlich sichtbar)</span>
+  </label>
+
+  <button class="btn" type="submit">Speichern</button>
+</form>
+
+<script>
+  import { actions } from 'astro:actions';
+
+  function init() {
+    const form = document.getElementById('event-form') as HTMLFormElement | null;
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '1';
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const get = (k: string) => String(fd.get(k) ?? '');
+      btn.disabled = true;
+      btn.textContent = 'Speichern…';
+      const { data, error } = await actions.saveEvent({
+        id: form.dataset.id || undefined,
+        title: get('title'),
+        slug: get('slug'),
+        description: get('description'),
+        eventDate: get('eventDate'),
+        startTime: get('startTime'),
+        endTime: get('endTime'),
+        location: get('location'),
+        locationDetails: get('locationDetails'),
+        street: get('street'),
+        postalCode: get('postalCode'),
+        city: get('city'),
+        latitude: get('latitude'),
+        longitude: get('longitude'),
+        maxParticipants: get('maxParticipants'),
+        costBasis: get('costBasis'),
+        imageUrl: get('imageUrl'),
+        isPublished: fd.get('isPublished') === 'on',
+      });
+      btn.disabled = false;
+      btn.textContent = 'Speichern';
+      if (error) {
+        window.adminToast?.('err', error.message);
+        return;
+      }
+      // New event → back to the list; edit → stay with confirmation.
+      if (!form.dataset.edit) {
+        window.location.href = '/admin';
+        return;
+      }
+      window.adminToast?.('ok', data.message);
+    });
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .dup-note {
+    margin: -0.75rem 0 1.25rem;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.78rem;
+    color: var(--ember);
+    background: var(--ember-soft);
+    border: 1px solid var(--ember-line);
+    border-radius: var(--r-sm);
+  }
+  .publish {
+    margin: 0.5rem 0 1.5rem;
+  }
+  #event-form button[type='submit'] {
+    min-width: 11rem;
+  }
+</style>

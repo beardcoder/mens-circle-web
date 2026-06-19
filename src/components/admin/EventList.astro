@@ -1,0 +1,224 @@
+---
+import CapacityRing from './CapacityRing.astro';
+
+interface EventRow {
+  id: string;
+  title: string;
+  slug: string;
+  eventDate: string;
+  startTime?: string;
+  isPublished: boolean;
+  maxParticipants: number;
+  activeCount: number;
+}
+interface Props {
+  events: EventRow[];
+}
+const { events } = Astro.props;
+
+const publishedCount = events.filter((e) => e.isPublished).length;
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
+}
+---
+
+<div class="pagehead">
+  <div class="pagehead__titles">
+    <p class="eyebrow">Übersicht</p>
+    <h1>Veranstaltungen</h1>
+  </div>
+  <a class="btn" href="/admin/events/new">Neue Veranstaltung</a>
+</div>
+
+{
+  events.length > 0 && (
+    <p class="summary mono muted">
+      <span class="summary__n">{events.length}</span> Veranstaltungen · <span class="summary__n">{publishedCount}</span>{' '}
+      veröffentlicht
+    </p>
+  )
+}
+
+{
+  events.length === 0 ? (
+    <div class="empty">
+      <p>Noch keine Veranstaltungen.</p>
+      <a class="btn btn--ghost btn--sm" href="/admin/events/new">
+        Die erste anlegen
+      </a>
+    </div>
+  ) : (
+    <ul id="event-list" class="events">
+      {events.map((ev) => (
+        <li class="event card" data-id={ev.id} data-title={ev.title}>
+          <a class="event__main" href={`/admin/events/${ev.id}`}>
+            <CapacityRing value={ev.activeCount} max={ev.maxParticipants} />
+            <span class="event__text">
+              <span class="event__title">{ev.title}</span>
+              <span class="event__meta mono">
+                {fmtDate(ev.eventDate)}
+                {ev.startTime ? ` · ${ev.startTime}` : ''}
+                <span class="faint"> · /event/{ev.slug}</span>
+              </span>
+            </span>
+          </a>
+          <div class="event__side">
+            {ev.isPublished ? (
+              <span class="badge badge--live">veröffentlicht</span>
+            ) : (
+              <span class="badge badge--draft">entwurf</span>
+            )}
+            <div class="event__actions">
+              <a class="btn btn--ghost btn--sm" href={`/admin/events/${ev.id}/registrations`}>
+                Anmeldungen
+              </a>
+              <a class="btn btn--ghost btn--sm" href={`/admin/events/new?from=${ev.id}`} title="Duplizieren">
+                Duplizieren
+              </a>
+              <button class="btn btn--danger btn--sm js-del" type="button">
+                Löschen
+              </button>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<script>
+  import { actions } from 'astro:actions';
+
+  function init() {
+    const list = document.getElementById('event-list');
+    if (!list || list.dataset.bound) return;
+    list.dataset.bound = '1';
+
+    list.addEventListener('click', async (e) => {
+      const btn = (e.target as HTMLElement).closest('.js-del') as HTMLButtonElement | null;
+      if (!btn) return;
+      const row = btn.closest('.event') as HTMLElement;
+      const { id, title } = row.dataset;
+      if (!id || !confirm(`„${title}“ wirklich löschen?`)) return;
+      btn.disabled = true;
+      const { error } = await actions.deleteEvent({ id });
+      if (error) {
+        btn.disabled = false;
+        window.adminToast?.('err', error.message);
+        return;
+      }
+      window.adminToast?.('ok', 'Veranstaltung gelöscht.');
+      row.style.height = `${row.offsetHeight}px`;
+      requestAnimationFrame(() => row.classList.add('removing'));
+      setTimeout(() => row.remove(), 220);
+    });
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .summary {
+    font-size: 0.82rem;
+    margin: -0.75rem 0 1.5rem;
+  }
+  .summary__n {
+    color: var(--ember);
+    font-weight: 600;
+  }
+  .events {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .event {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.25rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.15rem;
+    transition:
+      border-color var(--ease),
+      opacity 0.2s ease,
+      transform 0.2s ease,
+      height 0.2s ease,
+      padding 0.2s ease,
+      margin 0.2s ease;
+  }
+  .event:hover {
+    border-color: var(--line-strong);
+  }
+  .event.removing {
+    opacity: 0;
+    transform: translateX(-1rem);
+    height: 0 !important;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -0.75rem;
+    overflow: hidden;
+  }
+  .event__main {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+    flex: 1 1 16rem;
+  }
+  .event__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+  .event__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .event__main:hover .event__title {
+    color: var(--ember-bright);
+  }
+  .event__meta {
+    font-size: 0.76rem;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .event__side {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .event__actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  @media (max-width: 560px) {
+    .event__side {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .event__actions {
+      flex: 1 1 100%;
+    }
+    .event__actions .btn {
+      flex: 1 1 auto;
+    }
+  }
+</style>
