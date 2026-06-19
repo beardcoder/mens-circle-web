@@ -29,6 +29,11 @@ COPY . .
 # there is no PB_URL build arg and no rebuild-on-content-change anymore.
 ARG PUBLIC_SITE_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
+# Bake the JSON log handler into the SSR manifest (see astro.config.mjs). The
+# Bun runtime then emits one compact JSON object per log line — SSR errors
+# included — for Coolify/log aggregation. Build-time only: the runtime replays
+# the baked handler, so no runtime env var is needed.
+ENV LOG_FORMAT=json
 # Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks
 # Astro's Rollup build, while `bun run` still uses Bun for everything else.
 RUN bun run build
