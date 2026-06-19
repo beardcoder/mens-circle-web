@@ -1,18 +1,21 @@
 ---
-// Testimonials are rendered server-side: this block lives on the SSR home page,
-// so published entries are fetched from PocketBase per request (cached briefly
-// in pocketbase-server.ts) and rendered into the HTML — great SEO, no client
-// fetch / loading flash, and new testimonials go live with no rebuild.
+// Testimonials are rendered server-side: this block is a server island on the
+// (prerendered) home page, so published entries are fetched from the database
+// per request and rendered into the HTML — great SEO, no client fetch / loading
+// flash, and new testimonials go live with no rebuild.
 //
 // The section renders nothing when there are no published testimonials.
-import { fetchTestimonials } from '@lib/pocketbase-server';
-
+//
+// The data layer (`@lib/server/events` → `bun:sqlite`) is imported dynamically:
+// this runs only when the island renders at runtime, never during the
+// build-time prerender of the host page.
 interface Props {
   data?: { anchor?: string };
 }
 
 const { data } = Astro.props;
 const anchor = data?.anchor ?? 'stimmen';
+const { fetchTestimonials } = await import('@lib/server/events');
 const testimonials = await fetchTestimonials();
 ---
 

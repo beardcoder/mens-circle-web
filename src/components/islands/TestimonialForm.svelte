@@ -1,6 +1,6 @@
 <script lang="ts">
   import { isValidEmail } from '@lib/helpers';
-  import { submitTestimonial } from '@lib/pocketbase';
+  import { submitTestimonial } from '@lib/api';
   import { showToast } from '@lib/toast';
   import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
 
