@@ -1,5 +1,5 @@
 ---
-import CapacityRing from './CapacityRing.astro';
+import CircleSeating from './CircleSeating.astro';
 
 type Status = 'registered' | 'waitlist' | 'cancelled' | 'attended';
 interface Person {
@@ -26,6 +26,10 @@ const { event, people } = Astro.props;
 const registered = people.filter((p) => p.status === 'registered' || p.status === 'attended');
 const waitlist = people.filter((p) => p.status === 'waitlist');
 
+const name = (p: Person) => `${p.firstName} ${p.lastName}`.trim();
+const initials = (p: Person) => `${p.firstName[0] ?? ''}${p.lastName[0] ?? ''}`.toUpperCase() || '·';
+const seats = registered.map((p) => ({ initials: initials(p), name: name(p) }));
+
 const dateLong = (() => {
   const d = new Date(event.eventDate);
   if (Number.isNaN(d.getTime())) return event.eventDate;
@@ -38,7 +42,6 @@ const dateLong = (() => {
   });
 })();
 const timeStr = event.startTime ? `${event.startTime}${event.endTime ? `–${event.endTime}` : ''} Uhr` : '';
-const name = (p: Person) => `${p.firstName} ${p.lastName}`.trim();
 ---
 
 <section class="next">
@@ -47,57 +50,58 @@ const name = (p: Person) => `${p.firstName} ${p.lastName}`.trim();
     <a class="btn btn--sm" href={`/admin/events/${event.id}/registrations`}>Anmeldungen verwalten</a>
   </div>
 
-  <div class="next__head">
-    <CapacityRing value={event.activeCount} max={event.maxParticipants} size={68} stroke={6} />
-    <div class="next__titles">
-      <a class="next__title" href={`/admin/events/${event.id}`}>{event.title}</a>
-      <p class="next__meta mono">
-        {dateLong}
-        {timeStr && <span> · {timeStr}</span>}
-        {event.location && <span class="faint"> · {event.location}</span>}
-      </p>
-    </div>
+  <div class="next__titles">
+    <a class="next__title" href={`/admin/events/${event.id}`}>{event.title}</a>
+    <p class="next__meta mono">
+      {dateLong}
+      {timeStr && <span> · {timeStr}</span>}
+      {event.location && <span class="faint"> · {event.location}</span>}
+    </p>
   </div>
 
-  <div class="next__roster">
-    <div class="roster__col">
-      <p class="roster__label">
-        Angemeldet <span class="mono roster__n">{registered.length}/{event.maxParticipants}</span>
-      </p>
+  <div class="next__body">
+    <CircleSeating seats={seats} capacity={event.maxParticipants} />
+
+    <div class="roster__lists">
+      <div class="roster__col">
+        <p class="roster__label">
+          Angemeldet <span class="mono roster__n">{registered.length}/{event.maxParticipants}</span>
+        </p>
+        {
+          registered.length === 0 ? (
+            <p class="muted roster__empty">Noch niemand angemeldet.</p>
+          ) : (
+            <ol class="roster">
+              {registered.map((p, i) => (
+                <li class="roster__person">
+                  <span class="roster__idx mono faint">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="roster__name">{name(p)}</span>
+                  {p.status === 'attended' && <span class="badge badge--live">da</span>}
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </div>
+
       {
-        registered.length === 0 ? (
-          <p class="muted roster__empty">Noch niemand angemeldet.</p>
-        ) : (
-          <ol class="roster">
-            {registered.map((p, i) => (
-              <li class="roster__person">
-                <span class="roster__idx mono faint">{String(i + 1).padStart(2, '0')}</span>
-                <span class="roster__name">{name(p)}</span>
-                {p.status === 'attended' && <span class="badge badge--live">da</span>}
-              </li>
-            ))}
-          </ol>
+        waitlist.length > 0 && (
+          <div class="roster__col">
+            <p class="roster__label">
+              Warteliste <span class="mono roster__n">{waitlist.length}</span>
+            </p>
+            <ol class="roster">
+              {waitlist.map((p, i) => (
+                <li class="roster__person">
+                  <span class="roster__idx mono faint">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="roster__name muted">{name(p)}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
         )
       }
     </div>
-
-    {
-      waitlist.length > 0 && (
-        <div class="roster__col">
-          <p class="roster__label">
-            Warteliste <span class="mono roster__n">{waitlist.length}</span>
-          </p>
-          <ol class="roster">
-            {waitlist.map((p, i) => (
-              <li class="roster__person">
-                <span class="roster__idx mono faint">{String(i + 1).padStart(2, '0')}</span>
-                <span class="roster__name muted">{name(p)}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )
-    }
   </div>
 </section>
 
@@ -115,20 +119,14 @@ const name = (p: Person) => `${p.firstName} ${p.lastName}`.trim();
     justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
-  }
-  .next__head {
-    display: flex;
-    align-items: center;
-    gap: 1.1rem;
-    padding-bottom: 1.1rem;
-    border-bottom: 1px solid var(--line);
+    margin-bottom: 0.9rem;
   }
   .next__titles {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    min-width: 0;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--line);
   }
   .next__title {
     font-family: var(--font-display);
@@ -147,11 +145,18 @@ const name = (p: Person) => `${p.firstName} ${p.lastName}`.trim();
     font-size: 0.8rem;
     color: var(--muted);
   }
-  .next__roster {
+  .next__body {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.25rem 2rem;
-    padding-top: 1.1rem;
+    grid-template-columns: minmax(0, 280px) 1fr;
+    align-items: center;
+    gap: 1.5rem 2rem;
+    padding-top: 1.25rem;
+  }
+  .roster__lists {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.25rem 1.75rem;
+    align-self: start;
   }
   .roster__label {
     display: flex;
@@ -201,5 +206,17 @@ const name = (p: Person) => `${p.firstName} ${p.lastName}`.trim();
     margin-left: auto;
     font-size: 0.65rem;
     padding: 0.1rem 0.45rem;
+  }
+  .seating {
+    justify-self: center;
+  }
+  @media (max-width: 620px) {
+    .next__body {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+    .roster__lists {
+      width: 100%;
+    }
   }
 </style>
