@@ -4,14 +4,7 @@
 // <Sprite name="…" /> references resolve to these symbols via <use href="#icon-…" />.
 ---
 
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="0"
-  height="0"
-  style="position: absolute; width: 0; height: 0; overflow: hidden"
-  aria-hidden="true"
-  focusable="false"
->
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" class="sprite-defs" aria-hidden="true" focusable="false">
   <defs>
     {/* Brand */}
     <symbol
@@ -179,3 +172,14 @@
     </symbol>
   </defs>
 </svg>
+
+<style>
+  /* Keep the inline sprite out of flow and visually hidden — it only exists to
+     provide <symbol> defs for <use> references elsewhere. */
+  .sprite-defs {
+    position: absolute;
+    inline-size: 0;
+    block-size: 0;
+    overflow: hidden;
+  }
+</style>
