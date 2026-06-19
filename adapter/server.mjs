@@ -98,6 +98,17 @@ function createHandler(app, clientDir) {
     const url = new URL(request.url);
     const clientAddress = server?.requestIP?.(request)?.address;
 
+    // Liveness probe (Coolify / Docker HEALTHCHECK). Answered by the edge itself,
+    // before any SSR render or PocketBase proxy — a 200 confirms the Bun server
+    // is accepting and serving requests, with zero dependency on the render
+    // pipeline (which is what can stall over time under --smol).
+    if (url.pathname === '/health') {
+      return new Response('OK', {
+        status: 200,
+        headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' },
+      });
+    }
+
     if (ownedByPocketBase(url.pathname)) {
       return proxyToPocketBase(request, url, clientAddress);
     }
