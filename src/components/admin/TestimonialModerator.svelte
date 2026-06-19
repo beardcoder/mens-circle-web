@@ -91,8 +91,12 @@
     gap: 1rem;
   }
   blockquote {
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.75rem;
+    padding-left: 0.9rem;
+    border-left: 3px solid var(--a-accent);
     font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.55;
   }
   .meta {
     font-size: 0.85rem;
