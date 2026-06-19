@@ -37,6 +37,11 @@ const { bare = false, ...props } = Astro.props;
 <html lang="de" dir="ltr">
   <head>
     {
+      /* charset must be the very first thing in <head> (within the first 1024
+       bytes) so the browser never has to restart parsing. */
+    }
+    <meta charset="UTF-8" />
+    {
       /* Flag JS synchronously so reveals only hide their elements when JS is
         available — without JS, all [data-reveal] content stays visible. */
     }

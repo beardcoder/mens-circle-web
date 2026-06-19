@@ -35,7 +35,7 @@ const {
   ogImageAlt = 'Männerkreis Niederbayern/ Straubing - Gemeinschaft für Männer',
   robots = 'index, follow',
   schemas = [],
-  manifest = '/manifest.json',
+  manifest = '/manifest.webmanifest',
   webAppTitle,
   viewport = 'width=device-width, initial-scale=1.0, viewport-fit=cover',
 } = Astro.props;
@@ -112,7 +112,6 @@ const website = {
 const allSchemas = [localBusiness, website, ...schemas];
 ---
 
-<meta charset="UTF-8" />
 <meta name="viewport" content={viewport} />
 
 <title>{fullTitle}</title>
