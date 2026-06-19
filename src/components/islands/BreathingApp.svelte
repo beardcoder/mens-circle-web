@@ -1,485 +1,466 @@
 <script lang="ts">
-import { clamp } from '@lib/helpers';
-import { onDestroy } from 'svelte';
+  import { clamp } from '@lib/helpers';
+  import { onDestroy } from 'svelte';
 
-type Phase = 'idle' | 'breathing' | 'retention' | 'recovery' | 'complete';
+  type Phase = 'idle' | 'breathing' | 'retention' | 'recovery' | 'complete';
 
-interface SessionConfig {
-  breaths: number;
-  rounds: number;
-  recoveryHold: number;
-}
-
-const PHASE_LABEL: Record<Phase, string> = {
-  idle: 'Bereit',
-  breathing: 'Atmen',
-  retention: 'Halten',
-  recovery: 'Erholung',
-  complete: 'Geschafft',
-};
-
-const BREATH_VALUES = Array.from({ length: 11 }, (_, i) => 10 + i * 5);
-
-const PICKER_ITEM_WIDTH = 72;
-const DRAG_THRESHOLD_PX = 4;
-const INHALE_MS = 1800;
-const EXHALE_MS = 1800;
-const CYCLE_MS = INHALE_MS + EXHALE_MS;
-
-function formatTime(seconds: number): string {
-  const safeSeconds = Math.max(0, Math.floor(seconds));
-  const m = Math.floor(safeSeconds / 60);
-  const s = safeSeconds % 60;
-
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-}
-
-function circleMotion(phase: Phase): string | undefined {
-  if (phase === 'breathing') return 'wave';
-  if (phase === 'retention') return 'hold-high';
-  if (phase === 'recovery') return 'hold-low';
-
-  return undefined;
-}
-
-function closestBreathIndex(value: number): number {
-  return clamp(Math.round((value - 10) / 5), 0, BREATH_VALUES.length - 1);
-}
-
-// ─── Reactive state ────────────────────────────────────────────────
-let phase = $state<Phase>('idle');
-let round = $state(0);
-let breath = $state(0);
-let timerSeconds = $state(0);
-
-let settingBreaths = $state(35);
-let settingRounds = $state(3);
-let settingRecovery = $state(15);
-
-let session = $state<SessionConfig | null>(null);
-
-// ─── Picker state ─────────────────────────────────────────────────
-let breathIndex = $state(closestBreathIndex(settingBreaths));
-let pickerOffset = $state(0);
-let isDraggingPicker = $state(false);
-
-let dragPointerId: number | null = null;
-let dragStartX = 0;
-let hasDragged = false;
-
-// ─── Scheduling handles ───────────────────────────────────────────
-let timeoutHandle: number | null = null;
-let intervalHandle: number | null = null;
-let rafHandle: number | null = null;
-
-const isActive = $derived(
-  phase === 'breathing' || phase === 'retention' || phase === 'recovery',
-);
-
-const currentSession = $derived(
-  session ?? {
-    breaths: settingBreaths,
-    rounds: settingRounds,
-    recoveryHold: settingRecovery,
-  },
-);
-
-const sessionRounds = $derived(currentSession.rounds);
-const sessionBreaths = $derived(currentSession.breaths);
-const motion = $derived(circleMotion(phase));
-
-const pickerTransform = $derived(
-  `translate3d(${-breathIndex * PICKER_ITEM_WIDTH + pickerOffset}px, 0, 0)`,
-);
-
-const pickerTransition = $derived(
-  isDraggingPicker ? 'none' : 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)',
-);
-
-// Fractional position of the centre indicator over the track, in item units.
-// pickerOffset is 0 at rest, so this collapses to breathIndex when idle.
-const centerFloat = $derived(breathIndex - pickerOffset / PICKER_ITEM_WIDTH);
-
-// The value nearest the centre indicator — the one we "activate". Updates
-// live while dragging so the focused number lights up under the thumb.
-const focusedIndex = $derived(
-  clamp(Math.round(centerFloat), 0, BREATH_VALUES.length - 1),
-);
-
-// Native picker-wheel depth: items scale and fade with their distance from
-// the centre. Driven inline (not via :class) so it tracks the drag frame by
-// frame; the CSS transition only kicks in on release to settle.
-function itemDepth(index: number): string {
-  const distance = Math.abs(index - centerFloat);
-  const scale = clamp(1.18 - distance * 0.32, 0.62, 1.18);
-  const opacity = clamp(1 - distance * 0.32, 0.18, 1);
-
-  return `transform: scale(${scale.toFixed(3)}); opacity: ${opacity.toFixed(3)};`;
-}
-
-const counterText = $derived.by(() => {
-  switch (phase) {
-    case 'idle':
-      return `${settingRounds} Runden · ${settingBreaths} Atemzüge`;
-
-    case 'breathing':
-      return `Atemzug ${breath}`;
-
-    case 'retention':
-      return `Halten · ${formatTime(timerSeconds)}`;
-
-    case 'recovery':
-      return `Halten · ${timerSeconds}s`;
-
-    case 'complete':
-      return 'Nimm dir einen Moment, spüre nach.';
-  }
-});
-
-const startLabel = $derived(
-  phase === 'complete' ? 'Erneut starten' : 'Atemübung starten',
-);
-
-const holdLabel = $derived(
-  phase === 'recovery' ? 'Weiteratmen' : 'Atem freigeben',
-);
-
-const showStart = $derived(phase === 'idle' || phase === 'complete');
-const showHold = $derived(phase === 'retention' || phase === 'recovery');
-
-// ─── Scheduling ────────────────────────────────────────────────────
-function clearScheduled(): void {
-  if (timeoutHandle !== null) {
-    window.clearTimeout(timeoutHandle);
-    timeoutHandle = null;
+  interface SessionConfig {
+    breaths: number;
+    rounds: number;
+    recoveryHold: number;
   }
 
-  if (intervalHandle !== null) {
-    window.clearInterval(intervalHandle);
-    intervalHandle = null;
+  const PHASE_LABEL: Record<Phase, string> = {
+    idle: 'Bereit',
+    breathing: 'Atmen',
+    retention: 'Halten',
+    recovery: 'Erholung',
+    complete: 'Geschafft',
+  };
+
+  const BREATH_VALUES = Array.from({ length: 11 }, (_, i) => 10 + i * 5);
+
+  const PICKER_ITEM_WIDTH = 72;
+  const DRAG_THRESHOLD_PX = 4;
+  const INHALE_MS = 1800;
+  const EXHALE_MS = 1800;
+  const CYCLE_MS = INHALE_MS + EXHALE_MS;
+
+  function formatTime(seconds: number): string {
+    const safeSeconds = Math.max(0, Math.floor(seconds));
+    const m = Math.floor(safeSeconds / 60);
+    const s = safeSeconds % 60;
+
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   }
 
-  if (rafHandle !== null) {
-    window.cancelAnimationFrame(rafHandle);
-    rafHandle = null;
+  function circleMotion(phase: Phase): string | undefined {
+    if (phase === 'breathing') return 'wave';
+    if (phase === 'retention') return 'hold-high';
+    if (phase === 'recovery') return 'hold-low';
+
+    return undefined;
   }
-}
 
-// ─── Audio cues ────────────────────────────────────────────────────
-// Short, gentle chimes mark each new stage (next round, breath-hold,
-// recovery, finish). Pure Web Audio — no files. The context is created
-// lazily on the first user gesture (the start press) and reused; sound can
-// be muted with the toggle.
-let soundEnabled = $state(true);
-let audioCtx: AudioContext | null = null;
+  function closestBreathIndex(value: number): number {
+    return clamp(Math.round((value - 10) / 5), 0, BREATH_VALUES.length - 1);
+  }
 
-function chime(freqs: number[], step = 0.14, duration = 0.22): void {
-  if (!soundEnabled || typeof window === 'undefined') return;
+  // ─── Reactive state ────────────────────────────────────────────────
+  let phase = $state<Phase>('idle');
+  let round = $state(0);
+  let breath = $state(0);
+  let timerSeconds = $state(0);
 
-  const Ctor =
-    window.AudioContext ??
-    (window as unknown as { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext;
+  let settingBreaths = $state(35);
+  let settingRounds = $state(3);
+  let settingRecovery = $state(15);
 
-  if (!Ctor) return;
+  let session = $state<SessionConfig | null>(null);
 
-  audioCtx ??= new Ctor();
-  if (audioCtx.state === 'suspended') void audioCtx.resume();
+  // ─── Picker state ─────────────────────────────────────────────────
+  let breathIndex = $state(closestBreathIndex(settingBreaths));
+  let pickerOffset = $state(0);
+  let isDraggingPicker = $state(false);
 
-  const ctx = audioCtx;
+  let dragPointerId: number | null = null;
+  let dragStartX = 0;
+  let hasDragged = false;
 
-  freqs.forEach((freq, i) => {
-    const start = ctx.currentTime + i * step;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+  // ─── Scheduling handles ───────────────────────────────────────────
+  let timeoutHandle: number | null = null;
+  let intervalHandle: number | null = null;
+  let rafHandle: number | null = null;
 
-    osc.type = 'sine';
-    osc.frequency.value = freq;
+  const isActive = $derived(phase === 'breathing' || phase === 'retention' || phase === 'recovery');
 
-    // Soft attack, gentle exponential release — a calm "ping", not a beep.
-    gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(0.16, start + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  const currentSession = $derived(
+    session ?? {
+      breaths: settingBreaths,
+      rounds: settingRounds,
+      recoveryHold: settingRecovery,
+    },
+  );
 
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(start);
-    osc.stop(start + duration + 0.03);
+  const sessionRounds = $derived(currentSession.rounds);
+  const sessionBreaths = $derived(currentSession.breaths);
+  const motion = $derived(circleMotion(phase));
+
+  const pickerTransform = $derived(`translate3d(${-breathIndex * PICKER_ITEM_WIDTH + pickerOffset}px, 0, 0)`);
+
+  const pickerTransition = $derived(isDraggingPicker ? 'none' : 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1)');
+
+  // Fractional position of the centre indicator over the track, in item units.
+  // pickerOffset is 0 at rest, so this collapses to breathIndex when idle.
+  const centerFloat = $derived(breathIndex - pickerOffset / PICKER_ITEM_WIDTH);
+
+  // The value nearest the centre indicator — the one we "activate". Updates
+  // live while dragging so the focused number lights up under the thumb.
+  const focusedIndex = $derived(clamp(Math.round(centerFloat), 0, BREATH_VALUES.length - 1));
+
+  // Native picker-wheel depth: items scale and fade with their distance from
+  // the centre. Driven inline (not via :class) so it tracks the drag frame by
+  // frame; the CSS transition only kicks in on release to settle.
+  function itemDepth(index: number): string {
+    const distance = Math.abs(index - centerFloat);
+    const scale = clamp(1.18 - distance * 0.32, 0.62, 1.18);
+    const opacity = clamp(1 - distance * 0.32, 0.18, 1);
+
+    return `transform: scale(${scale.toFixed(3)}); opacity: ${opacity.toFixed(3)};`;
+  }
+
+  const counterText = $derived.by(() => {
+    switch (phase) {
+      case 'idle':
+        return `${settingRounds} Runden · ${settingBreaths} Atemzüge`;
+
+      case 'breathing':
+        return `Atemzug ${breath}`;
+
+      case 'retention':
+        return `Halten · ${formatTime(timerSeconds)}`;
+
+      case 'recovery':
+        return `Halten · ${timerSeconds}s`;
+
+      case 'complete':
+        return 'Nimm dir einen Moment, spüre nach.';
+    }
   });
-}
 
-// ─── Phase transitions ─────────────────────────────────────────────
-function enterIdle(): void {
-  clearScheduled();
+  const startLabel = $derived(phase === 'complete' ? 'Erneut starten' : 'Atemübung starten');
 
-  phase = 'idle';
-  round = 0;
-  breath = 0;
-  timerSeconds = 0;
-  session = null;
-}
+  const holdLabel = $derived(phase === 'recovery' ? 'Weiteratmen' : 'Atem freigeben');
 
-function finishSession(): void {
-  clearScheduled();
+  const showStart = $derived(phase === 'idle' || phase === 'complete');
+  const showHold = $derived(phase === 'retention' || phase === 'recovery');
 
-  phase = 'complete';
-  breath = 0;
-  timerSeconds = 0;
-
-  chime([523, 659, 784], 0.16, 0.32); // gentle closing arpeggio
-}
-
-function beginSession(): void {
-  session = {
-    breaths: settingBreaths,
-    rounds: settingRounds,
-    recoveryHold: settingRecovery,
-  };
-
-  round = 0;
-  breath = 0;
-  timerSeconds = 0;
-
-  startBreathing();
-}
-
-function startBreathing(): void {
-  clearScheduled();
-
-  phase = 'breathing';
-  round += 1;
-  breath = 1;
-  timerSeconds = 0;
-
-  chime([660, 880]); // rising cue: a (new) round of breathing begins
-
-  const startedAt = performance.now();
-  const breathLimit = currentSession.breaths;
-
-  intervalHandle = window.setInterval(() => {
-    if (phase !== 'breathing') return;
-
-    if (breath >= breathLimit) {
-      startRetention();
-      return;
+  // ─── Scheduling ────────────────────────────────────────────────────
+  function clearScheduled(): void {
+    if (timeoutHandle !== null) {
+      window.clearTimeout(timeoutHandle);
+      timeoutHandle = null;
     }
 
-    breath += 1;
-  }, CYCLE_MS);
+    if (intervalHandle !== null) {
+      window.clearInterval(intervalHandle);
+      intervalHandle = null;
+    }
 
-  const tick = (): void => {
-    if (phase !== 'breathing') return;
+    if (rafHandle !== null) {
+      window.cancelAnimationFrame(rafHandle);
+      rafHandle = null;
+    }
+  }
 
-    timerSeconds = Math.floor((performance.now() - startedAt) / 1000);
+  // ─── Audio cues ────────────────────────────────────────────────────
+  // Short, gentle chimes mark each new stage (next round, breath-hold,
+  // recovery, finish). Pure Web Audio — no files. The context is created
+  // lazily on the first user gesture (the start press) and reused; sound can
+  // be muted with the toggle.
+  let soundEnabled = $state(true);
+  let audioCtx: AudioContext | null = null;
+
+  function chime(freqs: number[], step = 0.14, duration = 0.22): void {
+    if (!soundEnabled || typeof window === 'undefined') return;
+
+    const Ctor =
+      window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+
+    if (!Ctor) return;
+
+    audioCtx ??= new Ctor();
+    if (audioCtx.state === 'suspended') void audioCtx.resume();
+
+    const ctx = audioCtx;
+
+    freqs.forEach((freq, i) => {
+      const start = ctx.currentTime + i * step;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+
+      // Soft attack, gentle exponential release — a calm "ping", not a beep.
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.16, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + duration + 0.03);
+    });
+  }
+
+  // ─── Phase transitions ─────────────────────────────────────────────
+  function enterIdle(): void {
+    clearScheduled();
+
+    phase = 'idle';
+    round = 0;
+    breath = 0;
+    timerSeconds = 0;
+    session = null;
+  }
+
+  function finishSession(): void {
+    clearScheduled();
+
+    phase = 'complete';
+    breath = 0;
+    timerSeconds = 0;
+
+    chime([523, 659, 784], 0.16, 0.32); // gentle closing arpeggio
+  }
+
+  function beginSession(): void {
+    session = {
+      breaths: settingBreaths,
+      rounds: settingRounds,
+      recoveryHold: settingRecovery,
+    };
+
+    round = 0;
+    breath = 0;
+    timerSeconds = 0;
+
+    startBreathing();
+  }
+
+  function startBreathing(): void {
+    clearScheduled();
+
+    phase = 'breathing';
+    round += 1;
+    breath = 1;
+    timerSeconds = 0;
+
+    chime([660, 880]); // rising cue: a (new) round of breathing begins
+
+    const startedAt = performance.now();
+    const breathLimit = currentSession.breaths;
+
+    intervalHandle = window.setInterval(() => {
+      if (phase !== 'breathing') return;
+
+      if (breath >= breathLimit) {
+        startRetention();
+        return;
+      }
+
+      breath += 1;
+    }, CYCLE_MS);
+
+    const tick = (): void => {
+      if (phase !== 'breathing') return;
+
+      timerSeconds = Math.floor((performance.now() - startedAt) / 1000);
+      timeoutHandle = window.setTimeout(tick, 1000);
+    };
+
     timeoutHandle = window.setTimeout(tick, 1000);
-  };
+  }
 
-  timeoutHandle = window.setTimeout(tick, 1000);
-}
+  function startRetention(): void {
+    clearScheduled();
 
-function startRetention(): void {
-  clearScheduled();
+    phase = 'retention';
+    timerSeconds = 0;
 
-  phase = 'retention';
-  timerSeconds = 0;
+    chime([392], 0, 0.6); // calm low tone: hold your breath
 
-  chime([392], 0, 0.6); // calm low tone: hold your breath
+    const startedAt = performance.now();
 
-  const startedAt = performance.now();
+    const loop = (): void => {
+      if (phase !== 'retention') return;
 
-  const loop = (): void => {
-    if (phase !== 'retention') return;
+      timerSeconds = Math.floor((performance.now() - startedAt) / 1000);
+      rafHandle = window.requestAnimationFrame(loop);
+    };
 
-    timerSeconds = Math.floor((performance.now() - startedAt) / 1000);
     rafHandle = window.requestAnimationFrame(loop);
-  };
+  }
 
-  rafHandle = window.requestAnimationFrame(loop);
-}
+  function startRecovery(): void {
+    clearScheduled();
 
-function startRecovery(): void {
-  clearScheduled();
+    phase = 'recovery';
+    timerSeconds = currentSession.recoveryHold;
 
-  phase = 'recovery';
-  timerSeconds = currentSession.recoveryHold;
+    chime([523]); // mid tone: recovery breath
 
-  chime([523]); // mid tone: recovery breath
+    const tick = (): void => {
+      if (phase !== 'recovery') return;
 
-  const tick = (): void => {
-    if (phase !== 'recovery') return;
+      timerSeconds -= 1;
 
-    timerSeconds -= 1;
+      if (timerSeconds <= 0) {
+        goToNextRound();
+        return;
+      }
 
-    if (timerSeconds <= 0) {
-      goToNextRound();
+      timeoutHandle = window.setTimeout(tick, 1000);
+    };
+
+    timeoutHandle = window.setTimeout(tick, 1000);
+  }
+
+  function goToNextRound(): void {
+    if (round >= currentSession.rounds) {
+      finishSession();
       return;
     }
 
-    timeoutHandle = window.setTimeout(tick, 1000);
-  };
-
-  timeoutHandle = window.setTimeout(tick, 1000);
-}
-
-function goToNextRound(): void {
-  if (round >= currentSession.rounds) {
-    finishSession();
-    return;
+    startBreathing();
   }
 
-  startBreathing();
-}
-
-// ─── Actions ───────────────────────────────────────────────────────
-function onCircleClick(): void {
-  if (phase === 'idle' || phase === 'complete') {
-    beginSession();
-  }
-}
-
-function onHoldClick(): void {
-  if (phase === 'retention') {
-    startRecovery();
-    return;
+  // ─── Actions ───────────────────────────────────────────────────────
+  function onCircleClick(): void {
+    if (phase === 'idle' || phase === 'complete') {
+      beginSession();
+    }
   }
 
-  if (phase === 'recovery') {
-    goToNextRound();
-  }
-}
+  function onHoldClick(): void {
+    if (phase === 'retention') {
+      startRecovery();
+      return;
+    }
 
-function setBreathIndex(index: number): void {
-  if (isActive) return;
-
-  breathIndex = clamp(index, 0, BREATH_VALUES.length - 1);
-  settingBreaths = BREATH_VALUES[breathIndex];
-}
-
-function adjustRounds(delta: number): void {
-  if (isActive) return;
-
-  settingRounds = clamp(settingRounds + delta, 1, 6);
-}
-
-function adjustRecovery(delta: number): void {
-  if (isActive) return;
-
-  settingRecovery = clamp(settingRecovery + delta, 5, 30);
-}
-
-// ─── Picker events ─────────────────────────────────────────────────
-function onPickerPointerDown(event: PointerEvent): void {
-  if (isActive) return;
-  if (event.pointerType === 'mouse' && event.button !== 0) return;
-
-  dragPointerId = event.pointerId;
-  dragStartX = event.clientX;
-  hasDragged = false;
-  isDraggingPicker = true;
-
-  if (event.currentTarget instanceof HTMLElement) {
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }
-}
-
-function onPickerPointerMove(event: PointerEvent): void {
-  if (dragPointerId !== event.pointerId) return;
-
-  const delta = event.clientX - dragStartX;
-
-  if (!hasDragged && Math.abs(delta) > DRAG_THRESHOLD_PX) {
-    hasDragged = true;
+    if (phase === 'recovery') {
+      goToNextRound();
+    }
   }
 
-  pickerOffset = delta;
+  function setBreathIndex(index: number): void {
+    if (isActive) return;
 
-  // Activate the value currently nearest the centre, live under the thumb.
-  settingBreaths = BREATH_VALUES[focusedIndex];
-}
-
-function onPickerPointerEnd(event: PointerEvent): void {
-  if (dragPointerId !== event.pointerId) return;
-
-  // Snap to whatever is in focus right now (read before the offset resets).
-  const target = focusedIndex;
-
-  dragPointerId = null;
-  pickerOffset = 0;
-  isDraggingPicker = false;
-
-  if (hasDragged) {
-    setBreathIndex(target);
-  }
-}
-
-function onPickerClick(value: number, event: MouseEvent): void {
-  if (isActive) {
-    event.preventDefault();
-    return;
+    breathIndex = clamp(index, 0, BREATH_VALUES.length - 1);
+    settingBreaths = BREATH_VALUES[breathIndex];
   }
 
-  if (hasDragged) {
-    event.preventDefault();
-    event.stopPropagation();
+  function adjustRounds(delta: number): void {
+    if (isActive) return;
+
+    settingRounds = clamp(settingRounds + delta, 1, 6);
+  }
+
+  function adjustRecovery(delta: number): void {
+    if (isActive) return;
+
+    settingRecovery = clamp(settingRecovery + delta, 5, 30);
+  }
+
+  // ─── Picker events ─────────────────────────────────────────────────
+  function onPickerPointerDown(event: PointerEvent): void {
+    if (isActive) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    dragPointerId = event.pointerId;
+    dragStartX = event.clientX;
     hasDragged = false;
-    return;
+    isDraggingPicker = true;
+
+    if (event.currentTarget instanceof HTMLElement) {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
   }
 
-  setBreathIndex(closestBreathIndex(value));
-}
+  function onPickerPointerMove(event: PointerEvent): void {
+    if (dragPointerId !== event.pointerId) return;
 
-function onPickerKeydown(event: KeyboardEvent): void {
-  if (isActive) return;
+    const delta = event.clientX - dragStartX;
 
-  switch (event.key) {
-    case 'ArrowLeft':
-    case 'ArrowDown':
+    if (!hasDragged && Math.abs(delta) > DRAG_THRESHOLD_PX) {
+      hasDragged = true;
+    }
+
+    pickerOffset = delta;
+
+    // Activate the value currently nearest the centre, live under the thumb.
+    settingBreaths = BREATH_VALUES[focusedIndex];
+  }
+
+  function onPickerPointerEnd(event: PointerEvent): void {
+    if (dragPointerId !== event.pointerId) return;
+
+    // Snap to whatever is in focus right now (read before the offset resets).
+    const target = focusedIndex;
+
+    dragPointerId = null;
+    pickerOffset = 0;
+    isDraggingPicker = false;
+
+    if (hasDragged) {
+      setBreathIndex(target);
+    }
+  }
+
+  function onPickerClick(value: number, event: MouseEvent): void {
+    if (isActive) {
       event.preventDefault();
-      setBreathIndex(breathIndex - 1);
-      break;
+      return;
+    }
 
-    case 'ArrowRight':
-    case 'ArrowUp':
+    if (hasDragged) {
       event.preventDefault();
+      event.stopPropagation();
+      hasDragged = false;
+      return;
+    }
+
+    setBreathIndex(closestBreathIndex(value));
+  }
+
+  function onPickerKeydown(event: KeyboardEvent): void {
+    if (isActive) return;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+      case 'ArrowDown':
+        event.preventDefault();
+        setBreathIndex(breathIndex - 1);
+        break;
+
+      case 'ArrowRight':
+      case 'ArrowUp':
+        event.preventDefault();
+        setBreathIndex(breathIndex + 1);
+        break;
+
+      case 'Home':
+        event.preventDefault();
+        setBreathIndex(0);
+        break;
+
+      case 'End':
+        event.preventDefault();
+        setBreathIndex(BREATH_VALUES.length - 1);
+        break;
+    }
+  }
+
+  function onPickerWheel(event: WheelEvent): void {
+    if (isActive) return;
+    if (Math.abs(event.deltaX) < Math.abs(event.deltaY)) return;
+
+    event.preventDefault();
+
+    if (event.deltaX > 10) {
       setBreathIndex(breathIndex + 1);
-      break;
-
-    case 'Home':
-      event.preventDefault();
-      setBreathIndex(0);
-      break;
-
-    case 'End':
-      event.preventDefault();
-      setBreathIndex(BREATH_VALUES.length - 1);
-      break;
+    } else if (event.deltaX < -10) {
+      setBreathIndex(breathIndex - 1);
+    }
   }
-}
 
-function onPickerWheel(event: WheelEvent): void {
-  if (isActive) return;
-  if (Math.abs(event.deltaX) < Math.abs(event.deltaY)) return;
-
-  event.preventDefault();
-
-  if (event.deltaX > 10) {
-    setBreathIndex(breathIndex + 1);
-  } else if (event.deltaX < -10) {
-    setBreathIndex(breathIndex - 1);
-  }
-}
-
-onDestroy(() => {
-  clearScheduled();
-  void audioCtx?.close();
-});
+  onDestroy(() => {
+    clearScheduled();
+    void audioCtx?.close();
+  });
 </script>
 
-<div
-  class="breathing-app"
-  data-motion-essential
-  data-phase={phase}
-  style="--breathing-cycle-ms: {CYCLE_MS}ms"
->
+<div class="breathing-app" data-motion-essential data-phase={phase} style="--breathing-cycle-ms: {CYCLE_MS}ms">
   <div class="breathing-app__stage" aria-live="polite">
     <button
       type="button"
@@ -488,18 +469,9 @@ onDestroy(() => {
       aria-label={`${PHASE_LABEL[phase]}: ${counterText}`}
       onclick={onCircleClick}
     >
-      <span
-        class="breathing-app__ring breathing-app__ring--1"
-        aria-hidden="true"
-      ></span>
-      <span
-        class="breathing-app__ring breathing-app__ring--2"
-        aria-hidden="true"
-      ></span>
-      <span
-        class="breathing-app__ring breathing-app__ring--3"
-        aria-hidden="true"
-      ></span>
+      <span class="breathing-app__ring breathing-app__ring--1" aria-hidden="true"></span>
+      <span class="breathing-app__ring breathing-app__ring--2" aria-hidden="true"></span>
+      <span class="breathing-app__ring breathing-app__ring--3" aria-hidden="true"></span>
       <span class="breathing-app__core" aria-hidden="true"></span>
 
       <span class="breathing-app__label">
@@ -547,9 +519,7 @@ onDestroy(() => {
       </button>
     {/if}
 
-    <button type="button" class="btn btn--ghost" onclick={enterIdle}>
-      Zurücksetzen
-    </button>
+    <button type="button" class="btn btn--ghost" onclick={enterIdle}> Zurücksetzen </button>
 
     <button
       type="button"
@@ -562,12 +532,7 @@ onDestroy(() => {
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"></path>
         {#if soundEnabled}
-          <path
-            d="M16 8.5a4 4 0 0 1 0 7"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
+          <path d="M16 8.5a4 4 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
           ></path>
         {:else}
           <path
@@ -609,12 +574,10 @@ onDestroy(() => {
           onpointerup={onPickerPointerEnd}
           onpointercancel={onPickerPointerEnd}
         >
-          {#each BREATH_VALUES as value, index}
+          {#each BREATH_VALUES as value, index (value)}
             <button
               type="button"
-              class={`breathing-picker__item ${
-                index === focusedIndex ? 'is-active' : ''
-              }`}
+              class={`breathing-picker__item ${index === focusedIndex ? 'is-active' : ''}`}
               style={itemDepth(index)}
               tabindex={index === focusedIndex ? 0 : -1}
               aria-label={`${value} Atemzüge`}
@@ -625,14 +588,8 @@ onDestroy(() => {
           {/each}
         </div>
 
-        <div
-          class="breathing-picker__fade breathing-picker__fade--start"
-          aria-hidden="true"
-        ></div>
-        <div
-          class="breathing-picker__fade breathing-picker__fade--end"
-          aria-hidden="true"
-        ></div>
+        <div class="breathing-picker__fade breathing-picker__fade--start" aria-hidden="true"></div>
+        <div class="breathing-picker__fade breathing-picker__fade--end" aria-hidden="true"></div>
       </div>
     </div>
 

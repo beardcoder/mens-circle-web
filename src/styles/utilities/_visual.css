@@ -61,7 +61,7 @@ body::before {
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  content: "";
+  content: '';
   background-image: var(--surface-noise);
   background-size: 400px 400px;
   mix-blend-mode: overlay;

@@ -1,95 +1,86 @@
 <script lang="ts">
-import { isValidEmail } from '@lib/helpers';
-import { submitTestimonial } from '@lib/pocketbase';
-import { showToast } from '@lib/toast';
-import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
+  import { isValidEmail } from '@lib/helpers';
+  import { submitTestimonial } from '@lib/pocketbase';
+  import { showToast } from '@lib/toast';
+  import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
 
-let quote = $state('');
-let authorName = $state('');
-let role = $state('');
-let email = $state('');
-let privacy = $state(false);
-let website = $state(''); // honeypot
-let submitting = $state(false);
+  let quote = $state('');
+  let authorName = $state('');
+  let role = $state('');
+  let email = $state('');
+  let privacy = $state(false);
+  let website = $state(''); // honeypot
+  let submitting = $state(false);
 
-const charCount = $derived(quote.length);
+  const charCount = $derived(quote.length);
 
-async function handleSubmit(e: SubmitEvent): Promise<void> {
-  e.preventDefault();
+  async function handleSubmit(e: SubmitEvent): Promise<void> {
+    e.preventDefault();
 
-  const text = quote.trim();
-  const name = authorName.trim();
-  const roleValue = role.trim();
-  const mail = email.trim();
+    const text = quote.trim();
+    const name = authorName.trim();
+    const roleValue = role.trim();
+    const mail = email.trim();
 
-  if (!text || text.length < 10) {
-    showToast(
-      'error',
-      'Bitte teile deine Erfahrung mit uns (mindestens 10 Zeichen).',
-    );
-    return;
-  }
-
-  if (!isValidEmail(mail)) {
-    showToast('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
-    return;
-  }
-
-  if (!privacy) {
-    showToast('error', 'Bitte bestätige die Datenschutzerklärung.');
-    return;
-  }
-
-  trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUBMIT, {
-    has_name: name ? 'yes' : 'no',
-    has_role: roleValue ? 'yes' : 'no',
-    char_count: text.length,
-  });
-  submitting = true;
-
-  try {
-    const { success, message } = await submitTestimonial({
-      quote: text,
-      author_name: name || null,
-      role: roleValue || null,
-      email: mail,
-      privacy: true,
-      website,
-    });
-
-    if (success) {
-      showToast('success', message);
-      trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUCCESS);
-      quote = '';
-      authorName = '';
-      role = '';
-      email = '';
-      privacy = false;
-    } else {
-      showToast('error', message);
-      trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: message });
+    if (!text || text.length < 10) {
+      showToast('error', 'Bitte teile deine Erfahrung mit uns (mindestens 10 Zeichen).');
+      return;
     }
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Network error';
-    showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
-    trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: msg });
-  } finally {
-    submitting = false;
+
+    if (!isValidEmail(mail)) {
+      showToast('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
+      return;
+    }
+
+    if (!privacy) {
+      showToast('error', 'Bitte bestätige die Datenschutzerklärung.');
+      return;
+    }
+
+    trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUBMIT, {
+      has_name: name ? 'yes' : 'no',
+      has_role: roleValue ? 'yes' : 'no',
+      char_count: text.length,
+    });
+    submitting = true;
+
+    try {
+      const { success, message } = await submitTestimonial({
+        quote: text,
+        author_name: name || null,
+        role: roleValue || null,
+        email: mail,
+        privacy: true,
+        website,
+      });
+
+      if (success) {
+        showToast('success', message);
+        trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUCCESS);
+        quote = '';
+        authorName = '';
+        role = '';
+        email = '';
+        privacy = false;
+      } else {
+        showToast('error', message);
+        trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: message });
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Network error';
+      showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
+      trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: msg });
+    } finally {
+      submitting = false;
+    }
   }
-}
 </script>
 
 <form class="testimonial-form" onsubmit={handleSubmit}>
   <div class="hp-field" aria-hidden="true">
     <label>
       Website
-      <input
-        type="text"
-        name="website"
-        tabindex="-1"
-        autocomplete="off"
-        bind:value={website}
-      />
+      <input type="text" name="website" tabindex="-1" autocomplete="off" bind:value={website} />
     </label>
   </div>
   <div class="form-field form-field--spaced">
@@ -101,13 +92,12 @@ async function handleSubmit(e: SubmitEvent): Promise<void> {
       name="quote"
       class="form-control form-control--light"
       rows="6"
-      placeholder={'z.B. "Hier kann ich endlich ich selbst sein, ohne Maske und ohne Leistungsdruck..."'}
+      placeholder="z.B. &quot;Hier kann ich endlich ich selbst sein, ohne Maske und ohne Leistungsdruck...&quot;"
       required
       minlength="10"
       maxlength="1000"
       bind:value={quote}
-      disabled={submitting}
-    ></textarea>
+      disabled={submitting}></textarea>
     <span class="form-hint">Mindestens 10 Zeichen, maximal 1000 Zeichen</span>
     <span class="testimonial-form__counter">
       <span class="char-count">{charCount}</span>/1000
@@ -162,8 +152,7 @@ async function handleSubmit(e: SubmitEvent): Promise<void> {
       bind:value={email}
       disabled={submitting}
     />
-    <span class="form-hint">Wird nicht veröffentlicht. Nur für Rückfragen.</span
-    >
+    <span class="form-hint">Wird nicht veröffentlicht. Nur für Rückfragen.</span>
   </div>
 
   <div class="form-field form-field--checkbox">
@@ -178,11 +167,8 @@ async function handleSubmit(e: SubmitEvent): Promise<void> {
       />
       <span class="form-checkbox-text">
         Ich habe die
-        <a href="/datenschutz" target="_blank" class="link"
-          >Datenschutzerklärung</a
-        >
-        zur Kenntnis genommen und bin damit einverstanden, dass meine Daten zum Zwecke
-        der Veröffentlichung gespeichert werden.
+        <a href="/datenschutz" target="_blank" class="link">Datenschutzerklärung</a>
+        zur Kenntnis genommen und bin damit einverstanden, dass meine Daten zum Zwecke der Veröffentlichung gespeichert werden.
         <span class="form-required">*</span>
       </span>
     </label>
@@ -196,8 +182,7 @@ async function handleSubmit(e: SubmitEvent): Promise<void> {
 
   <p class="testimonial-form__note">
     <small>
-      Alle Felder mit <span class="form-required">*</span> sind Pflichtfelder.<br
-      />
+      Alle Felder mit <span class="form-required">*</span> sind Pflichtfelder.<br />
       Dein Testimonial wird nach Prüfung durch uns veröffentlicht.
     </small>
   </p>

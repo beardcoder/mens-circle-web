@@ -31,10 +31,7 @@ function readCache(): boolean | null {
 
 function writeCache(value: boolean): void {
   try {
-    sessionStorage.setItem(
-      CACHE_KEY,
-      JSON.stringify({ value, at: Date.now() }),
-    );
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ value, at: Date.now() }));
   } catch {
     // sessionStorage unavailable (private mode / disabled) — just skip caching.
   }

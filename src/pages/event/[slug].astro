@@ -20,9 +20,5 @@ const cleanTitle = event.title?.trim() || 'Termin';
   description={`${cleanTitle} in ${event.location || 'Straubing'}. Sieh dir den Termin an und sichere dir deinen Platz.`}
   ogType="event"
 >
-  <EventPage
-    client:load
-    event={event}
-    whatsappLink={site.whatsappCommunityLink}
-  />
+  <EventPage client:load event={event} whatsappLink={site.whatsappCommunityLink} />
 </Layout>

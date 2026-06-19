@@ -59,14 +59,7 @@ const DEFAULTS: ResolvedOptions = {
   debug: false,
 };
 
-const ACTIVITY_EVENTS = [
-  'mousedown',
-  'mousemove',
-  'keydown',
-  'scroll',
-  'touchstart',
-  'click',
-] as const;
+const ACTIVITY_EVENTS = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'] as const;
 
 const MAX_UMAMI_WAIT_ATTEMPTS = 80;
 
@@ -158,8 +151,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
     console.debug('[UmamiKit]', ...args);
   };
 
-  const timeOnPageSeconds = (): number =>
-    Math.max(1, Math.round((Date.now() - state.startTime) / 1000));
+  const timeOnPageSeconds = (): number => Math.max(1, Math.round((Date.now() - state.startTime) / 1000));
 
   const checkScrollDepth = (): void => {
     const range = document.documentElement.scrollHeight - window.innerHeight;
@@ -205,10 +197,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
           window.clearTimeout(scrollDebounceTimer);
         }
 
-        scrollDebounceTimer = window.setTimeout(
-          checkScrollDepth,
-          opts.scrollDebounceMs,
-        );
+        scrollDebounceTimer = window.setTimeout(checkScrollDepth, opts.scrollDebounceMs);
       },
       { passive: true, signal },
     );
@@ -235,10 +224,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
       const now = Date.now();
 
       if (state.isIdle) {
-        const idleDurationSeconds = Math.max(
-          1,
-          Math.round((now - state.lastActivityAt) / 1000),
-        );
+        const idleDurationSeconds = Math.max(1, Math.round((now - state.lastActivityAt) / 1000));
 
         state.isIdle = false;
 
@@ -292,11 +278,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
 
         const link = event.target.closest<HTMLAnchorElement>('a[href]');
 
-        if (
-          !link ||
-          !isExternalLink(link.href) ||
-          link.hasAttribute('data-umami-event')
-        ) {
+        if (!link || !isExternalLink(link.href) || link.hasAttribute('data-umami-event')) {
           return;
         }
 
@@ -314,9 +296,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
   const setupVisibilityTracking = (): void => {
     if (!('IntersectionObserver' in window)) return;
 
-    const elements = document.querySelectorAll<HTMLElement>(
-      opts.visibilitySelector,
-    );
+    const elements = document.querySelectorAll<HTMLElement>(opts.visibilitySelector);
 
     if (elements.length === 0) return;
 
@@ -332,8 +312,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
           seenVisible.add(element);
           state.visibleElementsCount += 1;
 
-          const name =
-            element.dataset.umamiVisible ?? TRACKING_EVENTS.SECTION_VISIBLE;
+          const name = element.dataset.umamiVisible ?? TRACKING_EVENTS.SECTION_VISIBLE;
 
           trackEvent(name, {
             ...collectElementData(element),
@@ -374,8 +353,7 @@ export function createUmamiKit(options: UmamiKitOptions = {}): UmamiKit {
     destroy(): void {
       controller.abort();
 
-      if (scrollDebounceTimer !== null)
-        window.clearTimeout(scrollDebounceTimer);
+      if (scrollDebounceTimer !== null) window.clearTimeout(scrollDebounceTimer);
       if (heartbeatTimer !== null) window.clearInterval(heartbeatTimer);
       if (idleTimer !== null) window.clearInterval(idleTimer);
 

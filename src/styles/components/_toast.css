@@ -87,11 +87,7 @@
 
 .toast--success {
   color: var(--text-primary);
-  background: color-mix(
-    in oklch,
-    var(--color-sage-light) 15%,
-    var(--bg-elevated)
-  );
+  background: color-mix(in oklch, var(--color-sage-light) 15%, var(--bg-elevated));
   border-inline-start: 3px solid var(--color-success);
 }
 
@@ -156,11 +152,7 @@
   }
 
   .toast--success {
-    background: color-mix(
-      in oklch,
-      var(--color-success) 18%,
-      var(--bg-elevated)
-    );
+    background: color-mix(in oklch, var(--color-success) 18%, var(--bg-elevated));
   }
 
   .toast--success .toast__title {
@@ -176,11 +168,7 @@
   }
 
   .toast--info {
-    background: color-mix(
-      in oklch,
-      var(--color-terracotta) 18%,
-      var(--bg-elevated)
-    );
+    background: color-mix(in oklch, var(--color-terracotta) 18%, var(--bg-elevated));
   }
 
   .toast--info .toast__title {
@@ -188,11 +176,7 @@
   }
 
   .toast--warning {
-    background: color-mix(
-      in oklch,
-      var(--color-warning) 15%,
-      var(--bg-elevated)
-    );
+    background: color-mix(in oklch, var(--color-warning) 15%, var(--bg-elevated));
   }
 
   .toast--warning .toast__title {

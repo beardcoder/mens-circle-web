@@ -1,0 +1,18 @@
+# build output
+dist/
+.astro/
+
+# dependencies & lockfile
+node_modules/
+bun.lock
+
+# generated / vendored assets (not hand-edited)
+public/
+**/*.min.js
+
+# backend & external services — not ours to format
+pocketbase/
+listmonk/
+
+# tooling
+.claude/
