@@ -1,0 +1,159 @@
+---
+/**
+ * The Sitzkreis. The capacity ring taken to its literal end: the gathering
+ * drawn as a circle. Each registered participant is a seat around the fire
+ * (ember glow at the centre); open places are hollow seats. The circle fills
+ * clockwise from the top, matching the numbered roster beside it.
+ */
+interface Seat {
+  initials: string;
+  name: string;
+}
+interface Props {
+  seats: Seat[];
+  capacity: number;
+}
+const { seats, capacity } = Astro.props;
+
+const total = Math.max(capacity, seats.length, 1);
+const SIZE = 320;
+const C = SIZE / 2;
+const R = 122; // seat ring radius
+const NODE = 19; // seat radius
+
+const points = Array.from({ length: total }, (_, i) => {
+  const a = ((-90 + (i * 360) / total) * Math.PI) / 180;
+  return {
+    x: C + R * Math.cos(a),
+    y: C + R * Math.sin(a),
+    seat: seats[i],
+    n: i + 1,
+  };
+});
+const full = seats.length >= capacity && capacity > 0;
+---
+
+<figure class="seating" class:list={{ 'is-full': full }}>
+  <svg
+    viewBox={`0 0 ${SIZE} ${SIZE}`}
+    role="img"
+    aria-label={`Sitzkreis: ${seats.length} von ${capacity} Plätzen belegt`}
+  >
+    <circle class="seating__ring" cx={C} cy={C} r={R} fill="none"></circle>
+
+    <!-- the fire -->
+    <circle class="seating__glow" cx={C} cy={C} r="46"></circle>
+    <circle class="seating__fire" cx={C} cy={C} r="30"></circle>
+    <text class="seating__count" x={C} y={C} text-anchor="middle" dominant-baseline="central">
+      {seats.length}<tspan class="seating__cap">/{capacity}</tspan>
+    </text>
+
+    {
+      points.map((p) =>
+        p.seat ? (
+          <g class="seat seat--taken">
+            <circle cx={p.x} cy={p.y} r={NODE} />
+            <text x={p.x} y={p.y} text-anchor="middle" dominant-baseline="central">
+              {p.seat.initials}
+            </text>
+          </g>
+        ) : (
+          <g class="seat seat--open">
+            <circle cx={p.x} cy={p.y} r={NODE} fill="none" />
+            <text x={p.x} y={p.y} text-anchor="middle" dominant-baseline="central">
+              {p.n}
+            </text>
+          </g>
+        ),
+      )
+    }
+  </svg>
+</figure>
+
+<style>
+  .seating {
+    margin: 0;
+    width: 100%;
+    max-width: 300px;
+  }
+  .seating svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+  .seating__ring {
+    stroke: var(--line);
+    stroke-width: 1.5;
+  }
+
+  /* fire */
+  .seating__glow {
+    fill: var(--ember);
+    opacity: 0.18;
+    transform-origin: center;
+    animation: ember-pulse 3.6s ease-in-out infinite;
+  }
+  .seating__fire {
+    fill: var(--ember);
+    filter: drop-shadow(0 0 10px rgba(224, 138, 74, 0.6));
+  }
+  .is-full .seating__fire {
+    fill: var(--sage);
+    filter: drop-shadow(0 0 12px rgba(143, 176, 140, 0.6));
+  }
+  .is-full .seating__glow {
+    fill: var(--sage);
+  }
+  .seating__count {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 19px;
+    fill: #1a130c;
+  }
+  .seating__cap {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  /* seats */
+  .seat--taken circle {
+    fill: var(--ember);
+  }
+  .is-full .seat--taken circle {
+    fill: var(--sage);
+  }
+  .seat--taken text {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 13px;
+    fill: #1a130c;
+  }
+  .seat--open circle {
+    stroke: var(--line-strong);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 3;
+  }
+  .seat--open text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    fill: var(--faint);
+  }
+
+  @keyframes ember-pulse {
+    0%,
+    100% {
+      opacity: 0.16;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.3;
+      transform: scale(1.12);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .seating__glow {
+      animation: none;
+    }
+  }
+</style>
