@@ -1,0 +1,296 @@
+---
+import CapacityRing from './CapacityRing.astro';
+
+type Status = 'registered' | 'waitlist' | 'cancelled' | 'attended';
+interface Reg {
+  id: string;
+  status: Status;
+  registeredAt: string | null;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+interface Props {
+  eventId: string;
+  eventTitle: string;
+  maxParticipants: number;
+  registrations: Reg[];
+}
+const { eventId, eventTitle, maxParticipants, registrations } = Astro.props;
+
+const STATUS_LABEL: Record<Status, string> = {
+  registered: 'Angemeldet',
+  waitlist: 'Warteliste',
+  cancelled: 'Storniert',
+  attended: 'Teilgenommen',
+};
+const activeCount = registrations.filter((r) => r.status === 'registered' || r.status === 'attended').length;
+const waitlistCount = registrations.filter((r) => r.status === 'waitlist').length;
+
+function fmt(iso: string | null): string {
+  if (!iso) return '–';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '–' : d.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
+}
+function badgeClass(s: Status): string {
+  if (s === 'registered' || s === 'attended') return 'badge--live';
+  if (s === 'waitlist') return 'badge--wait';
+  return 'badge--off';
+}
+---
+
+<div class="pagehead">
+  <div class="pagehead__titles">
+    <p class="eyebrow">Anmeldungen</p>
+    <h1>{eventTitle}</h1>
+  </div>
+  <a class="btn btn--ghost" href="/admin">Zurück</a>
+</div>
+
+<div class="stats card">
+  <CapacityRing value={activeCount} max={maxParticipants} size={76} stroke={6} />
+  <div class="stats__text">
+    <p class="stats__line">
+      <span class="mono stats__n">{activeCount}</span> von <span class="mono">{maxParticipants}</span> Plätzen belegt
+    </p>
+    <p class="stats__line muted">
+      <span class="mono stats__n">{waitlistCount}</span> auf der Warteliste
+    </p>
+  </div>
+</div>
+
+{
+  registrations.length === 0 ? (
+    <div class="empty">Noch keine Anmeldungen.</div>
+  ) : (
+    <ul id="reg-list" class="regs">
+      {registrations.map((reg) => (
+        <li class="reg card" data-id={reg.id} data-name={`${reg.firstName} ${reg.lastName}`}>
+          <div class="reg__head">
+            <span class="reg__name">
+              {reg.firstName} {reg.lastName}
+            </span>
+            <span class={`badge ${badgeClass(reg.status)}`}>{STATUS_LABEL[reg.status]}</span>
+          </div>
+          <div class="reg__contact mono">
+            <a href={`mailto:${reg.email}`}>{reg.email}</a>
+            {reg.phone && <span class="faint"> · {reg.phone}</span>}
+          </div>
+          <div class="reg__foot">
+            <span class="reg__when mono faint">angemeldet {fmt(reg.registeredAt)}</span>
+            <div class="reg__actions">
+              <select class="js-status" aria-label="Status ändern">
+                <option value="registered" selected={reg.status === 'registered'}>
+                  Angemeldet
+                </option>
+                <option value="waitlist" selected={reg.status === 'waitlist'}>
+                  Warteliste
+                </option>
+                <option value="attended" selected={reg.status === 'attended'}>
+                  Teilgenommen
+                </option>
+                <option value="cancelled" selected={reg.status === 'cancelled'}>
+                  Storniert
+                </option>
+              </select>
+              <button class="btn btn--danger btn--sm js-del-reg" type="button">
+                Entfernen
+              </button>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<section class="broadcast">
+  <h2>Nachricht an Teilnehmer:innen</h2>
+  <p class="muted broadcast__hint">
+    Geht per E-Mail an alle <strong>angemeldeten</strong> Teilnehmer:innen. Platzhalter
+    <code>{'{first_name}'}</code> wird durch den Vornamen ersetzt.
+  </p>
+  <form id="broadcast-form" class="card" data-event={eventId}>
+    <div class="field">
+      <label for="msg-subject">Betreff</label>
+      <input id="msg-subject" name="subject" type="text" />
+    </div>
+    <div class="field">
+      <label for="msg-content">Nachricht</label>
+      <textarea id="msg-content" name="content" rows="6"></textarea>
+    </div>
+    <button class="btn" type="submit">Nachricht senden</button>
+  </form>
+</section>
+
+<script>
+  import { actions } from 'astro:actions';
+
+  function init() {
+    const list = document.getElementById('reg-list');
+    if (list && !list.dataset.bound) {
+      list.dataset.bound = '1';
+
+      // Status change.
+      list.addEventListener('change', async (e) => {
+        const sel = (e.target as HTMLElement).closest('.js-status') as HTMLSelectElement | null;
+        if (!sel) return;
+        const row = sel.closest('.reg') as HTMLElement;
+        const id = row.dataset.id!;
+        const status = sel.value as 'registered' | 'waitlist' | 'cancelled' | 'attended';
+        sel.disabled = true;
+        const { error } = await actions.setRegistrationStatus({ id, status });
+        sel.disabled = false;
+        if (error) {
+          window.adminToast?.('err', error.message);
+          return;
+        }
+        window.adminToast?.('ok', 'Status aktualisiert.');
+        // A cancellation can promote someone from the waitlist — reload to reflect it.
+        if (status === 'cancelled') setTimeout(() => window.location.reload(), 700);
+      });
+
+      // Remove.
+      list.addEventListener('click', async (e) => {
+        const btn = (e.target as HTMLElement).closest('.js-del-reg') as HTMLButtonElement | null;
+        if (!btn) return;
+        const row = btn.closest('.reg') as HTMLElement;
+        const { id, name } = row.dataset;
+        if (!id || !confirm(`Anmeldung von ${name} entfernen?`)) return;
+        btn.disabled = true;
+        const { error } = await actions.deleteRegistration({ id });
+        if (error) {
+          btn.disabled = false;
+          window.adminToast?.('err', error.message);
+          return;
+        }
+        window.adminToast?.('ok', 'Anmeldung entfernt.');
+        row.remove();
+      });
+    }
+
+    const form = document.getElementById('broadcast-form') as HTMLFormElement | null;
+    if (form && !form.dataset.bound) {
+      form.dataset.bound = '1';
+      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        btn.disabled = true;
+        btn.textContent = 'Senden…';
+        const { data, error } = await actions.sendEventMessage({
+          id: form.dataset.event!,
+          subject: String(fd.get('subject') ?? ''),
+          content: String(fd.get('content') ?? ''),
+        });
+        btn.disabled = false;
+        btn.textContent = 'Nachricht senden';
+        if (error) {
+          window.adminToast?.('err', error.message);
+          return;
+        }
+        window.adminToast?.('ok', data.message);
+        form.reset();
+      });
+    }
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .stats {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+  .stats__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .stats__line {
+    margin: 0;
+    font-size: 1rem;
+  }
+  .stats__n {
+    color: var(--ember);
+    font-weight: 600;
+    font-size: 1.15rem;
+  }
+  .regs {
+    list-style: none;
+    margin: 0 0 2.5rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .reg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1rem 1.15rem;
+  }
+  .reg__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .reg__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.02rem;
+  }
+  .reg__contact {
+    font-size: 0.8rem;
+  }
+  .reg__contact a {
+    color: var(--muted);
+  }
+  .reg__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.15rem;
+  }
+  .reg__when {
+    font-size: 0.72rem;
+  }
+  .reg__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .reg__actions select {
+    width: auto;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.5rem;
+  }
+  .broadcast__hint {
+    font-size: 0.85rem;
+    margin: 0 0 1rem;
+  }
+  .broadcast code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--bg);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    color: var(--ember);
+  }
+  @media (max-width: 480px) {
+    .reg__actions {
+      flex: 1 1 100%;
+      justify-content: space-between;
+    }
+    .reg__actions select {
+      flex: 1 1 auto;
+    }
+  }
+</style>

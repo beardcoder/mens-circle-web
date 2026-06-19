@@ -1,6 +1,6 @@
 ---
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
-import RegistrationManager from '../../../../components/admin/RegistrationManager.svelte';
+import RegistrationManager from '../../../../components/admin/RegistrationManager.astro';
 import { getEventById } from '@lib/server/events';
 import { listRegistrationsForEvent } from '@lib/server/registrations';
 
@@ -15,7 +15,6 @@ const registrations = await listRegistrationsForEvent(event.id);
 
 <AdminLayout title="Anmeldungen">
   <RegistrationManager
-    client:load
     eventId={event.id}
     eventTitle={event.title}
     maxParticipants={event.maxParticipants}

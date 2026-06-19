@@ -1,0 +1,271 @@
+---
+interface Testimonial {
+  id: string;
+  quote: string;
+  authorName: string;
+  role: string;
+  email: string;
+  isPublished: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+interface Props {
+  testimonials: Testimonial[];
+}
+const { testimonials } = Astro.props;
+---
+
+<div class="pagehead">
+  <div class="pagehead__titles">
+    <p class="eyebrow">Moderation</p>
+    <h1>Stimmen</h1>
+  </div>
+</div>
+
+{
+  testimonials.length === 0 ? (
+    <div class="empty">Noch keine Einreichungen.</div>
+  ) : (
+    <ul id="testi-list" class="testis">
+      {testimonials.map((t) => (
+        <li class="testi card" data-id={t.id} data-published={t.isPublished ? '1' : ''}>
+          <div class="testi__view">
+            <blockquote class="testi__quote js-quote">{t.quote}</blockquote>
+            <div class="testi__meta mono muted">
+              <strong class="testi__author js-author">{t.authorName}</strong>
+              <span class="js-role">{t.role ? ` · ${t.role}` : ''}</span>
+              <span class="faint js-email">{t.email ? ` · ${t.email}` : ''}</span>
+            </div>
+          </div>
+
+          <form class="testi__edit js-edit" hidden>
+            <div class="field">
+              <label>Zitat</label>
+              {/* prettier-ignore */}
+              <textarea name="quote" rows="4">{t.quote}</textarea>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Name</label>
+                <input name="authorName" type="text" value={t.authorName} />
+              </div>
+              <div class="field">
+                <label>Rolle</label>
+                <input name="role" type="text" value={t.role} />
+              </div>
+            </div>
+            <div class="field">
+              <label>E-Mail</label>
+              <input name="email" type="email" value={t.email} />
+            </div>
+            <div class="testi__editbtns">
+              <button class="btn btn--sm" type="submit">
+                Speichern
+              </button>
+              <button class="btn btn--ghost btn--sm js-cancel" type="button">
+                Abbrechen
+              </button>
+            </div>
+          </form>
+
+          <div class="testi__controls">
+            <span class={`badge js-badge ${t.isPublished ? 'badge--live' : 'badge--off'}`}>
+              {t.isPublished ? 'veröffentlicht' : 'unsichtbar'}
+            </span>
+            <label class="order">
+              <span class="muted">Reihenfolge</span>
+              <input class="js-order mono" type="number" value={t.sortOrder} />
+            </label>
+            <div class="testi__btns">
+              <button class="btn btn--ghost btn--sm js-edit-btn" type="button">
+                Bearbeiten
+              </button>
+              <button class="btn btn--ghost btn--sm js-toggle" type="button">
+                {t.isPublished ? 'Verbergen' : 'Veröffentlichen'}
+              </button>
+              <button class="btn btn--danger btn--sm js-del-testi" type="button">
+                Löschen
+              </button>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<script>
+  import { actions } from 'astro:actions';
+
+  function setEditing(card: HTMLElement, on: boolean) {
+    (card.querySelector('.testi__view') as HTMLElement).hidden = on;
+    (card.querySelector('.testi__controls') as HTMLElement).hidden = on;
+    (card.querySelector('.js-edit') as HTMLElement).hidden = !on;
+  }
+
+  function init() {
+    const list = document.getElementById('testi-list');
+    if (!list || list.dataset.bound) return;
+    list.dataset.bound = '1';
+
+    // Sort order.
+    list.addEventListener('change', async (e) => {
+      const input = (e.target as HTMLElement).closest('.js-order') as HTMLInputElement | null;
+      if (!input) return;
+      const id = (input.closest('.testi') as HTMLElement).dataset.id!;
+      const { error } = await actions.moderateTestimonial({ id, sortOrder: Number(input.value) || 0 });
+      window.adminToast?.(error ? 'err' : 'ok', error ? error.message : 'Reihenfolge gespeichert.');
+    });
+
+    // Edit form submit.
+    list.addEventListener('submit', async (e) => {
+      const form = (e.target as HTMLElement).closest('.js-edit') as HTMLFormElement | null;
+      if (!form) return;
+      e.preventDefault();
+      const card = form.closest('.testi') as HTMLElement;
+      const fd = new FormData(form);
+      const get = (k: string) => String(fd.get(k) ?? '');
+      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      btn.disabled = true;
+      const payload = {
+        id: card.dataset.id!,
+        quote: get('quote'),
+        authorName: get('authorName'),
+        role: get('role'),
+        email: get('email'),
+      };
+      const { error } = await actions.updateTestimonial(payload);
+      btn.disabled = false;
+      if (error) {
+        window.adminToast?.('err', error.message);
+        return;
+      }
+      // Reflect saved content in the display view.
+      (card.querySelector('.js-quote') as HTMLElement).textContent = payload.quote;
+      (card.querySelector('.js-author') as HTMLElement).textContent = payload.authorName;
+      (card.querySelector('.js-role') as HTMLElement).textContent = payload.role ? ` · ${payload.role}` : '';
+      (card.querySelector('.js-email') as HTMLElement).textContent = payload.email ? ` · ${payload.email}` : '';
+      setEditing(card, false);
+      window.adminToast?.('ok', 'Stimme gespeichert.');
+    });
+
+    list.addEventListener('click', async (e) => {
+      const target = e.target as HTMLElement;
+      const card = target.closest('.testi') as HTMLElement | null;
+      if (!card) return;
+
+      // Enter / leave edit mode.
+      if (target.closest('.js-edit-btn')) {
+        setEditing(card, true);
+        (card.querySelector('.js-edit textarea') as HTMLTextAreaElement)?.focus();
+        return;
+      }
+      if (target.closest('.js-cancel')) {
+        (card.querySelector('.js-edit') as HTMLFormElement).reset();
+        setEditing(card, false);
+        return;
+      }
+
+      // Toggle publish.
+      const toggle = target.closest('.js-toggle') as HTMLButtonElement | null;
+      if (toggle) {
+        const id = card.dataset.id!;
+        const publish = !card.dataset.published;
+        toggle.disabled = true;
+        const { error } = await actions.moderateTestimonial({ id, publish });
+        toggle.disabled = false;
+        if (error) {
+          window.adminToast?.('err', error.message);
+          return;
+        }
+        card.dataset.published = publish ? '1' : '';
+        toggle.textContent = publish ? 'Verbergen' : 'Veröffentlichen';
+        const badge = card.querySelector('.js-badge') as HTMLElement;
+        badge.textContent = publish ? 'veröffentlicht' : 'unsichtbar';
+        badge.classList.toggle('badge--live', publish);
+        badge.classList.toggle('badge--off', !publish);
+        window.adminToast?.('ok', publish ? 'Veröffentlicht.' : 'Verborgen.');
+        return;
+      }
+
+      // Delete.
+      if (target.closest('.js-del-testi')) {
+        if (!confirm('Diese Stimme wirklich löschen?')) return;
+        const { error } = await actions.deleteTestimonial({ id: card.dataset.id! });
+        if (error) {
+          window.adminToast?.('err', error.message);
+          return;
+        }
+        window.adminToast?.('ok', 'Gelöscht.');
+        card.remove();
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .testis {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .testi {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .testi__quote {
+    margin: 0;
+    padding-left: 1rem;
+    border-left: 2px solid var(--ember);
+    font-size: 1.08rem;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .testi__meta {
+    font-size: 0.78rem;
+    margin-top: 0.65rem;
+  }
+  .testi__author {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .testi__edit .field:last-of-type {
+    margin-bottom: 0.75rem;
+  }
+  .testi__editbtns {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .testi__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--line);
+  }
+  .order {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    margin: 0;
+  }
+  .order input {
+    width: 4.5rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  .testi__btns {
+    display: flex;
+    gap: 0.4rem;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+</style>

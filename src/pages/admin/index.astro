@@ -1,21 +1,53 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import EventList from '../../components/admin/EventList.svelte';
+import EventList from '../../components/admin/EventList.astro';
+import NextEvent from '../../components/admin/NextEvent.astro';
 import { listEventsForAdmin } from '@lib/server/events';
+import { listRegistrationsForEvent } from '@lib/server/registrations';
 
 export const prerender = false;
 
-const events = (await listEventsForAdmin()).map((e) => ({
+const all = await listEventsForAdmin();
+
+const events = all.map((e) => ({
   id: e.id,
   title: e.title,
   slug: e.slug,
   eventDate: e.eventDate,
+  startTime: e.startTime,
   isPublished: e.isPublished,
   maxParticipants: e.maxParticipants,
   activeCount: e.activeCount,
 }));
+
+// Next upcoming event (today or later, soonest first) for the planning panel.
+const todayYmd = new Date().toISOString().slice(0, 10);
+const next = all
+  .filter((e) => String(e.eventDate).slice(0, 10) >= todayYmd)
+  .sort((a, b) => (a.eventDate < b.eventDate ? -1 : 1))[0];
+
+const nextEvent = next
+  ? {
+      event: {
+        id: next.id,
+        title: next.title,
+        eventDate: next.eventDate,
+        startTime: next.startTime,
+        endTime: next.endTime,
+        location: next.location,
+        maxParticipants: next.maxParticipants,
+        activeCount: next.activeCount,
+      },
+      people: (await listRegistrationsForEvent(next.id)).map((r) => ({
+        firstName: r.firstName,
+        lastName: r.lastName,
+        status: r.status,
+      })),
+    }
+  : null;
 ---
 
 <AdminLayout title="Veranstaltungen">
-  <EventList client:load events={events} />
+  {nextEvent && <NextEvent event={nextEvent.event} people={nextEvent.people} />}
+  <EventList events={events} />
 </AdminLayout>
