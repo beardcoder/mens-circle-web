@@ -1,0 +1,68 @@
+<body style="margin:0;padding:0;background-color:#efe9dd;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#efe9dd;padding:24px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;overflow:hidden;">
+        <tr><td style="padding:40px 40px 32px;font-family:'DM Sans',Helvetica,Arial,sans-serif;color:#2c2418;">
+
+<p style="text-align:center;margin:0 0 6px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#b86f52;text-transform:uppercase;letter-spacing:0.2em;">Erinnerung</p>
+<h1 style="text-align:center;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.3;color:#2c2418;margin:0 0 16px;">{{ .Tx.Data.whenWordCap }} ist es soweit!</h1>
+<p style="text-align:center;color:#5c4a3a;font-size:15px;line-height:1.6;margin:0 0 32px;">Hallo {{ .Tx.Data.firstName }}, dein Termin<br /><strong>{{ .Tx.Data.eventTitle }}</strong> findet {{ .Tx.Data.whenWord }} statt.</p>
+
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 24px;">
+  <tr><td style="height:2px;background-color:#c4b49a;font-size:0;line-height:0;">&nbsp;</td></tr>
+  <tr><td style="background-color:#f4f0e8;padding:28px;">
+    <p style="margin:0 0 20px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#b86f52;text-transform:uppercase;letter-spacing:0.15em;">Dein Termin</p>
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+      <tr>
+        <td width="90" style="padding:6px 0;vertical-align:top;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#7a6248;text-transform:uppercase;letter-spacing:0.08em;">Datum</td>
+        <td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#2c2418;">{{ .Tx.Data.dateLong }}</td>
+      </tr>
+      {{ if .Tx.Data.timeRange }}
+      <tr>
+        <td width="90" style="padding:6px 0;vertical-align:top;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#7a6248;text-transform:uppercase;letter-spacing:0.08em;">Uhrzeit</td>
+        <td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#2c2418;">{{ .Tx.Data.timeRange }}</td>
+      </tr>
+      {{ end }}
+      {{ if .Tx.Data.location }}
+      <tr>
+        <td width="90" style="padding:6px 0;vertical-align:top;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#7a6248;text-transform:uppercase;letter-spacing:0.08em;">Ort</td>
+        <td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#2c2418;">{{ .Tx.Data.location }}</td>
+      </tr>
+      {{ end }}
+      {{ if .Tx.Data.locationDetails }}
+      <tr>
+        <td width="90" style="padding:6px 0;vertical-align:top;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#7a6248;text-transform:uppercase;letter-spacing:0.08em;">Treffpunkt</td>
+        <td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#2c2418;white-space:pre-line;">{{ .Tx.Data.locationDetails }}</td>
+      </tr>
+      {{ end }}
+    </table>
+  </td></tr>
+</table>
+
+<h2 style="font-family:Georgia,'Times New Roman',serif;font-size:19px;color:#2c2418;margin:32px 0 12px;">Zur Erinnerung</h2>
+<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;white-space:pre-line;">{{ .Tx.Data.description }}</p>
+{{ if .Tx.Data.costBasis }}<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;"><strong>Teilnahme:</strong> {{ .Tx.Data.costBasis }}</p>{{ end }}
+
+<h2 style="font-family:Georgia,'Times New Roman',serif;font-size:19px;color:#2c2418;margin:32px 0 12px;">Bitte beachten</h2>
+<ul style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;padding-left:20px;">
+  <li>Komm pünktlich – wir starten gemeinsam</li>
+  <li>Bring eine offene Haltung und Bereitschaft für echte Begegnung mit</li>
+  <li>Kurzfristig verhindert? Schreib uns bitte an <a href="mailto:{{ .Tx.Data.contactEmail }}" style="color:#b86f52;">{{ .Tx.Data.contactEmail }}</a></li>
+</ul>
+
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:32px 0;">
+  <tr><td style="height:1px;background-color:#c4b49a;font-size:0;line-height:0;">&nbsp;</td></tr>
+</table>
+
+<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">Bis {{ .Tx.Data.closingWord }}!</p>
+<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">Herzliche Grüße,<br /><strong>{{ .Tx.Data.siteName }}</strong></p>
+
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-top:28px;">
+  <tr><td style="border-top:1px solid #e3dccb;padding-top:16px;font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.6;color:#8a7c66;">Diese Erinnerung wurde an {{ .Tx.Data.recipientEmail }} gesendet, weil du für diese Veranstaltung angemeldet bist.</td></tr>
+</table>
+
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>

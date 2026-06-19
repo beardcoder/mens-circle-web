@@ -1,0 +1,36 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import EventForm from '../../../components/admin/EventForm.svelte';
+import { getEventById } from '@lib/server/events';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const event = id ? await getEventById(id) : null;
+if (!event) return Astro.redirect('/admin', 302);
+
+const data = {
+  id: event.id,
+  title: event.title,
+  slug: event.slug,
+  description: event.description,
+  eventDate: event.eventDate,
+  startTime: event.startTime,
+  endTime: event.endTime,
+  location: event.location,
+  locationDetails: event.locationDetails,
+  street: event.street,
+  postalCode: event.postalCode,
+  city: event.city,
+  latitude: event.latitude,
+  longitude: event.longitude,
+  maxParticipants: event.maxParticipants,
+  costBasis: event.costBasis,
+  isPublished: event.isPublished,
+  imageUrl: event.imageUrl,
+};
+---
+
+<AdminLayout title="Veranstaltung bearbeiten">
+  <EventForm client:load event={data} />
+</AdminLayout>
