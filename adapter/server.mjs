@@ -9,45 +9,8 @@ import path from 'node:path';
 import { clientDir } from 'virtual:mens-circle-edge/config';
 import { createApp } from 'astro/app/entrypoint';
 
-const SECURITY_HEADERS = {
-  'X-Content-Type-Options': 'nosniff',
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'X-Frame-Options': 'SAMEORIGIN',
-};
-
-/** Cache-Control by asset class. Content-hashed assets/fonts are immutable. */
-function cacheControlFor(pathname) {
-  if (pathname.startsWith('/assets/'))
-    return 'public, max-age=31536000, immutable';
-  if (/\.(?:woff2?|ttf|otf|eot)$/i.test(pathname))
-    return 'public, max-age=31536000, immutable';
-  if (/\.(?:avif|webp|jxl|png|jpe?g|gif|svg|ico)$/i.test(pathname))
-    return 'public, max-age=604800';
-  if (
-    /\.xml$/i.test(pathname) ||
-    /^\/(?:manifest\.(?:json|webmanifest)|robots\.txt|browserconfig\.xml)$/i.test(
-      pathname,
-    )
-  )
-    return 'public, max-age=86400';
-  return 'public, max-age=0, must-revalidate';
-}
-
-/** Re-emit a response with security headers + a Cache-Control (if unset). */
-function withSiteHeaders(response, pathname) {
-  const headers = new Headers(response.headers);
-  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
-    headers.set(key, value);
-  }
-  if (!headers.has('Cache-Control')) {
-    headers.set('Cache-Control', cacheControlFor(pathname));
-  }
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
-}
+// Security / SEO response headers are set by the edge proxy (Caddy via the
+// Coolify proxy), not here, so this server just emits responses verbatim.
 
 /** Serve a prerendered HTML page / static asset from dist/client, or 404. */
 async function serveStatic(pathname, clientDir) {
@@ -61,42 +24,28 @@ async function serveStatic(pathname, clientDir) {
   rel = rel.replace(/^\/+/, '');
 
   const candidates = [];
-  if (rel && !pathname.endsWith('/'))
-    candidates.push(path.join(clientDir, rel));
+  if (rel && !pathname.endsWith('/')) candidates.push(path.join(clientDir, rel));
   candidates.push(path.join(clientDir, rel, 'index.html'));
 
   for (const file of candidates) {
     // Guard against path traversal escaping the client dir.
     if (file !== clientDir && !file.startsWith(clientDir)) continue;
     const blob = Bun.file(file);
-    if (await blob.exists())
-      return withSiteHeaders(new Response(blob), pathname);
+    if (await blob.exists()) return new Response(blob);
   }
 
   const notFound = Bun.file(path.join(clientDir, '404.html'));
   if (await notFound.exists()) {
-    return new Response(notFound, {
-      status: 404,
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        ...SECURITY_HEADERS,
-      },
-    });
+    return new Response(notFound, { status: 404 });
   }
-  return new Response('Not found', { status: 404, headers: SECURITY_HEADERS });
+  return new Response('Not found', { status: 404 });
 }
 
-const PB_TARGET = (
-  process.env.PB_INTERNAL_URL || 'http://127.0.0.1:8091'
-).replace(/\/+$/, '');
+const PB_TARGET = (process.env.PB_INTERNAL_URL || 'http://127.0.0.1:8091').replace(/\/+$/, '');
 
 /** Paths owned by PocketBase: REST API (/api/…) and admin UI (/_, /_/…). */
 function ownedByPocketBase(pathname) {
-  return (
-    pathname.startsWith('/api/') ||
-    pathname === '/_' ||
-    pathname.startsWith('/_/')
-  );
+  return pathname.startsWith('/api/') || pathname === '/_' || pathname.startsWith('/_/');
 }
 
 /** Forward a request to PocketBase, streaming the response straight back. */
@@ -105,10 +54,7 @@ async function proxyToPocketBase(request, url, clientAddress) {
   // `Host` is a forbidden fetch header — it's set from the target URL.
   const priorXff = headers.get('x-forwarded-for');
   if (clientAddress) {
-    headers.set(
-      'x-forwarded-for',
-      priorXff ? `${priorXff}, ${clientAddress}` : clientAddress,
-    );
+    headers.set('x-forwarded-for', priorXff ? `${priorXff}, ${clientAddress}` : clientAddress);
     if (!headers.has('x-real-ip')) headers.set('x-real-ip', clientAddress);
   }
   if (!headers.has('x-forwarded-proto')) {
@@ -138,6 +84,7 @@ async function proxyToPocketBase(request, url, clientAddress) {
   const respHeaders = new Headers(upstream.headers);
   respHeaders.delete('content-encoding');
   respHeaders.delete('content-length');
+
   return new Response(upstream.body, {
     status: upstream.status,
     statusText: upstream.statusText,
@@ -157,12 +104,11 @@ function createHandler(app, clientDir) {
 
     const routeData = app.match(request);
     if (routeData) {
-      const response = await app.render(request, {
+      return app.render(request, {
         addCookieHeader: true,
         clientAddress,
         routeData,
       });
-      return withSiteHeaders(response, url.pathname);
     }
     return serveStatic(url.pathname, clientDir);
   };
