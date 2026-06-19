@@ -37,8 +37,8 @@ services:
       timeout: 5s
       retries: 3
     labels:
-      - "caddy_3.import=web_optimizations"
-      - "caddy_4.import=static_cache_headers"
+      - 'caddy_0.import=static_cache_headers'
+      - 'caddy_1.import=web_optimizations'
 
   listmonk:
     # Custom image that bakes the branded system email-templates into the
