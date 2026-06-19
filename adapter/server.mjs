@@ -1,13 +1,20 @@
 /**
  * Server entry for the local "mens-circle-edge" adapter (see ./index.mjs).
  * With `entrypointResolution: 'auto'` Astro builds this to dist/server/entry.mjs
- * and runs its top-level code. It is the container's single public edge: serves
- * static + SSR and proxies the PocketBase paths (/api, /_) to PB_INTERNAL_URL.
+ * and runs its top-level code. It is the container's single public edge: it
+ * serves static assets + on-demand SSR, including the API routes (/api/*) and
+ * the admin UI, which are now plain Astro endpoints backed by the in-process
+ * Drizzle/SQLite data layer (no external backend to proxy).
  */
 
 import path from 'node:path';
 import { clientDir } from 'virtual:mens-circle-edge/config';
 import { createApp } from 'astro/app/entrypoint';
+
+// Mark that we're in the live Bun runtime (not the build-time prerender). The
+// middleware reads this before lazily starting the reminder cron / touching the
+// `bun:sqlite` data layer, so the build never loads bun: modules.
+globalThis.__MC_RUNTIME = true;
 
 // Security / SEO response headers are set by the edge proxy (Caddy via the
 // Coolify proxy), not here, so this server just emits responses verbatim.
@@ -41,76 +48,21 @@ async function serveStatic(pathname, clientDir) {
   return new Response('Not found', { status: 404 });
 }
 
-const PB_TARGET = (process.env.PB_INTERNAL_URL || 'http://127.0.0.1:8091').replace(/\/+$/, '');
-
-/** Paths owned by PocketBase: REST API (/api/…) and admin UI (/_, /_/…). */
-function ownedByPocketBase(pathname) {
-  return pathname.startsWith('/api/') || pathname === '/_' || pathname.startsWith('/_/');
-}
-
-/** Forward a request to PocketBase, streaming the response straight back. */
-async function proxyToPocketBase(request, url, clientAddress) {
-  const headers = new Headers(request.headers);
-  // `Host` is a forbidden fetch header — it's set from the target URL.
-  const priorXff = headers.get('x-forwarded-for');
-  if (clientAddress) {
-    headers.set('x-forwarded-for', priorXff ? `${priorXff}, ${clientAddress}` : clientAddress);
-    if (!headers.has('x-real-ip')) headers.set('x-real-ip', clientAddress);
-  }
-  if (!headers.has('x-forwarded-proto')) {
-    headers.set('x-forwarded-proto', url.protocol.replace(':', ''));
-  }
-  if (!headers.has('x-forwarded-host') && headers.has('host')) {
-    headers.set('x-forwarded-host', headers.get('host'));
-  }
-  // Let fetch negotiate its own Accept-Encoding (gzip/deflate/br — all of which
-  // it can decode) instead of forwarding the browser's, which may ask for an
-  // encoding fetch won't decode (e.g. zstd) and leave the body still compressed.
-  headers.delete('accept-encoding');
-
-  const hasBody = request.method !== 'GET' && request.method !== 'HEAD';
-  const upstream = await fetch(`${PB_TARGET}${url.pathname}${url.search}`, {
-    method: request.method,
-    headers,
-    body: hasBody ? request.body : undefined,
-    duplex: hasBody ? 'half' : undefined,
-    redirect: 'manual',
-  });
-
-  // fetch transparently decodes the body (it always sends Accept-Encoding) but
-  // leaves Content-Encoding/-Length on the response. Forwarding them verbatim
-  // would tell the browser to gunzip already-plain bytes against a stale length
-  // → ERR_CONTENT_DECODING_FAILED. Drop them; the decoded body is sent as-is.
-  const respHeaders = new Headers(upstream.headers);
-  respHeaders.delete('content-encoding');
-  respHeaders.delete('content-length');
-
-  return new Response(upstream.body, {
-    status: upstream.status,
-    statusText: upstream.statusText,
-    headers: respHeaders,
-  });
-}
-
-/** Proxy PocketBase paths; otherwise SSR, falling back to static files. */
+/** SSR with a static-file fallback. The API (/api/*) is handled by Astro now. */
 function createHandler(app, clientDir) {
   return async (request, server) => {
     const url = new URL(request.url);
     const clientAddress = server?.requestIP?.(request)?.address;
 
     // Liveness probe (Coolify / Docker HEALTHCHECK). Answered by the edge itself,
-    // before any SSR render or PocketBase proxy — a 200 confirms the Bun server
-    // is accepting and serving requests, with zero dependency on the render
-    // pipeline (which is what can stall over time under --smol).
+    // before any SSR render — a 200 confirms the Bun server is accepting and
+    // serving requests, with zero dependency on the render pipeline (which is
+    // what can stall over time under --smol).
     if (url.pathname === '/health') {
       return new Response('OK', {
         status: 200,
         headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' },
       });
-    }
-
-    if (ownedByPocketBase(url.pathname)) {
-      return proxyToPocketBase(request, url, clientAddress);
     }
 
     const routeData = app.match(request);

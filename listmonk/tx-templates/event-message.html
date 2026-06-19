@@ -1,0 +1,23 @@
+<body style="margin:0;padding:0;background-color:#efe9dd;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#efe9dd;padding:24px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;overflow:hidden;">
+        <tr><td style="padding:40px 40px 32px;font-family:'DM Sans',Helvetica,Arial,sans-serif;color:#2c2418;">
+
+<div style="font-size:15px;line-height:1.7;color:#3a342c;white-space:pre-line;">{{ .Tx.Data.content }}</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:32px 0;">
+  <tr><td style="height:1px;background-color:#c4b49a;font-size:0;line-height:0;">&nbsp;</td></tr>
+</table>
+
+<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">Herzliche Grüße,<br /><strong>{{ .Tx.Data.siteName }}</strong></p>
+
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-top:28px;">
+  <tr><td style="border-top:1px solid #e3dccb;padding-top:16px;font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.6;color:#8a7c66;">Diese E-Mail wurde gesendet, weil du für die Veranstaltung „{{ .Tx.Data.eventTitle }}“ angemeldet bist.</td></tr>
+</table>
+
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>

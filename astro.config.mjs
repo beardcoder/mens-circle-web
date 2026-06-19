@@ -40,6 +40,12 @@ export default defineConfig({
   output: 'server',
   adapter: bun(),
   ...jsonLogger,
+  // `bun:sqlite` is a Bun runtime builtin (used by the Drizzle data layer); keep
+  // it external so Rollup doesn't try to bundle it into the SSR output.
+  vite: {
+    ssr: { external: ['bun:sqlite'] },
+    optimizeDeps: { exclude: ['bun:sqlite'] },
+  },
   trailingSlash: 'ignore',
   redirects: {
     '/home': '/',

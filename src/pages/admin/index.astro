@@ -1,0 +1,21 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import EventList from '../../components/admin/EventList.svelte';
+import { listEventsForAdmin } from '@lib/server/events';
+
+export const prerender = false;
+
+const events = (await listEventsForAdmin()).map((e) => ({
+  id: e.id,
+  title: e.title,
+  slug: e.slug,
+  eventDate: e.eventDate,
+  isPublished: e.isPublished,
+  maxParticipants: e.maxParticipants,
+  activeCount: e.activeCount,
+}));
+---
+
+<AdminLayout title="Veranstaltungen">
+  <EventList client:load events={events} />
+</AdminLayout>

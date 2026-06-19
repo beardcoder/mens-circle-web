@@ -137,7 +137,8 @@ Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
 
 Jede Veranstaltung bekommt automatisch ihre **eigene listmonk-Liste**, damit du
 genau die Teilnehmer einer Veranstaltung anschreiben kannst. Die Logik läuft in
-den PocketBase-Hooks (`pocketbase/pb_hooks/`), nicht in listmonk:
+der Datenschicht der Web-App (`src/lib/server/listmonk.ts` + `events.ts`), nicht
+in listmonk:
 
 - **Anlegen:** Beim Erstellen einer Veranstaltung wird eine private,
   Single-Opt-In-Liste „**Event: \<Titel\> (\<TT.MM.JJJJ\>)**" erzeugt; die
@@ -156,11 +157,19 @@ den PocketBase-Hooks (`pocketbase/pb_hooks/`), nicht in listmonk:
 - **Austragen:** Wird eine Anmeldung storniert (Status `cancelled`), wird die
   Person aus **dieser** Event-Liste entfernt (Newsletter/andere Events bleiben).
 
-Es sind **keine neuen Env-Variablen** nötig — die Hooks nutzen denselben
-listmonk-Admin-API-Zugang (`LISTMONK_URL`, `LISTMONK_API_USER`,
+Es sind **keine neuen Env-Variablen** für die Listen nötig — die App nutzt
+denselben listmonk-Admin-API-Zugang (`LISTMONK_URL`, `LISTMONK_API_USER`,
 `LISTMONK_API_TOKEN`). `LISTMONK_LIST_IDS` betrifft nur den Newsletter. Ist
 listmonk nicht konfiguriert, laufen Anmeldungen normal weiter (Listen-Sync wird
 übersprungen und protokolliert).
+
+## Transaktionale Event-Mails (`tx-templates/`)
+
+Die Event-Mails (Anmeldebestätigung, Warteliste, Erinnerung …) werden über
+listmonks **Transactional API** (`POST /api/tx`) versendet. Die Templates dafür
+werden einmalig in listmonk angelegt; Quelldateien und Anleitung liegen unter
+[`tx-templates/`](tx-templates/README.md). Die zugehörigen Template-IDs werden in
+der Web-App als `LISTMONK_TX_*`-Env-Variablen gesetzt.
 
 ## Testen
 
