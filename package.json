@@ -15,7 +15,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "db:generate": "drizzle-kit generate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "import:pb": "bun run scripts/import-pocketbase.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
