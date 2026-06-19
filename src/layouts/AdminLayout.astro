@@ -11,6 +11,10 @@ interface Props {
 }
 const { title, bare = false } = Astro.props;
 const admin = Astro.locals.admin;
+
+const path = Astro.url.pathname;
+const onEvents = path === '/admin' || path.startsWith('/admin/events');
+const onTestimonials = path.startsWith('/admin/testimonials');
 ---
 
 <!doctype html>
@@ -26,13 +30,22 @@ const admin = Astro.locals.admin;
       !bare && (
         <header class="admin-topbar">
           <nav class="admin-nav">
-            <a href="/admin" class="admin-brand">Männerkreis Admin</a>
-            <a href="/admin">Veranstaltungen</a>
-            <a href="/admin/testimonials">Stimmen</a>
+            <a href="/admin" class="admin-brand">
+              <span class="admin-brand-dot" aria-hidden="true" />
+              Männerkreis
+            </a>
+            <a href="/admin" class:list={['admin-nav-link', { 'is-active': onEvents }]}>
+              Veranstaltungen
+            </a>
+            <a href="/admin/testimonials" class:list={['admin-nav-link', { 'is-active': onTestimonials }]}>
+              Stimmen
+            </a>
           </nav>
           <div class="admin-user">
-            {admin && <span>{admin}</span>}
-            <button type="button" id="admin-logout" class="admin-btn admin-btn--ghost">Abmelden</button>
+            {admin && <span class="admin-user-name">{admin}</span>}
+            <button type="button" id="admin-logout" class="admin-btn admin-btn--ghost admin-btn--small">
+              Abmelden
+            </button>
           </div>
         </header>
       )
@@ -56,14 +69,22 @@ const admin = Astro.locals.admin;
       :root {
         --a-bg: #f5f2ec;
         --a-surface: #ffffff;
+        --a-surface-2: #faf8f3;
         --a-border: #e3dccb;
         --a-text: #2c2418;
         --a-muted: #7a6248;
         --a-accent: #b86f52;
+        --a-accent-hover: #a55f44;
         --a-accent-ink: #ffffff;
+        --a-accent-soft: rgba(184, 111, 82, 0.1);
+        --a-ring: rgba(184, 111, 82, 0.3);
         --a-danger: #b03a2e;
         --a-ok: #3a7d44;
-        --a-radius: 8px;
+        --a-radius: 12px;
+        --a-radius-sm: 8px;
+        --a-shadow-sm: 0 1px 2px rgba(44, 36, 24, 0.05);
+        --a-shadow: 0 4px 16px -4px rgba(44, 36, 24, 0.1);
+        --a-ease: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
       }
       * {
         box-sizing: border-box;
@@ -80,34 +101,61 @@ const admin = Astro.locals.admin;
         background: var(--a-bg);
         color: var(--a-text);
         line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
       }
       .admin-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 1rem;
+        gap: 0.75rem 1rem;
         flex-wrap: wrap;
-        padding: 0.75rem 1.5rem;
-        background: var(--a-surface);
+        padding: 0.7rem 1.5rem;
+        background: color-mix(in srgb, var(--a-surface) 85%, transparent);
+        backdrop-filter: saturate(1.4) blur(10px);
         border-bottom: 1px solid var(--a-border);
       }
       .admin-nav {
         display: flex;
         align-items: center;
-        gap: 1.25rem;
-      }
-      .admin-nav a {
-        color: var(--a-muted);
-        text-decoration: none;
-        font-size: 0.95rem;
-      }
-      .admin-nav a:hover {
-        color: var(--a-text);
+        gap: 0.4rem;
+        flex-wrap: wrap;
       }
       .admin-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
         font-weight: 700;
         color: var(--a-text) !important;
         font-size: 1.05rem;
+        text-decoration: none;
+        margin-right: 0.6rem;
+      }
+      .admin-brand-dot {
+        width: 0.7rem;
+        height: 0.7rem;
+        border-radius: 50%;
+        background: var(--a-accent);
+        box-shadow: 0 0 0 3px var(--a-accent-soft);
+      }
+      .admin-nav-link {
+        color: var(--a-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.4rem 0.7rem;
+        border-radius: 999px;
+        transition: color var(--a-ease), background var(--a-ease);
+      }
+      .admin-nav-link:hover {
+        color: var(--a-text);
+        background: var(--a-accent-soft);
+      }
+      .admin-nav-link.is-active {
+        color: var(--a-accent);
+        background: var(--a-accent-soft);
       }
       .admin-user {
         display: flex;
@@ -116,17 +164,25 @@ const admin = Astro.locals.admin;
         font-size: 0.9rem;
         color: var(--a-muted);
       }
+      .admin-user-name {
+        max-width: 14rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .admin-main {
         max-width: 960px;
         margin: 0 auto;
         padding: 2rem 1.5rem 4rem;
       }
       h1 {
-        font-size: 1.6rem;
+        font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.7rem);
+        letter-spacing: -0.02em;
         margin: 0 0 1rem;
       }
       h2 {
         font-size: 1.2rem;
+        letter-spacing: -0.01em;
         margin: 2rem 0 0.75rem;
       }
       a {
@@ -137,48 +193,73 @@ const admin = Astro.locals.admin;
         border: 1px solid var(--a-border);
         border-radius: var(--a-radius);
         padding: 1.25rem;
+        box-shadow: var(--a-shadow-sm);
       }
       .admin-btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 0.4rem;
         border: 1px solid var(--a-accent);
         background: var(--a-accent);
         color: var(--a-accent-ink);
         font: inherit;
         font-size: 0.9rem;
-        padding: 0.5rem 0.9rem;
-        border-radius: 6px;
+        font-weight: 600;
+        padding: 0.55rem 1rem;
+        border-radius: var(--a-radius-sm);
         cursor: pointer;
         text-decoration: none;
+        white-space: nowrap;
+        transition: background var(--a-ease), border-color var(--a-ease),
+          transform var(--a-ease), box-shadow var(--a-ease);
       }
       .admin-btn:hover {
-        filter: brightness(0.95);
+        background: var(--a-accent-hover);
+        border-color: var(--a-accent-hover);
+      }
+      .admin-btn:active {
+        transform: translateY(1px);
+      }
+      .admin-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--a-ring);
       }
       .admin-btn:disabled {
-        opacity: 0.6;
+        opacity: 0.55;
         cursor: not-allowed;
+        transform: none;
       }
       .admin-btn--ghost {
-        background: transparent;
+        background: var(--a-surface);
         color: var(--a-muted);
         border-color: var(--a-border);
       }
+      .admin-btn--ghost:hover {
+        background: var(--a-surface-2);
+        border-color: var(--a-muted);
+        color: var(--a-text);
+      }
       .admin-btn--danger {
-        background: transparent;
+        background: var(--a-surface);
         color: var(--a-danger);
+        border-color: color-mix(in srgb, var(--a-danger) 35%, var(--a-border));
+      }
+      .admin-btn--danger:hover {
+        background: var(--a-danger);
         border-color: var(--a-danger);
+        color: #fff;
       }
       .admin-btn--small {
         font-size: 0.8rem;
-        padding: 0.3rem 0.6rem;
+        padding: 0.35rem 0.7rem;
       }
       label {
         display: block;
         font-size: 0.85rem;
         font-weight: 600;
         color: var(--a-muted);
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.35rem;
       }
       input[type='text'],
       input[type='email'],
@@ -191,11 +272,19 @@ const admin = Astro.locals.admin;
       select {
         width: 100%;
         font: inherit;
-        padding: 0.55rem 0.7rem;
+        padding: 0.6rem 0.75rem;
         border: 1px solid var(--a-border);
-        border-radius: 6px;
+        border-radius: var(--a-radius-sm);
         background: #fff;
         color: var(--a-text);
+        transition: border-color var(--a-ease), box-shadow var(--a-ease);
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--a-accent);
+        box-shadow: 0 0 0 3px var(--a-ring);
       }
       textarea {
         min-height: 6rem;
@@ -209,24 +298,35 @@ const admin = Astro.locals.admin;
       th,
       td {
         text-align: left;
-        padding: 0.6rem 0.5rem;
+        padding: 0.7rem 0.6rem;
         border-bottom: 1px solid var(--a-border);
         vertical-align: middle;
       }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr {
+        transition: background var(--a-ease);
+      }
+      tbody tr:hover {
+        background: var(--a-surface-2);
+      }
       th {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
         color: var(--a-muted);
       }
       .admin-badge {
         display: inline-block;
         font-size: 0.72rem;
         font-weight: 600;
-        padding: 0.15rem 0.5rem;
+        padding: 0.2rem 0.55rem;
         border-radius: 999px;
         background: var(--a-border);
         color: var(--a-text);
+        white-space: nowrap;
       }
       .admin-badge--ok {
         background: #d8ecd8;
@@ -237,8 +337,8 @@ const admin = Astro.locals.admin;
         color: #9a6516;
       }
       .admin-badge--off {
-        background: #eee;
-        color: #888;
+        background: #ece8df;
+        color: #8a7d68;
       }
       .admin-muted {
         color: var(--a-muted);
@@ -254,9 +354,11 @@ const admin = Astro.locals.admin;
       }
       .admin-toast {
         margin-bottom: 1rem;
-        padding: 0.7rem 1rem;
-        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        border-radius: var(--a-radius-sm);
         font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: var(--a-shadow-sm);
       }
       .admin-toast--ok {
         background: #d8ecd8;
@@ -265,6 +367,64 @@ const admin = Astro.locals.admin;
       .admin-toast--err {
         background: #f6d8d4;
         color: var(--a-danger);
+      }
+
+      /* Responsive tables: stack rows into labelled cards on narrow screens. */
+      @media (max-width: 640px) {
+        .admin-main {
+          padding: 1.25rem 1rem 3rem;
+        }
+        .admin-card {
+          padding: 1rem;
+        }
+        .admin-table thead {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip: rect(0 0 0 0);
+        }
+        .admin-table,
+        .admin-table tbody,
+        .admin-table tr,
+        .admin-table td {
+          display: block;
+          width: 100%;
+        }
+        .admin-table tr {
+          border: 1px solid var(--a-border);
+          border-radius: var(--a-radius-sm);
+          padding: 0.5rem 0.85rem;
+          margin-bottom: 0.75rem;
+          background: var(--a-surface-2);
+        }
+        .admin-table tr:hover {
+          background: var(--a-surface-2);
+        }
+        .admin-table td {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          padding: 0.4rem 0;
+          border-bottom: 1px solid var(--a-border);
+          text-align: right;
+        }
+        .admin-table tr td:last-child {
+          border-bottom: none;
+        }
+        .admin-table td::before {
+          content: attr(data-label);
+          font-size: 0.7rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--a-muted);
+          text-align: left;
+        }
+        .admin-table td:empty {
+          display: none;
+        }
       }
     </style>
   </body>
