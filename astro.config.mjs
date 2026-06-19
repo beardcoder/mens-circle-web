@@ -45,6 +45,19 @@ export default defineConfig({
   vite: {
     ssr: { external: ['bun:sqlite'] },
     optimizeDeps: { exclude: ['bun:sqlite'] },
+    // Lightning CSS (https://lightningcss.dev) handles CSS transform + minify.
+    // Unlike esbuild it autoprefixes from real browser-compat data, so e.g.
+    // `backdrop-filter` ships with its `-webkit-` form for Safari without us
+    // hand-maintaining prefixes. `cssTarget` is what the minify step reads
+    // (Vite passes it through `convertTargets`); it's kept modern so the design
+    // tokens' native `oklch()` and `color-mix()` are preserved, not downleveled.
+    css: {
+      transformer: 'lightningcss',
+    },
+    build: {
+      cssMinify: 'lightningcss',
+      cssTarget: ['chrome111', 'edge111', 'firefox113', 'safari16.4'],
+    },
   },
   trailingSlash: 'ignore',
   redirects: {

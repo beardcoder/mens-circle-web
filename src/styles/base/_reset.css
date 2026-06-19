@@ -16,6 +16,9 @@
 html {
   /* Base font size for rem calculations */
   font-size: 16px;
+  /* Guard against mobile font-size inflation. Lightning CSS autoprefixes this
+     from the configured browser targets (e.g. the -webkit- form Safari/iOS
+     need) at build time — see astro.config.mjs. */
   text-size-adjust: none;
 
   /* Kill the grey tap-flash on every element (the property inherits) so
