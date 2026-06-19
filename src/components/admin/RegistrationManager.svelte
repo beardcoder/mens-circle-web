@@ -99,7 +99,7 @@
   <p class="admin-muted">Noch keine Anmeldungen.</p>
 {:else}
   <div class="admin-card">
-    <table>
+    <table class="admin-table">
       <thead>
         <tr>
           <th>Name</th>
@@ -112,13 +112,13 @@
       <tbody>
         {#each regs as reg (reg.id)}
           <tr>
-            <td>{reg.firstName} {reg.lastName}</td>
-            <td>
+            <td data-label="Name">{reg.firstName} {reg.lastName}</td>
+            <td data-label="Kontakt">
               <a href={`mailto:${reg.email}`}>{reg.email}</a>
               {#if reg.phone}<div class="admin-muted">{reg.phone}</div>{/if}
             </td>
-            <td>{fmt(reg.registeredAt)}</td>
-            <td>
+            <td data-label="Angemeldet">{fmt(reg.registeredAt)}</td>
+            <td data-label="Status">
               <span
                 class="admin-badge"
                 class:admin-badge--ok={reg.status === 'registered' || reg.status === 'attended'}
@@ -170,6 +170,8 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
   .head p {
     margin: 0;
@@ -184,11 +186,21 @@
     display: flex;
     gap: 0.4rem;
     align-items: center;
+    justify-content: flex-end;
   }
   .actions select {
     width: auto;
     font-size: 0.8rem;
-    padding: 0.3rem;
+    padding: 0.35rem 0.5rem;
+  }
+  @media (max-width: 640px) {
+    .actions {
+      flex-wrap: wrap;
+      padding-top: 0.5rem;
+    }
+    .actions select {
+      flex: 1 1 auto;
+    }
   }
   code {
     background: var(--a-bg);
