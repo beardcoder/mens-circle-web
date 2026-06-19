@@ -74,6 +74,24 @@ export async function setTestimonialSortOrder(id: string, sortOrder: number): Pr
   await db.update(testimonials).set({ sortOrder }).where(eq(testimonials.id, id));
 }
 
+/** Edit a testimonial's content (quote/author/role/email). */
+export async function updateTestimonialContent(
+  id: string,
+  fields: { quote: string; authorName: string; role: string; email: string },
+): Promise<Testimonial | null> {
+  const rows = await db
+    .update(testimonials)
+    .set({
+      quote: fields.quote.trim(),
+      authorName: fields.authorName.trim(),
+      role: fields.role.trim(),
+      email: fields.email.trim(),
+    })
+    .where(and(eq(testimonials.id, id), isNull(testimonials.deleted)))
+    .returning();
+  return rows[0] ?? null;
+}
+
 /** Soft-delete a testimonial. */
 export async function softDeleteTestimonial(id: string): Promise<void> {
   await db
