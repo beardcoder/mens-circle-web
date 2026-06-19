@@ -5,9 +5,11 @@ dist/
 # dependencies
 node_modules/
 
-# pocketbase runtime data (persisted in a Coolify volume, never committed)
-pocketbase/pb_data/
-pocketbase/pocketbase
+# SQLite runtime data (persisted in a Coolify volume, never committed)
+data/
+*.db
+*.db-wal
+*.db-shm
 
 # logs / env
 *.log

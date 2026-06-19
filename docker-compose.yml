@@ -9,23 +9,29 @@ services:
     restart: unless-stopped
     environment:
       APP_URL: ${SERVICE_URL_WEB}
+      DATABASE_PATH: /data/mens-circle.db
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-hallo@mens-circle.de}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Männerkreis Niederbayern/ Straubing}
       MAIL_ADMIN_ADDRESS: ${MAIL_ADMIN_ADDRESS:-hallo@mens-circle.de}
       MAIL_ADMIN_NAME: ${MAIL_ADMIN_NAME:-Männerkreis Admin}
-      SMTP_HOST: ${SMTP_HOST}
-      SMTP_PORT: ${SMTP_PORT:-587}
-      SMTP_USERNAME: ${SMTP_USERNAME}
-      SMTP_PASSWORD: ${SMTP_PASSWORD}
-      SMTP_TLS: ${SMTP_TLS:-true}
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD}
+      # Admin UI login (single operator) + session cookie secret.
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET}
+      # listmonk: newsletter, per-event lists + transactional email.
       LISTMONK_URL: http://listmonk:9000
       LISTMONK_API_USER: ${LISTMONK_API_USER}
       LISTMONK_API_TOKEN: ${LISTMONK_API_TOKEN}
       LISTMONK_LIST_IDS: ${LISTMONK_LIST_IDS}
+      # Numeric IDs of the listmonk transactional templates.
+      LISTMONK_TX_REGISTRATION_CONFIRMATION: ${LISTMONK_TX_REGISTRATION_CONFIRMATION}
+      LISTMONK_TX_WAITLIST_CONFIRMATION: ${LISTMONK_TX_WAITLIST_CONFIRMATION}
+      LISTMONK_TX_ADMIN_NOTIFICATION: ${LISTMONK_TX_ADMIN_NOTIFICATION}
+      LISTMONK_TX_WAITLIST_PROMOTION: ${LISTMONK_TX_WAITLIST_PROMOTION}
+      LISTMONK_TX_EVENT_REMINDER: ${LISTMONK_TX_EVENT_REMINDER}
+      LISTMONK_TX_EVENT_MESSAGE: ${LISTMONK_TX_EVENT_MESSAGE}
     volumes:
-      - pb-data:/pb/pb_data
+      - app-data:/data
     depends_on:
       - listmonk
     healthcheck:
@@ -96,6 +102,6 @@ services:
       retries: 6
 
 volumes:
-  pb-data:
+  app-data:
   listmonk-uploads:
   listmonk-db:

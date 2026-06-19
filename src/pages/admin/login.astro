@@ -1,0 +1,17 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AdminLogin from '../../components/admin/AdminLogin.svelte';
+import { readSession, SESSION_COOKIE } from '@lib/server/auth';
+
+export const prerender = false;
+
+// Already authenticated → go straight to the dashboard.
+const existing = await readSession(Astro.cookies.get(SESSION_COOKIE)?.value);
+if (existing) return Astro.redirect('/admin', 302);
+
+const redirect = Astro.url.searchParams.get('redirect') || '/admin';
+---
+
+<AdminLayout title="Anmeldung" bare>
+  <AdminLogin client:load redirect={redirect} />
+</AdminLayout>
