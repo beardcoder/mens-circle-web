@@ -1,0 +1,24 @@
+---
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+import RegistrationManager from '../../../../components/admin/RegistrationManager.svelte';
+import { getEventById } from '@lib/server/events';
+import { listRegistrationsForEvent } from '@lib/server/registrations';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const event = id ? await getEventById(id) : null;
+if (!event) return Astro.redirect('/admin', 302);
+
+const registrations = await listRegistrationsForEvent(event.id);
+---
+
+<AdminLayout title="Anmeldungen">
+  <RegistrationManager
+    client:load
+    eventId={event.id}
+    eventTitle={event.title}
+    maxParticipants={event.maxParticipants}
+    registrations={registrations}
+  />
+</AdminLayout>
