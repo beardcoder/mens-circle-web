@@ -1,6 +1,6 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import AdminLogin from '../../components/admin/AdminLogin.svelte';
+import LoginForm from '../../components/admin/LoginForm.astro';
 import { readSession, SESSION_COOKIE } from '@lib/server/auth';
 
 export const prerender = false;
@@ -13,5 +13,5 @@ const redirect = Astro.url.searchParams.get('redirect') || '/admin';
 ---
 
 <AdminLayout title="Anmeldung" bare>
-  <AdminLogin client:load redirect={redirect} />
+  <LoginForm redirect={redirect} />
 </AdminLayout>

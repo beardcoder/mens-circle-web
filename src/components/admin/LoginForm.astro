@@ -1,0 +1,85 @@
+---
+interface Props {
+  redirect?: string;
+}
+const { redirect = '/admin' } = Astro.props;
+---
+
+<div class="login">
+  <div class="login__brand">
+    <span class="login__ring" aria-hidden="true"></span>
+    männerkreis
+  </div>
+  <form id="login-form" class="card login__card" data-redirect={redirect}>
+    <p class="eyebrow">Back-office</p>
+    <h1>Anmeldung</h1>
+    <div class="field">
+      <label for="email">E-Mail</label>
+      <input id="email" name="email" type="email" autocomplete="username" required />
+    </div>
+    <div class="field">
+      <label for="password">Passwort</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+    </div>
+    <button class="btn btn--block" type="submit">Anmelden</button>
+  </form>
+</div>
+
+<script>
+  import { actions } from 'astro:actions';
+
+  function init() {
+    const form = document.getElementById('login-form') as HTMLFormElement | null;
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '1';
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      btn.disabled = true;
+      btn.textContent = 'Anmelden…';
+      const { error } = await actions.login({
+        email: String(fd.get('email') ?? '').trim(),
+        password: String(fd.get('password') ?? ''),
+      });
+      btn.disabled = false;
+      btn.textContent = 'Anmelden';
+      if (error) {
+        window.adminToast?.('err', error.message);
+        return;
+      }
+      window.location.href = form.dataset.redirect || '/admin';
+    });
+  }
+
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .login {
+    width: min(92vw, 24rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .login__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+  }
+  .login__ring {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    border: 3px solid var(--ember);
+    box-shadow: 0 0 0 4px var(--ember-soft);
+  }
+  .login__card h1 {
+    margin: 0.25rem 0 1.25rem;
+  }
+</style>
