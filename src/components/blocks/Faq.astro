@@ -21,10 +21,7 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 
 <section class="section section--large faq-section" id={anchor}>
   <div class="container">
-    <div
-      class="section-header section-header--start faq__header"
-      data-reveal-group
-    >
+    <div class="section-header section-header--start faq__header" data-reveal-group>
       {
         data.eyebrow && (
           <p class="eyebrow" data-reveal="up">
@@ -33,11 +30,7 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
         )
       }
 
-      {
-        data.title && (
-          <h2 class="section-title" data-reveal="blur" set:html={data.title} />
-        )
-      }
+      {data.title && <h2 class="section-title" data-reveal="blur" set:html={data.title} />}
 
       {
         data.intro && (
@@ -108,11 +101,7 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 
       &[open] {
         background: color-mix(in oklch, var(--accent-primary) 4%, transparent);
-        border-block-end-color: color-mix(
-          in oklch,
-          var(--accent-primary) 35%,
-          var(--border-light)
-        );
+        border-block-end-color: color-mix(in oklch, var(--accent-primary) 35%, var(--border-light));
 
         &::before {
           opacity: 1;
@@ -162,9 +151,7 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .accordion-item:not([open])
-        > .accordion-item__trigger:hover
-        .accordion-item__icon {
+      .accordion-item:not([open]) > .accordion-item__trigger:hover .accordion-item__icon {
         background: color-mix(in oklch, var(--_accent) 12%, transparent);
         border-color: var(--_accent);
 

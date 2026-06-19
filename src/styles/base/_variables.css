@@ -6,19 +6,19 @@
 
 /* Define animatable custom properties */
 @property --gradient-angle {
-  syntax: "<angle>";
+  syntax: '<angle>';
   initial-value: 0deg;
   inherits: false;
 }
 
 @property --glow-opacity {
-  syntax: "<number>";
+  syntax: '<number>';
   initial-value: 0;
   inherits: false;
 }
 
 @property --circle-scale {
-  syntax: "<number>";
+  syntax: '<number>';
   initial-value: 1;
   inherits: false;
 }
@@ -102,8 +102,7 @@
   --border-medium: color-mix(in oklch, var(--color-sand) 30%, transparent);
   --border-dark: var(--color-earth-mid);
   --border-on-dark: color-mix(in oklch, var(--color-sand) 15%, transparent);
-  --focus-ring: 0 0 0 3px
-    color-mix(in oklch, var(--accent-primary) 22%, transparent);
+  --focus-ring: 0 0 0 3px color-mix(in oklch, var(--accent-primary) 22%, transparent);
 
   /* ============================================
      Typography Scale
@@ -158,11 +157,7 @@
   --control-bg-hover: var(--bg-input-focus);
   --control-bg-light: var(--bg-primary);
   --control-color: var(--text-on-dark);
-  --control-placeholder: color-mix(
-    in oklch,
-    var(--color-sand) 60%,
-    transparent
-  );
+  --control-placeholder: color-mix(in oklch, var(--color-sand) 60%, transparent);
 
   /* ============================================
      Spacing Scale - Fluid with clamp()
@@ -195,40 +190,15 @@
      ============================================ */
 
   /* Canonical easings */
-  --ease-settle: cubic-bezier(
-    0.22,
-    1,
-    0.36,
-    1
-  ); /* Content arriving: page-load entrance, overlays */
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1); /* Content arriving: page-load entrance, overlays */
 
-  --ease-precise: cubic-bezier(
-    0.4,
-    0,
-    0.2,
-    1
-  ); /* Interactive: hover, press, toggles */
+  --ease-precise: cubic-bezier(0.4, 0, 0.2, 1); /* Interactive: hover, press, toggles */
 
-  --ease-release: cubic-bezier(
-    0.2,
-    0,
-    0,
-    1
-  ); /* Content leaving: collapse, dismiss */
+  --ease-release: cubic-bezier(0.2, 0, 0, 1); /* Content leaving: collapse, dismiss */
 
-  --ease-ambient: cubic-bezier(
-    0.43,
-    0.13,
-    0.23,
-    0.96
-  ); /* Ambient motion: breathing circles only */
+  --ease-ambient: cubic-bezier(0.43, 0.13, 0.23, 0.96); /* Ambient motion: breathing circles only */
 
-  --ease-emphasised: cubic-bezier(
-    0.16,
-    1,
-    0.3,
-    1
-  ); /* Signature hero entrance: long, deep, confident */
+  --ease-emphasised: cubic-bezier(0.16, 1, 0.3, 1); /* Signature hero entrance: long, deep, confident */
 
   --ease-reveal: cubic-bezier(
     0.33,
@@ -294,10 +264,8 @@
   --shadow-2xl:
     0 6px 12px color-mix(in oklch, var(--color-ink) 6%, transparent),
     0 28px 56px -14px color-mix(in oklch, var(--color-ink) 22%, transparent);
-  --shadow-glow-accent: 0 8px 32px
-    color-mix(in oklch, var(--accent-primary) 18%, transparent);
-  --shadow-inset: inset 0 1px 0
-    color-mix(in oklch, var(--color-bone) 12%, transparent);
+  --shadow-glow-accent: 0 8px 32px color-mix(in oklch, var(--accent-primary) 18%, transparent);
+  --shadow-inset: inset 0 1px 0 color-mix(in oklch, var(--color-bone) 12%, transparent);
 
   /* ============================================
      Border Radius
@@ -340,11 +308,7 @@
     --bg-section-alt: var(--color-earth-deep);
     --bg-light: var(--color-earth-dark);
     --bg-input: color-mix(in oklch, var(--color-earth-dark) 80%, transparent);
-    --bg-input-focus: color-mix(
-      in oklch,
-      var(--color-earth-mid) 90%,
-      transparent
-    );
+    --bg-input-focus: color-mix(in oklch, var(--color-earth-mid) 90%, transparent);
     --bg-overlay: color-mix(in oklch, var(--color-ink) 85%, transparent);
 
     /* Dark Theme Text - Enhanced Contrast */
@@ -358,24 +322,15 @@
     --text-light: var(--color-ink);
 
     /* Dark Theme Borders */
-    --border-light: color-mix(
-      in oklch,
-      var(--color-earth-mid) 40%,
-      transparent
-    );
-    --border-medium: color-mix(
-      in oklch,
-      var(--color-earth-mid) 50%,
-      transparent
-    );
+    --border-light: color-mix(in oklch, var(--color-earth-mid) 40%, transparent);
+    --border-medium: color-mix(in oklch, var(--color-earth-mid) 50%, transparent);
     --border-dark: var(--color-earth-warm);
     --border-on-dark: color-mix(in oklch, var(--color-sand) 30%, transparent);
 
     /* Adjusted shadows for dark mode - deeper, more contrast */
     --shadow-sm: 0 1px 2px color-mix(in oklch, black 24%, transparent);
     --shadow-md:
-      0 2px 4px color-mix(in oklch, black 20%, transparent),
-      0 6px 12px -2px color-mix(in oklch, black 30%, transparent);
+      0 2px 4px color-mix(in oklch, black 20%, transparent), 0 6px 12px -2px color-mix(in oklch, black 30%, transparent);
     --shadow-lg:
       0 2px 6px color-mix(in oklch, black 25%, transparent),
       0 12px 24px -6px color-mix(in oklch, black 35%, transparent);
@@ -385,8 +340,7 @@
     --shadow-2xl:
       0 6px 12px color-mix(in oklch, black 30%, transparent),
       0 28px 56px -14px color-mix(in oklch, black 55%, transparent);
-    --shadow-inset: inset 0 1px 0
-      color-mix(in oklch, var(--color-sand) 8%, transparent);
+    --shadow-inset: inset 0 1px 0 color-mix(in oklch, var(--color-sand) 8%, transparent);
   }
 }
 

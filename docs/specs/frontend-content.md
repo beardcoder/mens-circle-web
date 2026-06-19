@@ -229,14 +229,11 @@ Common optional prop on every block: `anchor` (string) → becomes the section `
 - `content` (HTML):
   ```html
   <p><strong>Angaben gemäß § 5 TMG:</strong></p>
-  <p>
-    Markus Sommer<br />Männerkreis Niederbayern/ Straubing<br />Musterstraße
-    1<br />94315 Straubing
-  </p>
+  <p>Markus Sommer<br />Männerkreis Niederbayern/ Straubing<br />Musterstraße 1<br />94315 Straubing</p>
   <p><strong>Kontakt:</strong><br />E-Mail: hallo@mens-circle.de</p>
   <p>
-    <strong>Hinweis:</strong> Bitte vervollständigen Sie diese Angaben vor
-    Go-Live gemäß Ihren rechtlichen Anforderungen.
+    <strong>Hinweis:</strong> Bitte vervollständigen Sie diese Angaben vor Go-Live gemäß Ihren rechtlichen
+    Anforderungen.
   </p>
   ```
   **Seeded content — Datenschutzerklärung:**
@@ -245,26 +242,23 @@ Common optional prop on every block: `anchor` (string) → becomes the section `
   ```html
   <h3>1. Datenschutz auf einen Blick</h3>
   <p>
-    Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit
-    Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen.
+    Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn
+    Sie diese Website besuchen.
   </p>
   <h3>2. Allgemeine Hinweise und Pflichtinformationen</h3>
   <p>
-    Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten sehr
-    ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und
-    entsprechend den gesetzlichen Datenschutzvorschriften sowie dieser
+    Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre
+    personenbezogenen Daten vertraulich und entsprechend den gesetzlichen Datenschutzvorschriften sowie dieser
     Datenschutzerklärung.
   </p>
   <h3>3. Newsletter</h3>
   <p>
-    Wenn Sie den auf der Website angebotenen Newsletter beziehen möchten,
-    benötigen wir von Ihnen eine E-Mail-Adresse sowie Informationen, welche uns
-    die Überprüfung gestatten, dass Sie der Inhaber der angegebenen
-    E-Mail-Adresse sind.
+    Wenn Sie den auf der Website angebotenen Newsletter beziehen möchten, benötigen wir von Ihnen eine E-Mail-Adresse
+    sowie Informationen, welche uns die Überprüfung gestatten, dass Sie der Inhaber der angegebenen E-Mail-Adresse sind.
   </p>
   <p>
-    <strong>Hinweis:</strong> Bitte vervollständigen Sie diese
-    Datenschutzerklärung vor Go-Live gemäß DSGVO-Anforderungen.
+    <strong>Hinweis:</strong> Bitte vervollständigen Sie diese Datenschutzerklärung vor Go-Live gemäß
+    DSGVO-Anforderungen.
   </p>
   ```
 
@@ -467,9 +461,7 @@ src/
       { "label": "Fragen", "url": "#faq" },
       { "label": "Atemübung", "url": "/atemuebung" }
     ],
-    "cta": [
-      { "label": "Nächster Termin", "url": "/event", "condition": "nextEvent" }
-    ],
+    "cta": [{ "label": "Nächster Termin", "url": "/event", "condition": "nextEvent" }],
     "meta": "Atme durch. Du bist angekommen."
   },
   "footerPrimary": [

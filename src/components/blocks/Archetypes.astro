@@ -47,11 +47,7 @@ function detectIcon(title = ''): string {
 
 {
   items.length > 0 && (
-    <section
-      class="section section--large archetypes-section"
-      id={anchor}
-      aria-labelledby="archetypes-title"
-    >
+    <section class="section section--large archetypes-section" id={anchor} aria-labelledby="archetypes-title">
       <div class="container">
         <div class="section-header" data-reveal-group>
           {data.eyebrow && (
@@ -59,14 +55,7 @@ function detectIcon(title = ''): string {
               {data.eyebrow}
             </p>
           )}
-          {data.title && (
-            <h2
-              class="section-title"
-              id="archetypes-title"
-              data-reveal="blur"
-              set:html={data.title}
-            />
-          )}
+          {data.title && <h2 class="section-title" id="archetypes-title" data-reveal="blur" set:html={data.title} />}
           {data.intro && (
             <p class="section-intro" data-reveal="up">
               {data.intro}
@@ -78,24 +67,11 @@ function detectIcon(title = ''): string {
           {items.map((item) => {
             const icon = detectIcon(item.title);
             return (
-              <article
-                class={`archetype-card archetype-card--${icon}`}
-                data-reveal="up"
-              >
-                <div
-                  class="archetype-card__background-icon"
-                  aria-hidden="true"
-                  set:html={ICONS[icon]}
-                />
+              <article class={`archetype-card archetype-card--${icon}`} data-reveal="up">
+                <div class="archetype-card__background-icon" aria-hidden="true" set:html={ICONS[icon]} />
                 <div class="archetype-card__content">
-                  {item.title && (
-                    <h3 class="archetype-card__title">{item.title}</h3>
-                  )}
-                  {item.description && (
-                    <p class="archetype-card__description">
-                      {item.description}
-                    </p>
-                  )}
+                  {item.title && <h3 class="archetype-card__title">{item.title}</h3>}
+                  {item.description && <p class="archetype-card__description">{item.description}</p>}
                 </div>
               </article>
             );

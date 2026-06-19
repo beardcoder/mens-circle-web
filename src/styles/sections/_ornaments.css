@@ -2,23 +2,13 @@
  * Decorative rings and ambient ornaments shared across dark visual sections.
  */
 
-:where(
-  .hero__circles,
-  .event-register__circles,
-  .event-about__circles,
-  .event-cta__circles
-) {
+:where(.hero__circles, .event-register__circles, .event-about__circles, .event-cta__circles) {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-:where(
-  .hero__circle,
-  .event-register__circle,
-  .event-about__circle,
-  .event-cta__circle
-) {
+:where(.hero__circle, .event-register__circle, .event-about__circle, .event-cta__circle) {
   position: absolute;
   border: 1px solid var(--_ornament-ring-color, var(--color-sand));
   border-radius: var(--radius-full);
