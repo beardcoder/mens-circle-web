@@ -4,6 +4,8 @@
  * the public site shell (no marketing header/footer/fonts) — a focused, fast
  * back-office. Auth is enforced by the middleware; `Astro.locals.admin` is set.
  */
+import { ClientRouter } from 'astro:transitions';
+
 interface Props {
   title: string;
   /** Hide the nav (used by the login page). */
@@ -24,6 +26,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>{title} · Admin · Männerkreis</title>
+    <ClientRouter />
   </head>
   <body>
     {
@@ -54,16 +57,16 @@ const onTestimonials = path.startsWith('/admin/testimonials');
       <slot />
     </main>
 
-    {
-      !bare && (
-        <script is:inline>
-          document.getElementById('admin-logout')?.addEventListener('click', async () => {
-            await fetch('/api/admin/logout', { method: 'POST' });
-            window.location.href = '/admin/login';
-          });
-        </script>
-      )
-    }
+    <script>
+      // Re-bind after every view-transition swap, not just the first load —
+      // `astro:page-load` fires on initial load and after each navigation.
+      document.addEventListener('astro:page-load', () => {
+        document.getElementById('admin-logout')?.addEventListener('click', async () => {
+          await fetch('/api/admin/logout', { method: 'POST' });
+          window.location.href = '/admin/login';
+        });
+      });
+    </script>
 
     <style is:global>
       :root {
@@ -147,7 +150,9 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         font-weight: 500;
         padding: 0.4rem 0.7rem;
         border-radius: 999px;
-        transition: color var(--a-ease), background var(--a-ease);
+        transition:
+          color var(--a-ease),
+          background var(--a-ease);
       }
       .admin-nav-link:hover {
         color: var(--a-text);
@@ -211,8 +216,11 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         cursor: pointer;
         text-decoration: none;
         white-space: nowrap;
-        transition: background var(--a-ease), border-color var(--a-ease),
-          transform var(--a-ease), box-shadow var(--a-ease);
+        transition:
+          background var(--a-ease),
+          border-color var(--a-ease),
+          transform var(--a-ease),
+          box-shadow var(--a-ease);
       }
       .admin-btn:hover {
         background: var(--a-accent-hover);
@@ -277,7 +285,9 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         border-radius: var(--a-radius-sm);
         background: #fff;
         color: var(--a-text);
-        transition: border-color var(--a-ease), box-shadow var(--a-ease);
+        transition:
+          border-color var(--a-ease),
+          box-shadow var(--a-ease);
       }
       input:focus,
       textarea:focus,
