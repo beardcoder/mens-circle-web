@@ -3,17 +3,18 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Männerkreis — single-image deploy for Coolify.
 #
-# A small, sustainable footprint built around two co-located processes:
+# One process, a small sustainable footprint:
 #
 #   Astro server (Bun runtime, :8090 — the exposed port, the public edge)
 #   ├─ serves the build's static assets + prerendered HTML (immutable caching)
-#   ├─ on-demand SSR (event pages + home testimonials, live from PocketBase)
-#   └─ /api · /_  → proxied to PocketBase (127.0.0.1:8091)
-#   PocketBase (127.0.0.1:8091)  REST API, admin UI, transactional email
-#                                (pb_hooks), cron, DB — never exposed directly.
+#   ├─ on-demand SSR (event pages + home testimonials)
+#   ├─ the public API (/api/*) and the admin UI (/admin/*)
+#   └─ data layer: Drizzle on bun:sqlite (file in the mounted /data volume),
+#      migrations applied automatically on boot
 #
-# The frontend runs in the Bun runtime (NOT Node). The Bun server is the single
-# public edge (no nginx); PocketBase keeps the data + email + cron logic.
+# Transactional + newsletter email is delegated to listmonk (see docker-compose).
+# The frontend runs in the Bun runtime (NOT Node); the Bun server is the single
+# public edge (no nginx, no separate backend process).
 # ─────────────────────────────────────────────────────────────────────────────
 
 # 1) Install dependencies + build the Astro server bundle with Bun.
@@ -24,36 +25,16 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
-# Canonical URL for sitemap / OG tags (build-time). Events + testimonials are
-# NO LONGER fetched at build time — they render on demand from PocketBase, so
-# there is no PB_URL build arg and no rebuild-on-content-change anymore.
+# Canonical URL for sitemap / OG tags (build-time).
 ARG PUBLIC_SITE_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
-# Bake the JSON log handler into the SSR manifest (see astro.config.mjs). The
-# Bun runtime then emits one compact JSON object per log line — SSR errors
-# included — for Coolify/log aggregation. Build-time only: the runtime replays
-# the baked handler, so no runtime env var is needed.
+# Bake the JSON log handler into the SSR manifest (see astro.config.mjs).
 ENV LOG_FORMAT=json
 # Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks
 # Astro's Rollup build, while `bun run` still uses Bun for everything else.
 RUN bun run build
 
-# 2) Fetch the PocketBase binary for the target architecture.
-FROM alpine:3.21 AS pocketbase
-ARG PB_VERSION=0.39.3
-ARG TARGETARCH
-RUN apk add --no-cache ca-certificates unzip wget
-RUN set -eux; \
-  case "${TARGETARCH:-amd64}" in \
-  amd64) PB_ARCH=amd64 ;; \
-  arm64) PB_ARCH=arm64 ;; \
-  *)     PB_ARCH=amd64 ;; \
-  esac; \
-  wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${PB_ARCH}.zip" -O /tmp/pb.zip; \
-  unzip /tmp/pb.zip -d /pb; \
-  rm /tmp/pb.zip
-
-# 3) Final runtime image — Bun runtime + the PocketBase binary.
+# 2) Final runtime image — Bun runtime only.
 FROM oven/bun:1
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
@@ -67,23 +48,21 @@ WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
+# Drizzle migrations — applied at runtime on boot (resolved against the WORKDIR).
+COPY --from=build /app/drizzle ./drizzle
 
-# PocketBase: binary + hooks + migrations (data lives in the mounted volume).
-COPY --from=pocketbase /pb/pocketbase /usr/local/bin/pocketbase
-COPY pocketbase/pb_hooks /pb/pb_hooks
-COPY pocketbase/pb_migrations /pb/pb_migrations
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Persisted data (database, uploaded files) — mount a Coolify volume here.
-VOLUME ["/pb/pb_data"]
-# The Bun server is the public edge on :8090; PocketBase (8091) stays loopback.
+# Persisted data (the SQLite database) — mount a Coolify volume here.
+ENV DATABASE_PATH=/data/mens-circle.db
+VOLUME ["/data"]
+# The Bun server is the public edge on :8090.
 EXPOSE 8090
 
 # Liveness probe for Coolify/Docker. /health is answered directly by the Bun
-# edge (adapter/server.mjs), with no SSR render, via wget (installed above —
-# curl is NOT in this image). A 200 means the public edge is accepting and
-# serving requests; if it stops responding the orchestrator restarts it.
+# edge (adapter/server.mjs), with no SSR render, via wget (curl is NOT in this
+# image). A 200 means the public edge is accepting and serving requests.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD wget -q -O /dev/null http://127.0.0.1:8090/health || exit 1
 

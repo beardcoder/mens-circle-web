@@ -1,0 +1,22 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import TestimonialModerator from '../../components/admin/TestimonialModerator.svelte';
+import { listTestimonialsForAdmin } from '@lib/server/testimonials';
+
+export const prerender = false;
+
+const testimonials = (await listTestimonialsForAdmin()).map((t) => ({
+  id: t.id,
+  quote: t.quote,
+  authorName: t.authorName,
+  role: t.role,
+  email: t.email,
+  isPublished: t.isPublished,
+  sortOrder: t.sortOrder,
+  createdAt: t.createdAt,
+}));
+---
+
+<AdminLayout title="Stimmen">
+  <TestimonialModerator client:load testimonials={testimonials} />
+</AdminLayout>

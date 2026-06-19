@@ -1,6 +1,6 @@
 <script lang="ts">
   import { isValidEmail } from '@lib/helpers';
-  import { subscribeNewsletter } from '@lib/pocketbase';
+  import { subscribeNewsletter } from '@lib/api';
   import { showToast } from '@lib/toast';
   import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
 

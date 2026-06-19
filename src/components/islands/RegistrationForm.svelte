@@ -1,6 +1,6 @@
 <script lang="ts">
   import { isValidEmail } from '@lib/helpers';
-  import { registerForEvent } from '@lib/pocketbase';
+  import { registerForEvent } from '@lib/api';
   import { showToast } from '@lib/toast';
   import type { EventDTO } from '@lib/types';
   import { TRACKING_EVENTS, trackEvent } from '@lib/umami';

@@ -1,0 +1,29 @@
+<!--
+  Shared markup reference for the Männerkreis transactional templates.
+
+  listmonk transactional templates are standalone (no shared file layout like
+  the campaign "content" block), so each template below embeds this same outer
+  parchment card. When you create a template in listmonk, paste one of the
+  sibling *.html files as the template BODY and set the template SUBJECT to:
+
+      {{ .Tx.Data.subject }}
+
+  Data is passed by the web app via POST /api/tx and read as
+  {{ .Tx.Data.<field> }}. Multiline free text (description, locationDetails,
+  content) is rendered inside a `white-space:pre-line` block so newlines show
+  without needing raw HTML.
+
+  Outer wrapper used by every template:
+
+  <body style="margin:0;padding:0;background-color:#efe9dd;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#efe9dd;padding:24px 0;">
+      <tr><td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;overflow:hidden;">
+          <tr><td style="padding:40px 40px 32px;font-family:'DM Sans',Helvetica,Arial,sans-serif;color:#2c2418;">
+            … body …
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+-->
