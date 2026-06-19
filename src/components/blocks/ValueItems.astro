@@ -28,11 +28,7 @@ const items = data.items ?? [];
           </p>
         )
       }
-      {
-        data.title && (
-          <h2 class="section-title" data-reveal="blur" set:html={data.title} />
-        )
-      }
+      {data.title && <h2 class="section-title" data-reveal="blur" set:html={data.title} />}
     </div>
 
     {
@@ -40,13 +36,9 @@ const items = data.items ?? [];
         <div class="intro__values" data-reveal-group="90">
           {items.map((item) => (
             <div class="value-item" data-reveal="up">
-              {item.number && (
-                <span class="value-item__number">{item.number}</span>
-              )}
+              {item.number && <span class="value-item__number">{item.number}</span>}
               {item.title && <h3 class="value-item__title">{item.title}</h3>}
-              {item.description && (
-                <p class="value-item__description">{item.description}</p>
-              )}
+              {item.description && <p class="value-item__description">{item.description}</p>}
             </div>
           ))}
         </div>

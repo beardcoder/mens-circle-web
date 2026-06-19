@@ -1,103 +1,95 @@
 <script lang="ts">
-import { isValidEmail } from '@lib/helpers';
-import { registerForEvent } from '@lib/pocketbase';
-import { showToast } from '@lib/toast';
-import type { EventDTO } from '@lib/types';
-import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
+  import { isValidEmail } from '@lib/helpers';
+  import { registerForEvent } from '@lib/pocketbase';
+  import { showToast } from '@lib/toast';
+  import type { EventDTO } from '@lib/types';
+  import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
 
-interface Props {
-  event: EventDTO;
-}
-
-const { event }: Props = $props();
-
-let firstName = $state('');
-let lastName = $state('');
-let email = $state('');
-let phone = $state('');
-let privacy = $state(false);
-let website = $state(''); // honeypot
-let submitting = $state(false);
-
-const submitLabel = $derived(
-  event.is_full ? 'Auf Warteliste eintragen' : 'Verbindlich anmelden',
-);
-
-async function handleSubmit(e: SubmitEvent): Promise<void> {
-  e.preventDefault();
-
-  const first = firstName.trim();
-  const last = lastName.trim();
-  const mail = email.trim();
-  const tel = phone.trim();
-
-  if (!first || !last) {
-    showToast('error', 'Bitte fülle alle Pflichtfelder aus.');
-    return;
+  interface Props {
+    event: EventDTO;
   }
 
-  if (!isValidEmail(mail)) {
-    showToast('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
-    return;
-  }
+  const { event }: Props = $props();
 
-  if (!privacy) {
-    showToast('error', 'Bitte bestätige die Datenschutzerklärung.');
-    return;
-  }
+  let firstName = $state('');
+  let lastName = $state('');
+  let email = $state('');
+  let phone = $state('');
+  let privacy = $state(false);
+  let website = $state(''); // honeypot
+  let submitting = $state(false);
 
-  trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_SUBMIT, {
-    event_id: event.id,
-    has_phone: tel ? 'yes' : 'no',
-  });
-  submitting = true;
+  const submitLabel = $derived(event.is_full ? 'Auf Warteliste eintragen' : 'Verbindlich anmelden');
 
-  try {
-    const { success, message } = await registerForEvent({
-      event_id: event.id,
-      first_name: first,
-      last_name: last,
-      email: mail,
-      phone_number: tel || null,
-      privacy: true,
-      website,
-    });
+  async function handleSubmit(e: SubmitEvent): Promise<void> {
+    e.preventDefault();
 
-    if (success) {
-      showToast('success', message);
-      trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_SUCCESS);
-      firstName = '';
-      lastName = '';
-      email = '';
-      phone = '';
-      privacy = false;
-    } else {
-      showToast('error', message);
-      trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_ERROR, {
-        error: message,
-      });
+    const first = firstName.trim();
+    const last = lastName.trim();
+    const mail = email.trim();
+    const tel = phone.trim();
+
+    if (!first || !last) {
+      showToast('error', 'Bitte fülle alle Pflichtfelder aus.');
+      return;
     }
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Network error';
-    showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
-    trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_ERROR, { error: msg });
-  } finally {
-    submitting = false;
+
+    if (!isValidEmail(mail)) {
+      showToast('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
+      return;
+    }
+
+    if (!privacy) {
+      showToast('error', 'Bitte bestätige die Datenschutzerklärung.');
+      return;
+    }
+
+    trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_SUBMIT, {
+      event_id: event.id,
+      has_phone: tel ? 'yes' : 'no',
+    });
+    submitting = true;
+
+    try {
+      const { success, message } = await registerForEvent({
+        event_id: event.id,
+        first_name: first,
+        last_name: last,
+        email: mail,
+        phone_number: tel || null,
+        privacy: true,
+        website,
+      });
+
+      if (success) {
+        showToast('success', message);
+        trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_SUCCESS);
+        firstName = '';
+        lastName = '';
+        email = '';
+        phone = '';
+        privacy = false;
+      } else {
+        showToast('error', message);
+        trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_ERROR, {
+          error: message,
+        });
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Network error';
+      showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
+      trackEvent(TRACKING_EVENTS.EVENT_REGISTRATION_ERROR, { error: msg });
+    } finally {
+      submitting = false;
+    }
   }
-}
 </script>
 
 <form class="event-register__form" autocomplete="on" onsubmit={handleSubmit}>
   <div class="hp-field" aria-hidden="true">
     <label>
       Website
-      <input
-        type="text"
-        name="website"
-        tabindex="-1"
-        autocomplete="off"
-        bind:value={website}
-      />
+      <input type="text" name="website" tabindex="-1" autocomplete="off" bind:value={website} />
     </label>
   </div>
   <div class="form-row">
@@ -160,19 +152,11 @@ async function handleSubmit(e: SubmitEvent): Promise<void> {
       bind:value={phone}
       disabled={submitting}
     />
-    <span class="form-helper"
-      >Für Erinnerungen per SMS am Veranstaltungstag</span
-    >
+    <span class="form-helper">Für Erinnerungen per SMS am Veranstaltungstag</span>
   </div>
 
   <label class="form-checkbox">
-    <input
-      type="checkbox"
-      name="privacy"
-      required
-      bind:checked={privacy}
-      disabled={submitting}
-    />
+    <input type="checkbox" name="privacy" required bind:checked={privacy} disabled={submitting} />
     <span
       >Ich habe die
       <a href="/datenschutz" target="_blank">Datenschutzerklärung</a>
@@ -180,11 +164,7 @@ async function handleSubmit(e: SubmitEvent): Promise<void> {
     >
   </label>
 
-  <button
-    type="submit"
-    class="btn btn--primary btn--large event-register__submit"
-    disabled={submitting}
-  >
+  <button type="submit" class="btn btn--primary btn--large event-register__submit" disabled={submitting}>
     {submitting ? 'Wird gesendet...' : submitLabel}
   </button>
 </form>

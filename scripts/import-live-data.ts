@@ -18,10 +18,7 @@
  */
 import { readFileSync } from 'node:fs';
 
-const PB_URL = (process.env.PB_URL || 'http://localhost:8090').replace(
-  /\/$/,
-  '',
-);
+const PB_URL = (process.env.PB_URL || 'http://localhost:8090').replace(/\/$/, '');
 const ADMIN_EMAIL = process.env.PB_ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.PB_ADMIN_PASSWORD;
 const CSV_DIR = process.argv[2];
@@ -81,9 +78,7 @@ function parseCsv(text: string): string[][] {
 
 function readCsv(name: string): Row[] {
   const text = readFileSync(`${CSV_DIR}/${name}`, 'utf8');
-  const rows = parseCsv(text).filter(
-    (r) => r.length > 1 || (r.length === 1 && r[0] !== ''),
-  );
+  const rows = parseCsv(text).filter((r) => r.length > 1 || (r.length === 1 && r[0] !== ''));
   if (rows.length === 0) return [];
   const header = rows[0];
   return rows.slice(1).map((r) => {
@@ -135,49 +130,33 @@ function isDeleted(r: Row): boolean {
 let token = '';
 
 async function auth(): Promise<void> {
-  const res = await fetch(
-    `${PB_URL}/api/collections/_superusers/auth-with-password`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identity: ADMIN_EMAIL, password: ADMIN_PASSWORD }),
-    },
-  );
-  if (!res.ok)
-    throw new Error(`Auth failed (${res.status}): ${await res.text()}`);
+  const res = await fetch(`${PB_URL}/api/collections/_superusers/auth-with-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ identity: ADMIN_EMAIL, password: ADMIN_PASSWORD }),
+  });
+  if (!res.ok) throw new Error(`Auth failed (${res.status}): ${await res.text()}`);
   token = ((await res.json()) as { token: string }).token;
 }
 
-async function upsert(
-  collection: string,
-  recordId: string,
-  data: Record<string, unknown>,
-): Promise<boolean> {
+async function upsert(collection: string, recordId: string, data: Record<string, unknown>): Promise<boolean> {
   const headers = { 'Content-Type': 'application/json', Authorization: token };
-  const existing = await fetch(
-    `${PB_URL}/api/collections/${collection}/records/${recordId}`,
-    { headers },
-  );
+  const existing = await fetch(`${PB_URL}/api/collections/${collection}/records/${recordId}`, { headers });
   const body = JSON.stringify({ id: recordId, ...data });
   const res =
     existing.status === 200
-      ? await fetch(
-          `${PB_URL}/api/collections/${collection}/records/${recordId}`,
-          {
-            method: 'PATCH',
-            headers,
-            body,
-          },
-        )
+      ? await fetch(`${PB_URL}/api/collections/${collection}/records/${recordId}`, {
+          method: 'PATCH',
+          headers,
+          body,
+        })
       : await fetch(`${PB_URL}/api/collections/${collection}/records`, {
           method: 'POST',
           headers,
           body,
         });
   if (!res.ok) {
-    console.warn(
-      `  ⚠ ${collection}/${recordId}: ${res.status} ${await res.text()}`,
-    );
+    console.warn(`  ⚠ ${collection}/${recordId}: ${res.status} ${await res.text()}`);
     return false;
   }
   return true;
@@ -205,33 +184,26 @@ async function importCollection(
     if (await upsert(collection, mapped.id, mapped.data)) ok++;
     else skipped++;
   }
-  console.log(
-    `✓ ${label}: ${ok} imported, ${skipped} skipped (of ${rows.length})`,
-  );
+  console.log(`✓ ${label}: ${ok} imported, ${skipped} skipped (of ${rows.length})`);
 }
 
 async function main(): Promise<void> {
   console.log(`Importing into ${PB_URL} from ${CSV_DIR}\n`);
   await auth();
 
-  await importCollection(
-    'participants',
-    'participants.csv',
-    'participants',
-    (r) => {
-      const pid = id('p', r.id);
-      importedParticipants.add(pid);
-      return {
-        id: pid,
-        data: {
-          first_name: clean(r.first_name),
-          last_name: clean(r.last_name),
-          email: (r.email || '').trim().toLowerCase(),
-          phone: clean(r.phone),
-        },
-      };
-    },
-  );
+  await importCollection('participants', 'participants.csv', 'participants', (r) => {
+    const pid = id('p', r.id);
+    importedParticipants.add(pid);
+    return {
+      id: pid,
+      data: {
+        first_name: clean(r.first_name),
+        last_name: clean(r.last_name),
+        email: (r.email || '').trim().toLowerCase(),
+        phone: clean(r.phone),
+      },
+    };
+  });
 
   let imageSkips = 0;
   await importCollection('events', 'events.csv', 'events', (r) => {
@@ -262,68 +234,45 @@ async function main(): Promise<void> {
       },
     };
   });
-  if (imageSkips)
-    console.log(
-      `  ℹ ${imageSkips} event(s) referenced an image file (not migrated)`,
-    );
+  if (imageSkips) console.log(`  ℹ ${imageSkips} event(s) referenced an image file (not migrated)`);
 
-  await importCollection(
-    'testimonials',
-    'testimonials.csv',
-    'testimonials',
-    (r) => {
-      if (isDeleted(r)) return null;
-      return {
-        id: id('t', r.id),
-        data: {
-          quote: clean(r.quote).slice(0, 1000),
-          author_name: clean(r.author_name),
-          role: clean(r.role),
-          email: (r.email || '').trim().toLowerCase(),
-          is_published: bool(r.is_published),
-          published_at: date(r.published_at),
-          sort_order: num(r.sort_order) ?? 0,
-        },
-      };
-    },
-  );
+  await importCollection('testimonials', 'testimonials.csv', 'testimonials', (r) => {
+    if (isDeleted(r)) return null;
+    return {
+      id: id('t', r.id),
+      data: {
+        quote: clean(r.quote).slice(0, 1000),
+        author_name: clean(r.author_name),
+        role: clean(r.role),
+        email: (r.email || '').trim().toLowerCase(),
+        is_published: bool(r.is_published),
+        published_at: date(r.published_at),
+        sort_order: num(r.sort_order) ?? 0,
+      },
+    };
+  });
 
-  await importCollection(
-    'registrations',
-    'registrations.csv',
-    'registrations',
-    (r) => {
-      if (isDeleted(r)) return null;
-      const participant = id('p', r.participant_id);
-      const event = id('e', r.event_id);
-      if (
-        !importedParticipants.has(participant) ||
-        !importedEvents.has(event)
-      ) {
-        return null; // dangling relation (e.g. event was deleted) — skip
-      }
-      const status = [
-        'registered',
-        'waitlist',
-        'cancelled',
-        'attended',
-      ].includes(r.status)
-        ? r.status
-        : 'registered';
-      return {
-        id: id('r', r.id),
-        data: {
-          participant,
-          event,
-          status,
-          registered_at: date(r.registered_at) || date(r.created_at),
-          cancelled_at: date(r.cancelled_at),
-          reminder_sent_at: date(r.reminder_sent_at),
-          sms_reminder_sent_at: date(r.sms_reminder_sent_at),
-        },
-      };
-    },
-  );
+  await importCollection('registrations', 'registrations.csv', 'registrations', (r) => {
+    if (isDeleted(r)) return null;
+    const participant = id('p', r.participant_id);
+    const event = id('e', r.event_id);
+    if (!importedParticipants.has(participant) || !importedEvents.has(event)) {
+      return null; // dangling relation (e.g. event was deleted) — skip
+    }
+    const status = ['registered', 'waitlist', 'cancelled', 'attended'].includes(r.status) ? r.status : 'registered';
+    return {
+      id: id('r', r.id),
+      data: {
+        participant,
+        event,
+        status,
+        registered_at: date(r.registered_at) || date(r.created_at),
+        cancelled_at: date(r.cancelled_at),
+        reminder_sent_at: date(r.reminder_sent_at),
+        sms_reminder_sent_at: date(r.sms_reminder_sent_at),
+      },
+    };
+  });
 
   console.log('\nDone.');
 }

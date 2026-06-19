@@ -10,10 +10,10 @@
     "preview": "astro preview",
     "start": "bun run dist/server/entry.mjs",
     "check": "astro check",
-    "format": "biome format --write .",
-    "format:check": "biome format .",
-    "lint": "biome lint .",
-    "biome:check": "biome check .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "import:live": "bun run scripts/import-live-data.ts",
     "pb:dev": "./pocketbase/pocketbase serve --dir ./pocketbase/pb_data --hooksDir ./pocketbase/pb_hooks --migrationsDir ./pocketbase/pb_migrations"
   },
@@ -28,8 +28,20 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "@biomejs/biome": "^2.5.0",
+    "@eslint/js": "^10.0.1",
     "@types/leaflet": "^1.9.21",
-    "typescript": "^6.0.3"
+    "astro-eslint-parser": "^1.4.0",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^1.7.0",
+    "eslint-plugin-svelte": "^3.19.0",
+    "globals": "^17.6.0",
+    "jiti": "^2.7.0",
+    "prettier": "^3.8.4",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-svelte": "^4.1.1",
+    "svelte-eslint-parser": "^1.8.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
   }
 }

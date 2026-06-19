@@ -18,11 +18,7 @@ const testimonials = await fetchTestimonials();
 
 {
   testimonials.length > 0 && (
-    <section
-      class="section section--large testimonials-section"
-      id={anchor}
-      aria-labelledby="testimonials-title"
-    >
+    <section class="section section--large testimonials-section" id={anchor} aria-labelledby="testimonials-title">
       <div class="testimonials__pattern" aria-hidden="true" />
       <div class="container">
         <div class="section-header">
@@ -30,9 +26,7 @@ const testimonials = await fetchTestimonials();
           <h2 class="section-title" id="testimonials-title">
             Was <span class="highlight">Teilnehmer</span> sagen
           </h2>
-          <p class="testimonials__subtitle">
-            Authentische Einblicke von Männern, die den Kreis erleben
-          </p>
+          <p class="testimonials__subtitle">Authentische Einblicke von Männern, die den Kreis erleben</p>
         </div>
 
         <div class="testimonials__grid">
@@ -41,12 +35,8 @@ const testimonials = await fetchTestimonials();
               <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
               {(t.author || t.role) && (
                 <div class="testimonial-item__author">
-                  {t.author && (
-                    <cite class="testimonial-item__name">{t.author}</cite>
-                  )}
-                  {t.role && (
-                    <span class="testimonial-item__role">{t.role}</span>
-                  )}
+                  {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
+                  {t.role && <span class="testimonial-item__role">{t.role}</span>}
                 </div>
               )}
             </article>

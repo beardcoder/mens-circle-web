@@ -14,11 +14,7 @@ const { data } = Astro.props;
 const anchor = data.anchor ?? 'newsletter';
 ---
 
-<section
-  class="section newsletter-section"
-  id={anchor}
-  aria-labelledby="newsletter-title"
->
+<section class="section newsletter-section" id={anchor} aria-labelledby="newsletter-title">
   <div class="container">
     <div class="newsletter__layout">
       <div class="newsletter__content" data-reveal-group="100">
@@ -50,15 +46,8 @@ const anchor = data.anchor ?? 'newsletter';
         }
       </div>
 
-      <div
-        class="newsletter__form-wrapper"
-        data-reveal="left"
-        data-reveal-delay="120"
-      >
-        <NewsletterForm
-          client:visible
-          context={{ location: 'newsletter-block' }}
-        />
+      <div class="newsletter__form-wrapper" data-reveal="left" data-reveal-delay="120">
+        <NewsletterForm client:visible context={{ location: 'newsletter-block' }} />
       </div>
     </div>
   </div>

@@ -39,9 +39,7 @@ type Controls = ReturnType<typeof animate>;
  * read from the `--header-clearance` custom property.
  */
 const headerOffset = (): number => {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(
-    '--header-clearance',
-  );
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--header-clearance');
   const parsed = Number.parseInt(raw, 10);
 
   return Number.isFinite(parsed) ? parsed : FALLBACK_HEADER_OFFSET_PX;
@@ -87,27 +85,19 @@ const coverRadius = (ox: number, oy: number): number => {
  * no-op cleanup) if the required DOM is missing.
  */
 export function initSiteHeader(): () => void {
-  const root = document.querySelector<HTMLElement>(
-    'header.header#header[data-lume="site-header"]',
-  );
+  const root = document.querySelector<HTMLElement>('header.header#header[data-lume="site-header"]');
 
   if (!root) return () => {};
 
   const nav = root.querySelector<HTMLElement>('[data-lume-part="nav"]');
-  const toggle = root.querySelector<HTMLButtonElement>(
-    '[data-lume-part="toggle"]',
-  );
+  const toggle = root.querySelector<HTMLButtonElement>('[data-lume-part="toggle"]');
 
   if (!nav || !toggle) return () => {};
 
-  const navLinks = Array.from(
-    root.querySelectorAll<HTMLAnchorElement>('[data-lume-part="nav-link"]'),
-  );
+  const navLinks = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-lume-part="nav-link"]'));
   const heroEl = document.querySelector<HTMLElement>('.hero');
 
-  const bars = Array.from(
-    toggle.querySelectorAll<HTMLElement>('.nav-toggle__bar'),
-  );
+  const bars = Array.from(toggle.querySelectorAll<HTMLElement>('.nav-toggle__bar'));
 
   // Everything that cascades into / out of the open panel.
   const revealItems = [
@@ -138,8 +128,7 @@ export function initSiteHeader(): () => void {
 
     if (target === null) return false;
 
-    const top =
-      target.getBoundingClientRect().top + window.scrollY - headerOffset();
+    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset();
 
     window.scrollTo({
       top: Math.max(top, 0),
@@ -177,9 +166,7 @@ export function initSiteHeader(): () => void {
     animate(
       top,
       {
-        transform: open
-          ? 'translateY(8px) rotate(45deg)'
-          : 'translateY(0px) rotate(0deg)',
+        transform: open ? 'translateY(8px) rotate(45deg)' : 'translateY(0px) rotate(0deg)',
       },
       { duration: 0.42, ease },
     );
@@ -191,9 +178,7 @@ export function initSiteHeader(): () => void {
     animate(
       bottom,
       {
-        transform: open
-          ? 'translateY(-8px) rotate(-45deg)'
-          : 'translateY(0px) rotate(0deg)',
+        transform: open ? 'translateY(-8px) rotate(-45deg)' : 'translateY(0px) rotate(0deg)',
       },
       { duration: 0.42, ease },
     );
@@ -223,15 +208,9 @@ export function initSiteHeader(): () => void {
           { duration: 0.62, delay: 0.14 + index * 0.06, ease: EASE_SETTLE },
         );
 
-        controls.finished
-          .then(() => (el.style.willChange = ''))
-          .catch(() => (el.style.willChange = ''));
+        controls.finished.then(() => (el.style.willChange = '')).catch(() => (el.style.willChange = ''));
       } else {
-        animate(
-          el,
-          { opacity: 0, transform: 'translateY(18px)' },
-          { duration: 0.26, ease: EASE_INHALE },
-        );
+        animate(el, { opacity: 0, transform: 'translateY(18px)' }, { duration: 0.26, ease: EASE_INHALE });
       }
     });
   };
@@ -276,9 +255,7 @@ export function initSiteHeader(): () => void {
         ease: EASE_EMPHASISED,
       },
     );
-    panelAnim.finished
-      .then(() => (nav.style.willChange = ''))
-      .catch(() => (nav.style.willChange = ''));
+    panelAnim.finished.then(() => (nav.style.willChange = '')).catch(() => (nav.style.willChange = ''));
 
     cascadeLinks(true);
   };

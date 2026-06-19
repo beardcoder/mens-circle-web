@@ -35,15 +35,6 @@ const anchor = data.anchor ?? slug;
       }
     </div>
 
-    {
-      data.content && (
-        <div
-          class="section__content"
-          data-reveal="up"
-          data-reveal-delay="120"
-          set:html={data.content}
-        />
-      )
-    }
+    {data.content && <div class="section__content" data-reveal="up" data-reveal-delay="120" set:html={data.content} />}
   </div>
 </section>

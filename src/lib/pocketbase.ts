@@ -16,11 +16,7 @@
  * that perform validation, capacity/waitlist logic and transactional email
  * server-side, returning a uniform { success, message } body.
  */
-import type {
-  ApiResponse,
-  RegistrationPayload,
-  TestimonialPayload,
-} from './types';
+import type { ApiResponse, RegistrationPayload, TestimonialPayload } from './types';
 
 function resolveBaseUrl(): string {
   const configured = import.meta.env.PUBLIC_PB_URL;
@@ -48,29 +44,18 @@ async function postJson(path: string, body: object): Promise<ApiResponse> {
 
   return {
     success: res.ok && data.success !== false,
-    message:
-      data.message ??
-      (res.ok
-        ? 'Erfolgreich.'
-        : 'Etwas ist schiefgelaufen. Bitte versuche es später erneut.'),
+    message: data.message ?? (res.ok ? 'Erfolgreich.' : 'Etwas ist schiefgelaufen. Bitte versuche es später erneut.'),
   };
 }
 
-export function registerForEvent(
-  payload: RegistrationPayload,
-): Promise<ApiResponse> {
+export function registerForEvent(payload: RegistrationPayload): Promise<ApiResponse> {
   return postJson('/api/event/register', payload);
 }
 
-export function subscribeNewsletter(
-  email: string,
-  website = '',
-): Promise<ApiResponse> {
+export function subscribeNewsletter(email: string, website = ''): Promise<ApiResponse> {
   return postJson('/api/newsletter/subscribe', { email, website });
 }
 
-export function submitTestimonial(
-  payload: TestimonialPayload,
-): Promise<ApiResponse> {
+export function submitTestimonial(payload: TestimonialPayload): Promise<ApiResponse> {
   return postJson('/api/testimonial/submit', payload);
 }

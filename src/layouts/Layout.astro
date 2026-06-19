@@ -52,16 +52,12 @@ const { bare = false, ...props } = Astro.props;
     <SeoHead {...props} />
   </head>
   <body class:list={[{ 'is-bare': bare }]}>
-    {
-      /* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */
-    }
+    {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
     {!bare && <span id="top" aria-hidden="true" />}
 
     <SpriteDefs />
 
-    {
-      /* Editorial side rails — decorative magazine framing, hidden on small screens */
-    }
+    {/* Editorial side rails — decorative magazine framing, hidden on small screens */}
     {
       !bare && (
         <>

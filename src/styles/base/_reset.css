@@ -38,7 +38,7 @@ html {
 button,
 summary,
 .btn,
-[role="button"] {
+[role='button'] {
   touch-action: manipulation;
 }
 
@@ -75,7 +75,7 @@ body {
 }
 
 /* Remove list styles on ul, ol with a list role */
-:where(ul, ol)[role="list"] {
+:where(ul, ol)[role='list'] {
   list-style: none;
 }
 

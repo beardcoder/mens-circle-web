@@ -37,20 +37,20 @@
 /* Global @keyframes — kept unlayered so the animation lookup never has to
    cross cascade layer boundaries. Used by ambient breathing circles in
    hero / intro / cta / newsletter / whatsapp / event sections. */
-@import url("base/_keyframes.css");
-@import url("base/_reset.css") layer(reset);
-@import url("base/_variables.css") layer(tokens);
-@import url("base/_typography.css") layer(base);
-@import url("utilities/_layout.css") layer(layout);
-@import url("components/_buttons.css") layer(components);
-@import url("components/_cards.css") layer(components);
-@import url("components/_forms.css") layer(components);
-@import url("components/_toast.css") layer(components);
-@import url("sections/_surfaces.css") layer(sections);
-@import url("sections/_ornaments.css") layer(sections);
-@import url("sections/_error.css") layer(sections);
-@import url("utilities/_animations.css") layer(utilities);
-@import url("utilities/_motion.css") layer(utilities);
-@import url("utilities/_visual.css") layer(utilities);
-@import url("utilities/_view-transitions.css") layer(utilities);
-@import url("utilities/_print.css") layer(utilities);
+@import url('base/_keyframes.css');
+@import url('base/_reset.css') layer(reset);
+@import url('base/_variables.css') layer(tokens);
+@import url('base/_typography.css') layer(base);
+@import url('utilities/_layout.css') layer(layout);
+@import url('components/_buttons.css') layer(components);
+@import url('components/_cards.css') layer(components);
+@import url('components/_forms.css') layer(components);
+@import url('components/_toast.css') layer(components);
+@import url('sections/_surfaces.css') layer(sections);
+@import url('sections/_ornaments.css') layer(sections);
+@import url('sections/_error.css') layer(sections);
+@import url('utilities/_animations.css') layer(utilities);
+@import url('utilities/_motion.css') layer(utilities);
+@import url('utilities/_visual.css') layer(utilities);
+@import url('utilities/_view-transitions.css') layer(utilities);
+@import url('utilities/_print.css') layer(utilities);
