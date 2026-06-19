@@ -45,7 +45,7 @@
   <p class="admin-muted">Noch keine Veranstaltungen. Lege die erste an.</p>
 {:else}
   <div class="admin-card">
-    <table>
+    <table class="admin-table">
       <thead>
         <tr>
           <th>Titel</th>
@@ -58,19 +58,21 @@
       <tbody>
         {#each events as ev (ev.id)}
           <tr>
-            <td>
-              <a href={`/admin/events/${ev.id}`}>{ev.title}</a>
-              <div class="admin-muted slug">/event/{ev.slug}</div>
+            <td data-label="Titel">
+              <div class="title-cell">
+                <a href={`/admin/events/${ev.id}`}>{ev.title}</a>
+                <div class="admin-muted slug">/event/{ev.slug}</div>
+              </div>
             </td>
-            <td>{fmtDate(ev.eventDate)}</td>
-            <td>
+            <td data-label="Datum">{fmtDate(ev.eventDate)}</td>
+            <td data-label="Status">
               {#if ev.isPublished}
                 <span class="admin-badge admin-badge--ok">Veröffentlicht</span>
               {:else}
                 <span class="admin-badge admin-badge--off">Entwurf</span>
               {/if}
             </td>
-            <td>{ev.activeCount} / {ev.maxParticipants}</td>
+            <td data-label="Anmeldungen">{ev.activeCount} / {ev.maxParticipants}</td>
             <td class="actions">
               <a class="admin-btn admin-btn--ghost admin-btn--small" href={`/admin/events/${ev.id}/registrations`}>
                 Anmeldungen
@@ -91,6 +93,15 @@
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+  .title-cell a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .title-cell a:hover {
+    text-decoration: underline;
   }
   .slug {
     font-size: 0.75rem;
@@ -100,5 +111,14 @@
     gap: 0.4rem;
     flex-wrap: wrap;
     justify-content: flex-end;
+  }
+  @media (max-width: 640px) {
+    .actions {
+      justify-content: stretch;
+      padding-top: 0.5rem;
+    }
+    .actions :global(.admin-btn) {
+      flex: 1 1 auto;
+    }
   }
 </style>
