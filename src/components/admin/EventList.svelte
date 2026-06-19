@@ -78,6 +78,13 @@
                 Anmeldungen
               </a>
               <a class="admin-btn admin-btn--ghost admin-btn--small" href={`/admin/events/${ev.id}`}>Bearbeiten</a>
+              <a
+                class="admin-btn admin-btn--ghost admin-btn--small"
+                href={`/admin/events/new?from=${ev.id}`}
+                title="Als neue Veranstaltung duplizieren"
+              >
+                Duplizieren
+              </a>
               <button class="admin-btn admin-btn--danger admin-btn--small" onclick={() => remove(ev)}>Löschen</button>
             </td>
           </tr>

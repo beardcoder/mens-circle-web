@@ -1,10 +1,39 @@
 ---
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import EventForm from '../../../components/admin/EventForm.svelte';
+import { getEventById } from '@lib/server/events';
 
 export const prerender = false;
+
+// `?from=<id>` pre-fills the form from an existing event for quick duplication.
+// Everything is copied except identity/scheduling/visibility, which must be set
+// fresh: no id (so it's a create), a blank date + slug, and unpublished.
+const from = Astro.url.searchParams.get('from');
+const source = from ? await getEventById(from) : null;
+
+const event = source
+  ? {
+      title: source.title,
+      description: source.description,
+      startTime: source.startTime,
+      endTime: source.endTime,
+      location: source.location,
+      locationDetails: source.locationDetails,
+      street: source.street,
+      postalCode: source.postalCode,
+      city: source.city,
+      latitude: source.latitude,
+      longitude: source.longitude,
+      maxParticipants: source.maxParticipants,
+      costBasis: source.costBasis,
+      imageUrl: source.imageUrl,
+      eventDate: '',
+      slug: '',
+      isPublished: false,
+    }
+  : null;
 ---
 
 <AdminLayout title="Neue Veranstaltung">
-  <EventForm client:load event={null} />
+  <EventForm client:load event={event} />
 </AdminLayout>
