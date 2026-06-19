@@ -50,9 +50,7 @@ function isPhone(value: string): boolean {
 }
 
 export function resolveSocialLink(link: SocialLink): ResolvedSocialLink {
-  const type = (
-    Object.keys(MAP).includes(link.type) ? link.type : 'other'
-  ) as SocialType;
+  const type = (Object.keys(MAP).includes(link.type) ? link.type : 'other') as SocialType;
   const meta = MAP[type];
   const title = link.label || meta.label;
 

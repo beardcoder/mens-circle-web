@@ -25,11 +25,7 @@ const DEFAULT_TITLES: Record<ToastType, string> = {
 const VISIBLE_MS = 5000;
 const EXIT_FALLBACK_MS = 400;
 
-function buildToast(
-  type: ToastType,
-  message: string,
-  title?: string,
-): HTMLDivElement {
+function buildToast(type: ToastType, message: string, title?: string): HTMLDivElement {
   const toast = document.createElement('div');
 
   toast.className = `toast toast--${type}`;
@@ -62,11 +58,7 @@ function buildToast(
   return toast;
 }
 
-export function showToast(
-  type: ToastType,
-  message: string,
-  title?: string,
-): void {
+export function showToast(type: ToastType, message: string, title?: string): void {
   const toast = buildToast(type, message, title);
 
   document.body.append(toast);

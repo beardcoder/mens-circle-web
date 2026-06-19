@@ -56,15 +56,9 @@ const anchor = data.anchor ?? 'ueber';
           <div class="intro__values" data-reveal-group="90">
             {data.values.map((value) => (
               <div class="value-item" data-reveal="up">
-                {value.number && (
-                  <span class="value-item__number">{value.number}</span>
-                )}
-                {value.title && (
-                  <h3 class="value-item__title">{value.title}</h3>
-                )}
-                {value.description && (
-                  <p class="value-item__description">{value.description}</p>
-                )}
+                {value.number && <span class="value-item__number">{value.number}</span>}
+                {value.title && <h3 class="value-item__title">{value.title}</h3>}
+                {value.description && <p class="value-item__description">{value.description}</p>}
               </div>
             ))}
           </div>
@@ -77,16 +71,7 @@ const anchor = data.anchor ?? 'ueber';
         <div class="intro__image-ring intro__image-ring--outer"></div>
         <div class="intro__image-ring intro__image-ring--inner"></div>
       </div>
-      {
-        data.quote && (
-          <p
-            class="intro__image-text"
-            data-reveal="up"
-            data-reveal-delay="120"
-            set:html={data.quote}
-          />
-        )
-      }
+      {data.quote && <p class="intro__image-text" data-reveal="up" data-reveal-delay="120" set:html={data.quote} />}
     </div>
   </div>
 </section>

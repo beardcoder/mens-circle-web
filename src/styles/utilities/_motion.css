@@ -124,26 +124,26 @@
 
 /* Any image inside a clipped frame: the frame hides overflow so the image
    can scale on hover without nudging neighbours. */
-[data-motion="image"] {
+[data-motion='image'] {
   overflow: clip;
 }
 
 /* Magnetic link — the underline grows from the inline-start edge on hover
    instead of fading in. For footer links and prose `<a>`. */
-[data-motion="link"] {
+[data-motion='link'] {
   position: relative;
   display: inline-flex;
   align-items: center;
   transition: color var(--motion-quick);
 }
 
-[data-motion="link"]::after {
+[data-motion='link']::after {
   position: absolute;
   inset-block-end: -2px;
   inset-inline: 0;
   block-size: 1px;
   pointer-events: none;
-  content: "";
+  content: '';
   background: currentcolor;
   opacity: 0.45;
   transform: scaleX(0.2);
@@ -154,8 +154,8 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  [data-motion="link"]:hover::after,
-  [data-motion="link"]:focus-visible::after {
+  [data-motion='link']:hover::after,
+  [data-motion='link']:focus-visible::after {
     opacity: 1;
     transform: scaleX(1);
   }
@@ -168,7 +168,7 @@
    real hover devices so touch never sticks in a hover state. */
 
 /* Lift: subtle vertical rise with shadow depth — cards, tiles. */
-[data-hover="lift"] {
+[data-hover='lift'] {
   --hover-lift-y: -4px;
   --hover-lift-shadow: var(--shadow-lg);
 
@@ -178,18 +178,18 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  [data-hover="lift"]:hover {
+  [data-hover='lift']:hover {
     box-shadow: var(--hover-lift-shadow);
     translate: 0 var(--hover-lift-y);
   }
 
-  [data-hover="lift"]:active {
+  [data-hover='lift']:active {
     translate: 0;
   }
 }
 
 /* Glow: accent ring radiates on hover — feature surfaces. */
-[data-hover="glow"] {
+[data-hover='glow'] {
   --hover-glow-color: var(--accent-primary);
 
   transition:
@@ -198,46 +198,45 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  [data-hover="glow"]:hover {
+  [data-hover='glow']:hover {
     box-shadow:
       0 0 0 3px color-mix(in oklch, var(--hover-glow-color) 25%, transparent),
-      0 8px 24px -8px
-      color-mix(in oklch, var(--hover-glow-color) 45%, transparent);
+      0 8px 24px -8px color-mix(in oklch, var(--hover-glow-color) 45%, transparent);
     translate: 0 -2px;
   }
 
-  [data-hover="glow"]:active {
+  [data-hover='glow']:active {
     translate: 0;
   }
 }
 
 /* Scale: gentle pulse — icon buttons and badges. */
-[data-hover="scale"] {
+[data-hover='scale'] {
   transition: scale var(--motion-standard) var(--ease-settle);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  [data-hover="scale"]:hover {
+  [data-hover='scale']:hover {
     scale: 1.06;
   }
 
-  [data-hover="scale"]:active {
+  [data-hover='scale']:active {
     scale: 0.96;
   }
 }
 
 /* Press: tactile scale-down — interactive tiles that respond to touch too. */
-[data-hover="press"] {
+[data-hover='press'] {
   transition: scale var(--motion-quick) var(--ease-precise);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  [data-hover="press"]:hover {
+  [data-hover='press']:hover {
     scale: 0.98;
   }
 }
 
-[data-hover="press"]:active {
+[data-hover='press']:active {
   scale: 0.95;
   transition-duration: var(--duration-fast);
 }
@@ -246,9 +245,9 @@
    would otherwise give no response at all. A subtle press-in on `:active`
    makes every interactive card feel tappable, the way a native app does. */
 @media (hover: none) {
-  [data-hover="lift"]:active,
-  [data-hover="glow"]:active,
-  [data-hover="scale"]:active {
+  [data-hover='lift']:active,
+  [data-hover='glow']:active,
+  [data-hover='scale']:active {
     scale: 0.97;
     transition: scale var(--duration-fast) var(--ease-precise);
   }
@@ -276,33 +275,32 @@
     animation: none;
   }
 
-  [data-motion="image"] > img,
-  [data-motion="image"] > picture > img {
+  [data-motion='image'] > img,
+  [data-motion='image'] > picture > img {
     transition: none;
   }
 
-  [data-hover="lift"] {
+  [data-hover='lift'] {
     transition:
       box-shadow var(--motion-standard),
       background-color var(--motion-standard),
       color var(--motion-standard);
   }
 
-  [data-hover="lift"]:hover,
-  [data-hover="lift"]:active,
-  [data-hover="glow"]:hover,
-  [data-hover="glow"]:active,
-  [data-hover="scale"]:hover,
-  [data-hover="scale"]:active,
-  [data-hover="press"]:hover,
-  [data-hover="press"]:active {
+  [data-hover='lift']:hover,
+  [data-hover='lift']:active,
+  [data-hover='glow']:hover,
+  [data-hover='glow']:active,
+  [data-hover='scale']:hover,
+  [data-hover='scale']:active,
+  [data-hover='press']:hover,
+  [data-hover='press']:active {
     scale: 1;
     translate: 0;
   }
 
-  [data-hover="glow"]:hover {
-    box-shadow: 0 0 0 3px
-      color-mix(in oklch, var(--hover-glow-color) 25%, transparent);
+  [data-hover='glow']:hover {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--hover-glow-color) 25%, transparent);
   }
 
   *:not([data-motion-essential], [data-motion-essential] *),

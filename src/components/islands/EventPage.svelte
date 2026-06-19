@@ -1,83 +1,80 @@
 <script lang="ts">
-import type { EventData, EventDTO } from '@lib/types';
-import CalendarModal from './CalendarModal.svelte';
-import EventMap from './EventMap.svelte';
-import NewsletterForm from './NewsletterForm.svelte';
-import RegistrationForm from './RegistrationForm.svelte';
+  import type { EventData, EventDTO } from '@lib/types';
+  import CalendarModal from './CalendarModal.svelte';
+  import EventMap from './EventMap.svelte';
+  import NewsletterForm from './NewsletterForm.svelte';
+  import RegistrationForm from './RegistrationForm.svelte';
 
-interface Props {
-  /** Event rendered at build time (null = no upcoming event scheduled). */
-  event: EventDTO | null;
-  /** WhatsApp community link, passed from Astro site data. */
-  whatsappLink?: string;
-}
+  interface Props {
+    /** Event rendered at build time (null = no upcoming event scheduled). */
+    event: EventDTO | null;
+    /** WhatsApp community link, passed from Astro site data. */
+    whatsappLink?: string;
+  }
 
-const { event: initialEvent, whatsappLink }: Props = $props();
+  const { event: initialEvent, whatsappLink }: Props = $props();
 
-// The page is server-rendered per request, so the event content AND its
-// volatile capacity (available spots / full / waitlist) are already live at
-// first paint — no client-side refresh needed.
-const event = initialEvent;
+  // The page is server-rendered per request, so the event content AND its
+  // volatile capacity (available spots / full / waitlist) are already live at
+  // first paint — no client-side refresh needed.
+  const event = initialEvent;
 
-// ─── Date formatting (de-DE, Europe/Berlin) ────────────────────────
-const TZ = 'Europe/Berlin';
+  // ─── Date formatting (de-DE, Europe/Berlin) ────────────────────────
+  const TZ = 'Europe/Berlin';
 
-function eventDate(iso: string): Date {
-  return new Date(iso);
-}
+  function eventDate(iso: string): Date {
+    return new Date(iso);
+  }
 
-function weekday(iso: string): string {
-  return new Intl.DateTimeFormat('de-DE', {
-    weekday: 'long',
-    timeZone: TZ,
-  }).format(eventDate(iso));
-}
+  function weekday(iso: string): string {
+    return new Intl.DateTimeFormat('de-DE', {
+      weekday: 'long',
+      timeZone: TZ,
+    }).format(eventDate(iso));
+  }
 
-function shortDate(iso: string): string {
-  return new Intl.DateTimeFormat('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    timeZone: TZ,
-  }).format(eventDate(iso));
-}
+  function shortDate(iso: string): string {
+    return new Intl.DateTimeFormat('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: TZ,
+    }).format(eventDate(iso));
+  }
 
-function longDate(iso: string): string {
-  return new Intl.DateTimeFormat('de-DE', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    timeZone: TZ,
-  }).format(eventDate(iso));
-}
+  function longDate(iso: string): string {
+    return new Intl.DateTimeFormat('de-DE', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      timeZone: TZ,
+    }).format(eventDate(iso));
+  }
 
-/** Build the EventData shape consumed by the calendar util. */
-function calendarData(e: EventDTO): EventData {
-  const dateOnly = new Intl.DateTimeFormat('en-CA', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    timeZone: TZ,
-  }).format(eventDate(e.event_date)); // YYYY-MM-DD
+  /** Build the EventData shape consumed by the calendar util. */
+  function calendarData(e: EventDTO): EventData {
+    const dateOnly = new Intl.DateTimeFormat('en-CA', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      timeZone: TZ,
+    }).format(eventDate(e.event_date)); // YYYY-MM-DD
 
-  return {
-    title: e.title,
-    description: e.description,
-    location: e.location,
-    startDate: dateOnly,
-    startTime: e.start_time,
-    endDate: dateOnly,
-    endTime: e.end_time,
-  };
-}
+    return {
+      title: e.title,
+      description: e.description,
+      location: e.location,
+      startDate: dateOnly,
+      startTime: e.start_time,
+      endDate: dateOnly,
+      endTime: e.end_time,
+    };
+  }
 
-function nl2brHtml(text: string): string {
-  const escaped = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-  return escaped.replace(/\r\n|\r|\n/g, '<br />');
-}
+  function nl2brHtml(text: string): string {
+    const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return escaped.replace(/\r\n|\r|\n/g, '<br />');
+  }
 </script>
 
 {#if event}
@@ -86,13 +83,7 @@ function nl2brHtml(text: string): string {
   <section class="hero event-hero">
     <div class="hero__bg">
       {#if e.image_url}
-        <img
-          class="hero__bg-image"
-          src={e.image_url}
-          loading="eager"
-          aria-hidden="true"
-          alt={e.title}
-        />
+        <img class="hero__bg-image" src={e.image_url} loading="eager" aria-hidden="true" alt={e.title} />
       {/if}
     </div>
     <div class="hero__circles" aria-hidden="true">
@@ -112,14 +103,11 @@ function nl2brHtml(text: string): string {
         </h1>
         <div class="hero__bottom">
           <p class="hero__description">
-            {weekday(e.event_date)}, {shortDate(e.event_date)} · {e.start_time} Uhr
-            · {e.location}
+            {weekday(e.event_date)}, {shortDate(e.event_date)} · {e.start_time} Uhr · {e.location}
           </p>
           {#if !e.is_past}
             <div class="hero__cta">
-              <a href="#anmeldung" class="btn btn--primary btn--large"
-                >Jetzt anmelden</a
-              >
+              <a href="#anmeldung" class="btn btn--primary btn--large">Jetzt anmelden</a>
             </div>
           {/if}
         </div>
@@ -137,12 +125,8 @@ function nl2brHtml(text: string): string {
             <div class="event-register__circle event-register__circle--2"></div>
           </div>
           <p class="eyebrow eyebrow--secondary">Rückblick</p>
-          <h2
-            class="section-title section-title--lg section-title--light event-register__title"
-          >
-            Dieses Treffen <br /><span class="text-italic"
-              >hat stattgefunden</span
-            >
+          <h2 class="section-title section-title--lg section-title--light event-register__title">
+            Dieses Treffen <br /><span class="text-italic">hat stattgefunden</span>
           </h2>
           <p class="event-register__spots">
             <span>Am {shortDate(e.event_date)}</span>
@@ -152,17 +136,13 @@ function nl2brHtml(text: string): string {
         <div class="event-register__form-wrap">
           <div class="event-register__past-info">
             <p class="event-register__past-text">
-              Dieses Treffen liegt in der Vergangenheit. Eine Anmeldung ist
-              nicht mehr möglich.
+              Dieses Treffen liegt in der Vergangenheit. Eine Anmeldung ist nicht mehr möglich.
             </p>
             <p class="event-register__past-text">
-              Möchtest du beim nächsten Männerkreis dabei sein? Dann trag dich
-              in unseren Newsletter ein, um über kommende Termine informiert zu
-              werden.
+              Möchtest du beim nächsten Männerkreis dabei sein? Dann trag dich in unseren Newsletter ein, um über
+              kommende Termine informiert zu werden.
             </p>
-            <a href="/#newsletter" class="btn btn--primary btn--large"
-              >Zum Newsletter anmelden</a
-            >
+            <a href="/#newsletter" class="btn btn--primary btn--large">Zum Newsletter anmelden</a>
           </div>
         </div>
       </div>
@@ -178,31 +158,22 @@ function nl2brHtml(text: string): string {
           </div>
           {#if e.is_full}
             <p class="eyebrow eyebrow--secondary">Warteliste</p>
-            <h2
-              class="section-title section-title--lg section-title--light event-register__title"
-            >
-              Trag dich auf die <br /><span class="text-italic"
-                >Warteliste ein</span
-              >
+            <h2 class="section-title section-title--lg section-title--light event-register__title">
+              Trag dich auf die <br /><span class="text-italic">Warteliste ein</span>
             </h2>
             <p class="event-register__spots">
               <span class="event-register__spots-full">Ausgebucht</span>
             </p>
             <p class="event-register__spots-hint">
-              Bei Absagen rückt die Warteliste automatisch nach. Du wirst sofort
-              per E-Mail informiert.
+              Bei Absagen rückt die Warteliste automatisch nach. Du wirst sofort per E-Mail informiert.
             </p>
           {:else}
             <p class="eyebrow eyebrow--secondary">Sei dabei</p>
-            <h2
-              class="section-title section-title--lg section-title--light event-register__title"
-            >
+            <h2 class="section-title section-title--lg section-title--light event-register__title">
               Sichere dir <br /><span class="text-italic">deinen Platz</span>
             </h2>
             <p class="event-register__spots">
-              <span class="event-register__spots-available"
-                >{e.available_spots}</span
-              >
+              <span class="event-register__spots-available">{e.available_spots}</span>
               <span>von {e.max_participants} Plätzen frei</span>
             </p>
           {/if}
@@ -271,9 +242,7 @@ function nl2brHtml(text: string): string {
             So findest du <span class="text-italic">zu uns</span>
           </h2>
           <p class="event-map__subtitle">
-            {[e.street, [e.postal_code, e.city].filter(Boolean).join(' ')]
-              .filter(Boolean)
-              .join(', ') || e.location}
+            {[e.street, [e.postal_code, e.city].filter(Boolean).join(' ')].filter(Boolean).join(', ') || e.location}
           </p>
         </div>
 
@@ -281,9 +250,8 @@ function nl2brHtml(text: string): string {
           lat={e.latitude}
           lng={e.longitude}
           title={e.location}
-          address={[e.street, [e.postal_code, e.city].filter(Boolean).join(' ')]
-            .filter(Boolean)
-            .join(', ') || e.location}
+          address={[e.street, [e.postal_code, e.city].filter(Boolean).join(' ')].filter(Boolean).join(', ') ||
+            e.location}
         />
 
         <div class="event-map__actions">
@@ -307,10 +275,7 @@ function nl2brHtml(text: string): string {
 
         <p class="event-map__attribution">
           Karte von
-          <a
-            href="https://www.openstreetmap.org/copyright"
-            target="_blank"
-            rel="noopener">OpenStreetMap</a
+          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a
           >-Mitwirkenden
         </p>
       </div>
@@ -361,17 +326,13 @@ function nl2brHtml(text: string): string {
           <h2 class="section-title event-cta__title">
             Bleib <span class="text-italic">informiert</span>
           </h2>
-          <a href="/#newsletter" class="btn btn--primary btn--large"
-            >Newsletter abonnieren</a
-          >
+          <a href="/#newsletter" class="btn btn--primary btn--large">Newsletter abonnieren</a>
         {:else}
           <p class="eyebrow">Bereit?</p>
           <h2 class="section-title event-cta__title">
             Melde dich <span class="text-italic">jetzt</span> an
           </h2>
-          <a href="#anmeldung" class="btn btn--primary btn--large"
-            >Zur Anmeldung</a
-          >
+          <a href="#anmeldung" class="btn btn--primary btn--large">Zur Anmeldung</a>
         {/if}
       </div>
     </div>
@@ -391,20 +352,15 @@ function nl2brHtml(text: string): string {
         <p class="hero__label">Männerkreis Niederbayern/ Straubing</p>
         <h1 class="hero__title">
           <span class="hero__title-line">Aktuell ist kein</span>
-          <span class="hero__title-line"
-            ><span class="text-italic">Termin</span> geplant</span
-          >
+          <span class="hero__title-line"><span class="text-italic">Termin</span> geplant</span>
         </h1>
         <div class="hero__bottom">
           <p class="hero__description">
-            Wir planen gerade unser nächstes Treffen. Melde dich für unseren
-            Newsletter an oder tritt unserer WhatsApp-Community bei, um als
-            Erster zu erfahren, wann es weitergeht.
+            Wir planen gerade unser nächstes Treffen. Melde dich für unseren Newsletter an oder tritt unserer
+            WhatsApp-Community bei, um als Erster zu erfahren, wann es weitergeht.
           </p>
           <div class="hero__cta">
-            <a href="#newsletter" class="btn btn--primary btn--large"
-              >Zum Newsletter</a
-            >
+            <a href="#newsletter" class="btn btn--primary btn--large">Zum Newsletter</a>
             <div class="hero__scroll">
               <span>Mehr erfahren</span>
               <div class="hero__scroll-line"></div>
@@ -425,10 +381,9 @@ function nl2brHtml(text: string): string {
             Ein Raum für <span class="text-italic">echte Begegnung</span>
           </h2>
           <p class="no-event-info__text">
-            Der Männerkreis Niederbayern/ Straubing bietet dir einen geschützten
-            Raum, in dem du dich mit anderen Männern austauschen, wachsen und
-            echte Verbindungen aufbauen kannst. Unsere Treffen finden regelmäßig
-            statt – sobald der nächste Termin feststeht, informieren wir dich.
+            Der Männerkreis Niederbayern/ Straubing bietet dir einen geschützten Raum, in dem du dich mit anderen
+            Männern austauschen, wachsen und echte Verbindungen aufbauen kannst. Unsere Treffen finden regelmäßig statt
+            – sobald der nächste Termin feststeht, informieren wir dich.
           </p>
         </div>
         <div class="no-event-info__visual">
@@ -458,8 +413,8 @@ function nl2brHtml(text: string): string {
             Bleib <span class="text-italic">informiert</span>
           </h2>
           <p class="newsletter__text">
-            Erhalte als Erster Bescheid, wenn unser nächstes Treffen
-            stattfindet. Kein Spam, nur relevante Informationen zum Männerkreis.
+            Erhalte als Erster Bescheid, wenn unser nächstes Treffen stattfindet. Kein Spam, nur relevante Informationen
+            zum Männerkreis.
           </p>
         </div>
 
@@ -481,19 +436,13 @@ function nl2brHtml(text: string): string {
               Tritt unserer <span class="text-italic">WhatsApp Community</span> bei
             </h2>
             <p class="whatsapp__text">
-              Bleibe mit anderen Männern in Verbindung, erhalte Erinnerungen zu
-              unseren Treffen und tausche dich zwischen den Kreisen aus. Ein
-              Raum für Austausch und gegenseitige Unterstützung.
+              Bleibe mit anderen Männern in Verbindung, erhalte Erinnerungen zu unseren Treffen und tausche dich
+              zwischen den Kreisen aus. Ein Raum für Austausch und gegenseitige Unterstützung.
             </p>
           </div>
 
           <div class="whatsapp__action">
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn--whatsapp whatsapp__button"
-            >
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" class="btn btn--whatsapp whatsapp__button">
               <span>Community beitreten</span>
             </a>
             <p class="whatsapp__hint">Kostenlos und unverbindlich</p>
@@ -511,10 +460,7 @@ function nl2brHtml(text: string): string {
         <h2 class="section-title no-event-cta__title">
           Entdecke den <span class="text-italic">Männerkreis</span>
         </h2>
-        <p class="no-event-cta__text">
-          Erfahre mehr über uns, unsere Werte und was dich bei einem Treffen
-          erwartet.
-        </p>
+        <p class="no-event-cta__text">Erfahre mehr über uns, unsere Werte und was dich bei einem Treffen erwartet.</p>
         <a href="/" class="btn btn--primary btn--large">Zur Startseite</a>
       </div>
     </div>

@@ -46,20 +46,11 @@ const anchor = data.anchor;
       {data.title && <h1 class="hero__title" set:html={data.title} />}
 
       <div class="hero__bottom">
-        {
-          data.description && (
-            <p class="hero__description">{data.description}</p>
-          )
-        }
+        {data.description && <p class="hero__description">{data.description}</p>}
 
         {
           data.buttonText && data.buttonLink && (
-            <div
-              class="hero__cta"
-              data-event-cta={
-                data.buttonLink?.startsWith('/event') ? '' : undefined
-              }
-            >
+            <div class="hero__cta" data-event-cta={data.buttonLink?.startsWith('/event') ? '' : undefined}>
               <a href={data.buttonLink} class="btn btn--primary btn--large">
                 {data.buttonText}
               </a>
@@ -102,11 +93,7 @@ const anchor = data.anchor;
     .hero__bg {
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-        180deg,
-        var(--color-earth-deep) 0%,
-        var(--color-earth-dark) 100%
-      );
+      background: linear-gradient(180deg, var(--color-earth-deep) 0%, var(--color-earth-dark) 100%);
     }
 
     .hero__bg-glow {
@@ -266,11 +253,7 @@ const anchor = data.anchor;
       inline-size: 1px;
       block-size: 80px;
       pointer-events: none;
-      background: linear-gradient(
-        to bottom,
-        var(--accent-primary),
-        transparent
-      );
+      background: linear-gradient(to bottom, var(--accent-primary), transparent);
     }
 
     @media (prefers-reduced-motion: no-preference) {

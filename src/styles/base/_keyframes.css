@@ -129,14 +129,12 @@
 
 @keyframes nav-pulse {
   0% {
-    box-shadow: 0 0 0 0
-      color-mix(in oklch, var(--accent-primary) 25%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent-primary) 25%, transparent);
     opacity: 0.35;
   }
 
   60% {
-    box-shadow: 0 0 0 24px
-      color-mix(in oklch, var(--accent-primary) 0%, transparent);
+    box-shadow: 0 0 0 24px color-mix(in oklch, var(--accent-primary) 0%, transparent);
     opacity: 0.12;
   }
 

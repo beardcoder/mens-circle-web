@@ -26,13 +26,10 @@ const photoAlt = data.name
 
 // Resolve the photo path (e.g. "/images/foo.jpg") to an imported asset so
 // Astro can generate optimised, responsive output at build time.
-const assetImages = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/images/*.{jpg,jpeg,png,webp,avif}',
-  { eager: true },
-);
-const photoKey = data.photo
-  ? `/src/assets/images/${data.photo.replace(/^\/images\//, '')}`
-  : null;
+const assetImages = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/*.{jpg,jpeg,png,webp,avif}', {
+  eager: true,
+});
+const photoKey = data.photo ? `/src/assets/images/${data.photo.replace(/^\/images\//, '')}` : null;
 const photoAsset = photoKey ? (assetImages[photoKey]?.default ?? null) : null;
 ---
 
@@ -54,12 +51,7 @@ const photoAsset = photoKey ? (assetImages[photoKey]?.default ?? null) : null;
                 decoding="async"
               />
             ) : data.photo ? (
-              <img
-                src={data.photo}
-                loading="lazy"
-                decoding="async"
-                alt={photoAlt}
-              />
+              <img src={data.photo} loading="lazy" decoding="async" alt={photoAlt} />
             ) : (
               <div class="moderator__photo-placeholder">
                 <Sprite name="user" />
@@ -80,21 +72,9 @@ const photoAsset = photoKey ? (assetImages[photoKey]?.default ?? null) : null;
           )
         }
 
-        {
-          data.name && (
-            <h2
-              class="moderator__name"
-              data-reveal="blur"
-              set:html={data.name}
-            />
-          )
-        }
+        {data.name && <h2 class="moderator__name" data-reveal="blur" set:html={data.name} />}
 
-        {
-          data.bio && (
-            <div class="moderator__bio" data-reveal="up" set:html={data.bio} />
-          )
-        }
+        {data.bio && <div class="moderator__bio" data-reveal="up" set:html={data.bio} />}
 
         {
           data.quote && (

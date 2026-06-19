@@ -51,22 +51,17 @@ const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
 const umamiOrigin = umamiId
   ? (() => {
       try {
-        return new URL(
-          import.meta.env.PUBLIC_UMAMI_ENDPOINT || 'https://cloud.umami.is',
-        ).origin;
+        return new URL(import.meta.env.PUBLIC_UMAMI_ENDPOINT || 'https://cloud.umami.is').origin;
       } catch {
         return null;
       }
     })()
   : null;
-const fullTitle =
-  title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
+const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
 const ogImageUrl = new URL(ogImage ?? '/images/logo-color.png', siteUrl).href;
 
 // Global structured data (mirrors the original LocalBusiness/Organization/WebSite).
-const sameAs = site.socialLinks
-  .filter((l) => !['email', 'phone', 'whatsapp'].includes(l.type))
-  .map((l) => l.value);
+const sameAs = site.socialLinks.filter((l) => !['email', 'phone', 'whatsapp'].includes(l.type)).map((l) => l.value);
 
 const localBusiness = {
   '@context': 'https://schema.org',
@@ -173,22 +168,11 @@ const allSchemas = [localBusiness, website, ...schemas];
     <>
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta
-        name="apple-mobile-web-app-status-bar-style"
-        content="black-translucent"
-      />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta name="apple-mobile-web-app-title" content={webAppTitle} />
     </>
   )
 }
 
 <!-- Structured data -->
-{
-  allSchemas.map((schema) => (
-    <script
-      is:inline
-      type="application/ld+json"
-      set:html={JSON.stringify(schema)}
-    />
-  ))
-}
+{allSchemas.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}

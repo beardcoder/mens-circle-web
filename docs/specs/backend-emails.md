@@ -331,14 +331,11 @@ pb_hooks/
 
 ```js
 routerAdd('POST', '/api/event/register', (e) => {
-  const { event_id, first_name, last_name, email, phone_number, privacy } =
-    readBody(e);
+  const { event_id, first_name, last_name, email, phone_number, privacy } = readBody(e);
   validate(privacy === true, 'Bitte bestätige die Datenschutzerklärung.');
   const event = findEventById(event_id);
-  if (!event || event.deleted)
-    return json(404, 'Diese Veranstaltung ist nicht verfügbar.');
-  if (isPast(event))
-    return json(410, 'Diese Veranstaltung hat bereits stattgefunden. ...');
+  if (!event || event.deleted) return json(404, 'Diese Veranstaltung ist nicht verfügbar.');
+  if (isPast(event)) return json(410, 'Diese Veranstaltung hat bereits stattgefunden. ...');
 
   const activeCount = countActiveRegistrations(event.id);
   const isWaitlist = activeCount >= event.max_participants;
@@ -360,9 +357,7 @@ routerAdd('POST', '/api/event/register', (e) => {
     );
   }
   const status = isWaitlist ? 'waitlist' : 'registered';
-  const reg = existing
-    ? restoreRegistration(existing, status)
-    : createRegistration(participant, event, status);
+  const reg = existing ? restoreRegistration(existing, status) : createRegistration(participant, event, status);
 
   // emails (could also live in onRecordAfterCreateSuccess)
   isWaitlist
@@ -370,10 +365,7 @@ routerAdd('POST', '/api/event/register', (e) => {
     : sendRegistrationConfirmation(reg, event, participant); // + iCal attachment
   sendAdminRegistrationNotification(reg, event, participant);
 
-  return json(
-    200,
-    isWaitlist ? waitlistMsg(first_name) : successMsg(first_name),
-  );
+  return json(200, isWaitlist ? waitlistMsg(first_name) : successMsg(first_name));
 });
 ```
 
@@ -383,8 +375,7 @@ routerAdd('POST', '/api/event/register', (e) => {
 onRecordAfterUpdateSuccess((e) => {
   const oldStatus = e.record.original().get('status');
   const newStatus = e.record.get('status');
-  if (!(oldStatus !== 'cancelled' && newStatus === 'cancelled'))
-    return e.next();
+  if (!(oldStatus !== 'cancelled' && newStatus === 'cancelled')) return e.next();
   const next = findOldestWaitlisted(e.record.get('event')); // order by registered_at ASC
   if (next) {
     next.set('status', 'registered');
@@ -411,15 +402,8 @@ function sendCampaign(newsletter) {
   save();
   let count = 0;
   forEachActiveSubscriber((chunk = 100), (sub) => {
-    const html = newsletter.content.replaceAll(
-      '{first_name}',
-      esc(sub.participant.first_name),
-    );
-    trySend(
-      sub.participant.email,
-      newsletter.subject,
-      html + unsubscribeFooter(sub.token),
-    );
+    const html = newsletter.content.replaceAll('{first_name}', esc(sub.participant.first_name));
+    trySend(sub.participant.email, newsletter.subject, html + unsubscribeFooter(sub.token));
     count++;
   });
   newsletter.set({ status: 'sent', sent_at: now(), recipient_count: count });
@@ -431,10 +415,9 @@ function sendCampaign(newsletter) {
 
 ```js
 $app.cron().add('event-reminders', '*/15 * * * *', () => {
-  const regs = findActiveRegistrationsForEventsBetween(
-    startOfToday(),
-    endOfTomorrow(),
-  ).filter((r) => !r.reminder_sent_at && r.event.is_published);
+  const regs = findActiveRegistrationsForEventsBetween(startOfToday(), endOfTomorrow()).filter(
+    (r) => !r.reminder_sent_at && r.event.is_published,
+  );
   for (const r of regs) {
     const isToday = sameDay(r.event.event_date, today());
     sendEventReminder(r, r.event, isToday);

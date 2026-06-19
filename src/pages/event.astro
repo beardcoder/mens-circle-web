@@ -15,11 +15,7 @@ const event = await fetchNextEvent();
   description="Der nächste Männerkreis in Straubing. Sieh dir den Termin an und sichere dir deinen Platz."
   ogType="event"
 >
-  <EventPage
-    client:load
-    event={event}
-    whatsappLink={site.whatsappCommunityLink}
-  />
+  <EventPage client:load event={event} whatsappLink={site.whatsappCommunityLink} />
 </Layout>
 
 <style is:global>
