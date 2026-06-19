@@ -34,8 +34,7 @@ export default function bunEdgeAdapter() {
               {
                 name: 'mens-circle-edge:config',
                 resolveId(id) {
-                  if (id === VIRTUAL_CONFIG_ID)
-                    return RESOLVED_VIRTUAL_CONFIG_ID;
+                  if (id === VIRTUAL_CONFIG_ID) return RESOLVED_VIRTUAL_CONFIG_ID;
                 },
                 load(id) {
                   // clientDir is set in astro:config:done, which runs before the
@@ -59,9 +58,7 @@ export default function bunEdgeAdapter() {
           // level — no `createExports()`/`start()`/`exports`/`args` (the
           // deprecated Astro 5 adapter API). Absolute path so Vite resolves it
           // during the SSR build.
-          serverEntrypoint: fileURLToPath(
-            new URL('./server.mjs', import.meta.url),
-          ),
+          serverEntrypoint: fileURLToPath(new URL('./server.mjs', import.meta.url)),
           entrypointResolution: 'auto',
           supportedAstroFeatures: {
             serverOutput: 'stable',

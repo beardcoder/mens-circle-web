@@ -20,7 +20,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  content: "";
+  content: '';
   background-image: var(--surface-noise);
   opacity: var(--_surface-noise-opacity, var(--surface-noise-opacity));
 }
@@ -39,20 +39,18 @@
   inline-size: 70%;
   block-size: 160%;
   pointer-events: none;
-  content: "";
+  content: '';
   background: radial-gradient(
     ellipse at center,
     color-mix(
         in oklch,
-        var(--_surface-glow-color, var(--accent-primary))
-          var(--_surface-glow-strength, var(--surface-glow-strength)),
+        var(--_surface-glow-color, var(--accent-primary)) var(--_surface-glow-strength, var(--surface-glow-strength)),
         transparent
       )
       0%,
     transparent 50%
   );
-  animation: breathe-slow var(--_surface-glow-duration, 20s) var(--ease-ambient)
-    infinite var(--_surface-glow-delay, 0s);
+  animation: breathe-slow var(--_surface-glow-duration, 20s) var(--ease-ambient) infinite var(--_surface-glow-delay, 0s);
 }
 
 .newsletter-section::after {

@@ -20,11 +20,7 @@
  */
 import type { EventDTO, Testimonial } from './types';
 
-const PB_URL = (
-  process.env.PB_INTERNAL_URL ||
-  process.env.PUBLIC_PB_URL ||
-  'http://127.0.0.1:8091'
-).replace(/\/$/, '');
+const PB_URL = (process.env.PB_INTERNAL_URL || process.env.PUBLIC_PB_URL || 'http://127.0.0.1:8091').replace(/\/$/, '');
 
 async function getJson<T>(path: string): Promise<T | null> {
   try {
@@ -77,16 +73,12 @@ export function fetchTestimonials(): Promise<Testimonial[]> {
 
 /** The next upcoming published event, or null if none. Not cached (live capacity). */
 export async function fetchNextEvent(): Promise<EventDTO | null> {
-  const data = await getJson<{ event: EventDTO | null }>(
-    '/api/public/events/next',
-  );
+  const data = await getJson<{ event: EventDTO | null }>('/api/public/events/next');
   return data?.event ?? null;
 }
 
 /** A single event by slug (past or upcoming), or null. Not cached (live capacity). */
 export async function getEventBySlug(slug: string): Promise<EventDTO | null> {
-  const data = await getJson<{ event: EventDTO | null }>(
-    `/api/public/events/${encodeURIComponent(slug)}`,
-  );
+  const data = await getJson<{ event: EventDTO | null }>(`/api/public/events/${encodeURIComponent(slug)}`);
   return data?.event ?? null;
 }

@@ -12,10 +12,7 @@ export interface UmamiEventData {
 /**
  * Track a custom event in Umami Analytics
  */
-export function trackEvent(
-  eventName: string,
-  eventData?: UmamiEventData,
-): void {
+export function trackEvent(eventName: string, eventData?: UmamiEventData): void {
   if (typeof window.umami === 'undefined') {
     if (import.meta.env.DEV) {
       // eslint-disable-next-line no-console

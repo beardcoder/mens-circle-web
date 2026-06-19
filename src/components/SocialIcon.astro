@@ -25,11 +25,5 @@ const iconClass = isText ? 'social-link__icon' : 'social-icon__svg';
   class={linkClass}
 >
   <Sprite name={iconName} class={iconClass} />
-  {
-    isText ? (
-      <span class="social-link__label">{title}</span>
-    ) : (
-      <span class="sr-only">{title}</span>
-    )
-  }
+  {isText ? <span class="social-link__label">{title}</span> : <span class="sr-only">{title}</span>}
 </a>

@@ -10,21 +10,12 @@ const ctaLinks = nav.header.cta;
 <header class="header" id="header" data-lume="site-header">
   <div class="container">
     <div class="header__inner">
-      <a
-        href="/"
-        class="header__logo logo"
-        aria-label={`${site.siteName} - Startseite`}
-      >
+      <a href="/" class="header__logo logo" aria-label={`${site.siteName} - Startseite`}>
         <Logo class="logo__icon" />
         <span class="logo__text">Männerkreis</span>
       </a>
 
-      <nav
-        class="nav"
-        id="nav"
-        data-lume-part="nav"
-        aria-label="Hauptnavigation"
-      >
+      <nav class="nav" id="nav" data-lume-part="nav" aria-label="Hauptnavigation">
         <span class="nav__ambient" aria-hidden="true">
           <span class="nav__ring"></span>
           <span class="nav__ring"></span>
@@ -42,11 +33,7 @@ const ctaLinks = nav.header.cta;
                   data-umami-event="nav-click"
                   data-umami-event-target={link.umamiTarget}
                   target={'target' in link ? link.target : undefined}
-                  rel={
-                    'target' in link && link.target === '_blank'
-                      ? 'noopener'
-                      : undefined
-                  }
+                  rel={'target' in link && link.target === '_blank' ? 'noopener' : undefined}
                 >
                   <span class="nav__index" aria-hidden="true">
                     {String(i + 1).padStart(2, '0')}
@@ -116,14 +103,12 @@ const ctaLinks = nav.header.cta;
   @keyframes meta-ember {
     0%,
     100% {
-      box-shadow: 0 0 0 0
-        color-mix(in oklch, var(--accent-secondary) 45%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent-secondary) 45%, transparent);
       opacity: 0.5;
     }
 
     50% {
-      box-shadow: 0 0 0 6px
-        color-mix(in oklch, var(--accent-secondary) 0%, transparent);
+      box-shadow: 0 0 0 6px color-mix(in oklch, var(--accent-secondary) 0%, transparent);
       opacity: 1;
     }
   }
@@ -161,8 +146,7 @@ const ctaLinks = nav.header.cta;
       pointer-events: none;
       content: '';
       background: color-mix(in oklch, var(--bg-primary) 55%, transparent);
-      border-block-end: 1px solid
-        color-mix(in oklch, var(--border-light) 45%, transparent);
+      border-block-end: 1px solid color-mix(in oklch, var(--border-light) 45%, transparent);
       box-shadow:
         0 1px 0 color-mix(in oklch, var(--color-ink) 2%, transparent),
         0 10px 24px -10px color-mix(in oklch, var(--color-ink) 8%, transparent);
@@ -240,8 +224,7 @@ const ctaLinks = nav.header.cta;
       place-items: center;
       inline-size: 100%;
       min-block-size: 100dvh;
-      padding-block: calc(var(--header-clearance) + var(--space-md))
-        var(--space-xl);
+      padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-xl);
       padding-inline: var(--space-md);
       overflow-y: auto;
       overscroll-behavior: contain;
@@ -253,17 +236,8 @@ const ctaLinks = nav.header.cta;
           color-mix(in oklch, var(--color-terracotta) 20%, transparent),
           transparent 58%
         ),
-        radial-gradient(
-          ellipse at 85% 90%,
-          color-mix(in oklch, var(--color-sand) 10%, transparent),
-          transparent 55%
-        ),
-        linear-gradient(
-          155deg,
-          var(--color-earth-deep) 0%,
-          var(--color-earth-dark) 58%,
-          var(--color-earth-mid) 100%
-        );
+        radial-gradient(ellipse at 85% 90%, color-mix(in oklch, var(--color-sand) 10%, transparent), transparent 55%),
+        linear-gradient(155deg, var(--color-earth-deep) 0%, var(--color-earth-dark) 58%, var(--color-earth-mid) 100%);
       clip-path: circle(0 at 100% 0);
     }
 
@@ -294,11 +268,7 @@ const ctaLinks = nav.header.cta;
 
     .nav__ring:nth-child(2) {
       inline-size: min(54vmin, 26rem);
-      border-color: color-mix(
-        in oklch,
-        var(--color-terracotta) 26%,
-        transparent
-      );
+      border-color: color-mix(in oklch, var(--color-terracotta) 26%, transparent);
     }
 
     .nav__ring:nth-child(3) {
@@ -308,11 +278,7 @@ const ctaLinks = nav.header.cta;
         color-mix(in oklch, var(--color-terracotta) 14%, transparent),
         transparent 70%
       );
-      border-color: color-mix(
-        in oklch,
-        var(--color-terracotta) 18%,
-        transparent
-      );
+      border-color: color-mix(in oklch, var(--color-terracotta) 18%, transparent);
     }
 
     @media (prefers-reduced-motion: no-preference) {
@@ -444,8 +410,7 @@ const ctaLinks = nav.header.cta;
       content: '';
       background: var(--accent-secondary);
       border-radius: var(--radius-full);
-      box-shadow: 0 0 0 0
-        color-mix(in oklch, var(--accent-secondary) 50%, transparent);
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent-secondary) 50%, transparent);
     }
 
     @media (prefers-reduced-motion: no-preference) {

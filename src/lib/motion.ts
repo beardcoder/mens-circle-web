@@ -155,13 +155,9 @@ function collect(tuning: Tuning): Map<HTMLElement, RevealConfig> {
   const configs = new Map<HTMLElement, RevealConfig>();
   const staggered = new Set<HTMLElement>();
 
-  for (const group of document.querySelectorAll<HTMLElement>(
-    '[data-reveal-group]',
-  )) {
+  for (const group of document.querySelectorAll<HTMLElement>('[data-reveal-group]')) {
     const step = ms(group.dataset.revealGroup) ?? tuning.step;
-    const children = group.querySelectorAll<HTMLElement>(
-      ':scope > [data-reveal]',
-    );
+    const children = group.querySelectorAll<HTMLElement>(':scope > [data-reveal]');
 
     children.forEach((child, index) => {
       const variant = (child.dataset.reveal || 'up') as Variant;
@@ -169,9 +165,7 @@ function collect(tuning: Tuning): Map<HTMLElement, RevealConfig> {
 
       configs.set(child, {
         enter: keyframesFor(variant, tuning),
-        duration:
-          (ms(child.dataset.revealDuration) ??
-            defaultDuration(variant, tuning)) / 1000,
+        duration: (ms(child.dataset.revealDuration) ?? defaultDuration(variant, tuning)) / 1000,
         delay: (base + index * step) / 1000,
         repeat: child.dataset.revealRepeat !== undefined,
       });
@@ -188,9 +182,7 @@ function collect(tuning: Tuning): Map<HTMLElement, RevealConfig> {
 
     configs.set(el, {
       enter: keyframesFor(variant, tuning),
-      duration:
-        (ms(el.dataset.revealDuration) ?? defaultDuration(variant, tuning)) /
-        1000,
+      duration: (ms(el.dataset.revealDuration) ?? defaultDuration(variant, tuning)) / 1000,
       delay: (ms(el.dataset.revealDelay) ?? 0) / 1000,
       repeat: el.dataset.revealRepeat !== undefined,
     });
@@ -211,9 +203,7 @@ export function initMotion(): void {
     return;
   }
 
-  const tuning = globalThis.matchMedia('(width < 640px)').matches
-    ? MOBILE
-    : DESKTOP;
+  const tuning = globalThis.matchMedia('(width < 640px)').matches ? MOBILE : DESKTOP;
   const configs = collect(tuning);
 
   if (configs.size === 0) {

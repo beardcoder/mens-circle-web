@@ -109,13 +109,8 @@ p:last-child {
 .eyebrow::before {
   inline-size: clamp(2.5rem, 5vw, 5rem);
   block-size: 1.5px;
-  content: "";
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--eyebrow-line) 24%,
-    var(--eyebrow-line)
-  );
+  content: '';
+  background: linear-gradient(90deg, transparent, var(--eyebrow-line) 24%, var(--eyebrow-line));
   transform: scaleX(1);
   transform-origin: right;
 }

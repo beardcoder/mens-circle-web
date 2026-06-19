@@ -1,132 +1,117 @@
 <script lang="ts">
-import { isCoarsePointer } from '@lib/helpers';
-import type { Map as LeafletMap } from 'leaflet';
-import { onDestroy, onMount } from 'svelte';
+  import { isCoarsePointer } from '@lib/helpers';
+  import type { Map as LeafletMap } from 'leaflet';
+  import { onDestroy, onMount } from 'svelte';
 
-interface Props {
-  lat: number;
-  lng: number;
-  title: string;
-  address: string;
-}
-
-const { lat, lng, title, address }: Props = $props();
-
-let canvas: HTMLElement;
-let state = $state<'idle' | 'loading' | 'ready'>('idle');
-let map: LeafletMap | null = null;
-let disposed = false;
-
-function buildDirectionsUrl(): string {
-  if (isCoarsePointer()) {
-    const label = encodeURIComponent(address || title);
-    return `geo:${lat},${lng}?q=${lat},${lng}(${label})`;
+  interface Props {
+    lat: number;
+    lng: number;
+    title: string;
+    address: string;
   }
-  return `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`;
-}
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+  const { lat, lng, title, address }: Props = $props();
 
-onMount(() => {
-  let cleanupCanvas: (() => void) | undefined;
+  let canvas: HTMLElement;
+  let state = $state<'idle' | 'loading' | 'ready'>('idle');
+  let map: LeafletMap | null = null;
+  let disposed = false;
 
-  void (async () => {
-    state = 'loading';
+  function buildDirectionsUrl(): string {
+    if (isCoarsePointer()) {
+      const label = encodeURIComponent(address || title);
+      return `geo:${lat},${lng}?q=${lat},${lng}(${label})`;
+    }
+    return `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`;
+  }
 
-    const [{ default: L }] = await Promise.all([
-      import('leaflet'),
-      import('leaflet/dist/leaflet.css'),
-    ]);
+  function escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
-    if (disposed || !canvas) return;
+  onMount(() => {
+    let cleanupCanvas: (() => void) | undefined;
 
-    map = L.map(canvas, {
-      scrollWheelZoom: false,
-      zoomControl: true,
-      attributionControl: true,
-    }).setView([lat, lng], 16);
+    void (async () => {
+      state = 'loading';
 
-    L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-      {
+      const [{ default: L }] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]);
+
+      if (disposed || !canvas) return;
+
+      map = L.map(canvas, {
+        scrollWheelZoom: false,
+        zoomControl: true,
+        attributionControl: true,
+      }).setView([lat, lng], 16);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
         maxZoom: 19,
         subdomains: 'abcd',
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
           ' &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      },
-    ).addTo(map);
+      }).addTo(map);
 
-    const icon = L.divIcon({
-      className: 'event-map__marker',
-      html:
-        '<svg viewBox="0 0 32 44" aria-hidden="true" focusable="false">' +
-        '<path d="M16 0C7.2 0 0 7 0 15.5 0 27 16 44 16 44s16-17 16-28.5C32 7 24.8 0 16 0z"/>' +
-        '<circle cx="16" cy="15.5" r="6" fill="#fff"/>' +
-        '</svg>',
-      iconSize: [32, 44],
-      iconAnchor: [16, 44],
-      popupAnchor: [0, -40],
-    });
+      const icon = L.divIcon({
+        className: 'event-map__marker',
+        html:
+          '<svg viewBox="0 0 32 44" aria-hidden="true" focusable="false">' +
+          '<path d="M16 0C7.2 0 0 7 0 15.5 0 27 16 44 16 44s16-17 16-28.5C32 7 24.8 0 16 0z"/>' +
+          '<circle cx="16" cy="15.5" r="6" fill="#fff"/>' +
+          '</svg>',
+        iconSize: [32, 44],
+        iconAnchor: [16, 44],
+        popupAnchor: [0, -40],
+      });
 
-    const popup =
-      '<strong>' +
-      escapeHtml(title) +
-      '</strong>' +
-      (address ? `<br>${escapeHtml(address)}` : '') +
-      '<br><a class="event-map__directions" href="' +
-      buildDirectionsUrl() +
-      '" target="_blank" rel="noopener">Route planen</a>';
+      const popup =
+        '<strong>' +
+        escapeHtml(title) +
+        '</strong>' +
+        (address ? `<br>${escapeHtml(address)}` : '') +
+        '<br><a class="event-map__directions" href="' +
+        buildDirectionsUrl() +
+        '" target="_blank" rel="noopener">Route planen</a>';
 
-    L.marker([lat, lng], { icon }).addTo(map).bindPopup(popup);
+      L.marker([lat, lng], { icon }).addTo(map).bindPopup(popup);
 
-    const enableZoom = (): void => {
-      map?.scrollWheelZoom.enable();
+      const enableZoom = (): void => {
+        map?.scrollWheelZoom.enable();
+      };
+      const disableZoom = (): void => {
+        map?.scrollWheelZoom.disable();
+      };
+
+      canvas.addEventListener('click', enableZoom);
+      canvas.addEventListener('mouseleave', disableZoom);
+      cleanupCanvas = (): void => {
+        canvas.removeEventListener('click', enableZoom);
+        canvas.removeEventListener('mouseleave', disableZoom);
+      };
+
+      state = 'ready';
+    })();
+
+    return () => {
+      cleanupCanvas?.();
     };
-    const disableZoom = (): void => {
-      map?.scrollWheelZoom.disable();
-    };
+  });
 
-    canvas.addEventListener('click', enableZoom);
-    canvas.addEventListener('mouseleave', disableZoom);
-    cleanupCanvas = (): void => {
-      canvas.removeEventListener('click', enableZoom);
-      canvas.removeEventListener('mouseleave', disableZoom);
-    };
-
-    state = 'ready';
-  })();
-
-  return () => {
-    cleanupCanvas?.();
-  };
-});
-
-onDestroy(() => {
-  disposed = true;
-  map?.remove();
-  map = null;
-});
+  onDestroy(() => {
+    disposed = true;
+    map?.remove();
+    map = null;
+  });
 </script>
 
-<div
-  class="event-map"
-  data-state={state}
-  aria-label="Karte zum Veranstaltungsort"
->
-  <div
-    bind:this={canvas}
-    class="event-map__canvas"
-    role="application"
-    aria-label="Interaktive Karte"
-  ></div>
+<div class="event-map" data-state={state} aria-label="Karte zum Veranstaltungsort">
+  <div bind:this={canvas} class="event-map__canvas" role="application" aria-label="Interaktive Karte"></div>
 </div>
 
 <style>
@@ -168,8 +153,7 @@ onDestroy(() => {
     display: block;
     position: relative;
     contain: paint;
-    box-shadow: 0 12px 40px -20px
-      color-mix(in oklch, var(--color-ink) 30%, transparent);
+    box-shadow: 0 12px 40px -20px color-mix(in oklch, var(--color-ink) 30%, transparent);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
     background: linear-gradient(
@@ -186,11 +170,7 @@ onDestroy(() => {
   }
 
   :global(.event-map__canvas) {
-    background: color-mix(
-      in oklch,
-      var(--color-sand-light) 50%,
-      var(--color-parchment)
-    );
+    background: color-mix(in oklch, var(--color-sand-light) 50%, var(--color-parchment));
     inline-size: 100%;
     block-size: clamp(320px, 50vh, 520px);
   }
@@ -214,9 +194,7 @@ onDestroy(() => {
   }
 
   :global(.event-map__marker) {
-    filter: drop-shadow(
-      0 4px 6px color-mix(in oklch, var(--color-ink) 40%, transparent)
-    );
+    filter: drop-shadow(0 4px 6px color-mix(in oklch, var(--color-ink) 40%, transparent));
     border: 0;
     background: none;
   }
@@ -229,8 +207,7 @@ onDestroy(() => {
   }
 
   :global(.event-map .leaflet-popup-content-wrapper) {
-    box-shadow: 0 8px 24px -10px
-      color-mix(in oklch, var(--color-ink) 40%, transparent);
+    box-shadow: 0 8px 24px -10px color-mix(in oklch, var(--color-ink) 40%, transparent);
     border-radius: var(--radius-md);
     background: var(--bg-elevated);
     color: var(--text-primary);

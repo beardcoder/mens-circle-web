@@ -27,10 +27,7 @@ export function clamp(value: number, min: number, max: number): number {
  * map / dial UI on phones and tablets.
  */
 export function isCoarsePointer(): boolean {
-  return (
-    typeof globalThis.matchMedia === 'function' &&
-    globalThis.matchMedia('(pointer: coarse)').matches
-  );
+  return typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(pointer: coarse)').matches;
 }
 
 /**
@@ -39,7 +36,6 @@ export function isCoarsePointer(): boolean {
  */
 export function prefersReducedMotion(): boolean {
   return (
-    typeof globalThis.matchMedia === 'function' &&
-    globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches
+    typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
 }
