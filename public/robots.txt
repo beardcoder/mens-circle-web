@@ -3,8 +3,8 @@
 User-agent: *
 Allow: /
 
-# Backend / API (served by PocketBase on the same origin)
-Disallow: /_/
+# Server-internal routes — no indexable content
 Disallow: /api/
+Disallow: /admin/
 
 Sitemap: https://mens-circle.de/sitemap-index.xml
