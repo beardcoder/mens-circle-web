@@ -10,9 +10,19 @@
 import type { EventDTO } from './types';
 import site from '../data/site.json';
 
-/** Strip inline HTML so schema text values stay plain. */
+/** Strip inline HTML so schema text values stay plain.
+ *
+ * Repeats until stable: a single pass can leave injectable residue on nested or
+ * malformed markup (e.g. `<scr<script>ipt>`), and these values are embedded into
+ * a JSON-LD `<script>` block, so a stray `</script>` must not survive. */
 function strip(s = ''): string {
-  return s.replace(/<[^>]*>/g, '').trim();
+  let prev: string;
+  let out = s;
+  do {
+    prev = out;
+    out = out.replace(/<[^>]*>/g, '');
+  } while (out !== prev);
+  return out.trim();
 }
 
 /** DST-aware Europe/Berlin UTC offset (e.g. "+02:00") for a given instant. */
