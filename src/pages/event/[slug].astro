@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getEventBySlug } from '@lib/server/events';
+import { buildEventSchema } from '@lib/event-schema';
 import EventPage from '../../components/islands/EventPage.svelte';
 import site from '../../data/site.json';
 
@@ -13,12 +14,16 @@ const event = slug ? await getEventBySlug(slug) : null;
 if (!event) return Astro.redirect('/event', 302);
 
 const cleanTitle = event.title?.trim() || 'Termin';
+
+// Per-event Event structured data (this is the canonical URL for the event).
+const schemas = [buildEventSchema(event, Astro.site ?? new URL('https://mens-circle.de'))];
 ---
 
 <Layout
   title={`${cleanTitle} – Männerkreis Niederbayern/ Straubing`}
   description={`${cleanTitle} in ${event.location || 'Straubing'}. Sieh dir den Termin an und sichere dir deinen Platz.`}
   ogType="event"
+  schemas={schemas}
 >
   <EventPage client:load event={event} whatsappLink={site.whatsappCommunityLink} />
 </Layout>
