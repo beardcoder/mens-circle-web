@@ -85,6 +85,12 @@
       }
     },
     {
+      "type": "testimonials",
+      "data": {
+        "anchor": "stimmen"
+      }
+    },
+    {
       "type": "faq",
       "data": {
         "anchor": "faq",
@@ -117,12 +123,6 @@
             "answer": "Nein. Der Männerkreis ist weder Therapie noch Coaching. Es geht nicht darum, Probleme zu lösen oder Ratschläge zu geben. Stattdessen bietet der Kreis einen Raum des Zuhörens und der Verbindung. Bei therapeutischem Bedarf empfehle ich professionelle Hilfe."
           }
         ]
-      }
-    },
-    {
-      "type": "testimonials",
-      "data": {
-        "anchor": "stimmen"
       }
     },
     {
