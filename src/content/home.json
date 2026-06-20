@@ -43,17 +43,6 @@
       }
     },
     {
-      "type": "moderator",
-      "data": {
-        "anchor": "moderator",
-        "eyebrow": "Dein Begleiter",
-        "name": "Markus<br><span class=\"light\">Sommer</span>",
-        "photo": "/images/markus-sommer.jpg",
-        "bio": "<p>Ich bin Markus, gebürtiger Niederbayer und Gründer des Männerkreises Straubing. Seit Jahren beschäftige ich mich mit der Frage, was es bedeutet, als Mann authentisch zu leben – jenseits von Rollenbildern und gesellschaftlichen Erwartungen.</p><p>Der Männerkreis ist für mich ein Herzensanliegen: Ein Ort, an dem wir uns gegenseitig stärken, herausfordern und unterstützen können.</p>",
-        "quote": "„Wahre Stärke zeigt sich nicht im Alleingang, sondern in der Bereitschaft, sich anderen zu öffnen.\""
-      }
-    },
-    {
       "type": "journey-steps",
       "data": {
         "anchor": "reise",
@@ -82,6 +71,17 @@
             "description": "Zum Abschluss verankern wir das Erlebte. Was nehmen wir mit? Was setzen wir im Alltag um?"
           }
         ]
+      }
+    },
+    {
+      "type": "moderator",
+      "data": {
+        "anchor": "moderator",
+        "eyebrow": "Dein Begleiter",
+        "name": "Markus<br><span class=\"light\">Sommer</span>",
+        "photo": "/images/markus-sommer.jpg",
+        "bio": "<p>Ich bin Markus, gebürtiger Niederbayer und Gründer des Männerkreises Straubing. Seit Jahren beschäftige ich mich mit der Frage, was es bedeutet, als Mann authentisch zu leben – jenseits von Rollenbildern und gesellschaftlichen Erwartungen.</p><p>Der Männerkreis ist für mich ein Herzensanliegen: Ein Ort, an dem wir uns gegenseitig stärken, herausfordern und unterstützen können.</p>",
+        "quote": "„Wahre Stärke zeigt sich nicht im Alleingang, sondern in der Bereitschaft, sich anderen zu öffnen.\""
       }
     },
     {
@@ -143,9 +143,9 @@
     {
       "type": "cta",
       "data": {
-        "eyebrow": "Nächstes Treffen",
-        "title": "Sei beim <span class=\"text-italic\">nächsten</span><br>Mal dabei",
-        "text": "Der nächste Männerkreis findet bald statt. Sichere dir deinen Platz und erlebe, was echte Männergemeinschaft bedeutet.",
+        "eyebrow": "Dein erster Schritt",
+        "title": "Trau dich, <span class=\"text-italic\">echt</span><br>zu sein",
+        "text": "Der perfekte Moment kommt nicht. Es gibt nur diesen einen – den, in dem du dich entscheidest. Sichere dir deinen Platz beim nächsten Kreis.",
         "buttonText": "Zum Termin & Anmeldung",
         "buttonLink": "/event"
       }
