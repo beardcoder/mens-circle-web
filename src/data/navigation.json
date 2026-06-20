@@ -23,6 +23,7 @@
   "footerPrimary": [
     { "label": "Über uns", "url": "/#ueber" },
     { "label": "Die Reise", "url": "/#reise" },
+    { "label": "Haltung", "url": "/warum-ich-den-maennerkreis-leite" },
     { "label": "FAQ", "url": "/#faq" },
     { "label": "Atemübung", "url": "/atemuebung", "target": "_blank" },
     { "label": "Nächster Termin", "url": "/event" }

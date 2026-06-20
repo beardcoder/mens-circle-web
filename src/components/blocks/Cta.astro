@@ -7,6 +7,8 @@ interface Props {
     text?: string;
     buttonText?: string;
     buttonLink?: string;
+    secondaryLabel?: string;
+    secondaryLink?: string;
   };
 }
 
@@ -49,6 +51,16 @@ const { data } = Astro.props;
           >
             {data.buttonText}
           </a>
+        )
+      }
+
+      {
+        data.secondaryLabel && data.secondaryLink && (
+          <p class="cta__secondary" data-reveal="up">
+            <a href={data.secondaryLink} class="link">
+              {data.secondaryLabel}
+            </a>
+          </p>
         )
       }
     </div>
@@ -99,6 +111,13 @@ const { data } = Astro.props;
       margin-block-end: var(--rhythm-block);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+
+    .cta__secondary {
+      margin-block-start: var(--space-md);
+      margin-inline: auto;
+      font-size: var(--text-sm);
       color: var(--text-secondary);
     }
   }
