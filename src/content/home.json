@@ -49,7 +49,7 @@
         "eyebrow": "Dein Begleiter",
         "name": "Markus<br><span class=\"light\">Sommer</span>",
         "photo": "/images/markus-sommer.jpg",
-        "bio": "<p>Ich bin Markus, gebürtiger Niederbayer und Gründer des Männerkreises Straubing. Seit Jahren beschäftige ich mich mit der Frage, was es bedeutet, als Mann authentisch zu leben – jenseits von Rollenbildern und gesellschaftlichen Erwartungen.</p><p>Der Männerkreis ist für mich ein Herzensanliegen: Ein Ort, an dem wir uns gegenseitig stärken, herausfordern und unterstützen können.</p>",
+        "bio": "<p>Ich bin Markus, gebürtiger Niederbayer und Gründer des Männerkreises Straubing. Seit Jahren beschäftige ich mich mit der Frage, was es bedeutet, als Mann authentisch zu leben – jenseits von Rollenbildern und gesellschaftlichen Erwartungen.</p><p>Der Männerkreis ist für mich ein Herzensanliegen: Ein Ort, an dem wir uns gegenseitig stärken, herausfordern und unterstützen können.</p><p>Wenn du wissen willst, warum ich diesen Kreis leite und welche Haltung dahintersteht, findest du hier einen persönlichen Einblick: <a class=\"link\" href=\"/warum-ich-den-maennerkreis-leite\">Warum ich den Männerkreis leite</a>.</p>",
         "quote": "„Wahre Stärke zeigt sich nicht im Alleingang, sondern in der Bereitschaft, sich anderen zu öffnen.\""
       }
     },
@@ -129,6 +129,15 @@
       "type": "whatsapp-community",
       "data": {
         "anchor": "whatsapp-community"
+      }
+    },
+    {
+      "type": "text-section",
+      "data": {
+        "anchor": "ankommen",
+        "eyebrow": "Kurz ankommen",
+        "title": "Bevor du weiterliest: atme einmal durch",
+        "content": "<p>Manchmal beginnt der erste Schritt nicht mit Reden. Sondern mit einem bewussten Atemzug.</p><p>Wenn du kurz bei dir ankommen willst, nutze die <a class=\"link\" href=\"/atemuebung\">Atemübung</a>.</p>"
       }
     },
     {
