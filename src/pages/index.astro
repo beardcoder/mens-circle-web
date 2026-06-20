@@ -14,22 +14,25 @@ const blocks = home.blocks as Block[];
 // Strip inline HTML from titles for schema text.
 const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
 
-// Build per-page structured data from the content blocks (mirrors the
-// original HowTo + FAQPage @push behavior).
+// Build per-page structured data from the content blocks.
 const schemas: Record<string, unknown>[] = [];
 
 const journey = blocks.find((b) => b.type === 'journey-steps');
 if (journey?.data?.steps?.length) {
+  // The journey steps describe the flow of a meeting, not an actionable
+  // procedure — and Google retired HowTo rich results in 2023, so HowTo markup
+  // no longer earns any SERP feature. ItemList is the valid, machine-readable
+  // representation that still feeds AI/LLM understanding of the steps.
   schemas.push({
     '@context': 'https://schema.org',
-    '@type': 'HowTo',
+    '@type': 'ItemList',
     name: strip(journey.data.title) || 'Deine Reise zum Männerkreis',
     description: journey.data.subtitle ?? 'Wie du Teil des Männerkreis wirst',
-    step: journey.data.steps.map((s: { title?: string; description?: string }, i: number) => ({
-      '@type': 'HowToStep',
+    itemListElement: journey.data.steps.map((s: { title?: string; description?: string }, i: number) => ({
+      '@type': 'ListItem',
       position: i + 1,
       name: s.title ?? '',
-      text: s.description ?? '',
+      description: s.description ?? '',
     })),
   });
 }
