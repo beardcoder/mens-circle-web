@@ -129,13 +129,14 @@ p:last-child {
    ============================================ */
 .section-title {
   margin-block-end: var(--rhythm-stack);
-  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
-  line-height: 1.05;
+  font-size: clamp(2.5rem, 6vw, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
 }
 
 .section-title--lg {
-  font-size: clamp(2.75rem, 7vw, 6rem);
-  line-height: 1;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 0.98;
 }
 
 .section-title .text-italic,
