@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+import type { Block } from '../components/PageContent.astro';
+import PageContent from '../components/PageContent.astro';
+import page from '../content/warum-ich-den-maennerkreis-leite.json';
+
+// Prerendered (static): a personal, content-only page (no live data), served
+// straight off disk by the Bun server.
+export const prerender = true;
+
+const blocks = page.blocks as Block[];
+
+// Strip inline HTML from titles/answers for schema text.
+const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
+
+const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
+
+// Build per-page structured data from the content blocks.
+const schemas: Record<string, unknown>[] = [];
+
+const faq = blocks.find((b) => b.type === 'faq');
+if (faq?.data?.items?.length) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.data.items
+      .filter((i: { question?: string; answer?: string }) => i.question && i.answer)
+      .map((i: { question?: string; answer?: string }) => ({
+        '@type': 'Question',
+        name: i.question,
+        acceptedAnswer: { '@type': 'Answer', text: strip(i.answer) },
+      })),
+  });
+}
+
+// Breadcrumb: Startseite → diese Seite.
+schemas.push({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl.origin },
+    { '@type': 'ListItem', position: 2, name: 'Warum ich den Männerkreis leite', item: canonical },
+  ],
+});
+
+// WebPage so the personal page is explicitly part of the site graph.
+schemas.push({
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': canonical,
+  url: canonical,
+  name: strip(page.meta.title),
+  description: page.meta.description,
+  inLanguage: 'de-DE',
+  isPartOf: { '@id': `${siteUrl.origin}/#website` },
+  about: { '@id': `${siteUrl.origin}/#organization` },
+});
+---
+
+<Layout
+  title={page.meta.title}
+  description={page.meta.description}
+  keywords={page.meta.keywords}
+  ogTitle={page.meta.ogTitle}
+  ogDescription={page.meta.ogDescription}
+  schemas={schemas}
+>
+  <PageContent blocks={blocks} />
+</Layout>
