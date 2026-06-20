@@ -10,6 +10,7 @@ interface Props {
     anchor?: string;
     eyebrow?: string;
     title?: string;
+    intro?: string;
     items?: Item[];
   };
 }
@@ -29,6 +30,13 @@ const items = data.items ?? [];
         )
       }
       {data.title && <h2 class="section-title" data-reveal="blur" set:html={data.title} />}
+      {
+        data.intro && (
+          <p class="section-intro" data-reveal="up">
+            {data.intro}
+          </p>
+        )
+      }
     </div>
 
     {

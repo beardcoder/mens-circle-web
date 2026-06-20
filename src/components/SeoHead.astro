@@ -9,6 +9,10 @@ interface Props {
   description?: string;
   keywords?: string;
   ogType?: string;
+  /** Open Graph / social title. Falls back to `title` (then the site name). */
+  ogTitle?: string;
+  /** Open Graph / social description. Falls back to `description`. */
+  ogDescription?: string;
   ogImage?: string;
   ogImageAlt?: string;
   robots?: string;
@@ -31,6 +35,8 @@ const {
   description = 'Authentischer Austausch, Gemeinschaft und persönliches Wachstum für Männer in Niederbayern.',
   keywords = 'Männerkreis, Niederbayern, Männergruppe, persönliches Wachstum, Gemeinschaft, Männer',
   ogType = 'website',
+  ogTitle,
+  ogDescription,
   ogImage,
   ogImageAlt = 'Männerkreis Niederbayern/ Straubing - Gemeinschaft für Männer',
   robots = 'index, follow',
@@ -58,6 +64,8 @@ const umamiOrigin = umamiId
     })()
   : null;
 const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
+const socialTitle = ogTitle ?? title ?? site.siteName;
+const socialDescription = ogDescription ?? description;
 const ogImageUrl = new URL(ogImage ?? '/images/logo-color.png', siteUrl).href;
 
 // Global structured data (mirrors the original LocalBusiness/Organization/WebSite).
@@ -133,8 +141,8 @@ const allSchemas = [localBusiness, website, ...schemas];
 <!-- Open Graph -->
 <meta property="og:type" content={ogType} />
 <meta property="og:url" content={canonical} />
-<meta property="og:title" content={title ?? site.siteName} />
-<meta property="og:description" content={description} />
+<meta property="og:title" content={socialTitle} />
+<meta property="og:description" content={socialDescription} />
 <meta property="og:image" content={ogImageUrl} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
@@ -145,8 +153,8 @@ const allSchemas = [localBusiness, website, ...schemas];
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:url" content={canonical} />
-<meta name="twitter:title" content={title ?? site.siteName} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:title" content={socialTitle} />
+<meta name="twitter:description" content={socialDescription} />
 <meta name="twitter:image" content={ogImageUrl} />
 <meta name="twitter:image:alt" content={ogImageAlt} />
 
