@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { fetchNextEvent } from '@lib/server/events';
+import { buildEventSchema } from '@lib/event-schema';
 import EventPage from '../components/islands/EventPage.svelte';
 import site from '../data/site.json';
 
@@ -8,12 +9,17 @@ import site from '../data/site.json';
 // per request, so /event always reflects the current "next" event with no
 // rebuild. `null` renders the graceful "no termin scheduled" state.
 const event = await fetchNextEvent();
+
+// Emit Event structured data when a concrete upcoming event exists, so the
+// page is eligible for an Event rich result (date, place, availability).
+const schemas = event ? [buildEventSchema(event, Astro.site ?? new URL('https://mens-circle.de'))] : [];
 ---
 
 <Layout
   title="Termin & Anmeldung – Männerkreis Niederbayern/ Straubing"
   description="Der nächste Männerkreis in Straubing. Sieh dir den Termin an und sichere dir deinen Platz."
   ogType="event"
+  schemas={schemas}
 >
   <EventPage client:load event={event} whatsappLink={site.whatsappCommunityLink} />
 </Layout>
