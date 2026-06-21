@@ -16,6 +16,7 @@
     "lint:fix": "eslint . --fix",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
+    "db:backup": "bun run scripts/backup-db.ts",
     "import:pb": "bun run scripts/import-pocketbase.ts"
   },
   "dependencies": {
