@@ -1,4 +1,7 @@
 ---
+import { Picture } from 'astro:assets';
+import { resolveAssetImage } from '../../lib/images';
+
 interface Props {
   data: {
     anchor?: string;
@@ -9,6 +12,7 @@ interface Props {
     buttonText?: string;
     buttonLink?: string;
     image?: string;
+    imageAlt?: string;
   };
 }
 
@@ -17,6 +21,11 @@ const align = data.align === 'left' ? 'left' : 'center';
 const hasImage = Boolean(data.image);
 const hasButton = Boolean(data.buttonText && data.buttonLink);
 const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
+
+// Prefer a build-optimised (responsive AVIF/WebP) asset; fall back to the raw
+// path for external URLs or images that aren't bundled.
+const imageAsset = resolveAssetImage(data.image);
+const imageAlt = data.imageAlt ?? '';
 ---
 
 <section class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`} id={data.anchor}>
@@ -51,14 +60,20 @@ const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
       {
         hasImage && (
           <div class="page-hero__media">
-            <img
-              src={data.image}
-              class="page-hero__image"
-              loading="eager"
-              fetchpriority="high"
-              aria-hidden="true"
-              alt=""
-            />
+            {imageAsset ? (
+              <Picture
+                src={imageAsset}
+                class="page-hero__image"
+                widths={[400, 600, 800, 1000]}
+                sizes="(max-width: 800px) 85vw, 40vw"
+                formats={['avif', 'webp']}
+                loading="eager"
+                fetchpriority="high"
+                alt={imageAlt}
+              />
+            ) : (
+              <img src={data.image} class="page-hero__image" loading="eager" fetchpriority="high" alt={imageAlt} />
+            )}
           </div>
         )
       }
@@ -199,6 +214,11 @@ const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
       overflow: hidden;
       border-radius: var(--radius-lg, 1.5rem);
       box-shadow: 0 24px 50px -20px color-mix(in oklch, var(--color-ink) 50%, transparent);
+    }
+
+    .page-hero__media picture {
+      display: block;
+      inline-size: 100%;
     }
 
     .page-hero__image {
