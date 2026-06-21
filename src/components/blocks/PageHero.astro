@@ -21,6 +21,9 @@ const align = data.align === 'left' ? 'left' : 'center';
 const hasImage = Boolean(data.image);
 const hasButton = Boolean(data.buttonText && data.buttonLink);
 const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
+// CTAs pointing at the next event are runtime-gated: hidden by default and only
+// revealed when an upcoming event is actually scheduled (see lib/event-cta.ts).
+const isEventCta = data.buttonLink?.startsWith('/event') ?? false;
 
 // Prefer a build-optimised (responsive AVIF/WebP) asset; fall back to the raw
 // path for external URLs or images that aren't bundled.
@@ -43,7 +46,7 @@ const imageAlt = data.imageAlt ?? '';
 
         {
           hasButton && (
-            <div class="page-hero__cta">
+            <div class="page-hero__cta" data-event-cta={isEventCta ? '' : undefined}>
               <a
                 href={data.buttonLink}
                 class="btn btn--primary btn--large"
@@ -206,6 +209,17 @@ const imageAlt = data.imageAlt ?? '';
 
     .page-hero__cta {
       margin-block-start: var(--space-xs);
+      max-inline-size: 100%;
+    }
+
+    /* The hero label can be long ("Zum nächsten Männerkreis anmelden"). The base
+       .btn is `white-space: nowrap` + `overflow: hidden`, so on narrow screens it
+       would force the content column wider than the viewport and get clipped.
+       Let this hero CTA wrap and never exceed its column. */
+    .page-hero__cta .btn {
+      max-inline-size: 100%;
+      white-space: normal;
+      text-align: center;
     }
 
     .page-hero__media {
