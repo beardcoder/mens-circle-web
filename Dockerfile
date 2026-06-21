@@ -50,6 +50,9 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 # Drizzle migrations — applied at runtime on boot (resolved against the WORKDIR).
 COPY --from=build /app/drizzle ./drizzle
+# Operational scripts (e.g. the SQLite → S3 backup, run via a scheduled
+# `docker exec <web> bun run scripts/backup-db.ts`).
+COPY --from=build /app/scripts ./scripts
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

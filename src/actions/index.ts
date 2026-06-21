@@ -14,7 +14,7 @@ import { z } from 'astro/zod';
 import type { ActionAPIContext } from 'astro:actions';
 import { createSession, readSession, SESSION_COOKIE, verifyCredentials } from '@lib/server/auth';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';
-import { createEvent, type EventInput, softDeleteEvent, updateEvent } from '@lib/server/events';
+import { createEvent, type EventInput, sendEventNewsletter, softDeleteEvent, updateEvent } from '@lib/server/events';
 import {
   broadcastEventMessage,
   changeRegistrationStatus,
@@ -158,6 +158,21 @@ export const server = {
       }
       const { sent, total } = await broadcastEventMessage(id, subject.trim(), content);
       return { message: `Nachricht an ${sent} von ${total} Teilnehmer:innen gesendet.` };
+    },
+  }),
+
+  sendEventNewsletter: defineAction({
+    input: z.object({ id: z.string(), subject: z.string(), intro: z.string().optional() }),
+    handler: async ({ id, subject, intro }, context) => {
+      await requireAdmin(context);
+      if (!subject.trim()) {
+        throw new ActionError({ code: 'BAD_REQUEST', message: 'Betreff ist erforderlich.' });
+      }
+      const res = await sendEventNewsletter(id, subject, intro ?? '');
+      if (!res.ok) {
+        throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: res.error ?? 'Versand fehlgeschlagen.' });
+      }
+      return { message: `Newsletter wird an die Liste gesendet (Kampagne #${res.campaignId}).` };
     },
   }),
 
