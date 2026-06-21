@@ -1,4 +1,7 @@
 ---
+import { Picture } from 'astro:assets';
+import { resolveAssetImage } from '../../lib/images';
+
 interface Props {
   data: {
     label?: string;
@@ -13,12 +16,28 @@ interface Props {
 
 const { data } = Astro.props;
 const anchor = data.anchor;
+
+// Full-bleed hero backdrop — prefer a build-optimised (responsive AVIF/WebP)
+// asset, fall back to the raw path for external or unbundled images.
+const bgAsset = resolveAssetImage(data.backgroundImage);
 ---
 
 <section class="hero" id={anchor}>
   <div class="hero__bg">
     {
-      data.backgroundImage && (
+      bgAsset ? (
+        <Picture
+          src={bgAsset}
+          class="hero__bg-image"
+          widths={[768, 1280, 1920]}
+          sizes="100vw"
+          formats={['avif', 'webp']}
+          loading="eager"
+          fetchpriority="high"
+          aria-hidden="true"
+          alt=""
+        />
+      ) : data.backgroundImage ? (
         <img
           src={data.backgroundImage}
           class="hero__bg-image"
@@ -27,7 +46,7 @@ const anchor = data.anchor;
           aria-hidden="true"
           alt=""
         />
-      )
+      ) : null
     }
     <div class="hero__bg-glow" aria-hidden="true"></div>
   </div>
