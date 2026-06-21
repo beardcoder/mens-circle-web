@@ -223,11 +223,23 @@ const imageAlt = data.imageAlt ?? '';
     }
 
     .page-hero__media {
+      position: relative;
       display: block;
       inline-size: 100%;
-      overflow: hidden;
-      border-radius: var(--radius-lg, 1.5rem);
-      box-shadow: 0 24px 50px -20px color-mix(in oklch, var(--color-ink) 50%, transparent);
+      isolation: isolate;
+    }
+
+    /* Offset accent frame — echoes the section's circle ornaments and the
+       Moderator portrait framing, tying the image into the warm palette
+       instead of floating as a plain card. */
+    .page-hero__media::after {
+      position: absolute;
+      inset-block: var(--space-sm) calc(var(--space-sm) * -1);
+      inset-inline: var(--space-sm) calc(var(--space-sm) * -1);
+      z-index: -1;
+      content: '';
+      border: 1px solid color-mix(in oklch, var(--accent-secondary) 55%, transparent);
+      border-radius: var(--radius-lg);
     }
 
     .page-hero__media picture {
@@ -241,6 +253,20 @@ const imageAlt = data.imageAlt ?? '';
       block-size: auto;
       aspect-ratio: 4 / 3;
       object-fit: cover;
+      border-radius: var(--radius-lg);
+      /* Hairline warm edge + layered warm shadow so the portrait reads as part
+         of the earthy hero rather than a neutral drop-shadowed rectangle. */
+      border: 1px solid color-mix(in oklch, var(--color-sand) 22%, transparent);
+      box-shadow:
+        0 24px 50px -20px color-mix(in oklch, var(--color-ink) 55%, transparent),
+        0 8px 28px -14px color-mix(in oklch, var(--accent-primary) 32%, transparent);
+    }
+
+    /* Gentle drift, matching the Moderator portrait's living feel. */
+    @media (prefers-reduced-motion: no-preference) {
+      .page-hero__media {
+        animation: float 7s var(--ease-ambient) infinite;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
