@@ -58,6 +58,12 @@ export const config = {
   LISTMONK_API_TOKEN: env('LISTMONK_API_TOKEN', ''),
   LISTMONK_LIST_IDS: parseIntList(env('LISTMONK_LIST_IDS', '')),
 
+  // Numeric ID of the listmonk *campaign* template (Admin → Campaigns →
+  // Templates → "Campaign") used for the event-newsletter broadcast — the
+  // branded "mens-circle" wrapper (masthead, signature, footer, unsubscribe).
+  // 0/empty → listmonk's default campaign template is used.
+  CAMPAIGN_TEMPLATE_ID: Number.parseInt(env('LISTMONK_CAMPAIGN_TEMPLATE_ID', '0'), 10) || 0,
+
   // Numeric IDs of the listmonk *transactional* templates (Admin → Campaigns →
   // Templates → "Transactional"). The app posts to listmonk's /api/tx with the
   // template ID + a data payload; the template owns the markup, the app the
