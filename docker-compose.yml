@@ -30,6 +30,16 @@ services:
       LISTMONK_TX_WAITLIST_PROMOTION: ${LISTMONK_TX_WAITLIST_PROMOTION}
       LISTMONK_TX_EVENT_REMINDER: ${LISTMONK_TX_EVENT_REMINDER}
       LISTMONK_TX_EVENT_MESSAGE: ${LISTMONK_TX_EVENT_MESSAGE}
+      # SQLite → S3 backup (scripts/backup-db.ts), run on a schedule via
+      # `docker exec <web> bun run scripts/backup-db.ts`. All optional — without
+      # a bucket the script just exits.
+      BACKUP_S3_BUCKET: ${BACKUP_S3_BUCKET:-}
+      BACKUP_S3_PREFIX: ${BACKUP_S3_PREFIX:-mens-circle-db}
+      BACKUP_S3_REGION: ${BACKUP_S3_REGION:-auto}
+      BACKUP_S3_ENDPOINT: ${BACKUP_S3_ENDPOINT:-}
+      BACKUP_S3_ACCESS_KEY_ID: ${BACKUP_S3_ACCESS_KEY_ID:-}
+      BACKUP_S3_SECRET_ACCESS_KEY: ${BACKUP_S3_SECRET_ACCESS_KEY:-}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
     volumes:
       - app-data:/data
     depends_on:
