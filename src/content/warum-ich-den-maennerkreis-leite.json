@@ -16,7 +16,9 @@
         "lead": "Ich glaube, viele Männer tragen mehr mit sich herum, als man ihnen ansieht. Nach außen läuft vieles. Arbeit. Familie. Alltag. Verantwortung. Aber innen bleibt oft wenig Raum. Für Ruhe. Für ehrliche Worte. Für das, was wirklich da ist. Genau deshalb gibt es diesen Männerkreis.",
         "buttonText": "Zum nächsten Männerkreis anmelden",
         "buttonLink": "/event",
-        "align": "left"
+        "align": "left",
+        "image": "/images/markus-sommer.jpg",
+        "imageAlt": "Markus Sommer, Leiter des Männerkreises Niederbayern"
       }
     },
     {
