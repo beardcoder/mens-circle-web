@@ -2,6 +2,11 @@
   "header": {
     "links": [
       { "label": "Über", "url": "/#ueber", "umamiTarget": "ueber" },
+      {
+        "label": "Haltung",
+        "url": "/warum-ich-den-maennerkreis-leite",
+        "umamiTarget": "haltung"
+      },
       { "label": "Die Reise", "url": "/#reise", "umamiTarget": "reise" },
       { "label": "Fragen", "url": "/#faq", "umamiTarget": "faq" },
       {
