@@ -225,6 +225,8 @@ export async function sendNewsletterCampaign(opts: {
   subject: string;
   bodyHtml: string;
   listIds: number[];
+  /** listmonk campaign template ID (the branded wrapper). 0 → default template. */
+  templateId?: number;
 }): Promise<{ ok: boolean; campaignId: number; error?: string }> {
   if (!listmonkApiConfigured()) {
     return { ok: false, campaignId: 0, error: 'listmonk ist nicht konfiguriert.' };
@@ -242,6 +244,9 @@ export async function sendNewsletterCampaign(opts: {
     content_type: 'html',
     body: opts.bodyHtml,
     messenger: 'email',
+    // Wrap the prose body in the branded campaign template (signature, footer,
+    // unsubscribe). When 0, listmonk falls back to its default template.
+    ...(opts.templateId && opts.templateId > 0 ? { template_id: opts.templateId } : {}),
   });
   if (!created?.ok) {
     // eslint-disable-next-line no-console

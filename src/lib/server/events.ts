@@ -188,34 +188,51 @@ export async function ensureEventList(ev: Event): Promise<number> {
 
 // ── Event newsletter (public list campaign) ──────────────────────────────────
 
-/** nl2br with HTML-escaping, for admin-provided plain-text intros. */
-function introToHtml(text: string): string {
-  return escapeHtml(text.trim()).replace(/\r\n|\r|\n/g, '<br />');
+/**
+ * Default invitation copy (grounded in the website's tone) used when the admin
+ * doesn't write their own intro. Also pre-filled into the admin textarea.
+ * Plain text; paragraphs are separated by a blank line.
+ */
+export const DEFAULT_EVENT_NEWSLETTER_INTRO = `es ist wieder so weit – der nächste Männerkreis steht an. Ein Abend, an dem wir gemeinsam zur Ruhe kommen, offen sprechen und einander auf Augenhöhe begegnen.
+
+Der Männerkreis ist ein geschützter Raum, in dem du dich zeigen kannst, wie du wirklich bist – ohne Rollen, ohne Bewertung. Es geht um echte Begegnung, gegenseitige Unterstützung und darum, gemeinsam zu wachsen.
+
+Die Teilnehmerzahl ist bewusst klein gehalten. Wenn du dabei sein möchtest, sichere dir deinen Platz – ich freue mich auf dich.`;
+
+/** Escape + paragraph-ize plain text into prose `<p>` blocks (blank line = new ¶). */
+function introToProse(text: string): string {
+  return text
+    .trim()
+    .split(/\n\s*\n/)
+    .map((para) => `<p>${escapeHtml(para.trim()).replace(/\r?\n/g, '<br />')}</p>`)
+    .join('\n');
 }
 
 /**
- * Render the HTML body for an event announcement newsletter: the admin's
- * intro followed by the event's date/time/location and a button linking to the
- * public event page.
+ * Render the *prose body* for the event-announcement campaign. This is injected
+ * into the branded listmonk campaign template (`{{ template "content" . }}`),
+ * which already provides the masthead, the "Markus" signature, the closing
+ * quote and the footer with the unsubscribe / browser links — so the body is
+ * content only: intro, the event facts and a clear call-to-action link.
  */
 function buildEventNewsletterHtml(ev: Event, intro: string): string {
   const url = `${config.APP_URL}/event/${ev.slug}`;
   const dateLong = formatDateLongDE(ev.eventDate);
   const time = timeRangeText(ev);
   const address = fullAddress(ev) || ev.location || '';
-  const rows: string[] = [];
-  if (dateLong) rows.push(`<strong>Wann:</strong> ${escapeHtml(dateLong)}${time ? `, ${escapeHtml(time)}` : ''}`);
-  if (address) rows.push(`<strong>Wo:</strong> ${escapeHtml(address)}`);
+
+  const facts: string[] = [];
+  if (dateLong) facts.push(`<strong>Wann:</strong> ${escapeHtml(dateLong)}${time ? `, ${escapeHtml(time)}` : ''}`);
+  if (address) facts.push(`<strong>Wo:</strong> ${escapeHtml(address)}`);
+  if (ev.costBasis) facts.push(`<strong>Beitrag:</strong> ${escapeHtml(ev.costBasis)}`);
+
+  const body = intro.trim() ? intro : DEFAULT_EVENT_NEWSLETTER_INTRO;
 
   return [
-    intro.trim() ? `<p>${introToHtml(intro)}</p>` : '',
-    `<h2 style="margin:1.5rem 0 0.5rem;">${escapeHtml(ev.title)}</h2>`,
-    rows.length ? `<p>${rows.join('<br />')}</p>` : '',
-    `<p style="margin:1.5rem 0;">` +
-      `<a href="${escapeHtml(url)}" style="display:inline-block;padding:0.75rem 1.5rem;` +
-      `background:#b5532f;color:#fff;text-decoration:none;border-radius:6px;">Zum Termin &amp; zur Anmeldung</a>` +
-      `</p>`,
-    `<p><a href="${escapeHtml(url)}">${escapeHtml(url)}</a></p>`,
+    introToProse(body),
+    `<h2>${escapeHtml(ev.title)}</h2>`,
+    facts.length ? `<p>${facts.join('<br />')}</p>` : '',
+    `<p><a href="${escapeHtml(url)}"><strong>Zum Termin &amp; zur Anmeldung →</strong></a></p>`,
   ]
     .filter(Boolean)
     .join('\n');
@@ -239,6 +256,7 @@ export async function sendEventNewsletter(
     subject: subject.trim(),
     bodyHtml: buildEventNewsletterHtml(ev, intro),
     listIds: config.LISTMONK_LIST_IDS,
+    templateId: config.CAMPAIGN_TEMPLATE_ID,
   });
 }
 
