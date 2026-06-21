@@ -1,4 +1,6 @@
 ---
+import { DEFAULT_EVENT_NEWSLETTER_INTRO } from '@lib/server/events';
+
 interface EventData {
   id?: string;
   title?: string;
@@ -29,6 +31,9 @@ const isDuplicate = !!event && !event.id;
 const v = event ?? {};
 const dateValue = v.eventDate ? String(v.eventDate).slice(0, 10) : '';
 const num = (n: number | null | undefined) => (n == null ? '' : String(n));
+// Short alias so the textarea stays a single line — whitespace inside
+// <textarea> is significant and would otherwise leak into the field value.
+const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
 ---
 
 <div class="pagehead">
@@ -143,16 +148,18 @@ const num = (n: number | null | undefined) => (n == null ? '' : String(n));
       <h2>Newsletter zu dieser Veranstaltung senden</h2>
       <p class="muted newsletter-send__hint">
         Geht als Kampagne an die <strong>öffentliche Newsletter-Liste</strong> — dieselbe Liste, in die sich Besucher
-        über das Anmeldeformular eintragen. Datum, Ort und ein Link zur Veranstaltung werden automatisch angehängt.
+        über das Anmeldeformular eintragen. Unten steht ein fertiger Vorschlag, den du anpassen kannst. Titel, Datum,
+        Ort und der Link zur Veranstaltung werden automatisch ergänzt; Anrede, Grußformel, Fußzeile und Abmeldelink
+        kommen aus der listmonk-Vorlage.
       </p>
       <form id="newsletter-form" class="card" data-id={event?.id ?? ''}>
         <div class="field">
           <label for="nl-subject">Betreff *</label>
-          <input id="nl-subject" name="subject" type="text" value={`Neuer Termin: ${v.title ?? ''}`} required />
+          <input id="nl-subject" name="subject" type="text" value={`Einladung zum nächsten Männerkreis`} required />
         </div>
         <div class="field">
           <label for="nl-intro">Einleitungstext</label>
-          <textarea id="nl-intro" name="intro" rows="5" placeholder="Ein paar persönliche Zeilen zur Einladung …" />
+          <textarea id="nl-intro" name="intro" rows="8" set:text={nlIntro} />
         </div>
         <button class="btn btn--ghost" type="submit">
           Newsletter senden
