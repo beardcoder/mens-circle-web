@@ -137,6 +137,31 @@ const num = (n: number | null | undefined) => (n == null ? '' : String(n));
   <button class="btn" type="submit">Speichern</button>
 </form>
 
+{
+  isEdit && (
+    <section class="newsletter-send">
+      <h2>Newsletter zu dieser Veranstaltung senden</h2>
+      <p class="muted newsletter-send__hint">
+        Geht als Kampagne an die <strong>öffentliche Newsletter-Liste</strong> — dieselbe Liste, in die sich Besucher
+        über das Anmeldeformular eintragen. Datum, Ort und ein Link zur Veranstaltung werden automatisch angehängt.
+      </p>
+      <form id="newsletter-form" class="card" data-id={event?.id ?? ''}>
+        <div class="field">
+          <label for="nl-subject">Betreff *</label>
+          <input id="nl-subject" name="subject" type="text" value={`Neuer Termin: ${v.title ?? ''}`} required />
+        </div>
+        <div class="field">
+          <label for="nl-intro">Einleitungstext</label>
+          <textarea id="nl-intro" name="intro" rows="5" placeholder="Ein paar persönliche Zeilen zur Einladung …" />
+        </div>
+        <button class="btn btn--ghost" type="submit">
+          Newsletter senden
+        </button>
+      </form>
+    </section>
+  )
+}
+
 <script>
   import { actions } from 'astro:actions';
 
@@ -185,6 +210,32 @@ const num = (n: number | null | undefined) => (n == null ? '' : String(n));
       }
       window.adminToast?.('ok', data.message);
     });
+
+    const nlForm = document.getElementById('newsletter-form') as HTMLFormElement | null;
+    if (nlForm && !nlForm.dataset.bound) {
+      nlForm.dataset.bound = '1';
+      const nlBtn = nlForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+      nlForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(nlForm);
+        const subject = String(fd.get('subject') ?? '');
+        if (!confirm('Newsletter jetzt an die gesamte Newsletter-Liste senden?')) return;
+        nlBtn.disabled = true;
+        nlBtn.textContent = 'Senden…';
+        const { data, error } = await actions.sendEventNewsletter({
+          id: nlForm.dataset.id!,
+          subject,
+          intro: String(fd.get('intro') ?? ''),
+        });
+        nlBtn.disabled = false;
+        nlBtn.textContent = 'Newsletter senden';
+        if (error) {
+          window.adminToast?.('err', error.message);
+          return;
+        }
+        window.adminToast?.('ok', data.message);
+      });
+    }
   }
 
   document.addEventListener('astro:page-load', init);
@@ -204,6 +255,22 @@ const num = (n: number | null | undefined) => (n == null ? '' : String(n));
     margin: 0.5rem 0 1.5rem;
   }
   #event-form button[type='submit'] {
+    min-width: 11rem;
+  }
+  .newsletter-send {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line, rgba(0, 0, 0, 0.1));
+  }
+  .newsletter-send h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
+  }
+  .newsletter-send__hint {
+    margin: 0 0 1rem;
+    max-width: 60ch;
+  }
+  #newsletter-form button[type='submit'] {
     min-width: 11rem;
   }
 </style>
