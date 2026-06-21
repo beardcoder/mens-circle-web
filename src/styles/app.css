@@ -48,6 +48,8 @@
 @import url('components/_toast.css') layer(components);
 @import url('sections/_surfaces.css') layer(sections);
 @import url('sections/_ornaments.css') layer(sections);
+@import url('sections/_hero.css') layer(sections);
+@import url('sections/_event.css') layer(sections);
 @import url('sections/_error.css') layer(sections);
 @import url('utilities/_animations.css') layer(utilities);
 @import url('utilities/_motion.css') layer(utilities);

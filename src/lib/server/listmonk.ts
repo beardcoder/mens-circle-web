@@ -212,6 +212,58 @@ export async function removeFromList(email: string, listId: number): Promise<boo
   return !!res?.ok;
 }
 
+// ── Newsletter campaigns ─────────────────────────────────────────────────────
+
+/**
+ * Create a regular email campaign and start it immediately. Used to broadcast
+ * an event announcement to the public newsletter list(s) — the same list
+ * people subscribe to via the sign-up form. Best-effort: returns a coarse
+ * result with an error message instead of throwing.
+ */
+export async function sendNewsletterCampaign(opts: {
+  name: string;
+  subject: string;
+  bodyHtml: string;
+  listIds: number[];
+}): Promise<{ ok: boolean; campaignId: number; error?: string }> {
+  if (!listmonkApiConfigured()) {
+    return { ok: false, campaignId: 0, error: 'listmonk ist nicht konfiguriert.' };
+  }
+  if (opts.listIds.length === 0) {
+    return { ok: false, campaignId: 0, error: 'Keine Newsletter-Liste konfiguriert (LISTMONK_LIST_IDS).' };
+  }
+
+  const created = await request('POST', '/api/campaigns', {
+    name: opts.name,
+    subject: opts.subject,
+    lists: opts.listIds,
+    from_email: `${config.MAIL_FROM_NAME} <${config.MAIL_FROM_ADDRESS}>`,
+    type: 'regular',
+    content_type: 'html',
+    body: opts.bodyHtml,
+    messenger: 'email',
+  });
+  if (!created?.ok) {
+    // eslint-disable-next-line no-console
+    console.error('[listmonk] campaign create rejected', created?.status, JSON.stringify(created?.body));
+    return { ok: false, campaignId: 0, error: 'Kampagne konnte nicht erstellt werden.' };
+  }
+  const campaignId = Number(created.body?.data?.id) || 0;
+  if (!campaignId) return { ok: false, campaignId: 0, error: 'Kampagne wurde ohne ID angelegt.' };
+
+  const started = await request('PUT', `/api/campaigns/${campaignId}/status`, { status: 'running' });
+  if (!started?.ok) {
+    // eslint-disable-next-line no-console
+    console.error('[listmonk] campaign start rejected', campaignId, started?.status, JSON.stringify(started?.body));
+    return {
+      ok: false,
+      campaignId,
+      error: `Kampagne #${campaignId} wurde als Entwurf angelegt, konnte aber nicht gestartet werden.`,
+    };
+  }
+  return { ok: true, campaignId };
+}
+
 // ── Transactional email ──────────────────────────────────────────────────────
 
 /**
