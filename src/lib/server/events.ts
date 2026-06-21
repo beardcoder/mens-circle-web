@@ -9,9 +9,9 @@ import type { EventDTO, Testimonial as TestimonialDTO } from '../types';
 import { db } from './db';
 import type { Event, NewEvent } from './db/schema';
 import { events, registrations, testimonials } from './db/schema';
-import { listmonkApiConfigured } from './config';
-import { formatDateShortDE, toDate } from './format';
-import { createList, eventListName, renameList } from './listmonk';
+import { config, listmonkApiConfigured } from './config';
+import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
+import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
 
 /** Count active registrations (registered|attended, not soft-deleted). */
 export async function countActiveRegistrations(eventId: string): Promise<number> {
@@ -184,6 +184,62 @@ export async function ensureEventList(ev: Event): Promise<number> {
     console.error('[events] failed to persist listmonk_list_id', ev.id, String(err));
   }
   return id;
+}
+
+// ── Event newsletter (public list campaign) ──────────────────────────────────
+
+/** nl2br with HTML-escaping, for admin-provided plain-text intros. */
+function introToHtml(text: string): string {
+  return escapeHtml(text.trim()).replace(/\r\n|\r|\n/g, '<br />');
+}
+
+/**
+ * Render the HTML body for an event announcement newsletter: the admin's
+ * intro followed by the event's date/time/location and a button linking to the
+ * public event page.
+ */
+function buildEventNewsletterHtml(ev: Event, intro: string): string {
+  const url = `${config.APP_URL}/event/${ev.slug}`;
+  const dateLong = formatDateLongDE(ev.eventDate);
+  const time = timeRangeText(ev);
+  const address = fullAddress(ev) || ev.location || '';
+  const rows: string[] = [];
+  if (dateLong) rows.push(`<strong>Wann:</strong> ${escapeHtml(dateLong)}${time ? `, ${escapeHtml(time)}` : ''}`);
+  if (address) rows.push(`<strong>Wo:</strong> ${escapeHtml(address)}`);
+
+  return [
+    intro.trim() ? `<p>${introToHtml(intro)}</p>` : '',
+    `<h2 style="margin:1.5rem 0 0.5rem;">${escapeHtml(ev.title)}</h2>`,
+    rows.length ? `<p>${rows.join('<br />')}</p>` : '',
+    `<p style="margin:1.5rem 0;">` +
+      `<a href="${escapeHtml(url)}" style="display:inline-block;padding:0.75rem 1.5rem;` +
+      `background:#b5532f;color:#fff;text-decoration:none;border-radius:6px;">Zum Termin &amp; zur Anmeldung</a>` +
+      `</p>`,
+    `<p><a href="${escapeHtml(url)}">${escapeHtml(url)}</a></p>`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+/**
+ * Send an event announcement to the public newsletter list(s) as a listmonk
+ * campaign. Returns a coarse result for the admin UI.
+ */
+export async function sendEventNewsletter(
+  eventId: string,
+  subject: string,
+  intro: string,
+): Promise<{ ok: boolean; campaignId: number; error?: string }> {
+  const ev = await getEventById(eventId);
+  if (!ev) return { ok: false, campaignId: 0, error: 'Veranstaltung nicht gefunden.' };
+
+  const dateShort = formatDateShortDE(ev.eventDate);
+  return sendNewsletterCampaign({
+    name: `Event-Newsletter: ${ev.title}${dateShort ? ` (${dateShort})` : ''}`,
+    subject: subject.trim(),
+    bodyHtml: buildEventNewsletterHtml(ev, intro),
+    listIds: config.LISTMONK_LIST_IDS,
+  });
 }
 
 // ── Admin CRUD ───────────────────────────────────────────────────────────────
