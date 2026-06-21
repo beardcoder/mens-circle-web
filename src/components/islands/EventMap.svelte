@@ -2,6 +2,11 @@
   import { isCoarsePointer } from '@lib/helpers';
   import type { Map as LeafletMap } from 'leaflet';
   import { onDestroy, onMount } from 'svelte';
+  // Static import so Astro bundles Leaflet's CSS into the page styles. A
+  // runtime `import('leaflet/dist/leaflet.css')` 404s under
+  // `inlineStylesheets: 'always'` (the emitted .css asset is inlined into the
+  // HTML and removed from disk), which left the map unstyled / broken.
+  import 'leaflet/dist/leaflet.css';
 
   interface Props {
     lat: number;
@@ -40,7 +45,7 @@
     void (async () => {
       state = 'loading';
 
-      const [{ default: L }] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]);
+      const { default: L } = await import('leaflet');
 
       if (disposed || !canvas) return;
 
