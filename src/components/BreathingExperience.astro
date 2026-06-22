@@ -156,24 +156,31 @@ const { standalone = false } = Astro.props;
       min-block-size: 100svh;
     }
 
-    /* One screen: the app fills the viewport but with real breathing room top
-       and bottom, so the circle (and its rings) never touch the edges. */
+    /* Full-screen app surface. It fills the viewport and centres the experience
+       when it fits, but is allowed to grow (and let the page scroll) instead of
+       clipping the controls off the bottom on short phones — the previous fixed
+       `block-size + overflow: clip` made the start button and settings
+       unreachable there. svh, not dvh: dvh mis-resolves on iOS PWA cold start
+       and jumps as the toolbar shows/hides; 100vh is the old-browser fallback. */
     .breathing-screen {
-      display: grid;
-      grid-template-rows: 1fr;
-      justify-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       padding-inline: max(var(--space-md), var(--safe-area-inset-left))
         max(var(--space-md), var(--safe-area-inset-right));
       padding-block: max(var(--space-md), var(--safe-area-inset-top))
         max(var(--space-md), var(--safe-area-inset-bottom));
-      /* Fixed to one viewport (svh, not dvh: dvh mis-resolves on iOS PWA cold
-         start and jumps as the toolbar shows/hides). `overflow: clip` plus the
-         flexible 1fr row means the app is sized to the screen and never makes
-         the page scroll — on a very short screen the circle compresses rather
-         than pushing content off. 100vh is the old-browser fallback. */
-      block-size: 100vh;
-      block-size: 100svh;
-      overflow: clip;
+      min-block-size: 100vh;
+      min-block-size: 100svh;
+      /* Contain the soft ring glow horizontally without trapping vertical scroll. */
+      overflow-x: clip;
+    }
+
+    /* Natural height inside the centred column (the base `block-size: 100%` only
+       makes sense for the old fixed-height grid). */
+    .breathing-screen .breathing-app {
+      block-size: auto;
     }
 
     /* Embedded surface: the same experience sitting inside the normal site

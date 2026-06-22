@@ -19,7 +19,7 @@
  * Bump CACHE to invalidate everything on the next activation.
  */
 
-const CACHE = 'mk-breath-v3';
+const CACHE = 'mk-breath-v4';
 
 // The app shell needed to launch the breathing exercise offline. The page's CSS
 // is inlined into its HTML, so caching the document covers the styling; the
