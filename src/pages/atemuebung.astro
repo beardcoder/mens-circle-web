@@ -1,4 +1,5 @@
 ---
+import { BREATHING_STEPS, BREATHING_WARNING } from '@lib/breathing';
 import Layout from '../layouts/Layout.astro';
 import BreathingExperience from '../components/BreathingExperience.astro';
 
@@ -47,12 +48,17 @@ const schemas = [
     </p>
 
     <ol class="breathing__steps atem-intro__steps">
-      <li><strong>Tief atmen:</strong> 35 kräftige Atemzüge — vollständig einatmen, locker ausatmen.</li>
-      <li><strong>Halten:</strong> Nach der letzten Ausatmung den Atem so lange wie möglich anhalten.</li>
-      <li><strong>Erholung:</strong> Tief einatmen und 15 Sekunden halten. Dann normal weiteratmen.</li>
+      {
+        BREATHING_STEPS.map((step) => (
+          <li>
+            <strong>{step.title}:</strong> {step.text}
+          </li>
+        ))
+      }
     </ol>
     <p class="breathing__warning atem-intro__warning">
-      <strong>Wichtig:</strong> Übe niemals im Wasser oder beim Autofahren. Setze oder lege dich entspannt hin.
+      <strong>Wichtig:</strong>
+      {BREATHING_WARNING}
     </p>
   </section>
 
