@@ -1,29 +1,34 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import BreathingApp from '../components/islands/BreathingApp.svelte';
+import BreathingExperience from '../components/BreathingExperience.astro';
 
-// Self-contained breathing tool — no live data, prerendered at build time.
+// Embedded breathing tool — the public-site page. Opened from the nav/footer it
+// presents inside the normal site chrome (header/footer), with the instructions
+// shown inline. The chrome-less, installable full-screen variant lives at
+// /atemuebung/app and is reached via the CTA below.
 export const prerender = true;
+
+const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
 
 const schemas = [
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Startseite', item: '/' },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Atemübung',
-        item: '/atemuebung',
-      },
+      { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl.origin },
+      { '@type': 'ListItem', position: 2, name: 'Atemübung', item: canonical },
     ],
   },
   {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
+    '@id': canonical,
+    url: canonical,
     name: 'Atemübung',
     description: 'Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode.',
+    inLanguage: 'de-DE',
+    isPartOf: { '@id': `${siteUrl.origin}/#website` },
   },
 ];
 ---
@@ -32,947 +37,100 @@ const schemas = [
   title="Atemübung – Männerkreis Niederbayern/ Straubing"
   description="Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode. Drei Runden bewusster Atem für Klarheit, Energie und innere Ruhe."
   schemas={schemas}
-  manifest="/atemuebung.webmanifest"
-  webAppTitle="Atemübung"
-  viewport="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
-  bare
 >
-  <section class="breathing-section breathing-screen">
-    <h1 class="sr-only">Atemübung</h1>
+  <section class="atem-intro">
+    <p class="atem-intro__eyebrow">Atemübung</p>
+    <h1 class="atem-intro__title">Komm bei dir an.</h1>
+    <p class="atem-intro__lede">
+      Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode — drei Runden bewusster Atem für Klarheit,
+      Energie und innere Ruhe. Setze oder lege dich entspannt hin und folge dem Kreis.
+    </p>
 
-    <button
-      type="button"
-      class="breathing-info-btn"
-      id="info-open"
-      aria-haspopup="dialog"
-      aria-label="So funktioniert es"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"></circle>
-        <path d="M12 11v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        <circle cx="12" cy="7.5" r="1.25" fill="currentColor"></circle>
-      </svg>
-    </button>
+    <ol class="breathing__steps atem-intro__steps">
+      <li><strong>Tief atmen:</strong> 35 kräftige Atemzüge — vollständig einatmen, locker ausatmen.</li>
+      <li><strong>Halten:</strong> Nach der letzten Ausatmung den Atem so lange wie möglich anhalten.</li>
+      <li><strong>Erholung:</strong> Tief einatmen und 15 Sekunden halten. Dann normal weiteratmen.</li>
+    </ol>
+    <p class="breathing__warning atem-intro__warning">
+      <strong>Wichtig:</strong> Übe niemals im Wasser oder beim Autofahren. Setze oder lege dich entspannt hin.
+    </p>
+  </section>
 
-    <BreathingApp client:visible />
+  <BreathingExperience />
 
-    <dialog class="info-modal" id="info-modal" aria-labelledby="info-title">
-      <div class="info-modal__content">
-        <button type="button" class="info-modal__close" id="info-close" aria-label="Schließen">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            ></path>
-          </svg>
-        </button>
-
-        <h2 id="info-title">So funktioniert es</h2>
-        <ol class="breathing__steps">
-          <li>
-            <strong>Tief atmen:</strong> 35 kräftige Atemzüge — vollständig einatmen, locker ausatmen.
-          </li>
-          <li>
-            <strong>Halten:</strong> Nach der letzten Ausatmung den Atem so lange wie möglich anhalten.
-          </li>
-          <li>
-            <strong>Erholung:</strong> Tief einatmen und 15 Sekunden halten. Dann normal weiteratmen.
-          </li>
-        </ol>
-        <p class="breathing__warning">
-          <strong>Wichtig:</strong> Übe niemals im Wasser oder beim Autofahren. Setze oder lege dich entspannt hin.
-        </p>
-
-        <button type="button" id="pwa-install" class="breathing__install" hidden>
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path
-              d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></path>
-          </svg>
-          Als App installieren
-        </button>
-      </div>
-    </dialog>
+  <section class="atem-cta">
+    <p class="atem-cta__text">Lieber ablenkungsfrei? Öffne die Übung im Vollbild oder installiere sie als App.</p>
+    <a class="btn btn--primary btn--large" href="/atemuebung/app">Im Vollbild öffnen</a>
   </section>
 </Layout>
 
-<script>
-  // Progressive web app wiring for the breathing exercise: register the service
-  // worker (offline + installability) and surface a native install prompt
-  // through an in-page button when the browser offers one.
-  type InstallPromptEvent = Event & {
-    prompt: () => void;
-    userChoice: Promise<{ outcome: string }>;
-  };
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {
-        /* registration is best-effort; the app works fine without it */
-      });
-    });
+<style>
+  .atem-intro {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-sm);
+    margin-inline: auto;
+    padding-block-start: var(--space-3xl);
+    padding-inline: var(--space-md);
+    inline-size: 100%;
+    max-inline-size: 48rem;
   }
 
-  const installButton = document.querySelector<HTMLButtonElement>('#pwa-install');
-
-  const isStandalone =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true;
-
-  let deferredPrompt: InstallPromptEvent | null = null;
-
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    deferredPrompt = event as InstallPromptEvent;
-
-    if (installButton && !isStandalone) installButton.hidden = false;
-  });
-
-  installButton?.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-
-    installButton.hidden = true;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-  });
-
-  window.addEventListener('appinstalled', () => {
-    if (installButton) installButton.hidden = true;
-  });
-
-  // Instructions live in a native <dialog> opened from the floating info
-  // button, so the main screen stays just the app. showModal() gives the
-  // focus trap, Escape-to-close and backdrop for free; a click outside the
-  // card (on the dialog/backdrop) also closes it.
-  const infoModal = document.querySelector<HTMLDialogElement>('#info-modal');
-  const infoOpen = document.querySelector<HTMLButtonElement>('#info-open');
-  const infoClose = document.querySelector<HTMLButtonElement>('#info-close');
-
-  infoOpen?.addEventListener('click', () => {
-    if (infoModal && !infoModal.open) infoModal.showModal();
-  });
-
-  infoClose?.addEventListener('click', () => infoModal?.close());
-
-  infoModal?.addEventListener('click', (event) => {
-    if (event.target !== infoModal) return;
-
-    const r = infoModal.getBoundingClientRect();
-    const inside =
-      event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom;
-
-    if (!inside) infoModal.close();
-  });
-</script>
-
-<style is:global>
-  /* @property kept unlayered — must be at top level for interpolation to work */
-  @property --ring-scale {
-    syntax: '<number>';
-    initial-value: 1;
-    inherits: true;
+  .atem-intro__eyebrow {
+    color: var(--color-terracotta);
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 
-  @layer sections {
-    .breathing-section {
-      --breathing-bg: var(--color-earth-deep);
-      --breathing-bg-deep: var(--color-ink);
-      --breathing-accent: var(--color-terracotta-light);
-      --breathing-accent-dim: var(--color-terracotta);
-      --breathing-warm: var(--color-sand);
-      --_surface-noise-opacity: 0.03;
-
-      position: relative;
-      background:
-        radial-gradient(
-          ellipse at 50% 0%,
-          color-mix(in oklch, var(--breathing-accent-dim) 14%, transparent),
-          transparent 60%
-        ),
-        radial-gradient(
-          ellipse at 85% 92%,
-          color-mix(in oklch, var(--breathing-warm) 10%, transparent),
-          transparent 55%
-        ),
-        linear-gradient(160deg, var(--breathing-bg) 0%, var(--breathing-bg-deep) 100%);
-      overflow: hidden;
-      color: var(--text-on-dark);
-    }
-
-    .breathing-section::before {
-      z-index: 0;
-    }
-
-    /* Keep the app to one screen: the global `body { min-block-size: 100dvh }`
-       would otherwise add a scrollable strip (the browser-toolbar delta) below
-       the 100svh screen. Pinning the bare body to svh removes it, so the page
-       doesn't scroll in the common case (it still can if content genuinely
-       overflows on very short screens). */
-    body.is-bare {
-      min-block-size: 100svh;
-    }
-
-    /* One screen: the app fills the viewport but with real breathing room top
-       and bottom, so the circle (and its rings) never touch the edges. */
-    .breathing-screen {
-      display: grid;
-      grid-template-rows: 1fr;
-      justify-items: center;
-      padding-inline: max(var(--space-md), var(--safe-area-inset-left))
-        max(var(--space-md), var(--safe-area-inset-right));
-      padding-block: max(var(--space-md), var(--safe-area-inset-top))
-        max(var(--space-md), var(--safe-area-inset-bottom));
-      /* Fixed to one viewport (svh, not dvh: dvh mis-resolves on iOS PWA cold
-         start and jumps as the toolbar shows/hides). `overflow: clip` plus the
-         flexible 1fr row means the app is sized to the screen and never makes
-         the page scroll — on a very short screen the circle compresses rather
-         than pushing content off. 100vh is the old-browser fallback. */
-      block-size: 100vh;
-      block-size: 100svh;
-      overflow: clip;
-    }
-
-    .breathing-screen > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Floating info button — opens the instructions dialog. */
-    .breathing-info-btn {
-      display: grid;
-      position: absolute;
-      place-items: center;
-      z-index: 2;
-      backdrop-filter: blur(8px);
-      transition:
-        color var(--motion-quick),
-        background-color var(--motion-quick);
-      cursor: pointer;
-      inset-block-start: max(var(--space-sm), var(--safe-area-inset-top));
-      inset-inline-end: max(var(--space-sm), var(--safe-area-inset-right));
-      border: 1px solid color-mix(in oklch, var(--color-sand) 16%, transparent);
-      border-radius: var(--radius-full);
-      background: color-mix(in oklch, var(--color-sand) 8%, transparent);
-      inline-size: 2.75rem;
-      block-size: 2.75rem;
-      color: color-mix(in oklch, var(--text-on-dark) 70%, transparent);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .breathing-info-btn:hover {
-        background: color-mix(in oklch, var(--color-sand) 16%, transparent);
-        color: var(--text-on-dark);
-      }
-    }
-
-    .breathing-info-btn:focus-visible {
-      outline: 2px solid var(--breathing-accent);
-      outline-offset: 3px;
-    }
-
-    .breathing-info-btn svg {
-      inline-size: 1.4rem;
-      block-size: 1.4rem;
-    }
-
-    /* Instructions dialog (native <dialog> + showModal): focus trap, Escape
-       and backdrop for free, with a smooth open/close via @starting-style. */
-    .info-modal {
-      translate: 0 12px;
-      scale: 0.96;
-      opacity: 0;
-      transition:
-        opacity var(--motion-standard),
-        scale var(--motion-standard),
-        translate var(--motion-standard),
-        overlay var(--motion-standard) allow-discrete,
-        display var(--motion-standard) allow-discrete;
-      margin: auto;
-      box-shadow: var(--shadow-2xl);
-      border: 1px solid color-mix(in oklch, var(--color-sand) 16%, transparent);
-      border-radius: var(--radius-lg);
-      background: color-mix(in oklch, var(--breathing-bg) 86%, black);
-      padding: 0;
-      inline-size: min(420px, calc(100vw - 2 * var(--space-md)));
-      max-block-size: calc(100dvh - 2 * var(--space-md));
-      color: var(--text-on-dark);
-    }
-
-    .info-modal[open] {
-      translate: 0 0;
-      scale: 1;
-      opacity: 1;
-    }
-
-    @starting-style {
-      .info-modal[open] {
-        translate: 0 12px;
-        scale: 0.96;
-        opacity: 0;
-      }
-    }
-
-    .info-modal::backdrop {
-      backdrop-filter: blur(0);
-      transition:
-        background-color var(--motion-standard),
-        backdrop-filter var(--motion-standard),
-        overlay var(--motion-standard) allow-discrete,
-        display var(--motion-standard) allow-discrete;
-      background-color: color-mix(in oklch, black 0%, transparent);
-    }
-
-    .info-modal[open]::backdrop {
-      backdrop-filter: blur(4px);
-      background-color: color-mix(in oklch, black 55%, transparent);
-    }
-
-    @starting-style {
-      .info-modal[open]::backdrop {
-        backdrop-filter: blur(0);
-        background-color: color-mix(in oklch, black 0%, transparent);
-      }
-    }
-
-    .info-modal__content {
-      position: relative;
-      padding: var(--space-lg);
-      max-block-size: calc(100dvh - 2 * var(--space-md));
-      overflow-y: auto;
-    }
-
-    .info-modal__close {
-      display: grid;
-      position: absolute;
-      place-items: center;
-      transition:
-        color var(--motion-quick),
-        background-color var(--motion-quick);
-      cursor: pointer;
-      inset-block-start: var(--space-xs);
-      inset-inline-end: var(--space-xs);
-      border: none;
-      border-radius: var(--radius-full);
-      background: none;
-      inline-size: 2.25rem;
-      block-size: 2.25rem;
-      color: color-mix(in oklch, var(--text-on-dark) 65%, transparent);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .info-modal__close:hover {
-        background: color-mix(in oklch, var(--color-sand) 12%, transparent);
-        color: var(--text-on-dark);
-      }
-    }
-
-    .info-modal__close:focus-visible {
-      outline: 2px solid var(--breathing-accent);
-      outline-offset: 2px;
-    }
-
-    .info-modal__close svg {
-      inline-size: 1.25rem;
-      block-size: 1.25rem;
-    }
-
-    .info-modal__content h2 {
-      margin-block-end: var(--space-md);
-      color: var(--text-on-dark);
-      font-weight: 500;
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      font-family: var(--font-display);
-      letter-spacing: -0.01em;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .info-modal {
-        translate: 0;
-        scale: 1;
-        transition:
-          opacity var(--motion-quick),
-          overlay var(--motion-quick) allow-discrete,
-          display var(--motion-quick) allow-discrete;
-      }
-
-      @starting-style {
-        .info-modal[open] {
-          translate: 0;
-          scale: 1;
-        }
-      }
-
-      .info-modal::backdrop,
-      .info-modal[open]::backdrop {
-        backdrop-filter: none;
-      }
-    }
-
-    .breathing__steps {
-      margin-block-end: var(--space-md);
-      padding-inline-start: 1.25rem;
-      color: color-mix(in oklch, var(--text-on-dark) 72%, transparent);
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
-    }
-
-    .breathing__steps li {
-      margin-block-end: var(--space-xs);
-    }
-
-    .breathing__steps strong {
-      color: var(--text-on-dark);
-    }
-
-    .breathing__warning {
-      border-radius: var(--radius-md);
-      border-inline-start: 3px solid var(--color-warning);
-      background: color-mix(in oklch, var(--color-warning) 12%, transparent);
-      padding: var(--space-sm) var(--space-md);
-      color: var(--text-on-dark);
-      font-size: 0.9375rem;
-    }
-
-    /* Shown only when the browser offers a native install (beforeinstallprompt). */
-    .breathing__install {
-      display: inline-flex;
-      align-items: center;
-      align-self: start;
-      gap: var(--space-xs);
-      transition:
-        background-color var(--motion-quick),
-        border-color var(--motion-quick),
-        translate var(--motion-quick);
-      cursor: pointer;
-      margin-block-start: var(--space-md);
-      border: 1px solid color-mix(in oklch, var(--breathing-accent) 45%, transparent);
-      border-radius: var(--radius-full);
-      background: color-mix(in oklch, var(--breathing-accent) 14%, transparent);
-      padding: var(--space-xs) var(--space-md);
-      color: var(--text-on-dark);
-      font-weight: 600;
-      font-size: 0.9375rem;
-      font-family: var(--font-body);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .breathing__install:hover {
-        translate: 0 -2px;
-        border-color: color-mix(in oklch, var(--breathing-accent) 60%, transparent);
-        background: color-mix(in oklch, var(--breathing-accent) 22%, transparent);
-      }
-    }
-
-    .breathing__install:focus-visible {
-      outline: 2px solid var(--breathing-accent);
-      outline-offset: 3px;
-    }
-
-    .breathing__install svg {
-      inline-size: 1.1rem;
-      block-size: 1.1rem;
-    }
-
-    .breathing-app {
-      --breathing-cycle-ms: 3600ms;
-      display: grid;
-
-      position: relative;
-      grid-template-rows: 1fr auto auto auto;
-      gap: clamp(var(--space-sm), 3vw, var(--space-md));
-      inline-size: 100%;
-      max-inline-size: 640px;
-      /* Own the full screen height and let the inner 1fr stage absorb any
-         shortfall (min-block-size:0 lets it actually shrink). */
-      block-size: 100%;
-      min-block-size: 0;
-      color: var(--text-on-dark);
-    }
-
-    .breathing-app__stage {
-      display: grid;
-      place-items: center;
-      min-block-size: 0;
-    }
-
-    .breathing-app__circle {
-      --size: min(74vw, 46svh, 400px);
-      display: grid;
-
-      position: relative;
-      place-items: center;
-      transition: filter var(--duration-slower) var(--ease-settle);
-      cursor: pointer;
-      isolation: isolate;
-      inline-size: var(--size);
-      block-size: var(--size);
-      text-align: center;
-    }
-
-    .breathing-app[data-phase='breathing'] .breathing-app__circle,
-    .breathing-app[data-phase='retention'] .breathing-app__circle,
-    .breathing-app[data-phase='recovery'] .breathing-app__circle {
-      cursor: default;
-    }
-
-    .breathing-app__ring {
-      position: absolute;
-      transform: scale(var(--ring-scale));
-      mix-blend-mode: screen;
-      transition:
-        --ring-scale var(--duration-slower) var(--ease-settle),
-        background var(--duration-slower) var(--ease-settle),
-        box-shadow var(--duration-slower) var(--ease-settle);
-      will-change: transform;
-      box-shadow:
-        inset 0 0 50px color-mix(in oklch, var(--breathing-accent) 22%, transparent),
-        inset 0 0 2px color-mix(in oklch, var(--breathing-accent) 38%, transparent);
-      border-radius: var(--radius-full);
-      background: radial-gradient(
-        circle at 32% 28%,
-        color-mix(in oklch, var(--breathing-accent) 38%, transparent) 0%,
-        color-mix(in oklch, var(--breathing-accent-dim) 22%, transparent) 45%,
-        color-mix(in oklch, var(--breathing-accent-dim) 8%, transparent) 75%,
-        transparent 100%
-      );
-    }
-
-    .breathing-app__ring--1 {
-      opacity: 0.42;
-      inset: 0;
-    }
-
-    .breathing-app__ring--2 {
-      opacity: 0.6;
-      inset: 22%;
-    }
-
-    .breathing-app__ring--3 {
-      opacity: 0.85;
-      inset: 42%;
-    }
-
-    .breathing-app[data-phase='idle'] .breathing-app__ring--1,
-    .breathing-app[data-phase='complete'] .breathing-app__ring--1 {
-      animation: breathing-idle 7s var(--ease-precise) infinite;
-    }
-
-    .breathing-app[data-phase='idle'] .breathing-app__ring--2,
-    .breathing-app[data-phase='complete'] .breathing-app__ring--2 {
-      animation: breathing-idle 7s var(--ease-precise) infinite -0.6s;
-    }
-
-    .breathing-app[data-phase='idle'] .breathing-app__ring--3,
-    .breathing-app[data-phase='complete'] .breathing-app__ring--3 {
-      animation: breathing-idle-inner 7s var(--ease-precise) infinite -1.2s;
-    }
-
-    .breathing-app__circle[data-motion='wave'] .breathing-app__ring--1 {
-      animation: breathing-wave-outer var(--breathing-cycle-ms) var(--ease-precise) infinite;
-      transition: none;
-    }
-
-    .breathing-app__circle[data-motion='wave'] .breathing-app__ring--2 {
-      animation: breathing-wave-mid var(--breathing-cycle-ms) var(--ease-precise) infinite;
-      transition: none;
-    }
-
-    .breathing-app__circle[data-motion='wave'] .breathing-app__ring--3 {
-      animation: breathing-wave-inner var(--breathing-cycle-ms) var(--ease-precise) infinite;
-      transition: none;
-    }
-
-    .breathing-app__circle[data-motion='hold-high'] .breathing-app__ring--1 {
-      --ring-scale: 1.04;
-    }
-
-    .breathing-app__circle[data-motion='hold-high'] .breathing-app__ring--2 {
-      --ring-scale: 1.3;
-    }
-
-    .breathing-app__circle[data-motion='hold-high'] .breathing-app__ring--3 {
-      --ring-scale: 1.9;
-    }
-
-    .breathing-app__circle[data-motion='hold-low'] .breathing-app__ring--1 {
-      --ring-scale: 0.98;
-    }
-
-    .breathing-app__circle[data-motion='hold-low'] .breathing-app__ring--2 {
-      --ring-scale: 0.95;
-    }
-
-    .breathing-app__circle[data-motion='hold-low'] .breathing-app__ring--3 {
-      --ring-scale: 0.9;
-    }
-
-    .breathing-app__core {
-      position: absolute;
-      mix-blend-mode: screen;
-      transition:
-        background var(--duration-slower) var(--ease-settle),
-        box-shadow var(--duration-slower) var(--ease-settle);
-      inset: 48%;
-      box-shadow:
-        0 0 60px color-mix(in oklch, var(--breathing-accent) 55%, transparent),
-        0 0 120px color-mix(in oklch, var(--breathing-accent) 25%, transparent);
-      border-radius: var(--radius-full);
-      background: radial-gradient(
-        circle at 35% 30%,
-        color-mix(in oklch, var(--breathing-accent) 92%, var(--color-bone) 8%),
-        color-mix(in oklch, var(--breathing-accent) 70%, transparent) 60%,
-        color-mix(in oklch, var(--breathing-accent-dim) 50%, transparent) 100%
-      );
-    }
-
-    .breathing-app[data-phase='retention'] {
-      --breathing-accent: var(--color-sage-light);
-      --breathing-accent-dim: var(--color-sage);
-    }
-
-    .breathing-app[data-phase='recovery'] {
-      --breathing-accent: var(--color-sand-light);
-      --breathing-accent-dim: var(--color-sand);
-    }
-
-    .breathing-app[data-phase='complete'] {
-      --breathing-accent: var(--color-terracotta-light);
-      --breathing-accent-dim: var(--color-terracotta);
-    }
-
-    .breathing-app__label {
-      display: grid;
-      position: relative;
-      gap: var(--space-2xs);
-      z-index: 2;
-      padding: var(--space-sm) var(--space-md);
-      pointer-events: none;
-    }
-
-    .breathing-app__phase {
-      display: block;
-      color: var(--text-on-dark);
-      font-weight: 500;
-      font-size: clamp(1.75rem, 6vw, 2.5rem);
-      font-family: var(--font-display);
-      letter-spacing: 0.01em;
-      text-shadow: 0 2px 24px color-mix(in oklch, black 70%, transparent);
-    }
-
-    .breathing-app__counter {
-      display: block;
-      color: color-mix(in oklch, var(--text-on-dark) 70%, transparent);
-      font-weight: 500;
-      font-size: 0.8125rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .breathing-app__meta {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-sm);
-      text-align: center;
-    }
-
-    .breathing-app__meta-item {
-      display: grid;
-      gap: var(--space-3xs);
-      border-block-start: 1px solid color-mix(in oklch, var(--color-sand) 14%, transparent);
-      padding-block: var(--space-xs);
-    }
-
-    .breathing-app__meta-label {
-      color: color-mix(in oklch, var(--text-on-dark) 48%, transparent);
-      font-weight: 500;
-      font-size: 0.6875rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .breathing-app__meta-value {
-      color: var(--text-on-dark);
-      font-weight: 500;
-      font-size: clamp(1.125rem, 3vw, 1.375rem);
-      font-family: var(--font-display);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .breathing-app__controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: var(--space-xs);
-    }
-
-    .breathing-app__controls .btn {
-      min-block-size: 52px;
-    }
-
-    .breathing-app__start svg {
-      margin-inline-start: 3px;
-    }
-
-    /* Sound toggle — compact, square ghost icon button. */
-    .breathing-app__sound {
-      --btn-padding-inline: var(--space-xs);
-
-      aspect-ratio: 1;
-    }
-
-    .breathing-app__sound svg {
-      inline-size: 1.4rem;
-      block-size: 1.4rem;
-    }
-
-    .breathing-app__settings {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: var(--space-md) var(--space-lg);
-      border-block-start: 1px solid color-mix(in oklch, var(--color-sand) 10%, transparent);
-      padding-block-start: var(--space-md);
-    }
-
-    .breathing-app__setting {
-      display: grid;
-      align-content: start;
-      justify-items: center;
-      gap: var(--space-xs);
-      text-align: center;
-    }
-
-    .breathing-app__setting--wheel {
-      grid-column: 1 / -1;
-    }
-
-    .breathing-app__setting-label {
-      color: color-mix(in oklch, var(--text-on-dark) 60%, transparent);
-      font-weight: 500;
-      font-size: 0.6875rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .breathing-stepper {
-      display: inline-grid;
-      grid-template-columns: auto minmax(3.5rem, auto) auto;
-      align-items: center;
-      gap: var(--space-sm);
-      border: 1px solid color-mix(in oklch, var(--color-sand) 14%, transparent);
-      border-radius: var(--radius-full);
-      background: color-mix(in oklch, var(--color-sand) 6%, transparent);
-      padding: var(--space-3xs) var(--space-xs);
-    }
-
-    .breathing-stepper__btn {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      transition:
-        background-color var(--motion-quick),
-        color var(--motion-quick),
-        transform var(--duration-fast) var(--ease-settle);
-      cursor: pointer;
-      border: none;
-      border-radius: var(--radius-full);
-      background: color-mix(in oklch, var(--color-sand) 10%, transparent);
-      padding: 0;
-      inline-size: 40px;
-      block-size: 40px;
-      color: var(--text-on-dark);
-      font-weight: 500;
-      font-size: 1.5rem;
-      line-height: 1;
-      font-family: var(--font-display);
-    }
-
-    .breathing-stepper__btn:hover {
-      background: var(--breathing-accent);
-      color: var(--breathing-bg-deep);
-    }
-
-    .breathing-stepper__btn:active {
-      transform: scale(0.92);
-    }
-
-    .breathing-stepper__btn:focus-visible {
-      outline: 2px solid var(--breathing-accent);
-      outline-offset: 2px;
-    }
-
-    .breathing-stepper__btn[disabled],
-    .breathing-stepper__btn[aria-disabled='true'] {
-      opacity: 0.4;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    .breathing-stepper__value {
-      min-inline-size: 2.5ch;
-      color: var(--text-on-dark);
-      font-weight: 500;
-      font-size: 1.5rem;
-      font-family: var(--font-display);
-      font-variant-numeric: tabular-nums;
-      text-align: center;
-    }
-
-    .breathing-picker {
-      --picker-item-width: 72px;
-      --picker-height: 72px;
-
-      position: relative;
-      box-shadow:
-        inset 0 1px 0 color-mix(in oklch, var(--color-bone) 4%, transparent),
-        inset 0 -1px 0 color-mix(in oklch, black 20%, transparent);
-      border: 1px solid color-mix(in oklch, var(--color-sand) 14%, transparent);
-      border-radius: var(--radius-full);
-      background: color-mix(in oklch, var(--color-sand) 6%, transparent);
-      inline-size: min(100%, 360px);
-      block-size: var(--picker-height);
-      overflow: hidden;
-    }
-
-    .breathing-picker:focus-visible {
-      outline: 2px solid var(--breathing-accent);
-      outline-offset: 3px;
-    }
-
-    .breathing-picker__indicator {
-      position: absolute;
-      transform: translateX(-50%);
-      transition: background-color var(--duration-normal) var(--ease-settle);
-      inset-block: 8px;
-      inset-inline-start: 50%;
-      box-shadow:
-        0 4px 14px -4px color-mix(in oklch, var(--breathing-accent) 35%, transparent),
-        inset 0 1px 0 color-mix(in oklch, var(--color-bone) 12%, transparent);
-      border: 1px solid color-mix(in oklch, var(--breathing-accent) 55%, transparent);
-      border-radius: var(--radius-full);
-      background: color-mix(in oklch, var(--breathing-accent) 20%, transparent);
-      inline-size: var(--picker-item-width);
-      pointer-events: none;
-    }
-
-    .breathing-picker__track {
-      display: flex;
-      position: absolute;
-      align-items: center;
-      transform: translate3d(0, 0, 0);
-      transition: transform 220ms var(--ease-settle);
-      will-change: transform;
-      cursor: grab;
-      inset-block: 0;
-      inset-inline-start: calc(50% - var(--picker-item-width) / 2);
-      block-size: 100%;
-      touch-action: pan-y;
-      user-select: none;
-    }
-
-    .breathing-picker.is-dragging .breathing-picker__track {
-      cursor: grabbing;
-    }
-
-    .breathing-picker.is-dragging .breathing-picker__indicator {
-      background: color-mix(in oklch, var(--breathing-accent) 30%, transparent);
-    }
-
-    .breathing-picker__item {
-      display: inline-flex;
-      flex: 0 0 var(--picker-item-width);
-      justify-content: center;
-      align-items: center;
-      /* Scale + opacity (the picker-wheel depth) are set inline from the
-         distance to the centre so they track the drag frame by frame. This
-         transition only settles them after release; it is switched off mid-drag
-         via .is-dragging below. Compositor-only — no font-size reflow. */
-      transition:
-        transform 260ms var(--ease-settle),
-        opacity 260ms var(--ease-settle),
-        color 260ms var(--ease-settle);
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      padding: 0;
-      inline-size: var(--picker-item-width);
-      block-size: 100%;
-      pointer-events: auto;
-      color: color-mix(in oklch, var(--text-on-dark) 55%, transparent);
-      font-weight: 500;
-      font-size: 1.5rem;
-      font-family: var(--font-display);
-      font-variant-numeric: tabular-nums;
-      text-align: center;
-    }
-
-    .breathing-picker.is-dragging .breathing-picker__item {
-      transition: color 260ms var(--ease-settle);
-    }
-
-    .breathing-picker__item:focus-visible {
-      outline: 2px solid var(--breathing-accent);
-      outline-offset: 4px;
-      border-radius: var(--radius-sm);
-      color: var(--text-on-dark);
-    }
-
-    .breathing-picker__item.is-active {
-      color: var(--text-on-dark);
-      font-weight: 600;
-    }
-
-    .breathing-picker__fade {
-      position: absolute;
-      z-index: 1;
-      inset-block: 0;
-      inline-size: 64px;
-      pointer-events: none;
-    }
-
-    .breathing-picker__fade--start {
-      inset-inline-start: 0;
-      border-start-start-radius: var(--radius-full);
-      border-end-start-radius: var(--radius-full);
-      background: linear-gradient(
-        to right,
-        color-mix(in oklch, var(--breathing-bg) 95%, transparent) 0%,
-        transparent 100%
-      );
-    }
-
-    .breathing-picker__fade--end {
-      inset-inline-end: 0;
-      border-start-end-radius: var(--radius-full);
-      border-end-end-radius: var(--radius-full);
-      background: linear-gradient(
-        to left,
-        color-mix(in oklch, var(--breathing-bg) 95%, transparent) 0%,
-        transparent 100%
-      );
-    }
-
-    .breathing-picker[aria-disabled='true'] {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-
-    @media (width < 480px) {
-      .breathing-app__circle {
-        --size: min(78vw, 44svh);
-      }
-
-      .breathing-app__controls .btn {
-        padding-inline: var(--space-sm);
-        min-block-size: 48px;
-      }
-
-      .breathing-app__start {
-        --btn-size: 64px;
-      }
-    }
+  .atem-intro__title {
+    margin: 0;
+    font-weight: 500;
+    font-size: clamp(2.25rem, 6vw, 3.5rem);
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: var(--leading-tight);
+  }
+
+  .atem-intro__lede {
+    margin-block: var(--space-2xs) var(--space-sm);
+    color: var(--text-secondary);
+    font-size: var(--text-section-body);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* The shared step/warning styling targets `--text-on-dark`; on the light page
+     re-point those tones to the page's own ink colours. */
+  .atem-intro__steps {
+    margin-block-end: var(--space-md);
+    color: var(--text-secondary);
+  }
+
+  .atem-intro__steps strong,
+  .atem-intro__warning strong {
+    color: var(--text-primary);
+  }
+
+  .atem-intro__warning {
+    justify-self: stretch;
+    color: var(--text-primary);
+  }
+
+  .atem-cta {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-md);
+    margin-inline: auto;
+    padding-block: var(--space-2xl) var(--space-3xl);
+    padding-inline: var(--space-md);
+    max-inline-size: 48rem;
+    text-align: center;
+  }
+
+  .atem-cta__text {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-section-body);
   }
 </style>

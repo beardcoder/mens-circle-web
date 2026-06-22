@@ -31,8 +31,15 @@ if (dbPath !== ':memory:') {
 }
 
 const sqlite = new Database(dbPath, { create: true });
-// Better concurrency + integrity for a long-lived server.
+// Tuned for a long-lived, low-RAM single-writer server:
+//   • WAL            → readers never block the writer (live SSR + admin writes).
+//   • synchronous=NORMAL → the recommended WAL companion: drops a full fsync per
+//     transaction (much less disk I/O) while staying durable across an app
+//     crash; only a hard OS/power loss can lose the last commit, acceptable here.
+//   • foreign_keys   → enforce the registration↔event/participant relations.
+//   • busy_timeout   → wait out a brief writer lock instead of erroring.
 sqlite.run('PRAGMA journal_mode = WAL;');
+sqlite.run('PRAGMA synchronous = NORMAL;');
 sqlite.run('PRAGMA foreign_keys = ON;');
 sqlite.run('PRAGMA busy_timeout = 5000;');
 
