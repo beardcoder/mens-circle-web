@@ -547,122 +547,124 @@
     </button>
   </div>
 
-  <div class="breathing-app__settings" aria-disabled={isActive}>
-    <div class="breathing-app__setting breathing-app__setting--picker">
-      <span class="breathing-app__setting-label">Atemzüge je Runde</span>
-
-      <div
-        class={`breathing-picker ${isDraggingPicker ? 'is-dragging' : ''}`}
-        role="slider"
-        tabindex="0"
-        aria-label="Atemzüge je Runde"
-        aria-valuemin={BREATH_VALUES[0]}
-        aria-valuemax={BREATH_VALUES[BREATH_VALUES.length - 1]}
-        aria-valuenow={settingBreaths}
-        aria-valuetext={`${settingBreaths} Atemzüge`}
-        aria-disabled={isActive ? 'true' : undefined}
-        onkeydown={onPickerKeydown}
-        onwheel={onPickerWheel}
-      >
-        <div class="breathing-picker__indicator" aria-hidden="true"></div>
+  {#if !isActive}
+    <div class="breathing-app__settings">
+      <div class="breathing-app__setting breathing-app__setting--picker">
+        <span class="breathing-app__setting-label">Atemzüge je Runde</span>
 
         <div
-          class="breathing-picker__track"
-          style={`transform: ${pickerTransform}; transition: ${pickerTransition};`}
-          onpointerdown={onPickerPointerDown}
-          onpointermove={onPickerPointerMove}
-          onpointerup={onPickerPointerEnd}
-          onpointercancel={onPickerPointerEnd}
+          class={`breathing-picker ${isDraggingPicker ? 'is-dragging' : ''}`}
+          role="slider"
+          tabindex="0"
+          aria-label="Atemzüge je Runde"
+          aria-valuemin={BREATH_VALUES[0]}
+          aria-valuemax={BREATH_VALUES[BREATH_VALUES.length - 1]}
+          aria-valuenow={settingBreaths}
+          aria-valuetext={`${settingBreaths} Atemzüge`}
+          aria-disabled={isActive ? 'true' : undefined}
+          onkeydown={onPickerKeydown}
+          onwheel={onPickerWheel}
         >
-          {#each BREATH_VALUES as value, index (value)}
-            <button
-              type="button"
-              class={`breathing-picker__item ${index === focusedIndex ? 'is-active' : ''}`}
-              style={itemDepth(index)}
-              tabindex={index === focusedIndex ? 0 : -1}
-              aria-label={`${value} Atemzüge`}
-              onclick={(event) => onPickerClick(value, event)}
-            >
-              {value}
-            </button>
-          {/each}
+          <div class="breathing-picker__indicator" aria-hidden="true"></div>
+
+          <div
+            class="breathing-picker__track"
+            style={`transform: ${pickerTransform}; transition: ${pickerTransition};`}
+            onpointerdown={onPickerPointerDown}
+            onpointermove={onPickerPointerMove}
+            onpointerup={onPickerPointerEnd}
+            onpointercancel={onPickerPointerEnd}
+          >
+            {#each BREATH_VALUES as value, index (value)}
+              <button
+                type="button"
+                class={`breathing-picker__item ${index === focusedIndex ? 'is-active' : ''}`}
+                style={itemDepth(index)}
+                tabindex={index === focusedIndex ? 0 : -1}
+                aria-label={`${value} Atemzüge`}
+                onclick={(event) => onPickerClick(value, event)}
+              >
+                {value}
+              </button>
+            {/each}
+          </div>
+
+          <div class="breathing-picker__fade breathing-picker__fade--start" aria-hidden="true"></div>
+          <div class="breathing-picker__fade breathing-picker__fade--end" aria-hidden="true"></div>
         </div>
+      </div>
 
-        <div class="breathing-picker__fade breathing-picker__fade--start" aria-hidden="true"></div>
-        <div class="breathing-picker__fade breathing-picker__fade--end" aria-hidden="true"></div>
+      <div class="breathing-app__setting breathing-app__setting--stepper">
+        <span class="breathing-app__setting-label">Runden</span>
+
+        <div class="breathing-stepper">
+          <button
+            type="button"
+            class="breathing-stepper__btn"
+            aria-label="Eine Runde weniger"
+            disabled={isActive || settingRounds <= 1}
+            onclick={() => adjustRounds(-1)}
+          >
+            −
+          </button>
+
+          <span
+            class="breathing-stepper__value"
+            role="spinbutton"
+            aria-valuemin="1"
+            aria-valuemax="6"
+            aria-valuenow={settingRounds}
+          >
+            {settingRounds}
+          </span>
+
+          <button
+            type="button"
+            class="breathing-stepper__btn"
+            aria-label="Eine Runde mehr"
+            disabled={isActive || settingRounds >= 6}
+            onclick={() => adjustRounds(1)}
+          >
+            +
+          </button>
+        </div>
+      </div>
+
+      <div class="breathing-app__setting breathing-app__setting--stepper">
+        <span class="breathing-app__setting-label">Erholungs-Halt (Sek.)</span>
+
+        <div class="breathing-stepper">
+          <button
+            type="button"
+            class="breathing-stepper__btn"
+            aria-label="Erholungs-Halt verringern"
+            disabled={isActive || settingRecovery <= 5}
+            onclick={() => adjustRecovery(-1)}
+          >
+            −
+          </button>
+
+          <span
+            class="breathing-stepper__value"
+            role="spinbutton"
+            aria-valuemin="5"
+            aria-valuemax="30"
+            aria-valuenow={settingRecovery}
+          >
+            {settingRecovery}
+          </span>
+
+          <button
+            type="button"
+            class="breathing-stepper__btn"
+            aria-label="Erholungs-Halt erhöhen"
+            disabled={isActive || settingRecovery >= 30}
+            onclick={() => adjustRecovery(1)}
+          >
+            +
+          </button>
+        </div>
       </div>
     </div>
-
-    <div class="breathing-app__setting breathing-app__setting--stepper">
-      <span class="breathing-app__setting-label">Runden</span>
-
-      <div class="breathing-stepper">
-        <button
-          type="button"
-          class="breathing-stepper__btn"
-          aria-label="Eine Runde weniger"
-          disabled={isActive || settingRounds <= 1}
-          onclick={() => adjustRounds(-1)}
-        >
-          −
-        </button>
-
-        <span
-          class="breathing-stepper__value"
-          role="spinbutton"
-          aria-valuemin="1"
-          aria-valuemax="6"
-          aria-valuenow={settingRounds}
-        >
-          {settingRounds}
-        </span>
-
-        <button
-          type="button"
-          class="breathing-stepper__btn"
-          aria-label="Eine Runde mehr"
-          disabled={isActive || settingRounds >= 6}
-          onclick={() => adjustRounds(1)}
-        >
-          +
-        </button>
-      </div>
-    </div>
-
-    <div class="breathing-app__setting breathing-app__setting--stepper">
-      <span class="breathing-app__setting-label">Erholungs-Halt (Sek.)</span>
-
-      <div class="breathing-stepper">
-        <button
-          type="button"
-          class="breathing-stepper__btn"
-          aria-label="Erholungs-Halt verringern"
-          disabled={isActive || settingRecovery <= 5}
-          onclick={() => adjustRecovery(-1)}
-        >
-          −
-        </button>
-
-        <span
-          class="breathing-stepper__value"
-          role="spinbutton"
-          aria-valuemin="5"
-          aria-valuemax="30"
-          aria-valuenow={settingRecovery}
-        >
-          {settingRecovery}
-        </span>
-
-        <button
-          type="button"
-          class="breathing-stepper__btn"
-          aria-label="Erholungs-Halt erhöhen"
-          disabled={isActive || settingRecovery >= 30}
-          onclick={() => adjustRecovery(1)}
-        >
-          +
-        </button>
-      </div>
-    </div>
-  </div>
+  {/if}
 </div>
