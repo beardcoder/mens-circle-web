@@ -187,8 +187,12 @@ const { standalone = false } = Astro.props;
       padding-block: var(--space-xl);
     }
 
+    /* Auto height (not a fixed slab) so the circle keeps its natural size and
+       the controls/settings flow below it — the min keeps a generous, calm
+       stage without ever crushing the circle into the panel beneath it. */
     .breathing-embed .breathing-app {
-      block-size: clamp(30rem, 76svh, 44rem);
+      block-size: auto;
+      min-block-size: clamp(34rem, 82svh, 50rem);
     }
 
     .breathing-screen > * {
@@ -928,6 +932,21 @@ const { standalone = false } = Astro.props;
 
       .breathing-app__start {
         --btn-size: 64px;
+      }
+    }
+
+    /* Short viewports (the standalone app on a phone in particular): tighten the
+       settings panel so the whole experience still fits one screen without the
+       circle being clipped against the controls. */
+    @media (height < 760px) {
+      .breathing-screen .breathing-app__settings {
+        gap: var(--space-sm) var(--space-md);
+        padding-block-start: var(--space-sm);
+      }
+
+      .breathing-screen .breathing-picker {
+        --picker-height: 60px;
+        --picker-item-width: 64px;
       }
     }
   }
