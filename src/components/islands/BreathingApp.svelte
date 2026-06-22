@@ -1,6 +1,6 @@
 <script lang="ts">
   import { clamp } from '@lib/helpers';
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   type Phase = 'idle' | 'breathing' | 'retention' | 'recovery' | 'complete';
 
@@ -160,19 +160,52 @@
   // be muted with the toggle.
   let soundEnabled = $state(true);
   let audioCtx: AudioContext | null = null;
+  let audioUnlocked = false;
 
-  function chime(freqs: number[], step = 0.14, duration = 0.22): void {
-    if (!soundEnabled || typeof window === 'undefined') return;
+  // Lazily create the single shared AudioContext; null when Web Audio is absent.
+  function getAudioContext(): AudioContext | null {
+    if (typeof window === 'undefined') return null;
 
     const Ctor =
       window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
 
-    if (!Ctor) return;
+    if (!Ctor) return null;
 
     audioCtx ??= new Ctor();
-    if (audioCtx.state === 'suspended') void audioCtx.resume();
 
-    const ctx = audioCtx;
+    return audioCtx;
+  }
+
+  // iOS only lets Web Audio make sound once it has been started from inside a
+  // real user gesture: the context boots "suspended" and stays silent until it
+  // is both resumed AND has played a buffer within a touch/click. We run this on
+  // the first interaction (and again when a session starts), so every later,
+  // timer-scheduled chime is audible. Without it, sound is dead on iOS.
+  function unlockAudio(): void {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    if (ctx.state === 'suspended') void ctx.resume();
+
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+
+    // A one-sample silent buffer is enough to flip iOS into the unlocked state.
+    const buffer = ctx.createBuffer(1, 1, 22050);
+    const source = ctx.createBufferSource();
+
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start(0);
+  }
+
+  function chime(freqs: number[], step = 0.14, duration = 0.22): void {
+    if (!soundEnabled) return;
+
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    if (ctx.state === 'suspended') void ctx.resume();
 
     freqs.forEach((freq, i) => {
       const start = ctx.currentTime + i * step;
@@ -215,6 +248,9 @@
   }
 
   function beginSession(): void {
+    // Runs from a click/tap, so this is the moment to satisfy iOS' gesture rule.
+    unlockAudio();
+
     session = {
       breaths: settingBreaths,
       rounds: settingRounds,
@@ -320,6 +356,14 @@
     if (phase === 'idle' || phase === 'complete') {
       beginSession();
     }
+  }
+
+  function toggleSound(): void {
+    soundEnabled = !soundEnabled;
+
+    // Turning sound on is a user gesture — prime the context so the next cue is
+    // audible on iOS even if the session is already running.
+    if (soundEnabled) unlockAudio();
   }
 
   function onHoldClick(): void {
@@ -454,6 +498,20 @@
     }
   }
 
+  onMount(() => {
+    // Prime audio on the very first interaction anywhere, so iOS has an unlocked
+    // context ready before the first chime — `once` cleans each up after firing.
+    const prime = (): void => unlockAudio();
+
+    window.addEventListener('pointerdown', prime, { once: true });
+    window.addEventListener('touchend', prime, { once: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', prime);
+      window.removeEventListener('touchend', prime);
+    };
+  });
+
   onDestroy(() => {
     clearScheduled();
     void audioCtx?.close();
@@ -527,7 +585,7 @@
       aria-pressed={soundEnabled}
       aria-label={soundEnabled ? 'Ton ausschalten' : 'Ton einschalten'}
       title={soundEnabled ? 'Ton aus' : 'Ton an'}
-      onclick={() => (soundEnabled = !soundEnabled)}
+      onclick={toggleSound}
     >
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"></path>
