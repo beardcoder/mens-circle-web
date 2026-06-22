@@ -37,6 +37,7 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 **`src/lib/server/*` is server-only** (db, events, registrations, testimonials, listmonk, email, auth, cron, ics, format, ratelimit, config). Never import it into client/Svelte code — it pulls in `bun:sqlite`. This is the business-logic layer; the two RPC surfaces below are thin wrappers over it.
 
 **Two RPC surfaces:**
+
 - **Public forms → `src/pages/api/*`** (register, newsletter, testimonial). Svelte islands POST JSON via `src/lib/api.ts`; endpoints validate, run capacity/waitlist logic, send mail, and return `{ success, message }`.
 - **Admin back-office → Astro Actions in `src/actions/index.ts`** (served at `/_actions/*`). Admin components call `actions.<name>(input)` for typed `{ data, error }`. This replaced the old `/api/admin/*` endpoints + `admin-client.ts` (now empty/legacy).
 
