@@ -32,8 +32,8 @@ const ctaLinks = nav.header.cta;
                   data-lume-part="nav-link"
                   data-umami-event="nav-click"
                   data-umami-event-target={link.umamiTarget}
-                  target={'target' in link ? link.target : undefined}
-                  rel={'target' in link && link.target === '_blank' ? 'noopener' : undefined}
+                  target={(link as { target?: string }).target}
+                  rel={(link as { target?: string }).target === '_blank' ? 'noopener' : undefined}
                 >
                   <span class="nav__index" aria-hidden="true">
                     {String(i + 1).padStart(2, '0')}
