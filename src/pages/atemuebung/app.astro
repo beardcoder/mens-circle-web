@@ -1,0 +1,82 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BreathingExperience from '../../components/BreathingExperience.astro';
+
+// Standalone, chrome-less breathing app — the installable PWA surface
+// (manifest start_url / scope point here). Reached from /atemuebung via its
+// "Im Vollbild öffnen" CTA, or launched directly once installed. Prerendered.
+export const prerender = true;
+
+const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+
+const schemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl.origin },
+      { '@type': 'ListItem', position: 2, name: 'Atemübung', item: new URL('/atemuebung', siteUrl).href },
+      { '@type': 'ListItem', position: 3, name: 'Vollbild', item: new URL('/atemuebung/app', siteUrl).href },
+    ],
+  },
+];
+---
+
+<Layout
+  title="Atemübung – Männerkreis Niederbayern/ Straubing"
+  description="Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode. Drei Runden bewusster Atem für Klarheit, Energie und innere Ruhe."
+  schemas={schemas}
+  manifest="/atemuebung.webmanifest"
+  webAppTitle="Atemübung"
+  viewport="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+  robots="noindex, follow"
+  bare
+>
+  <BreathingExperience standalone />
+</Layout>
+
+<script>
+  // Progressive web app wiring for the breathing exercise: register the service
+  // worker (offline + installability) and surface a native install prompt
+  // through the in-dialog button when the browser offers one.
+  type InstallPromptEvent = Event & {
+    prompt: () => void;
+    userChoice: Promise<{ outcome: string }>;
+  };
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {
+        /* registration is best-effort; the app works fine without it */
+      });
+    });
+  }
+
+  const installButton = document.querySelector<HTMLButtonElement>('#pwa-install');
+
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true;
+
+  let deferredPrompt: InstallPromptEvent | null = null;
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredPrompt = event as InstallPromptEvent;
+
+    if (installButton && !isStandalone) installButton.hidden = false;
+  });
+
+  installButton?.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+
+    installButton.hidden = true;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    if (installButton) installButton.hidden = true;
+  });
+</script>

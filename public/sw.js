@@ -8,24 +8,24 @@
  *                        then to the cached breathing app shell as a last resort
  *   - static, hashed   → stale-while-revalidate (immutable build assets, fonts,
  *     assets              images, icons)
- *   - everything else  → straight to the network (never cached: PocketBase API,
- *                        POST/PUT, cross-origin, etc.)
+ *   - everything else  → straight to the network (never cached: the JSON API,
+ *                        admin UI, server actions, POST/PUT, cross-origin, etc.)
  *
- * The PocketBase backend (admin UI at /_/ and the API at /api/) is never
- * touched — the SW returns early so those requests hit the network directly.
- * Without that, the whole-origin navigation handler would shadow /_/ and serve
- * a cached site page instead of the admin dashboard.
+ * The dynamic back-office is never intercepted — the SW returns early for the
+ * API (/api/), the admin UI (/admin/) and the server actions (/_actions/) so
+ * those always hit the network. Without that, the whole-origin navigation
+ * handler would shadow /admin/ and serve a cached public page instead.
  *
  * Bump CACHE to invalidate everything on the next activation.
  */
 
-const CACHE = 'mk-breath-v2';
+const CACHE = 'mk-breath-v3';
 
 // The app shell needed to launch the breathing exercise offline. The page's CSS
 // is inlined into its HTML, so caching the document covers the styling; the
 // island's JS chunks and fonts are filled in by the runtime SWR handler below.
 const APP_SHELL = [
-  '/atemuebung',
+  '/atemuebung/app',
   '/atemuebung.webmanifest',
   '/favicon.svg',
   '/favicon-192x192.png',
@@ -73,13 +73,14 @@ self.addEventListener('fetch', (event) => {
 
   if (url.origin !== self.location.origin) return;
 
-  // PocketBase backend — never intercept. Letting these fall through to the
-  // network keeps the admin UI (/_/) and API (/api/) reachable; otherwise the
-  // navigation handler below would serve a cached site page for /_/.
+  // Dynamic back-office — never intercept. Letting these fall through to the
+  // network keeps the JSON API, the admin UI and the server actions reachable;
+  // otherwise the navigation handler below would serve a cached public page for
+  // /admin/ instead of the live dashboard.
   if (
-    url.pathname === '/_' ||
-    url.pathname.startsWith('/_/') ||
-    url.pathname.startsWith('/api/')
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/admin') ||
+    url.pathname.startsWith('/_actions/')
   ) {
     return;
   }
@@ -96,7 +97,7 @@ self.addEventListener('fetch', (event) => {
         .catch(() =>
           caches
             .match(request)
-            .then((hit) => hit || caches.match('/atemuebung')),
+            .then((hit) => hit || caches.match('/atemuebung/app')),
         ),
     );
     return;

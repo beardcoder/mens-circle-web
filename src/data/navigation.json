@@ -12,8 +12,7 @@
       {
         "label": "Atemübung",
         "url": "/atemuebung",
-        "umamiTarget": "atemuebung",
-        "target": "_blank"
+        "umamiTarget": "atemuebung"
       }
     ],
     "cta": [
@@ -30,7 +29,7 @@
     { "label": "Die Reise", "url": "/#reise" },
     { "label": "Haltung", "url": "/warum-ich-den-maennerkreis-leite" },
     { "label": "FAQ", "url": "/#faq" },
-    { "label": "Atemübung", "url": "/atemuebung", "target": "_blank" },
+    { "label": "Atemübung", "url": "/atemuebung" },
     { "label": "Nächster Termin", "url": "/event" }
   ],
   "footerContact": [{ "label": "Newsletter", "url": "/#newsletter" }],
