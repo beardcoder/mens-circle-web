@@ -951,9 +951,12 @@ const { standalone = false } = Astro.props;
         padding-block-start: var(--space-sm);
       }
 
+      /* NB: only the height is tuned here. `--picker-item-width` must stay in
+         sync with the JS `PICKER_ITEM_WIDTH` constant that drives the track
+         offset — overriding it here knocked the selected number out from under
+         the centre indicator on short screens. */
       .breathing-screen .breathing-picker {
         --picker-height: 60px;
-        --picker-item-width: 64px;
       }
     }
   }
