@@ -1,4 +1,5 @@
 ---
+import { BREATHING_STEPS, BREATHING_WARNING } from '@lib/breathing';
 import BreathingApp from './islands/BreathingApp.svelte';
 
 interface Props {
@@ -53,18 +54,14 @@ const { standalone = false } = Astro.props;
 
           <h2 id="info-title">So funktioniert es</h2>
           <ol class="breathing__steps">
-            <li>
-              <strong>Tief atmen:</strong> 35 kräftige Atemzüge — vollständig einatmen, locker ausatmen.
-            </li>
-            <li>
-              <strong>Halten:</strong> Nach der letzten Ausatmung den Atem so lange wie möglich anhalten.
-            </li>
-            <li>
-              <strong>Erholung:</strong> Tief einatmen und 15 Sekunden halten. Dann normal weiteratmen.
-            </li>
+            {BREATHING_STEPS.map((step) => (
+              <li>
+                <strong>{step.title}:</strong> {step.text}
+              </li>
+            ))}
           </ol>
           <p class="breathing__warning">
-            <strong>Wichtig:</strong> Übe niemals im Wasser oder beim Autofahren. Setze oder lege dich entspannt hin.
+            <strong>Wichtig:</strong> {BREATHING_WARNING}
           </p>
 
           <button type="button" id="pwa-install" class="breathing__install" hidden>
@@ -181,15 +178,13 @@ const { standalone = false } = Astro.props;
 
     /* Embedded surface: the same experience sitting inside the normal site
        page. It is sized to a generous slab (not the whole viewport) so the
-       header above and the page content below stay in view, and it rounds into
-       the page instead of bleeding to the edges. */
+       header above and the page content below stay in view. */
     .breathing-embed {
       display: grid;
       justify-items: center;
       padding-inline: max(var(--space-md), var(--safe-area-inset-left))
         max(var(--space-md), var(--safe-area-inset-right));
       padding-block: var(--space-xl);
-      border-radius: var(--radius-lg);
     }
 
     .breathing-embed .breathing-app {
