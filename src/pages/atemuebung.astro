@@ -4,9 +4,10 @@ import Layout from '../layouts/Layout.astro';
 import BreathingExperience from '../components/BreathingExperience.astro';
 
 // Embedded breathing tool — the public-site page. Opened from the nav/footer it
-// presents inside the normal site chrome (header/footer), with the instructions
-// shown inline. The chrome-less, installable full-screen variant lives at
-// /atemuebung/app and is reached via the CTA below.
+// presents inside the normal site chrome (header/footer). The whole page is one
+// continuous dark surface (intro → tool → guide → CTA) so it shares the calm,
+// earthy language of the rest of the site instead of bouncing light↔dark. The
+// chrome-less, installable full-screen variant lives at /atemuebung/app.
 export const prerender = true;
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
@@ -39,104 +40,162 @@ const schemas = [
   description="Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode. Drei Runden bewusster Atem für Klarheit, Energie und innere Ruhe."
   schemas={schemas}
 >
-  <section class="atem-intro">
-    <p class="atem-intro__eyebrow">Atemübung</p>
-    <h1 class="atem-intro__title">Komm bei dir an.</h1>
-    <p class="atem-intro__lede">
-      Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode — drei Runden bewusster Atem für Klarheit,
-      Energie und innere Ruhe. Setze oder lege dich entspannt hin und folge dem Kreis.
-    </p>
+  <div class="atem-page">
+    <section class="atem-intro">
+      <div class="atem-intro__inner">
+        <p class="atem-intro__eyebrow">Atemübung</p>
+        <h1 class="atem-intro__title">Komm bei <span class="atem-intro__accent">dir</span> an.</h1>
+        <p class="atem-intro__lede">
+          Eine geführte, interaktive Atemübung im Stil der Wim-Hof-Methode — drei Runden bewusster Atem für Klarheit,
+          Energie und innere Ruhe. Setze oder lege dich entspannt hin und folge dem Kreis.
+        </p>
+      </div>
+    </section>
 
-    <ol class="breathing__steps atem-intro__steps">
-      {
-        BREATHING_STEPS.map((step) => (
-          <li>
-            <strong>{step.title}:</strong> {step.text}
-          </li>
-        ))
-      }
-    </ol>
-    <p class="breathing__warning atem-intro__warning">
-      <strong>Wichtig:</strong>
-      {BREATHING_WARNING}
-    </p>
-  </section>
+    <BreathingExperience />
 
-  <BreathingExperience />
+    <section class="atem-guide">
+      <div class="atem-guide__inner">
+        <h2 class="atem-guide__title">So funktioniert es</h2>
+        <ol class="breathing__steps atem-guide__steps">
+          {
+            BREATHING_STEPS.map((step) => (
+              <li>
+                <strong>{step.title}:</strong> {step.text}
+              </li>
+            ))
+          }
+        </ol>
+        <p class="breathing__warning atem-guide__warning">
+          <strong>Wichtig:</strong>
+          {BREATHING_WARNING}
+        </p>
+      </div>
+    </section>
 
-  <section class="atem-cta">
-    <p class="atem-cta__text">Lieber ablenkungsfrei? Öffne die Übung im Vollbild oder installiere sie als App.</p>
-    <a class="btn btn--primary btn--large" href="/atemuebung/app">Im Vollbild öffnen</a>
-  </section>
+    <section class="atem-cta">
+      <p class="atem-cta__text">Lieber ablenkungsfrei? Öffne die Übung im Vollbild oder installiere sie als App.</p>
+      <a class="btn btn--primary btn--large" href="/atemuebung/app">Im Vollbild öffnen</a>
+    </section>
+  </div>
 </Layout>
 
 <style>
+  /* One continuous dark surface. Each band's gradient hands off to the next so
+     the page reads as a single calm column: the intro settles onto
+     --color-earth-deep (where the breathing tool begins) and the CTA picks up
+     from --color-ink (where the tool ends). */
+  .atem-page {
+    background: var(--color-earth-deep);
+    color: var(--text-on-dark);
+  }
+
   .atem-intro {
     display: grid;
-    justify-items: start;
-    gap: var(--space-sm);
-    margin-inline: auto;
-    padding-block-start: var(--space-3xl);
+    justify-items: center;
+    padding-block: calc(var(--header-clearance) + var(--space-sm)) var(--space-xl);
     padding-inline: var(--space-md);
+    background: linear-gradient(180deg, var(--color-earth-dark) 0%, var(--color-earth-deep) 100%);
+    text-align: center;
+  }
+
+  .atem-intro__inner {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-sm);
     inline-size: 100%;
-    max-inline-size: 48rem;
+    max-inline-size: var(--content-max-wide);
   }
 
   .atem-intro__eyebrow {
-    color: var(--color-terracotta);
+    display: inline-flex;
+    gap: var(--space-sm);
+    align-items: center;
+    margin: 0;
+    color: var(--accent-secondary);
     font-weight: 600;
-    font-size: 0.75rem;
-    letter-spacing: 0.18em;
+    font-size: var(--text-caption);
+    letter-spacing: 0.25em;
     text-transform: uppercase;
+  }
+
+  .atem-intro__eyebrow::before,
+  .atem-intro__eyebrow::after {
+    inline-size: clamp(1.75rem, 5vw, 3.5rem);
+    block-size: 1px;
+    content: '';
+    background: color-mix(in oklch, var(--accent-secondary) 60%, transparent);
   }
 
   .atem-intro__title {
     margin: 0;
+    color: var(--text-on-dark);
     font-weight: 500;
-    font-size: clamp(2.25rem, 6vw, 3.5rem);
+    font-size: clamp(2.5rem, 6vw, 4rem);
     font-family: var(--font-display);
     letter-spacing: -0.02em;
     line-height: var(--leading-tight);
   }
 
+  .atem-intro__accent {
+    color: var(--accent-secondary);
+    font-style: italic;
+  }
+
   .atem-intro__lede {
-    margin-block: var(--space-2xs) var(--space-sm);
-    color: var(--text-secondary);
-    font-size: var(--text-section-body);
+    margin: 0;
+    max-inline-size: var(--content-max-description);
+    color: color-mix(in oklch, var(--text-on-dark) 80%, transparent);
+    font-size: var(--text-section-body-lg);
     line-height: var(--leading-relaxed);
+    text-wrap: balance;
   }
 
-  /* The shared step/warning styling targets `--text-on-dark`; on the light page
-     re-point those tones to the page's own ink colours. */
-  .atem-intro__steps {
+  /* Detailed steps + safety note, sitting below the tool. The shared
+     `.breathing__steps` / `.breathing__warning` styles already target the dark
+     surface, so they need no recolouring here — just layout. */
+  .atem-guide {
+    display: grid;
+    justify-items: center;
+    padding-block: var(--space-xl);
+    padding-inline: var(--space-md);
+    background: var(--color-ink);
+  }
+
+  .atem-guide__inner {
+    inline-size: 100%;
+    max-inline-size: var(--content-max-text);
+  }
+
+  .atem-guide__title {
+    margin: 0 0 var(--space-md);
+    color: var(--text-on-dark);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    text-align: center;
+  }
+
+  .atem-guide__steps {
     margin-block-end: var(--space-md);
-    color: var(--text-secondary);
-  }
-
-  .atem-intro__steps strong,
-  .atem-intro__warning strong {
-    color: var(--text-primary);
-  }
-
-  .atem-intro__warning {
-    justify-self: stretch;
-    color: var(--text-primary);
   }
 
   .atem-cta {
     display: grid;
     justify-items: center;
     gap: var(--space-md);
-    margin-inline: auto;
-    padding-block: var(--space-2xl) var(--space-3xl);
+    padding-block: var(--space-xl) var(--space-2xl);
     padding-inline: var(--space-md);
-    max-inline-size: 48rem;
+    background: linear-gradient(180deg, var(--color-ink) 0%, var(--color-earth-deep) 100%);
     text-align: center;
   }
 
   .atem-cta__text {
     margin: 0;
-    color: var(--text-secondary);
+    max-inline-size: var(--content-max-text);
+    color: color-mix(in oklch, var(--text-on-dark) 72%, transparent);
     font-size: var(--text-section-body);
+    line-height: var(--leading-relaxed);
   }
 </style>
