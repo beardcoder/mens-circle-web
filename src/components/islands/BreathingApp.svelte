@@ -20,6 +20,9 @@
 
   const BREATH_VALUES = Array.from({ length: 11 }, (_, i) => 10 + i * 5);
 
+  // Must match the CSS `--picker-item-width` (BreathingExperience.astro): this
+  // value drives the track offset, so any CSS override of the item width would
+  // slide the selected number off-centre from the indicator.
   const PICKER_ITEM_WIDTH = 72;
   const DRAG_THRESHOLD_PX = 4;
   const INHALE_MS = 1800;
