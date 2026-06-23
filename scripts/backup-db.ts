@@ -75,7 +75,7 @@ try {
   const db = new Database(dbPath);
   // VACUUM INTO reads the source in a single transaction and writes a clean,
   // self-contained copy (WAL contents folded in, no sidecar needed).
-  db.exec(`VACUUM INTO '${snapshotPath.replace(/'/g, "''")}'`);
+  db.run(`VACUUM INTO '${snapshotPath.replace(/'/g, "''")}'`);
   db.close();
 } catch (err) {
   fail(`snapshot failed: ${String(err)}`);
