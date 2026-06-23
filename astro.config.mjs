@@ -12,11 +12,11 @@ const umamiId = process.env.PUBLIC_UMAMI_ID;
 const umamiEndpoint = process.env.PUBLIC_UMAMI_ENDPOINT;
 const analytics = umamiId
   ? [
-    umami({
-      id: umamiId,
-      ...(umamiEndpoint ? { endpointUrl: umamiEndpoint } : {}),
-    }),
-  ]
+      umami({
+        id: umamiId,
+        ...(umamiEndpoint ? { endpointUrl: umamiEndpoint } : {}),
+      }),
+    ]
   : [];
 
 // SSR on the Bun runtime. The local "mens-circle-edge" adapter (adapter/) builds
