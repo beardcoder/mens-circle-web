@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
     environment:
       APP_URL: ${SERVICE_URL_WEB}
+      PORT: ${SERVICE_PORT_WEB:-8090}
       DATABASE_PATH: /data/mens-circle.db
       MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-hallo@mens-circle.de}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Männerkreis Niederbayern/ Straubing}
@@ -47,10 +48,7 @@ services:
     depends_on:
       - listmonk
     healthcheck:
-      # wget, not curl — curl isn't installed in the Bun runtime image. /health is
-      # answered directly by the Bun edge (see adapter/server.mjs), no SSR render.
-      # 127.0.0.1 (not localhost) — Bun binds IPv4 only; localhost may hit ::1.
-      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:8090/health || exit 1']
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:8090 || exit 1']
       start_period: 20s
       interval: 30s
       timeout: 5s
@@ -60,11 +58,6 @@ services:
       - 'caddy_1.import=web_optimizations'
 
   listmonk:
-    # Custom image that bakes the branded system email-templates into the
-    # container (see listmonk/Dockerfile). We intentionally do NOT bind-mount
-    # ./listmonk/static at runtime: repo-relative bind mounts are fragile on
-    # some hosts (e.g. Coolify) and a missing mount silently falls back to
-    # listmonk's embedded English defaults.
     build:
       context: ./listmonk
     image: mens-circle-listmonk:latest
@@ -87,7 +80,7 @@ services:
     healthcheck:
       test: ['CMD-SHELL', 'curl -sf http://localhost:9000/api/ping || exit 1']
       start_period: 120s
-      interval: 15s
+      interval: 30s
       timeout: 5s
       retries: 12
     command:
@@ -108,7 +101,7 @@ services:
       - listmonk-db:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
-      interval: 10s
+      interval: 30s
       timeout: 5s
       retries: 6
 
