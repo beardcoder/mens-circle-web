@@ -65,7 +65,7 @@ function numOrNull(v: number | string | null | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-type EventRaw = (typeof eventSchema)['_output'];
+type EventRaw = z.output<typeof eventSchema>;
 
 function toEventInput(raw: EventRaw): EventInput {
   // "YYYY-MM-DD" from the date input → ISO UTC, matching the old endpoint.

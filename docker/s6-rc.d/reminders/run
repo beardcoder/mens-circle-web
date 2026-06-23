@@ -1,0 +1,20 @@
+#!/command/with-contenv sh
+# Event-reminder scheduler (replaces the old in-process setInterval cron).
+#
+# s6 supervises this longrun: a simple sleep-loop runs the one-shot reminder
+# pass every 15 minutes. A non-zero exit from the script is swallowed (|| true)
+# so one bad pass never tears down the loop; s6 restarts the loop itself if the
+# shell ever dies.
+set -e
+
+export DATABASE_PATH="${DATABASE_PATH:-/data/mens-circle.db}"
+cd /app
+
+# Let the web service boot and apply DB migrations first.
+sleep 60
+
+while true; do
+  echo "→ [reminders] running pass"
+  bun --smol run /app/scripts/send-reminders.ts || echo "→ [reminders] pass failed (continuing)"
+  sleep 900
+done
