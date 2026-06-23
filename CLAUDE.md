@@ -34,7 +34,7 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 
 **Data layer — `src/lib/server/db/`:** Drizzle on `bun:sqlite`. Schema in `schema.ts`; migrations in `drizzle/` are **applied automatically on boot** (`index.ts`). `bun:sqlite` is a Bun builtin kept `external` in `astro.config.mjs` (Rollup must not bundle it). After changing the schema, run `bun run db:generate`.
 
-**`src/lib/server/*` is server-only** (db, events, registrations, testimonials, listmonk, email, auth, cron, ics, format, ratelimit, config). Never import it into client/Svelte code — it pulls in `bun:sqlite`. This is the business-logic layer; the two RPC surfaces below are thin wrappers over it.
+**`src/lib/server/*` is server-only** (db, events, registrations, testimonials, listmonk, email, auth, reminders, ics, format, ratelimit, config). Never import it into client/Svelte code — it pulls in `bun:sqlite`. This is the business-logic layer; the two RPC surfaces below are thin wrappers over it.
 
 **Two RPC surfaces:**
 
@@ -43,7 +43,7 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 
 **Auth & guards:** `src/middleware.ts` guards admin **pages** (`/admin/*`) behind a signed session cookie (`ADMIN_EMAIL`/`ADMIN_PASSWORD`/`ADMIN_SESSION_SECRET`); unauth pages redirect to login, API hits get 401. Actions live outside the `/admin` path match, so each mutating action **self-guards** via `requireAdmin`.
 
-**Cron:** The reminder cron is started lazily from middleware, gated on the `__MC_RUNTIME` flag (set in `adapter/server.mjs`) so the build-time prerender never imports the `bun:sqlite` data layer.
+**Cron (reminders):** Not in-process. The Docker image runs **s6-overlay** as PID 1: the Bun web server is the foreground CMD, and a supervised `reminders` side service (`docker/s6-rc.d/reminders`) runs `scripts/send-reminders.ts` every 15 min. That script calls `runReminders()` from `src/lib/server/reminders.ts` (a single idempotent pass, stamping `reminder_sent_at`). The runtime image therefore ships `src/lib/server` so the script can reuse the data/email layer. To trigger a pass manually: `bun run scripts/send-reminders.ts`.
 
 **Email — listmonk (external service):** The app does not render emails. It calls listmonk's transactional API (`POST /api/tx`) with a template ID + data; templates are maintained in listmonk. Source templates + setup in `listmonk/tx-templates/`. Newsletter (double-opt-in + campaigns) also via listmonk. Template IDs are wired through `LISTMONK_TX_*` env vars.
 
