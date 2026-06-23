@@ -19,7 +19,7 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 │   ├─ Admin-UI    → /admin/* (Events anlegen, Anmeldungen verwalten)         │
 │   ├─ Datenhaltung → Drizzle ORM auf bun:sqlite (Datei im /data-Volume)      │
 │   │    Migrationen werden beim Boot automatisch angewendet (drizzle/)       │
-│   └─ Cron        → Event-Erinnerungen (alle 15 min, s6-Service)             │
+│   └─ Cron        → Event-Erinnerungen (alle 15 min, Bun.cron)               │
 │                                           │                                 │
 │                                           ▼ (E-Mail)                         │
 │                                        listmonk (externer Dienst)           │
@@ -76,7 +76,7 @@ src/
   lib/            api.ts (Client), admin-client.ts, types, Utils
   lib/server/     Datenschicht (db/, events, registrations, testimonials,
                   listmonk, email, auth, reminders, ics, format) — NUR serverseitig
-  middleware.ts   Admin-Guard (Reminder-Cron läuft separat via s6-overlay)
+  middleware.ts   Admin-Guard (Reminder-Cron: Bun.cron via --preload, s. unten)
   pages/          index, event, atemuebung, teile-deine-erfahrung, [slug]
   pages/api/      Public-API + /api/admin/* (Astro-Endpunkte)
   pages/admin/    Admin-UI-Seiten
