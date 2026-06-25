@@ -4,7 +4,10 @@ import { events, participants, registrations } from './db/schema';
 import { sendEventReminder } from './email';
 import { toDate } from './format';
 
-function createWindow() {
+type Window = ReturnType<typeof createWindow>;
+type PendingRow = Awaited<ReturnType<typeof queryPending>>[number];
+
+const createWindow = () => {
   const now = new Date();
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   const tomorrow = new Date(today.getTime() + 86_400_000);
@@ -13,11 +16,11 @@ function createWindow() {
     to: new Date(tomorrow.getTime() + 86_400_000).toISOString(),
     isToday: (d: Date) => d.getTime() < tomorrow.getTime(),
     stamp: now.toISOString(),
-  };
-}
+  } as const;
+};
 
-function queryPending(from: string, to: string) {
-  return db
+const queryPending = (from: string, to: string) =>
+  db
     .select({
       regId: registrations.id,
       regSmsReminderSentAt: registrations.smsReminderSentAt,
@@ -39,12 +42,12 @@ function queryPending(from: string, to: string) {
       ),
     )
     .orderBy(asc(registrations.registeredAt));
-}
 
-type PendingRow = Awaited<ReturnType<typeof queryPending>>[number];
+const dispatch = async (row: PendingRow, { isToday, stamp }: Window) => {
+  const date = toDate(row.event.eventDate);
+  if (!date) return;
 
-async function dispatch(row: PendingRow, isToday: boolean, stamp: string) {
-  await sendEventReminder(row.event, row.participant, isToday);
+  await sendEventReminder(row.event, row.participant, isToday(date));
   await db
     .update(registrations)
     .set({
@@ -53,19 +56,17 @@ async function dispatch(row: PendingRow, isToday: boolean, stamp: string) {
       smsReminderSentAt: row.participant.phone ? stamp : row.regSmsReminderSentAt,
     })
     .where(eq(registrations.id, row.regId));
-}
+};
 
 export async function runReminders(): Promise<void> {
-  const window = createWindow();
-  const rows = await queryPending(window.from, window.to);
+  const win = createWindow();
+  const rows = await queryPending(win.from, win.to);
+  const results = await Promise.allSettled(rows.map((r) => dispatch(r, win)));
 
-  for (const r of rows) {
-    try {
-      const date = toDate(r.event.eventDate);
-      if (date) await dispatch(r, window.isToday(date), window.stamp);
-    } catch (err) {
+  for (const [i, result] of results.entries()) {
+    if (result.status === 'rejected') {
       // eslint-disable-next-line no-console
-      console.error('[reminders] per-registration failed', r.regId, String(err));
+      console.error('[reminders] failed', rows[i].regId, result.reason);
     }
   }
 }
