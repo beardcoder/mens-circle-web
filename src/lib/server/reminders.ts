@@ -10,7 +10,7 @@
  * loaded via `bun --preload` in `docker-entrypoint.sh`). Call `runReminders()`
  * directly from `scripts/send-reminders.ts` for a manual one-shot trigger.
  */
-import { and, asc, eq, isNull } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, isNull, lt } from 'drizzle-orm';
 import { db } from './db';
 import { events, participants, registrations } from './db/schema';
 import { sendEventReminder } from './email';
@@ -18,17 +18,16 @@ import { toDate } from './format';
 
 export async function runReminders(): Promise<void> {
   const now = new Date();
-  const startOfToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
-  const endOfTomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 23, 59, 59));
+  const startOfToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const startOfTomorrow = new Date(startOfToday.getTime() + 86_400_000);
+  const startOfDayAfter = new Date(startOfTomorrow.getTime() + 86_400_000);
 
   const rows = await db
     .select({
       regId: registrations.id,
-      regPhone: participants.phone,
-      eventId: events.id,
-      eventDate: events.eventDate,
-      isPublished: events.isPublished,
-      deleted: events.deleted,
+      regSmsReminderSentAt: registrations.smsReminderSentAt,
+      event: events,
+      participant: participants,
     })
     .from(registrations)
     .innerJoin(events, eq(registrations.eventId, events.id))
@@ -39,43 +38,31 @@ export async function runReminders(): Promise<void> {
         isNull(registrations.reminderSentAt),
         eq(events.isPublished, true),
         isNull(events.deleted),
+        gte(events.eventDate, startOfToday.toISOString()),
+        lt(events.eventDate, startOfDayAfter.toISOString()),
+        inArray(registrations.status, ['registered', 'attended']),
       ),
     )
     .orderBy(asc(registrations.registeredAt));
 
+  const nowIso = now.toISOString();
   for (const r of rows) {
     try {
-      // Status filter (registered | attended).
-      const eventDate = toDate(r.eventDate);
+      const eventDate = toDate(r.event.eventDate);
       if (!eventDate) continue;
-      if (eventDate.getTime() < startOfToday.getTime() || eventDate.getTime() > endOfTomorrow.getTime()) continue;
 
-      // Re-read the full registration to check status (kept simple).
-      const reg = (await db.select().from(registrations).where(eq(registrations.id, r.regId)).limit(1))[0];
-      if (!reg || (reg.status !== 'registered' && reg.status !== 'attended')) continue;
+      const isToday = eventDate.getTime() < startOfTomorrow.getTime();
 
-      const event = (await db.select().from(events).where(eq(events.id, r.eventId)).limit(1))[0];
-      const participant = (
-        await db.select().from(participants).where(eq(participants.id, reg.participantId)).limit(1)
-      )[0];
-      if (!event || !participant) continue;
+      await sendEventReminder(r.event, r.participant, isToday);
 
-      const isToday =
-        eventDate.getUTCFullYear() === startOfToday.getUTCFullYear() &&
-        eventDate.getUTCMonth() === startOfToday.getUTCMonth() &&
-        eventDate.getUTCDate() === startOfToday.getUTCDate();
-
-      await sendEventReminder(event, participant, isToday);
-
-      const nowIso = now.toISOString();
       await db
         .update(registrations)
         .set({
           reminderSentAt: nowIso,
           // TODO: send SMS via a provider if a phone is present.
-          smsReminderSentAt: participant.phone ? nowIso : reg.smsReminderSentAt,
+          smsReminderSentAt: r.participant.phone ? nowIso : r.regSmsReminderSentAt,
         })
-        .where(eq(registrations.id, reg.id));
+        .where(eq(registrations.id, r.regId));
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('[reminders] per-registration failed', r.regId, String(err));
