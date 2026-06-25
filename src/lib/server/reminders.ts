@@ -1,35 +1,31 @@
-/**
- * Event reminder run (server-only).
- *
- * Finds active, not-yet-reminded registrations whose published event falls today
- * or tomorrow, sends the heute/morgen reminder and stamps `reminder_sent_at`
- * (idempotent).
- *
- * This is a single, side-effect-free *pass*: it does the work once and returns.
- * It is driven on a schedule from outside the process — an s6-overlay service in
- * the Docker image runs `scripts/send-reminders.ts` every 15 minutes (see the
- * Dockerfile). Keeping the scheduling out of the long-lived web process means no
- * in-process timer, no boot hook, and the cron survives a hung request loop.
- */
-import { and, asc, eq, isNull } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, isNull, lt } from 'drizzle-orm';
 import { db } from './db';
 import { events, participants, registrations } from './db/schema';
 import { sendEventReminder } from './email';
 import { toDate } from './format';
 
-export async function runReminders(): Promise<void> {
-  const now = new Date();
-  const startOfToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
-  const endOfTomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 23, 59, 59));
+type Window = ReturnType<typeof createWindow>;
+type PendingRow = Awaited<ReturnType<typeof queryPending>>[number];
 
-  const rows = await db
+const createWindow = () => {
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const tomorrow = new Date(today.getTime() + 86_400_000);
+  return {
+    from: today.toISOString(),
+    to: new Date(tomorrow.getTime() + 86_400_000).toISOString(),
+    isToday: (d: Date) => d.getTime() < tomorrow.getTime(),
+    stamp: now.toISOString(),
+  } as const;
+};
+
+const queryPending = (from: string, to: string) =>
+  db
     .select({
       regId: registrations.id,
-      regPhone: participants.phone,
-      eventId: events.id,
-      eventDate: events.eventDate,
-      isPublished: events.isPublished,
-      deleted: events.deleted,
+      regSmsReminderSentAt: registrations.smsReminderSentAt,
+      event: events,
+      participant: participants,
     })
     .from(registrations)
     .innerJoin(events, eq(registrations.eventId, events.id))
@@ -40,46 +36,37 @@ export async function runReminders(): Promise<void> {
         isNull(registrations.reminderSentAt),
         eq(events.isPublished, true),
         isNull(events.deleted),
+        gte(events.eventDate, from),
+        lt(events.eventDate, to),
+        inArray(registrations.status, ['registered', 'attended']),
       ),
     )
     .orderBy(asc(registrations.registeredAt));
 
-  for (const r of rows) {
-    try {
-      // Status filter (registered | attended).
-      const eventDate = toDate(r.eventDate);
-      if (!eventDate) continue;
-      if (eventDate.getTime() < startOfToday.getTime() || eventDate.getTime() > endOfTomorrow.getTime()) continue;
+const dispatch = async (row: PendingRow, { isToday, stamp }: Window) => {
+  const date = toDate(row.event.eventDate);
+  if (!date) return;
 
-      // Re-read the full registration to check status (kept simple).
-      const reg = (await db.select().from(registrations).where(eq(registrations.id, r.regId)).limit(1))[0];
-      if (!reg || (reg.status !== 'registered' && reg.status !== 'attended')) continue;
+  await sendEventReminder(row.event, row.participant, isToday(date));
+  await db
+    .update(registrations)
+    .set({
+      reminderSentAt: stamp,
+      // TODO: send SMS via a provider if a phone is present.
+      smsReminderSentAt: row.participant.phone ? stamp : row.regSmsReminderSentAt,
+    })
+    .where(eq(registrations.id, row.regId));
+};
 
-      const event = (await db.select().from(events).where(eq(events.id, r.eventId)).limit(1))[0];
-      const participant = (
-        await db.select().from(participants).where(eq(participants.id, reg.participantId)).limit(1)
-      )[0];
-      if (!event || !participant) continue;
+export async function runReminders(): Promise<void> {
+  const win = createWindow();
+  const rows = await queryPending(win.from, win.to);
+  const results = await Promise.allSettled(rows.map((r) => dispatch(r, win)));
 
-      const isToday =
-        eventDate.getUTCFullYear() === startOfToday.getUTCFullYear() &&
-        eventDate.getUTCMonth() === startOfToday.getUTCMonth() &&
-        eventDate.getUTCDate() === startOfToday.getUTCDate();
-
-      await sendEventReminder(event, participant, isToday);
-
-      const nowIso = new Date().toISOString();
-      await db
-        .update(registrations)
-        .set({
-          reminderSentAt: nowIso,
-          // TODO: send SMS via a provider if a phone is present.
-          smsReminderSentAt: participant.phone ? nowIso : reg.smsReminderSentAt,
-        })
-        .where(eq(registrations.id, reg.id));
-    } catch (err) {
+  for (const [i, result] of results.entries()) {
+    if (result.status === 'rejected') {
       // eslint-disable-next-line no-console
-      console.error('[reminders] per-registration failed', r.regId, String(err));
+      console.error('[reminders] failed', rows[i].regId, result.reason);
     }
   }
 }

@@ -1,18 +1,7 @@
-/**
- * Admin server actions — the entire admin back-office RPC surface in one typed
- * file. Replaces the former hand-written `/api/admin/*` JSON endpoints and the
- * `admin-client.ts` fetch wrapper: components call `actions.<name>(input)` and
- * get a typed `{ data, error }`; auth, validation, and JSON are handled here.
- *
- * Business logic still lives in `src/lib/server/*` — actions are a thin,
- * validated, authenticated edge over it. `src/middleware.ts` guards the admin
- * *pages*; each mutating action guards itself via `requireAdmin` (actions are
- * served from `/_actions/*`, outside the middleware's `/admin` path match).
- */
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 import type { ActionAPIContext } from 'astro:actions';
-import { createSession, readSession, SESSION_COOKIE, verifyCredentials } from '@lib/server/auth';
+import { createSession, readSession, SESSION_COOKIE, SESSION_TTL_S, verifyCredentials } from '@lib/server/auth';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';
 import { createEvent, type EventInput, sendEventNewsletter, softDeleteEvent, updateEvent } from '@lib/server/events';
 import {
@@ -28,16 +17,12 @@ import {
   updateTestimonialContent,
 } from '@lib/server/testimonials';
 
-/** Throw UNAUTHORIZED unless the request carries a valid admin session. */
-async function requireAdmin(context: ActionAPIContext): Promise<string> {
+const requireAdmin = async (context: ActionAPIContext): Promise<string> => {
   const email = await readSession(context.cookies.get(SESSION_COOKIE)?.value);
   if (!email) throw new ActionError({ code: 'UNAUTHORIZED', message: 'Nicht angemeldet.' });
   return email;
-}
+};
 
-// ── Event form coercion ──────────────────────────────────────────────────────
-// The form ships strings; numeric fields may be empty. Mirror the old
-// parseEventBody so stored shapes are identical.
 const eventSchema = z.object({
   id: z.string().optional(),
   title: z.string(),
@@ -59,16 +44,15 @@ const eventSchema = z.object({
   imageUrl: z.string().optional(),
 });
 
-function numOrNull(v: number | string | null | undefined): number | null {
+const numOrNull = (v: number | string | null | undefined): number | null => {
   if (v === '' || v == null) return null;
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
-}
+};
 
 type EventRaw = z.output<typeof eventSchema>;
 
-function toEventInput(raw: EventRaw): EventInput {
-  // "YYYY-MM-DD" from the date input → ISO UTC, matching the old endpoint.
+const toEventInput = (raw: EventRaw): EventInput => {
   let eventDate = (raw.eventDate ?? '').trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) eventDate = `${eventDate}T00:00:00.000Z`;
   return {
@@ -90,10 +74,9 @@ function toEventInput(raw: EventRaw): EventInput {
     isPublished: raw.isPublished === true,
     imageUrl: (raw.imageUrl ?? '').trim() || null,
   };
-}
+};
 
 export const server = {
-  // ── Auth ──
   login: defineAction({
     input: z.object({ email: z.string(), password: z.string() }),
     handler: async ({ email, password }, context) => {
@@ -109,7 +92,7 @@ export const server = {
         secure: import.meta.env.PROD,
         sameSite: 'lax',
         path: '/',
-        maxAge: 7 * 24 * 60 * 60,
+        maxAge: SESSION_TTL_S,
       });
       return { message: 'Angemeldet.' };
     },
@@ -122,7 +105,6 @@ export const server = {
     },
   }),
 
-  // ── Events ──
   saveEvent: defineAction({
     input: eventSchema,
     handler: async (raw, context) => {
@@ -176,7 +158,6 @@ export const server = {
     },
   }),
 
-  // ── Registrations ──
   setRegistrationStatus: defineAction({
     input: z.object({
       id: z.string(),
@@ -199,7 +180,6 @@ export const server = {
     },
   }),
 
-  // ── Testimonials ──
   moderateTestimonial: defineAction({
     input: z.object({ id: z.string(), publish: z.boolean().optional(), sortOrder: z.number().optional() }),
     handler: async ({ id, publish, sortOrder }, context) => {

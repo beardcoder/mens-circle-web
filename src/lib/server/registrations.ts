@@ -1,9 +1,4 @@
-/**
- * Registration logic (server-only) — the public registration flow with
- * capacity/waitlist handling and participant upsert, plus the admin status
- * transitions (cancellation → FIFO waitlist promotion). Ported from the
- * PocketBase register route + registrations hooks.
- */
+/* eslint-disable no-console */
 import { and, asc, eq, isNull } from 'drizzle-orm';
 import type { ApiResponse, RegistrationPayload } from '../types';
 import { db } from './db';
@@ -16,15 +11,18 @@ import { addToLists, removeFromList } from './listmonk';
 export type RegStatus = 'registered' | 'waitlist' | 'cancelled' | 'attended';
 
 export interface RegisterResult {
-  status: number; // HTTP status
+  status: number;
   body: ApiResponse;
 }
 
-/** Find or create a participant by email; backfill name/phone on hit. */
-async function upsertParticipant(
+const fireAndForget = (label: string, promise: Promise<unknown>): void => {
+  void promise.catch((err) => console.error(label, String(err)));
+};
+
+const upsertParticipant = async (
   email: string,
   fields: { firstName?: string; lastName?: string; phone?: string },
-): Promise<Participant> {
+): Promise<Participant> => {
   const existing = (await db.select().from(participants).where(eq(participants.email, email)).limit(1))[0];
   const patch: Partial<Participant> = {};
   if (fields.firstName) patch.firstName = fields.firstName;
@@ -33,8 +31,7 @@ async function upsertParticipant(
 
   if (existing) {
     if (Object.keys(patch).length > 0) {
-      const updated = (await db.update(participants).set(patch).where(eq(participants.id, existing.id)).returning())[0];
-      return updated;
+      return (await db.update(participants).set(patch).where(eq(participants.id, existing.id)).returning())[0];
     }
     return existing;
   }
@@ -44,21 +41,17 @@ async function upsertParticipant(
       .values({ email, firstName: fields.firstName ?? '', lastName: fields.lastName ?? '', phone: fields.phone ?? '' })
       .returning()
   )[0];
-}
+};
 
-function truthy(v: unknown): boolean {
-  return v === true || v === 'true' || v === 1 || v === '1';
-}
+const truthy = (v: unknown): boolean => v === true || v === 'true' || v === 1 || v === '1';
 
-/** Public event registration. Returns an HTTP status + uniform body. */
-export async function register(payload: RegistrationPayload): Promise<RegisterResult> {
+export const register = async (payload: RegistrationPayload): Promise<RegisterResult> => {
   const firstName = (payload.first_name || '').trim();
   const lastName = (payload.last_name || '').trim();
   const email = (payload.email || '').trim().toLowerCase();
   const phone = (payload.phone_number || '').trim();
   const eventId = payload.event_id;
 
-  // Honeypot: a filled hidden "website" field means a bot — fake success.
   if (typeof payload.website === 'string' && payload.website.trim() !== '') {
     return {
       status: 200,
@@ -117,47 +110,30 @@ export async function register(payload: RegistrationPayload): Promise<RegisterRe
 
   const nowIso = new Date().toISOString();
   if (existing) {
-    // Restore a soft-deleted registration.
     await db
       .update(registrations)
       .set({ status, registeredAt: nowIso, cancelledAt: null, deleted: null })
       .where(eq(registrations.id, existing.id));
   } else {
-    await db.insert(registrations).values({
-      participantId: participant.id,
-      eventId: event.id,
-      status,
-      registeredAt: nowIso,
-    });
+    await db
+      .insert(registrations)
+      .values({ participantId: participant.id, eventId: event.id, status, registeredAt: nowIso });
   }
 
-  // Emails (best-effort; never block the response).
   const freshCount = await countActiveRegistrations(event.id);
-  void sendRegistrationEmails(event, participant, status, freshCount).catch((err) =>
-    // eslint-disable-next-line no-console
-    console.error('[registrations] emails failed', String(err)),
+  fireAndForget('[registrations] emails failed', sendRegistrationEmails(event, participant, status, freshCount));
+  fireAndForget(
+    '[registrations] listmonk assignment failed',
+    ensureEventList(event).then((listId) => {
+      if (listId) return addToLists(email, `${firstName} ${lastName}`.trim(), [listId], true);
+    }),
   );
-
-  // listmonk per-event list assignment (best-effort).
-  void (async () => {
-    try {
-      const listId = await ensureEventList(event);
-      if (listId) {
-        await addToLists(email, `${firstName} ${lastName}`.trim(), [listId], true);
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('[registrations] listmonk assignment failed', event.id, String(err));
-    }
-  })();
 
   const message = isWaitlist
     ? `Du wurdest auf die Warteliste eingetragen, ${firstName}. Wir benachrichtigen dich per E-Mail, sobald ein Platz frei wird.`
     : `Vielen Dank, ${firstName}! Deine Anmeldung war erfolgreich. Du erhältst in Kürze eine Bestätigung per E-Mail.`;
   return { status: 200, body: { success: true, message } };
-}
-
-// ── Admin ────────────────────────────────────────────────────────────────────
+};
 
 export interface RegistrationRow {
   id: string;
@@ -171,8 +147,7 @@ export interface RegistrationRow {
   phone: string;
 }
 
-/** Active (non-soft-deleted) registrations for an event, with participant info. */
-export async function listRegistrationsForEvent(eventId: string): Promise<RegistrationRow[]> {
+export const listRegistrationsForEvent = async (eventId: string): Promise<RegistrationRow[]> => {
   const rows = await db
     .select({
       id: registrations.id,
@@ -190,9 +165,9 @@ export async function listRegistrationsForEvent(eventId: string): Promise<Regist
     .where(and(eq(registrations.eventId, eventId), isNull(registrations.deleted)))
     .orderBy(asc(registrations.registeredAt));
   return rows as RegistrationRow[];
-}
+};
 
-async function promoteNextWaitlisted(event: Event): Promise<void> {
+const promoteNextWaitlisted = async (event: Event): Promise<void> => {
   const next = (
     await db
       .select()
@@ -212,19 +187,11 @@ async function promoteNextWaitlisted(event: Event): Promise<void> {
 
   const participant = (await db.select().from(participants).where(eq(participants.id, next.participantId)).limit(1))[0];
   if (participant) {
-    void sendWaitlistPromotion(event, participant).catch((err) =>
-      // eslint-disable-next-line no-console
-      console.error('[registrations] promotion email failed', String(err)),
-    );
+    fireAndForget('[registrations] promotion email failed', sendWaitlistPromotion(event, participant));
   }
-}
+};
 
-/**
- * Change a registration's status (admin). On a transition into `cancelled` the
- * participant is dropped from the event's listmonk list and the oldest
- * waitlisted registration is promoted (FIFO) and emailed.
- */
-export async function changeRegistrationStatus(regId: string, newStatus: RegStatus): Promise<Registration | null> {
+export const changeRegistrationStatus = async (regId: string, newStatus: RegStatus): Promise<Registration | null> => {
   const reg = (await db.select().from(registrations).where(eq(registrations.id, regId)).limit(1))[0];
   if (!reg) return null;
   const oldStatus = reg.status as RegStatus;
@@ -246,54 +213,31 @@ export async function changeRegistrationStatus(regId: string, newStatus: RegStat
     }
   }
   return updated;
-}
+};
 
-/** Soft-delete a registration (admin "remove" — frees the unique slot). */
-export async function softDeleteRegistration(regId: string): Promise<void> {
+export const softDeleteRegistration = async (regId: string): Promise<void> => {
   await db.update(registrations).set({ deleted: new Date().toISOString() }).where(eq(registrations.id, regId));
-}
+};
 
-/** Send a free-form message to every active participant of an event. */
-export async function broadcastEventMessage(
+export const broadcastEventMessage = async (
   eventId: string,
   subject: string,
   content: string,
-): Promise<{ sent: number; total: number }> {
+): Promise<{ sent: number; total: number }> => {
   const event = await getEventById(eventId);
   if (!event) return { sent: 0, total: 0 };
+
   const recipients = await db
-    .select({
-      firstName: participants.firstName,
-      lastName: participants.lastName,
-      email: participants.email,
-      phone: participants.phone,
-      id: participants.id,
-      pCreated: participants.createdAt,
-      pUpdated: participants.updatedAt,
-    })
+    .select({ participant: participants })
     .from(registrations)
     .innerJoin(participants, eq(registrations.participantId, participants.id))
     .where(
       and(eq(registrations.eventId, eventId), isNull(registrations.deleted), eq(registrations.status, 'registered')),
     );
 
-  let sent = 0;
-  for (const r of recipients) {
-    const ok = await sendEventMessage(
-      event,
-      {
-        id: r.id,
-        firstName: r.firstName,
-        lastName: r.lastName,
-        email: r.email,
-        phone: r.phone,
-        createdAt: r.pCreated,
-        updatedAt: r.pUpdated,
-      },
-      subject,
-      content,
-    );
-    if (ok) sent++;
-  }
+  const results = await Promise.allSettled(
+    recipients.map(({ participant }) => sendEventMessage(event, participant, subject, content)),
+  );
+  const sent = results.filter((r) => r.status === 'fulfilled' && r.value).length;
   return { sent, total: recipients.length };
-}
+};
