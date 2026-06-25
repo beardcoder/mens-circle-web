@@ -51,24 +51,19 @@ export const sendRegistrationEmails = async (
           icsUrl: icsUrlFor(ev.slug),
         });
 
-  const adminSend = sendTransactional(
-    config.TX_ADMIN_NOTIFICATION,
-    config.MAIL_ADMIN_ADDRESS,
-    config.MAIL_ADMIN_NAME,
-    {
-      subject: `Neue Anmeldung: ${ev.title}`,
-      eventTitle: ev.title,
-      participantName: recipientName,
-      participantEmail: recipient,
-      participantPhone: participant.phone,
-      dateShort: formatDateShortDE(ev.eventDate),
-      timeRange: timeRangeText(ev),
-      location: ev.location,
-      activeCount,
-      maxParticipants: ev.maxParticipants,
-      statusLabel: status === 'waitlist' ? 'Warteliste' : 'Angemeldet',
-    },
-  );
+  const adminSend = sendTransactional(config.TX_ADMIN_NOTIFICATION, config.MAIL_ADMIN_ADDRESS, config.MAIL_ADMIN_NAME, {
+    subject: `Neue Anmeldung: ${ev.title}`,
+    eventTitle: ev.title,
+    participantName: recipientName,
+    participantEmail: recipient,
+    participantPhone: participant.phone,
+    dateShort: formatDateShortDE(ev.eventDate),
+    timeRange: timeRangeText(ev),
+    location: ev.location,
+    activeCount,
+    maxParticipants: ev.maxParticipants,
+    statusLabel: status === 'waitlist' ? 'Warteliste' : 'Angemeldet',
+  });
 
   await Promise.all([userSend, adminSend]);
 };

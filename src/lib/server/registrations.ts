@@ -115,7 +115,9 @@ export const register = async (payload: RegistrationPayload): Promise<RegisterRe
       .set({ status, registeredAt: nowIso, cancelledAt: null, deleted: null })
       .where(eq(registrations.id, existing.id));
   } else {
-    await db.insert(registrations).values({ participantId: participant.id, eventId: event.id, status, registeredAt: nowIso });
+    await db
+      .insert(registrations)
+      .values({ participantId: participant.id, eventId: event.id, status, registeredAt: nowIso });
   }
 
   const freshCount = await countActiveRegistrations(event.id);

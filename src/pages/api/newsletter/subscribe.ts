@@ -3,8 +3,7 @@ import { subscribeToNewsletter } from '@lib/server/listmonk';
 
 export const prerender = false;
 
-const SUCCESS_MSG =
-  'Vielen Dank! Du hast dich erfolgreich für unseren Newsletter angemeldet. Schau in dein Postfach.';
+const SUCCESS_MSG = 'Vielen Dank! Du hast dich erfolgreich für unseren Newsletter angemeldet. Schau in dein Postfach.';
 
 export const POST = apiRoute('newsletter/subscribe', 'newsletter', 5, 3600, async (request) => {
   const data = (await request.json()) as { email?: string; name?: string; website?: string };

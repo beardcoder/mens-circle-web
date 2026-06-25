@@ -3,8 +3,7 @@ const env = (key: string, fallback = ''): string => {
   return v && v.length > 0 ? v : fallback;
 };
 
-const envInt = (key: string, fallback = 0) =>
-  Number.parseInt(env(key, String(fallback)), 10) || fallback;
+const envInt = (key: string, fallback = 0) => Number.parseInt(env(key, String(fallback)), 10) || fallback;
 
 export const parseIntList = (raw: string): number[] =>
   raw
@@ -16,7 +15,9 @@ export const parseIntList = (raw: string): number[] =>
           const n = Number.parseInt(token, 10);
           if (Number.isNaN(n) || String(n) !== token) {
             // eslint-disable-next-line no-console
-            console.warn(`[config] ignoring non-numeric listmonk list id "${token}" — expected the numeric ID, not a UUID`);
+            console.warn(
+              `[config] ignoring non-numeric listmonk list id "${token}" — expected the numeric ID, not a UUID`,
+            );
             return [];
           }
           return [n];
@@ -51,8 +52,6 @@ export const config = {
 export const listmonkApiConfigured = (): boolean =>
   config.LISTMONK_URL.length > 0 && config.LISTMONK_API_USER.length > 0 && config.LISTMONK_API_TOKEN.length > 0;
 
-export const listmonkConfigured = (): boolean =>
-  listmonkApiConfigured() && config.LISTMONK_LIST_IDS.length > 0;
+export const listmonkConfigured = (): boolean => listmonkApiConfigured() && config.LISTMONK_LIST_IDS.length > 0;
 
-export const adminConfigured = (): boolean =>
-  config.ADMIN_EMAIL.length > 0 && config.ADMIN_PASSWORD.length > 0;
+export const adminConfigured = (): boolean => config.ADMIN_EMAIL.length > 0 && config.ADMIN_PASSWORD.length > 0;
