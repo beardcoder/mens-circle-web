@@ -1,13 +1,3 @@
-/**
- * Request middleware.
- *
- * Guards the admin UI (/admin/*) and admin API (/api/admin/*) behind the signed
- * session cookie; unauthenticated page hits redirect to the login, API hits get
- * a 401.
- *
- * The reminder cron no longer lives here: it runs as a separate s6-overlay
- * service in the Docker image (scripts/send-reminders.ts, every 15m).
- */
 import { defineMiddleware } from 'astro:middleware';
 import { readSession, SESSION_COOKIE } from './lib/server/auth';
 
