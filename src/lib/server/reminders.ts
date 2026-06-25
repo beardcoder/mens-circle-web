@@ -6,10 +6,9 @@
  * (idempotent).
  *
  * This is a single, side-effect-free *pass*: it does the work once and returns.
- * It is driven on a schedule from outside the process — an s6-overlay service in
- * the Docker image runs `scripts/send-reminders.ts` every 15 minutes (see the
- * Dockerfile). Keeping the scheduling out of the long-lived web process means no
- * in-process timer, no boot hook, and the cron survives a hung request loop.
+ * It is scheduled in-process via `Bun.cron` (registered by `scripts/reminder-cron.ts`,
+ * loaded via `bun --preload` in `docker-entrypoint.sh`). Call `runReminders()`
+ * directly from `scripts/send-reminders.ts` for a manual one-shot trigger.
  */
 import { and, asc, eq, isNull } from 'drizzle-orm';
 import { db } from './db';
@@ -68,7 +67,7 @@ export async function runReminders(): Promise<void> {
 
       await sendEventReminder(event, participant, isToday);
 
-      const nowIso = new Date().toISOString();
+      const nowIso = now.toISOString();
       await db
         .update(registrations)
         .set({
