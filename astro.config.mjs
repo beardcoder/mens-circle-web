@@ -19,13 +19,12 @@ const analytics = umamiId
     ]
   : [];
 
-// SSR on the Bun runtime. The local "mens-circle-edge" adapter (adapter/) builds
-// its own server entry (adapter/server.mjs → dist/server/entry.mjs) which Bun
-// runs: it serves static + SSR AND reverse-proxies the dynamic PocketBase paths
-// — so a single Bun process is the public edge (no nginx) and PocketBase stays
-// on loopback for the API/admin/email backend. Most pages are prerendered
-// (static, RAM-friendly); only the event pages and the home testimonials render
-// on demand from PocketBase.
+// SSR on the Bun runtime. @wyattjoh/astro-bun-adapter builds the server entry
+// (dist/server/entry.mjs) which Bun runs: it serves hashed static assets +
+// prerendered HTML from disk and renders SSR routes on demand. A single Bun
+// process is the public edge (no nginx). Data comes from Drizzle on bun:sqlite.
+// Most pages are prerendered (static, RAM-friendly); only the event pages and
+// the home testimonials render on demand from the DB.
 // https://astro.build/config
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://mens-circle.de',

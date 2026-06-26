@@ -6,7 +6,7 @@
 //
 // The section renders nothing when there are no published testimonials.
 //
-// The data layer (`@lib/server/events` → `bun:sqlite`) is imported dynamically:
+// The data layer (`@lib/server/testimonials` → `bun:sqlite`) is imported dynamically:
 // this runs only when the island renders at runtime, never during the
 // build-time prerender of the host page.
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 
 const { data } = Astro.props;
 const anchor = data?.anchor ?? 'stimmen';
-const { fetchTestimonials } = await import('@lib/server/events');
+const { fetchTestimonials } = await import('@lib/server/testimonials');
 const testimonials = await fetchTestimonials();
 ---
 
