@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { and, asc, desc, eq, gte, isNull, sql } from 'drizzle-orm';
-import type { EventDTO, Testimonial as TestimonialDTO } from '../types';
+import type { EventDTO } from '../types';
 import { db } from './db';
 import type { Event, NewEvent } from './db/schema';
-import { events, registrations, testimonials } from './db/schema';
+import { events, registrations } from './db/schema';
 import { config, listmonkApiConfigured } from './config';
 import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
 import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
@@ -100,24 +100,6 @@ export const fetchNextEvent = (): Promise<EventDTO | null> => tryEventDto(getNex
 export const getEventBySlug = (slug: string): Promise<EventDTO | null> =>
   tryEventDto(() => getPublishedEventBySlug(slug), 'getEventBySlug');
 
-export const fetchTestimonials = async (): Promise<TestimonialDTO[]> => {
-  try {
-    const rows = await db
-      .select()
-      .from(testimonials)
-      .where(and(eq(testimonials.isPublished, true), isNull(testimonials.deleted)))
-      .orderBy(asc(testimonials.sortOrder), desc(testimonials.publishedAt))
-      .limit(200);
-    return rows.map((r) => ({
-      quote: r.quote,
-      author: r.authorName || null,
-      role: r.role || null,
-    }));
-  } catch (err) {
-    console.error('[events] fetchTestimonials failed', String(err));
-    return [];
-  }
-};
 
 export const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
   const base = String(eventDate).slice(0, 10);

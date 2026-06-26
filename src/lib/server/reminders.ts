@@ -23,7 +23,6 @@ const queryPending = (from: string, to: string) =>
   db
     .select({
       regId: registrations.id,
-      regSmsReminderSentAt: registrations.smsReminderSentAt,
       event: events,
       participant: participants,
     })
@@ -50,11 +49,7 @@ const dispatch = async (row: PendingRow, { isToday, stamp }: Window) => {
   await sendEventReminder(row.event, row.participant, isToday(date));
   await db
     .update(registrations)
-    .set({
-      reminderSentAt: stamp,
-      // TODO: send SMS via a provider if a phone is present.
-      smsReminderSentAt: row.participant.phone ? stamp : row.regSmsReminderSentAt,
-    })
+    .set({ reminderSentAt: stamp })
     .where(eq(registrations.id, row.regId));
 };
 
