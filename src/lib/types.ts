@@ -20,7 +20,7 @@ export interface EventData {
 }
 
 /**
- * Public event shape returned by the PocketBase routes
+ * Public event shape returned by the API routes
  * `GET /api/public/events/next` and `GET /api/public/events/{slug}`.
  * Capacity values are computed server-side (registration counts are not
  * exposed to the public), so the client never sees raw registration data.
