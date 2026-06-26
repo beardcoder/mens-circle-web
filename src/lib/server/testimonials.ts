@@ -1,8 +1,8 @@
 /**
- * Testimonial submission + admin moderation (server-only).
+ * Testimonial submission, public fetch, and admin moderation (server-only).
  */
-import { and, desc, eq, isNull } from 'drizzle-orm';
-import type { ApiResponse, TestimonialPayload } from '../types';
+import { and, asc, desc, eq, isNull } from 'drizzle-orm';
+import type { ApiResponse, Testimonial as TestimonialDTO, TestimonialPayload } from '../types';
 import { db } from './db';
 import type { Testimonial } from './db/schema';
 import { testimonials } from './db/schema';
@@ -49,6 +49,27 @@ export async function submitTestimonial(payload: TestimonialPayload): Promise<Su
   });
 
   return { status: 200, body: { success: true, message: SUCCESS_MESSAGE } };
+}
+
+/** Published testimonials for the public site, sorted by sortOrder then newest. */
+export async function fetchTestimonials(): Promise<TestimonialDTO[]> {
+  try {
+    const rows = await db
+      .select()
+      .from(testimonials)
+      .where(and(eq(testimonials.isPublished, true), isNull(testimonials.deleted)))
+      .orderBy(asc(testimonials.sortOrder), desc(testimonials.createdAt))
+      .limit(200);
+    return rows.map((r) => ({
+      quote: r.quote,
+      author: r.authorName || null,
+      role: r.role || null,
+    }));
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('[testimonials] fetchTestimonials failed', String(err));
+    return [];
+  }
 }
 
 /** All non-deleted testimonials (admin), newest first. */
