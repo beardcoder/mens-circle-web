@@ -100,7 +100,6 @@ export const fetchNextEvent = (): Promise<EventDTO | null> => tryEventDto(getNex
 export const getEventBySlug = (slug: string): Promise<EventDTO | null> =>
   tryEventDto(() => getPublishedEventBySlug(slug), 'getEventBySlug');
 
-
 export const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
   const base = String(eventDate).slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(base)) {

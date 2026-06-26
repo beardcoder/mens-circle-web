@@ -47,10 +47,7 @@ const dispatch = async (row: PendingRow, { isToday, stamp }: Window) => {
   if (!date) return;
 
   await sendEventReminder(row.event, row.participant, isToday(date));
-  await db
-    .update(registrations)
-    .set({ reminderSentAt: stamp })
-    .where(eq(registrations.id, row.regId));
+  await db.update(registrations).set({ reminderSentAt: stamp }).where(eq(registrations.id, row.regId));
 };
 
 export async function runReminders(): Promise<void> {
