@@ -53,5 +53,3 @@ export const listmonkApiConfigured = (): boolean =>
   config.LISTMONK_URL.length > 0 && config.LISTMONK_API_USER.length > 0 && config.LISTMONK_API_TOKEN.length > 0;
 
 export const listmonkConfigured = (): boolean => listmonkApiConfigured() && config.LISTMONK_LIST_IDS.length > 0;
-
-export const adminConfigured = (): boolean => config.ADMIN_EMAIL.length > 0 && config.ADMIN_PASSWORD.length > 0;
