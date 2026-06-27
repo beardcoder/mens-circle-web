@@ -4,12 +4,7 @@ import type { ActionAPIContext } from 'astro:actions';
 import { createSession, readSession, SESSION_COOKIE, SESSION_TTL_S, verifyCredentials } from '@lib/server/auth';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';
 import { createEvent, type EventInput, sendEventNewsletter, softDeleteEvent, updateEvent } from '@lib/server/events';
-import {
-  broadcastEventMessage,
-  changeRegistrationStatus,
-  type RegStatus,
-  softDeleteRegistration,
-} from '@lib/server/registrations';
+import { broadcastEventMessage, changeRegistrationStatus, softDeleteRegistration } from '@lib/server/registrations';
 import {
   setTestimonialPublished,
   setTestimonialSortOrder,
@@ -165,7 +160,7 @@ export const server = {
     }),
     handler: async ({ id, status }, context) => {
       await requireAdmin(context);
-      const updated = await changeRegistrationStatus(id, status as RegStatus);
+      const updated = await changeRegistrationStatus(id, status);
       if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Anmeldung nicht gefunden.' });
       return { message: 'Status aktualisiert.' };
     },
