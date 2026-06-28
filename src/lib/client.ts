@@ -14,6 +14,7 @@
 import { initEventCtas } from './event-cta';
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';
+import { initTheme } from './theme';
 import { initUmamiKit } from './umami-kit';
 
 let initialised = false;
@@ -21,6 +22,13 @@ let initialised = false;
 function init(): void {
   if (initialised) return;
   initialised = true;
+
+  try {
+    initTheme();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('[client] initTheme failed:', error);
+  }
 
   try {
     initSiteHeader();
