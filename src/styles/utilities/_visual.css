@@ -89,19 +89,19 @@ body::before {
 
 .side-rail--left {
   inset-inline-start: 0;
-  border-inline-end: 1px solid oklch(50% 0.02 68deg / 10%);
+  border-inline-end: 1px solid color-mix(in oklch, var(--text-muted) 18%, transparent);
 }
 
 .side-rail--right {
   inset-inline-end: 0;
-  border-inline-start: 1px solid oklch(50% 0.02 68deg / 10%);
+  border-inline-start: 1px solid color-mix(in oklch, var(--text-muted) 18%, transparent);
 }
 
 .side-rail__text {
   font-family: var(--font-body);
   font-size: 0.625rem;
   font-weight: 600;
-  color: oklch(55% 0.03 68deg / 50%);
+  color: color-mix(in oklch, var(--text-muted) 65%, transparent);
   text-transform: uppercase;
   letter-spacing: 0.42em;
   white-space: nowrap;

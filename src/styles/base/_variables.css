@@ -25,6 +25,24 @@
 
 :root {
   /* ============================================
+     Theme system
+     ------------------------------------------------------------------
+     Two independent axes, both persisted in localStorage and applied
+     by an inline script before first paint (see Layout.astro):
+
+       • Palette  — `data-theme`  : "warm" (default) | "cool"
+       • Mode     — `data-mode`   : unset → follow system | "light" | "dark"
+
+     The palette only redefines the raw OKLCH *primitives* below; every
+     semantic token is built from those primitives, so a single palette
+     swap cascades everywhere. The light/dark mode is expressed with the
+     native `light-dark()` function, resolved off `color-scheme`. With no
+     explicit mode we advertise `light dark` so the OS preference wins;
+     forcing a mode pins `color-scheme` and therefore `light-dark()`.
+     ============================================ */
+  color-scheme: light dark;
+
+  /* ============================================
      Color Palette - Using OKLCH for 2025
      OKLCH provides perceptually uniform colors
      ============================================ */
@@ -59,33 +77,42 @@
      Semantic Color Tokens - Light Theme
      ============================================ */
 
-  /* Backgrounds */
-  --bg-primary: var(--color-bone);
-  --bg-secondary: var(--color-parchment);
-  --bg-tertiary: var(--color-sand-light);
+  /* Backgrounds — light/dark resolved via light-dark() */
+  --bg-primary: light-dark(var(--color-bone), var(--color-ink));
+  --bg-secondary: light-dark(var(--color-parchment), var(--color-earth-deep));
+  --bg-tertiary: light-dark(var(--color-sand-light), var(--color-earth-dark));
   --bg-dark: var(--color-earth-deep);
   --bg-dark-alt: var(--color-earth-dark);
-  --bg-elevated: var(--color-parchment);
-  --bg-section-alt: var(--color-earth-mid);
-  --bg-input: color-mix(in oklch, var(--color-bone) 8%, transparent);
-  --bg-input-focus: color-mix(in oklch, var(--color-bone) 12%, transparent);
-  --bg-overlay: color-mix(in oklch, var(--color-ink) 70%, transparent);
+  --bg-elevated: light-dark(var(--color-parchment), var(--color-earth-deep));
+  --bg-section-alt: light-dark(var(--color-earth-mid), var(--color-earth-deep));
+  --bg-input: light-dark(
+    color-mix(in oklch, var(--color-bone) 8%, transparent),
+    color-mix(in oklch, var(--color-earth-dark) 80%, transparent)
+  );
+  --bg-input-focus: light-dark(
+    color-mix(in oklch, var(--color-bone) 12%, transparent),
+    color-mix(in oklch, var(--color-earth-mid) 90%, transparent)
+  );
+  --bg-overlay: light-dark(
+    color-mix(in oklch, var(--color-ink) 70%, transparent),
+    color-mix(in oklch, var(--color-ink) 85%, transparent)
+  );
   --surface-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   --surface-noise-opacity: 0.035;
   --surface-glow-strength: 16%;
 
-  /* Text */
-  --text-primary: var(--color-ink);
-  --text-secondary: var(--color-ink-soft);
-  --text-muted: oklch(55% 0.02 68deg);
+  /* Text — light/dark resolved via light-dark() */
+  --text-primary: light-dark(var(--color-ink), var(--color-parchment));
+  --text-secondary: light-dark(var(--color-ink-soft), oklch(80% 0.02 75deg));
+  --text-muted: light-dark(oklch(55% 0.02 68deg), oklch(65% 0.02 75deg));
   --text-on-dark: var(--color-parchment);
-  --text-on-dark-secondary: var(--color-sand);
-  --text-accent: var(--color-earth-warm);
-  --text-dark: var(--color-ink);
-  --text-light: var(--color-parchment);
+  --text-on-dark-secondary: light-dark(var(--color-sand), var(--color-sand-light));
+  --text-accent: light-dark(var(--color-earth-warm), var(--color-terracotta-light));
+  --text-dark: light-dark(var(--color-ink), var(--color-parchment));
+  --text-light: light-dark(var(--color-parchment), var(--color-ink));
 
-  /* Light mode specific */
-  --bg-light: var(--color-parchment);
+  /* Surface tone that flips with mode (parchment in light, earth in dark) */
+  --bg-light: light-dark(var(--color-parchment), var(--color-earth-dark));
 
   /* Accents */
   --accent-primary: var(--color-terracotta);
@@ -97,11 +124,17 @@
   --color-info: oklch(60% 0.12 240deg);
   --color-warning: oklch(68% 0.16 75deg);
 
-  /* Borders */
-  --border-light: var(--color-sand-light);
-  --border-medium: color-mix(in oklch, var(--color-sand) 30%, transparent);
-  --border-dark: var(--color-earth-mid);
-  --border-on-dark: color-mix(in oklch, var(--color-sand) 15%, transparent);
+  /* Borders — light/dark resolved via light-dark() */
+  --border-light: light-dark(var(--color-sand-light), color-mix(in oklch, var(--color-earth-mid) 40%, transparent));
+  --border-medium: light-dark(
+    color-mix(in oklch, var(--color-sand) 30%, transparent),
+    color-mix(in oklch, var(--color-earth-mid) 50%, transparent)
+  );
+  --border-dark: light-dark(var(--color-earth-mid), var(--color-earth-warm));
+  --border-on-dark: light-dark(
+    color-mix(in oklch, var(--color-sand) 15%, transparent),
+    color-mix(in oklch, var(--color-sand) 30%, transparent)
+  );
   --focus-ring: 0 0 0 3px color-mix(in oklch, var(--accent-primary) 22%, transparent);
 
   /* ============================================
@@ -251,21 +284,36 @@
      Shadows & Effects
      Layered shadows for perceptual depth
      ============================================ */
-  --shadow-sm: 0 1px 2px color-mix(in oklch, var(--color-ink) 5%, transparent);
+  /* Each shadow color flips with mode via light-dark() — deeper, blacker
+     casts in the dark to keep depth legible against dark surfaces. */
+  --shadow-sm: 0 1px 2px
+    light-dark(color-mix(in oklch, var(--color-ink) 5%, transparent), color-mix(in oklch, black 24%, transparent));
   --shadow-md:
-    0 2px 4px color-mix(in oklch, var(--color-ink) 4%, transparent),
-    0 6px 12px -2px color-mix(in oklch, var(--color-ink) 8%, transparent);
+    0 2px 4px
+      light-dark(color-mix(in oklch, var(--color-ink) 4%, transparent), color-mix(in oklch, black 20%, transparent)),
+    0 6px 12px -2px
+      light-dark(color-mix(in oklch, var(--color-ink) 8%, transparent), color-mix(in oklch, black 30%, transparent));
   --shadow-lg:
-    0 2px 6px color-mix(in oklch, var(--color-ink) 5%, transparent),
-    0 12px 24px -6px color-mix(in oklch, var(--color-ink) 10%, transparent);
+    0 2px 6px
+      light-dark(color-mix(in oklch, var(--color-ink) 5%, transparent), color-mix(in oklch, black 25%, transparent)),
+    0 12px 24px -6px
+      light-dark(color-mix(in oklch, var(--color-ink) 10%, transparent), color-mix(in oklch, black 35%, transparent));
   --shadow-xl:
-    0 4px 8px color-mix(in oklch, var(--color-ink) 5%, transparent),
-    0 20px 40px -10px color-mix(in oklch, var(--color-ink) 12%, transparent);
+    0 4px 8px
+      light-dark(color-mix(in oklch, var(--color-ink) 5%, transparent), color-mix(in oklch, black 25%, transparent)),
+    0 20px 40px -10px
+      light-dark(color-mix(in oklch, var(--color-ink) 12%, transparent), color-mix(in oklch, black 40%, transparent));
   --shadow-2xl:
-    0 6px 12px color-mix(in oklch, var(--color-ink) 6%, transparent),
-    0 28px 56px -14px color-mix(in oklch, var(--color-ink) 22%, transparent);
+    0 6px 12px
+      light-dark(color-mix(in oklch, var(--color-ink) 6%, transparent), color-mix(in oklch, black 30%, transparent)),
+    0 28px 56px -14px
+      light-dark(color-mix(in oklch, var(--color-ink) 22%, transparent), color-mix(in oklch, black 55%, transparent));
   --shadow-glow-accent: 0 8px 32px color-mix(in oklch, var(--accent-primary) 18%, transparent);
-  --shadow-inset: inset 0 1px 0 color-mix(in oklch, var(--color-bone) 12%, transparent);
+  --shadow-inset: inset 0 1px 0
+    light-dark(
+      color-mix(in oklch, var(--color-bone) 12%, transparent),
+      color-mix(in oklch, var(--color-sand) 8%, transparent)
+    );
 
   /* ============================================
      Border Radius
@@ -291,57 +339,60 @@
 }
 
 /* ============================================
-   Dark Mode Theme
-   Using color-scheme for native dark mode support
+   Mode (light / dark) — drives light-dark()
+   ------------------------------------------------------------------
+   With no `data-mode` the root keeps `color-scheme: light dark`, so
+   the OS preference picks the branch of every light-dark() token.
+   An explicit choice pins `color-scheme`, forcing that branch and
+   also re-tinting native UI (form controls, scrollbars).
    ============================================ */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
+:root[data-mode='light'] {
+  color-scheme: light;
+}
 
-    /* Dark Theme Backgrounds */
-    --bg-primary: var(--color-ink);
-    --bg-secondary: var(--color-earth-deep);
-    --bg-tertiary: var(--color-earth-dark);
-    --bg-dark: var(--color-earth-deep);
-    --bg-dark-alt: var(--color-earth-dark);
-    --bg-elevated: var(--color-earth-deep);
-    --bg-section-alt: var(--color-earth-deep);
-    --bg-light: var(--color-earth-dark);
-    --bg-input: color-mix(in oklch, var(--color-earth-dark) 80%, transparent);
-    --bg-input-focus: color-mix(in oklch, var(--color-earth-mid) 90%, transparent);
-    --bg-overlay: color-mix(in oklch, var(--color-ink) 85%, transparent);
+:root[data-mode='dark'] {
+  color-scheme: dark;
+}
 
-    /* Dark Theme Text - Enhanced Contrast */
-    --text-primary: var(--color-parchment);
-    --text-secondary: oklch(80% 0.02 75deg);
-    --text-muted: oklch(65% 0.02 75deg);
-    --text-on-dark: var(--color-parchment);
-    --text-on-dark-secondary: var(--color-sand-light);
-    --text-accent: var(--color-terracotta-light);
-    --text-dark: var(--color-parchment);
-    --text-light: var(--color-ink);
+/* ============================================
+   Cool palette — "kühle Sommer Variante" (forest & shade)
+   ------------------------------------------------------------------
+   Only the raw OKLCH primitives are re-pitched toward cool greens and
+   shaded teals; every semantic token is derived from them (and from
+   light-dark()), so this single block re-themes the whole site in both
+   light and dark mode. Lightness/chroma roughly mirror the warm palette
+   so contrast ratios and the visual rhythm are preserved.
+   ============================================ */
+:root[data-theme='cool'] {
+  /* Forest shade tones (warm earth → cool spruce) */
+  --color-earth-deep: oklch(20% 0.028 178deg);
+  --color-earth-dark: oklch(26% 0.034 172deg);
+  --color-earth-mid: oklch(37% 0.042 165deg);
+  --color-earth-warm: oklch(48% 0.05 160deg);
 
-    /* Dark Theme Borders */
-    --border-light: color-mix(in oklch, var(--color-earth-mid) 40%, transparent);
-    --border-medium: color-mix(in oklch, var(--color-earth-mid) 50%, transparent);
-    --border-dark: var(--color-earth-warm);
-    --border-on-dark: color-mix(in oklch, var(--color-sand) 30%, transparent);
+  /* Fern accent (terracotta → leaf green) */
+  --color-terracotta: oklch(58% 0.125 158deg);
+  --color-terracotta-light: oklch(70% 0.11 156deg);
 
-    /* Adjusted shadows for dark mode - deeper, more contrast */
-    --shadow-sm: 0 1px 2px color-mix(in oklch, black 24%, transparent);
-    --shadow-md:
-      0 2px 4px color-mix(in oklch, black 20%, transparent), 0 6px 12px -2px color-mix(in oklch, black 30%, transparent);
-    --shadow-lg:
-      0 2px 6px color-mix(in oklch, black 25%, transparent),
-      0 12px 24px -6px color-mix(in oklch, black 35%, transparent);
-    --shadow-xl:
-      0 4px 8px color-mix(in oklch, black 25%, transparent),
-      0 20px 40px -10px color-mix(in oklch, black 40%, transparent);
-    --shadow-2xl:
-      0 6px 12px color-mix(in oklch, black 30%, transparent),
-      0 28px 56px -14px color-mix(in oklch, black 55%, transparent);
-    --shadow-inset: inset 0 1px 0 color-mix(in oklch, var(--color-sand) 8%, transparent);
-  }
+  /* Cool sage neutrals (sand → eucalyptus) */
+  --color-sand: oklch(76% 0.025 165deg);
+  --color-sand-light: oklch(89% 0.014 168deg);
+
+  /* Cool light grounds */
+  --color-parchment: oklch(95% 0.008 172deg);
+  --color-bone: oklch(98% 0.004 174deg);
+
+  /* Cool ink */
+  --color-ink: oklch(14% 0.012 185deg);
+  --color-ink-soft: oklch(25% 0.018 180deg);
+
+  /* Deeper, cooler sages for status/decoration accents */
+  --color-sage: oklch(48% 0.075 175deg);
+  --color-sage-light: oklch(58% 0.06 172deg);
+
+  /* Re-pitch the few neutral text tokens that bake in a warm hue */
+  --text-secondary: light-dark(var(--color-ink-soft), oklch(80% 0.018 168deg));
+  --text-muted: light-dark(oklch(55% 0.018 168deg), oklch(65% 0.018 168deg));
 }
 
 /* ============================================
