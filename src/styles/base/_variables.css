@@ -370,9 +370,9 @@
   --color-earth-mid: oklch(37% 0.042 165deg);
   --color-earth-warm: oklch(48% 0.05 160deg);
 
-  /* Fern accent (terracotta → leaf green) */
-  --color-terracotta: oklch(58% 0.125 158deg);
-  --color-terracotta-light: oklch(70% 0.11 156deg);
+  /* Fern accent (terracotta → fresh leaf green) */
+  --color-terracotta: oklch(58% 0.14 156deg);
+  --color-terracotta-light: oklch(70% 0.12 154deg);
 
   /* Cool sage neutrals (sand → eucalyptus) */
   --color-sand: oklch(76% 0.025 165deg);

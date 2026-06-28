@@ -17,10 +17,23 @@
  * (before first paint) so nothing flashes; this module re-syncs on load,
  * wires the header buttons, and keeps things live when the OS flips while
  * no explicit mode is pinned. Returns a cleanup that detaches everything.
+ *
+ * A *user* toggle cross-fades via the View Transitions API — the same
+ * language the site already uses for page navigation — with the root swap
+ * tuned in CSS (see `_view-transitions.css`, `[data-theme-transition]`).
+ * It degrades to an instant swap without VT support or under reduced
+ * motion. OS-driven flips apply instantly and never hijack with motion.
  */
+
+import { prefersReducedMotion } from './helpers';
 
 export type Palette = 'warm' | 'cool';
 export type Mode = 'light' | 'dark';
+
+/** `Document.startViewTransition` is not in the DOM lib yet — narrow locally. */
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void) => { finished: Promise<unknown> };
+};
 
 const STORAGE_THEME = 'mc-theme';
 const STORAGE_MODE = 'mc-mode';
@@ -110,21 +123,46 @@ export function initTheme(): () => void {
 
   syncButtons();
 
-  if (paletteBtn) {
-    listen(paletteBtn, 'click', () => {
-      writeStored(STORAGE_THEME, getPalette() === 'cool' ? 'warm' : 'cool');
+  /**
+   * Persist a choice (`mutate`), then repaint the new theme. When the
+   * browser supports it and motion is welcome, the repaint runs inside a
+   * view transition so the page cross-fades instead of snapping.
+   */
+  const commit = (mutate: () => void): void => {
+    mutate();
+
+    const repaint = (): void => {
       apply();
       syncButtons();
-    });
+    };
+
+    const root = document.documentElement;
+    const doc = document as ViewTransitionDocument;
+
+    if (prefersReducedMotion() || typeof doc.startViewTransition !== 'function') {
+      repaint();
+
+      return;
+    }
+
+    root.setAttribute('data-theme-transition', '');
+    const transition = doc.startViewTransition(repaint);
+    const clear = (): void => root.removeAttribute('data-theme-transition');
+
+    transition.finished.then(clear, clear);
+  };
+
+  if (paletteBtn) {
+    listen(paletteBtn, 'click', () =>
+      commit(() => writeStored(STORAGE_THEME, getPalette() === 'cool' ? 'warm' : 'cool')),
+    );
   }
 
   if (modeBtn) {
-    listen(modeBtn, 'click', () => {
-      // Toggle relative to what's actually showing, then pin it explicitly.
-      writeStored(STORAGE_MODE, resolveMode() === 'dark' ? 'light' : 'dark');
-      apply();
-      syncButtons();
-    });
+    // Toggle relative to what's actually showing, then pin it explicitly.
+    listen(modeBtn, 'click', () =>
+      commit(() => writeStored(STORAGE_MODE, resolveMode() === 'dark' ? 'light' : 'dark')),
+    );
   }
 
   // Keep the resolved mode live when the OS flips and nothing is pinned.

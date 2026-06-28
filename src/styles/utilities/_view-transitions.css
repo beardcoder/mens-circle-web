@@ -52,3 +52,15 @@
   animation-duration: 380ms;
   animation-timing-function: var(--ease-precise, cubic-bezier(0.4, 0, 0.2, 1));
 }
+
+/* The theme switch animates with the same View Transitions API, but a
+   palette / light↔dark swap wants a plain cross-fade: the `plus-lighter`
+   blend used for page navigation flashes bright when two very different
+   grounds overlap. While a toggle is in flight the root carries
+   `data-theme-transition` (set in lib/theme.ts), so we neutralise the
+   blend and tighten the timing just for that case. */
+html[data-theme-transition]::view-transition-old(root),
+html[data-theme-transition]::view-transition-new(root) {
+  mix-blend-mode: normal;
+  animation-duration: 300ms;
+}
