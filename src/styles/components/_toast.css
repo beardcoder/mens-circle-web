@@ -20,7 +20,8 @@
   padding: var(--space-sm) var(--space-md);
   font-family: var(--font-body);
   pointer-events: auto;
-  border: 1px solid var(--border-medium);
+  background: light-dark(transparent, color-mix(in oklch, var(--bg-elevated) 95%, transparent));
+  border: 1px solid light-dark(var(--border-medium), var(--border-light));
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-2xl);
   opacity: 1;
@@ -85,9 +86,14 @@
    Type variants
    ============================================ */
 
+/* Per-type backgrounds + titles flip with mode via light-dark() so a
+   forced light/dark choice tints toasts even against the OS preference. */
 .toast--success {
   color: var(--text-primary);
-  background: color-mix(in oklch, var(--color-sage-light) 15%, var(--bg-elevated));
+  background: light-dark(
+    color-mix(in oklch, var(--color-sage-light) 15%, var(--bg-elevated)),
+    color-mix(in oklch, var(--color-success) 18%, var(--bg-elevated))
+  );
   border-inline-start: 3px solid var(--color-success);
 }
 
@@ -97,12 +103,15 @@
 }
 
 .toast--success .toast__title {
-  color: var(--color-sage);
+  color: light-dark(var(--color-sage), var(--color-sage-light));
 }
 
 .toast--error {
   color: var(--text-primary);
-  background: color-mix(in oklch, var(--color-error) 12%, var(--bg-elevated));
+  background: light-dark(
+    color-mix(in oklch, var(--color-error) 12%, var(--bg-elevated)),
+    color-mix(in oklch, var(--color-error) 15%, var(--bg-elevated))
+  );
   border-inline-start: 3px solid var(--color-error);
 }
 
@@ -112,12 +121,15 @@
 }
 
 .toast--error .toast__title {
-  color: var(--color-error);
+  color: light-dark(var(--color-error), color-mix(in oklch, var(--color-error) 80%, var(--color-bone)));
 }
 
 .toast--info {
   color: var(--text-primary);
-  background: color-mix(in oklch, var(--color-info) 10%, var(--bg-elevated));
+  background: light-dark(
+    color-mix(in oklch, var(--color-info) 10%, var(--bg-elevated)),
+    color-mix(in oklch, var(--color-terracotta) 18%, var(--bg-elevated))
+  );
   border-inline-start: 3px solid var(--color-terracotta);
 }
 
@@ -127,12 +139,15 @@
 }
 
 .toast--info .toast__title {
-  color: var(--color-terracotta);
+  color: light-dark(var(--color-terracotta), var(--color-terracotta-light));
 }
 
 .toast--warning {
   color: var(--text-primary);
-  background: color-mix(in oklch, var(--color-warning) 12%, var(--bg-elevated));
+  background: light-dark(
+    color-mix(in oklch, var(--color-warning) 12%, var(--bg-elevated)),
+    color-mix(in oklch, var(--color-warning) 15%, var(--bg-elevated))
+  );
   border-inline-start: 3px solid var(--color-warning);
 }
 
@@ -142,46 +157,7 @@
 }
 
 .toast--warning .toast__title {
-  color: color-mix(in oklch, var(--color-warning) 85%, var(--color-ink));
-}
-
-@media (prefers-color-scheme: dark) {
-  .toast {
-    background: color-mix(in oklch, var(--bg-elevated) 95%, transparent);
-    border-color: var(--border-light);
-  }
-
-  .toast--success {
-    background: color-mix(in oklch, var(--color-success) 18%, var(--bg-elevated));
-  }
-
-  .toast--success .toast__title {
-    color: var(--color-sage-light);
-  }
-
-  .toast--error {
-    background: color-mix(in oklch, var(--color-error) 15%, var(--bg-elevated));
-  }
-
-  .toast--error .toast__title {
-    color: color-mix(in oklch, var(--color-error) 80%, var(--color-bone));
-  }
-
-  .toast--info {
-    background: color-mix(in oklch, var(--color-terracotta) 18%, var(--bg-elevated));
-  }
-
-  .toast--info .toast__title {
-    color: var(--color-terracotta-light);
-  }
-
-  .toast--warning {
-    background: color-mix(in oklch, var(--color-warning) 15%, var(--bg-elevated));
-  }
-
-  .toast--warning .toast__title {
-    color: var(--color-warning);
-  }
+  color: light-dark(color-mix(in oklch, var(--color-warning) 85%, var(--color-ink)), var(--color-warning));
 }
 
 @media (width <= 768px) {
