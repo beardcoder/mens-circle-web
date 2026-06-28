@@ -45,10 +45,29 @@ const { bare = false, ...props } = Astro.props;
     <meta charset="UTF-8" />
     {
       /* Flag JS synchronously so reveals only hide their elements when JS is
-        available — without JS, all [data-reveal] content stays visible. */
+        available — without JS, all [data-reveal] content stays visible.
+
+        Also resolve the persisted theme (palette + light/dark) and stamp it
+        on <html> before first paint so the chosen colours never flash. The
+        full manager (src/lib/theme.ts) re-syncs and wires the controls once
+        the DOM is ready. */
     }
     <script is:inline>
       document.documentElement.classList.add('motion-ready');
+      (() => {
+        try {
+          const root = document.documentElement;
+          const theme = localStorage.getItem('mc-theme') === 'cool' ? 'cool' : 'warm';
+          const stored = localStorage.getItem('mc-mode');
+          const mode = stored === 'light' || stored === 'dark' ? stored : null;
+          const resolved = mode || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          root.setAttribute('data-theme', theme);
+          root.setAttribute('data-mode-resolved', resolved);
+          if (mode) root.setAttribute('data-mode', mode);
+        } catch {
+          /* localStorage / matchMedia unavailable — fall back to CSS defaults. */
+        }
+      })();
     </script>
     {
       /* Native Astro fonts (config in astro.config.mjs). Preload Playfair —
