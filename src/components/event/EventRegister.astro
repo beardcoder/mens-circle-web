@@ -1,6 +1,6 @@
 ---
 import type { EventDTO } from '@lib/types';
-import { formatDateShortDE } from '@lib/server/format';
+import { formatDateShortDE, toDate } from '@lib/server/format';
 import RegistrationForm from '../islands/RegistrationForm.svelte';
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
 }
 
 const { event } = Astro.props;
+const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
 ---
 
 <section class="event-register-section" id="anmeldung">
@@ -28,7 +29,9 @@ const { event } = Astro.props;
               <span class="text-italic">hat stattgefunden</span>
             </h2>
             <p class="event-register__spots" data-reveal="up">
-              <span>Am {formatDateShortDE(event.event_date)}</span>
+              <span>
+                Am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time>
+              </span>
             </p>
           </>
         ) : event.is_full ? (

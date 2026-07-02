@@ -267,7 +267,7 @@
 
   :global(.calendar-modal__content p) {
     margin-block-end: var(--space-md);
-    font-size: 0.9375rem;
+    font-size: var(--text-body-compact);
     color: var(--text-secondary);
   }
 

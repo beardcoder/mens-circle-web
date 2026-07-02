@@ -400,7 +400,7 @@ const { standalone = false } = Astro.props;
       background: color-mix(in oklch, var(--color-warning) 12%, transparent);
       padding: var(--space-sm) var(--space-md);
       color: var(--text-on-dark);
-      font-size: 0.9375rem;
+      font-size: var(--text-body-compact);
     }
 
     /* Shown only when the browser offers a native install (beforeinstallprompt). */
@@ -421,7 +421,7 @@ const { standalone = false } = Astro.props;
       padding: var(--space-xs) var(--space-md);
       color: var(--text-on-dark);
       font-weight: 600;
-      font-size: 0.9375rem;
+      font-size: var(--text-body-compact);
       font-family: var(--font-body);
     }
 
@@ -633,7 +633,7 @@ const { standalone = false } = Astro.props;
       display: block;
       color: color-mix(in oklch, var(--text-on-dark) 70%, transparent);
       font-weight: 500;
-      font-size: 0.8125rem;
+      font-size: var(--text-caption);
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }

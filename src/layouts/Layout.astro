@@ -29,6 +29,14 @@ interface Props {
 
 const { bare = false, ...props } = Astro.props;
 
+// Umami heatmap recorder — a second, optional tracker script alongside the
+// analytics script the @yeskunall/astro-umami integration injects. Only
+// loaded in production when Umami is configured; the sample rate and the
+// heatmaps toggle live in the Umami admin, not here.
+const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
+const umamiEndpoint = import.meta.env.PUBLIC_UMAMI_ENDPOINT;
+const umamiRecorderSrc = import.meta.env.PROD && umamiId && umamiEndpoint ? `${umamiEndpoint}/recorder.js` : null;
+
 // The "next event" CTAs ([data-event-cta]) are HIDDEN by default (CSS) and
 // revealed at runtime by the client only when an upcoming event is actually
 // scheduled (see lib/event-cta.ts). They can't be gated at build time because
@@ -76,6 +84,7 @@ const { bare = false, ...props } = Astro.props;
     <Font cssVariable="--font-playfair" preload />
     <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
+    {umamiRecorderSrc && <script is:inline defer src={umamiRecorderSrc} data-website-id={umamiId} />}
   </head>
   <body class:list={[{ 'is-bare': bare }]}>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
