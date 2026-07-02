@@ -1,0 +1,61 @@
+---
+import type { EventDTO } from '@lib/types';
+import { formatDateShortDE, formatWeekdayDE } from '@lib/server/format';
+
+interface Props {
+  event: EventDTO;
+}
+
+const { event } = Astro.props;
+---
+
+<section class="hero event-hero">
+  <div class="hero__bg">
+    {
+      event.image_url && (
+        <img
+          class="hero__bg-image"
+          src={event.image_url}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          aria-hidden="true"
+          alt=""
+        />
+      )
+    }
+  </div>
+  <div class="hero__circles" aria-hidden="true">
+    <div class="hero__circle hero__circle--1"></div>
+    <div class="hero__circle hero__circle--2"></div>
+    <div class="hero__circle hero__circle--3"></div>
+    <div class="hero__circle hero__circle--4"></div>
+  </div>
+
+  <div class="container">
+    <div class="hero__content">
+      <p class="hero__label">
+        {event.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}
+      </p>
+      <h1 class="hero__title">
+        <span class="hero__title-line">{event.title}</span>
+      </h1>
+      <div class="hero__bottom">
+        <p class="hero__description">
+          {formatWeekdayDE(event.event_date)}, {formatDateShortDE(event.event_date)} · {event.start_time} Uhr · {
+            event.location
+          }
+        </p>
+        {
+          !event.is_past && (
+            <div class="hero__cta">
+              <a href="#anmeldung" class="btn btn--primary btn--large">
+                Jetzt anmelden
+              </a>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
