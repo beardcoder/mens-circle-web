@@ -1,0 +1,40 @@
+---
+import type { EventDTO } from '@lib/types';
+import { escapeHtml } from '@lib/server/format';
+
+interface Props {
+  event: EventDTO;
+}
+
+const { event } = Astro.props;
+
+// Plain-text description → HTML with hard line breaks (matches admin input).
+const descriptionHtml = escapeHtml(event.description).replace(/\r\n|\r|\n/g, '<br />');
+---
+
+<section class="event-about-section">
+  <div class="event-about__layout">
+    <div class="event-about__content" data-reveal-group="100">
+      <p class="eyebrow" data-reveal="up">Über das Treffen</p>
+      <h2 class="section-title section-title--lg event-about__title" data-reveal="blur">
+        Ein Raum für <br /><span class="text-italic">echte Begegnung</span>
+      </h2>
+      <div class="event-about__text" data-reveal="up" set:html={descriptionHtml} />
+    </div>
+    <div class="event-about__visual">
+      <div class="event-about__quote-area">
+        <div class="event-about__circles" aria-hidden="true">
+          <div class="event-about__circle event-about__circle--1"></div>
+          <div class="event-about__circle event-about__circle--2"></div>
+          <div class="event-about__circle event-about__circle--3"></div>
+        </div>
+        <p class="event-about__quote" data-reveal="zoom">
+          »Gemeinsam<br />
+          <span class="text-italic">wachsen</span>,<br />
+          einander<br />
+          <span class="text-italic">stärken</span>«
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

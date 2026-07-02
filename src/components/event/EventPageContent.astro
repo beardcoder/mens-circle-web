@@ -1,0 +1,41 @@
+---
+import type { EventDTO } from '@lib/types';
+import EventAbout from './EventAbout.astro';
+import EventFinalCta from './EventFinalCta.astro';
+import EventHero from './EventHero.astro';
+import EventInfo from './EventInfo.astro';
+import EventMapSection from './EventMapSection.astro';
+import EventRegister from './EventRegister.astro';
+import NoEvent from './NoEvent.astro';
+
+/**
+ * The full /event page body, server-rendered. Only the genuinely interactive
+ * pieces hydrate as islands (registration form, add-to-calendar dialog, map,
+ * newsletter form) — everything else is plain HTML, so the page ships a
+ * fraction of the JS the old whole-page Svelte island needed.
+ */
+
+interface Props {
+  /** Event rendered per request (null = no upcoming event scheduled). */
+  event: EventDTO | null;
+}
+
+const { event } = Astro.props;
+---
+
+{
+  event ? (
+    <>
+      <EventHero event={event} />
+      <EventRegister event={event} />
+      <EventInfo event={event} />
+      {event.latitude !== null && event.longitude !== null && (
+        <EventMapSection event={event} lat={event.latitude} lng={event.longitude} />
+      )}
+      <EventAbout event={event} />
+      <EventFinalCta event={event} />
+    </>
+  ) : (
+    <NoEvent />
+  )
+}

@@ -1,0 +1,93 @@
+---
+import Newsletter from '../blocks/Newsletter.astro';
+import WhatsappCommunity from '../blocks/WhatsappCommunity.astro';
+---
+
+<section class="hero no-event-hero">
+  <div class="hero__circles" aria-hidden="true">
+    <div class="hero__circle hero__circle--1"></div>
+    <div class="hero__circle hero__circle--2"></div>
+    <div class="hero__circle hero__circle--3"></div>
+    <div class="hero__circle hero__circle--4"></div>
+  </div>
+
+  <div class="container">
+    <div class="hero__content">
+      <p class="hero__label">Männerkreis Niederbayern/ Straubing</p>
+      <h1 class="hero__title">
+        <span class="hero__title-line">Aktuell ist kein</span>
+        <span class="hero__title-line"><span class="text-italic">Termin</span> geplant</span>
+      </h1>
+      <div class="hero__bottom">
+        <p class="hero__description">
+          Wir planen gerade unser nächstes Treffen. Melde dich für unseren Newsletter an oder tritt unserer
+          WhatsApp-Community bei, um als Erster zu erfahren, wann es weitergeht.
+        </p>
+        <div class="hero__cta">
+          <a href="#newsletter" class="btn btn--primary btn--large">Zum Newsletter</a>
+          <div class="hero__scroll">
+            <span>Mehr erfahren</span>
+            <div class="hero__scroll-line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section no-event-info-section">
+  <div class="container">
+    <div class="no-event-info__layout">
+      <div class="no-event-info__content" data-reveal-group="100">
+        <p class="eyebrow" data-reveal="up">Was ist der Männerkreis?</p>
+        <h2 class="section-title no-event-info__title" data-reveal="blur">
+          Ein Raum für <span class="text-italic">echte Begegnung</span>
+        </h2>
+        <p class="no-event-info__text" data-reveal="up">
+          Der Männerkreis Niederbayern/ Straubing bietet dir einen geschützten Raum, in dem du dich mit anderen Männern
+          austauschen, wachsen und echte Verbindungen aufbauen kannst. Unsere Treffen finden regelmäßig statt – sobald
+          der nächste Termin feststeht, informieren wir dich.
+        </p>
+      </div>
+      <div class="no-event-info__visual" data-reveal="zoom">
+        <div class="no-event-info__quote-area">
+          <div class="event-about__circles" aria-hidden="true">
+            <div class="event-about__circle event-about__circle--1"></div>
+            <div class="event-about__circle event-about__circle--2"></div>
+            <div class="event-about__circle event-about__circle--3"></div>
+          </div>
+          <p class="event-about__quote">
+            »Bleib<br />
+            <span class="text-italic">verbunden</span>«
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<Newsletter
+  data={{
+    eyebrow: 'Newsletter',
+    title: 'Bleib <span class="text-italic">informiert</span>',
+    text: 'Erhalte als Erster Bescheid, wenn unser nächstes Treffen stattfindet. Kein Spam, nur relevante Informationen zum Männerkreis.',
+  }}
+  context={{ page: 'no-event' }}
+/>
+
+<WhatsappCommunity />
+
+<section class="section no-event-cta-section">
+  <div class="container">
+    <div class="no-event-cta__content" data-reveal-group="100">
+      <p class="eyebrow" data-reveal="up">Mehr erfahren</p>
+      <h2 class="section-title no-event-cta__title" data-reveal="blur">
+        Entdecke den <span class="text-italic">Männerkreis</span>
+      </h2>
+      <p class="no-event-cta__text" data-reveal="up">
+        Erfahre mehr über uns, unsere Werte und was dich bei einem Treffen erwartet.
+      </p>
+      <a href="/" class="btn btn--primary btn--large" data-reveal="up">Zur Startseite</a>
+    </div>
+  </div>
+</section>

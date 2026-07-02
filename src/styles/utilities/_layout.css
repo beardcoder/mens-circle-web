@@ -34,3 +34,40 @@
 .section--large {
   padding-block: var(--rhythm-section-lg);
 }
+
+/* ============================================
+   Rendering performance — skip below-fold sections
+   ============================================
+   The long pages (home, event) stack many self-contained sections. With
+   `content-visibility: auto` the browser skips style/layout/paint for the
+   ones far outside the viewport and renders them just-in-time as they
+   approach — first render and every restyle get cheaper, with zero visual
+   difference (each listed section already clips its own decoration, so the
+   paint containment this implies changes nothing).
+
+   The intrinsic-size hint stands in for a skipped section's height so the
+   scrollbar stays sane before first render; `auto` then remembers the real
+   size once rendered. Only sections that never sit above the fold are
+   listed — heroes, intro and the registration split stay always-rendered. */
+@supports (content-visibility: auto) {
+  :where(
+    .moderator-section,
+    .journey-section,
+    .faq-section,
+    .values-section,
+    .archetypes-section,
+    .testimonials-section,
+    .newsletter-section,
+    .whatsapp-section,
+    .cta-section,
+    .event-info-section,
+    .event-map-section,
+    .event-about-section,
+    .event-cta-section,
+    .no-event-info-section,
+    .no-event-cta-section
+  ) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 800px;
+  }
+}

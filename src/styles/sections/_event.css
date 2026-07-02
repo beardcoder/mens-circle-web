@@ -2,8 +2,9 @@
  * Event page sections
  *
  * Register / info / about / map / CTA and the "no upcoming event" states.
- * Shared by /event and /event/<slug> (both render EventPage.svelte), so the
- * rules live here globally instead of inline in a single page.
+ * Shared by /event and /event/<slug> (both render the server components in
+ * components/event/), so the rules live here globally instead of inline in
+ * a single page.
  */
 
 /* ---- Event Register Section ---- */
@@ -284,6 +285,11 @@
   font-size: clamp(1.5rem, 3vw, 2.25rem);
   line-height: 1.1;
   font-family: var(--font-display);
+
+  /* Long German location names ("Gemeinschaftsraum …") must wrap inside the
+     card, not clip at its overflow edge. */
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .event-info__card-sub {

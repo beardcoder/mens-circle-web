@@ -441,20 +441,22 @@ Store in PB settings (mailer + app params) and an admin-editable `settings` coll
 `$app.settings()` meta for the rest.
 
 **Mailer (PB built-in SMTP settings / env):**
-| Key | Value (default) |
-|---|---|
+
+| Key                            | Value (default)                                                     |
+| ------------------------------ | ------------------------------------------------------------------- |
 | SMTP host / port / user / pass | `MAIL_HOST` / `MAIL_PORT` (587) / `MAIL_USERNAME` / `MAIL_PASSWORD` |
-| From address | `hallo@mens-circle.de` |
-| From name | `Männerkreis Niederbayern/ Straubing` |
-| Admin notification address | `hallo@mens-circle.de` |
-| Admin notification name | `Männerkreis Admin` |
+| From address                   | `hallo@mens-circle.de`                                              |
+| From name                      | `Männerkreis Niederbayern/ Straubing`                               |
+| Admin notification address     | `hallo@mens-circle.de`                                              |
+| Admin notification name        | `Männerkreis Admin`                                                 |
 
 **App-level:**
-| Key | Value (default) |
-|---|---|
-| Site name / app name | `Männerkreis Niederbayern/ Straubing` (used in every email signature) |
-| Site URL | `https://mens-circle.de` (for event URLs, unsubscribe links, iCal UID domain) |
-| Contact email (in copy) | `hallo@mens-circle.de` |
+
+| Key                     | Value (default)                                                               |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| Site name / app name    | `Männerkreis Niederbayern/ Straubing` (used in every email signature)         |
+| Site URL                | `https://mens-circle.de` (for event URLs, unsubscribe links, iCal UID domain) |
+| Contact email (in copy) | `hallo@mens-circle.de`                                                        |
 
 **Editable general settings (Laravel `GeneralSettings`)** — keep as a small admin-only collection or
 key/value:

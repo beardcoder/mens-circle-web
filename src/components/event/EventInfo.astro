@@ -1,0 +1,58 @@
+---
+import type { EventData, EventDTO } from '@lib/types';
+import { formatDayMonthYearDE, formatWeekdayDE, toDate } from '@lib/server/format';
+import CalendarModal from '../islands/CalendarModal.svelte';
+
+interface Props {
+  event: EventDTO;
+}
+
+const { event } = Astro.props;
+
+// The EventData shape consumed by the add-to-calendar island. The event date
+// is stored as an ISO timestamp; the calendar wants the plain calendar day.
+const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
+const calendarData: EventData = {
+  title: event.title,
+  description: event.description,
+  location: event.location,
+  startDate: dateOnly,
+  startTime: event.start_time,
+  endDate: dateOnly,
+  endTime: event.end_time,
+};
+
+const cards = [
+  {
+    modifier: 'date',
+    label: 'Datum',
+    value: formatWeekdayDE(event.event_date),
+    sub: formatDayMonthYearDE(event.event_date),
+  },
+  { modifier: 'time', label: 'Uhrzeit', value: `${event.start_time} Uhr`, sub: `bis ${event.end_time} Uhr` },
+  { modifier: 'location', label: 'Ort', value: event.location, sub: 'Genaue Adresse nach Anmeldung' },
+  { modifier: 'participants', label: 'Teilnehmer', value: `Max. ${event.max_participants}`, sub: event.cost_basis },
+];
+---
+
+<section class="event-info-section">
+  <div class="event-info__bg-text" aria-hidden="true">TERMIN</div>
+  <div class="container">
+    <div class="event-info__grid" data-reveal-group="90">
+      {
+        cards.map((card) => (
+          <div class:list={['event-info__card', `event-info__card--${card.modifier}`]} data-reveal="up">
+            <div class="event-info__card-circle" aria-hidden="true" />
+            <div class="event-info__card-content">
+              <h3>{card.label}</h3>
+              <p class="event-info__card-value">{card.value}</p>
+              <p class="event-info__card-sub">{card.sub}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <CalendarModal client:visible event={calendarData} />
+  </div>
+</section>

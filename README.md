@@ -70,7 +70,8 @@ src/
   content/        home.json (Block-Reihenfolge + Texte), legal/*.json
   data/           site.json, navigation.json
   components/      Astro-Blöcke (Hero, Intro, FAQ …), Header, Footer, SEO
-  components/islands/  Svelte-5-Islands (Formulare, Breathing, Event, Map …)
+  components/event/    Server-gerenderte Event-Seite (Hero, Anmeldung, Infos, Karte …)
+  components/islands/  Svelte-5-Islands (Formulare, Breathing, Kalender-Modal, Map)
   components/admin/    Svelte-5-Islands der Admin-UI (Events, Anmeldungen, Stimmen)
   layouts/        Layout.astro (Seite), AdminLayout.astro (Back-Office)
   lib/            api.ts (Client), admin-client.ts, types, Utils

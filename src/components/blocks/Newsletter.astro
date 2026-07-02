@@ -8,9 +8,11 @@ interface Props {
     title?: string;
     text?: string;
   };
+  /** Analytics context forwarded to the form island. */
+  context?: Record<string, string | number | boolean>;
 }
 
-const { data } = Astro.props;
+const { data, context = { location: 'newsletter-block' } } = Astro.props;
 const anchor = data.anchor ?? 'newsletter';
 ---
 
@@ -47,7 +49,7 @@ const anchor = data.anchor ?? 'newsletter';
       </div>
 
       <div class="newsletter__form-wrapper" data-reveal="left" data-reveal-delay="120">
-        <NewsletterForm client:visible context={{ location: 'newsletter-block' }} />
+        <NewsletterForm client:visible context={context} />
       </div>
     </div>
   </div>
