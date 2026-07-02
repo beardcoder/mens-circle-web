@@ -41,15 +41,19 @@ const items = data.items ?? [];
 
     {
       items.length > 0 && (
-        <div class="intro__values" data-reveal-group="90">
+        <ol class="intro__values" role="list" data-reveal-group="90">
           {items.map((item) => (
-            <div class="value-item" data-reveal="up">
-              {item.number && <span class="value-item__number">{item.number}</span>}
+            <li class="value-item" data-reveal="up">
+              {item.number && (
+                <span class="value-item__number" aria-hidden="true">
+                  {item.number}
+                </span>
+              )}
               {item.title && <h3 class="value-item__title">{item.title}</h3>}
               {item.description && <p class="value-item__description">{item.description}</p>}
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )
     }
   </div>

@@ -63,20 +63,20 @@ function detectIcon(title = ''): string {
           )}
         </div>
 
-        <div class="archetypes__grid" data-reveal-group="90">
+        <ul class="archetypes__grid" role="list" data-reveal-group="90">
           {items.map((item) => {
             const icon = detectIcon(item.title);
             return (
-              <article class={`archetype-card archetype-card--${icon}`} data-reveal="up">
+              <li class={`archetype-card archetype-card--${icon}`} data-reveal="up">
                 <div class="archetype-card__background-icon" aria-hidden="true" set:html={ICONS[icon]} />
                 <div class="archetype-card__content">
                   {item.title && <h3 class="archetype-card__title">{item.title}</h3>}
                   {item.description && <p class="archetype-card__description">{item.description}</p>}
                 </div>
-              </article>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
     </section>
   )

@@ -258,18 +258,23 @@
   }
 }
 
-.event-info__card-circle {
+/* Decorative corner ring — a pseudo-element so the <dl> grid contains only
+   valid dt/dd groups. */
+.event-info__card::before {
   position: absolute;
   opacity: 0.3;
   inset-block-start: -30%;
   inset-inline-end: -30%;
+  pointer-events: none;
+  content: '';
   border: 1px solid var(--border-light);
   border-radius: 50%;
   aspect-ratio: 1 / 1;
   inline-size: 60%;
 }
 
-.event-info__card h3 {
+.event-info__card-label {
+  position: relative;
   margin-block-end: var(--space-xs);
   color: var(--text-secondary);
   font-weight: 600;

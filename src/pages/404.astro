@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+import site from '../data/site.json';
+
+// Server-rendered: the Bun adapter hands every unmatched route to
+// `app.render()`, which resolves to this 404 route. It must NOT be
+// prerendered — the adapter has no static-file fallback for 404.html, so a
+// prerendered version would leave unmatched routes with an empty body.
+---
+
+<Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow">
+  <section class="error-page">
+    <div class="error-page__content">
+      <p class="error-page__code" aria-hidden="true">404</p>
+      <h1 class="error-page__title">Diese Seite gibt es nicht</h1>
+      <p class="error-page__text">
+        Die Seite, die du suchst, wurde verschoben, umbenannt oder hat nie existiert. Kein Grund zur Sorge – der Kreis
+        bleibt offen.
+      </p>
+      <div class="error-page__actions">
+        <a href="/" class="btn btn--primary">Zur Startseite</a>
+        <a href="/event" class="btn btn--secondary" data-event-cta>Zum nächsten Termin</a>
+      </div>
+      {
+        site.contactEmail && (
+          <p class="error-page__contact">
+            Du vermisst hier etwas? <a href={`mailto:${site.contactEmail}`}>Schreib mir kurz.</a>
+          </p>
+        )
+      }
+    </div>
+  </section>
+</Layout>

@@ -45,10 +45,9 @@ const steps = data.steps ?? [];
 
     {
       steps.length > 0 && (
-        <div class="journey__steps" data-reveal-group="110">
-          <div class="journey__thread" aria-hidden="true" />
+        <ol class="journey__steps" role="list" data-reveal-group="110">
           {steps.map((step) => (
-            <div class="journey__step" data-reveal="up">
+            <li class="journey__step" data-reveal="up">
               {step.number && (
                 <div class="journey__step-number" aria-hidden="true">
                   {step.number}
@@ -56,9 +55,9 @@ const steps = data.steps ?? [];
               )}
               {step.title && <h3 class="journey__step-title">{step.title}</h3>}
               {step.description && <p class="journey__step-text">{step.description}</p>}
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )
     }
   </div>
@@ -105,14 +104,18 @@ const steps = data.steps ?? [];
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       overflow: hidden;
+      list-style: none;
     }
 
-    .journey__thread {
+    /* The glowing thread across the top of the steps — a pseudo-element so
+       the ordered list contains only its <li> children. */
+    .journey__steps::before {
       position: absolute;
       inset-block-start: 0;
       inset-inline: 0;
       block-size: 1px;
       pointer-events: none;
+      content: '';
       background: linear-gradient(
         90deg,
         transparent,
@@ -124,7 +127,7 @@ const steps = data.steps ?? [];
     }
 
     @media (prefers-reduced-motion: no-preference) {
-      .journey__thread {
+      .journey__steps::before {
         animation: thread-drift 7s var(--ease-ambient) infinite;
       }
     }
@@ -139,7 +142,7 @@ const steps = data.steps ?? [];
           view-timeline: --journey-progress block;
         }
 
-        .journey__thread {
+        .journey__steps::before {
           animation: journey-thread-draw linear both;
           animation-timeline: --journey-progress;
           animation-range: entry 10% cover 30%;
@@ -222,7 +225,7 @@ const steps = data.steps ?? [];
 
     .journey__step-text {
       margin: 0;
-      font-size: 0.9375rem;
+      font-size: var(--text-body-compact);
       line-height: var(--leading-normal);
       color: var(--color-sand);
       opacity: 0.9;
