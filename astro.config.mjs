@@ -12,15 +12,6 @@ import { defineConfig, fontProviders } from 'astro/config';
 // (LCP, INP, CLS, FCP, TTFB) — https://docs.umami.is/docs/performance.
 const umamiId = process.env.PUBLIC_UMAMI_ID;
 const umamiEndpoint = process.env.PUBLIC_UMAMI_ENDPOINT;
-const analytics = umamiId
-  ? [
-      umami({
-        id: umamiId,
-        performance: true,
-        ...(umamiEndpoint ? { endpointUrl: umamiEndpoint } : {}),
-      }),
-    ]
-  : [];
 
 // SSR on the Bun runtime. @wyattjoh/astro-bun-adapter builds the server entry
 // (dist/server/entry.mjs) which Bun runs: it serves hashed static assets +
@@ -144,6 +135,10 @@ export default defineConfig({
         // Legal pages are noindex; keep them out of the sitemap.
         !page.includes('/impressum') && !page.includes('/datenschutz'),
     }),
-    ...analytics,
+    umami({
+      id: 'f2964cb9-28e6-4658-810f-2acfb9cb9c46',
+      performance: true,
+      endpointUrl: 'https://va.letsbenow.de',
+    }),
   ],
 });
