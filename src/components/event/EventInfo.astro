@@ -38,20 +38,28 @@ const cards = [
 <section class="event-info-section">
   <div class="event-info__bg-text" aria-hidden="true">TERMIN</div>
   <div class="container">
-    <div class="event-info__grid" data-reveal-group="90">
+    {/* Key facts as a definition list — each card is a term/definition pair. */}
+    <dl class="event-info__grid" data-reveal-group="90">
       {
         cards.map((card) => (
           <div class:list={['event-info__card', `event-info__card--${card.modifier}`]} data-reveal="up">
-            <div class="event-info__card-circle" aria-hidden="true" />
-            <div class="event-info__card-content">
-              <h3>{card.label}</h3>
-              <p class="event-info__card-value">{card.value}</p>
-              <p class="event-info__card-sub">{card.sub}</p>
-            </div>
+            <dt class="event-info__card-label">{card.label}</dt>
+            <dd class="event-info__card-value">
+              {card.modifier === 'time' ? (
+                <>
+                  <time datetime={event.start_time}>{event.start_time}</time> Uhr
+                </>
+              ) : (
+                card.value
+              )}
+            </dd>
+            <dd class="event-info__card-sub">
+              {card.modifier === 'date' ? <time datetime={dateOnly}>{card.sub}</time> : card.sub}
+            </dd>
           </div>
         ))
       }
-    </div>
+    </dl>
 
     <CalendarModal client:visible event={calendarData} />
   </div>

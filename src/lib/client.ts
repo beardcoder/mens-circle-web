@@ -2,9 +2,11 @@
  * Client entry — page-level initialisers.
  *
  * Imported by the Astro layout as a client script. Wires up the vanilla
- * site header, scroll reveals and Umami engagement tracking once the DOM
- * is ready. The `.motion-ready` class is added inline in the layout head,
- * so nothing is done here for FOUC gating.
+ * site header, theme controls and scroll reveals once the DOM is ready.
+ * (Analytics needs no init here — Umami's own tracker script handles
+ * pageviews, `data-umami-event` clicks and Web Vitals declaratively.)
+ * The `.motion-ready` class is added inline in the layout head, so
+ * nothing is done here for FOUC gating.
  *
  * Each initialiser is wrapped in try/catch so one failing feature never
  * blocks the others — failures are logged, never swallowed. A module-level
@@ -15,7 +17,6 @@ import { initEventCtas } from './event-cta';
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';
 import { initTheme } from './theme';
-import { initUmamiKit } from './umami-kit';
 
 let initialised = false;
 
@@ -42,13 +43,6 @@ function init(): void {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('[client] initMotion failed:', error);
-  }
-
-  try {
-    initUmamiKit();
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('[client] initUmamiKit failed:', error);
   }
 
   // Reveal the "next event" CTAs only if an upcoming event is actually
