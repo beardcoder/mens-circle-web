@@ -36,6 +36,18 @@ export const toDate = (value: unknown): Date | null => {
   return Number.isNaN(d.getTime()) ? null : d;
 };
 
+export const formatWeekdayDE = (value: unknown): string => {
+  const d = toDate(value);
+  return d ? WEEKDAYS_DE[d.getUTCDay()] : '';
+};
+
+/** "12. Juni 2026" — long date without the weekday. */
+export const formatDayMonthYearDE = (value: unknown): string => {
+  const d = toDate(value);
+  if (!d) return '';
+  return `${d.getUTCDate()}. ${MONTHS_DE[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+};
+
 export const formatDateLongDE = (value: unknown): string => {
   const d = toDate(value);
   if (!d) return '';
