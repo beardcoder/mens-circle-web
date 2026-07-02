@@ -8,12 +8,15 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // Umami analytics is opt-in: it only loads when a website id is configured.
 // Self-hosted instances set PUBLIC_UMAMI_ENDPOINT (e.g. https://umami.example.com).
+// `performance: true` turns on Umami's native Core Web Vitals collection
+// (LCP, INP, CLS, FCP, TTFB) — https://docs.umami.is/docs/performance.
 const umamiId = process.env.PUBLIC_UMAMI_ID;
 const umamiEndpoint = process.env.PUBLIC_UMAMI_ENDPOINT;
 const analytics = umamiId
   ? [
       umami({
         id: umamiId,
+        performance: true,
         ...(umamiEndpoint ? { endpointUrl: umamiEndpoint } : {}),
       }),
     ]

@@ -177,5 +177,82 @@ p:last-child {
 }
 
 .link:hover {
-  color: var(--color-earth-warm);
+  color: var(--text-accent);
+}
+
+/* ============================================
+   Prose — long-form rich text from the CMS/JSON
+   ------------------------------------------------------------------
+   The global reset zeroes every margin and the heading defaults are
+   tuned for display use, so raw editorial HTML (legal pages, text
+   sections) needs its own rhythm: heading spacing, list indents,
+   readable links, simple tables.
+   ============================================ */
+.prose h2 {
+  margin-block: var(--space-xl) var(--space-sm);
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.prose h3 {
+  margin-block: var(--space-lg) var(--space-xs);
+  font-size: 1.125rem;
+}
+
+.prose h2:first-child,
+.prose h3:first-child {
+  margin-block-start: 0;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin-block-end: var(--space-sm);
+  font-size: 1rem;
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.25rem;
+}
+
+.prose li {
+  margin-block-end: 0.5rem;
+}
+
+.prose a {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--motion-quick);
+}
+
+.prose a:hover,
+.prose a:focus-visible {
+  color: var(--text-accent);
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.prose table {
+  inline-size: 100%;
+  margin-block: var(--space-md);
+  border-collapse: collapse;
+}
+
+.prose th,
+.prose td {
+  padding: var(--space-sm);
+  text-align: start;
+  border-block-end: 1px solid var(--border-light);
+}
+
+.prose th {
+  font-weight: 600;
+  color: var(--text-primary);
 }
