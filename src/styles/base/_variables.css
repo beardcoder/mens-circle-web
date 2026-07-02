@@ -1,27 +1,7 @@
 /**
  * CSS Custom Properties (Variables)
- * Modern 2025 approach with @property for animatable values
- * Using OKLCH for perceptually uniform colors
+ * Design tokens — OKLCH primitives, semantic tokens, type/space/motion scales.
  */
-
-/* Define animatable custom properties */
-@property --gradient-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@property --glow-opacity {
-  syntax: '<number>';
-  initial-value: 0;
-  inherits: false;
-}
-
-@property --circle-scale {
-  syntax: '<number>';
-  initial-value: 1;
-  inherits: false;
-}
 
 :root {
   /* ============================================

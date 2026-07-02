@@ -2,8 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { fetchNextEvent } from '@lib/server/events';
 import { buildEventSchema } from '@lib/event-schema';
-import EventPage from '../components/islands/EventPage.svelte';
-import site from '../data/site.json';
+import EventPageContent from '../components/event/EventPageContent.astro';
 
 // SSR: the next upcoming event (incl. live capacity) is fetched from PocketBase
 // per request, so /event always reflects the current "next" event with no
@@ -26,5 +25,5 @@ const schemas = event ? [buildEventSchema(event, Astro.site ?? new URL('https://
   ogType="event"
   schemas={schemas}
 >
-  <EventPage client:load event={event} whatsappLink={site.whatsappCommunityLink} />
+  <EventPageContent event={event} />
 </Layout>
