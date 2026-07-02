@@ -1,0 +1,57 @@
+---
+import type { EventDTO } from '@lib/types';
+import { fullAddress } from '@lib/server/format';
+import EventMap from '../islands/EventMap.svelte';
+
+interface Props {
+  /** Event with non-null coordinates (the caller guards). */
+  event: EventDTO;
+  lat: number;
+  lng: number;
+}
+
+const { event, lat, lng } = Astro.props;
+
+const address =
+  fullAddress({ street: event.street, postalCode: event.postal_code, city: event.city }) || event.location;
+---
+
+<section class="event-map-section">
+  <div class="container">
+    <div class="event-map__header" data-reveal-group="100">
+      <p class="eyebrow" data-reveal="up">Anfahrt</p>
+      <h2 class="section-title section-title--lg event-map__title" data-reveal="blur">
+        So findest du <span class="text-italic">zu uns</span>
+      </h2>
+      <p class="event-map__subtitle" data-reveal="up">{address}</p>
+    </div>
+
+    <div data-reveal="zoom">
+      <EventMap client:visible lat={lat} lng={lng} title={event.location} address={address} />
+    </div>
+
+    <div class="event-map__actions" data-reveal="up">
+      <a
+        href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
+        target="_blank"
+        rel="noopener"
+        class="btn btn--secondary"
+      >
+        In OpenStreetMap öffnen
+      </a>
+      <a
+        href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+        target="_blank"
+        rel="noopener"
+        class="btn btn--primary"
+      >
+        Route mit Google Maps
+      </a>
+    </div>
+
+    <p class="event-map__attribution">
+      Karte von
+      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>-Mitwirkenden
+    </p>
+  </div>
+</section>

@@ -1,0 +1,89 @@
+---
+import type { EventDTO } from '@lib/types';
+import { formatDateShortDE } from '@lib/server/format';
+import RegistrationForm from '../islands/RegistrationForm.svelte';
+
+interface Props {
+  event: EventDTO;
+}
+
+const { event } = Astro.props;
+---
+
+<section class="event-register-section" id="anmeldung">
+  <div class="event-register__layout">
+    <div class="event-register__content" data-reveal-group="100">
+      <div class="event-register__circles" aria-hidden="true">
+        <div class="event-register__circle event-register__circle--1"></div>
+        <div class="event-register__circle event-register__circle--2"></div>
+      </div>
+      {
+        event.is_past ? (
+          <>
+            <p class="eyebrow eyebrow--secondary" data-reveal="up">
+              Rückblick
+            </p>
+            <h2 class="section-title section-title--lg section-title--light event-register__title" data-reveal="blur">
+              Dieses Treffen <br />
+              <span class="text-italic">hat stattgefunden</span>
+            </h2>
+            <p class="event-register__spots" data-reveal="up">
+              <span>Am {formatDateShortDE(event.event_date)}</span>
+            </p>
+          </>
+        ) : event.is_full ? (
+          <>
+            <p class="eyebrow eyebrow--secondary" data-reveal="up">
+              Warteliste
+            </p>
+            <h2 class="section-title section-title--lg section-title--light event-register__title" data-reveal="blur">
+              Trag dich auf die <br />
+              <span class="text-italic">Warteliste ein</span>
+            </h2>
+            <p class="event-register__spots" data-reveal="up">
+              <span class="event-register__spots-full">Ausgebucht</span>
+            </p>
+            <p class="event-register__spots-hint" data-reveal="up">
+              Bei Absagen rückt die Warteliste automatisch nach. Du wirst sofort per E-Mail informiert.
+            </p>
+          </>
+        ) : (
+          <>
+            <p class="eyebrow eyebrow--secondary" data-reveal="up">
+              Sei dabei
+            </p>
+            <h2 class="section-title section-title--lg section-title--light event-register__title" data-reveal="blur">
+              Sichere dir <br />
+              <span class="text-italic">deinen Platz</span>
+            </h2>
+            <p class="event-register__spots" data-reveal="up">
+              <span class="event-register__spots-available">{event.available_spots}</span>
+              <span>von {event.max_participants} Plätzen frei</span>
+            </p>
+          </>
+        )
+      }
+    </div>
+
+    <div class="event-register__form-wrap">
+      {
+        event.is_past ? (
+          <div class="event-register__past-info" data-reveal="up">
+            <p class="event-register__past-text">
+              Dieses Treffen liegt in der Vergangenheit. Eine Anmeldung ist nicht mehr möglich.
+            </p>
+            <p class="event-register__past-text">
+              Möchtest du beim nächsten Männerkreis dabei sein? Dann trag dich in unseren Newsletter ein, um über
+              kommende Termine informiert zu werden.
+            </p>
+            <a href="/#newsletter" class="btn btn--primary btn--large">
+              Zum Newsletter anmelden
+            </a>
+          </div>
+        ) : (
+          <RegistrationForm client:visible event={event} />
+        )
+      }
+    </div>
+  </div>
+</section>

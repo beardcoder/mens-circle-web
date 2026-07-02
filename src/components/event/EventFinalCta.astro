@@ -1,0 +1,47 @@
+---
+import type { EventDTO } from '@lib/types';
+
+interface Props {
+  event: EventDTO;
+}
+
+const { event } = Astro.props;
+---
+
+<section class="event-cta-section">
+  <div class="event-cta__circles" aria-hidden="true">
+    <div class="event-cta__circle event-cta__circle--1"></div>
+    <div class="event-cta__circle event-cta__circle--2"></div>
+  </div>
+  <div class="container">
+    <div class="event-cta__content" data-reveal-group="100">
+      {
+        event.is_past ? (
+          <>
+            <p class="eyebrow" data-reveal="up">
+              Interesse geweckt?
+            </p>
+            <h2 class="section-title event-cta__title" data-reveal="blur">
+              Bleib <span class="text-italic">informiert</span>
+            </h2>
+            <a href="/#newsletter" class="btn btn--primary btn--large" data-reveal="up">
+              Newsletter abonnieren
+            </a>
+          </>
+        ) : (
+          <>
+            <p class="eyebrow" data-reveal="up">
+              Bereit?
+            </p>
+            <h2 class="section-title event-cta__title" data-reveal="blur">
+              Melde dich <span class="text-italic">jetzt</span> an
+            </h2>
+            <a href="#anmeldung" class="btn btn--primary btn--large" data-reveal="up">
+              Zur Anmeldung
+            </a>
+          </>
+        )
+      }
+    </div>
+  </div>
+</section>

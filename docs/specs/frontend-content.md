@@ -321,13 +321,13 @@ From `layouts/app.blade.php` + `NavigationItemSeeder`. The layout splits header 
 
 - **Logo:** SVG (`<x-logo>` → sprite `#icon-logo`, a circular brand mark — full path data in `components/sprite-defs.blade.php`) + text label `Männerkreis`. Links to home; aria-label `{site_name} - Startseite`.
 - **Header nav items** (location `Header`, ordered by `sort`):
-  | Label | URL | Notes |
-  |---|---|---|
-  | `Über` | `#ueber` | umami target `ueber` |
-  | `Die Reise` | `#reise` | `reise` |
-  | `Fragen` | `#faq` | `faq` |
-  | `Atemübung` | `/atemuebung` | `atemuebung` |
-  | `Nächster Termin` | (dynamic) | **CTA** (`is_cta`), condition `NextEvent` — link resolves to next event; shown only when a next event exists |
+  | Label             | URL           | Notes                                                                                                        |
+  | ----------------- | ------------- | ------------------------------------------------------------------------------------------------------------ |
+  | `Über`            | `#ueber`      | umami target `ueber`                                                                                         |
+  | `Die Reise`       | `#reise`      | `reise`                                                                                                      |
+  | `Fragen`          | `#faq`        | `faq`                                                                                                        |
+  | `Atemübung`       | `/atemuebung` | `atemuebung`                                                                                                 |
+  | `Nächster Termin` | (dynamic)     | **CTA** (`is_cta`), condition `NextEvent` — link resolves to next event; shown only when a next event exists |
 - Each nav link shows a two-digit index (`01`, `02`, …) + label.
 - **Decorative:** ambient concentric rings (mobile), nav meta text `Atme durch. Du bist angekommen.`, side-rails `Männerkreis · Niederbayern` (left) and `Straubing · Bayern` (right) — hidden on small screens.
 - **Mobile menu:** hamburger button `#navToggle` (`aria-controls="nav"`, `aria-expanded`), aria-label `Menü öffnen`; toggles the nav drawer (JS `data-lume="site-header"`).

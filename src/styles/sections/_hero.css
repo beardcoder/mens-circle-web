@@ -3,8 +3,9 @@
  *
  * Full-bleed hero used by the homepage Hero block AND the SSR event pages
  * (/event, /event/<slug>), which render their own hero markup via
- * EventPage.svelte. Lives here (global, layer: sections) so the styling is
- * present no matter which component emits the markup.
+ * components/event/EventHero.astro and NoEvent.astro. Lives here (global,
+ * layer: sections) so the styling is present no matter which component
+ * emits the markup.
  */
 
 /**
