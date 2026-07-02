@@ -32,9 +32,9 @@ const testimonials = await fetchTestimonials();
           <p class="testimonials__subtitle">Authentische Einblicke von Männern, die den Kreis erleben</p>
         </div>
 
-        <div class="testimonials__grid">
+        <ul class="testimonials__grid" role="list">
           {testimonials.map((t) => (
-            <article class="testimonial-item">
+            <li class="testimonial-item">
               <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
               {(t.author || t.role) && (
                 <div class="testimonial-item__author">
@@ -42,9 +42,9 @@ const testimonials = await fetchTestimonials();
                   {t.role && <span class="testimonial-item__role">{t.role}</span>}
                 </div>
               )}
-            </article>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   )

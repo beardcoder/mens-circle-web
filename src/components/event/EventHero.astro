@@ -1,12 +1,13 @@
 ---
 import type { EventDTO } from '@lib/types';
-import { formatDateShortDE, formatWeekdayDE } from '@lib/server/format';
+import { formatDateShortDE, formatWeekdayDE, toDate } from '@lib/server/format';
 
 interface Props {
   event: EventDTO;
 }
 
 const { event } = Astro.props;
+const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
 ---
 
 <section class="hero event-hero">
@@ -42,9 +43,8 @@ const { event } = Astro.props;
       </h1>
       <div class="hero__bottom">
         <p class="hero__description">
-          {formatWeekdayDE(event.event_date)}, {formatDateShortDE(event.event_date)} · {event.start_time} Uhr · {
-            event.location
-          }
+          <time datetime={dateOnly}>{formatWeekdayDE(event.event_date)}, {formatDateShortDE(event.event_date)}</time> ·
+          <time datetime={event.start_time}>{event.start_time}</time> Uhr · {event.location}
         </p>
         {
           !event.is_past && (
