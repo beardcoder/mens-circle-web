@@ -16,7 +16,7 @@ interface Props {
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
-// Derive a meaningful alt from the (HTML) name for the portrait.
+// Portrait alt text, derived from the (HTML) name.
 const photoAlt = data.name
   ? data.name
       .replace(/<[^>]*>/g, ' ')
@@ -24,8 +24,6 @@ const photoAlt = data.name
       .trim()
   : 'Begleiter';
 
-// Resolve the photo path (e.g. "/images/foo.jpg") to an imported asset so
-// Astro can generate optimised, responsive output at build time.
 const photoAsset = resolveAssetImage(data.photo);
 ---
 
@@ -72,9 +70,10 @@ const photoAsset = resolveAssetImage(data.photo);
 
         {data.bio && <div class="moderator__bio" data-reveal="up" set:html={data.bio} />}
 
+        {/* A spoken word settles rather than moves — slow fade, no travel. */}
         {
           data.quote && (
-            <blockquote class="moderator__quote" data-reveal="up">
+            <blockquote class="moderator__quote" data-reveal="fade" data-reveal-duration="1200">
               <p>{data.quote}</p>
             </blockquote>
           )
@@ -113,9 +112,8 @@ const photoAsset = resolveAssetImage(data.photo);
       }
     }
 
-    /* The vertical background word drifts slowly across as the section scrolls
-       by, so the otherwise-static ornament breathes with the page. Animates
-       `translate` (not `transform`) to keep the rotate/centring intact. */
+    /* The background word drifts as the section scrolls by. Animates
+       `translate` to keep the rotate/centring on `transform` intact. */
     @media (prefers-reduced-motion: no-preference) {
       @supports (animation-timeline: view()) {
         .moderator-section {

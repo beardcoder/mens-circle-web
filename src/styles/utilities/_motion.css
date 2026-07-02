@@ -1,32 +1,16 @@
 /**
- * Motion System — the single source of truth for frontend animation
- * ─────────────────────────────────────────────────────────────────
+ * Motion system — single source of truth for frontend animation.
  *
- * Three orthogonal vocabularies, each with one responsibility:
+ *   data-reveal   scroll-triggered entrance (driven by lib/motion.ts)
+ *   data-hover    pointer micro-interaction (lift / glow / scale / press)
+ *   data-motion   intrinsic surface behaviour (image clip-scale, link underline)
  *
- *   data-reveal   — scroll-triggered entrance (granular, staggered)
- *   data-hover    — pointer micro-interaction (lift / glow / scale / press)
- *   data-motion   — intrinsic surface behaviour (image clip-scale, link underline)
- *
- * Plus the hero page-load entrance — the one above-the-fold moment.
- *
- * Principles
- *   • Prefer small, granular motion (eyebrow, headline, button, card, list
- *     item) over fading whole blocks in one generic move.
- *   • Composited only — opacity, translate, scale, filter, box-shadow.
- *     Never animate layout properties.
- *   • Timing, easing and stagger come from the shared tokens in
- *     base/_variables.css so every section feels the same.
- *   • Everything decorative is wrapped in `prefers-reduced-motion:
- *     no-preference`; the reduce branch leaves content visible and still.
+ * Composited properties only; timing tokens live in base/_variables.css;
+ * everything decorative is gated behind `prefers-reduced-motion: no-preference`.
  */
 
-/* ============================================
-   Hero entrance — page-load only
-   ============================================
-   The one above-the-fold animated entry. Children rise in sequence on
-   initial load (no scroll trigger), a subtle blur burn-off carrying the
-   eye into the title. */
+/* Hero entrance — the one above-the-fold page-load sequence. Children rise
+   in order, a blur burn-off carrying the eye into the title. */
 
 @media (prefers-reduced-motion: no-preference) {
   .hero__label,
@@ -55,8 +39,7 @@
     animation-delay: var(--stagger-4);
   }
 
-  /* Inner-page hero (page-hero block) — same signature entrance, lighter
-     stagger. Above-the-fold, so it plays on load rather than on scroll. */
+  /* Inner-page hero — same signature entrance, lighter stagger. */
   .page-hero__eyebrow,
   .page-hero__title,
   .page-hero__lead,
@@ -88,29 +71,9 @@
   }
 }
 
-/* ============================================
-   Reveal-on-scroll — the entrance vocabulary
-   ============================================
-   JS (utils/motion.ts) drives the motion through Motion One's mini
-   `animate()`, triggered by an IntersectionObserver as the element enters
-   the viewport. CSS owns only the *hidden start state* below — a flat
-   `opacity: 0` — so nothing flashes before the script runs. Motion owns the
-   `transform` and `filter` keyframes entirely, so this stylesheet must NOT
-   set `translate` / `scale` / `filter` here (they would compose with the
-   shorthand Motion animates and double the offset).
-
-   The start state is gated behind `.motion-ready` (added synchronously to
-   <html> in the <head>) *and* `prefers-reduced-motion: no-preference`.
-   Without JS — and under reduced motion — every element stays visible and
-   still, with no animation at all.
-
-     data-reveal                  fade + rise (default = "up")
-     data-reveal="up|down|left|right|zoom|fade|blur"
-     data-reveal-delay="120"      ms, individual offset
-     data-reveal-duration="900"   ms, override
-     data-reveal-repeat           replay on every entry
-     data-reveal-group[="110"]    on a parent — auto-stagger its
-                                  direct [data-reveal] children (ms step) */
+/* Reveal-on-scroll hidden start state. CSS owns only this flat `opacity: 0`
+   (gated behind `.motion-ready` so nothing flashes pre-script); lib/motion.ts
+   owns the transform/filter keyframes entirely — do not set them here. */
 
 @media (prefers-reduced-motion: no-preference) {
   .motion-ready [data-reveal] {
@@ -118,18 +81,14 @@
   }
 }
 
-/* ============================================
-   Surface primitives — data-motion
-   ============================================ */
+/* Surface primitives — data-motion */
 
-/* Any image inside a clipped frame: the frame hides overflow so the image
-   can scale on hover without nudging neighbours. */
+/* Clipped image frame: the image can scale on hover without nudging neighbours. */
 [data-motion='image'] {
   overflow: clip;
 }
 
-/* Magnetic link — the underline grows from the inline-start edge on hover
-   instead of fading in. For footer links and prose `<a>`. */
+/* Link underline grows from the inline-start edge on hover. */
 [data-motion='link'] {
   position: relative;
   display: inline-flex;
@@ -161,13 +120,9 @@
   }
 }
 
-/* ============================================
-   Micro-interactions — data-hover
-   ============================================
-   Compositor-only pointer feedback for interactive surfaces. Gated to
-   real hover devices so touch never sticks in a hover state. */
+/* Micro-interactions — data-hover. Gated to real hover devices so touch
+   never sticks in a hover state. */
 
-/* Lift: subtle vertical rise with shadow depth — cards, tiles. */
 [data-hover='lift'] {
   --hover-lift-y: -4px;
   --hover-lift-shadow: var(--shadow-lg);
@@ -188,7 +143,6 @@
   }
 }
 
-/* Glow: accent ring radiates on hover — feature surfaces. */
 [data-hover='glow'] {
   --hover-glow-color: var(--accent-primary);
 
@@ -210,7 +164,6 @@
   }
 }
 
-/* Scale: gentle pulse — icon buttons and badges. */
 [data-hover='scale'] {
   transition: scale var(--motion-standard) var(--ease-settle);
 }
@@ -225,7 +178,6 @@
   }
 }
 
-/* Press: tactile scale-down — interactive tiles that respond to touch too. */
 [data-hover='press'] {
   transition: scale var(--motion-quick) var(--ease-precise);
 }
@@ -241,9 +193,7 @@
   transition-duration: var(--duration-fast);
 }
 
-/* Touch feedback — on devices without hover, the lift/glow/scale surfaces
-   would otherwise give no response at all. A subtle press-in on `:active`
-   makes every interactive card feel tappable, the way a native app does. */
+/* Touch feedback: press-in on :active where hover doesn't exist. */
 @media (hover: none) {
   [data-hover='lift']:active,
   [data-hover='glow']:active,
@@ -253,13 +203,8 @@
   }
 }
 
-/* ============================================
-   Reduced motion — strip anything decorative
-   ============================================
-   Keep colour/shadow feedback, drop all positional motion. The global cap
-   is a safety net for any ambient `infinite` keyframe; elements tagged
-   `data-motion-essential` (the breathing meditation app, where motion *is*
-   the feature) opt out. */
+/* Reduced motion — keep colour/shadow feedback, drop positional motion.
+   `data-motion-essential` (breathing app) opts out of the iteration cap. */
 
 @media (prefers-reduced-motion: reduce) {
   .hero__label,
