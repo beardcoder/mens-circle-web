@@ -44,10 +44,7 @@ const umamiRecorderSrc = import.meta.env.PROD && umamiId && umamiEndpoint ? `${u
 ---
 
 <!doctype html>
-<html
-  lang="de"
-  dir="ltr"
->
+<html lang="de" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <script is:inline>
@@ -71,33 +68,14 @@ const umamiRecorderSrc = import.meta.env.PROD && umamiId && umamiEndpoint ? `${u
       /* Native Astro fonts (config in astro.config.mjs). Preload Playfair —
         the hero heading is the LCP; DM Sans loads without a preload race. */
     }
-    <Font
-      cssVariable="--font-playfair"
-      preload
-    />
+    <Font cssVariable="--font-playfair" preload />
     <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
-    {
-      umamiRecorderSrc && (
-        <script
-          is:inline
-          defer
-          src={umamiRecorderSrc}
-          data-website-id={umamiId}
-        />
-      )
-    }
+    {umamiRecorderSrc && <script is:inline defer src={umamiRecorderSrc} data-website-id={umamiId} />}
   </head>
   <body class:list={[{ 'is-bare': bare }]}>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
-    {
-      !bare && (
-        <span
-          id="top"
-          aria-hidden="true"
-        />
-      )
-    }
+    {!bare && <span id="top" aria-hidden="true" />}
 
     <SpriteDefs />
 
@@ -105,27 +83,17 @@ const umamiRecorderSrc = import.meta.env.PROD && umamiId && umamiEndpoint ? `${u
     {
       !bare && (
         <>
-          <aside
-            class="side-rail side-rail--left"
-            aria-hidden="true"
-          >
+          <aside class="side-rail side-rail--left" aria-hidden="true">
             <span class="side-rail__text">Männerkreis · Niederbayern</span>
           </aside>
-          <aside
-            class="side-rail side-rail--right"
-            aria-hidden="true"
-          >
+          <aside class="side-rail side-rail--right" aria-hidden="true">
             <span class="side-rail__text">Straubing · Bayern</span>
           </aside>
         </>
       )
     }
 
-    <a
-      href="#main"
-      class="skip-link"
-      >Zum Inhalt springen</a
-    >
+    <a href="#main" class="skip-link">Zum Inhalt springen</a>
 
     {!bare && <Header />}
 
@@ -140,11 +108,6 @@ const umamiRecorderSrc = import.meta.env.PROD && umamiId && umamiEndpoint ? `${u
     <script>
       import '../lib/client';
     </script>
-    <script
-      defer
-      src="https://va.letsbenow.de/recorder.js"
-      data-website-id="f2964cb9-28e6-4658-810f-2acfb9cb9c46"
-    ></script>
   </body>
 </html>
 

@@ -10,8 +10,22 @@ import { defineConfig, fontProviders } from 'astro/config';
 // Self-hosted instances set PUBLIC_UMAMI_ENDPOINT (e.g. https://umami.example.com).
 // `performance: true` turns on Umami's native Core Web Vitals collection
 // (LCP, INP, CLS, FCP, TTFB) — https://docs.umami.is/docs/performance.
+//
+// BUILD-TIME variables: the integration decides at `bun run build` whether to
+// inject the tracker, so the values must reach the Docker BUILD stage. They are
+// threaded as build args (Dockerfile ARG + docker-compose `build.args`) —
+// setting them only as runtime container env does nothing.
 const umamiId = process.env.PUBLIC_UMAMI_ID;
 const umamiEndpoint = process.env.PUBLIC_UMAMI_ENDPOINT;
+const analytics = umamiId
+  ? [
+      umami({
+        id: umamiId,
+        performance: true,
+        ...(umamiEndpoint ? { endpointUrl: umamiEndpoint } : {}),
+      }),
+    ]
+  : [];
 
 // SSR on the Bun runtime. @wyattjoh/astro-bun-adapter builds the server entry
 // (dist/server/entry.mjs) which Bun runs: it serves hashed static assets +
@@ -135,10 +149,6 @@ export default defineConfig({
         // Legal pages are noindex; keep them out of the sitemap.
         !page.includes('/impressum') && !page.includes('/datenschutz'),
     }),
-    umami({
-      id: 'f2964cb9-28e6-4658-810f-2acfb9cb9c46',
-      performance: true,
-      endpointUrl: 'https://va.letsbenow.de',
-    }),
+    ...analytics,
   ],
 });

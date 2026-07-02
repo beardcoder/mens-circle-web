@@ -28,6 +28,12 @@ COPY . .
 # Canonical URL for sitemap / OG tags (build-time).
 ARG PUBLIC_SITE_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
+# Umami analytics (build-time: astro.config.mjs decides during `bun run build`
+# whether to inject the tracker + heatmap recorder — runtime env is too late).
+ARG PUBLIC_UMAMI_ID
+ENV PUBLIC_UMAMI_ID=$PUBLIC_UMAMI_ID
+ARG PUBLIC_UMAMI_ENDPOINT
+ENV PUBLIC_UMAMI_ENDPOINT=$PUBLIC_UMAMI_ENDPOINT
 # Bake the JSON log handler into the SSR manifest (see astro.config.mjs).
 ENV LOG_FORMAT=json
 # Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks

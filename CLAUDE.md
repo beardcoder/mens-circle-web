@@ -57,4 +57,4 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 
 ## Environment
 
-Copy `.env.example`. Without `ADMIN_*` the `/admin` area is unusable; without `LISTMONK_*` email/newsletter is inert. `PUBLIC_SITE_URL` is build-time (sitemap/OG); `APP_URL` is runtime (email links, .ics, image URLs); `DATABASE_PATH` defaults to `./data/mens-circle.db` locally and the `/data` volume in Docker.
+Copy `.env.example`. Without `ADMIN_*` the `/admin` area is unusable; without `LISTMONK_*` email/newsletter is inert. `PUBLIC_SITE_URL` and `PUBLIC_UMAMI_ID`/`PUBLIC_UMAMI_ENDPOINT` are **build-time** (read during `bun run build`; in Docker they're threaded as build args — Dockerfile `ARG` + compose `build.args` — runtime container env is too late); `APP_URL` is runtime (email links, .ics, image URLs); `DATABASE_PATH` defaults to `./data/mens-circle.db` locally and the `/data` volume in Docker.

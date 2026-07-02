@@ -6,6 +6,10 @@ services:
       context: .
       args:
         PUBLIC_SITE_URL: ${SERVICE_URL_WEB:-https://mens-circle.de}
+        # Build-time analytics config — astro.config.mjs reads these during
+        # `bun run build`; as runtime-only env they would never take effect.
+        PUBLIC_UMAMI_ID: ${PUBLIC_UMAMI_ID:-}
+        PUBLIC_UMAMI_ENDPOINT: ${PUBLIC_UMAMI_ENDPOINT:-}
     restart: unless-stopped
     environment:
       APP_URL: ${SERVICE_URL_WEB}
