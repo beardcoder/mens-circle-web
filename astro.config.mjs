@@ -62,6 +62,14 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'viewport',
   },
+  experimental: {
+    // Upgrade viewport prefetch to full document *prerender* via the
+    // Speculation Rules API where supported (Chromium): the next page is
+    // fetched, parsed and rendered off-screen before the click, so navigation
+    // is instant and the cross-document view transition starts from a ready
+    // frame. Browsers without speculation rules keep the fetch-based prefetch.
+    clientPrerender: true,
+  },
   build: {
     // Keep asset URLs stable and cache-friendly.
     assets: 'assets',

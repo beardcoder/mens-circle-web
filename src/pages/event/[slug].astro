@@ -2,8 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getEventBySlug } from '@lib/server/events';
 import { buildEventSchema } from '@lib/event-schema';
-import EventPage from '../../components/islands/EventPage.svelte';
-import site from '../../data/site.json';
+import EventPageContent from '../../components/event/EventPageContent.astro';
 
 // SSR: one page per event (date-based slug, e.g. /event/2026-06-12), covering
 // past and upcoming events. The record is fetched from PocketBase per request,
@@ -25,5 +24,5 @@ const schemas = [buildEventSchema(event, Astro.site ?? new URL('https://mens-cir
   ogType="event"
   schemas={schemas}
 >
-  <EventPage client:load event={event} whatsappLink={site.whatsappCommunityLink} />
+  <EventPageContent event={event} />
 </Layout>
