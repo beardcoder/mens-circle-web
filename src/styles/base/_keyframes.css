@@ -1,19 +1,9 @@
 /**
- * Global Keyframes
- *
- * Defined OUTSIDE any cascade layer so the animation lookup never has
- * to cross layer boundaries. Per spec `@keyframes` are looked up
- * globally, but real-world Vite/lightningcss builds have shipped subtle
- * regressions when the rule lives inside `@layer`. Keeping them
- * unlayered is the recommended defensive pattern.
- *
- * Grouped by domain so the file stays scannable.
+ * Global keyframes. Kept outside any cascade layer — @keyframes inside
+ * @layer have shipped subtle regressions in Vite/lightningcss builds.
  */
 
-/* ============================================
-   Ambient breathing — used by decorative circles in hero / intro /
-   cta / newsletter / whatsapp / event sections.
-   ============================================ */
+/* Ambient breathing — decorative circles in hero / intro / cta / newsletter. */
 @keyframes breathe {
   0%,
   100% {
@@ -40,8 +30,7 @@
   }
 }
 
-/* Ambient thread — slow horizontal pulse for decorative section
-   lines (e.g. journey divider). */
+/* Slow horizontal pulse for decorative section lines. */
 @keyframes thread-drift {
   0%,
   100% {
@@ -55,12 +44,7 @@
   }
 }
 
-/* ============================================
-   Scroll-driven parallax — gated behind @supports (animation-timeline)
-   at the call sites. The hero content lifts and fades as it scrolls away
-   while the ambient rings drift the opposite way for a sense of depth;
-   the journey thread draws itself across as the steps enter view.
-   ============================================ */
+/* Scroll-driven parallax — gated behind @supports (animation-timeline) at call sites. */
 @keyframes hero-content-leave {
   to {
     opacity: 0.3;
@@ -74,6 +58,7 @@
   }
 }
 
+/* The journey thread draws itself across as the steps enter view. */
 @keyframes journey-thread-draw {
   from {
     opacity: 0;
@@ -86,8 +71,6 @@
   }
 }
 
-/* Gentle parallax for the intro panel: the rings drift behind the quote as
-   the section passes through the viewport. */
 @keyframes intro-rings-drift {
   from {
     transform: translate3d(0, -1.5rem, 0);
@@ -98,9 +81,7 @@
   }
 }
 
-/* The big background word in the moderator section slides slowly across as
-   you scroll past — animates `translate` so the base rotate/centring on
-   `transform` is preserved and composes cleanly. */
+/* Animates `translate` so the base rotate/centring on `transform` is preserved. */
 @keyframes moderator-word-drift {
   from {
     translate: 2.5rem 0;
@@ -111,9 +92,7 @@
   }
 }
 
-/* ============================================
-   Header — scroll-driven color morph and overlay fade.
-   ============================================ */
+/* Header — scroll-driven color morph and overlay fade. */
 @keyframes header-color-morph {
   to {
     padding-block: calc(var(--space-md) * 0.78);
@@ -144,9 +123,7 @@
   }
 }
 
-/* ============================================
-   Breathing meditation app — phase-based ring animations.
-   ============================================ */
+/* Breathing meditation app — phase-based ring animations. */
 @keyframes breathing-idle {
   0%,
   100% {
@@ -202,10 +179,7 @@
   }
 }
 
-/* ============================================
-   Float — gentle rhythmic levitation. Used by the moderator photo
-   for a living, present quality. Compositor-only (transform only).
-   ============================================ */
+/* Gentle levitation — moderator photo. */
 @keyframes float {
   0%,
   100% {
@@ -217,10 +191,7 @@
   }
 }
 
-/* ============================================
-   Scroll line pulse — the hero scroll indicator line sweeps
-   downward in a loop to invite the eye to scroll.
-   ============================================ */
+/* Hero scroll indicator line sweeps downward in a loop. */
 @keyframes scroll-line-sweep {
   0% {
     opacity: 1;
@@ -247,11 +218,7 @@
   }
 }
 
-/* ============================================
-   Hero entrance — one-shot page-load sequence for above-the-fold
-   content. Children opt-in by setting `animation-name: hero-rise`
-   and a stagger delay; see utilities/_motion.css.
-   ============================================ */
+/* One-shot page-load entrance for above-the-fold content (see utilities/_motion.css). */
 @keyframes hero-rise {
   from {
     opacity: 0;
@@ -266,9 +233,7 @@
   }
 }
 
-/* ============================================
-   View transitions — root crossfade and directional variants.
-   ============================================ */
+/* View transitions — root crossfade. */
 @keyframes vt-fade-out {
   to {
     opacity: 0;

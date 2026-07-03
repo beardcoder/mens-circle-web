@@ -1,14 +1,7 @@
 /**
- * Animation Utilities
- *
- * Scroll-to-top button — driven by the page's scroll position via
- * `animation-timeline: scroll(root block)`. No JS, no event listener,
- * no `getBoundingClientRect`. Reads like a CSS animation triggered by
- * scroll, not time.
- *
- * Browsers without scroll-driven animations get the always-visible
- * fallback styled below; the `@supports` block layers the reveal
- * behaviour only where it actually works.
+ * Scroll-to-top button — revealed by scroll position via
+ * `animation-timeline: scroll(root block)`, no JS. Browsers without
+ * scroll-driven animations get the always-visible fallback.
  */
 
 @keyframes scroll-to-top-reveal {
