@@ -1,14 +1,7 @@
 ---
-// Testimonials are rendered server-side: this block is a server island on the
-// (prerendered) home page, so published entries are fetched from the database
-// per request and rendered into the HTML — great SEO, no client fetch / loading
-// flash, and new testimonials go live with no rebuild.
-//
-// The section renders nothing when there are no published testimonials.
-//
-// The data layer (`@lib/server/testimonials` → `bun:sqlite`) is imported dynamically:
-// this runs only when the island renders at runtime, never during the
-// build-time prerender of the host page.
+// Server island: published entries are fetched per request, so new
+// testimonials go live without a rebuild. The dynamic import keeps
+// `bun:sqlite` out of the build-time prerender. Renders nothing when empty.
 interface Props {
   data?: { anchor?: string };
 }
@@ -24,17 +17,22 @@ const testimonials = await fetchTestimonials();
     <section class="section section--large testimonials-section" id={anchor} aria-labelledby="testimonials-title">
       <div class="testimonials__pattern" aria-hidden="true" />
       <div class="container">
-        <div class="section-header">
-          <p class="eyebrow">Community Stimmen</p>
-          <h2 class="section-title" id="testimonials-title">
+        <div class="section-header" data-reveal-group>
+          <p class="eyebrow" data-reveal="up">
+            Community Stimmen
+          </p>
+          <h2 class="section-title" id="testimonials-title" data-reveal="blur">
             Was <span class="highlight">Teilnehmer</span> sagen
           </h2>
-          <p class="testimonials__subtitle">Authentische Einblicke von Männern, die den Kreis erleben</p>
+          <p class="testimonials__subtitle" data-reveal="up">
+            Authentische Einblicke von Männern, die den Kreis erleben
+          </p>
         </div>
 
-        <ul class="testimonials__grid" role="list">
+        {/* Voices don't travel — they arise: a slow fade, one after another. */}
+        <ul class="testimonials__grid" role="list" data-reveal-group="160">
           {testimonials.map((t) => (
-            <li class="testimonial-item">
+            <li class="testimonial-item" data-reveal="fade" data-reveal-duration="1100">
               <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
               {(t.author || t.role) && (
                 <div class="testimonial-item__author">
