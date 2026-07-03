@@ -75,7 +75,18 @@ const anchor = data.anchor ?? 'ueber';
         <div class="intro__image-ring intro__image-ring--outer"></div>
         <div class="intro__image-ring intro__image-ring--inner"></div>
       </div>
-      {data.quote && <p class="intro__image-text" data-reveal="up" data-reveal-delay="120" set:html={data.quote} />}
+      {/* The quote is drawn into the circle — a slow zoom instead of a rise. */}
+      {
+        data.quote && (
+          <p
+            class="intro__image-text"
+            data-reveal="zoom"
+            data-reveal-delay="120"
+            data-reveal-duration="1100"
+            set:html={data.quote}
+          />
+        )
+      }
     </div>
   </div>
 </section>
@@ -163,11 +174,8 @@ const anchor = data.anchor ?? 'ueber';
       gap: 0;
     }
 
-    /* Scroll-driven parallax inside the dark panel — the rings drift gently as
-       the panel passes, giving the otherwise-flat surface depth. The quote
-       itself owns the entrance reveal (data-reveal), so it is deliberately left
-       out here to avoid two animations fighting over its transform. Pure CSS,
-       gated to scroll-driven browsers and allowed motion. */
+    /* Scroll-driven parallax: the rings drift as the panel passes. The quote
+       is left out — its transform belongs to the data-reveal entrance. */
     @media (prefers-reduced-motion: no-preference) {
       @supports (animation-timeline: view()) {
         .intro__image-area {
