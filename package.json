@@ -19,7 +19,6 @@
     "db:backup": "bun run scripts/backup-db.ts"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.3",
     "@astrojs/svelte": "9.0.0",
     "@wyattjoh/astro-bun-adapter": "^2.1.0",
     "@yeskunall/astro-umami": "^0.0.9",

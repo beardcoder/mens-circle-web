@@ -85,6 +85,20 @@ export const getEventById = async (id: string): Promise<Event | null> => {
   return rows[0] ?? null;
 };
 
+/**
+ * All published, non-deleted events (past and upcoming) — each has a live,
+ * indexable page at `/event/<slug>`. Used to build the XML sitemap so the
+ * SSR-rendered event pages are actually discoverable by search engines
+ * (the static sitemap can't see them). `updatedAt` feeds `<lastmod>`.
+ */
+export const listPublishedEventSlugs = async (): Promise<Array<{ slug: string; updatedAt: string }>> => {
+  return db
+    .select({ slug: events.slug, updatedAt: events.updatedAt })
+    .from(events)
+    .where(and(eq(events.isPublished, true), isNull(events.deleted)))
+    .orderBy(desc(events.eventDate));
+};
+
 const tryEventDto = async (fetch: () => Promise<Event | null>, label: string): Promise<EventDTO | null> => {
   try {
     const ev = await fetch();
