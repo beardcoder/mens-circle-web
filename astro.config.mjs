@@ -1,6 +1,5 @@
 // @ts-check
 
-import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import bun from '@wyattjoh/astro-bun-adapter';
 import umami from '@yeskunall/astro-umami';
@@ -49,6 +48,13 @@ export default defineConfig({
     '/events': '/event',
     // Legacy plural deep-links → the per-event page (was a PocketBase route).
     '/events/[slug]': '/event/[slug]',
+    // Old PocketBase "Über uns" page (still indexed by Google, now a 404) →
+    // the about section on the home page.
+    '/ueber-uns': '/#ueber',
+    // Legacy sitemap URLs Google already knows (from the old @astrojs/sitemap
+    // output that never actually served) → the live SSR sitemap.
+    '/sitemap-index.xml': '/sitemap.xml',
+    '/sitemap-0.xml': '/sitemap.xml',
   },
   // Prefetch in-viewport internal links for instant navigation. Pairs with the
   // CSS cross-document view transitions (styles/utilities/_view-transitions.css).
@@ -130,11 +136,6 @@ export default defineConfig({
   ],
   integrations: [
     svelte(),
-    sitemap({
-      filter: (page) =>
-        // Legal pages are noindex; keep them out of the sitemap.
-        !page.includes('/impressum') && !page.includes('/datenschutz'),
-    }),
     umami({
       id: 'f2964cb9-28e6-4658-810f-2acfb9cb9c46',
       performance: true,
