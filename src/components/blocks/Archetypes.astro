@@ -63,11 +63,12 @@ function detectIcon(title = ''): string {
           )}
         </div>
 
-        <ul class="archetypes__grid" role="list" data-reveal-group="90">
+        {/* Archetypes emerge from within — scale up instead of sliding in. */}
+        <ul class="archetypes__grid" role="list" data-reveal-group="120">
           {items.map((item) => {
             const icon = detectIcon(item.title);
             return (
-              <li class={`archetype-card archetype-card--${icon}`} data-reveal="up">
+              <li class={`archetype-card archetype-card--${icon}`} data-reveal="zoom">
                 <div class="archetype-card__background-icon" aria-hidden="true" set:html={ICONS[icon]} />
                 <div class="archetype-card__content">
                   {item.title && <h3 class="archetype-card__title">{item.title}</h3>}

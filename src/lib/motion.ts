@@ -1,55 +1,28 @@
 /**
- * Motion — scroll-triggered reveals (Motion Mini)
- *
- * Motion's `inView()` runs a single shared IntersectionObserver that decides
- * *when* an element enters the viewport; Motion One's mini `animate()` carries
- * the motion itself, driving the Web Animations API directly. This keeps the
- * bundle tiny (mini ships only the WAAPI path — no spring/layout engine) while
- * giving us JS-precise easing, stagger and a `finished` promise we use to drop
- * `will-change` the instant a transition settles — keeping the compositor lean
- * on mobile.
- *
- * `inView` also folds away the bookkeeping we'd otherwise hand-roll: returning
- * nothing from the enter callback auto-unobserves the element (reveal once),
- * while returning a handler keeps it observed and replays on every entry
- * (`data-reveal-repeat`).
- *
- * The hidden start state lives in CSS (utilities/_motion.css), gated behind
- * `.motion-ready` on <html>, so nothing flashes before this script runs and —
- * under reduced motion or with JS disabled — every element simply stays
- * visible and still.
+ * Scroll-triggered reveals. Motion's `inView()` shares an IntersectionObserver;
+ * the mini `animate()` drives the Web Animations API directly (tiny bundle).
+ * The hidden start state lives in CSS (utilities/_motion.css) behind
+ * `.motion-ready`, so without JS or under reduced motion everything stays
+ * visible and still. Content added after load (server islands) is picked up
+ * by a MutationObserver.
  *
  * Markup:
- *   <h2 data-reveal>                       fade + rise (default = "up")
- *   <p  data-reveal="blur">                headline burn-in
- *   <a  data-reveal="up" data-reveal-delay="120">
- *   <img data-reveal="zoom" data-reveal-duration="900">
- *   <li data-reveal="up" data-reveal-repeat>   replays on every entry
- *
- * Auto-stagger the direct children of a group:
- *   <ul data-reveal-group>                 default step
- *   <ul data-reveal-group="120">           custom step in ms
- *     <li data-reveal="up">…</li>
- *     <li data-reveal="up">…</li>
- *   </ul>
+ *   data-reveal="up|down|left|right|fade|zoom|blur"   (default "up")
+ *   data-reveal-delay / data-reveal-duration          ms overrides
+ *   data-reveal-repeat                                replay on every entry
+ *   data-reveal-group[="110"]                         stagger direct children
  */
 
 import { inView } from 'motion';
 import { animate } from 'motion/mini';
 
-/** The keyframe-definition type `animate()` accepts, drawn from its own
- *  signature so we don't depend on Motion re-exporting it. */
 type DOMKeyframes = Parameters<typeof animate>[1];
 
 type Variant = 'up' | 'down' | 'left' | 'right' | 'fade' | 'zoom' | 'blur';
 
-/** Easing — mirrors `--ease-reveal`: a soft start that reads across the full
- *  duration rather than the front-loaded snap of an emphasised curve. */
 const EASE: [number, number, number, number] = [0.33, 0, 0.2, 1];
 
-/** Per-viewport tuning. Phones get smaller travel, quicker beats and a tighter
- *  stagger so a whole sequence resolves inside a single thumb-flick — and the
- *  headline burn-in drops its blur, the classic source of mobile scroll jank. */
+// Phones get shorter travel, quicker beats and no blur (scroll-jank source).
 interface Tuning {
   shift: string;
   zoom: number;
@@ -90,11 +63,7 @@ interface RevealConfig {
   repeat: boolean;
 }
 
-/**
- * Resolve the hidden → resting keyframes for a reveal variant. Motion drives
- * the `transform` shorthand and `filter` only — never layout properties — so
- * nothing reflows as it animates.
- */
+// Composited properties only (transform/filter/opacity) — nothing reflows.
 function keyframesFor(variant: Variant, t: Tuning): Keyframes {
   switch (variant) {
     case 'down':
@@ -135,7 +104,6 @@ function keyframesFor(variant: Variant, t: Tuning): Keyframes {
   }
 }
 
-/** Read a positive numeric dataset value in ms, or `null` if absent/invalid. */
 function ms(value: string | undefined): number | null {
   if (value === undefined) {
     return null;
@@ -146,75 +114,75 @@ function ms(value: string | undefined): number | null {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
-/**
- * Build the reveal config for every `[data-reveal]`. Group children inherit a
- * per-index stagger from their `[data-reveal-group]` parent; individual
- * `data-reveal-delay` / `data-reveal-duration` overrides layer on top.
- */
-function collect(tuning: Tuning): Map<HTMLElement, RevealConfig> {
-  const configs = new Map<HTMLElement, RevealConfig>();
-  const staggered = new Set<HTMLElement>();
-
-  for (const group of document.querySelectorAll<HTMLElement>('[data-reveal-group]')) {
-    const step = ms(group.dataset.revealGroup) ?? tuning.step;
-    const children = group.querySelectorAll<HTMLElement>(':scope > [data-reveal]');
-
-    children.forEach((child, index) => {
-      const variant = (child.dataset.reveal || 'up') as Variant;
-      const base = ms(child.dataset.revealDelay) ?? 0;
-
-      configs.set(child, {
-        enter: keyframesFor(variant, tuning),
-        duration: (ms(child.dataset.revealDuration) ?? defaultDuration(variant, tuning)) / 1000,
-        delay: (base + index * step) / 1000,
-        repeat: child.dataset.revealRepeat !== undefined,
-      });
-      staggered.add(child);
-    });
-  }
-
-  for (const el of document.querySelectorAll<HTMLElement>('[data-reveal]')) {
-    if (staggered.has(el)) {
-      continue;
-    }
-
-    const variant = (el.dataset.reveal || 'up') as Variant;
-
-    configs.set(el, {
-      enter: keyframesFor(variant, tuning),
-      duration: (ms(el.dataset.revealDuration) ?? defaultDuration(variant, tuning)) / 1000,
-      delay: (ms(el.dataset.revealDelay) ?? 0) / 1000,
-      repeat: el.dataset.revealRepeat !== undefined,
-    });
-  }
-
-  return configs;
-}
-
 function defaultDuration(variant: Variant, t: Tuning): number {
   return variant === 'blur' ? t.blurDuration * 1000 : t.duration * 1000;
 }
 
-export function initMotion(): void {
-  // Reduced motion: the hidden start state never applies (it is gated behind
-  // `prefers-reduced-motion: no-preference` in CSS), so content is already
-  // visible — there is nothing to animate or observe.
-  if (globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+const configs = new WeakMap<HTMLElement, RevealConfig>();
+const registered = new WeakSet<HTMLElement>();
+
+function configFor(el: HTMLElement, tuning: Tuning, extraDelay = 0): RevealConfig {
+  const variant = (el.dataset.reveal || 'up') as Variant;
+
+  return {
+    enter: keyframesFor(variant, tuning),
+    duration: (ms(el.dataset.revealDuration) ?? defaultDuration(variant, tuning)) / 1000,
+    delay: ((ms(el.dataset.revealDelay) ?? 0) + extraDelay) / 1000,
+    repeat: el.dataset.revealRepeat !== undefined,
+  };
+}
+
+function matching(root: HTMLElement, selector: string): HTMLElement[] {
+  const found = Array.from(root.querySelectorAll<HTMLElement>(selector));
+
+  if (root.matches(selector)) {
+    found.unshift(root);
+  }
+
+  return found;
+}
+
+// Register every unseen [data-reveal] under `root`. Group children inherit a
+// per-index stagger; individual overrides layer on top.
+function register(root: HTMLElement, tuning: Tuning): HTMLElement[] {
+  const fresh: HTMLElement[] = [];
+
+  for (const group of matching(root, '[data-reveal-group]')) {
+    const step = ms(group.dataset.revealGroup) ?? tuning.step;
+    const children = group.querySelectorAll<HTMLElement>(':scope > [data-reveal]');
+
+    children.forEach((child, index) => {
+      if (registered.has(child)) {
+        return;
+      }
+
+      registered.add(child);
+      configs.set(child, configFor(child, tuning, index * step));
+      fresh.push(child);
+    });
+  }
+
+  for (const el of matching(root, '[data-reveal]')) {
+    if (registered.has(el)) {
+      continue;
+    }
+
+    registered.add(el);
+    configs.set(el, configFor(el, tuning));
+    fresh.push(el);
+  }
+
+  return fresh;
+}
+
+function observe(elements: HTMLElement[]): void {
+  if (elements.length === 0) {
     return;
   }
 
-  const tuning = globalThis.matchMedia('(width < 640px)').matches ? MOBILE : DESKTOP;
-  const configs = collect(tuning);
-
-  if (configs.size === 0) {
-    return;
-  }
-
-  // A single shared observer for every reveal. Firing a touch before the
-  // element is fully in view (the `-12%` bottom margin) lets the entrance read
-  // as the eye arrives, rather than after.
+  // Fire slightly before full visibility so the entrance reads as the eye arrives.
   inView(
-    Array.from(configs.keys()),
+    elements,
     (element) => {
       const el = element as HTMLElement;
       const config = configs.get(el);
@@ -225,19 +193,36 @@ export function initMotion(): void {
 
       reveal(el, config);
 
-      // Repeat elements stay observed and replay on each re-entry; everything
-      // else returns nothing, so `inView` unobserves it after the first play.
+      // Returning a handler keeps the element observed (repeat) and replays on re-entry.
       return config.repeat ? () => hide(el, config) : undefined;
     },
     { margin: '0px 0px -12% 0px', amount: 'some' },
   );
 }
 
-/**
- * Play the entrance. `will-change` is promoted only for the life of the
- * animation and dropped on `finished` — so dozens of revealed elements never
- * leave permanent compositor layers behind.
- */
+export function initMotion(): void {
+  // Under reduced motion the CSS start state never applies — nothing to do.
+  if (globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  const tuning = globalThis.matchMedia('(width < 640px)').matches ? MOBILE : DESKTOP;
+
+  observe(register(document.body, tuning));
+
+  // Server islands swap their content in after load — register what arrives.
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node instanceof HTMLElement) {
+          observe(register(node, tuning));
+        }
+      }
+    }
+  }).observe(document.body, { childList: true, subtree: true });
+}
+
+// `will-change` is held only for the life of the animation.
 function reveal(el: HTMLElement, config: RevealConfig): void {
   el.style.willChange = 'transform, opacity';
 
@@ -252,12 +237,10 @@ function reveal(el: HTMLElement, config: RevealConfig): void {
       el.style.willChange = '';
     })
     .catch(() => {
-      // Animation was cancelled (e.g. a repeat element left the viewport mid-play).
       el.style.willChange = '';
     });
 }
 
-/** Reverse the entrance for `data-reveal-repeat` elements leaving the viewport. */
 function hide(el: HTMLElement, config: RevealConfig): void {
   const { enter } = config;
   const exit: Keyframes = { opacity: [enter.opacity[1], enter.opacity[0]] };
