@@ -1,9 +1,11 @@
 // @ts-check
 
+import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import bun from '@wyattjoh/astro-bun-adapter';
 import umami from '@yeskunall/astro-umami';
 import { defineConfig, fontProviders } from 'astro/config';
+import { serveSitemapWithBunAdapter } from './astro-integrations/serve-sitemap-with-bun-adapter.mjs';
 
 // Umami analytics is opt-in: it only loads when a website id is configured.
 // Self-hosted instances set PUBLIC_UMAMI_ENDPOINT (e.g. https://umami.example.com).
@@ -51,10 +53,9 @@ export default defineConfig({
     // Old PocketBase "Über uns" page (still indexed by Google, now a 404) →
     // the about section on the home page.
     '/ueber-uns': '/#ueber',
-    // Legacy sitemap URLs Google already knows (from the old @astrojs/sitemap
-    // output that never actually served) → the live SSR sitemap.
-    '/sitemap-index.xml': '/sitemap.xml',
-    '/sitemap-0.xml': '/sitemap.xml',
+    // The sitemap now lives at /sitemap-index.xml (the @astrojs/sitemap output);
+    // send the short-lived interim /sitemap.xml URL there so nothing dangles.
+    '/sitemap.xml': '/sitemap-index.xml',
   },
   // Prefetch in-viewport internal links for instant navigation. Pairs with the
   // CSS cross-document view transitions (styles/utilities/_view-transitions.css).
@@ -136,6 +137,29 @@ export default defineConfig({
   ],
   integrations: [
     svelte(),
+    sitemap({
+      // Keep noindex / non-public routes out of the sitemap. Dynamic event
+      // detail pages (/event/<slug>) are SSR and thus not known at build time,
+      // so they aren't listed here — they stay indexable and are discovered by
+      // crawling the /event hub and internal links.
+      filter: (page) =>
+        !page.includes('/admin') &&
+        !page.includes('/impressum') &&
+        !page.includes('/datenschutz') &&
+        !page.includes('/atemuebung/app'),
+      // Emit the canonical, slash-less URLs (matching each page's <link rel=
+      // "canonical"> and the trailing-slash redirect in middleware.ts), so
+      // every sitemap entry resolves 200 directly instead of 301-redirecting.
+      serialize(item) {
+        const url = new URL(item.url);
+        if (url.pathname !== '/') url.pathname = url.pathname.replace(/\/+$/, '');
+        return { ...item, url: url.href };
+      },
+    }),
+    // Must run AFTER sitemap(): registers the generated sitemap files into the
+    // Bun adapter's static manifest so they are actually served (see the
+    // integration for the full why).
+    serveSitemapWithBunAdapter(),
     umami({
       id: 'f2964cb9-28e6-4658-810f-2acfb9cb9c46',
       performance: true,
