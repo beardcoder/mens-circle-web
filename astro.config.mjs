@@ -4,7 +4,9 @@ import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import bun from '@wyattjoh/astro-bun-adapter';
 import umami from '@yeskunall/astro-umami';
+import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
 import { defineConfig, fontProviders } from 'astro/config';
+import { serveLlmsWithBunAdapter } from './astro-integrations/serve-llms-with-bun-adapter.mjs';
 import { serveSitemapWithBunAdapter } from './astro-integrations/serve-sitemap-with-bun-adapter.mjs';
 
 // Umami analytics is opt-in: it only loads when a website id is configured.
@@ -160,6 +162,27 @@ export default defineConfig({
     // Bun adapter's static manifest so they are actually served (see the
     // integration for the full why).
     serveSitemapWithBunAdapter(),
+    // llms.txt for AI crawlers. Replaces the former hand-maintained
+    // public/llms.txt: astro-llms-md derives llms.txt / llms-full.txt and
+    // per-page markdown from the built HTML at `astro:build:done`, so the AI
+    // index stays in sync with the actual pages instead of drifting.
+    // https://github.com/tfmurad/astro-llms-md
+    llms({
+      name: 'Männerkreis Niederbayern/ Straubing',
+      description:
+        'Ein Männerkreis in Straubing / Niederbayern – ein geschützter Raum für echte Begegnung, authentischen Austausch und persönliches Wachstum unter Männern. Die Treffen finden regelmäßig statt und laufen auf Spendenbasis. Es ist keine Vorerfahrung nötig.',
+      // Site content lives in <main id="main"> (see Layout.astro).
+      contentSelector: 'main',
+      // Strip chrome (nav/footer/forms/aria-hidden) so the markdown is prose.
+      excludeSelectors: [...DEFAULT_NOISE_SELECTORS],
+      // Keep the admin back-office and the noindex breathing-exercise app out of
+      // the AI index (on top of the built-in 404/_astro/asset excludes).
+      exclude: ['admin/**', 'atemuebung/app/**'],
+    }),
+    // Must run AFTER llms(): registers the generated llms.txt / llms-full.txt /
+    // per-page *.md into the Bun adapter's static manifest so they are actually
+    // served (same reason as serveSitemapWithBunAdapter above).
+    serveLlmsWithBunAdapter(),
     umami({
       id: 'f2964cb9-28e6-4658-810f-2acfb9cb9c46',
       performance: true,
