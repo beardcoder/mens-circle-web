@@ -1,7 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import { resolveAssetImage } from '../../lib/images';
-import Sprite from '../Sprite.astro';
+import { Icon } from 'astro-icon/components';
 
 interface Props {
   data: {
@@ -48,7 +48,7 @@ const photoAsset = resolveAssetImage(data.photo);
               <img src={data.photo} loading="lazy" decoding="async" alt={photoAlt} />
             ) : (
               <div class="moderator__photo-placeholder">
-                <Sprite name="user" />
+                <Icon name="user" aria-hidden="true" />
                 <span>Foto</span>
               </div>
             )

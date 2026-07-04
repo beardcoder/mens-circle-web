@@ -1,5 +1,5 @@
 ---
-import Sprite from './Sprite.astro';
+import { Icon } from 'astro-icon/components';
 
 interface Props {
   class?: string;
@@ -8,4 +8,4 @@ interface Props {
 const { class: className = 'logo__icon' } = Astro.props;
 ---
 
-<Sprite name="logo" class={className} />
+<Icon name="logo" class={className} aria-hidden="true" />
