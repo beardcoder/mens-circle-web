@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import bun from '@wyattjoh/astro-bun-adapter';
 import umami from '@yeskunall/astro-umami';
+import icon from 'astro-icon';
 import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
 import { defineConfig, fontProviders } from 'astro/config';
 import { serveLlmsWithBunAdapter } from './astro-integrations/serve-llms-with-bun-adapter.mjs';
@@ -139,6 +140,11 @@ export default defineConfig({
   ],
   integrations: [
     svelte(),
+    // Local SVG icons from src/icons/ inlined via <Icon name="…" /> from
+    // 'astro-icon/components'. Replaces the former hand-rolled inline SVG sprite
+    // (SpriteDefs.astro + Sprite.astro): each icon is its own optimized file and
+    // renders as an inline <svg> with no runtime <use> indirection.
+    icon(),
     sitemap({
       // Keep noindex / non-public routes out of the sitemap. Dynamic event
       // detail pages (/event/<slug>) are SSR and thus not known at build time,
