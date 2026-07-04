@@ -1,6 +1,6 @@
 ---
 import site from '../../data/site.json';
-import Sprite from '../Sprite.astro';
+import { Icon } from 'astro-icon/components';
 
 interface Props {
   data?: { anchor?: string };
@@ -38,7 +38,7 @@ const link = site.whatsappCommunityLink;
               data-umami-event="whatsapp-click"
               data-umami-event-type="community-join"
             >
-              <Sprite name="social-whatsapp" class="whatsapp__icon" />
+              <Icon name="social-whatsapp" class="whatsapp__icon" aria-hidden="true" />
               <span>Community beitreten</span>
             </a>
             <p class="whatsapp__hint">Kostenlos und unverbindlich</p>
