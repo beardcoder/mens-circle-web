@@ -1,6 +1,6 @@
 ---
+import { Icon } from 'astro-icon/components';
 import { resolveSocialLink, type SocialLink } from '../lib/social';
-import Sprite from './Sprite.astro';
 
 interface Props {
   link: SocialLink;
@@ -24,6 +24,6 @@ const iconClass = isText ? 'social-link__icon' : 'social-icon__svg';
   data-umami-event-platform={type}
   class={linkClass}
 >
-  <Sprite name={iconName} class={iconClass} />
+  <Icon name={iconName} class={iconClass} aria-hidden="true" />
   {isText ? <span class="social-link__label">{title}</span> : <span class="sr-only">{title}</span>}
 </a>
