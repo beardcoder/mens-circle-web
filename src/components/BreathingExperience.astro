@@ -1,5 +1,6 @@
 ---
 import { BREATHING_STEPS, BREATHING_WARNING } from '@lib/breathing';
+import { Icon } from 'astro-icon/components';
 import BreathingApp from './islands/BreathingApp.svelte';
 
 interface Props {
@@ -23,11 +24,7 @@ const { standalone = false } = Astro.props;
         aria-haspopup="dialog"
         aria-label="So funktioniert es"
       >
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
-          <path d="M12 11v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          <circle cx="12" cy="7.5" r="1.25" fill="currentColor" />
-        </svg>
+        <Icon name="info" aria-hidden="true" />
       </button>
     )
   }
@@ -41,15 +38,7 @@ const { standalone = false } = Astro.props;
       <dialog class="info-modal" id="info-modal" aria-labelledby="info-title">
         <div class="info-modal__content">
           <button type="button" class="info-modal__close" id="info-close" aria-label="Schließen">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path
-                d="M6 6l12 12M18 6L6 18"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
+            <Icon name="close" aria-hidden="true" />
           </button>
 
           <h2 id="info-title">So funktioniert es</h2>
@@ -65,16 +54,7 @@ const { standalone = false } = Astro.props;
           </p>
 
           <button type="button" id="pwa-install" class="breathing__install" hidden>
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path
-                d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <Icon name="download" aria-hidden="true" />
             Als App installieren
           </button>
         </div>
