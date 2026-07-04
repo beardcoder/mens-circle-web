@@ -52,9 +52,7 @@ export function serveLlmsWithBunAdapter() {
         const clientDir = fileURLToPath(dir);
         // The generated llms index/full files plus the per-page markdown that
         // llms.txt links to — all emitted at the client root by astro-llms-md.
-        const files = (await readdir(clientDir)).filter(
-          (f) => /^llms(-full)?\.txt$/.test(f) || f.endsWith('.md')
-        );
+        const files = (await readdir(clientDir)).filter((f) => /^llms(-full)?\.txt$/.test(f) || f.endsWith('.md'));
 
         let changed = false;
         for (const file of files) {
@@ -64,9 +62,7 @@ export function serveLlmsWithBunAdapter() {
           const content = await readFile(new URL(file, dir));
           const size = (await stat(new URL(file, dir))).size;
           const etag = createHash('sha256').update(content).digest('hex').slice(0, 16);
-          const contentType = file.endsWith('.md')
-            ? 'text/markdown; charset=utf-8'
-            : 'text/plain; charset=utf-8';
+          const contentType = file.endsWith('.md') ? 'text/markdown; charset=utf-8' : 'text/plain; charset=utf-8';
 
           manifest[pathname] = {
             headers: {
