@@ -90,3 +90,174 @@ const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
     </div>
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .event-register-section {
+      --_surface-noise-opacity: 0.03;
+
+      position: relative;
+      background: var(--bg-dark);
+      overflow: hidden;
+      color: var(--text-on-dark);
+    }
+
+    .event-register__layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-block-size: 100svh;
+    }
+
+    @media (width <= 900px) {
+      .event-register__layout {
+        grid-template-columns: 1fr;
+        min-block-size: auto;
+      }
+    }
+
+    .event-register__content {
+      display: flex;
+      position: relative;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-xl) var(--space-lg);
+      overflow: hidden;
+    }
+
+    @media (width <= 900px) {
+      .event-register__content {
+        padding: var(--space-xl) var(--space-md);
+        text-align: center;
+      }
+    }
+
+    .event-register__circles {
+      opacity: 0.15;
+    }
+
+    .event-register__circle--1 {
+      animation: breathe 20s var(--ease-ambient) infinite;
+      inset-block-start: -60%;
+      inset-inline-start: -30%;
+      inline-size: 120%;
+      block-size: 120%;
+    }
+
+    .event-register__circle--2 {
+      animation: breathe-slow 26s var(--ease-ambient) infinite -7s;
+      inset-block-end: -40%;
+      inset-inline-end: -20%;
+      inline-size: 80%;
+      block-size: 80%;
+    }
+
+    .event-register__eyebrow {
+      position: relative;
+      z-index: 1;
+    }
+
+    .event-register__title {
+      position: relative;
+      z-index: 1;
+      margin-block-end: var(--space-lg);
+      color: var(--text-on-dark);
+    }
+
+    .event-register__spots {
+      display: flex;
+      position: relative;
+      align-items: baseline;
+      gap: var(--space-xs);
+      z-index: 1;
+      color: var(--color-sand);
+      font-size: var(--text-lg);
+    }
+
+    @media (width <= 900px) {
+      .event-register__spots {
+        justify-content: center;
+      }
+    }
+
+    .event-register__spots-available {
+      color: var(--accent-secondary);
+      font-weight: 700;
+      font-size: var(--text-2xl);
+      line-height: 1;
+      font-family: var(--font-display);
+    }
+
+    .event-register__spots-full {
+      color: var(--accent-primary);
+      font-weight: 700;
+      font-size: var(--text-xl);
+      font-family: var(--font-display);
+    }
+
+    .event-register__spots-hint {
+      position: relative;
+      z-index: 1;
+      margin-block-start: var(--space-sm);
+      max-inline-size: 32ch;
+      color: color-mix(in oklch, var(--color-sand) 75%, transparent);
+      font-size: var(--text-body-compact);
+      line-height: 1.5;
+    }
+
+    .event-register__form-wrap {
+      display: flex;
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      border-inline-start: 1px solid var(--border-on-dark);
+      background: color-mix(in oklch, var(--bg-primary) 5%, transparent);
+      padding: var(--space-xl) var(--space-lg);
+    }
+
+    @media (width <= 900px) {
+      .event-register__form-wrap {
+        border-inline-start: none;
+        border-block-start: 1px solid var(--border-on-dark);
+        padding: var(--space-xl) var(--space-md);
+      }
+    }
+
+    .event-register__form {
+      inline-size: 100%;
+      max-inline-size: var(--content-max-form);
+    }
+
+    .event-register__submit {
+      margin-block-start: var(--space-md);
+      inline-size: 100%;
+    }
+
+    .event-register__submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .event-register__past-info {
+      inline-size: 100%;
+      max-inline-size: var(--content-max-form);
+      text-align: center;
+    }
+
+    .event-register__past-text {
+      margin-block-end: var(--space-md);
+      color: var(--text-secondary);
+      font-size: var(--text-lg);
+      line-height: 1.6;
+    }
+
+    .event-register__past-text:last-of-type {
+      margin-block-end: var(--space-lg);
+    }
+
+    @media (width <= 900px) {
+      .event-register__past-info {
+        text-align: start;
+      }
+    }
+  }
+</style>

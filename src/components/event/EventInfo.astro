@@ -64,3 +64,138 @@ const cards = [
     <CalendarModal client:visible event={calendarData} />
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .event-info-section {
+      position: relative;
+      background: var(--bg-primary);
+      padding: var(--space-2xl) 0;
+      overflow: hidden;
+    }
+
+    .event-info__bg-text {
+      position: absolute;
+      transform: translateY(-50%);
+      opacity: 0.25;
+      inset-block-start: 50%;
+      inset-inline-end: var(--space-md);
+      pointer-events: none;
+      color: var(--border-light);
+      font-weight: 800;
+      font-size: clamp(6rem, 18vw, 16rem);
+      line-height: 0.8;
+      font-family: var(--font-display);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    @media (width <= 800px) {
+      .event-info__bg-text {
+        display: none;
+      }
+    }
+
+    .event-info__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border-block-start: 1px solid var(--border-light);
+      border-block-end: 1px solid var(--border-light);
+    }
+
+    @media (width <= 1000px) {
+      .event-info__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (width <= 600px) {
+      .event-info__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .event-info__card {
+      position: relative;
+      border-inline-end: 1px solid var(--border-light);
+      padding: var(--space-lg);
+      overflow: hidden;
+    }
+
+    .event-info__card:last-child {
+      border-inline-end: none;
+    }
+
+    @media (width <= 1000px) {
+      .event-info__card:nth-child(2n) {
+        border-inline-end: none;
+      }
+
+      .event-info__card:nth-child(1),
+      .event-info__card:nth-child(2) {
+        border-block-end: 1px solid var(--border-light);
+      }
+    }
+
+    @media (width <= 600px) {
+      .event-info__card {
+        border-inline-end: none;
+        border-block-end: 1px solid var(--border-light);
+      }
+
+      .event-info__card:last-child {
+        border-block-end: none;
+      }
+    }
+
+    /* Decorative corner ring — a pseudo-element so the <dl> grid contains only
+       valid dt/dd groups. */
+    .event-info__card::before {
+      position: absolute;
+      opacity: 0.3;
+      inset-block-start: -30%;
+      inset-inline-end: -30%;
+      pointer-events: none;
+      content: '';
+      border: 1px solid var(--border-light);
+      border-radius: 50%;
+      aspect-ratio: 1 / 1;
+      inline-size: 60%;
+    }
+
+    .event-info__card-label {
+      position: relative;
+      margin-block-end: var(--space-xs);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: var(--text-xs);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .event-info__card-value {
+      margin-block-end: 0.25rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      line-height: 1.1;
+      font-family: var(--font-display);
+
+      /* Long German location names ("Gemeinschaftsraum …") must wrap inside the
+         card, not clip at its overflow edge. */
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .event-info__card-sub {
+      color: var(--text-secondary);
+      font-size: var(--text-body-compact);
+    }
+
+    .event-info__calendar {
+      margin-block-start: var(--space-xl);
+      text-align: center;
+    }
+  }
+</style>

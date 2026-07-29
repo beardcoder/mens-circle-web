@@ -49,8 +49,23 @@
 @import url('sections/_surfaces.css') layer(sections);
 @import url('sections/_ornaments.css') layer(sections);
 @import url('sections/_hero.css') layer(sections);
-@import url('sections/_event.css') layer(sections);
-@import url('sections/_error.css') layer(sections);
+/* The event-page and error-page section styles are NOT here. They live in the
+   components that own them — components/event/{EventRegister,EventInfo,
+   EventAbout,EventFinalCta,NoEvent}.astro and pages/404.astro — each in a
+   `<style is:global>` + `@layer sections` block, the same way every block
+   component in components/blocks/ already carries its own section styles.
+   Since `inlineStylesheets: 'always'` inlines the bundled CSS into every
+   document, keeping them global meant ~12 kB of event rules were repeated on
+   the home page, the legal pages, the breathing exercise and the 404. Astro
+   emits component styles only for the pages that render the component, so
+   colocating them is both the established convention here and ~10.7 kB less
+   inlined CSS per page.
+
+   `_hero.css` deliberately stays global: it styles `.hero__title`,
+   `.hero__content`, `.hero__cta`, `.hero__label` and `.hero__description`
+   unscoped, and blocks/PageHero.astro plus pages/teile-deine-erfahrung.astro
+   reuse exactly those class names — so it is needed on nearly every page, not
+   just the home hero. */
 @import url('utilities/_animations.css') layer(utilities);
 @import url('utilities/_motion.css') layer(utilities);
 @import url('utilities/_visual.css') layer(utilities);
