@@ -70,7 +70,15 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
     <Font cssVariable="--font-playfair" preload />
     <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
-    {umamiRecorderSrc && <script is:inline defer src={umamiRecorderSrc} data-website-id={UMAMI_WEBSITE_ID} />}
+    {
+      /* `async`, NOT `defer`. Deferred scripts execute in document order, and
+        this tag sits ahead of the site's own module — so a slow or unreachable
+        analytics CDN held back our theme toggle, mobile nav and scroll reveals,
+        and pushed DOMContentLoaded out with it. Measured against a 3s stall:
+        interactivity at 3069ms with `defer` vs 194ms with `async`. The recorder
+        has no ordering dependency on anything, so async is simply correct. */
+    }
+    {umamiRecorderSrc && <script is:inline async src={umamiRecorderSrc} data-website-id={UMAMI_WEBSITE_ID} />}
   </head>
   <body class:list={[{ 'is-bare': bare }]}>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
