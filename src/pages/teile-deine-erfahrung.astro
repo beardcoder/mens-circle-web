@@ -2,7 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import TestimonialForm from '../components/islands/TestimonialForm.svelte';
 
-// Static form page (submits client-side to PocketBase) — prerendered at build.
+// Static form page — prerendered at build. The island POSTs to
+// /api/testimonial/submit, so no server rendering is needed here.
 export const prerender = true;
 
 const schemas = [

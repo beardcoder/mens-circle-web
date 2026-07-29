@@ -24,6 +24,17 @@ updates:
         update-types:
           - 'minor'
           - 'patch'
+    ignore:
+      # TypeScript majors must be adopted by hand, not auto-merged. TS 7 is the
+      # native (Go) port: it changes the JS compiler API, which both of our
+      # type-checking consumers still target through the TS 6 surface —
+      # typescript-eslint declares `typescript: >=4.8.4 <6.1.0` and
+      # @astrojs/check declares `^5.0.0 || ^6.0.0`. A TS 7 bump therefore breaks
+      # `bun run lint` AND `bun run check` at config-load time (before any file
+      # is read), which is exactly what happened in #58. Drop this entry once
+      # both tools ship TS 7 support.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
 
   # The GitHub Actions used by the workflows in .github/workflows.
   - package-ecosystem: 'github-actions'
