@@ -1,6 +1,6 @@
 import { and, asc, eq, gte, inArray, isNull, lt } from 'drizzle-orm';
 import { db } from './db';
-import { events, participants, registrations } from './db/schema';
+import { ACTIVE_REGISTRATION_STATUSES, events, participants, registrations } from './db/schema';
 import { sendEventReminder } from './email';
 import { toDate } from './format';
 
@@ -37,7 +37,7 @@ const queryPending = (from: string, to: string) =>
         isNull(events.deleted),
         gte(events.eventDate, from),
         lt(events.eventDate, to),
-        inArray(registrations.status, ['registered', 'attended']),
+        inArray(registrations.status, ACTIVE_REGISTRATION_STATUSES),
       ),
     )
     .orderBy(asc(registrations.registeredAt));

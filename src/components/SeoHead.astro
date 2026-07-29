@@ -1,5 +1,6 @@
 ---
 import site from '../data/site.json';
+import { umamiOrigin } from '../lib/umami-config';
 
 // Font preloading is handled by the native <Font preload /> component in the
 // layout head (fonts configured in astro.config.mjs).
@@ -49,20 +50,10 @@ const {
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = new URL(Astro.url.pathname, siteUrl).href;
 
-// Only third-party origin we ever load: the Umami analytics endpoint (when
-// configured). Preconnect to it so the tracker script connects faster.
-// Everything else (fonts, CSS, JS, API) is same-origin, so no other
-// preconnect candidates exist.
-const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
-const umamiOrigin = umamiId
-  ? (() => {
-      try {
-        return new URL(import.meta.env.PUBLIC_UMAMI_ENDPOINT || 'https://cloud.umami.is').origin;
-      } catch {
-        return null;
-      }
-    })()
-  : null;
+// Only third-party origin we ever load: the Umami analytics endpoint. Preconnect
+// to it so the tracker script connects faster. Everything else (fonts, CSS, JS,
+// API) is same-origin, so no other preconnect candidates exist.
+const analyticsOrigin = umamiOrigin();
 const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
 const socialTitle = ogTitle ?? title ?? site.siteName;
 const socialDescription = ogDescription ?? description;
@@ -136,7 +127,7 @@ const allSchemas = [localBusiness, website, ...schemas];
 <meta name="color-scheme" content="light dark" />
 <meta name="msapplication-TileColor" content={site.themeColor} />
 
-{umamiOrigin && <link rel="preconnect" href={umamiOrigin} crossorigin />}
+{analyticsOrigin && <link rel="preconnect" href={analyticsOrigin} crossorigin />}
 
 <!-- Open Graph -->
 <meta property="og:type" content={ogType} />

@@ -1,5 +1,4 @@
-/** Social link type → sprite icon name + German label. Mirrors the original
- *  SocialLinkType enum. */
+/** Social link type → icon name (src/icons/social-*.svg) + German label. */
 export type SocialType =
   | 'email'
   | 'phone'
