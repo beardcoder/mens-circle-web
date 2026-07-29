@@ -91,3 +91,118 @@ import WhatsappCommunity from '../blocks/WhatsappCommunity.astro';
     </div>
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .no-event-hero {
+      display: flex;
+      align-items: center;
+      background: var(--bg-section-alt);
+      min-block-size: 80vh;
+    }
+
+    .no-event-info-section {
+      position: relative;
+      background: var(--bg-primary);
+      overflow: hidden;
+    }
+
+    .no-event-info__layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: center;
+      gap: var(--space-xl);
+      min-block-size: 60vh;
+    }
+
+    @media (width <= 900px) {
+      .no-event-info__layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        min-block-size: auto;
+      }
+    }
+
+    .no-event-info__content {
+      padding: var(--space-lg) 0;
+    }
+
+    @media (width <= 900px) {
+      .no-event-info__content {
+        order: 2;
+        text-align: center;
+      }
+    }
+
+    .no-event-info__title {
+      max-inline-size: var(--content-max-description);
+    }
+
+    @media (width <= 900px) {
+      .no-event-info__title {
+        max-inline-size: 100%;
+      }
+    }
+
+    .no-event-info__text {
+      max-inline-size: var(--content-max-text);
+      color: var(--text-secondary);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+    }
+
+    @media (width <= 900px) {
+      .no-event-info__text {
+        max-inline-size: 100%;
+      }
+    }
+
+    .no-event-info__visual {
+      display: flex;
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      border-radius: var(--radius-lg);
+      background: var(--bg-section-alt);
+      min-block-size: 400px;
+      overflow: hidden;
+    }
+
+    @media (width <= 900px) {
+      .no-event-info__visual {
+        order: 1;
+        min-block-size: 300px;
+      }
+    }
+
+    .no-event-info__quote-area {
+      --_surface-noise-opacity: 0.05;
+      display: flex;
+
+      position: absolute;
+      justify-content: center;
+      align-items: center;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .no-event-cta-section {
+      position: relative;
+      background: var(--bg-primary);
+      padding: var(--space-2xl) 0;
+      text-align: center;
+    }
+
+    .no-event-cta__content {
+      margin-inline: auto;
+      max-inline-size: var(--content-max-description);
+    }
+
+    .no-event-cta__text {
+      margin-block-end: var(--space-lg);
+      color: var(--text-secondary);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+    }
+  }
+</style>

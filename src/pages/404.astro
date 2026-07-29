@@ -31,3 +31,73 @@ import site from '../data/site.json';
     </div>
   </section>
 </Layout>
+
+<style is:global>
+  @layer sections {
+    .error-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      /* Clear the fixed header, and fill the viewport so the footer never
+         floats into view on short error content. */
+      min-block-size: 100svh;
+      padding-block: var(--header-clearance) var(--space-xl);
+      text-align: center;
+    }
+
+    .error-page__content {
+      max-inline-size: var(--content-max-description);
+      margin-inline: auto;
+    }
+
+    .error-page__code {
+      margin-block-end: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 18vw, 9rem);
+      line-height: 1;
+      color: var(--text-accent);
+    }
+
+    .error-page__title {
+      margin-block-end: var(--space-md);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      color: var(--text-primary);
+    }
+
+    .error-page__text {
+      margin-block-end: var(--space-md);
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-muted);
+    }
+
+    .error-page__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      justify-content: center;
+    }
+
+    .error-page__contact {
+      margin-block-start: var(--space-md);
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .error-page__contact a,
+    .error-page__text a {
+      color: var(--accent-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color var(--motion-quick);
+    }
+
+    .error-page__contact a:hover,
+    .error-page__contact a:focus-visible,
+    .error-page__text a:hover,
+    .error-page__text a:focus-visible {
+      color: var(--text-accent);
+    }
+  }
+</style>
