@@ -13,6 +13,11 @@ const { href, title, iconName, type, internal } = resolveSocialLink(link);
 const isText = variant === 'link';
 const linkClass = isText ? 'social-link' : 'social-icon';
 const iconClass = isText ? 'social-link__icon' : 'social-icon__svg';
+
+// External profiles open in a new tab. Say so as part of the accessible name —
+// an unannounced context switch is disorienting for screen-reader users, and
+// `mailto:`/`tel:` links (internal) stay in place and get no such note.
+const newTabNote = internal ? '' : ' (öffnet in neuem Tab)';
 ---
 
 <a
@@ -25,5 +30,14 @@ const iconClass = isText ? 'social-link__icon' : 'social-icon__svg';
   class={linkClass}
 >
   <Icon name={iconName} class={iconClass} aria-hidden="true" />
-  {isText ? <span class="social-link__label">{title}</span> : <span class="sr-only">{title}</span>}
+  {
+    isText ? (
+      <span class="social-link__label">
+        {title}
+        <span class="sr-only">{newTabNote}</span>
+      </span>
+    ) : (
+      <span class="sr-only">{title + newTabNote}</span>
+    )
+  }
 </a>
