@@ -35,9 +35,11 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
   HTML-Seiten** direkt von Platte, rendert die SSR-Routen on demand und bedient
   die API- und Admin-Routen direkt als Astro-Endpunkte. Es gibt **keinen
   separaten Backend-Prozess** mehr — die Daten liegen in einer SQLite-Datei, auf
-  die Drizzle in-process zugreift. Logik des Servers im Adapter
-  ([`adapter/server.mjs`](adapter/server.mjs)). Kompression + TLS übernimmt der
-  Coolify-Edge.
+  die Drizzle in-process zugreift. Den Server-Entrypoint
+  (`dist/server/entry.mjs`) erzeugt `@wyattjoh/astro-bun-adapter` beim Build; es
+  gibt keine handgeschriebene Server-Datei. Kompression + TLS übernimmt der
+  Coolify-Edge. Liveness-Probe: `GET /health`
+  ([`src/pages/health.ts`](src/pages/health.ts)).
 - **Datenhaltung: Drizzle + bun:sqlite.** Schema in
   [`src/lib/server/db/schema.ts`](src/lib/server/db/schema.ts), Migrationen unter
   [`drizzle/`](drizzle/) (mit `bun run db:generate` aus dem Schema erzeugt) werden
@@ -74,18 +76,22 @@ src/
   components/islands/  Svelte-5-Islands (Formulare, Breathing, Kalender-Modal, Map)
   components/admin/    Svelte-5-Islands der Admin-UI (Events, Anmeldungen, Stimmen)
   layouts/        Layout.astro (Seite), AdminLayout.astro (Back-Office)
-  lib/            api.ts (Client), admin-client.ts, types, Utils
+  actions/        Astro Actions (`/_actions/*`) — die Admin-RPC-Schicht
+  lib/            api.ts (Client-Formulare), types, umami-config, Utils
   lib/server/     Datenschicht (db/, events, registrations, testimonials,
                   listmonk, email, auth, reminders, ics, format) — NUR serverseitig
-  middleware.ts   Admin-Guard (Reminder-Cron: Bun.cron via --preload, s. unten)
-  pages/          index, event, atemuebung, teile-deine-erfahrung, [slug]
-  pages/api/      Public-API + /api/admin/* (Astro-Endpunkte)
+  middleware.ts   Admin-Guard + Trailing-Slash-Kanonisierung
+  pages/          index, event, atemuebung, teile-deine-erfahrung, [slug], health
+  pages/api/      Public-API (Formular-Endpunkte + /api/public/*)
   pages/admin/    Admin-UI-Seiten
   styles/         vollständiges CSS-Designsystem (OKLCH, @layer, kein Tailwind)
+astro-integrations/  Build-Integrationen (Sitemap/llms.txt in das Static-Manifest
+                  des Bun-Adapters nachtragen — s. serve-with-bun-adapter.mjs)
+scripts/          reminder-cron.ts (Bun.cron via --preload), send-reminders.ts,
+                  backup-db.ts (SQLite → S3)
 drizzle/          generierte SQL-Migrationen (beim Boot angewendet)
 drizzle.config.ts drizzle-kit-Konfiguration
 listmonk/         listmonk-Templates (System, Kampagne) + tx-templates/ (Transactional)
-adapter/          lokaler Astro-Bun-Adapter (Server-Entrypoint: Edge + SSR + API)
 Dockerfile        Multi-Stage: Bun-Build → Bun-Runtime (ein Prozess)
 ```
 
@@ -99,6 +105,11 @@ cp .env.example .env   # ADMIN_EMAIL / ADMIN_PASSWORD setzen für /admin
 
 bun run dev            # Astro-Dev-Server (Port 4321), API + Admin inklusive
 ```
+
+Das `dev`-Skript ist `bun --bun astro dev`: die Bun-Runtime ist zwingend, sonst
+brechen die DB-Seiten an `bun:sqlite`. Kein zweites `--bun` davorsetzen. Der
+Astro-7-Dev-Server läuft als Daemon im Hintergrund — `bun run dev` kehrt sofort
+zurück, gesteuert wird er über `bunx astro dev status | logs | stop`.
 
 Die SQLite-Datei wird automatisch unter `./data/mens-circle.db` angelegt und beim
 Start migriert. Nach Schema-Änderungen neue Migration erzeugen:
