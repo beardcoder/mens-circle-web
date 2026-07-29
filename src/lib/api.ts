@@ -9,12 +9,13 @@
  */
 import type { ApiResponse, RegistrationPayload, TestimonialPayload } from './types';
 
-/** Same-origin base URL (the API routes live on this site). */
-export const API_BASE_URL = typeof window !== 'undefined' ? window.location.origin : '';
-
-/** POST a JSON body to an API route and normalise the response/errors. */
+/** POST a JSON body to an API route and normalise the response/errors.
+ *
+ *  The path stays root-relative: these helpers only ever run in the browser and
+ *  the routes are same-origin, so `fetch` resolves them against the current
+ *  document without an origin prefix. */
 async function postJson(path: string, body: object): Promise<ApiResponse> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(path, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(body),

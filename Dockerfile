@@ -28,8 +28,6 @@ COPY . .
 # Canonical URL for sitemap / OG tags (build-time).
 ARG PUBLIC_SITE_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
-# Bake the JSON log handler into the SSR manifest (see astro.config.mjs).
-ENV LOG_FORMAT=json
 # Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks
 # Astro's Rollup build, while `bun run` still uses Bun for everything else.
 RUN bun run build
@@ -68,9 +66,10 @@ VOLUME ["/data"]
 # The Bun server is the public edge on :8090.
 EXPOSE 8090
 
-# Liveness probe for Coolify/Docker. /health is answered directly by the Bun
-# edge (adapter/server.mjs), with no SSR render, via wget (curl is NOT in this
-# image). A 200 means the public edge is accepting and serving requests.
+# Liveness probe for Coolify/Docker. /health is a dedicated endpoint route
+# (src/pages/health.ts) that returns a bare 200 with no SSR page render and no
+# DB round-trip. Probed with wget (curl is NOT in this image). A 200 means the
+# public edge is accepting and serving requests.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD wget -q -O /dev/null http://127.0.0.1:8090/health || exit 1
 

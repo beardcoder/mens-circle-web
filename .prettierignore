@@ -10,8 +10,7 @@ bun.lock
 public/
 **/*.min.js
 
-# backend & external services — not ours to format
-pocketbase/
+# external services — not ours to format
 listmonk/
 
 # tooling
