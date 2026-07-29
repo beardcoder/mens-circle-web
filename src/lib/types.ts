@@ -20,10 +20,10 @@ export interface EventData {
 }
 
 /**
- * Public event shape returned by the API routes
- * `GET /api/public/events/next` and `GET /api/public/events/{slug}`.
- * Capacity values are computed server-side (registration counts are not
- * exposed to the public), so the client never sees raw registration data.
+ * Public event shape: what `GET /api/public/events/next` returns, and what the
+ * SSR event pages render from. Capacity values are computed server-side
+ * (registration counts are not exposed to the public), so the client never sees
+ * raw registration data.
  */
 export interface EventDTO {
   id: string;
@@ -80,6 +80,5 @@ export interface TestimonialPayload {
 declare global {
   interface Window {
     umami?: { track: (name: string, data?: Record<string, unknown>) => void };
-    eventData?: EventData;
   }
 }

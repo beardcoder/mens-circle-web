@@ -3,7 +3,7 @@
  *
  * Server-only. Opens the SQLite file from `DATABASE_PATH`, applies the
  * Drizzle migrations under `./drizzle` on first import, and exports a ready
- * `db` handle. Replaces PocketBase's embedded SQLite + JS migrations.
+ * `db` handle.
  *
  * Migrations run once at process start (the Bun server is long-lived), so a
  * fresh deploy provisions its schema with no manual step. The migrations

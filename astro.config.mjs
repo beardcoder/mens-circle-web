@@ -7,15 +7,8 @@ import umami from '@yeskunall/astro-umami';
 import icon from 'astro-icon';
 import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
 import { defineConfig, fontProviders } from 'astro/config';
-import { serveLlmsWithBunAdapter } from './astro-integrations/serve-llms-with-bun-adapter.mjs';
-import { serveSitemapWithBunAdapter } from './astro-integrations/serve-sitemap-with-bun-adapter.mjs';
-
-// Umami analytics is opt-in: it only loads when a website id is configured.
-// Self-hosted instances set PUBLIC_UMAMI_ENDPOINT (e.g. https://umami.example.com).
-// `performance: true` turns on Umami's native Core Web Vitals collection
-// (LCP, INP, CLS, FCP, TTFB) — https://docs.umami.is/docs/performance.
-const umamiId = process.env.PUBLIC_UMAMI_ID;
-const umamiEndpoint = process.env.PUBLIC_UMAMI_ENDPOINT;
+import { serveLlmsWithBunAdapter, serveSitemapWithBunAdapter } from './astro-integrations/serve-with-bun-adapter.mjs';
+import { UMAMI_ENDPOINT, UMAMI_WEBSITE_ID } from './src/lib/umami-config.ts';
 
 // SSR on the Bun runtime. @wyattjoh/astro-bun-adapter builds the server entry
 // (dist/server/entry.mjs) which Bun runs: it serves hashed static assets +
@@ -189,10 +182,15 @@ export default defineConfig({
     // per-page *.md into the Bun adapter's static manifest so they are actually
     // served (same reason as serveSitemapWithBunAdapter above).
     serveLlmsWithBunAdapter(),
+    // Umami analytics — the pageview/event tracker script. Id + endpoint come
+    // from src/lib/umami-config.ts (env-overridable, see there), the same values
+    // the layout's heatmap recorder and SeoHead's preconnect use.
+    // `performance: true` turns on Umami's native Core Web Vitals collection
+    // (LCP, INP, CLS, FCP, TTFB) — https://docs.umami.is/docs/performance.
     umami({
-      id: 'f2964cb9-28e6-4658-810f-2acfb9cb9c46',
+      id: UMAMI_WEBSITE_ID,
       performance: true,
-      endpointUrl: 'https://va.letsbenow.de',
+      endpointUrl: UMAMI_ENDPOINT,
     }),
   ],
 });

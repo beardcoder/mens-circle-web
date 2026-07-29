@@ -4,7 +4,7 @@ import { fetchNextEvent } from '@lib/server/events';
 import { buildEventSchema } from '@lib/event-schema';
 import EventPageContent from '../components/event/EventPageContent.astro';
 
-// SSR: the next upcoming event (incl. live capacity) is fetched from PocketBase
+// SSR: the next upcoming event (incl. live capacity) is read from the database
 // per request, so /event always reflects the current "next" event with no
 // rebuild. `null` renders the graceful "no termin scheduled" state.
 const event = await fetchNextEvent();

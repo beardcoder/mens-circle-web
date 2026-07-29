@@ -1,24 +1,26 @@
 /* eslint-disable no-console */
-import { and, asc, desc, eq, gte, isNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
 import type { EventDTO } from '../types';
 import { db } from './db';
 import type { Event, NewEvent } from './db/schema';
-import { events, registrations } from './db/schema';
+import { ACTIVE_REGISTRATION_STATUSES, events, registrations } from './db/schema';
 import { config, listmonkApiConfigured } from './config';
 import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
 import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
+
+/**
+ * A registration that occupies a seat: live (not soft-deleted) and in a
+ * seat-holding status. The single predicate behind every capacity number, so a
+ * one-off count and the grouped admin listing can't drift apart.
+ */
+const holdsASeat = () =>
+  and(isNull(registrations.deleted), inArray(registrations.status, ACTIVE_REGISTRATION_STATUSES));
 
 export const countActiveRegistrations = async (eventId: string): Promise<number> => {
   const rows = await db
     .select({ c: sql<number>`count(*)` })
     .from(registrations)
-    .where(
-      and(
-        eq(registrations.eventId, eventId),
-        isNull(registrations.deleted),
-        sql`${registrations.status} in ('registered','attended')`,
-      ),
-    );
+    .where(and(eq(registrations.eventId, eventId), holdsASeat()));
   return rows[0]?.c ?? 0;
 };
 
@@ -206,8 +208,23 @@ export interface EventInput {
 }
 
 export const listEventsForAdmin = async (): Promise<Array<Event & { activeCount: number }>> => {
-  const rows = await db.select().from(events).where(isNull(events.deleted)).orderBy(desc(events.eventDate));
-  return Promise.all(rows.map(async (ev) => ({ ...ev, activeCount: await countActiveRegistrations(ev.id) })));
+  // One grouped LEFT JOIN instead of a COUNT round-trip per event: the admin
+  // list previously issued 1 + N queries, so it got linearly slower as the event
+  // archive grew. `count(<column>)` (not `count(*)`) is what makes the LEFT JOIN
+  // correct — it counts matched rows only, so an event with no registrations
+  // still yields 0 rather than 1.
+  const rows = await db
+    .select({
+      event: events,
+      activeCount: sql<number>`count(${registrations.id})`,
+    })
+    .from(events)
+    .leftJoin(registrations, and(eq(registrations.eventId, events.id), holdsASeat()))
+    .where(isNull(events.deleted))
+    .groupBy(events.id)
+    .orderBy(desc(events.eventDate));
+
+  return rows.map(({ event, activeCount }) => ({ ...event, activeCount }));
 };
 
 const inputToColumns = (input: EventInput): Partial<NewEvent> => ({
