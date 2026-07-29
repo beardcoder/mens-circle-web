@@ -141,6 +141,57 @@ textarea.form-control {
   color: var(--text-secondary);
 }
 
+/* ── Validation ──────────────────────────────────────────────────────────
+   A rejected field says so in place, next to the input, and keeps saying it
+   until corrected — a toast alone disappears and never tells you *which*
+   field. Keyed off [aria-invalid="true"] rather than a class so the visual
+   state and the state exposed to assistive tech cannot drift apart, and off
+   :not(:focus) so the ring doesn't fight the focus ring while you fix it. */
+.form-control[aria-invalid='true'],
+.newsletter__input[aria-invalid='true'],
+.form-group input[aria-invalid='true'],
+.form-group textarea[aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.form-control[aria-invalid='true']:not(:focus),
+.newsletter__input[aria-invalid='true']:not(:focus),
+.form-group input[aria-invalid='true']:not(:focus),
+.form-group textarea[aria-invalid='true']:not(:focus) {
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-error) 22%, transparent);
+}
+
+/* The message carries its OWN background rather than inheriting the section's.
+   These forms sit on three very different surfaces — the testimonial page is
+   near-white (rgb 242,238,231), the event register a dark brown (rgb 41,31,19),
+   the newsletter a mid brown (rgb 84,59,39) — and measured against them a single
+   red text colour cannot clear 4.5:1 everywhere: `--color-error` scores 4.59:1 on
+   the light surface but only 1.95:1 on the newsletter. Giving the chip a fixed
+   pair of its own makes the contrast a constant instead of a function of
+   whichever section the form happens to be dropped into. */
+.form-error {
+  display: flex;
+  gap: var(--space-3xs);
+  align-items: flex-start;
+  width: fit-content;
+  margin-block-start: var(--space-2xs);
+  padding: 0.3em 0.6em;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  color: oklch(38% 0.16 25deg);
+  text-wrap: pretty;
+  background: oklch(95% 0.035 30deg);
+  border-radius: var(--radius-sm);
+}
+
+/* Colour alone must never be the only signal (WCAG 1.4.1), so each message
+   carries a mark of its own. */
+.form-error::before {
+  flex: none;
+  font-weight: 700;
+  content: '!';
+}
+
 .form-hint {
   margin-block-start: var(--space-xs);
   font-size: var(--text-sm);
@@ -246,6 +297,12 @@ textarea.form-control {
 .newsletter__form {
   display: flex;
   gap: var(--space-sm);
+}
+
+/* Sits after the form, not inside it — the form is a flex row and a third item
+   would compete with the input/button pair for the line. */
+.newsletter__error {
+  margin-block-start: var(--space-2xs);
 }
 
 @media (width <= 600px) {
