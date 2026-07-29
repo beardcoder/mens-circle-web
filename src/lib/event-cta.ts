@@ -12,8 +12,6 @@
  * The result is memoised in sessionStorage for a minute so navigating between
  * pages in a visit doesn't re-hit the API.
  */
-import { API_BASE_URL } from './api';
-
 const CACHE_KEY = 'mc:has-upcoming-event';
 const TTL_MS = 60_000;
 
@@ -50,7 +48,7 @@ export async function initEventCtas(): Promise<void> {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/public/events/next`, {
+    const res = await fetch('/api/public/events/next', {
       headers: { Accept: 'application/json' },
     });
     if (!res.ok) return; // leave hidden on error — no dead button

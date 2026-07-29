@@ -2,13 +2,14 @@
 import { and, asc, eq, isNull } from 'drizzle-orm';
 import type { ApiResponse, RegistrationPayload } from '../types';
 import { db } from './db';
-import type { Event, Participant, Registration } from './db/schema';
+import type { Event, Participant, Registration, RegistrationStatus } from './db/schema';
 import { participants, registrations } from './db/schema';
 import { sendEventMessage, sendRegistrationEmails, sendWaitlistPromotion } from './email';
 import { countActiveRegistrations, ensureEventList, getEventById, isEventPast } from './events';
 import { addToLists, removeFromList } from './listmonk';
 
-export type RegStatus = 'registered' | 'waitlist' | 'cancelled' | 'attended';
+/** Alias kept for the existing call sites; the union lives with the column. */
+export type RegStatus = RegistrationStatus;
 
 export interface RegisterResult {
   status: number;
@@ -164,7 +165,7 @@ export const listRegistrationsForEvent = async (eventId: string): Promise<Regist
     .innerJoin(participants, eq(registrations.participantId, participants.id))
     .where(and(eq(registrations.eventId, eventId), isNull(registrations.deleted)))
     .orderBy(asc(registrations.registeredAt));
-  return rows as RegistrationRow[];
+  return rows;
 };
 
 const promoteNextWaitlisted = async (event: Event): Promise<void> => {
@@ -194,7 +195,7 @@ const promoteNextWaitlisted = async (event: Event): Promise<void> => {
 export const changeRegistrationStatus = async (regId: string, newStatus: RegStatus): Promise<Registration | null> => {
   const reg = (await db.select().from(registrations).where(eq(registrations.id, regId)).limit(1))[0];
   if (!reg) return null;
-  const oldStatus = reg.status as RegStatus;
+  const oldStatus = reg.status;
 
   const patch: Partial<Registration> = { status: newStatus };
   if (newStatus === 'cancelled') patch.cancelledAt = new Date().toISOString();

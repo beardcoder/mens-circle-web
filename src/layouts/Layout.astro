@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import ScrollToTop from '../components/ScrollToTop.astro';
 import SeoHead from '../components/SeoHead.astro';
+import { UMAMI_ENDPOINT, UMAMI_WEBSITE_ID } from '../lib/umami-config';
 
 interface Props {
   title?: string;
@@ -28,18 +29,17 @@ interface Props {
 
 const { bare = false, ...props } = Astro.props;
 
-// Umami heatmap recorder — a second, optional tracker script alongside the
-// analytics script the @yeskunall/astro-umami integration injects. Only
-// loaded in production when Umami is configured; the sample rate and the
-// heatmaps toggle live in the Umami admin, not here.
-const umamiId = import.meta.env.PUBLIC_UMAMI_ID;
-const umamiEndpoint = import.meta.env.PUBLIC_UMAMI_ENDPOINT;
-const umamiRecorderSrc = import.meta.env.PROD && umamiId && umamiEndpoint ? `${umamiEndpoint}/recorder.js` : null;
+// Umami heatmap recorder — the second, optional tracker script alongside the
+// analytics script the @yeskunall/astro-umami integration injects (config in
+// astro.config.mjs; both read the same id/endpoint from lib/umami-config).
+// Production only, so local development never records sessions. The sample rate
+// and the heatmaps toggle live in the Umami admin, not here.
+const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` : null;
 
 // The "next event" CTAs ([data-event-cta]) are HIDDEN by default (CSS) and
 // revealed at runtime by the client only when an upcoming event is actually
 // scheduled (see lib/event-cta.ts). They can't be gated at build time because
-// these pages are prerendered and PocketBase isn't reachable during the build.
+// these pages are prerendered, so no event data is available during the build.
 ---
 
 <!doctype html>
@@ -70,7 +70,7 @@ const umamiRecorderSrc = import.meta.env.PROD && umamiId && umamiEndpoint ? `${u
     <Font cssVariable="--font-playfair" preload />
     <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
-    {umamiRecorderSrc && <script is:inline defer src={umamiRecorderSrc} data-website-id={umamiId} />}
+    {umamiRecorderSrc && <script is:inline defer src={umamiRecorderSrc} data-website-id={UMAMI_WEBSITE_ID} />}
   </head>
   <body class:list={[{ 'is-bare': bare }]}>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
@@ -105,8 +105,6 @@ const umamiRecorderSrc = import.meta.env.PROD && umamiId && umamiEndpoint ? `${u
     <script>
       import '../lib/client';
     </script>
-    <script defer src="https://va.letsbenow.de/recorder.js" data-website-id="f2964cb9-28e6-4658-810f-2acfb9cb9c46"
-    ></script>
   </body>
 </html>
 

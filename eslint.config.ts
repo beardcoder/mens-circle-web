@@ -11,7 +11,7 @@ export default defineConfig([
   // Build output, vendored assets and external services are never linted.
   // (node_modules and .git are ignored by ESLint out of the box.)
   {
-    ignores: ['dist/**', '.astro/**', '.claude/**', 'public/**', 'pocketbase/**', 'listmonk/**', '**/*.min.js'],
+    ignores: ['dist/**', '.astro/**', '.claude/**', 'public/**', 'listmonk/**', '**/*.min.js'],
   },
 
   // Base rule sets.
@@ -49,9 +49,9 @@ export default defineConfig([
     },
   },
 
-  // CLI scripts and the server adapter log to the console by design.
+  // CLI scripts log to the console by design.
   {
-    files: ['scripts/**', 'adapter/**'],
+    files: ['scripts/**'],
     rules: { 'no-console': 'off' },
   },
 

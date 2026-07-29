@@ -1,12 +1,13 @@
 /**
  * One-shot event-reminder run.
  *
- * Invoked on a schedule by the `reminders` s6-overlay service in the Docker
- * image (every 15 minutes — see the Dockerfile), replacing the old in-process
- * setInterval cron. Does a single reminder pass and exits, so a failed run can
- * never wedge the long-lived web process.
+ * The scheduled pass runs in-process via Bun.cron (scripts/reminder-cron.ts,
+ * loaded with `bun --preload` — see docker-entrypoint.sh). This script is the
+ * manual escape hatch: one idempotent pass, then exit. Useful to force a pass
+ * after fixing a mail misconfiguration without waiting for the next tick.
  *
  *   bun run scripts/send-reminders.ts
+ *   docker exec <web> bun run scripts/send-reminders.ts
  *
  * Reads the same env as the server (DATABASE_PATH, LISTMONK_*, APP_URL, …).
  */

@@ -1,18 +1,29 @@
 /**
- * Drizzle schema — the SQLite tables that replace the former PocketBase
- * collections (participants, events, registrations, testimonials).
+ * Drizzle schema — the four SQLite tables behind the site: participants, events,
+ * registrations, testimonials.
  *
- * Conventions mirrored from the old PocketBase model:
+ * Conventions, applied consistently across all of them:
  *   • Text UUID primary keys.
  *   • `deleted` is a soft-delete timestamp (ISO string) — null = live.
  *   • Timestamps are ISO-8601 strings (UTC), so they sort lexicographically.
  *   • Booleans are stored as integers (0/1).
  */
-import { sql } from 'drizzle-orm';
 import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 const uuid = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
+
+/** Lifecycle of a seat in an event. */
+export type RegistrationStatus = 'registered' | 'waitlist' | 'cancelled' | 'attended';
+
+/**
+ * The statuses that occupy a seat — i.e. what "how full is this event" counts.
+ * `waitlist` does not hold a seat and `cancelled` released theirs; `attended` is
+ * a past-tense `registered`, so it still counts. Shared by the capacity queries
+ * (lib/server/events.ts) and the reminder pass (lib/server/reminders.ts) so the
+ * two can never disagree about who is actually booked in.
+ */
+export const ACTIVE_REGISTRATION_STATUSES = ['registered', 'attended'] as const satisfies RegistrationStatus[];
 
 export const participants = sqliteTable(
   'participants',
@@ -67,8 +78,7 @@ export const registrations = sqliteTable(
     eventId: text('event_id')
       .notNull()
       .references(() => events.id, { onDelete: 'cascade' }),
-    // 'registered' | 'waitlist' | 'cancelled' | 'attended'
-    status: text('status').notNull(),
+    status: text('status').$type<RegistrationStatus>().notNull(),
     registeredAt: text('registered_at'),
     cancelledAt: text('cancelled_at'),
     reminderSentAt: text('reminder_sent_at'),
@@ -102,6 +112,3 @@ export type NewEvent = typeof events.$inferInsert;
 export type Participant = typeof participants.$inferSelect;
 export type Registration = typeof registrations.$inferSelect;
 export type Testimonial = typeof testimonials.$inferSelect;
-
-// Re-export for migrations / drizzle-kit introspection convenience.
-export const __sql = sql;

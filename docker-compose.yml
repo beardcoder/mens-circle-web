@@ -48,7 +48,9 @@ services:
     depends_on:
       - listmonk
     healthcheck:
-      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:8090 || exit 1']
+      # Same dedicated endpoint the image's own HEALTHCHECK uses (see Dockerfile
+      # + src/pages/health.ts): a bare 200, no page render, no DB round-trip.
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:8090/health || exit 1']
       start_period: 20s
       interval: 30s
       timeout: 5s
