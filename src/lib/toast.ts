@@ -29,8 +29,19 @@ function buildToast(type: ToastType, message: string, title?: string): HTMLDivEl
   const toast = document.createElement('div');
 
   toast.className = `toast toast--${type}`;
-  toast.role = 'alert';
-  toast.ariaLive = 'polite';
+
+  // Match the announcement urgency to the message. `role="alert"` already
+  // implies `aria-live="assertive"`, so the previous pairing of alert +
+  // aria-live="polite" asked screen readers for both at once — an explicit
+  // politeness that contradicts the role it sits on. Problems interrupt;
+  // confirmations wait for a pause.
+  const urgent = type === 'error' || type === 'warning';
+
+  toast.role = urgent ? 'alert' : 'status';
+  toast.ariaLive = urgent ? 'assertive' : 'polite';
+  // The whole toast is one message: read the title and body together rather
+  // than announcing whichever text node happened to change.
+  toast.ariaAtomic = 'true';
 
   const icon = document.createElement('div');
 
