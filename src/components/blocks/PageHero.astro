@@ -21,10 +21,6 @@ const align = data.align === 'left' ? 'left' : 'center';
 const hasImage = Boolean(data.image);
 const hasButton = Boolean(data.buttonText && data.buttonLink);
 const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
-// CTAs pointing at the next event are runtime-gated: hidden by default and only
-// revealed when an upcoming event is actually scheduled (see lib/event-cta.ts).
-const isEventCta = data.buttonLink?.startsWith('/event') ?? false;
-
 // Prefer a build-optimised (responsive AVIF/WebP) asset; fall back to the raw
 // path for external URLs or images that aren't bundled.
 const imageAsset = resolveAssetImage(data.image);
@@ -46,7 +42,7 @@ const imageAlt = data.imageAlt ?? '';
 
         {
           hasButton && (
-            <div class="page-hero__cta" data-event-cta={isEventCta ? '' : undefined}>
+            <div class="page-hero__cta">
               <a
                 href={data.buttonLink}
                 class="btn btn--primary btn--large"

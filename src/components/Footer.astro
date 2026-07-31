@@ -40,7 +40,6 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
                 <a
                   href={item.url}
                   data-umami-event="footer-link"
-                  data-event-cta={item.url === '/event' ? '' : undefined}
                   target={(item as { target?: string }).target}
                   rel={(item as { target?: string }).target === '_blank' ? 'noopener' : undefined}
                 >
