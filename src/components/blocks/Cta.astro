@@ -46,7 +46,6 @@ const { data } = Astro.props;
             class="btn btn--primary btn--large"
             data-reveal="zoom"
             data-reveal-duration="1000"
-            data-event-cta={data.buttonLink?.startsWith('/event') ? '' : undefined}
             data-umami-event="cta-click"
             data-umami-event-location="cta-block"
             data-umami-event-text={data.buttonText}

@@ -1,0 +1,501 @@
+---
+import { buildEventFaq, EVENT_FACTS, EVENT_RHYTHM, type NextEventSummary } from '@lib/event-landing';
+import Faq from '../blocks/Faq.astro';
+import Newsletter from '../blocks/Newsletter.astro';
+import WhatsappCommunity from '../blocks/WhatsappCommunity.astro';
+
+/**
+ * The permanent /event landing page.
+ *
+ * This route used to do one of two unhelpful things: 302 straight to
+ * /event/<slug> whenever a date existed — so the hub URL never held any content
+ * of its own and could not rank — or, with nothing scheduled, render a page
+ * whose <h1> was literally "Aktuell ist kein Termin geplant". On top of that
+ * every internal link pointing here was hidden by CSS while no date was set, so
+ * the page was orphaned at exactly the moment it was the only thing to show.
+ *
+ * It is now evergreen: the heading, the copy and the structured data describe
+ * the Männerkreis itself and stay true whether or not a date is on the books.
+ * The upcoming date is a *slot* near the top — filled with a concrete card when
+ * one exists, and with the "how to hear about it first" panel when it doesn't.
+ * Registration still happens on /event/<slug>, which stays the canonical URL for
+ * an individual evening and carries its own Event markup; this page links there
+ * rather than duplicating it.
+ *
+ * Every factual claim below (Straubing, alle zwei bis vier Wochen, 2-3 Stunden,
+ * Spendenbasis, Vertraulichkeit, keine Vorerfahrung) is taken from the FAQ and
+ * block copy already in src/content/home.json — nothing here is invented.
+ */
+
+interface Props {
+  /** The next upcoming event reduced to display strings, or null when none. */
+  next: NextEventSummary | null;
+}
+
+const { next } = Astro.props;
+
+// Same call the page makes for the JSON-LD, so the rendered questions and the
+// FAQPage markup are guaranteed to be the identical strings.
+const faqItems = buildEventFaq(next);
+---
+
+<section class="section event-landing-hero">
+  <div class="event-landing-hero__circles" aria-hidden="true">
+    <span class="event-landing-hero__circle event-landing-hero__circle--1"></span>
+    <span class="event-landing-hero__circle event-landing-hero__circle--2"></span>
+  </div>
+
+  <div class="container">
+    <div class="event-landing-hero__content" data-reveal-group="90">
+      <p class="eyebrow" data-reveal="up">Termine · Straubing / Niederbayern</p>
+
+      {/* Evergreen and keyword-bearing: true with or without a date on the books. */}
+      <h1 class="event-landing-hero__title" data-reveal="blur">
+        Männerkreis in Straubing – <span class="text-italic">die Termine</span>
+      </h1>
+
+      <p class="event-landing-hero__lead" data-reveal="up">
+        Alle zwei bis vier Wochen kommen wir in Straubing in einem kleinen Kreis zusammen: zwei bis drei Stunden
+        ehrlicher Austausch unter Männern, auf Spendenbasis, ohne Vorerfahrung und ohne Mitgliedschaft. Hier findest du
+        den nächsten Termin und alles, was du für deinen ersten Abend wissen musst.
+      </p>
+    </div>
+  </div>
+</section>
+
+{/* ── The one slot that depends on live data ───────────────────────────── */}
+<section class="section event-landing-next" id="naechster-termin" aria-labelledby="naechster-termin-title">
+  <div class="container">
+    {
+      next ? (
+        <div class="event-landing-next__card" data-reveal="up">
+          <p class="eyebrow eyebrow--secondary">Nächster Termin</p>
+          <h2 class="event-landing-next__title" id="naechster-termin-title">
+            {next.dateLabel}
+          </h2>
+
+          <dl class="event-landing-next__meta">
+            {next.timeRange && (
+              <div class="event-landing-next__row">
+                <dt>Uhrzeit</dt>
+                <dd>{next.timeRange}</dd>
+              </div>
+            )}
+            <div class="event-landing-next__row">
+              <dt>Ort</dt>
+              <dd>{next.place}</dd>
+            </div>
+            <div class="event-landing-next__row">
+              <dt>Plätze</dt>
+              <dd>
+                {next.isFull
+                  ? 'Ausgebucht – Warteliste möglich'
+                  : `${next.availableSpots} von ${next.maxParticipants} frei`}
+              </dd>
+            </div>
+          </dl>
+
+          <a href={`/event/${next.slug}`} class="btn btn--primary btn--large">
+            {next.isFull ? 'Auf die Warteliste' : 'Zum Termin & Anmeldung'}
+          </a>
+        </div>
+      ) : (
+        <div class="event-landing-next__card event-landing-next__card--pending" data-reveal="up">
+          <p class="eyebrow eyebrow--secondary">Nächster Termin</p>
+          <h2 class="event-landing-next__title" id="naechster-termin-title">
+            Der nächste Termin wird gerade <span class="text-italic">geplant</span>
+          </h2>
+          <p class="event-landing-next__text">
+            Die Gruppe bleibt bewusst klein, deshalb sind die Plätze schnell weg. Trag dich in den Newsletter ein oder
+            komm in die WhatsApp-Community – dann erfährst du es zuerst, sobald der neue Termin steht.
+          </p>
+          <div class="event-landing-next__actions">
+            <a href="#newsletter" class="btn btn--primary btn--large">
+              Benachrichtigt werden
+            </a>
+            <a href="#whatsapp-community" class="btn btn--secondary btn--large">
+              WhatsApp-Community
+            </a>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+{/* ── Evergreen: the payload that makes this page worth indexing ───────── */}
+<section class="section event-landing-facts" aria-labelledby="ablauf-facts-title">
+  <div class="container">
+    <div class="section-header section-header--start" data-reveal-group>
+      <p class="eyebrow" data-reveal="up">Gut zu wissen</p>
+      <h2 class="section-title" id="ablauf-facts-title" data-reveal="blur">
+        Ort, Rhythmus, <span class="text-italic">Beitrag</span>
+      </h2>
+    </div>
+
+    <dl class="event-landing-facts__grid" data-reveal-group="90">
+      {
+        EVENT_FACTS.map((fact) => (
+          <div class="event-landing-facts__item" data-reveal="up">
+            <dt class="event-landing-facts__label">{fact.label}</dt>
+            <dd class="event-landing-facts__value">{fact.value}</dd>
+            <dd class="event-landing-facts__sub">{fact.sub}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<section class="section event-landing-rhythm" aria-labelledby="ablauf-title">
+  <div class="container">
+    <div class="section-header section-header--start" data-reveal-group>
+      <p class="eyebrow" data-reveal="up">Dein erster Abend</p>
+      <h2 class="section-title" id="ablauf-title" data-reveal="blur">
+        Wie ein Treffen <span class="text-italic">abläuft</span>
+      </h2>
+      <p class="section-intro" data-reveal="up">
+        Wir sitzen im Kreis – das ist mehr als eine Sitzordnung, es steht für Gleichwertigkeit. Es gibt keine starren
+        Regeln, aber einen verlässlichen Rhythmus.
+      </p>
+    </div>
+
+    <ol class="event-landing-rhythm__list" role="list" data-reveal-group="110">
+      {
+        EVENT_RHYTHM.map((phase) => (
+          <li class="event-landing-rhythm__item" data-reveal="up">
+            <p class="event-landing-rhythm__step" aria-hidden="true">
+              {phase.step}
+            </p>
+            <h3 class="event-landing-rhythm__title">{phase.title}</h3>
+            <p class="event-landing-rhythm__text">{phase.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="event-landing-rhythm__note" data-reveal="up">
+      Der Männerkreis ist weder Therapie noch Coaching – es geht nicht darum, Probleme zu lösen oder Ratschläge zu
+      verteilen, sondern um Zuhören und Verbindung. Mehr über die Haltung dahinter liest du in
+      <a href="/warum-ich-den-maennerkreis-leite" class="link">warum ich den Männerkreis leite</a>.
+    </p>
+  </div>
+</section>
+
+<Faq
+  data={{
+    anchor: 'fragen-zum-termin',
+    eyebrow: 'Fragen zur Teilnahme',
+    title: 'Was du vor deinem<br><span class="text-italic">ersten Abend</span> wissen willst',
+    items: faqItems,
+  }}
+/>
+
+<Newsletter
+  data={{
+    eyebrow: 'Newsletter',
+    title: 'Erfahre es <span class="text-italic">zuerst</span>',
+    text: 'Ein kurzer Hinweis, sobald der nächste Termin steht – damit du dir deinen Platz sichern kannst, bevor der Kreis voll ist.',
+  }}
+  context={{ page: 'event-landing' }}
+/>
+
+<WhatsappCommunity />
+
+<section class="section event-landing-more" aria-labelledby="mehr-title">
+  <div class="container">
+    <div class="section-header section-header--start" data-reveal-group>
+      <p class="eyebrow" data-reveal="up">Weiterlesen</p>
+      <h2 class="section-title" id="mehr-title" data-reveal="blur">
+        Bevor du <span class="text-italic">dabei bist</span>
+      </h2>
+    </div>
+
+    <ul class="event-landing-more__list" role="list" data-reveal-group="90">
+      <li class="event-landing-more__item" data-reveal="up">
+        <a href="/#ueber">
+          <h3>Was ist ein Männerkreis?</h3>
+          <p>Worum es im Kreis geht – und worum ausdrücklich nicht.</p>
+        </a>
+      </li>
+      <li class="event-landing-more__item" data-reveal="up">
+        <a href="/warum-ich-den-maennerkreis-leite">
+          <h3>Meine Haltung</h3>
+          <p>Warum ich diesen Raum öffne und wie ich ihn halte.</p>
+        </a>
+      </li>
+      <li class="event-landing-more__item" data-reveal="up">
+        <a href="/atemuebung">
+          <h3>Atemübung</h3>
+          <p>Eine geführte Übung, die du sofort ausprobieren kannst.</p>
+        </a>
+      </li>
+      <li class="event-landing-more__item" data-reveal="up">
+        <a href="/teile-deine-erfahrung">
+          <h3>Stimmen aus dem Kreis</h3>
+          <p>Was Teilnehmer erlebt haben – und teile deine Erfahrung.</p>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    /* ── Hero ─────────────────────────────────────────────────────────── */
+    .event-landing-hero {
+      position: relative;
+      padding-block: calc(var(--header-clearance) + var(--space-lg)) var(--space-lg);
+      overflow: clip;
+    }
+
+    .event-landing-hero__circles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .event-landing-hero__circle {
+      position: absolute;
+      border: 1px solid color-mix(in oklch, var(--accent-primary) 14%, transparent);
+      border-radius: var(--radius-full);
+    }
+
+    .event-landing-hero__circle--1 {
+      inset-block-start: -18%;
+      inset-inline-end: -12%;
+      inline-size: 32rem;
+      block-size: 32rem;
+    }
+
+    .event-landing-hero__circle--2 {
+      inset-block-end: -30%;
+      inset-inline-start: -14%;
+      inline-size: 22rem;
+      block-size: 22rem;
+    }
+
+    .event-landing-hero__content {
+      position: relative;
+      z-index: 1;
+      max-inline-size: 52rem;
+    }
+
+    .event-landing-hero__title {
+      margin-block: var(--space-xs) var(--space-sm);
+      font-size: clamp(2.25rem, 1.4rem + 4vw, 4.5rem);
+      line-height: 1.05;
+      text-wrap: balance;
+    }
+
+    .event-landing-hero__lead {
+      max-inline-size: var(--content-max-description);
+      font-size: var(--text-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    /* ── Next-date slot ───────────────────────────────────────────────── */
+    .event-landing-next {
+      padding-block-start: 0;
+    }
+
+    .event-landing-next__card {
+      padding: clamp(1.75rem, 4vw, 3rem);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-inline-start: 4px solid var(--accent-primary);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .event-landing-next__title {
+      margin-block: var(--space-2xs) var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.5rem);
+      line-height: 1.15;
+      color: var(--text-primary);
+      text-wrap: balance;
+    }
+
+    .event-landing-next__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm) var(--space-lg);
+      margin-block-end: var(--space-md);
+    }
+
+    .event-landing-next__row dt {
+      font-size: var(--text-caption);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .event-landing-next__row dd {
+      margin: 0;
+      font-size: var(--text-lg);
+      color: var(--text-primary);
+    }
+
+    .event-landing-next__text {
+      max-inline-size: var(--content-max-description);
+      margin-block-end: var(--space-md);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-next__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    /* ── Facts ────────────────────────────────────────────────────────── */
+    .event-landing-facts__grid {
+      display: grid;
+      /* Exactly four facts: 4-up, then 2-up, then stacked. */
+      grid-template-columns: repeat(4, 1fr);
+
+      @media (width <= 1000px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (width <= 480px) {
+        grid-template-columns: 1fr;
+      }
+      gap: var(--space-md);
+      margin: 0;
+    }
+
+    .event-landing-facts__item {
+      padding-block-start: var(--space-sm);
+      border-block-start: 1px solid var(--border-medium);
+    }
+
+    .event-landing-facts__label {
+      font-size: var(--text-caption);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .event-landing-facts__value {
+      margin: var(--space-3xs) 0 0;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      color: var(--text-primary);
+    }
+
+    .event-landing-facts__sub {
+      margin: var(--space-3xs) 0 0;
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    /* ── Rhythm ───────────────────────────────────────────────────────── */
+    .event-landing-rhythm__list {
+      display: grid;
+      /* Four phases, same ladder as the facts grid above. */
+      grid-template-columns: repeat(4, 1fr);
+
+      @media (width <= 1000px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (width <= 480px) {
+        grid-template-columns: 1fr;
+      }
+      gap: var(--space-md);
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .event-landing-rhythm__step {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      line-height: 1;
+      color: color-mix(in oklch, var(--accent-primary) 55%, transparent);
+    }
+
+    .event-landing-rhythm__title {
+      margin-block: var(--space-2xs) var(--space-3xs);
+      font-size: var(--text-lg);
+      color: var(--text-primary);
+    }
+
+    .event-landing-rhythm__text {
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-rhythm__note {
+      max-inline-size: var(--content-max-description);
+      margin-block-start: var(--space-lg);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      color: var(--text-muted);
+      text-wrap: pretty;
+    }
+
+    /* ── Further reading ──────────────────────────────────────────────── */
+    .event-landing-more__list {
+      display: grid;
+      /* Four links, same ladder again. */
+      grid-template-columns: repeat(4, 1fr);
+
+      @media (width <= 1000px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (width <= 480px) {
+        grid-template-columns: 1fr;
+      }
+      gap: var(--space-sm);
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .event-landing-more__item a {
+      display: block;
+      block-size: 100%;
+      padding: var(--space-sm);
+      color: inherit;
+      text-decoration: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      transition:
+        border-color var(--motion-quick),
+        transform var(--motion-quick);
+    }
+
+    .event-landing-more__item a:hover,
+    .event-landing-more__item a:focus-visible {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    .event-landing-more__item h3 {
+      margin-block-end: var(--space-3xs);
+      font-size: var(--text-base);
+      color: var(--text-primary);
+    }
+
+    .event-landing-more__item p {
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+  }
+</style>
