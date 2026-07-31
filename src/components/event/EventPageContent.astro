@@ -6,36 +6,35 @@ import EventHero from './EventHero.astro';
 import EventInfo from './EventInfo.astro';
 import EventMapSection from './EventMapSection.astro';
 import EventRegister from './EventRegister.astro';
-import NoEvent from './NoEvent.astro';
 
 /**
- * The full /event page body, server-rendered. Only the genuinely interactive
- * pieces hydrate as islands (registration form, add-to-calendar dialog, map,
- * newsletter form) — everything else is plain HTML, so the page ships a
- * fraction of the JS the old whole-page Svelte island needed.
+ * The body of a single event's page (/event/<slug>), server-rendered. Only the
+ * genuinely interactive pieces hydrate as islands (registration form,
+ * add-to-calendar dialog, map, newsletter form) — everything else is plain HTML,
+ * so the page ships a fraction of the JS the old whole-page Svelte island needed.
+ *
+ * The event is required. This used to accept `null` and fall back to a
+ * "no upcoming event" body, but that branch is unreachable now: /event/<slug>
+ * redirects to /event when the slug resolves to nothing, and /event itself is the
+ * permanent landing page (components/event/EventLanding.astro) which owns the
+ * empty state.
  */
 
 interface Props {
-  /** Event rendered per request (null = no upcoming event scheduled). */
-  event: EventDTO | null;
+  /** The event this page is about, read from the DB per request. */
+  event: EventDTO;
 }
 
 const { event } = Astro.props;
 ---
 
+<EventHero event={event} />
+<EventRegister event={event} />
+<EventInfo event={event} />
 {
-  event ? (
-    <>
-      <EventHero event={event} />
-      <EventRegister event={event} />
-      <EventInfo event={event} />
-      {event.latitude !== null && event.longitude !== null && (
-        <EventMapSection event={event} lat={event.latitude} lng={event.longitude} />
-      )}
-      <EventAbout event={event} />
-      <EventFinalCta event={event} />
-    </>
-  ) : (
-    <NoEvent />
+  event.latitude !== null && event.longitude !== null && (
+    <EventMapSection event={event} lat={event.latitude} lng={event.longitude} />
   )
 }
+<EventAbout event={event} />
+<EventFinalCta event={event} />

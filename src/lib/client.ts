@@ -4,7 +4,6 @@
  * blocks the others.
  */
 
-import { initEventCtas } from './event-cta';
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';
 import { initTheme } from './theme';
@@ -35,10 +34,6 @@ function init(): void {
     // eslint-disable-next-line no-console
     console.error('[client] initMotion failed:', error);
   }
-
-  // Runtime check on prerendered pages: event CTAs stay hidden unless an
-  // upcoming event exists.
-  void initEventCtas();
 }
 
 if (document.readyState === 'loading') {

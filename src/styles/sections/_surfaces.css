@@ -14,7 +14,6 @@
   .event-register-section,
   .event-about__quote-area,
   .event-cta-section,
-  .no-event-info__quote-area,
   .testimonial-form-hero .hero__bg
 )::before {
   position: absolute;
