@@ -64,8 +64,9 @@
     .event-map-section,
     .event-about-section,
     .event-cta-section,
-    .no-event-info-section,
-    .no-event-cta-section
+    .event-landing-facts,
+    .event-landing-rhythm,
+    .event-landing-more
   ) {
     content-visibility: auto;
     contain-intrinsic-block-size: auto 800px;

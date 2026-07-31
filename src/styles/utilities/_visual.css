@@ -3,22 +3,12 @@
  * Accessibility helpers, editorial chrome
  */
 
-/* ============================================
-   "Next event" CTAs — runtime gated
-   ============================================
-   Every link/button that points at the next event carries `data-event-cta`.
-   The pages carrying them are prerendered (static), so whether an upcoming
-   event exists is checked at runtime by the client (see lib/event-cta.ts),
-   which tags `<body>` with `has-upcoming-event` only when one is confirmed.
-
-   The CTAs are hidden by DEFAULT and only revealed on that confirmation, so
-   there is no flicker and no dead button in the empty/offline state. For CTAs
-   that sit inside a list (footer nav) the whole row is dropped so no empty
-   bullet remains. */
-body:not(.has-upcoming-event) [data-event-cta],
-body:not(.has-upcoming-event) :is(li):has(> [data-event-cta]) {
-  display: none;
-}
+/* The "next event" CTAs used to be hidden here by default and revealed at
+   runtime (`body.has-upcoming-event`) only once a client-side fetch confirmed a
+   date existed. That is gone: /event is now a permanent landing page that reads
+   well with or without a date on the books, so the links never point anywhere
+   dead and are always rendered — no runtime probe, no flicker, and a crawlable
+   internal link to /event on every page instead of an orphaned URL. */
 
 /* ============================================
    Screen Reader Only

@@ -35,11 +35,6 @@ const { bare = false, ...props } = Astro.props;
 // Production only, so local development never records sessions. The sample rate
 // and the heatmaps toggle live in the Umami admin, not here.
 const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` : null;
-
-// The "next event" CTAs ([data-event-cta]) are HIDDEN by default (CSS) and
-// revealed at runtime by the client only when an upcoming event is actually
-// scheduled (see lib/event-cta.ts). They can't be gated at build time because
-// these pages are prerendered, so no event data is available during the build.
 ---
 
 <!doctype html>
