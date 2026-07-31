@@ -68,7 +68,7 @@ const bgAsset = resolveAssetImage(data.backgroundImage);
 
         {
           data.buttonText && data.buttonLink && (
-            <div class="hero__cta" data-event-cta={data.buttonLink?.startsWith('/event') ? '' : undefined}>
+            <div class="hero__cta">
               <a href={data.buttonLink} class="btn btn--primary btn--large">
                 {data.buttonText}
               </a>
