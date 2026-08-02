@@ -82,6 +82,31 @@ export const getPublishedEventBySlug = async (slug: string): Promise<Event | nul
   return rows[0] ?? null;
 };
 
+/** One row per publicly reachable /event/<slug> page, for the XML sitemap. */
+export interface SitemapEvent {
+  slug: string;
+  /** ISO timestamp of the last edit — becomes `<lastmod>`. */
+  updatedAt: string;
+  eventDate: string;
+}
+
+/**
+ * Every event that resolves to a public page, newest first.
+ *
+ * Deliberately includes past events: their pages render a real "Rückblick"
+ * state with their own date, place and description, they answer 200, and the
+ * landing page only ever links the *next* one — so without the sitemap they are
+ * reachable but undiscoverable. The filter mirrors getPublishedEventBySlug
+ * exactly (published, not soft-deleted), because listing a URL that route would
+ * refuse to serve is worse than not listing it at all.
+ */
+export const listPublishedEventsForSitemap = async (): Promise<SitemapEvent[]> =>
+  db
+    .select({ slug: events.slug, updatedAt: events.updatedAt, eventDate: events.eventDate })
+    .from(events)
+    .where(and(eq(events.isPublished, true), isNull(events.deleted)))
+    .orderBy(desc(events.eventDate));
+
 export const getEventById = async (id: string): Promise<Event | null> => {
   const rows = await db.select().from(events).where(eq(events.id, id)).limit(1);
   return rows[0] ?? null;
