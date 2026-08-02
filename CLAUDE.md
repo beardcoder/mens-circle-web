@@ -42,6 +42,8 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 
 **Rendering:** Most pages are prerendered (static, RAM-friendly). Only **event pages and the home-page testimonials** render on demand (SSR) from the DB — content edits in the admin UI are live immediately, no rebuild.
 
+**SEO / sitemap:** `/event` is a permanent landing page (`components/event/EventLanding.astro`) that reads correctly with or without a scheduled date — it never redirects, and `/event/<slug>` stays the canonical URL for one meeting. The sitemap is in **two parts**: `@astrojs/sitemap` emits `sitemap-0.xml` for the build-time routes, and `src/pages/sitemap-events.xml.ts` lists the event pages per request (their slugs live in SQLite and are unknown at build time). `astro-integrations/sitemap-index-extra.mjs` adds that route to `sitemap-index.xml` — it **must** be registered between `sitemap()` and `serveSitemapWithBunAdapter()`, because the latter writes the index's byte length into the static manifest and patching the file afterwards would serve a truncated document.
+
 **Data layer — `src/lib/server/db/`:** Drizzle on `bun:sqlite`. Schema in `schema.ts`; migrations in `drizzle/` are **applied automatically on boot** (`index.ts`). `bun:sqlite` is a Bun builtin kept `external` in `astro.config.mjs` (Rollup must not bundle it). After changing the schema, run `bun run db:generate`.
 
 **`src/lib/server/*` is server-only** (db, events, registrations, testimonials, listmonk, email, auth, reminders, ics, format, ratelimit, config). Never import it into client/Svelte code — it pulls in `bun:sqlite`. This is the business-logic layer; the two RPC surfaces below are thin wrappers over it.

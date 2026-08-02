@@ -7,6 +7,7 @@ import umami from '@yeskunall/astro-umami';
 import icon from 'astro-icon';
 import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
 import { defineConfig, fontProviders } from 'astro/config';
+import { addSitemapsToIndex } from './astro-integrations/sitemap-index-extra.mjs';
 import { serveLlmsWithBunAdapter, serveSitemapWithBunAdapter } from './astro-integrations/serve-with-bun-adapter.mjs';
 import { UMAMI_ENDPOINT, UMAMI_WEBSITE_ID } from './src/lib/umami-config.ts';
 
@@ -139,10 +140,10 @@ export default defineConfig({
     // renders as an inline <svg> with no runtime <use> indirection.
     icon(),
     sitemap({
-      // Keep noindex / non-public routes out of the sitemap. Dynamic event
-      // detail pages (/event/<slug>) are SSR and thus not known at build time,
-      // so they aren't listed here — they stay indexable and are discovered by
-      // crawling the /event hub and internal links.
+      // Keep noindex / non-public routes out of the sitemap. The event detail
+      // pages (/event/<slug>) are SSR and unknown at build time, so they cannot
+      // appear here — they are listed by the dynamic /sitemap-events.xml route
+      // instead, which addSitemapsToIndex() below wires into the index.
       filter: (page) =>
         !page.includes('/admin') &&
         !page.includes('/impressum') &&
@@ -157,6 +158,10 @@ export default defineConfig({
         return { ...item, url: url.href };
       },
     }),
+    // Must sit BETWEEN sitemap() and serveSitemapWithBunAdapter(): it needs the
+    // generated index to exist, and it must patch it BEFORE the manifest records
+    // that file's byte length (see the integration for the full why).
+    addSitemapsToIndex({ paths: ['/sitemap-events.xml'] }),
     // Must run AFTER sitemap(): registers the generated sitemap files into the
     // Bun adapter's static manifest so they are actually served (see the
     // integration for the full why).
