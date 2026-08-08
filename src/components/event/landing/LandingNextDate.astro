@@ -1,0 +1,164 @@
+---
+import type { NextEventSummary } from '@lib/event-landing';
+
+/**
+ * The one slot on /event that depends on live data.
+ *
+ * Registration deliberately stays on /event/<slug> — that URL is canonical for
+ * a single evening and carries its own Event markup. This card links there.
+ *
+ * With nothing scheduled the panel stays calm: no "die Plätze sind schnell weg"
+ * when there is no date to be quick about. Real capacity numbers are only shown
+ * when a real event supplies them.
+ */
+
+interface Props {
+  next: NextEventSummary | null;
+}
+
+const { next } = Astro.props;
+---
+
+<section class="section event-landing-next" id="naechster-termin" aria-labelledby="naechster-termin-title">
+  <div class="container">
+    {
+      next ? (
+        <div class="event-landing-next__card" data-reveal="up">
+          <p class="eyebrow">Nächster Termin</p>
+          <h2 class="event-landing-next__title" id="naechster-termin-title">
+            {next.dateLabel}
+          </h2>
+
+          <dl class="event-landing-next__meta">
+            {next.timeRange && (
+              <div class="event-landing-next__row">
+                <dt>Uhrzeit</dt>
+                <dd>{next.timeRange}</dd>
+              </div>
+            )}
+            <div class="event-landing-next__row">
+              <dt>Ort</dt>
+              <dd>{next.place}</dd>
+            </div>
+            <div class="event-landing-next__row">
+              <dt>Plätze</dt>
+              <dd>
+                {next.isFull
+                  ? 'Ausgebucht – Warteliste möglich'
+                  : `${next.availableSpots} von ${next.maxParticipants} frei`}
+              </dd>
+            </div>
+          </dl>
+
+          <a href={`/event/${next.slug}`} class="btn btn--primary btn--large">
+            {next.isFull ? 'Zur Warteliste' : 'Termin ansehen & anmelden'}
+          </a>
+
+          <p class="event-landing-next__hint">
+            Die Anmeldung läuft über die Terminseite. Name und E-Mail genügen – den genauen Treffpunkt bekommst du mit
+            der Bestätigung.
+          </p>
+        </div>
+      ) : (
+        <div class="event-landing-next__card event-landing-next__card--pending" data-reveal="up">
+          <p class="eyebrow">Nächster Männerkreis</p>
+          <h2 class="event-landing-next__title" id="naechster-termin-title">
+            Der nächste Kreis <span class="text-italic">entsteht gerade</span>
+          </h2>
+          <p class="event-landing-next__text">
+            Aktuell steht noch kein neuer Termin fest. Wenn du neugierig bist, musst du deshalb nicht regelmäßig
+            nachsehen: Über den Newsletter oder die WhatsApp-Community erfährst du, sobald der nächste Abend geplant
+            ist.
+          </p>
+          <div class="event-landing-next__actions">
+            <a href="#newsletter" class="btn btn--primary btn--large">
+              Über neuen Termin informieren
+            </a>
+            <a href="#whatsapp-community" class="btn btn--secondary btn--large">
+              WhatsApp-Community
+            </a>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-next {
+      padding-block-start: 0;
+    }
+
+    .event-landing-next__card {
+      padding: clamp(1.75rem, 4vw, 3rem);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-light);
+      border-inline-start: 4px solid var(--accent-primary);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .event-landing-next__title {
+      margin-block: var(--space-2xs) var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.5rem);
+      line-height: 1.15;
+      color: var(--text-primary);
+      text-wrap: balance;
+    }
+
+    .event-landing-next__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm) var(--space-lg);
+      margin-block-end: var(--space-md);
+    }
+
+    .event-landing-next__row dt {
+      font-size: var(--text-caption);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .event-landing-next__row dd {
+      margin: 0;
+      font-size: var(--text-lg);
+      color: var(--text-primary);
+    }
+
+    .event-landing-next__text {
+      max-inline-size: var(--content-max-description);
+      margin-block-end: var(--space-md);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-next__hint {
+      max-inline-size: var(--content-max-description);
+      margin-block-start: var(--space-sm);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      color: var(--text-muted);
+      text-wrap: pretty;
+    }
+
+    .event-landing-next__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    /* Long German CTA labels must wrap on a phone rather than force a
+       horizontal scroll — `.btn` sets `white-space: nowrap` by default. */
+    @media (width <= 480px) {
+      .event-landing-next__card .btn {
+        inline-size: 100%;
+        white-space: normal;
+      }
+    }
+  }
+</style>

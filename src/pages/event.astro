@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { fetchNextEvent } from '@lib/server/events';
+import { fetchTestimonials } from '@lib/server/testimonials';
 import { buildEventFaq, summarizeNextEvent } from '@lib/event-landing';
 import EventLanding from '../components/event/EventLanding.astro';
 import site from '../data/site.json';
@@ -19,6 +20,12 @@ import site from '../data/site.json';
  */
 const event = await fetchNextEvent();
 const next = summarizeNextEvent(event);
+
+// A single published voice for the pull quote after "Du musst nichts können" —
+// the top of the curated order, not a second copy of the home page's grid. The
+// page is server-rendered anyway, so this is one extra one-row read per request;
+// `null` when nothing is published, and the section then renders nothing.
+const [voice = null] = await fetchTestimonials(1);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = new URL('/event', siteUrl).href;
@@ -39,8 +46,11 @@ const eventSeries: Record<string, unknown> = {
   '@type': 'EventSeries',
   '@id': `${canonical}#series`,
   name: 'Männerkreis Niederbayern/ Straubing',
+  // Kept in step with what the page actually shows: the rhythm, the duration and
+  // the donation basis are all stated in the visible facts section, so the
+  // structured data and the page can't drift apart.
   description:
-    'Regelmäßiger Männerkreis in Straubing, Niederbayern: ein geschützter Raum für ehrlichen Austausch, Gemeinschaft und persönliches Wachstum. Alle zwei bis vier Wochen, zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.',
+    'Regelmäßiger Männerkreis in Straubing, Niederbayern: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt. Alle zwei bis vier Wochen, zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.',
   url: canonical,
   inLanguage: 'de-DE',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
@@ -103,8 +113,8 @@ const breadcrumbs = {
 // The description changes with the state so the SERP snippet is never stale,
 // but both variants lead with the same evergreen keywords.
 const description = next
-  ? `Nächster Männerkreis in Straubing: ${next.dateLabel}${next.timeRange ? `, ${next.timeRange}` : ''}. Ehrlicher Austausch unter Männern, auf Spendenbasis, ohne Vorerfahrung. Jetzt Platz sichern.`
-  : 'Männerkreis in Straubing/ Niederbayern: alle Termine, Ablauf eines Abends, Ort und Beitrag. Ehrlicher Austausch unter Männern, auf Spendenbasis und ohne Vorerfahrung.';
+  ? `Nächster Männerkreis in ${next.place}: ${next.dateLabel}${next.timeRange ? `, ${next.timeRange}` : ''}. Ein Abend unter Männern, an dem du nichts darstellen musst – ohne Vorerfahrung, auf Spendenbasis.`
+  : 'Männerkreis in Straubing/ Niederbayern: was an so einem Abend passiert, was du mitbringen musst (nichts) und wann der nächste Termin ist. Ohne Vorerfahrung, auf Spendenbasis.';
 ---
 
 <Layout
@@ -113,5 +123,5 @@ const description = next
   keywords="Männerkreis Straubing, Männerkreis Niederbayern, Männergruppe Straubing, Termine, Männerkreis Termine, Anmeldung"
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  <EventLanding next={next} />
+  <EventLanding next={next} voice={voice} />
 </Layout>

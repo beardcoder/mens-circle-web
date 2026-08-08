@@ -1,0 +1,70 @@
+---
+import { EVENT_FRAME } from '@lib/event-landing';
+
+/**
+ * "Der Rahmen" — the four ground rules, spelled out.
+ *
+ * These used to be summarised in a single sentence ("keine starren Regeln, aber
+ * Leitlinien"). Someone deciding whether to walk in wants to read the actual
+ * agreements, so each one gets its own line and its own plain explanation.
+ */
+---
+
+<section class="section event-landing-frame" aria-labelledby="rahmen-title">
+  <div class="container">
+    <div class="section-header section-header--start" data-reveal-group>
+      <p class="eyebrow" data-reveal="up">Der Rahmen</p>
+      <h2 class="section-title" id="rahmen-title" data-reveal="blur">
+        Damit ehrliche Gespräche <span class="text-italic">möglich werden</span>
+      </h2>
+    </div>
+
+    <dl class="event-landing-frame__grid" data-reveal-group="90">
+      {
+        EVENT_FRAME.map((rule) => (
+          <div class="event-landing-frame__item" data-reveal="up">
+            <dt class="event-landing-frame__title">{rule.title}</dt>
+            <dd class="event-landing-frame__text">{rule.text}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-frame__grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md) var(--space-xl);
+      margin: 0;
+
+      @media (width <= 700px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .event-landing-frame__item {
+      padding-block-start: var(--space-sm);
+      border-block-start: 1px solid var(--border-medium);
+    }
+
+    .event-landing-frame__title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      line-height: 1.15;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .event-landing-frame__text {
+      max-inline-size: 46ch;
+      margin: var(--space-2xs) 0 0;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+  }
+</style>

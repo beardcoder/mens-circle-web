@@ -1,0 +1,145 @@
+---
+import { EVENT_NO_PREP } from '@lib/event-landing';
+
+/**
+ * "Zum ersten Mal dabei?" — the section that has to be readable in five seconds.
+ *
+ * Everything here is a negation on purpose: what you do *not* need. The list is
+ * the point, so it gets the visual weight and the copy around it stays short.
+ */
+---
+
+<section class="section event-landing-first" aria-labelledby="erstes-mal-title">
+  <div class="container">
+    <div class="event-landing-first__layout">
+      <div class="event-landing-first__intro" data-reveal-group="90">
+        <p class="eyebrow" data-reveal="up">Zum ersten Mal dabei?</p>
+        <h2 class="section-title" id="erstes-mal-title" data-reveal="blur">
+          Du musst <span class="text-italic">nichts können.</span>
+        </h2>
+        <p class="event-landing-first__text" data-reveal="up">
+          Viele Männer waren vorher noch nie in einem Männerkreis. Du brauchst keine besondere Vorbereitung und keine
+          Erfahrung mit Meditation, Atemarbeit oder Männergruppen.
+        </p>
+      </div>
+
+      <div class="event-landing-first__panel" data-reveal="up" data-reveal-delay="120">
+        <p class="event-landing-first__panel-label">Was du mitbringen musst:</p>
+        <ul class="event-landing-first__list" role="list">
+          {EVENT_NO_PREP.map((item) => <li class="event-landing-first__item">{item}</li>)}
+        </ul>
+        <p class="event-landing-first__panel-note">Nur dich – so, wie du gerade bist.</p>
+      </div>
+    </div>
+
+    <div class="event-landing-first__close" data-reveal="up">
+      <p>
+        Und du musst auch nicht sofort über deine persönlichsten Themen sprechen. Du bestimmst selbst, was du teilst.
+      </p>
+      <p class="event-landing-first__accent">Zuhören ist genauso Teil des Kreises wie sprechen.</p>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-first {
+      background: var(--bg-secondary);
+    }
+
+    .event-landing-first__layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg) var(--space-xl);
+      align-items: center;
+
+      @media (width <= 900px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .event-landing-first__text {
+      max-inline-size: var(--content-max-text);
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-first__panel {
+      padding: clamp(1.5rem, 3vw, 2.25rem);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+    }
+
+    .event-landing-first__panel-label {
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-caption);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .event-landing-first__list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .event-landing-first__item {
+      position: relative;
+      padding-block: var(--space-xs);
+      padding-inline-start: 1.75rem;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-normal);
+      color: var(--text-primary);
+      text-wrap: pretty;
+    }
+
+    /* A small ring rather than a checkmark — these are things you don't need. */
+    .event-landing-first__item::before {
+      position: absolute;
+      /* Centred on the first line box: block padding + half the line height. */
+      inset-block-start: calc(var(--space-xs) + var(--leading-normal) * 0.5em);
+      inset-inline-start: 0;
+      inline-size: 0.625rem;
+      block-size: 0.625rem;
+      content: '';
+      border: 1.5px solid var(--accent-primary);
+      border-radius: var(--radius-full);
+      transform: translateY(-50%);
+    }
+
+    .event-landing-first__panel-note {
+      margin-block-start: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-style: italic;
+      color: var(--text-accent);
+    }
+
+    .event-landing-first__close {
+      max-inline-size: var(--content-max-wide);
+      margin-block-start: var(--space-lg);
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+
+      & p {
+        margin-block-end: var(--space-sm);
+      }
+    }
+
+    .event-landing-first__accent {
+      margin-block-end: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+      font-style: italic;
+      line-height: 1.35;
+      color: var(--text-primary);
+    }
+  }
+</style>
