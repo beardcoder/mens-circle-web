@@ -42,7 +42,18 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
   <head>
     <meta charset="UTF-8" />
     <script is:inline>
+      // `.motion-ready` is what lets CSS hide every [data-reveal] at opacity 0
+      // before lib/motion.ts animates it in. Setting it here (rather than from
+      // the module) is what stops the content flashing — but it also means a
+      // module that never arrives leaves the whole page invisible: one failed
+      // chunk, a blocked CDN or a JS error and the site renders blank.
+      // So the class is armed with a dead-man's switch: initMotion() clears the
+      // timer as soon as it has the reveals under observation, and if it never
+      // does, the hidden state lifts on its own and everything is simply shown.
       document.documentElement.classList.add('motion-ready');
+      window.__mcMotionFallback = setTimeout(() => {
+        document.documentElement.classList.remove('motion-ready');
+      }, 4000);
       (() => {
         try {
           const root = document.documentElement;

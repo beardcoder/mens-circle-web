@@ -121,6 +121,21 @@ function defaultDuration(variant: Variant, t: Tuning): number {
 const configs = new WeakMap<HTMLElement, RevealConfig>();
 const registered = new WeakSet<HTMLElement>();
 
+/** Timer id parked on `window` by the layout's inline boot script. */
+declare global {
+  interface Window {
+    __mcMotionFallback?: ReturnType<typeof setTimeout>;
+  }
+}
+
+/** Stand down the layout's "show everything" timer — reveals are running. */
+function clearMotionFallback(): void {
+  if (window.__mcMotionFallback !== undefined) {
+    clearTimeout(window.__mcMotionFallback);
+    window.__mcMotionFallback = undefined;
+  }
+}
+
 function configFor(el: HTMLElement, tuning: Tuning, extraDelay = 0): RevealConfig {
   const variant = (el.dataset.reveal || 'up') as Variant;
 
@@ -203,12 +218,18 @@ function observe(elements: HTMLElement[]): void {
 export function initMotion(): void {
   // Under reduced motion the CSS start state never applies — nothing to do.
   if (globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    clearMotionFallback();
+
     return;
   }
 
   const tuning = globalThis.matchMedia('(width < 640px)').matches ? MOBILE : DESKTOP;
 
   observe(register(document.body, tuning));
+
+  // The reveals are under observation, so the layout's dead-man's switch (which
+  // would drop `.motion-ready` and just show everything) is no longer needed.
+  clearMotionFallback();
 
   // Server islands swap their content in after load — register what arrives.
   new MutationObserver((mutations) => {
