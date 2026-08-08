@@ -1,0 +1,92 @@
+---
+import { buildEventFacts, type NextEventSummary } from '@lib/event-landing';
+
+/**
+ * The quick-scan facts row.
+ *
+ * General by default, but a scheduled evening overrides what it actually knows
+ * (city, time window, participation fee) — dynamic data wins over evergreen copy.
+ * The venue itself is never stated beyond the city: the exact address goes out
+ * with the registration confirmation, not on a public page.
+ */
+
+interface Props {
+  next: NextEventSummary | null;
+}
+
+const { next } = Astro.props;
+const facts = buildEventFacts(next);
+---
+
+<section class="section event-landing-facts" aria-labelledby="fakten-title">
+  <div class="container">
+    <div class="section-header section-header--start" data-reveal-group>
+      <p class="eyebrow" data-reveal="up">Gut zu wissen</p>
+      <h2 class="section-title" id="fakten-title" data-reveal="blur">
+        Ort, Rhythmus, <span class="text-italic">Beitrag</span>
+      </h2>
+    </div>
+
+    <dl class="event-landing-facts__grid" data-reveal-group="90">
+      {
+        facts.map((fact) => (
+          <div class="event-landing-facts__item" data-reveal="up">
+            <dt class="event-landing-facts__label">{fact.label}</dt>
+            <dd class="event-landing-facts__value">{fact.value}</dd>
+            <dd class="event-landing-facts__sub">{fact.sub}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-facts__grid {
+      display: grid;
+      /* Exactly four facts: 4-up, then 2-up, then stacked. */
+      grid-template-columns: repeat(4, 1fr);
+
+      @media (width <= 1000px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (width <= 480px) {
+        grid-template-columns: 1fr;
+      }
+      gap: var(--space-md);
+      margin: 0;
+    }
+
+    .event-landing-facts__item {
+      padding-block-start: var(--space-sm);
+      border-block-start: 1px solid var(--border-medium);
+    }
+
+    .event-landing-facts__label {
+      font-size: var(--text-caption);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .event-landing-facts__value {
+      margin: var(--space-3xs) 0 0;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      line-height: 1.15;
+      color: var(--text-primary);
+      overflow-wrap: break-word;
+    }
+
+    .event-landing-facts__sub {
+      margin: var(--space-3xs) 0 0;
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+  }
+</style>
