@@ -1,0 +1,115 @@
+---
+import { EVENT_RHYTHM } from '@lib/event-landing';
+
+/**
+ * "Was passiert eigentlich an so einem Abend?"
+ *
+ * The home page's "Die Reise" block already describes the circle's arc
+ * (Ankommen → Öffnen → Wachsen → Integrieren). Repeating it here would put near
+ * identical copy on two indexed URLs, so this one takes the first-timer's seat
+ * instead: what you will find yourself doing, in the order it happens.
+ *
+ * Laid out as a quiet numbered ladder — hairlines, no boxes.
+ */
+---
+
+<section class="section event-landing-evening" aria-labelledby="abend-title">
+  <div class="container">
+    <div class="section-header section-header--start" data-reveal-group>
+      <p class="eyebrow" data-reveal="up">Was dich erwartet</p>
+      <h2 class="section-title" id="abend-title" data-reveal="blur">
+        Was passiert eigentlich an <span class="text-italic">so einem Abend</span>?
+      </h2>
+      <p class="section-intro" data-reveal="up">
+        Kein festes Programm, aber ein verlässlicher Ablauf. Wir sitzen im Kreis – das ist mehr als eine Sitzordnung, es
+        steht dafür, dass hier keiner über dem anderen steht.
+      </p>
+    </div>
+
+    <ol class="event-landing-evening__list" role="list" data-reveal-group="110">
+      {
+        EVENT_RHYTHM.map((phase) => (
+          <li class="event-landing-evening__item" data-reveal="up">
+            <p class="event-landing-evening__step" aria-hidden="true">
+              {phase.step}
+            </p>
+            <div class="event-landing-evening__body">
+              <h3 class="event-landing-evening__title">{phase.title}</h3>
+              <p class="event-landing-evening__text">{phase.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-evening__list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0 var(--space-xl);
+      padding: 0;
+      margin: 0;
+      list-style: none;
+
+      @media (width <= 900px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .event-landing-evening__item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-sm) var(--space-md);
+      align-items: start;
+      padding-block: var(--space-md);
+      border-block-start: 1px solid var(--border-light);
+
+      @media (width <= 480px) {
+        gap: var(--space-2xs) var(--space-sm);
+      }
+    }
+
+    /* Only the first item of each column loses its rule, so the ladder reads as
+       one continuous line per column instead of a floating first row. */
+    .event-landing-evening__item:nth-child(-n + 2) {
+      border-block-start: none;
+      padding-block-start: 0;
+    }
+
+    @media (width <= 900px) {
+      .event-landing-evening__item:nth-child(2) {
+        border-block-start: 1px solid var(--border-light);
+        padding-block-start: var(--space-md);
+      }
+    }
+
+    .event-landing-evening__step {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 1.4rem + 2vw, 3.25rem);
+      line-height: 0.9;
+      /* `--accent-text`, not the fill tone: these numerals order the steps, so
+         they are content and owe the 3:1 that display-size text does. */
+      color: color-mix(in oklch, var(--accent-text) 75%, transparent);
+      letter-spacing: -0.04em;
+    }
+
+    .event-landing-evening__title {
+      margin-block-end: var(--space-2xs);
+      font-size: var(--text-xl);
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+
+    .event-landing-evening__text {
+      max-inline-size: 46ch;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+  }
+</style>

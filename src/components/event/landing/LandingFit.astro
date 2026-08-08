@@ -1,0 +1,73 @@
+---
+import { EVENT_FIT } from '@lib/event-landing';
+
+/**
+ * "Vielleicht ist der Kreis etwas für dich, wenn …"
+ *
+ * Reasons a man might come, not benefits he will receive — the sentence stem
+ * lives in the heading and each line simply continues it. Hairline-separated
+ * lines, no icons, no checkmarks: this is a list to read down, not to tick off.
+ */
+---
+
+<section class="section event-landing-fit" aria-labelledby="passt-title">
+  <div class="container">
+    <div class="section-header section-header--start" data-reveal-group>
+      <p class="eyebrow" data-reveal="up">Passt das zu dir?</p>
+      <h2 class="section-title" id="passt-title" data-reveal="blur">
+        Vielleicht ist der Kreis etwas für dich, <span class="text-italic">wenn …</span>
+      </h2>
+    </div>
+
+    <ul class="event-landing-fit__list" role="list" data-reveal-group="70">
+      {
+        EVENT_FIT.map((item) => (
+          <li class="event-landing-fit__item" data-reveal="up">
+            {item}
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="event-landing-fit__close" data-reveal="up">
+      Du brauchst keinen besonderen Grund. <span class="text-italic">Manchmal reicht Neugier.</span>
+    </p>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    /* The measure lives on the list, not the items, so the opening rule and the
+       per-item rules line up instead of the first one running full width. */
+    .event-landing-fit__list {
+      max-inline-size: min(38rem, 100%);
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      border-block-start: 1px solid var(--border-light);
+    }
+
+    .event-landing-fit__item {
+      padding-block: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 1rem + 1.1vw, 1.875rem);
+      line-height: 1.3;
+      color: var(--text-primary);
+      border-block-end: 1px solid var(--border-light);
+      text-wrap: pretty;
+    }
+
+    .event-landing-fit__close {
+      max-inline-size: var(--content-max-wide);
+      margin-block-start: var(--space-md);
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-fit__close .text-italic {
+      color: var(--text-accent);
+    }
+  }
+</style>

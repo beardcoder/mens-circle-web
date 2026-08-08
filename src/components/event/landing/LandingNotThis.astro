@@ -1,0 +1,129 @@
+---
+import { EVENT_NOT_THIS } from '@lib/event-landing';
+
+/**
+ * "Was der Männerkreis nicht ist" — the section that catches the sceptics.
+ *
+ * Boundaries only: naming what this is not is what makes it safe to try. Nothing
+ * here devalues therapy or coaching; the closing line points at professional
+ * help where professional help is the right answer.
+ *
+ * Dark surface on purpose — it is the one moment on this page that speaks in a
+ * flat, declarative voice, and the change of ground marks that.
+ */
+---
+
+<section class="section event-landing-not" aria-labelledby="nicht-title">
+  <div class="event-landing-not__glow" aria-hidden="true"></div>
+  <div class="container">
+    <div class="event-landing-not__layout">
+      <div class="section-header section-header--start section-header--on-dark" data-reveal-group>
+        <p class="eyebrow eyebrow--secondary" data-reveal="up">Klar gesagt</p>
+        <h2 class="section-title section-title--light" id="nicht-title" data-reveal="blur">
+          Was der Männerkreis <span class="text-italic">nicht</span> ist
+        </h2>
+      </div>
+
+      <div class="event-landing-not__body">
+        <ul class="event-landing-not__list" role="list" data-reveal-group="70">
+          {
+            EVENT_NOT_THIS.map((item) => (
+              <li class="event-landing-not__item" data-reveal="up">
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="event-landing-not__close" data-reveal="up">
+          <p>
+            Wir sitzen als Männer zusammen, hören einander zu und teilen Erfahrungen. Jeder bleibt für sich selbst
+            verantwortlich.
+          </p>
+          <p>
+            Wenn du therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Das eine ersetzt
+            das andere nicht.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-not {
+      --_surface-noise-opacity: 0.03;
+
+      position: relative;
+      overflow: clip;
+      color: var(--text-on-dark);
+      background: var(--bg-dark);
+    }
+
+    .event-landing-not__glow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(
+        ellipse 70% 60% at 15% 0%,
+        color-mix(in oklch, var(--accent-primary) 14%, transparent) 0%,
+        transparent 55%
+      );
+    }
+
+    .event-landing-not__layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: var(--space-lg) var(--space-xl);
+      align-items: start;
+
+      @media (width <= 900px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .event-landing-not .section-header {
+      margin-block-end: 0;
+    }
+
+    .event-landing-not__list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .event-landing-not__item {
+      padding-block: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(1.375rem, 1.1rem + 1.2vw, 2rem);
+      line-height: 1.25;
+      color: var(--text-on-dark);
+      border-block-end: 1px solid var(--border-on-dark);
+      text-wrap: pretty;
+
+      &:first-child {
+        padding-block-start: 0;
+      }
+    }
+
+    .event-landing-not__close {
+      max-inline-size: var(--content-max-description);
+      margin-block-start: var(--space-md);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--color-sand);
+      text-wrap: pretty;
+
+      & p {
+        margin-block-end: var(--space-sm);
+      }
+
+      & p:last-child {
+        margin-block-end: 0;
+      }
+    }
+  }
+</style>

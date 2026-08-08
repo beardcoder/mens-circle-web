@@ -80,7 +80,11 @@ const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
         type="text"
         value={v.costBasis ?? ''}
         placeholder="z. B. Auf Spendenbasis"
+        aria-describedby="costBasis-hint"
       />
+      <span class="field-hint" id="costBasis-hint">
+        Kurz halten – der Text steht auf /event als Fakt in großer Schrift.
+      </span>
     </div>
     <div class="field">
       <label for="slug">Slug</label>
@@ -249,6 +253,11 @@ const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
 </script>
 
 <style>
+  .field-hint {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--muted);
+  }
   .dup-note {
     margin: -0.75rem 0 1.25rem;
     padding: 0.6rem 0.9rem;

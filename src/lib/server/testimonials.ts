@@ -51,15 +51,20 @@ export async function submitTestimonial(payload: TestimonialPayload): Promise<Su
   return { status: 200, body: { success: true, message: SUCCESS_MESSAGE } };
 }
 
-/** Published testimonials for the public site, sorted by sortOrder then newest. */
-export async function fetchTestimonials(): Promise<TestimonialDTO[]> {
+/**
+ * Published testimonials for the public site, sorted by sortOrder then newest.
+ *
+ * `limit` exists for callers that only want the top of the curated order — the
+ * /event landing page shows a single voice and has no use for the other 199.
+ */
+export async function fetchTestimonials(limit = 200): Promise<TestimonialDTO[]> {
   try {
     const rows = await db
       .select()
       .from(testimonials)
       .where(and(eq(testimonials.isPublished, true), isNull(testimonials.deleted)))
       .orderBy(asc(testimonials.sortOrder), desc(testimonials.createdAt))
-      .limit(200);
+      .limit(limit);
     return rows.map((r) => ({
       quote: r.quote,
       author: r.authorName || null,
