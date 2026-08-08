@@ -1,5 +1,6 @@
 ---
 import { buildEventFaq, type NextEventSummary } from '@lib/event-landing';
+import type { Testimonial } from '@lib/types';
 import Faq from '../blocks/Faq.astro';
 import Newsletter from '../blocks/Newsletter.astro';
 import WhatsappCommunity from '../blocks/WhatsappCommunity.astro';
@@ -8,6 +9,7 @@ import LandingNextDate from './landing/LandingNextDate.astro';
 import LandingEveryday from './landing/LandingEveryday.astro';
 import LandingEvening from './landing/LandingEvening.astro';
 import LandingFirstTime from './landing/LandingFirstTime.astro';
+import LandingVoice from './landing/LandingVoice.astro';
 import LandingFit from './landing/LandingFit.astro';
 import LandingNotThis from './landing/LandingNotThis.astro';
 import LandingFrame from './landing/LandingFrame.astro';
@@ -46,21 +48,24 @@ import LandingMore from './landing/LandingMore.astro';
 interface Props {
   /** The next upcoming event reduced to display strings, or null when none. */
   next: NextEventSummary | null;
+  /** One published testimonial for the pull quote, or null when none exists. */
+  voice: Testimonial | null;
 }
 
-const { next } = Astro.props;
+const { next, voice } = Astro.props;
 
 // Same call the page makes for the JSON-LD, so the rendered questions and the
 // FAQPage markup are guaranteed to be the identical strings.
 const faqItems = buildEventFaq(next);
 ---
 
-<LandingHero />
+<LandingHero place={next?.place ?? null} />
 <LandingNextDate next={next} />
 
 <LandingEveryday />
 <LandingEvening />
 <LandingFirstTime />
+<LandingVoice voice={voice} />
 <LandingFit />
 <LandingNotThis />
 <LandingFrame />

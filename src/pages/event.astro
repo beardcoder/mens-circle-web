@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { fetchNextEvent } from '@lib/server/events';
+import { fetchTestimonials } from '@lib/server/testimonials';
 import { buildEventFaq, summarizeNextEvent } from '@lib/event-landing';
 import EventLanding from '../components/event/EventLanding.astro';
 import site from '../data/site.json';
@@ -19,6 +20,12 @@ import site from '../data/site.json';
  */
 const event = await fetchNextEvent();
 const next = summarizeNextEvent(event);
+
+// A single published voice for the pull quote after "Du musst nichts können" —
+// the top of the curated order, not a second copy of the home page's grid. The
+// page is server-rendered anyway, so this is one extra one-row read per request;
+// `null` when nothing is published, and the section then renders nothing.
+const [voice = null] = await fetchTestimonials(1);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = new URL('/event', siteUrl).href;
@@ -116,5 +123,5 @@ const description = next
   keywords="Männerkreis Straubing, Männerkreis Niederbayern, Männergruppe Straubing, Termine, Männerkreis Termine, Anmeldung"
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  <EventLanding next={next} />
+  <EventLanding next={next} voice={voice} />
 </Layout>

@@ -1,4 +1,6 @@
 ---
+import site from '@data/site.json';
+
 /**
  * /event hero — an invitation, not a headline for a date.
  *
@@ -6,7 +8,26 @@
  * like an SEO slug and told a first-time visitor nothing about what he would
  * walk into. The local keywords now sit in the eyebrow and the closing line of
  * the lead, where they stay true without bending the sentence around them.
+ *
+ * The eyebrow stays evergreen — it names the circle, which is the Straubing one
+ * regardless of where a single evening lands. The meta line below is the one
+ * that makes a claim about a meeting, so it defers to the scheduled event's own
+ * city when there is one, and only falls back to the site's locality otherwise.
+ *
+ * The eyebrow's locality is joined with non-breaking spaces, so a phone breaks
+ * that line after "Männerkreis ·" rather than orphaning "Niederbayern".
  */
+
+interface Props {
+  /** City of the next scheduled event, or null when nothing is scheduled. */
+  place: string | null;
+}
+
+const { place } = Astro.props;
+
+// \u00A0 rather than a plain space: the locality stays on one line, so a phone
+// breaks after "Männerkreis ·" instead of orphaning "Niederbayern".
+const eyebrow = 'Männerkreis · Straubing\u00A0/\u00A0Niederbayern';
 ---
 
 <section class="section event-landing-hero">
@@ -17,7 +38,7 @@
 
   <div class="container">
     <div class="event-landing-hero__content" data-reveal-group="90">
-      <p class="eyebrow" data-reveal="up">Männerkreis · Straubing / Niederbayern</p>
+      <p class="eyebrow event-landing-hero__eyebrow" data-reveal="up">{eyebrow}</p>
 
       <h1 class="event-landing-hero__title" data-reveal="blur">
         Ein Abend, an dem du nichts <span class="text-italic">darstellen</span> musst
@@ -30,7 +51,19 @@
       </p>
 
       <p class="event-landing-hero__meta" data-reveal="up">
-        Wir treffen uns in Straubing in Niederbayern, alle zwei bis vier Wochen. Ohne Vorerfahrung, ohne Mitgliedschaft.
+        {
+          place && place !== site.geo.locality ? (
+            <>
+              Wir treffen uns alle zwei bis vier Wochen in Niederbayern – das nächste Mal in {place}. Ohne Vorerfahrung,
+              ohne Mitgliedschaft.
+            </>
+          ) : (
+            <>
+              Wir treffen uns in {site.geo.locality} in Niederbayern, alle zwei bis vier Wochen. Ohne Vorerfahrung, ohne
+              Mitgliedschaft.
+            </>
+          )
+        }
       </p>
     </div>
   </div>
@@ -68,6 +101,21 @@
       inset-inline-start: -14%;
       inline-size: 22rem;
       block-size: 22rem;
+    }
+
+    /* The locality wraps to a second line on a phone. `.eyebrow` centres its
+       rule against the whole (now two-line) text, which reads as a stray dash
+       floating between the lines — pin it to the first line instead. */
+    .event-landing-hero__eyebrow {
+      line-height: 1.4;
+
+      @media (width <= 480px) {
+        align-items: start;
+
+        &::before {
+          margin-block-start: 0.7em;
+        }
+      }
     }
 
     .event-landing-hero__content {
