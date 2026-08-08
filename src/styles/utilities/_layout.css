@@ -64,8 +64,14 @@
     .event-map-section,
     .event-about-section,
     .event-cta-section,
+    .event-landing-everyday,
+    .event-landing-evening,
+    .event-landing-first,
+    .event-landing-fit,
+    .event-landing-not,
+    .event-landing-frame,
     .event-landing-facts,
-    .event-landing-rhythm,
+    .event-landing-guide,
     .event-landing-more
   ) {
     content-visibility: auto;

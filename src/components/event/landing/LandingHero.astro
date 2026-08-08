@@ -1,0 +1,103 @@
+---
+/**
+ * /event hero — an invitation, not a headline for a date.
+ *
+ * The old version led with "Männerkreis in Straubing – die Termine", which read
+ * like an SEO slug and told a first-time visitor nothing about what he would
+ * walk into. The local keywords now sit in the eyebrow and the closing line of
+ * the lead, where they stay true without bending the sentence around them.
+ */
+---
+
+<section class="section event-landing-hero">
+  <div class="event-landing-hero__circles" aria-hidden="true">
+    <span class="event-landing-hero__circle event-landing-hero__circle--1"></span>
+    <span class="event-landing-hero__circle event-landing-hero__circle--2"></span>
+  </div>
+
+  <div class="container">
+    <div class="event-landing-hero__content" data-reveal-group="90">
+      <p class="eyebrow" data-reveal="up">Männerkreis · Straubing / Niederbayern</p>
+
+      <h1 class="event-landing-hero__title" data-reveal="blur">
+        Ein Abend, an dem du nichts <span class="text-italic">darstellen</span> musst
+      </h1>
+
+      <p class="event-landing-hero__lead" data-reveal="up">
+        Im Alltag gibt es genug Situationen, in denen du funktionieren musst. Im Männerkreis geht es für ein paar
+        Stunden nicht um Leistung, nicht um Lösungen und nicht darum, irgendjemandem etwas zu beweisen. Du kannst
+        einfach da sein, zuhören und – wenn du möchtest – erzählen, was dich gerade beschäftigt.
+      </p>
+
+      <p class="event-landing-hero__meta" data-reveal="up">
+        Wir treffen uns in Straubing in Niederbayern, alle zwei bis vier Wochen. Ohne Vorerfahrung, ohne Mitgliedschaft.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-hero {
+      position: relative;
+      padding-block: calc(var(--header-clearance) + var(--space-lg)) var(--space-lg);
+      overflow: clip;
+    }
+
+    .event-landing-hero__circles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .event-landing-hero__circle {
+      position: absolute;
+      border: 1px solid color-mix(in oklch, var(--accent-primary) 14%, transparent);
+      border-radius: var(--radius-full);
+    }
+
+    .event-landing-hero__circle--1 {
+      inset-block-start: -18%;
+      inset-inline-end: -12%;
+      inline-size: 32rem;
+      block-size: 32rem;
+    }
+
+    .event-landing-hero__circle--2 {
+      inset-block-end: -30%;
+      inset-inline-start: -14%;
+      inline-size: 22rem;
+      block-size: 22rem;
+    }
+
+    .event-landing-hero__content {
+      position: relative;
+      z-index: 1;
+      max-inline-size: 52rem;
+    }
+
+    .event-landing-hero__title {
+      margin-block: var(--space-xs) var(--space-sm);
+      font-size: clamp(2.25rem, 1.4rem + 4vw, 4.5rem);
+      line-height: 1.05;
+      text-wrap: balance;
+    }
+
+    .event-landing-hero__lead {
+      max-inline-size: var(--content-max-wide);
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-hero__meta {
+      max-inline-size: var(--content-max-description);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      color: var(--text-muted);
+      text-wrap: pretty;
+    }
+  }
+</style>
