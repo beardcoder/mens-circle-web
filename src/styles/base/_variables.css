@@ -33,9 +33,19 @@
   --color-earth-mid: oklch(35% 0.04 68deg);
   --color-earth-warm: oklch(46% 0.05 68deg);
 
-  /* Terracotta Accents */
-  --color-terracotta: oklch(61% 0.16 44deg);
-  --color-terracotta-light: oklch(72% 0.14 45deg);
+  /* Terracotta Accents — three lightnesses, one per contrast role.
+     The accent has to clear WCAG AA in three different jobs and no single
+     lightness does all of them:
+       • ...-deep   body-size accent text on a light ground (links, required
+                    markers): 4.7:1 even on the darkest light surface (sand-light).
+       • base       button/badge fill under a parchment label (4.7:1), and
+                    display-size accent text, which only owes 3:1.
+       • ...-light  accent text on the dark earth surfaces (4.8:1 on earth-mid).
+     The old single pair sat at 61%/72%: a parchment label on the fill was
+     3.8:1 and the light tone was 2.3:1 as text on a light ground. */
+  --color-terracotta-deep: oklch(49% 0.16 44deg);
+  --color-terracotta: oklch(54% 0.16 44deg);
+  --color-terracotta-light: oklch(75% 0.14 45deg);
 
   /* Neutral Sand Tones */
   --color-sand: oklch(76% 0.04 75deg);
@@ -84,7 +94,9 @@
   /* Text — light/dark resolved via light-dark() */
   --text-primary: light-dark(var(--color-ink), var(--color-parchment));
   --text-secondary: light-dark(var(--color-ink-soft), oklch(80% 0.02 75deg));
-  --text-muted: light-dark(oklch(55% 0.02 68deg), oklch(65% 0.02 75deg));
+  /* 52%, not 55%: at 55% muted copy measured 4.19:1 on the parchment surfaces
+     the forms sit on — under the 4.5:1 body-text floor. */
+  --text-muted: light-dark(oklch(52% 0.02 68deg), oklch(65% 0.02 75deg));
   --text-on-dark: var(--color-parchment);
   --text-on-dark-secondary: light-dark(var(--color-sand), var(--color-sand-light));
   --text-accent: light-dark(var(--color-earth-warm), var(--color-terracotta-light));
@@ -94,9 +106,15 @@
   /* Surface tone that flips with mode (parchment in light, earth in dark) */
   --bg-light: light-dark(var(--color-parchment), var(--color-earth-dark));
 
-  /* Accents */
+  /* Accents.
+     `--accent-primary` fills (buttons, rules, focus rings) and carries
+     display-size accent text; `--accent-secondary` is the tone for dark
+     surfaces. `--accent-text` is the one to reach for when the accent *is*
+     body-size text: it follows the mode, because in light mode the copy sits on
+     a light ground and in dark mode on a dark one. */
   --accent-primary: var(--color-terracotta);
   --accent-secondary: var(--color-terracotta-light);
+  --accent-text: light-dark(var(--color-terracotta-deep), var(--color-terracotta-light));
 
   /* Status Colors */
   --color-success: oklch(58% 0.15 145deg);
@@ -350,9 +368,11 @@
   --color-earth-mid: oklch(37% 0.042 165deg);
   --color-earth-warm: oklch(48% 0.05 160deg);
 
-  /* Fern accent (terracotta → fresh leaf green) */
-  --color-terracotta: oklch(58% 0.14 156deg);
-  --color-terracotta-light: oklch(70% 0.12 154deg);
+  /* Fern accent (terracotta → fresh leaf green) — same three contrast roles
+     as the warm palette, pitched to the green hue. */
+  --color-terracotta-deep: oklch(46% 0.14 156deg);
+  --color-terracotta: oklch(50% 0.14 156deg);
+  --color-terracotta-light: oklch(73% 0.12 154deg);
 
   /* Cool sage neutrals (sand → eucalyptus) */
   --color-sand: oklch(76% 0.025 165deg);
@@ -372,7 +392,7 @@
 
   /* Re-pitch the few neutral text tokens that bake in a warm hue */
   --text-secondary: light-dark(var(--color-ink-soft), oklch(80% 0.018 168deg));
-  --text-muted: light-dark(oklch(55% 0.018 168deg), oklch(65% 0.018 168deg));
+  --text-muted: light-dark(oklch(52% 0.018 168deg), oklch(65% 0.018 168deg));
 }
 
 /* ============================================

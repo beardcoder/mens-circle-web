@@ -142,7 +142,9 @@ p:last-child {
 .section-title .highlight {
   margin-inline: -0.05em 0.08em;
   font-style: italic;
-  color: var(--accent-primary);
+  /* `--accent-text`, not `--accent-primary`: in dark mode every surface is a
+     dark one, and the fill tone only reached 2.8:1 there. */
+  color: var(--accent-text);
 }
 
 .section-title--light .text-italic,
@@ -170,7 +172,7 @@ p:last-child {
    Links
    ============================================ */
 .link {
-  color: var(--accent-primary);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color var(--motion-quick);
@@ -223,7 +225,7 @@ p:last-child {
 }
 
 .prose a {
-  color: var(--accent-primary);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color var(--motion-quick);
