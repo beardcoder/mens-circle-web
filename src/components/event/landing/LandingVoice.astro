@@ -1,0 +1,90 @@
+---
+import type { Testimonial } from '@lib/types';
+
+/**
+ * One real voice, placed right after "Du musst nichts können".
+ *
+ * Deliberately not a second Testimonials block: the home page already renders
+ * the full grid (blocks/Testimonials.astro), and repeating it here would put the
+ * same quotes on two indexed URLs and cost a second full query. This slot takes
+ * the top entry of the curated order and shows it as a pull quote — no grid, no
+ * cards, no headline claiming what it proves.
+ *
+ * Renders nothing when no testimonial is published. Nothing here is ever
+ * invented: if the database is empty, the page simply moves on.
+ */
+
+interface Props {
+  voice: Testimonial | null;
+}
+
+const { voice } = Astro.props;
+---
+
+{
+  voice && (
+    <section class="section event-landing-voice" aria-label="Stimme aus dem Kreis">
+      <div class="container">
+        <p class="eyebrow" data-reveal="up">
+          Aus dem Kreis
+        </p>
+
+        {/* A spoken word settles rather than moves — slow fade, no travel. */}
+        <figure class="event-landing-voice__figure" data-reveal="fade" data-reveal-duration="1100">
+          <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
+          {(voice.author || voice.role) && (
+            <figcaption class="event-landing-voice__author">
+              {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
+              {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
+            </figcaption>
+          )}
+        </figure>
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer sections {
+    .event-landing-voice__figure {
+      max-inline-size: min(42rem, 100%);
+      margin: 0;
+    }
+
+    /* The accent rule of `.moderator__quote`, not the testimonial grid's hanging
+       quote mark: an existing pattern for a single spoken line, and it can't
+       drift out of alignment the way a positioned glyph does. */
+    .event-landing-voice__quote {
+      padding-inline-start: var(--space-md);
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
+      font-style: italic;
+      line-height: 1.4;
+      color: var(--text-primary);
+      border-inline-start: 3px solid var(--accent-primary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-voice__author {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3xs) var(--space-xs);
+      align-items: baseline;
+      padding-inline-start: calc(var(--space-md) + 3px);
+      margin-block-start: var(--space-sm);
+    }
+
+    .event-landing-voice__name {
+      font-size: var(--text-body-compact);
+      font-style: normal;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .event-landing-voice__role {
+      font-size: var(--text-caption);
+      color: var(--text-muted);
+    }
+  }
+</style>

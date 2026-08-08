@@ -1,0 +1,156 @@
+---
+import { EVENT_EVERYDAY_QUESTIONS } from '@lib/event-landing';
+
+/**
+ * "Vielleicht kennst du das" — recognition before explanation.
+ *
+ * The home page explains what a Männerkreis is. This section does the opposite:
+ * it describes an ordinary week and lets the reader notice himself in it, so the
+ * evening has something to connect to before a single thing is claimed about it.
+ * Typography does the work here — no cards, no icons.
+ *
+ * Note the full stop inside the italic span in the heading: `.text-italic`
+ * carries a negative inline-start margin, so a period left outside it renders
+ * visibly detached from the word.
+ */
+---
+
+<section class="section event-landing-everyday" aria-labelledby="alltag-title">
+  <div class="container">
+    <div class="event-landing-everyday__layout">
+      <div class="event-landing-everyday__intro" data-reveal-group="90">
+        <p class="eyebrow" data-reveal="up">Vielleicht kennst du das</p>
+        <h2 class="section-title event-landing-everyday__title" id="alltag-title" data-reveal="blur">
+          Im Alltag funktioniert vieles. Aber nicht alles bekommt <span class="text-italic">Raum.</span>
+        </h2>
+
+        <p class="event-landing-everyday__staccato" data-reveal="up">
+          Arbeit. Familie. Beziehung. Entscheidungen. Verantwortung.
+        </p>
+
+        <div class="event-landing-everyday__text" data-reveal="up">
+          <p>Vieles davon machen wir erst einmal mit uns selbst aus.</p>
+          <p>
+            Nicht, weil niemand da wäre. Sondern weil Gespräche unter Männern oft schnell bei Arbeit, Alltag, Sport oder
+            beim nächsten Ratschlag landen.
+          </p>
+        </div>
+      </div>
+
+      <div class="event-landing-everyday__questions" data-reveal-group="90">
+        <p class="event-landing-everyday__lead-in" data-reveal="up">
+          Im Männerkreis darf es einmal um das gehen, was darunter liegt.
+        </p>
+        <ul class="event-landing-everyday__list" role="list">
+          {
+            EVENT_EVERYDAY_QUESTIONS.map((question) => (
+              <li class="event-landing-everyday__question" data-reveal="up">
+                {question}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <p class="event-landing-everyday__close" data-reveal="up">
+      Du musst darauf keine fertigen Antworten haben. <span class="text-italic">Du kannst einfach kommen.</span>
+    </p>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-everyday__layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg) var(--space-xl);
+      align-items: start;
+
+      @media (width <= 900px) {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+    }
+
+    .event-landing-everyday__title {
+      max-inline-size: 18ch;
+      text-wrap: balance;
+    }
+
+    .event-landing-everyday__staccato {
+      margin-block: var(--space-sm) var(--space-md);
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 0.9rem + 1.4vw, 1.875rem);
+      font-style: italic;
+      line-height: 1.35;
+      color: var(--text-accent);
+      text-wrap: balance;
+    }
+
+    .event-landing-everyday__text {
+      max-inline-size: var(--content-max-text);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+
+      & p {
+        margin-block-end: var(--space-sm);
+      }
+    }
+
+    .event-landing-everyday__questions {
+      padding-inline-start: var(--space-md);
+      border-inline-start: 1px solid var(--border-medium);
+
+      @media (width <= 900px) {
+        padding-inline-start: 0;
+        border-inline-start: none;
+      }
+    }
+
+    .event-landing-everyday__lead-in {
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-everyday__list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .event-landing-everyday__question {
+      padding-block: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+      line-height: 1.3;
+      color: var(--text-primary);
+      border-block-start: 1px solid var(--border-light);
+      text-wrap: pretty;
+
+      &:first-child {
+        border-block-start: none;
+        padding-block-start: 0;
+      }
+    }
+
+    .event-landing-everyday__close {
+      max-inline-size: var(--content-max-wide);
+      margin-block-start: var(--space-lg);
+      font-family: var(--font-display);
+      font-size: clamp(1.375rem, 1rem + 1.4vw, 2.125rem);
+      line-height: 1.35;
+      color: var(--text-primary);
+      text-wrap: balance;
+    }
+
+    .event-landing-everyday__close .text-italic {
+      color: var(--accent-text);
+    }
+  }
+</style>
