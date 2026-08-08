@@ -22,6 +22,13 @@ export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://mens-circle.de',
   output: 'server',
   adapter: bun({ isr: true }),
+  // NOTE: Astro 7.2's `session: false` (drop the session runtime — we never use
+  // `Astro.session`; the admin area carries its own signed cookie, see
+  // lib/server/auth.ts) is a no-op under @wyattjoh/astro-bun-adapter 2.1.1: the
+  // adapter's `astro:config:setup` unconditionally writes
+  // `session: { driver: config.session?.driver ?? 'fs-lite' }`, which turns the
+  // opt-out straight back into an fs-lite session. Clean builds with and without
+  // the flag are byte-identical. Set it once the adapter honours `false`.
   // `bun:sqlite` is a Bun runtime builtin (used by the Drizzle data layer); keep
   // it external so Rollup doesn't try to bundle it into the SSR output.
   vite: {
