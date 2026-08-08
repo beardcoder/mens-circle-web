@@ -1,0 +1,41 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  /** Extra class on the wrapper — used to place/hide each instance. */
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+{
+  /* Rendered twice by the header: once in the top bar (wide screens) and once
+     inside the mobile nav overlay (narrow screens), with CSS showing exactly
+     one. `display: none` keeps the inactive copy out of the a11y tree and the
+     tab order, so there is never a duplicate control. initTheme() wires every
+     instance (lib/theme.ts). */
+}
+<div class:list={['theme-switch', className]} role="group" aria-label="Darstellung">
+  <button
+    class="theme-switch__btn"
+    type="button"
+    data-theme-toggle
+    aria-label="Farbwelt wechseln"
+    title="Farbwelt wechseln (warm / kühl)"
+  >
+    <Icon class="theme-switch__icon theme-switch__icon--warm" name="theme-warm" aria-hidden="true" />
+    <Icon class="theme-switch__icon theme-switch__icon--cool" name="theme-cool" aria-hidden="true" />
+  </button>
+
+  <button
+    class="theme-switch__btn"
+    type="button"
+    data-mode-toggle
+    aria-label="Hell-/Dunkelmodus wechseln"
+    title="Hell-/Dunkelmodus wechseln"
+  >
+    <Icon class="theme-switch__icon theme-switch__icon--light" name="theme-light" aria-hidden="true" />
+    <Icon class="theme-switch__icon theme-switch__icon--dark" name="theme-dark" aria-hidden="true" />
+  </button>
+</div>

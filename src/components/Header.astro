@@ -1,8 +1,8 @@
 ---
-import { Icon } from 'astro-icon/components';
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
 import Logo from './Logo.astro';
+import ThemeSwitch from './ThemeSwitch.astro';
 
 const links = nav.header.links;
 const ctaLinks = nav.header.cta;
@@ -46,33 +46,14 @@ const ctaLinks = nav.header.cta;
           }
         </ul>
 
-        <p class="nav__meta">{nav.header.meta}</p>
+        <div class="nav__footer">
+          <ThemeSwitch class="theme-switch--nav" />
+          <p class="nav__meta">{nav.header.meta}</p>
+        </div>
       </nav>
 
       <div class="header__actions">
-        <div class="theme-switch" role="group" aria-label="Darstellung">
-          <button
-            class="theme-switch__btn"
-            type="button"
-            data-theme-toggle
-            aria-label="Farbwelt wechseln"
-            title="Farbwelt wechseln (warm / kühl)"
-          >
-            <Icon class="theme-switch__icon theme-switch__icon--warm" name="theme-warm" aria-hidden="true" />
-            <Icon class="theme-switch__icon theme-switch__icon--cool" name="theme-cool" aria-hidden="true" />
-          </button>
-
-          <button
-            class="theme-switch__btn"
-            type="button"
-            data-mode-toggle
-            aria-label="Hell-/Dunkelmodus wechseln"
-            title="Hell-/Dunkelmodus wechseln"
-          >
-            <Icon class="theme-switch__icon theme-switch__icon--light" name="theme-light" aria-hidden="true" />
-            <Icon class="theme-switch__icon theme-switch__icon--dark" name="theme-dark" aria-hidden="true" />
-          </button>
-        </div>
+        <ThemeSwitch class="theme-switch--bar" />
 
         {
           ctaLinks.map((link) => (
@@ -181,8 +162,13 @@ const ctaLinks = nav.header.cta;
 
     .header__inner {
       display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: var(--space-md);
+      /* `minmax(0, …)` on every track: the default `auto` minimum is the
+         content's min-content size, which let the actions cluster push past the
+         header's own box. `.header` is `position: fixed`, so that overflow never
+         raised a scrollbar to make itself visible — it silently pushed the nav
+         toggle outside the viewport instead. */
+      grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
+      gap: var(--header-gap, var(--space-md));
       align-items: center;
     }
 
@@ -200,9 +186,10 @@ const ctaLinks = nav.header.cta;
     .header__actions {
       display: flex;
       grid-column: 3;
-      gap: var(--space-sm);
+      gap: var(--header-gap, var(--space-sm));
       align-items: center;
       justify-self: end;
+      min-inline-size: 0;
     }
 
     .logo {
@@ -412,13 +399,22 @@ const ctaLinks = nav.header.cta;
       transform: scaleX(1);
     }
 
-    .nav__meta {
+    /* Overlay foot: the theme controls (on narrow screens, see below) sit above
+       the standing meta line, well clear of the link cascade. */
+    .nav__footer {
       position: relative;
       z-index: 1;
       display: flex;
       flex-direction: column;
-      gap: 1.1em;
+      gap: var(--space-md);
       place-self: center;
+      align-items: center;
+    }
+
+    .nav__meta {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1em;
       align-items: center;
       margin: 0;
       font-size: var(--text-caption);
@@ -445,7 +441,7 @@ const ctaLinks = nav.header.cta;
 
     @media (prefers-reduced-motion: no-preference) {
       .motion-ready .nav__item,
-      .motion-ready .nav__meta {
+      .motion-ready .nav__footer {
         opacity: 0;
       }
     }
@@ -580,15 +576,26 @@ const ctaLinks = nav.header.cta;
       display: none;
     }
 
-    @media (width <= 480px) {
-      .theme-switch__btn {
-        inline-size: 38px;
-        block-size: 38px;
+    /* Where the theme controls live.
+       ------------------------------------------------------------------
+       The bar has to hold logo + CTA + toggle at every width, and the two
+       theme buttons are what tipped it over: below 768px the cluster no
+       longer fits (worst case ~562px of content in a ~433px track), which is
+       how the nav toggle ended up off-screen. So the switch moves into the
+       nav overlay there — it has room to spare, and the controls stay one tap
+       away behind a button that is now reachable. Exactly one copy is in the
+       DOM's a11y tree at any width. */
+    .theme-switch--nav {
+      display: none;
+    }
+
+    @media (width < 768px) {
+      .theme-switch--bar {
+        display: none;
       }
 
-      .theme-switch__icon {
-        inline-size: 18px;
-        block-size: 18px;
+      .theme-switch--nav {
+        display: flex;
       }
     }
 
@@ -634,7 +641,10 @@ const ctaLinks = nav.header.cta;
       }
     }
 
-    @media (width <= 480px) {
+    /* Compact bar. The wordmark and the roomier CTA only return once the track
+       can carry them: at 481px the full-size pair needed ~445px against 433px
+       available, so this now holds to 560px. */
+    @media (width <= 560px) {
       .logo__text {
         display: none;
       }
@@ -643,6 +653,15 @@ const ctaLinks = nav.header.cta;
         --btn-padding-block: 0.6rem;
         --btn-padding-inline: 1rem;
         --btn-font-size: var(--text-xs);
+      }
+    }
+
+    /* Smallest phones (360px and below): tighten the gaps that separate the
+       three bar slots so the CTA keeps its label instead of being clipped. */
+    @media (width <= 400px) {
+      .header__inner,
+      .header__actions {
+        --header-gap: var(--space-xs);
       }
     }
 
