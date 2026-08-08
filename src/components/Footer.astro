@@ -158,10 +158,14 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       list-style: none;
     }
 
+    /* The footer's standalone links are all held to a 24px minimum box (WCAG
+       2.2 SC 2.5.8): they sit in navigation lists, not inside a sentence, so
+       the inline-text exception does not cover them. They measured 21-22px. */
     .social-link {
       display: inline-flex;
       gap: 0.75rem;
       align-items: center;
+      min-block-size: 24px;
       font-size: var(--text-body-compact);
       color: var(--color-sand);
       opacity: 0.9;
@@ -214,7 +218,9 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
 
     .footer__links a {
       position: relative;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      min-block-size: 24px;
       padding-inline-start: 0;
       font-size: var(--text-body-compact);
       color: var(--color-sand);
@@ -243,6 +249,9 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
 
     .footer__legal a {
       position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-block-size: 24px;
       font-size: var(--text-caption);
       color: var(--color-sand);
       opacity: 0.9;

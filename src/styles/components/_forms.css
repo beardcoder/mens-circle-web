@@ -199,7 +199,7 @@ textarea.form-control {
 }
 
 .form-required {
-  color: var(--accent-primary);
+  color: var(--accent-text);
 }
 
 .form-optional,
@@ -267,7 +267,7 @@ textarea.form-control {
 }
 
 .form-checkbox a {
-  color: var(--accent-secondary);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

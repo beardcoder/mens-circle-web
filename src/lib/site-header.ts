@@ -102,7 +102,7 @@ export function initSiteHeader(): () => void {
   // Everything that cascades into / out of the open panel.
   const revealItems = [
     ...Array.from(nav.querySelectorAll<HTMLElement>('.nav__item')),
-    ...Array.from(nav.querySelectorAll<HTMLElement>('.nav__meta')),
+    ...Array.from(nav.querySelectorAll<HTMLElement>('.nav__footer')),
   ];
 
   // Track every binding so the returned cleanup can detach them all.

@@ -32,7 +32,11 @@ const steps = data.steps ?? [];
         )
       }
 
-      {data.title && <h2 class="section-title" id="journey-title" data-reveal="blur" set:html={data.title} />}
+      {
+        data.title && (
+          <h2 class="section-title section-title--light" id="journey-title" data-reveal="blur" set:html={data.title} />
+        )
+      }
 
       {
         data.subtitle && (
