@@ -1,0 +1,119 @@
+---
+import { Picture } from 'astro:assets';
+import { resolveAssetImage } from '@lib/images';
+
+/**
+ * A short, personal note from Markus — deliberately *not* the home page's
+ * moderator block (components/blocks/Moderator.astro), which is a full-bleed
+ * portrait section with bio and quote. Duplicating it here would mean the same
+ * text on two indexed URLs; a visitor on this page only needs to know who holds
+ * the evening, and where to read more if he wants to.
+ *
+ * The portrait is the same bundled asset the home page uses, requested at
+ * portrait-thumbnail sizes.
+ */
+const photo = resolveAssetImage('/images/markus-sommer.jpg');
+---
+
+<section class="section event-landing-guide" aria-labelledby="begleiter-title">
+  <div class="container">
+    <div class="event-landing-guide__layout">
+      {
+        photo && (
+          <div class="event-landing-guide__photo" data-reveal="right" data-motion="image">
+            <Picture
+              src={photo}
+              alt="Markus Sommer, Gründer des Männerkreises Niederbayern/ Straubing"
+              widths={[220, 440]}
+              sizes="(max-width: 700px) 140px, 220px"
+              formats={['avif', 'webp']}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        )
+      }
+
+      <div class="event-landing-guide__content" data-reveal-group="90">
+        <p class="eyebrow" data-reveal="up">Dein Begleiter</p>
+        <h2 class="event-landing-guide__title" id="begleiter-title" data-reveal="blur">
+          Ich bin <span class="text-italic">Markus</span>
+        </h2>
+        <div class="event-landing-guide__text" data-reveal="up">
+          <p>
+            Ich habe den Männerkreis gegründet, weil mir selbst ein Ort gefehlt hat, an dem Männer auch über das
+            sprechen können, was sie sonst meist mit sich selbst ausmachen.
+          </p>
+          <p>
+            Ich sehe mich dabei nicht als Lehrer und habe keine Antworten für die Männer im Kreis. Meine Aufgabe ist es,
+            einen verlässlichen Rahmen zu halten und den Abend zu begleiten.
+          </p>
+        </div>
+        <a href="/warum-ich-den-maennerkreis-leite" class="link event-landing-guide__link" data-reveal="up">
+          Mehr über meine Haltung
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .event-landing-guide__layout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-md) var(--space-lg);
+      align-items: center;
+
+      @media (width <= 700px) {
+        grid-template-columns: 1fr;
+        justify-items: start;
+      }
+    }
+
+    .event-landing-guide__photo {
+      inline-size: 220px;
+      aspect-ratio: 3 / 4;
+      overflow: clip;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-lg);
+
+      @media (width <= 700px) {
+        inline-size: 140px;
+      }
+    }
+
+    .event-landing-guide__photo img {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+    }
+
+    .event-landing-guide__title {
+      margin-block-end: var(--space-sm);
+      font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .event-landing-guide__title .text-italic {
+      color: var(--accent-text);
+    }
+
+    .event-landing-guide__text {
+      max-inline-size: var(--content-max-wide);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+      text-wrap: pretty;
+
+      & p {
+        margin-block-end: var(--space-sm);
+      }
+    }
+
+    .event-landing-guide__link {
+      display: inline-block;
+      font-size: var(--text-section-body);
+    }
+  }
+</style>
