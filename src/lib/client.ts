@@ -31,6 +31,10 @@ function init(): void {
   try {
     initMotion();
   } catch (error) {
+    // Reveals are hidden by CSS until they animate in, so a failure here would
+    // otherwise leave the page blank. Drop the hidden state immediately rather
+    // than waiting out the layout's fallback timer.
+    document.documentElement.classList.remove('motion-ready');
     // eslint-disable-next-line no-console
     console.error('[client] initMotion failed:', error);
   }

@@ -113,12 +113,18 @@ export function initTheme(): () => void {
   // Re-assert state on load (covers stored choices made before this ran).
   apply();
 
-  const paletteBtn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
-  const modeBtn = document.querySelector<HTMLButtonElement>('[data-mode-toggle]');
+  // The switch is rendered twice — in the header bar and inside the nav overlay
+  // — with CSS showing whichever fits the viewport (see Header.astro). Wire and
+  // sync every instance so the hidden copy is never stale when it takes over.
+  const paletteBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]'));
+  const modeBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-mode-toggle]'));
 
   const syncButtons = (): void => {
-    paletteBtn?.setAttribute('aria-pressed', String(getPalette() === 'cool'));
-    modeBtn?.setAttribute('aria-pressed', String(resolveMode() === 'dark'));
+    const palettePressed = String(getPalette() === 'cool');
+    const modePressed = String(resolveMode() === 'dark');
+
+    for (const btn of paletteBtns) btn.setAttribute('aria-pressed', palettePressed);
+    for (const btn of modeBtns) btn.setAttribute('aria-pressed', modePressed);
   };
 
   syncButtons();
@@ -152,17 +158,13 @@ export function initTheme(): () => void {
     transition.finished.then(clear, clear);
   };
 
-  if (paletteBtn) {
-    listen(paletteBtn, 'click', () =>
-      commit(() => writeStored(STORAGE_THEME, getPalette() === 'cool' ? 'warm' : 'cool')),
-    );
+  for (const btn of paletteBtns) {
+    listen(btn, 'click', () => commit(() => writeStored(STORAGE_THEME, getPalette() === 'cool' ? 'warm' : 'cool')));
   }
 
-  if (modeBtn) {
-    // Toggle relative to what's actually showing, then pin it explicitly.
-    listen(modeBtn, 'click', () =>
-      commit(() => writeStored(STORAGE_MODE, resolveMode() === 'dark' ? 'light' : 'dark')),
-    );
+  // Toggle relative to what's actually showing, then pin it explicitly.
+  for (const btn of modeBtns) {
+    listen(btn, 'click', () => commit(() => writeStored(STORAGE_MODE, resolveMode() === 'dark' ? 'light' : 'dark')));
   }
 
   // Keep the resolved mode live when the OS flips and nothing is pinned.

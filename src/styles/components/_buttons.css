@@ -192,13 +192,14 @@
   --btn-lift: 0;
 }
 
-/* Sage-green community CTA — used by WhatsApp section */
+/* Sage-green community CTA — used by WhatsApp section.
+   50%, not 60%: the bone label only reached 3.5:1 on the lighter green. */
 .btn--whatsapp {
-  --btn-bg: oklch(60% 0.15 145deg);
+  --btn-bg: oklch(50% 0.15 145deg);
   --btn-color: var(--color-bone);
-  --btn-hover-bg: oklch(55% 0.16 145deg);
+  --btn-hover-bg: oklch(45% 0.16 145deg);
   --btn-hover-color: var(--color-bone);
-  --btn-hover-border: oklch(55% 0.16 145deg);
+  --btn-hover-border: oklch(45% 0.16 145deg);
   --btn-shadow:
     0 4px 14px color-mix(in oklch, oklch(40% 0.1 145deg) 30%, transparent),
     0 2px 6px color-mix(in oklch, oklch(40% 0.1 145deg) 20%, transparent);
