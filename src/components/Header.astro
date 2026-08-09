@@ -137,11 +137,13 @@ const ctaLinks = nav.header.cta;
       inset-block-start: 0;
       inset-inline: 0;
       z-index: var(--z-header);
+      /* One height, always. The bar used to re-pad itself on scroll (see
+         `header-color-morph`); that is a layout property, so it jumped
+         instead of gliding and dragged the whole fixed header through
+         layout on every scroll frame. Only the tone transitions now. */
       padding-block: clamp(0.875rem, 0.65rem + 0.7vw, 1.25rem);
       color: var(--text-primary);
-      transition:
-        padding-block var(--motion-standard),
-        color var(--motion-standard);
+      transition: color var(--motion-standard);
     }
 
     .header::before {
