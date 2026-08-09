@@ -92,10 +92,16 @@
   }
 }
 
-/* Header — scroll-driven color morph and overlay fade. */
+/* Header — scroll-driven color morph and overlay fade.
+   Deliberately colour-only: this used to animate `padding-block` as well,
+   which had two problems. It made the bar *grow* on scroll (the target
+   `--space-md * 0.78` is larger than the base padding at every viewport),
+   and because padding is a layout property the scroll-driven animation
+   could not run on the compositor — every scroll frame relaid out the
+   fixed header on the main thread and the height visibly stepped behind
+   the scroll. The header now keeps one height; only the tone changes. */
 @keyframes header-color-morph {
   to {
-    padding-block: calc(var(--space-md) * 0.78);
     color: var(--text-primary);
   }
 }
@@ -218,17 +224,24 @@
   }
 }
 
-/* One-shot page-load entrance for above-the-fold content (see utilities/_motion.css). */
+/* One-shot page-load entrance for above-the-fold content (see utilities/_motion.css).
+   No `filter: blur()` here on purpose. A filter paints through a filter
+   region derived from the *border box*, grown by the blur margin (~3σ — 9px
+   for a 6px blur). `.hero__title` runs `line-height: 0.88` at up to 11rem,
+   so its glyph ink overflows that box by ~0.22em (≈29px at 1440px, more on
+   the event heroes): far past the margin, and WebKit crops to the region, so
+   the headline rendered clipped for the whole entrance and only snapped back
+   once the filter settled. Chromium grows the region to fit, which is why it
+   never showed there. Opacity and transform are also the only two properties
+   the compositor can animate without help. */
 @keyframes hero-rise {
   from {
     opacity: 0;
-    filter: blur(6px);
     transform: translate3d(0, 1.25rem, 0);
   }
 
   to {
     opacity: 1;
-    filter: blur(0);
     transform: translate3d(0, 0, 0);
   }
 }
