@@ -243,9 +243,12 @@ export function initMotion(): void {
   }).observe(document.body, { childList: true, subtree: true });
 }
 
-// `will-change` is held only for the life of the animation.
+// `will-change` is held only for the life of the animation. The `blur`
+// variant has to name `filter` too — without it the browser re-rasterises
+// the element on every frame of the burn-off instead of filtering a cached
+// layer, which is exactly where the reveals used to stutter.
 function reveal(el: HTMLElement, config: RevealConfig): void {
-  el.style.willChange = 'transform, opacity';
+  el.style.willChange = config.enter.filter ? 'transform, opacity, filter' : 'transform, opacity';
 
   const controls = animate(el, config.enter as unknown as DOMKeyframes, {
     duration: config.duration,
