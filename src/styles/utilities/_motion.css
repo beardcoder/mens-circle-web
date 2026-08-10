@@ -81,6 +81,34 @@
   }
 }
 
+/* Ambient loop parking. `lib/ambient.ts` marks a section while it sits
+   outside the viewport; every loop inside it stops until it comes back.
+   The decorative breathing is all `infinite`, so without this a long page
+   keeps a dozen animations — and the layers they were promoted onto —
+   running where nobody can see them, spending the budget the scroll needs. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .is-ambient-paused,
+  .is-ambient-paused::before,
+  .is-ambient-paused::after,
+  .is-ambient-paused *,
+  .is-ambient-paused *::before,
+  .is-ambient-paused *::after {
+    animation-play-state: paused;
+  }
+
+  /* The breathing exercise's rings *are* the content — never parked. Same
+     specificity as the rule above, so source order decides; keep it last. */
+  [data-motion-essential],
+  [data-motion-essential]::before,
+  [data-motion-essential]::after,
+  [data-motion-essential] *,
+  [data-motion-essential] *::before,
+  [data-motion-essential] *::after {
+    animation-play-state: running;
+  }
+}
+
 /* Surface primitives — data-motion */
 
 /* Clipped image frame: the image can scale on hover without nudging neighbours. */

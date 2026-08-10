@@ -162,6 +162,23 @@ const ctaLinks = nav.header.cta;
       transition: opacity var(--motion-standard);
     }
 
+    /* The blur is by far the most expensive thing this bar does: a
+       backdrop-filter re-samples and re-blurs the full width of the viewport
+       behind it on every scroll frame, and on a page without a hero it is on
+       for the entire scroll. Two cases trade it for an opaque bar — the same
+       separation, none of the per-frame fill:
+         • touch devices, which have the least GPU headroom to spare and are
+           where the scroll stutter actually shows;
+         • anyone who asked for less transparency.
+       Pointer-fine devices keep the glass. To put it back everywhere, delete
+       this block. */
+    @media (hover: none) and (pointer: coarse), (prefers-reduced-transparency: reduce) {
+      .header::before {
+        background: var(--bg-primary);
+        backdrop-filter: none;
+      }
+    }
+
     .header__inner {
       display: grid;
       /* `minmax(0, …)` on every track: the default `auto` minimum is the

@@ -4,6 +4,7 @@
  * blocks the others.
  */
 
+import { initAmbient } from './ambient';
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';
 import { initTheme } from './theme';
@@ -37,6 +38,15 @@ function init(): void {
     document.documentElement.classList.remove('motion-ready');
     // eslint-disable-next-line no-console
     console.error('[client] initMotion failed:', error);
+  }
+
+  try {
+    initAmbient();
+  } catch (error) {
+    // Purely an optimisation — a failure just means the ambient loops keep
+    // running off-screen, which is what they did before.
+    // eslint-disable-next-line no-console
+    console.error('[client] initAmbient failed:', error);
   }
 }
 
