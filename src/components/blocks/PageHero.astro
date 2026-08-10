@@ -249,6 +249,12 @@ const imageAlt = data.imageAlt ?? '';
       block-size: auto;
       aspect-ratio: 4 / 3;
       object-fit: cover;
+      /* A portrait source loses about half its height in this landscape frame,
+         and a centred crop takes the middle band — on a standing or seated
+         subject that is the torso, with the head cut off above the edge.
+         Biasing the crop upward keeps the face in frame and leaves a little
+         air above it. */
+      object-position: center 30%;
       border-radius: var(--radius-lg);
       /* Hairline warm edge + layered warm shadow so the portrait reads as part
          of the earthy hero rather than a neutral drop-shadowed rectangle. */
