@@ -1,10 +1,6 @@
 /**
- * One-shot event-reminder run.
- *
- * The scheduled pass runs in-process via Bun.cron (scripts/reminder-cron.ts,
- * loaded with `bun --preload` — see docker-entrypoint.sh). This script is the
- * manual escape hatch: one idempotent pass, then exit. Useful to force a pass
- * after fixing a mail misconfiguration without waiting for the next tick.
+ * One-shot event-reminder run — the manual escape hatch beside the scheduled
+ * pass in scripts/reminder-cron.ts. One idempotent pass, then exit.
  *
  *   bun run scripts/send-reminders.ts
  *   docker exec <web> bun run scripts/send-reminders.ts
