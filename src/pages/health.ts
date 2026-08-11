@@ -1,14 +1,10 @@
 /**
- * Liveness probe — `GET /health`.
+ * Liveness probe — `GET /health`, polled every 30s by the Docker HEALTHCHECK.
+ * The cheapest possible 200: answering at all proves the request loop is up.
  *
- * The Docker HEALTHCHECK (and Coolify behind it) polls this every 30s. It must
- * be the cheapest possible 200: no page render, no template, no DB round-trip.
- * A response at all proves the Bun process is up and its request loop is
- * accepting — which is exactly what liveness means. Readiness of the data layer
- * is not probed on purpose: the migrations run during boot (see
- * lib/server/db/index.ts), so a process that reached the point of answering
- * requests already has a provisioned schema, and coupling the probe to a query
- * would let a transient SQLite lock restart a healthy container.
+ * Deliberately no DB query. Migrations run at boot, so a process answering
+ * requests already has a schema, and probing one would let a transient SQLite
+ * lock restart a healthy container.
  */
 import type { APIRoute } from 'astro';
 

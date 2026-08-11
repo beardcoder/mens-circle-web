@@ -21,19 +21,16 @@ interface Props {
   manifest?: string;
   webAppTitle?: string;
   viewport?: string;
-  /** Chrome-less shell: drop the header, footer, side rails and
-   *  scroll-to-top so a page can present as a focused, full-screen app
-   *  (used by the installable breathing exercise). */
+  /** Chrome-less shell — no header, footer, rails or scroll-to-top, so a page
+   *  can present as a full-screen app (the installable breathing exercise). */
   bare?: boolean;
 }
 
 const { bare = false, ...props } = Astro.props;
 
-// Umami heatmap recorder — the second, optional tracker script alongside the
-// analytics script the @yeskunall/astro-umami integration injects (config in
-// astro.config.mjs; both read the same id/endpoint from lib/umami-config).
-// Production only, so local development never records sessions. The sample rate
-// and the heatmaps toggle live in the Umami admin, not here.
+// Umami heatmap recorder, alongside the tracker the astro-umami integration
+// injects (both read lib/umami-config). Production only. Sample rate and the
+// heatmaps toggle live in the Umami admin.
 const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` : null;
 ---
 
@@ -42,26 +39,20 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
   <head>
     <meta charset="UTF-8" />
     <script is:inline>
-      // `.motion-ready` is what lets CSS hide every [data-reveal] at opacity 0
-      // before lib/motion.ts animates it in. Setting it here (rather than from
-      // the module) is what stops the content flashing — but it also means a
-      // module that never arrives leaves the whole page invisible: one failed
-      // chunk, a blocked CDN or a JS error and the site renders blank.
-      // So the class is armed with a dead-man's switch: initMotion() clears the
-      // timer as soon as it has the reveals under observation, and if it never
-      // does, the hidden state lifts on its own and everything is simply shown.
+      // `.motion-ready` lets CSS hide every [data-reveal] until lib/motion.ts
+      // animates it in. Set here rather than from the module so nothing flashes
+      // — but a module that never arrives would then leave the page blank, so
+      // the class carries a dead-man's switch: initMotion() clears the timer
+      // once the reveals are observed, otherwise the hidden state lifts itself.
       document.documentElement.classList.add('motion-ready');
       window.__mcMotionFallback = setTimeout(() => {
         document.documentElement.classList.remove('motion-ready');
       }, 4000);
-      // Cross-document view transitions (styles/utilities/_view-transitions.css).
-      // `pagereveal` is the browser's hook into the incoming document: it fires
-      // before its first rendering opportunity, and carries the ViewTransition
-      // object when the navigation is animating. Marking the document here —
-      // and only here, because a class added after the first paint would be too
-      // late — lets CSS stand the page's own entrance down, so the cross-fade
-      // is the only thing moving. The listener has to live inline: our module
-      // is deferred and would miss the event on a slow chunk.
+      // `pagereveal` fires in the incoming document before its first rendering
+      // opportunity and carries the ViewTransition when the navigation animates.
+      // Marking the document here — the only point early enough — lets CSS stand
+      // the page's own entrance down so the cross-fade is the only thing moving.
+      // Inline because our module is deferred and would miss the event.
       addEventListener('pagereveal', (event) => {
         if (event.viewTransition) document.documentElement.classList.add('vt-arrival');
       });
@@ -80,20 +71,14 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
         }
       })();
     </script>
-    {
-      /* Native Astro fonts (config in astro.config.mjs). Preload Playfair —
-        the hero heading is the LCP; DM Sans loads without a preload race. */
-    }
+    {/* Preload Playfair — the hero heading is the LCP. Config in astro.config.mjs. */}
     <Font cssVariable="--font-playfair" preload />
     <Font cssVariable="--font-dm-sans" />
     <SeoHead {...props} />
     {
-      /* `async`, NOT `defer`. Deferred scripts execute in document order, and
-        this tag sits ahead of the site's own module — so a slow or unreachable
-        analytics CDN held back our theme toggle, mobile nav and scroll reveals,
-        and pushed DOMContentLoaded out with it. Measured against a 3s stall:
-        interactivity at 3069ms with `defer` vs 194ms with `async`. The recorder
-        has no ordering dependency on anything, so async is simply correct. */
+      /* `async`, NOT `defer`: deferred scripts run in document order, so a stalled
+        analytics CDN would hold back our own module behind it — 3069ms to
+        interactive vs 194ms in a 3s-stall test. Nothing orders against this. */
     }
     {umamiRecorderSrc && <script is:inline async src={umamiRecorderSrc} data-website-id={UMAMI_WEBSITE_ID} />}
   </head>

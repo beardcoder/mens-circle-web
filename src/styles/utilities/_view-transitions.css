@@ -1,15 +1,12 @@
 /**
- * View Transitions — Native Cross-Document Fade
+ * View Transitions — native cross-document fade.
  *
- * The whole page transition is the browser's: `@view-transition` opts the
- * site into cross-document transitions and the UA drives the snapshots.
- * There is no router and no JS animating anything here — the only script
- * involved is the `pagereveal` listener in Layout.astro, which marks a
- * document that arrived through a transition so its own entrance animation
- * stands down (see utilities/_motion.css, `.vt-arrival`).
+ * No router, no JS animating anything: `@view-transition` opts in and the UA
+ * drives the snapshots. The only script involved is the `pagereveal` listener
+ * in Layout.astro, which sets `.vt-arrival` so the arriving page's own entrance
+ * stands down (see utilities/_motion.css).
  *
- * Requires Chrome 126+ / Edge 126+ / Safari 18.2+; ignored elsewhere, where
- * navigation is simply instant.
+ * Chrome/Edge 126+, Safari 18.2+; elsewhere navigation is simply instant.
  */
 
 @view-transition {
@@ -17,9 +14,8 @@
 }
 
 :root {
-  /* One duration for both halves of the cross-fade. They have to match —
-     see the blend-mode note below — so they read it from here rather than
-     each carrying their own copy. */
+  /* Both halves of the cross-fade must share one duration — see the blend-mode
+     note below — so they read it from here. */
   --vt-duration: 420ms;
 }
 
@@ -29,13 +25,11 @@
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  /* `plus-lighter` composites the two snapshots additively, which is what
-     avoids the grey sag in the middle of a plain cross-fade. It is only
-     correct while the two opacities sum to 1 at every instant, though, and
-     both sides used to ease with `--ease-settle` — a front-loaded curve, so
-     halfway through they sat near 0.9 each and summed to ~1.8. That is the
-     bright wash the transition flashed before snapping back to the new page.
-     Linear on both, identical duration, is the pairing the blend mode wants. */
+  /* `plus-lighter` adds the two snapshots, which avoids the grey sag of a plain
+     cross-fade — but only while their opacities sum to 1. Both sides used to
+     ease with `--ease-settle`, a front-loaded curve, so mid-transition they sat
+     near 0.9 each and summed to ~1.8: that was the bright flash. Linear on both,
+     same duration, is the pairing the blend mode expects. */
   mix-blend-mode: plus-lighter;
   animation-duration: var(--vt-duration);
   animation-timing-function: linear;
@@ -49,26 +43,16 @@
   animation-name: vt-fade-in;
 }
 
-/* The header deliberately has no `view-transition-name`.
-   ------------------------------------------------------------------
-   It used to carry one, so the brand would hold its identity across a
-   navigation. But the bar's appearance is derived from scroll position —
-   `header-color-morph` runs on a scroll timeline — so the snapshot was taken
-   in the *outgoing* page's scroll state and then animated on its own, shorter
-   clock, independent of the root fade. Leaving a scrolled page for one that
-   opens on a hero therefore parked the previous page's opaque light bar, dark
-   logo and all, over the new dark hero for a few hundred milliseconds before
-   it snapped to the right state. Folding the header back into the root
-   snapshot cross-fades it in lock-step with the ground behind it; both
-   documents draw it in the same place with the same mark, so there is nothing
-   left to flicker. */
+/* The header deliberately has no `view-transition-name`. It used to, but its
+   appearance comes from scroll position (`header-color-morph` on a scroll
+   timeline), so the snapshot was captured in the *outgoing* page's scroll state
+   and animated on its own shorter clock — parking the old opaque bar over the
+   new dark hero before snapping. In the root snapshot it cross-fades in
+   lock-step with the ground behind it. */
 
-/* The theme switch animates with the same View Transitions API, but a
-   palette / light↔dark swap wants a plain cross-fade: the `plus-lighter`
-   blend used for page navigation flashes bright when two very different
-   grounds overlap. While a toggle is in flight the root carries
-   `data-theme-transition` (set in lib/theme.ts), so we neutralise the
-   blend and tighten the timing just for that case. */
+/* A theme swap uses the same API but wants a plain cross-fade — `plus-lighter`
+   flashes when two very different grounds overlap. lib/theme.ts sets
+   `data-theme-transition` while a toggle is in flight. */
 html[data-theme-transition]::view-transition-old(root),
 html[data-theme-transition]::view-transition-new(root) {
   mix-blend-mode: normal;
