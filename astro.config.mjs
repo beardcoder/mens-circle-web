@@ -11,35 +11,22 @@ import { addSitemapsToIndex } from './astro-integrations/sitemap-index-extra.mjs
 import { serveLlmsWithBunAdapter, serveSitemapWithBunAdapter } from './astro-integrations/serve-with-bun-adapter.mjs';
 import { UMAMI_ENDPOINT, UMAMI_WEBSITE_ID } from './src/lib/umami-config.ts';
 
-// SSR on the Bun runtime. @wyattjoh/astro-bun-adapter builds the server entry
-// (dist/server/entry.mjs) which Bun runs: it serves hashed static assets +
-// prerendered HTML from disk and renders SSR routes on demand. A single Bun
-// process is the public edge (no nginx). Data comes from Drizzle on bun:sqlite.
-// Most pages are prerendered (static, RAM-friendly); only the event pages and
-// the home testimonials render on demand from the DB.
-// https://astro.build/config
+// SSR on Bun: the adapter builds dist/server/entry.mjs, and that single process
+// is the public edge — static assets, prerendered HTML and on-demand routes.
+// Only the event pages and the home testimonials render per request.
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://mens-circle.de',
   output: 'server',
   adapter: bun({ isr: true }),
-  // NOTE: Astro 7.2's `session: false` (drop the session runtime — we never use
-  // `Astro.session`; the admin area carries its own signed cookie, see
-  // lib/server/auth.ts) is a no-op under @wyattjoh/astro-bun-adapter 2.1.1: the
-  // adapter's `astro:config:setup` unconditionally writes
-  // `session: { driver: config.session?.driver ?? 'fs-lite' }`, which turns the
-  // opt-out straight back into an fs-lite session. Clean builds with and without
-  // the flag are byte-identical. Set it once the adapter honours `false`.
-  // `bun:sqlite` is a Bun runtime builtin (used by the Drizzle data layer); keep
-  // it external so Rollup doesn't try to bundle it into the SSR output.
+  // `session: false` is deliberately absent: adapter 2.1.1 overwrites it with an
+  // fs-lite driver, so the opt-out is a no-op. Set it once the adapter honours it.
+  // `bun:sqlite` is a Bun builtin — external, or Rollup tries to bundle it.
   vite: {
     ssr: { external: ['bun:sqlite'] },
     optimizeDeps: { exclude: ['bun:sqlite'] },
-    // Lightning CSS (https://lightningcss.dev) handles CSS transform + minify.
-    // Unlike esbuild it autoprefixes from real browser-compat data, so e.g.
-    // `backdrop-filter` ships with its `-webkit-` form for Safari without us
-    // hand-maintaining prefixes. `cssTarget` is what the minify step reads
-    // (Vite passes it through `convertTargets`); it's kept modern so the design
-    // tokens' native `oklch()` and `color-mix()` are preserved, not downleveled.
+    // Lightning CSS autoprefixes from real compat data (so `-webkit-backdrop-filter`
+    // is handled for us). `cssTarget` stays modern so the tokens' `oklch()` and
+    // `color-mix()` survive minification instead of being downleveled.
     css: {
       transformer: 'lightningcss',
     },
@@ -54,51 +41,36 @@ export default defineConfig({
     '/events': '/event',
     // Legacy plural deep-links → the per-event page (was a PocketBase route).
     '/events/[slug]': '/event/[slug]',
-    // Old PocketBase "Über uns" page (still indexed by Google, now a 404) →
-    // the about section on the home page.
+    // Old PocketBase page, still indexed.
     '/ueber-uns': '/#ueber',
-    // The sitemap now lives at /sitemap-index.xml (the @astrojs/sitemap output);
-    // send the short-lived interim /sitemap.xml URL there so nothing dangles.
+    // Interim URL from before @astrojs/sitemap.
     '/sitemap.xml': '/sitemap-index.xml',
   },
-  // Prefetch in-viewport internal links for instant navigation. Pairs with the
-  // CSS cross-document view transitions (styles/utilities/_view-transitions.css).
+  // Prefetch in-viewport internal links; pairs with the cross-document view
+  // transitions in styles/utilities/_view-transitions.css.
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'viewport',
   },
   experimental: {
-    // Upgrade viewport prefetch to full document *prerender* via the
-    // Speculation Rules API where supported (Chromium): the next page is
-    // fetched, parsed and rendered off-screen before the click, so navigation
-    // is instant and the cross-document view transition starts from a ready
-    // frame. Browsers without speculation rules keep the fetch-based prefetch.
+    // Speculation Rules where supported: the next page is rendered off-screen
+    // before the click, so the view transition starts from a ready frame.
     clientPrerender: true,
   },
   build: {
     // Keep asset URLs stable and cache-friendly.
     assets: 'assets',
-    // Inline the bundled CSS into each page's <head> instead of emitting a
-    // separate <link rel="stylesheet">. The external stylesheet was a
-    // render-blocking second request (~400ms: HTML must arrive and be parsed
-    // before the browser even discovers the link). Inlining ships the CSS with
-    // the HTML in one request, so first paint no longer waits on a round-trip.
-    // Pages are gzip/brotli-compressed on the wire and prefetched, which
-    // absorbs the cost of repeating the CSS per document.
+    // Inline the CSS rather than link it: the external stylesheet cost a
+    // render-blocking second round-trip (~400ms). Compression absorbs the
+    // repetition per document.
     inlineStylesheets: 'always',
   },
-  // Native Astro Fonts API (stable since Astro 6). Replaces the former
-  // `@fontsource-variable/*` CSS @imports + the hand-maintained fallback faces
-  // in styles/base/_fonts.css. Astro self-hosts and subsets the woff2, emits
-  // the @font-face rules inline (no render-blocking @import), and auto-derives
-  // metric-matched fallback faces (`optimizedFallbacks`, on by default) from the
-  // trailing generic family — so the first paint is dimensionally stable and the
-  // eventual swap shifts nothing. The <Font> component in the layout head wires
-  // up the CSS variables and the preloads (see src/layouts/Layout.astro).
+  // Native Astro Fonts API: self-hosted, subset woff2 with inline @font-face and
+  // auto-derived metric-matched fallbacks, so the swap shifts nothing. The <Font>
+  // components in src/layouts/Layout.astro wire up the variables and preloads.
   fonts: [
     {
-      // Display / headings — the hero heading (incl. its big italic accent) is
-      // the LCP, so this family is preloaded.
+      // Display / headings. The hero heading is the LCP, so this one is preloaded.
       name: 'Playfair Display',
       cssVariable: '--font-playfair',
       provider: fontProviders.fontsource(),
@@ -118,8 +90,7 @@ export default defineConfig({
       fallbacks: ['system-ui', 'sans-serif'],
     },
     {
-      // Admin display face — sturdy grotesque, for headings + the capacity-ring
-      // numerals. Deliberately not the public site's serif.
+      // Admin display face — deliberately not the public site's serif.
       name: 'Bricolage Grotesque',
       cssVariable: '--font-bricolage',
       provider: fontProviders.fontsource(),
@@ -129,7 +100,7 @@ export default defineConfig({
       fallbacks: ['system-ui', 'sans-serif'],
     },
     {
-      // Admin data face — dates, times, counts, IDs read as a logbook.
+      // Admin data face — dates, counts and IDs read as a logbook.
       name: 'IBM Plex Mono',
       cssVariable: '--font-plex-mono',
       provider: fontProviders.fontsource(),
@@ -141,24 +112,18 @@ export default defineConfig({
   ],
   integrations: [
     svelte(),
-    // Local SVG icons from src/icons/ inlined via <Icon name="…" /> from
-    // 'astro-icon/components'. Replaces the former hand-rolled inline SVG sprite
-    // (SpriteDefs.astro + Sprite.astro): each icon is its own optimized file and
-    // renders as an inline <svg> with no runtime <use> indirection.
+    // Local SVGs from src/icons/, inlined via <Icon name="…" />.
     icon(),
     sitemap({
-      // Keep noindex / non-public routes out of the sitemap. The event detail
-      // pages (/event/<slug>) are SSR and unknown at build time, so they cannot
-      // appear here — they are listed by the dynamic /sitemap-events.xml route
-      // instead, which addSitemapsToIndex() below wires into the index.
+      // Drop noindex / non-public routes. Event pages are SSR and unknown at build
+      // time; /sitemap-events.xml lists those, wired in by addSitemapsToIndex below.
       filter: (page) =>
         !page.includes('/admin') &&
         !page.includes('/impressum') &&
         !page.includes('/datenschutz') &&
         !page.includes('/atemuebung/app'),
-      // Emit the canonical, slash-less URLs (matching each page's <link rel=
-      // "canonical"> and the trailing-slash redirect in middleware.ts), so
-      // every sitemap entry resolves 200 directly instead of 301-redirecting.
+      // Slash-less URLs, matching the canonicals — every entry resolves 200
+      // instead of 301-redirecting.
       serialize(item) {
         const url = new URL(item.url);
         if (url.pathname !== '/') url.pathname = url.pathname.replace(/\/+$/, '');
@@ -166,39 +131,26 @@ export default defineConfig({
       },
     }),
     // Must sit BETWEEN sitemap() and serveSitemapWithBunAdapter(): it needs the
-    // generated index to exist, and it must patch it BEFORE the manifest records
-    // that file's byte length (see the integration for the full why).
+    // index to exist, and must patch it before the manifest records its length.
     addSitemapsToIndex({ paths: ['/sitemap-events.xml'] }),
-    // Must run AFTER sitemap(): registers the generated sitemap files into the
-    // Bun adapter's static manifest so they are actually served (see the
-    // integration for the full why).
+    // Must run AFTER sitemap(): registers its output in the adapter's manifest.
     serveSitemapWithBunAdapter(),
-    // llms.txt for AI crawlers. Replaces the former hand-maintained
-    // public/llms.txt: astro-llms-md derives llms.txt / llms-full.txt and
-    // per-page markdown from the built HTML at `astro:build:done`, so the AI
-    // index stays in sync with the actual pages instead of drifting.
-    // https://github.com/tfmurad/astro-llms-md
+    // llms.txt for AI crawlers, derived from the built HTML so it cannot drift.
     llms({
       name: 'Männerkreis Niederbayern/ Straubing',
       description:
         'Ein Männerkreis in Straubing / Niederbayern – ein geschützter Raum für echte Begegnung, authentischen Austausch und persönliches Wachstum unter Männern. Die Treffen finden regelmäßig statt und laufen auf Spendenbasis. Es ist keine Vorerfahrung nötig.',
-      // Site content lives in <main id="main"> (see Layout.astro).
       contentSelector: 'main',
       // Strip chrome (nav/footer/forms/aria-hidden) so the markdown is prose.
       excludeSelectors: [...DEFAULT_NOISE_SELECTORS],
-      // Keep the admin back-office and the noindex breathing-exercise app out of
-      // the AI index (on top of the built-in 404/_astro/asset excludes).
+      // Back-office and the noindex breathing app stay out of the AI index.
       exclude: ['admin/**', 'atemuebung/app/**'],
     }),
-    // Must run AFTER llms(): registers the generated llms.txt / llms-full.txt /
-    // per-page *.md into the Bun adapter's static manifest so they are actually
-    // served (same reason as serveSitemapWithBunAdapter above).
+    // Must run AFTER llms(), same manifest reason as serveSitemapWithBunAdapter.
     serveLlmsWithBunAdapter(),
-    // Umami analytics — the pageview/event tracker script. Id + endpoint come
-    // from src/lib/umami-config.ts (env-overridable, see there), the same values
-    // the layout's heatmap recorder and SeoHead's preconnect use.
-    // `performance: true` turns on Umami's native Core Web Vitals collection
-    // (LCP, INP, CLS, FCP, TTFB) — https://docs.umami.is/docs/performance.
+    // Umami tracker. Id + endpoint from src/lib/umami-config.ts, shared with the
+    // layout's heatmap recorder and SeoHead's preconnect. `performance` turns on
+    // Umami's own Core Web Vitals collection.
     umami({
       id: UMAMI_WEBSITE_ID,
       performance: true,
