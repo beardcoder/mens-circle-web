@@ -3,23 +3,16 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Add sitemaps that are ROUTES, not build artefacts, to the generated
- * `sitemap-index.xml`.
+ * Add sitemaps that are ROUTES, not build artefacts, to `sitemap-index.xml`.
  *
- * `@astrojs/sitemap` can only list what exists at build time. The event pages
- * don't: `/event/<slug>` is SSR and its slugs come from SQLite, so they are
- * published without a rebuild (see src/pages/sitemap-events.xml.ts). That
- * sitemap has to be generated per request — and then something has to tell
- * crawlers it exists, because robots.txt only points at the index.
+ * `@astrojs/sitemap` can only list what exists at build time, and `/event/<slug>`
+ * does not: it is SSR off SQLite slugs. src/pages/sitemap-events.xml.ts covers
+ * those per request, and this appends a `<sitemap>` entry pointing at it, since
+ * robots.txt only advertises the index.
  *
- * This integration appends a `<sitemap>` entry per configured path.
- *
- * ORDER MATTERS TWICE. Register it AFTER `sitemap()`, so the index file already
- * exists, and BEFORE `serveSitemapWithBunAdapter()`, which records each sitemap
- * file's byte length and ETag into the Bun adapter's static manifest — patching
- * the file afterwards would leave a stale `content-length` and serve a truncated
- * document. Astro runs `astro:build:done` hooks in integration-array order, so
- * sitting between the two is what keeps both invariants.
+ * ORDER MATTERS TWICE: after `sitemap()`, so the index exists, and before
+ * `serveSitemapWithBunAdapter()`, which records each file's byte length into the
+ * adapter manifest — patching afterwards would serve a truncated document.
  *
  * @param {object} options
  * @param {string[]} options.paths Root-relative sitemap paths to add, e.g.

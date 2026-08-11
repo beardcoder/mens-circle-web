@@ -1,23 +1,14 @@
 /**
- * Site Header — navigation with a breathing, circle-reveal menu.
+ * Site header — navigation with a circle-reveal mobile menu.
  *
- * The mobile menu is the signature surface. Tapping the toggle *breathes*
- * a full-screen earth panel open: a `clip-path` circle expands from the
- * button itself (Motion drives the radius), the concentric rings behind
- * the links pulse, and the links rise on a calm stagger. Closing inhales
- * the circle back down to the button.
+ * Tapping the toggle expands a `clip-path` circle from the button itself into a
+ * full-screen panel; the links rise on a stagger and closing inhales it back.
+ * Every transition runs through Motion Mini's `animate()` (WAAPI), which gives
+ * clean interruption mid-tap and a `finished` promise to drop `will-change`.
+ * The endless ambient breathing lives in CSS instead.
  *
- * Every *transition* (open / close / link cascade / the toggle morphing
- * into an X) is driven by Motion Mini's `animate()` — WAAPI under the
- * hood, so we get JS-precise easing, clean interruption when the user
- * taps mid-animation, and a `finished` promise to drop `will-change` the
- * instant a move settles. The endless, ambient "breathing" (rings, the
- * idle toggle ring) lives in CSS so it costs nothing here and pauses
- * itself under reduced motion.
- *
- * This is a vanilla initialiser operating on the Astro-rendered DOM. It
- * wires every listener and returns a cleanup function that removes them
- * and stops any in-flight panel animation.
+ * Vanilla initialiser over the Astro-rendered DOM. Returns a cleanup that
+ * detaches every listener and stops any in-flight panel animation.
  */
 
 import { animate } from 'motion/mini';
@@ -26,18 +17,14 @@ import { prefersReducedMotion } from './helpers';
 const SCROLL_THRESHOLD_PX = 48;
 const FALLBACK_HEADER_OFFSET_PX = 120;
 
-/** Cubic-bézier easings, mirrored from `_variables.css`. `animate()` wants
- *  the four control points as a tuple. */
+/** Easings mirrored from `_variables.css`, as the tuples `animate()` wants. */
 const EASE_EMPHASISED: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_SETTLE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const EASE_INHALE: [number, number, number, number] = [0.7, 0, 0.84, 0];
 
 type Controls = ReturnType<typeof animate>;
 
-/**
- * Offset (px) that anchored scrolling must clear below the fixed header,
- * read from the `--header-clearance` custom property.
- */
+/** Offset anchored scrolling must clear below the fixed header. */
 const headerOffset = (): number => {
   const raw = getComputedStyle(document.documentElement).getPropertyValue('--header-clearance');
   const parsed = Number.parseInt(raw, 10);
@@ -45,11 +32,7 @@ const headerOffset = (): number => {
   return Number.isFinite(parsed) ? parsed : FALLBACK_HEADER_OFFSET_PX;
 };
 
-/**
- * The fragment of a link that targets an anchor on the *current* page, or
- * `null` when it navigates elsewhere (other origin/path, new tab, or no
- * fragment).
- */
+/** A link's fragment when it targets the current page, else `null`. */
 const samePageHash = (link: HTMLAnchorElement): string | null => {
   if (link.target && link.target !== '_self') return null;
 
@@ -68,10 +51,7 @@ const samePageHash = (link: HTMLAnchorElement): string | null => {
   return url.hash;
 };
 
-/**
- * Radius a circle centred at (`ox`, `oy`) needs to cover the whole
- * viewport — the distance to the farthest corner.
- */
+/** Radius needed to cover the viewport from (`ox`, `oy`). */
 const coverRadius = (ox: number, oy: number): number => {
   const w = window.innerWidth;
   const h = window.innerHeight;
@@ -79,11 +59,7 @@ const coverRadius = (ox: number, oy: number): number => {
   return Math.hypot(Math.max(ox, w - ox), Math.max(oy, h - oy));
 };
 
-/**
- * Wire the site header. Returns a cleanup function that removes every
- * listener and stops any in-flight panel animation. No-op (returns a
- * no-op cleanup) if the required DOM is missing.
- */
+/** Wire the header. Returns a cleanup; no-op when the DOM isn't there. */
 export function initSiteHeader(): () => void {
   const root = document.querySelector<HTMLElement>('header.header#header[data-lume="site-header"]');
 
@@ -240,8 +216,7 @@ export function initSiteHeader(): () => void {
     const from = `circle(0px at ${ox}px ${oy}px)`;
     const to = `circle(${coverRadius(ox, oy)}px at ${ox}px ${oy}px)`;
 
-    // Set the closed clip synchronously, *then* reveal — so nothing flashes
-    // between the panel becoming visible and Motion taking over the radius.
+    // Set the closed clip before revealing, or the panel flashes open.
     nav.style.clipPath = from;
     nav.classList.add('is-open');
     nav.style.willChange = 'clip-path';
@@ -261,9 +236,8 @@ export function initSiteHeader(): () => void {
   };
 
   /**
-   * Inhale the circle back to the toggle. When `targetHash` points at an
-   * in-page anchor, scroll there once the body lock is released instead of
-   * restoring the pre-open position.
+   * Inhale the circle back to the toggle. With a `targetHash`, scroll there
+   * once the body lock lifts instead of restoring the pre-open position.
    */
   const closeMenu = (targetHash: string | null = null): void => {
     if (!isOpen) return;
@@ -349,8 +323,8 @@ export function initSiteHeader(): () => void {
         return;
       }
 
-      // Own the scroll for in-page anchors so the fixed header is cleared
-      // and the close animation doesn't snap us back to the saved position.
+      // Own the scroll so the header is cleared and the close animation
+      // doesn't snap back to the saved position.
       (event as MouseEvent).preventDefault();
 
       if (isOpen) closeMenu(hash);

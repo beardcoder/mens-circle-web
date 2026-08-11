@@ -1,6 +1,6 @@
 /**
- * Global keyframes. Kept outside any cascade layer — @keyframes inside
- * @layer have shipped subtle regressions in Vite/lightningcss builds.
+ * Global keyframes, unlayered — @keyframes inside @layer has shipped subtle
+ * regressions in Vite/lightningcss builds.
  */
 
 /* Ambient breathing — decorative circles in hero / intro / cta / newsletter. */
@@ -44,7 +44,7 @@
   }
 }
 
-/* Scroll-driven parallax — gated behind @supports (animation-timeline) at call sites. */
+/* Scroll-driven parallax — @supports-gated at the call sites. */
 @keyframes hero-content-leave {
   to {
     opacity: 0.3;
@@ -81,7 +81,7 @@
   }
 }
 
-/* Animates `translate` so the base rotate/centring on `transform` is preserved. */
+/* Uses `translate` so the base rotate/centring on `transform` survives. */
 @keyframes moderator-word-drift {
   from {
     translate: 2.5rem 0;
@@ -92,14 +92,10 @@
   }
 }
 
-/* Header — scroll-driven color morph and overlay fade.
-   Deliberately colour-only: this used to animate `padding-block` as well,
-   which had two problems. It made the bar *grow* on scroll (the target
-   `--space-md * 0.78` is larger than the base padding at every viewport),
-   and because padding is a layout property the scroll-driven animation
-   could not run on the compositor — every scroll frame relaid out the
-   fixed header on the main thread and the height visibly stepped behind
-   the scroll. The header now keeps one height; only the tone changes. */
+/* Header — scroll-driven colour morph and overlay fade. Colour-only on
+   purpose: animating `padding-block` here made the bar *grow* on scroll and,
+   being a layout property, relaid out the fixed header on every frame so the
+   height visibly stepped. One height now, only the tone changes. */
 @keyframes header-color-morph {
   to {
     color: var(--text-primary);
@@ -224,16 +220,12 @@
   }
 }
 
-/* One-shot page-load entrance for above-the-fold content (see utilities/_motion.css).
-   No `filter: blur()` here on purpose. A filter paints through a filter
-   region derived from the *border box*, grown by the blur margin (~3σ — 9px
-   for a 6px blur). `.hero__title` runs `line-height: 0.88` at up to 11rem,
-   so its glyph ink overflows that box by ~0.22em (≈29px at 1440px, more on
-   the event heroes): far past the margin, and WebKit crops to the region, so
-   the headline rendered clipped for the whole entrance and only snapped back
-   once the filter settled. Chromium grows the region to fit, which is why it
-   never showed there. Opacity and transform are also the only two properties
-   the compositor can animate without help. */
+/* One-shot page-load entrance for above-the-fold content (utilities/_motion.css).
+   No `filter: blur()` on purpose: a filter paints through a region derived from
+   the border box plus the blur margin (~9px at 6px blur), but `.hero__title`
+   runs `line-height: 0.88`, so its glyph ink overflows by ~0.22em. WebKit crops
+   to the region and the headline rendered clipped for the whole entrance.
+   Opacity and transform are also the only two the compositor animates alone. */
 @keyframes hero-rise {
   from {
     opacity: 0;

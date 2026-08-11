@@ -1,42 +1,24 @@
 /**
- * Männerkreis Niederbayern / Straubing — Main Stylesheet
- * =======================================================
+ * Männerkreis Niederbayern / Straubing — main stylesheet.
  *
- * Cascade architecture. Every stylesheet is loaded into a named layer so
- * the cascade order is explicit and predictable. Un-layered styles beat
- * all layers, so we keep the top-level file clean of loose rules.
+ * Every sheet loads into a named layer so the cascade order is explicit.
+ * Un-layered styles beat all layers, so this file stays free of loose rules.
  *
  *   reset      — normalize browser defaults
  *   tokens     — design tokens (colors, spacing, type, motion)
  *   base       — element defaults (typography, fonts)
  *   layout     — page-level layout utilities
- *   components — reusable UI (buttons, header, footer, accordion, forms, modal)
- *   sections   — page sections (hero, intro, faq, etc.)
- *   utilities  — single-purpose helpers, animations, reveal, print
- *
- * Modern features in use across the codebase:
- *   - OKLCH color space (perceptually uniform)
- *   - Logical properties for internationalisation
- *   - @property with animatable custom properties
- *   - color-mix(in oklch, …) for blending
- *   - Native CSS nesting
- *   - @starting-style + transition-behavior: allow-discrete (toast entry/exit)
- *   - animation-timeline: scroll() (scroll-to-top reveal)
- *   - IntersectionObserver-driven reveals (utilities/_motion.css)
- *   - View Transitions API (cross-document fade)
- *   - prefers-color-scheme, prefers-reduced-motion
- *   - :has(), :focus-visible
+ *   components — reusable UI (buttons, cards, forms, toast)
+ *   sections   — page sections (hero, surfaces, ornaments)
+ *   utilities  — helpers, motion, view transitions, print
  */
 
 @layer reset, tokens, base, layout, components, sections, utilities;
 
-/* Webfonts are loaded via the native Astro Fonts API — the @font-face rules
-   (incl. auto-generated, metric-matched fallback faces) are injected by the
-   <Font> components in the layout head. See astro.config.mjs `fonts`. */
+/* Webfonts come from the native Astro Fonts API — the <Font> components in the
+   layout head inject the @font-face rules. See astro.config.mjs `fonts`. */
 
-/* Global @keyframes — kept unlayered so the animation lookup never has to
-   cross cascade layer boundaries. Used by ambient breathing circles in
-   hero / intro / cta / newsletter / whatsapp / event sections. */
+/* Global @keyframes, unlayered so animation lookup never crosses a layer. */
 @import url('base/_keyframes.css');
 @import url('base/_reset.css') layer(reset);
 @import url('base/_variables.css') layer(tokens);
@@ -49,23 +31,15 @@
 @import url('sections/_surfaces.css') layer(sections);
 @import url('sections/_ornaments.css') layer(sections);
 @import url('sections/_hero.css') layer(sections);
-/* The event-page and error-page section styles are NOT here. They live in the
-   components that own them — components/event/{EventRegister,EventInfo,
-   EventAbout,EventFinalCta,NoEvent}.astro and pages/404.astro — each in a
-   `<style is:global>` + `@layer sections` block, the same way every block
-   component in components/blocks/ already carries its own section styles.
-   Since `inlineStylesheets: 'always'` inlines the bundled CSS into every
-   document, keeping them global meant ~12 kB of event rules were repeated on
-   the home page, the legal pages, the breathing exercise and the 404. Astro
-   emits component styles only for the pages that render the component, so
-   colocating them is both the established convention here and ~10.7 kB less
-   inlined CSS per page.
+/* Event- and error-page section styles are NOT here — they live in the
+   components that own them, each in a `<style is:global>` + `@layer sections`
+   block, like every block in components/blocks/. With
+   `inlineStylesheets: 'always'` a global copy would repeat ~12 kB of event
+   rules into every document; colocating saves ~10.7 kB per page.
 
-   `_hero.css` deliberately stays global: it styles `.hero__title`,
-   `.hero__content`, `.hero__cta`, `.hero__label` and `.hero__description`
-   unscoped, and blocks/PageHero.astro plus pages/teile-deine-erfahrung.astro
-   reuse exactly those class names — so it is needed on nearly every page, not
-   just the home hero. */
+   `_hero.css` stays global on purpose: PageHero.astro and
+   pages/teile-deine-erfahrung.astro reuse its unscoped `.hero__*` classes, so
+   it is needed on nearly every page. */
 @import url('utilities/_animations.css') layer(utilities);
 @import url('utilities/_motion.css') layer(utilities);
 @import url('utilities/_visual.css') layer(utilities);

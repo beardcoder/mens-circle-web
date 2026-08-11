@@ -55,6 +55,26 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 
 **Auth & guards:** `src/middleware.ts` guards admin **pages** (`/admin/*`) behind a signed session cookie (`ADMIN_EMAIL`/`ADMIN_PASSWORD`/`ADMIN_SESSION_SECRET`); unauth pages redirect to login, API hits get 401. Actions live outside the `/admin` path match, so each mutating action **self-guards** via `requireAdmin`.
 
+**Motion:** One system, CSS-first and compositor-only (`opacity`/`transform`).
+`styles/utilities/_motion.css` holds the hero entrance, the
+`data-reveal`/`data-hover`/`data-motion` primitives and the ambient-parking rule;
+keyframes live unlayered in `base/_keyframes.css`. `lib/motion.ts` drives the
+scroll reveals (Motion's `inView` + WAAPI), `lib/ambient.ts` pauses the endless
+decorative loops inside off-screen `<section>`s, `lib/site-header.ts` owns the
+mobile nav. Two traps worth knowing: never animate a layout property (the header
+animated `padding-block` on a scroll timeline and relaid itself out every frame),
+and never put `filter: blur()` on tight-leading display text — WebKit crops the
+element to the filter region and the glyphs get cut.
+
+**Page transitions:** native cross-document View Transitions
+(`@view-transition` in `styles/utilities/_view-transitions.css`), no router. The
+root cross-fade uses `mix-blend-mode: plus-lighter`, which is only correct while
+both halves share a **linear** curve and one duration (`--vt-duration`) — an
+eased pair sums past 1 and flashes bright. The header deliberately carries no
+`view-transition-name`: its look is scroll-derived, so a separate snapshot lands
+the old page's bar on the new page. A `pagereveal` listener in `Layout.astro`
+sets `.vt-arrival` before first paint so the arriving page skips its own entrance.
+
 **Cron (reminders):** In-process, via **Bun's native `Bun.cron`**. `scripts/reminder-cron.ts` registers a `*/15 * * * *` (UTC) job that calls `runReminders()` from `src/lib/server/reminders.ts` — a single idempotent pass that stamps `reminder_sent_at`. It's loaded as a **`bun --preload`** module in `docker-entrypoint.sh`, so it registers once at process startup, before the Astro entry boots, in the same long-lived web process. (`--preload` must precede the entry file; the `bun run` subcommand is dropped — preload is a runtime flag.) This replaces the old "start lazily from middleware" trick, which relied on a `__MC_RUNTIME` flag the new Bun adapter never sets. The runtime image ships `src/lib/server` so the preload can reuse the data/email layer. To trigger a pass manually: `bun run scripts/send-reminders.ts`.
 
 **Email — listmonk (external service):** The app does not render emails. It calls listmonk's transactional API (`POST /api/tx`) with a template ID + data; templates are maintained in listmonk. Source templates + setup in `listmonk/tx-templates/`. Newsletter (double-opt-in + campaigns) also via listmonk. Template IDs are wired through `LISTMONK_TX_*` env vars.
@@ -64,7 +84,7 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 - **Static content is JSON in the repo:** `src/content/home.json` (home block order + copy), `src/content/legal/*.json`, `src/data/site.json` (name, social, footer), `src/data/navigation.json`.
 - **Dynamic content (events, registrations, testimonials)** is managed in the admin UI at `/admin`; newsletter in the listmonk admin.
 - **Path aliases:** `@lib/*`, `@components/*`, `@data/*` (see `tsconfig.json`, extends `astro/tsconfigs/strict`).
-- **Styling:** hand-organized CSS under `src/styles/` (base/components/sections/utilities, entry `app.css`). LightningCSS transforms/minifies; design tokens use native `oklch()`/`color-mix()` and are kept modern (not downleveled). CSS is inlined into each page's `<head>`.
+- **Styling:** hand-organized CSS under `src/styles/` (base/components/sections/utilities, entry `app.css`). LightningCSS transforms/minifies; design tokens use native `oklch()`/`color-mix()` and are kept modern (not downleveled). CSS is inlined into each page's `<head>`. Animation belongs in `utilities/_motion.css` and `base/_keyframes.css` — see **Motion** above.
 - Fonts are self-hosted via the native Astro Fonts API (configured in `astro.config.mjs`, wired in `src/layouts/Layout.astro`).
 
 ## Environment

@@ -1,21 +1,13 @@
 /**
- * Umami analytics — the single source of truth for the website id + endpoint.
+ * Umami analytics — one source of truth for the website id + endpoint, shared by
+ * astro.config.mjs (tracker), Layout.astro (heatmap recorder) and SeoHead.astro
+ * (preconnect). They used to re-derive these independently, which is how the
+ * recorder ended up loading twice in production.
  *
- * Three places need these two values and they used to hardcode or re-derive
- * them independently, which is how the site ended up loading the heatmap
- * recorder twice in production:
+ * Env first, built-in default second, so a deployment can point at another
+ * instance through `PUBLIC_UMAMI_ID` / `PUBLIC_UMAMI_ENDPOINT`.
  *
- *   • astro.config.mjs  → the `@yeskunall/astro-umami` integration (tracker)
- *   • layouts/Layout.astro → the optional heatmap recorder script
- *   • components/SeoHead.astro → the `preconnect` to the analytics origin
- *
- * Resolution order is env first, built-in default second, so a deployment can
- * point at a different Umami instance (or a staging one) purely through
- * `PUBLIC_UMAMI_ID` / `PUBLIC_UMAMI_ENDPOINT` without touching code, while a
- * deploy that sets neither keeps tracking exactly as before.
- *
- * Build-time only — plain data, no runtime/server imports, safe in the config,
- * in .astro frontmatter and in client code alike.
+ * Build-time only — plain data, safe anywhere.
  */
 
 /** The production Männerkreis Umami property. */

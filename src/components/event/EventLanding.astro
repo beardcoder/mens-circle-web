@@ -20,29 +20,21 @@ import LandingMore from './landing/LandingMore.astro';
 /**
  * The permanent /event landing page.
  *
- * This URL never redirects to /event/<slug>: it is the page that has to rank and
- * that has to work when nothing is scheduled. Registration still happens on
- * /event/<slug>, which stays canonical for a single evening and carries its own
- * Event markup — this page links there rather than duplicating it.
+ * Never redirects to /event/<slug>: this is the URL that has to rank and to work
+ * when nothing is scheduled. Registration stays on /event/<slug>, which remains
+ * canonical for a single evening and carries its own Event markup.
  *
- * The division of labour with the home page is the whole point of the copy here.
- * The home page answers "what is the Männerkreis and what does it stand for":
- * values, Markus, Die Reise (Ankommen → Öffnen → Wachsen → Integrieren), the
- * general FAQ. This page answers a different question — "what is it actually
- * like to go there, and do I dare try it once" — for someone who arrived from a
- * WhatsApp link, an Instagram post or a Google search and has never been near a
- * men's circle. Hence recognition before explanation, the evening told from a
- * first-timer's seat, an explicit "you don't need to be able to do anything",
- * and a hard boundary section. No Wachstum/Transformation/Spiegelung vocabulary,
- * and no manufactured scarcity: real capacity numbers appear only when a real
- * event supplies them.
+ * Where the home page says what the Männerkreis is, this page answers "what is
+ * it actually like to go, and do I dare try once" — written for someone who
+ * arrived from a WhatsApp link and has never been near a men's circle. Hence
+ * recognition before explanation, the evening told from a first-timer's seat,
+ * and a hard boundary section. Capacity numbers appear only when a real event
+ * supplies them.
  *
- * The section order is deliberate — establish the invitation, show the one live
- * date, build recognition, then answer the doubts in the order they surface, and
- * only afterwards hand over to newsletter/WhatsApp and further reading.
+ * Section order is deliberate: invitation, the live date, recognition, then the
+ * doubts in the order they surface, and only then newsletter/WhatsApp.
  *
- * Everything is static HTML except the two form islands inside Newsletter and
- * WhatsappCommunity, which already existed.
+ * Static HTML apart from the two form islands.
  */
 
 interface Props {

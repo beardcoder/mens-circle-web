@@ -91,7 +91,7 @@ const ctaLinks = nav.header.cta;
 </header>
 
 <style is:global>
-  /* Keyframes kept unlayered so animation lookup never crosses layer boundaries */
+  /* Unlayered so animation lookup never crosses a layer boundary. */
   @keyframes ring-breath {
     0%,
     100% {
@@ -137,10 +137,9 @@ const ctaLinks = nav.header.cta;
       inset-block-start: 0;
       inset-inline: 0;
       z-index: var(--z-header);
-      /* One height, always. The bar used to re-pad itself on scroll (see
-         `header-color-morph`); that is a layout property, so it jumped
-         instead of gliding and dragged the whole fixed header through
-         layout on every scroll frame. Only the tone transitions now. */
+      /* One height, always. The bar used to re-pad itself on scroll — a layout
+         property, so it stepped instead of gliding and dragged the fixed header
+         through layout every frame. Only the tone transitions now. */
       padding-block: clamp(0.875rem, 0.65rem + 0.7vw, 1.25rem);
       color: var(--text-primary);
       transition: color var(--motion-standard);
@@ -162,16 +161,11 @@ const ctaLinks = nav.header.cta;
       transition: opacity var(--motion-standard);
     }
 
-    /* The blur is by far the most expensive thing this bar does: a
-       backdrop-filter re-samples and re-blurs the full width of the viewport
-       behind it on every scroll frame, and on a page without a hero it is on
-       for the entire scroll. Two cases trade it for an opaque bar — the same
-       separation, none of the per-frame fill:
-         • touch devices, which have the least GPU headroom to spare and are
-           where the scroll stutter actually shows;
-         • anyone who asked for less transparency.
-       Pointer-fine devices keep the glass. To put it back everywhere, delete
-       this block. */
+    /* The blur is the most expensive thing this bar does — a backdrop-filter
+       re-blurs the full viewport width on every scroll frame, and without a hero
+       it is on for the whole scroll. Touch devices (least GPU headroom, where the
+       stutter shows) and anyone asking for less transparency get an opaque bar
+       instead. Delete this block to put the glass back everywhere. */
     @media (hover: none) and (pointer: coarse), (prefers-reduced-transparency: reduce) {
       .header::before {
         background: var(--bg-primary);
@@ -181,11 +175,10 @@ const ctaLinks = nav.header.cta;
 
     .header__inner {
       display: grid;
-      /* `minmax(0, …)` on every track: the default `auto` minimum is the
-         content's min-content size, which let the actions cluster push past the
-         header's own box. `.header` is `position: fixed`, so that overflow never
-         raised a scrollbar to make itself visible — it silently pushed the nav
-         toggle outside the viewport instead. */
+      /* `minmax(0, …)` on every track: the default `auto` minimum is min-content,
+         which let the actions cluster push past the header box. The header is
+         fixed, so that overflow never raised a scrollbar — it just pushed the
+         nav toggle off-screen. */
       grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
       gap: var(--header-gap, var(--space-md));
       align-items: center;
@@ -418,8 +411,7 @@ const ctaLinks = nav.header.cta;
       transform: scaleX(1);
     }
 
-    /* Overlay foot: the theme controls (on narrow screens, see below) sit above
-       the standing meta line, well clear of the link cascade. */
+    /* Overlay foot — theme controls above the meta line, clear of the links. */
     .nav__footer {
       position: relative;
       z-index: 1;
@@ -585,9 +577,8 @@ const ctaLinks = nav.header.cta;
       stroke-linejoin: round;
     }
 
-    /* Show only the icon matching the active palette / resolved mode. The
-       `data-theme` and `data-mode-resolved` attributes are set on <html> by
-       the inline boot script before first paint, so no icon flashes. */
+    /* Only the icon matching the active palette / resolved mode. Both attributes
+       are set before first paint by the layout's boot script, so nothing flashes. */
     :root:not([data-theme='cool']) .theme-switch__icon--cool,
     :root[data-theme='cool'] .theme-switch__icon--warm,
     :root:not([data-mode-resolved='dark']) .theme-switch__icon--dark,
@@ -595,15 +586,11 @@ const ctaLinks = nav.header.cta;
       display: none;
     }
 
-    /* Where the theme controls live.
-       ------------------------------------------------------------------
-       The bar has to hold logo + CTA + toggle at every width, and the two
-       theme buttons are what tipped it over: below 768px the cluster no
-       longer fits (worst case ~562px of content in a ~433px track), which is
-       how the nav toggle ended up off-screen. So the switch moves into the
-       nav overlay there — it has room to spare, and the controls stay one tap
-       away behind a button that is now reachable. Exactly one copy is in the
-       DOM's a11y tree at any width. */
+    /* Where the theme controls live. The bar must hold logo + CTA + toggle at
+       every width, and below 768px the two theme buttons no longer fit (~562px
+       of content in a ~433px track), which pushed the nav toggle off-screen. So
+       they move into the nav overlay there. Exactly one copy is in the a11y tree
+       at any width. */
     .theme-switch--nav {
       display: none;
     }
@@ -660,9 +647,8 @@ const ctaLinks = nav.header.cta;
       }
     }
 
-    /* Compact bar. The wordmark and the roomier CTA only return once the track
-       can carry them: at 481px the full-size pair needed ~445px against 433px
-       available, so this now holds to 560px. */
+    /* Compact bar. The wordmark and roomier CTA return only once the track can
+       carry them — the full-size pair needs ~445px, so this holds to 560px. */
     @media (width <= 560px) {
       .logo__text {
         display: none;
@@ -675,8 +661,7 @@ const ctaLinks = nav.header.cta;
       }
     }
 
-    /* Smallest phones (360px and below): tighten the gaps that separate the
-       three bar slots so the CTA keeps its label instead of being clipped. */
+    /* Smallest phones: tighten the slot gaps so the CTA keeps its label. */
     @media (width <= 400px) {
       .header__inner,
       .header__actions {
