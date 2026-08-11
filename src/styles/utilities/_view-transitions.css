@@ -1,33 +1,44 @@
 /**
  * View Transitions — Native Cross-Document Fade
  *
- * Enables a cinematic cross-document transition using the View Transitions
- * API. Requires Chrome 126+ / Edge 126+ / Safari 18.2+; gracefully ignored
- * elsewhere.
+ * The whole page transition is the browser's: `@view-transition` opts the
+ * site into cross-document transitions and the UA drives the snapshots.
+ * There is no router and no JS animating anything here — the only script
+ * involved is the `pagereveal` listener in Layout.astro, which marks a
+ * document that arrived through a transition so its own entrance animation
+ * stands down (see utilities/_motion.css, `.vt-arrival`).
  *
- * Functional overlays (scroll progress, scroll-to-top, calendar modal)
- * are opted out so they don't flash on every navigation.
+ * Requires Chrome 126+ / Edge 126+ / Safari 18.2+; ignored elsewhere, where
+ * navigation is simply instant.
  */
 
 @view-transition {
   navigation: auto;
 }
 
-.scroll-progress,
-.scroll-to-top,
-.calendar-modal {
-  view-transition-name: none;
+:root {
+  /* One duration for both halves of the cross-fade. They have to match —
+     see the blend-mode note below — so they read it from here rather than
+     each carrying their own copy. */
+  --vt-duration: 420ms;
 }
 
 ::view-transition-group(root) {
-  animation-duration: 520ms;
+  animation-duration: var(--vt-duration);
 }
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
+  /* `plus-lighter` composites the two snapshots additively, which is what
+     avoids the grey sag in the middle of a plain cross-fade. It is only
+     correct while the two opacities sum to 1 at every instant, though, and
+     both sides used to ease with `--ease-settle` — a front-loaded curve, so
+     halfway through they sat near 0.9 each and summed to ~1.8. That is the
+     bright wash the transition flashed before snapping back to the new page.
+     Linear on both, identical duration, is the pairing the blend mode wants. */
   mix-blend-mode: plus-lighter;
-  animation-duration: 520ms;
-  animation-timing-function: var(--ease-settle, cubic-bezier(0.22, 1, 0.36, 1));
+  animation-duration: var(--vt-duration);
+  animation-timing-function: linear;
 }
 
 ::view-transition-old(root) {
@@ -38,20 +49,19 @@
   animation-name: vt-fade-in;
 }
 
-/* The site header keeps its identity across navigations so the brand
-   doesn't flicker. Apply only when the user has not requested reduced
-   motion — otherwise the morph itself can feel like motion. */
-@media (prefers-reduced-motion: no-preference) {
-  .header {
-    view-transition-name: site-header;
-  }
-}
-
-::view-transition-old(site-header),
-::view-transition-new(site-header) {
-  animation-duration: 380ms;
-  animation-timing-function: var(--ease-precise, cubic-bezier(0.4, 0, 0.2, 1));
-}
+/* The header deliberately has no `view-transition-name`.
+   ------------------------------------------------------------------
+   It used to carry one, so the brand would hold its identity across a
+   navigation. But the bar's appearance is derived from scroll position —
+   `header-color-morph` runs on a scroll timeline — so the snapshot was taken
+   in the *outgoing* page's scroll state and then animated on its own, shorter
+   clock, independent of the root fade. Leaving a scrolled page for one that
+   opens on a hero therefore parked the previous page's opaque light bar, dark
+   logo and all, over the new dark hero for a few hundred milliseconds before
+   it snapped to the right state. Folding the header back into the root
+   snapshot cross-fades it in lock-step with the ground behind it; both
+   documents draw it in the same place with the same mark, so there is nothing
+   left to flicker. */
 
 /* The theme switch animates with the same View Transitions API, but a
    palette / light↔dark swap wants a plain cross-fade: the `plus-lighter`
