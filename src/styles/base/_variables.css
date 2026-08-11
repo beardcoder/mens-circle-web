@@ -4,22 +4,15 @@
  */
 
 :root {
-  /* ============================================
-     Theme system
-     ------------------------------------------------------------------
-     Two independent axes, both persisted in localStorage and applied
-     by an inline script before first paint (see Layout.astro):
+  /* Theme system — two axes, persisted in localStorage and applied before first
+     paint by the layout's inline script:
 
-       • Palette  — `data-theme`  : "warm" (default) | "cool"
-       • Mode     — `data-mode`   : unset → follow system | "light" | "dark"
+       • `data-theme`  "warm" (default) | "cool"
+       • `data-mode`   unset (follow OS) | "light" | "dark"
 
-     The palette only redefines the raw OKLCH *primitives* below; every
-     semantic token is built from those primitives, so a single palette
-     swap cascades everywhere. The light/dark mode is expressed with the
-     native `light-dark()` function, resolved off `color-scheme`. With no
-     explicit mode we advertise `light dark` so the OS preference wins;
-     forcing a mode pins `color-scheme` and therefore `light-dark()`.
-     ============================================ */
+     The palette only redefines the raw OKLCH primitives below; every semantic
+     token derives from those, so one swap cascades everywhere. Light/dark runs
+     through native `light-dark()`, resolved off `color-scheme`. */
   color-scheme: light dark;
 
   /* ============================================
@@ -33,16 +26,12 @@
   --color-earth-mid: oklch(35% 0.04 68deg);
   --color-earth-warm: oklch(46% 0.05 68deg);
 
-  /* Terracotta Accents — three lightnesses, one per contrast role.
-     The accent has to clear WCAG AA in three different jobs and no single
-     lightness does all of them:
-       • ...-deep   body-size accent text on a light ground (links, required
-                    markers): 4.7:1 even on the darkest light surface (sand-light).
+  /* Terracotta accents — three lightnesses, because no single one clears WCAG AA
+     in all three jobs:
+       • ...-deep   body-size accent text on a light ground (4.7:1)
        • base       button/badge fill under a parchment label (4.7:1), and
-                    display-size accent text, which only owes 3:1.
-       • ...-light  accent text on the dark earth surfaces (4.8:1 on earth-mid).
-     The old single pair sat at 61%/72%: a parchment label on the fill was
-     3.8:1 and the light tone was 2.3:1 as text on a light ground. */
+                    display-size accent text, which only owes 3:1
+       • ...-light  accent text on the dark earth surfaces (4.8:1) */
   --color-terracotta-deep: oklch(49% 0.16 44deg);
   --color-terracotta: oklch(54% 0.16 44deg);
   --color-terracotta-light: oklch(75% 0.14 45deg);
@@ -94,8 +83,7 @@
   /* Text — light/dark resolved via light-dark() */
   --text-primary: light-dark(var(--color-ink), var(--color-parchment));
   --text-secondary: light-dark(var(--color-ink-soft), oklch(80% 0.02 75deg));
-  /* 52%, not 55%: at 55% muted copy measured 4.19:1 on the parchment surfaces
-     the forms sit on — under the 4.5:1 body-text floor. */
+  /* 52%, not 55%: at 55% this measured 4.19:1 on the forms' parchment ground. */
   --text-muted: light-dark(oklch(52% 0.02 68deg), oklch(65% 0.02 75deg));
   --text-on-dark: var(--color-parchment);
   --text-on-dark-secondary: light-dark(var(--color-sand), var(--color-sand-light));
@@ -106,12 +94,9 @@
   /* Surface tone that flips with mode (parchment in light, earth in dark) */
   --bg-light: light-dark(var(--color-parchment), var(--color-earth-dark));
 
-  /* Accents.
-     `--accent-primary` fills (buttons, rules, focus rings) and carries
-     display-size accent text; `--accent-secondary` is the tone for dark
-     surfaces. `--accent-text` is the one to reach for when the accent *is*
-     body-size text: it follows the mode, because in light mode the copy sits on
-     a light ground and in dark mode on a dark one. */
+  /* `--accent-primary` fills and carries display-size accent text;
+     `--accent-secondary` is the tone for dark surfaces; `--accent-text` is for
+     body-size accent copy and follows the mode. */
   --accent-primary: var(--color-terracotta);
   --accent-secondary: var(--color-terracotta-light);
   --accent-text: light-dark(var(--color-terracotta-deep), var(--color-terracotta-light));
@@ -204,23 +189,15 @@
   --space-2xl: clamp(7rem, 3rem + 8vw, 14rem);
   --space-3xl: clamp(9rem, 4rem + 10vw, 18rem);
 
-  /* ============================================
-     Semantic Rhythm Tokens
-     One source of truth for vertical rhythm so every section feels
-     the same regardless of which file styles it.
-     ============================================ */
+  /* Vertical rhythm — one source of truth, so every section feels the same
+     regardless of which file styles it. */
   --rhythm-section: var(--space-xl); /* default section block padding */
   --rhythm-section-lg: var(--space-2xl); /* prominent section padding */
   --rhythm-block: var(--space-lg); /* header → body of a section */
   --rhythm-stack: var(--space-sm); /* eyebrow → title → intro inside a header */
   --rhythm-cluster: var(--space-xs); /* tight inline groups */
 
-  /* ============================================
-     Motion System — Settled Weight
-     Four semantic easings. No spring, no bounce.
-     ============================================ */
-
-  /* Canonical easings */
+  /* Motion — "settled weight". Semantic easings, no spring, no bounce. */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1); /* Content arriving: page-load entrance, overlays */
 
   --ease-precise: cubic-bezier(0.4, 0, 0.2, 1); /* Interactive: hover, press, toggles */
@@ -282,8 +259,7 @@
      Shadows & Effects
      Layered shadows for perceptual depth
      ============================================ */
-  /* Each shadow color flips with mode via light-dark() — deeper, blacker
-     casts in the dark to keep depth legible against dark surfaces. */
+  /* Shadow colours flip with mode — deeper casts in the dark. */
   --shadow-sm: 0 1px 2px
     light-dark(color-mix(in oklch, var(--color-ink) 5%, transparent), color-mix(in oklch, black 24%, transparent));
   --shadow-md:
@@ -336,14 +312,9 @@
   --z-toast: 1500;
 }
 
-/* ============================================
-   Mode (light / dark) — drives light-dark()
-   ------------------------------------------------------------------
-   With no `data-mode` the root keeps `color-scheme: light dark`, so
-   the OS preference picks the branch of every light-dark() token.
-   An explicit choice pins `color-scheme`, forcing that branch and
-   also re-tinting native UI (form controls, scrollbars).
-   ============================================ */
+/* Mode — drives light-dark(). Without `data-mode` the root keeps
+   `color-scheme: light dark` and the OS preference picks the branch; an explicit
+   choice pins it, which also re-tints native UI. */
 :root[data-mode='light'] {
   color-scheme: light;
 }
@@ -352,15 +323,10 @@
   color-scheme: dark;
 }
 
-/* ============================================
-   Cool palette — "kühle Sommer Variante" (forest & shade)
-   ------------------------------------------------------------------
-   Only the raw OKLCH primitives are re-pitched toward cool greens and
-   shaded teals; every semantic token is derived from them (and from
-   light-dark()), so this single block re-themes the whole site in both
-   light and dark mode. Lightness/chroma roughly mirror the warm palette
-   so contrast ratios and the visual rhythm are preserved.
-   ============================================ */
+/* Cool palette — "kühle Sommer Variante". Only the raw primitives are
+   re-pitched; every semantic token derives from them, so this one block
+   re-themes the site in both modes. Lightness and chroma mirror the warm
+   palette so the contrast ratios hold. */
 :root[data-theme='cool'] {
   /* Forest shade tones (warm earth → cool spruce) */
   --color-earth-deep: oklch(20% 0.028 178deg);

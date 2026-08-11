@@ -4,23 +4,18 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Make files that OTHER integrations generate at `astro:build:done` actually
- * reachable in production under `@wyattjoh/astro-bun-adapter`.
+ * Make files that OTHER integrations generate at `astro:build:done` reachable
+ * under `@wyattjoh/astro-bun-adapter`.
  *
- * The adapter serves static files from a `static-manifest.json` it builds by
- * walking `dist/client` in its own `astro:build:done` hook. Astro `unshift`s the
- * adapter to the FRONT of the integration list (see astro/dist/integrations/
- * hooks.js), so the adapter's hook always runs *before* every other
- * integration's. Anything written later — `@astrojs/sitemap`'s
- * `sitemap-index.xml`, `astro-llms-md`'s `llms.txt` and per-page `*.md` —
- * therefore never makes it into the manifest and 404s in production (exactly
- * what Google reported for the sitemap).
+ * The adapter serves static files from a `static-manifest.json` it builds in its
+ * own `astro:build:done` hook — and Astro unshifts the adapter to the front of
+ * the integration list, so that hook always runs first. Anything written later
+ * (the sitemap index, llms.txt, the per-page `*.md`) never enters the manifest
+ * and 404s in production.
  *
- * This factory returns an integration that runs after the generator and appends
- * the matching files to the adapter's manifest, so the Bun edge serves them like
- * any other static asset. Register it *after* the integration whose output it
- * publishes. It is a no-op when the adapter manifest is absent (dev, or a
- * different adapter), so it stays harmless if the setup changes.
+ * This factory returns an integration that appends the matching files to the
+ * manifest afterwards. Register it *after* the integration whose output it
+ * publishes. No-op without the adapter manifest (dev, or a different adapter).
  *
  * @param {object} options
  * @param {string} options.name Integration name, as it appears in build logs.

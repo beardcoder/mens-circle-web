@@ -1,15 +1,10 @@
 /**
- * SQLite → S3 backup (cron-style).
+ * SQLite → S3 backup (cron-style). Snapshots the database, gzips it, uploads it
+ * to an S3-compatible bucket and prunes past the retention window.
  *
- * Takes a transactionally-consistent snapshot of the bun:sqlite database,
- * gzips it, and uploads it to an S3 (or S3-compatible: R2, MinIO, …) bucket.
- * Old backups beyond the retention window are pruned.
- *
- * Why this over a plain file copy: `cp` of a live SQLite file is NOT crash- or
- * transaction-safe (especially with WAL). We use `VACUUM INTO`, which writes a
- * clean snapshot from a single read transaction — the approach recommended at
- * https://litestream.io/alternatives/cron/. It runs in-process via bun:sqlite,
- * so no `sqlite3` CLI is needed in the runtime image.
+ * `VACUUM INTO`, not `cp`: copying a live SQLite file is not crash-safe under
+ * WAL, while VACUUM writes a clean snapshot from one read transaction. Runs
+ * in-process via bun:sqlite, so the image needs no `sqlite3` CLI.
  *
  * Run on a schedule (Coolify "Scheduled Task" or host crontab), e.g. hourly:
  *

@@ -1,28 +1,18 @@
 /**
- * Theme manager — palette + light/dark, persisted across visits.
+ * Theme manager — palette + light/dark, persisted across visits. Two axes live
+ * on <html> and in localStorage:
  *
- * Two independent axes live on the <html> element and in localStorage:
+ *   • `data-theme`         "warm" (default) | "cool"
+ *   • `data-mode`          absent (follow OS) | "light" | "dark"
+ *   • `data-mode-resolved` the mode actually in effect, mirrored for the icons
  *
- *   • Palette  — `data-theme`         : "warm" (default) | "cool"
- *   • Mode     — `data-mode`          : (absent → follow OS) | "light" | "dark"
- *   • Resolved — `data-mode-resolved` : "light" | "dark"  (mirror used for icons)
+ * The layout's inline boot script sets these before first paint so nothing
+ * flashes; this module re-syncs on load, wires the buttons and follows the OS
+ * while no mode is pinned. Returns a cleanup that detaches everything.
  *
- * The *resolved* mode is the mode actually in effect: the explicit choice
- * when one is stored, otherwise the OS preference. Only the resolved mode
- * drives the header icon swap and the mobile `theme-color`; the palette and
- * the color-scheme branch of every `light-dark()` token follow `data-theme`
- * and `data-mode` directly in CSS.
- *
- * The attributes are also set by an inline boot script in the layout head
- * (before first paint) so nothing flashes; this module re-syncs on load,
- * wires the header buttons, and keeps things live when the OS flips while
- * no explicit mode is pinned. Returns a cleanup that detaches everything.
- *
- * A *user* toggle cross-fades via the View Transitions API — the same
- * language the site already uses for page navigation — with the root swap
- * tuned in CSS (see `_view-transitions.css`, `[data-theme-transition]`).
- * It degrades to an instant swap without VT support or under reduced
- * motion. OS-driven flips apply instantly and never hijack with motion.
+ * A user toggle cross-fades through the View Transitions API (tuned in
+ * `_view-transitions.css` under `[data-theme-transition]`) and degrades to an
+ * instant swap. OS-driven flips are always instant.
  */
 
 import { prefersReducedMotion } from './helpers';
@@ -113,9 +103,8 @@ export function initTheme(): () => void {
   // Re-assert state on load (covers stored choices made before this ran).
   apply();
 
-  // The switch is rendered twice — in the header bar and inside the nav overlay
-  // — with CSS showing whichever fits the viewport (see Header.astro). Wire and
-  // sync every instance so the hidden copy is never stale when it takes over.
+  // The switch is rendered twice (bar + nav overlay, see Header.astro) with CSS
+  // picking one. Wire both so the hidden copy is never stale when it takes over.
   const paletteBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]'));
   const modeBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-mode-toggle]'));
 
@@ -130,9 +119,8 @@ export function initTheme(): () => void {
   syncButtons();
 
   /**
-   * Persist a choice (`mutate`), then repaint the new theme. When the
-   * browser supports it and motion is welcome, the repaint runs inside a
-   * view transition so the page cross-fades instead of snapping.
+   * Persist a choice, then repaint — inside a view transition where supported
+   * and welcome, so the page cross-fades instead of snapping.
    */
   const commit = (mutate: () => void): void => {
     mutate();
