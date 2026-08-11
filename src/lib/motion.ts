@@ -1,10 +1,8 @@
 /**
- * Scroll-triggered reveals. Motion's `inView()` shares an IntersectionObserver;
- * the mini `animate()` drives the Web Animations API directly (tiny bundle).
- * The hidden start state lives in CSS (utilities/_motion.css) behind
+ * Scroll-triggered reveals. `inView()` shares one IntersectionObserver, the mini
+ * `animate()` drives WAAPI directly. The hidden start state lives in CSS behind
  * `.motion-ready`, so without JS or under reduced motion everything stays
- * visible and still. Content added after load (server islands) is picked up
- * by a MutationObserver.
+ * visible. A MutationObserver picks up content added after load.
  *
  * Markup:
  *   data-reveal="up|down|left|right|fade|zoom|blur"   (default "up")
@@ -157,8 +155,7 @@ function matching(root: HTMLElement, selector: string): HTMLElement[] {
   return found;
 }
 
-// Register every unseen [data-reveal] under `root`. Group children inherit a
-// per-index stagger; individual overrides layer on top.
+// Register unseen [data-reveal] under `root`; group children get a stagger.
 function register(root: HTMLElement, tuning: Tuning): HTMLElement[] {
   const fresh: HTMLElement[] = [];
 
@@ -243,10 +240,9 @@ export function initMotion(): void {
   }).observe(document.body, { childList: true, subtree: true });
 }
 
-// `will-change` is held only for the life of the animation. The `blur`
-// variant has to name `filter` too — without it the browser re-rasterises
-// the element on every frame of the burn-off instead of filtering a cached
-// layer, which is exactly where the reveals used to stutter.
+// `will-change` is held only for the life of the animation. The `blur` variant
+// must name `filter` too, or the browser re-rasterises every frame instead of
+// filtering a cached layer — that was a source of stutter.
 function reveal(el: HTMLElement, config: RevealConfig): void {
   el.style.willChange = config.enter.filter ? 'transform, opacity, filter' : 'transform, opacity';
 

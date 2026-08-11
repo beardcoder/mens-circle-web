@@ -1,25 +1,17 @@
 /**
  * Content for the /event landing page.
  *
- * This lives outside the components on purpose: the page renders these strings
- * AND emits some of them as JSON-LD (FAQPage). Google treats FAQ markup that
- * doesn't match the visible text as a structured-data violation, so both have to
- * read from one source — hence a module rather than copy in two places.
+ * Kept outside the components because the page both renders these strings and
+ * emits some as JSON-LD (FAQPage) — Google flags FAQ markup that doesn't match
+ * the visible text, so both must read from one source.
  *
- * Editorial brief: the home page answers "what is a Männerkreis and what does it
- * stand for". This page answers "what is it actually like to walk in there, and
- * do I dare try it once". So the copy here stays deliberately plain — no
- * Wachstum/Transformation/Spiegelung vocabulary, no manufactured scarcity — and
- * every factual claim traces back to content already in the repo:
- * src/content/home.json (Straubing, alle zwei bis vier Wochen, 2–3 Stunden,
- * Spendenbasis, Vertraulichkeit, keine Vorerfahrung, weder Therapie noch
- * Coaching) and src/content/warum-ich-den-maennerkreis-leite.json (einfache
- * Übungen mit Atem und Körperwahrnehmung, jeder bleibt für sich verantwortlich,
- * niemand wird gedrängt). Nothing here is invented.
+ * Editorial brief: the home page says what a Männerkreis is; this page says what
+ * walking into one is actually like. The copy stays plain, and every factual
+ * claim traces back to src/content/home.json or
+ * src/content/warum-ich-den-maennerkreis-leite.json.
  *
- * Server-render only. It imports the date formatters from lib/server/format,
- * which is safe — that module's only server import is a `type`, so nothing pulls
- * `bun:sqlite` — but this module still has no business in a client bundle.
+ * Server-render only — safe to import lib/server/format (type-only server
+ * import, so no `bun:sqlite`), but it has no business in a client bundle.
  */
 import type { EventDTO } from './types';
 import { formatDayMonthYearDE, formatWeekdayDE } from './server/format';

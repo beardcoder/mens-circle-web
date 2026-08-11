@@ -2,16 +2,10 @@
 import type { Testimonial } from '@lib/types';
 
 /**
- * One real voice, placed right after "Du musst nichts können".
- *
- * Deliberately not a second Testimonials block: the home page already renders
- * the full grid (blocks/Testimonials.astro), and repeating it here would put the
- * same quotes on two indexed URLs and cost a second full query. This slot takes
- * the top entry of the curated order and shows it as a pull quote — no grid, no
- * cards, no headline claiming what it proves.
- *
- * Renders nothing when no testimonial is published. Nothing here is ever
- * invented: if the database is empty, the page simply moves on.
+ * One real voice, right after "Du musst nichts können". Deliberately not a
+ * second Testimonials grid — that would put the same quotes on two indexed URLs
+ * and cost another full query. Takes the top curated entry as a pull quote, and
+ * renders nothing when none is published.
  */
 
 interface Props {

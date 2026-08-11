@@ -2,20 +2,16 @@
 import site from '@data/site.json';
 
 /**
- * /event hero — an invitation, not a headline for a date.
+ * /event hero — an invitation, not a headline for a date. The local keywords sit
+ * in the eyebrow and the closing line of the lead rather than bending the
+ * sentence around them.
  *
- * The old version led with "Männerkreis in Straubing – die Termine", which read
- * like an SEO slug and told a first-time visitor nothing about what he would
- * walk into. The local keywords now sit in the eyebrow and the closing line of
- * the lead, where they stay true without bending the sentence around them.
+ * The eyebrow is evergreen: it names the circle, which is the Straubing one
+ * wherever a single evening lands. The meta line makes a claim about a meeting,
+ * so it defers to the scheduled event's city and only then to the site locality.
  *
- * The eyebrow stays evergreen — it names the circle, which is the Straubing one
- * regardless of where a single evening lands. The meta line below is the one
- * that makes a claim about a meeting, so it defers to the scheduled event's own
- * city when there is one, and only falls back to the site's locality otherwise.
- *
- * The eyebrow's locality is joined with non-breaking spaces, so a phone breaks
- * that line after "Männerkreis ·" rather than orphaning "Niederbayern".
+ * Non-breaking spaces in the eyebrow so a phone breaks after "Männerkreis ·"
+ * instead of orphaning "Niederbayern".
  */
 
 interface Props {

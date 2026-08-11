@@ -1,20 +1,13 @@
 /**
  * `GET /sitemap-events.xml` — the event pages, listed at request time.
  *
- * `@astrojs/sitemap` runs during `astro:build:done` and can only see routes that
- * exist at build time. The event pages don't: `/event/<slug>` is SSR, the slugs
- * live in SQLite, and the whole point of that design is that adding an event in
- * the admin UI publishes a page with no rebuild. A build-time sitemap therefore
- * either misses them or goes stale the moment an event is added — which is why
- * they were absent rather than merely misconfigured.
+ * `@astrojs/sitemap` only sees routes that exist at build time, and `/event/<slug>`
+ * does not: the slugs live in SQLite and adding an event publishes a page with no
+ * rebuild. So this sitemap is a route, not a build artefact — it queries the DB
+ * per request and `astro-integrations/sitemap-index-extra.mjs` links it from the
+ * index that robots.txt advertises.
  *
- * So this sitemap is a route, not a build artefact: it queries the DB per request
- * and is always current. `astro-integrations/sitemap-index-extra.mjs` adds it to
- * the generated `sitemap-index.xml`, so crawlers reach it from the index that
- * robots.txt already advertises.
- *
- * Note the path: NOT under /api/, which robots.txt disallows — a sitemap a
- * crawler is forbidden to fetch would be worse than none.
+ * Deliberately NOT under /api/, which robots.txt disallows.
  */
 import type { APIRoute } from 'astro';
 import { listPublishedEventsForSitemap } from '@lib/server/events';

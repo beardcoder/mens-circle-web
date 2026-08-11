@@ -9,8 +9,7 @@
  * everything decorative is gated behind `prefers-reduced-motion: no-preference`.
  */
 
-/* Hero entrance — the one above-the-fold page-load sequence. Children rise
-   in order, a blur burn-off carrying the eye into the title. */
+/* Hero entrance — the one above-the-fold page-load sequence. */
 
 @media (prefers-reduced-motion: no-preference) {
   .hero__label,
@@ -71,14 +70,11 @@
   }
 
   /* Arriving through a view transition, the cross-fade already *is* the
-     entrance. Running the rise on top of it meant the incoming page faded in
-     while its own heading was still travelling and staggering underneath —
-     two entrances at once, which is what made the navigation look like it
-     lurched into place rather than settling.
-     `.vt-arrival` is set from the `pagereveal` listener in Layout.astro,
-     before the document's first paint, and is never removed: taking it off
-     later would start these animations from `opacity: 0` at that moment and
-     flash the whole hero. */
+     entrance — running the rise underneath it was two entrances at once, which
+     is what made navigation look like it lurched into place. `.vt-arrival` is
+     set from the `pagereveal` listener in Layout.astro before first paint, and
+     never removed: taking it off later would start these animations from
+     `opacity: 0` and flash the hero. */
   .vt-arrival .hero__label,
   .vt-arrival .hero__title,
   .vt-arrival .hero__bottom,
@@ -92,9 +88,8 @@
   }
 }
 
-/* Reveal-on-scroll hidden start state. CSS owns only this flat `opacity: 0`
-   (gated behind `.motion-ready` so nothing flashes pre-script); lib/motion.ts
-   owns the transform/filter keyframes entirely — do not set them here. */
+/* Reveal-on-scroll hidden start state. CSS owns only this `opacity: 0`, gated
+   behind `.motion-ready`; lib/motion.ts owns the keyframes — not here. */
 
 @media (prefers-reduced-motion: no-preference) {
   .motion-ready [data-reveal] {
@@ -102,11 +97,9 @@
   }
 }
 
-/* Ambient loop parking. `lib/ambient.ts` marks a section while it sits
-   outside the viewport; every loop inside it stops until it comes back.
-   The decorative breathing is all `infinite`, so without this a long page
-   keeps a dozen animations — and the layers they were promoted onto —
-   running where nobody can see them, spending the budget the scroll needs. */
+/* Ambient loop parking. `lib/ambient.ts` marks off-screen sections; the loops
+   inside stop until they come back. Without it a long page keeps a dozen
+   infinite animations — and their layers — running where nobody can see them. */
 
 @media (prefers-reduced-motion: no-preference) {
   .is-ambient-paused,
@@ -118,8 +111,8 @@
     animation-play-state: paused;
   }
 
-  /* The breathing exercise's rings *are* the content — never parked. Same
-     specificity as the rule above, so source order decides; keep it last. */
+  /* The breathing rings *are* the content. Same specificity as above, so source
+     order decides — keep this last. */
   [data-motion-essential],
   [data-motion-essential]::before,
   [data-motion-essential]::after,
@@ -169,8 +162,7 @@
   }
 }
 
-/* Micro-interactions — data-hover. Gated to real hover devices so touch
-   never sticks in a hover state. */
+/* Micro-interactions — gated to real hover devices so touch never sticks. */
 
 [data-hover='lift'] {
   --hover-lift-y: -4px;
@@ -253,7 +245,7 @@
 }
 
 /* Reduced motion — keep colour/shadow feedback, drop positional motion.
-   `data-motion-essential` (breathing app) opts out of the iteration cap. */
+   `data-motion-essential` opts out of the iteration cap. */
 
 @media (prefers-reduced-motion: reduce) {
   .hero__label,

@@ -1,10 +1,6 @@
 /**
- * Button Component System
- *
- * Single token-driven base (`.btn`) with variant + size modifiers. Every
- * surface that previously rolled its own button (WhatsApp section, breathing
- * controls, etc.) overrides the `--btn-*` tokens instead of redefining the
- * geometry.
+ * Buttons — one token-driven base (`.btn`) with variant and size modifiers.
+ * Surfaces override the `--btn-*` tokens rather than redefining geometry.
  *
  *   <a class="btn btn--primary"           — solid accent, default CTA
  *   <a class="btn btn--secondary"         — outlined, light surfaces
