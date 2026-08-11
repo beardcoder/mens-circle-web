@@ -1,14 +1,9 @@
 /**
- * Resolve content image paths to bundled, build-optimisable assets.
+ * Map a content image path ("/images/markus-sommer.jpg") to the bundled asset in
+ * `src/assets/images/`, so components can hand it to `<Image>` / `<Picture>` and
+ * Astro can generate responsive AVIF/WebP.
  *
- * Content (JSON blocks, site data) references images with public-style paths
- * like "/images/markus-sommer.jpg". The actual source lives in
- * `src/assets/images/` so Astro can generate responsive AVIF/WebP at build
- * time. This eagerly globs those assets and maps a content path to its
- * `ImageMetadata`, so components can feed it to `<Image>` / `<Picture>`.
- *
- * Returns `null` for external URLs (http/https) or paths with no matching
- * bundled asset — callers should fall back to a plain `<img>` in that case.
+ * `null` for external URLs or unmatched paths — callers fall back to `<img>`.
  */
 import type { ImageMetadata } from 'astro';
 

@@ -65,6 +65,45 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 - **Dynamische Teile** (Anmeldung, Warteliste, Newsletter, Testimonial,
   Atemübung) sind **Svelte-5-Islands**, die per `fetch` mit der API sprechen.
 
+## Motion & Seitenübergänge
+
+Ein System, CSS-first und ausschließlich auf compositor-fähigen Eigenschaften
+(`opacity`, `transform`). Alles Dekorative hängt hinter
+`prefers-reduced-motion: no-preference`.
+
+- **Regeln** in [`src/styles/utilities/_motion.css`](src/styles/utilities/_motion.css)
+  (Hero-Entrance, die Primitives `data-reveal` / `data-hover` / `data-motion`,
+  das Parken der Ambient-Loops), **Keyframes** ungelayert in
+  [`src/styles/base/_keyframes.css`](src/styles/base/_keyframes.css).
+- **Scroll-Reveals** treibt [`src/lib/motion.ts`](src/lib/motion.ts) über Motions
+  `inView` + die Web Animations API. Der versteckte Startzustand steht hinter
+  `.motion-ready`, das eine Totmannschaltung im Layout wieder abräumt — ohne JS
+  bleibt also alles sichtbar.
+- **Ambient-Loops** (atmende Kreise, Section-Glows) laufen endlos und würden
+  auch weit außerhalb des Viewports weiterticken.
+  [`src/lib/ambient.ts`](src/lib/ambient.ts) beobachtet jede `<section>` und
+  pausiert die Loops darin, solange sie nicht sichtbar ist. Sections mit
+  `[data-motion-essential]` (die Atemübung) sind ausgenommen.
+- **Seitenübergänge** sind native Cross-Document View Transitions
+  ([`src/styles/utilities/_view-transitions.css`](src/styles/utilities/_view-transitions.css)),
+  kein Router. Ein `pagereveal`-Listener im Layout setzt `.vt-arrival` vor dem
+  ersten Paint, damit die ankommende Seite ihre eigene Entrance auslässt und nur
+  der Cross-Fade läuft.
+
+Zwei Fallen, die hier schon zugeschnappt sind:
+
+1. **Keine Layout-Eigenschaften animieren.** Der Header hat `padding-block` auf
+   einer Scroll-Timeline animiert — das lief nicht auf dem Compositor, sondern
+   rechnete den fixierten Header in jedem Scroll-Frame neu um.
+2. **Kein `filter: blur()` auf eng gesetzter Display-Schrift.** Ein Filter malt
+   durch eine Region, die aus der Border-Box abgeleitet wird; bei
+   `line-height: 0.88` ragen die Glyphen darüber hinaus und WebKit schneidet ab.
+
+Beim Cross-Fade gilt zusätzlich: `mix-blend-mode: plus-lighter` stimmt nur,
+solange beide Hälften dieselbe **lineare** Kurve und dieselbe Dauer
+(`--vt-duration`) haben — eine gestaffelte Kurve summiert sich über 1 und blitzt
+hell auf.
+
 ## Projektstruktur
 
 ```
@@ -77,14 +116,17 @@ src/
   components/admin/    Svelte-5-Islands der Admin-UI (Events, Anmeldungen, Stimmen)
   layouts/        Layout.astro (Seite), AdminLayout.astro (Back-Office)
   actions/        Astro Actions (`/_actions/*`) — die Admin-RPC-Schicht
-  lib/            api.ts (Client-Formulare), types, umami-config, Utils
+  lib/            api.ts (Client-Formulare), motion.ts (Scroll-Reveals),
+                  ambient.ts (Ambient-Loops parken), site-header.ts (Mobile-Nav),
+                  theme.ts, types, umami-config, Utils
   lib/server/     Datenschicht (db/, events, registrations, testimonials,
                   listmonk, email, auth, reminders, ics, format) — NUR serverseitig
   middleware.ts   Admin-Guard + Trailing-Slash-Kanonisierung
   pages/          index, event, atemuebung, teile-deine-erfahrung, [slug], health
   pages/api/      Public-API (Formular-Endpunkte + /api/public/*)
   pages/admin/    Admin-UI-Seiten
-  styles/         vollständiges CSS-Designsystem (OKLCH, @layer, kein Tailwind)
+  styles/         vollständiges CSS-Designsystem (OKLCH, @layer, kein Tailwind);
+                  utilities/_motion.css + base/_keyframes.css = Animation
 astro-integrations/  Build-Integrationen (Sitemap/llms.txt in das Static-Manifest
                   des Bun-Adapters nachtragen — s. serve-with-bun-adapter.mjs)
 scripts/          reminder-cron.ts (Bun.cron via --preload), send-reminders.ts,

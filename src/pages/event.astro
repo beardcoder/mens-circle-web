@@ -7,16 +7,12 @@ import EventLanding from '../components/event/EventLanding.astro';
 import site from '../data/site.json';
 
 /**
- * /event — the permanent landing page for the Männerkreis dates.
+ * /event — the permanent landing page for the Männerkreis dates. It never
+ * redirects to /event/<slug>, so this URL holds evergreen content of its own and
+ * can rank, with a slot for the next date when one is scheduled.
  *
- * It used to 302 to /event/<slug> as soon as a date existed, which meant this
- * URL never held content of its own and could never rank, while /event/<slug>
- * changed with every meeting. Now the hub always renders: evergreen copy about
- * attending, plus a slot showing the next date when one is scheduled.
- *
- * Server-rendered rather than prerendered so the upcoming date is in the initial
- * HTML — a server island would only fill in after JS runs, which is exactly the
- * content a crawler should not have to wait for.
+ * Server-rendered, not prerendered: the upcoming date belongs in the initial
+ * HTML rather than filling in after JS.
  */
 const event = await fetchNextEvent();
 const next = summarizeNextEvent(event);

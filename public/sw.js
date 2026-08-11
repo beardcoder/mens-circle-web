@@ -1,20 +1,16 @@
 /**
  * Service worker for the installable breathing app (Atemübung).
  *
- * Scope is the whole origin (the file is served from the root), but the
- * strategy is deliberately conservative so the SSR site stays fresh:
+ * Scope is the whole origin, so the strategy stays conservative to keep the SSR
+ * site fresh:
  *
- *   - navigations      → network-first, falling back to cache when offline,
- *                        then to the cached breathing app shell as a last resort
- *   - static, hashed   → stale-while-revalidate (immutable build assets, fonts,
- *     assets              images, icons)
- *   - everything else  → straight to the network (never cached: the JSON API,
- *                        admin UI, server actions, POST/PUT, cross-origin, etc.)
+ *   - navigations     → network-first, then cache, then the app shell
+ *   - hashed assets   → stale-while-revalidate
+ *   - everything else → straight to the network, never cached
  *
- * The dynamic back-office is never intercepted — the SW returns early for the
- * API (/api/), the admin UI (/admin/) and the server actions (/_actions/) so
- * those always hit the network. Without that, the whole-origin navigation
- * handler would shadow /admin/ and serve a cached public page instead.
+ * /api/, /admin/ and /_actions/ return early and always hit the network —
+ * without that the navigation handler would shadow the back-office with a
+ * cached public page.
  *
  * Bump CACHE to invalidate everything on the next activation.
  */
