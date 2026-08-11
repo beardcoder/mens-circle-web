@@ -69,6 +69,27 @@
     animation-duration: var(--duration-cinematic);
     animation-delay: var(--stagger-2);
   }
+
+  /* Arriving through a view transition, the cross-fade already *is* the
+     entrance. Running the rise on top of it meant the incoming page faded in
+     while its own heading was still travelling and staggering underneath —
+     two entrances at once, which is what made the navigation look like it
+     lurched into place rather than settling.
+     `.vt-arrival` is set from the `pagereveal` listener in Layout.astro,
+     before the document's first paint, and is never removed: taking it off
+     later would start these animations from `opacity: 0` at that moment and
+     flash the whole hero. */
+  .vt-arrival .hero__label,
+  .vt-arrival .hero__title,
+  .vt-arrival .hero__bottom,
+  .vt-arrival .hero__scroll,
+  .vt-arrival .page-hero__eyebrow,
+  .vt-arrival .page-hero__title,
+  .vt-arrival .page-hero__lead,
+  .vt-arrival .page-hero__cta,
+  .vt-arrival .page-hero__media {
+    animation: none;
+  }
 }
 
 /* Reveal-on-scroll hidden start state. CSS owns only this flat `opacity: 0`

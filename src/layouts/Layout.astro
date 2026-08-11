@@ -54,6 +54,17 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
       window.__mcMotionFallback = setTimeout(() => {
         document.documentElement.classList.remove('motion-ready');
       }, 4000);
+      // Cross-document view transitions (styles/utilities/_view-transitions.css).
+      // `pagereveal` is the browser's hook into the incoming document: it fires
+      // before its first rendering opportunity, and carries the ViewTransition
+      // object when the navigation is animating. Marking the document here —
+      // and only here, because a class added after the first paint would be too
+      // late — lets CSS stand the page's own entrance down, so the cross-fade
+      // is the only thing moving. The listener has to live inline: our module
+      // is deferred and would miss the event on a slow chunk.
+      addEventListener('pagereveal', (event) => {
+        if (event.viewTransition) document.documentElement.classList.add('vt-arrival');
+      });
       (() => {
         try {
           const root = document.documentElement;
