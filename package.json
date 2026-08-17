@@ -27,7 +27,7 @@
     "astro-icon": "^1.1.5",
     "drizzle-orm": "^0.45.2",
     "leaflet": "^1.9.4",
-    "motion": "^12.43.0",
+    "motion": "^13.1.0",
     "svelte": "^5.56.9"
   },
   "devDependencies": {
