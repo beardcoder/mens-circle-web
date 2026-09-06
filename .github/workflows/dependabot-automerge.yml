@@ -1,15 +1,21 @@
 name: Dependabot Auto-merge
 
-# Approves Dependabot's pull requests and turns on GitHub's native auto-merge,
-# so they merge into `main` automatically once the required CI checks are green.
-# Covers patch, minor AND major updates — a red build keeps the PR open.
+# Turns on GitHub's native auto-merge for Dependabot's pull requests, so they
+# merge into `main` automatically once the required CI checks are green.
+#
+# Patch and minor updates only. Majors are left open for a human: astro-llms-md
+# 3.0.1 (#81) removed an export the Astro config imports, so the build died at
+# config load — CI was red and the PR merged anyway, because auto-merge only
+# waits for checks that branch protection marks *required*. Without that rule
+# `--auto` merges immediately, and the auto-merge push (made with GITHUB_TOKEN)
+# does not trigger the CI workflow on `main` either, so nothing flagged the
+# broken build until the deploy failed.
 #
 # Requirements (one-time, in the repo settings):
 #   • Settings → General → "Allow auto-merge" must be enabled.
-#   • A branch protection rule on `main` requiring the CI checks to pass.
-#   • Settings → Actions → General → "Allow GitHub Actions to create and
-#     approve pull requests" must be enabled if you want the workflow to
-#     also approve the PR (currently skipped to avoid permission errors).
+#   • A branch protection rule on `main` that marks the CI job as a REQUIRED
+#     status check. This is what makes "a red build keeps the PR open" true —
+#     without it auto-merge has nothing to wait for and merges straight away.
 
 on:
   pull_request_target:
@@ -30,8 +36,19 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Enable auto-merge
+      # Majors change APIs; they need a human to read the changelog.
+      - name: Enable auto-merge (patch and minor only)
+        if: ${{ steps.metadata.outputs.update-type != 'version-update:semver-major' }}
         run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Flag major update for review
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-major' }}
+        run: |
+          echo "Major update — left open for manual review." >> "$GITHUB_STEP_SUMMARY"
+          gh pr edit "$PR_URL" --add-label 'major-update' || true
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
