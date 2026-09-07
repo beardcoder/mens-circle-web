@@ -136,6 +136,10 @@ export default defineConfig({
     // Must run AFTER sitemap(): registers its output in the adapter's manifest.
     serveSitemapWithBunAdapter(),
     // llms.txt for AI crawlers, derived from the built HTML so it cannot drift.
+    // Pinned to 2.x on purpose: v3 dropped both `DEFAULT_NOISE_SELECTORS` and the
+    // `excludeSelectors` option (the config no longer loads), and its new SSR pass
+    // ignores `exclude` — it scrapes /admin/* from the *live* site at build time and
+    // publishes it as .md. Revisit once `exclude` covers SSR routes again.
     llms({
       name: 'Männerkreis Niederbayern/ Straubing',
       description:
