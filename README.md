@@ -19,7 +19,7 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 │   ├─ Admin-UI    → /admin/* (Events anlegen, Anmeldungen verwalten)         │
 │   ├─ Datenhaltung → Drizzle ORM auf bun:sqlite (Datei im /data-Volume)      │
 │   │    Migrationen werden beim Boot automatisch angewendet (drizzle/)       │
-│   └─ Cron        → Event-Erinnerungen (alle 15 min, Bun.cron)               │
+│   └─ Scheduler   → Event-Erinnerungen (alle 15 min, In-Process-Timer)       │
 │                                           │                                 │
 │                                           ▼ (E-Mail)                         │
 │                                        listmonk (externer Dienst)           │
@@ -129,7 +129,7 @@ src/
                   utilities/_motion.css + base/_keyframes.css = Animation
 astro-integrations/  Build-Integrationen (Sitemap/llms.txt in das Static-Manifest
                   des Bun-Adapters nachtragen — s. serve-with-bun-adapter.mjs)
-scripts/          reminder-cron.ts (Bun.cron via --preload), send-reminders.ts,
+scripts/          reminder-cron.ts (Timer-Scheduler via --preload), send-reminders.ts,
                   backup-db.ts (SQLite → S3)
 drizzle/          generierte SQL-Migrationen (beim Boot angewendet)
 drizzle.config.ts drizzle-kit-Konfiguration
