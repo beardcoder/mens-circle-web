@@ -119,9 +119,12 @@ const boundaryItems = data.boundaryItems ?? [];
 
     /* Set apart by a change of ground and a single accent rule — the one place
        on the page the warm accent is used for anything. */
+    /* `--bg-secondary`, not the literal sunk paper: the text inside inherits
+       `--text-primary`, so a fixed light panel put light text on light ground
+       in dark mode (1.1:1) and the whole boundary list vanished. */
     .home-frame__boundary {
       padding: var(--space-md);
-      background: var(--color-paper-sunk);
+      background: var(--bg-secondary);
       border-inline-start: 6px solid var(--color-orange);
       border-radius: 0;
     }

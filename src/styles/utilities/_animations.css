@@ -28,10 +28,11 @@
   justify-content: center;
   inline-size: 44px;
   block-size: 44px;
+  /* Ink on orange in both modes — the orange ground does not flip. */
   color: var(--color-ink);
   cursor: pointer;
   background: var(--color-orange);
-  border: 2px solid var(--color-ink);
+  border: 2px solid var(--rule-strong);
   border-radius: 0;
   transition:
     background-color var(--motion-quick),
@@ -49,13 +50,13 @@
 
 @media (hover: hover) and (pointer: fine) {
   .scroll-to-top:hover {
-    color: var(--color-paper);
-    background: var(--color-ink);
+    color: var(--bg-primary);
+    background: var(--text-primary);
   }
 }
 
 .scroll-to-top:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--text-primary);
   outline-offset: 3px;
   box-shadow: 0 0 0 3px var(--color-orange);
 }

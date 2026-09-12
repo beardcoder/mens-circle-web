@@ -125,7 +125,17 @@
   --color-info: light-dark(#2f5570, #93b6d0);
   --color-warning: light-dark(#8a6218, #d9b45f);
 
-  /* Borders */
+  /* Borders.
+     `--rule-strong` is the 2-3px structural rule the poster layout is built
+     from — the bar under the header, the line above each step, the edge of the
+     hero's action block. It MUST flip with the mode: a literal `--color-ink`
+     rule is invisible on the dark ground. The same goes for any focus outline
+     that sits on the page ground.
+
+     The literal `--color-ink` / `--color-paper` stay correct only where the
+     ground itself does not flip: the orange statement field, the ink bands,
+     the footer and the breathing exercise. */
+  --rule-strong: light-dark(var(--color-ink), var(--color-chalk));
   --border-light: light-dark(var(--color-rule), var(--color-night-rule));
   --border-medium: light-dark(var(--color-rule-strong), #4a4f47);
   --border-dark: light-dark(var(--color-ink-muted), #5c625a);

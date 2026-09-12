@@ -13,7 +13,7 @@
 .hero {
   position: relative;
   padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
-  border-block-end: 2px solid var(--color-ink);
+  border-block-end: 2px solid var(--rule-strong);
 }
 
 .hero__content {
