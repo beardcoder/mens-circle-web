@@ -1,131 +1,106 @@
 /**
  * Global keyframes, unlayered — @keyframes inside @layer has shipped subtle
  * regressions in Vite/lightningcss builds.
+ *
+ * Three designed motion situations plus the breathing exercise. Everything here
+ * is opacity/transform only, so it composites, and every call site is gated
+ * behind `prefers-reduced-motion: no-preference`.
  */
 
-/* Ambient breathing — decorative circles in hero / intro / cta / newsletter. */
-@keyframes breathe {
-  0%,
-  100% {
-    opacity: 0.16;
-    transform: scale(0.92);
-  }
+/* ── 1. The entrance ────────────────────────────────────────────────────
+   One short, staggered introduction of the hero: the headline rises line by
+   line, the ring scales up from just under full size, the photograph wipes in.
+   Whole sequence lands inside ~900ms. */
 
-  50% {
-    opacity: 0.34;
-    transform: scale(1.12);
-  }
-}
-
-@keyframes breathe-slow {
-  0%,
-  100% {
-    opacity: 0.1;
-    transform: scale(0.94) rotate(-0.4deg);
-  }
-
-  50% {
-    opacity: 0.28;
-    transform: scale(1.06) rotate(0.6deg);
-  }
-}
-
-/* Slow horizontal pulse for decorative section lines. */
-@keyframes thread-drift {
-  0%,
-  100% {
-    opacity: 0.45;
-    transform: translate3d(-8%, 0, 0) scaleX(0.9);
-  }
-
-  50% {
-    opacity: 0.9;
-    transform: translate3d(0, 0, 0) scaleX(1);
-  }
-}
-
-/* Scroll-driven parallax — @supports-gated at the call sites. */
-@keyframes hero-content-leave {
-  to {
-    opacity: 0.3;
-    transform: translate3d(0, -4rem, 0);
-  }
-}
-
-@keyframes hero-rings-drift {
-  to {
-    transform: translate3d(0, 3rem, 0);
-  }
-}
-
-/* The journey thread draws itself across as the steps enter view. */
-@keyframes journey-thread-draw {
+@keyframes poster-line-in {
   from {
     opacity: 0;
-    transform: scaleX(0);
+    transform: translate3d(0, 0.45em, 0);
   }
 
-  to {
-    opacity: 0.7;
-    transform: scaleX(1);
-  }
-}
-
-@keyframes intro-rings-drift {
-  from {
-    transform: translate3d(0, -1.5rem, 0);
-  }
-
-  to {
-    transform: translate3d(0, 1.5rem, 0);
-  }
-}
-
-/* Uses `translate` so the base rotate/centring on `transform` survives. */
-@keyframes moderator-word-drift {
-  from {
-    translate: 2.5rem 0;
-  }
-
-  to {
-    translate: -2.5rem 0;
-  }
-}
-
-/* Header — scroll-driven colour morph and overlay fade. Colour-only on
-   purpose: animating `padding-block` here made the bar *grow* on scroll and,
-   being a layout property, relaid out the fixed header on every frame so the
-   height visibly stepped. One height now, only the tone changes. */
-@keyframes header-color-morph {
-  to {
-    color: var(--text-primary);
-  }
-}
-
-@keyframes header-overlay-fade {
   to {
     opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
-@keyframes nav-pulse {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent-primary) 25%, transparent);
-    opacity: 0.35;
-  }
-
-  60% {
-    box-shadow: 0 0 0 24px color-mix(in oklch, var(--accent-primary) 0%, transparent);
-    opacity: 0.12;
-  }
-
-  100% {
-    box-shadow: 0 0 0 32px transparent;
+@keyframes poster-rise {
+  from {
     opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
-/* Breathing meditation app — phase-based ring animations. */
+@keyframes ring-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88) rotate(-8deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* The photograph arrives as a wipe rather than a fade, so it reads as a plate
+   being laid down. `clip-path` on a rect is compositor-friendly. */
+@keyframes plate-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ── 2. The ring on scroll ──────────────────────────────────────────────
+   Driven by a `view()` timeline, so progress is scroll position, not time.
+   Bounded: 40px of drift, 12° of turn. The reprise turns the other way. */
+
+@keyframes ring-drift {
+  from {
+    transform: translate3d(0, -20px, 0) rotate(-6deg);
+  }
+
+  to {
+    transform: translate3d(0, 20px, 0) rotate(6deg);
+  }
+}
+
+@keyframes ring-drift-reverse {
+  from {
+    transform: translate3d(0, 22px, 0) rotate(7deg);
+  }
+
+  to {
+    transform: translate3d(0, -22px, 0) rotate(-5deg);
+  }
+}
+
+/* ── 3. The statement's settle ──────────────────────────────────────────
+   The three lines of the orange statement slide in from the right and settle
+   flush left as the section enters view. The *end* state is the readable one
+   and it is what a reduced-motion or unsupported browser gets immediately, so
+   no information exists only mid-animation. */
+
+@keyframes statement-settle {
+  from {
+    transform: translate3d(var(--statement-from, 8%), 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ── Breathing exercise — phase-based rings. These are the content. ───── */
 @keyframes breathing-idle {
   0%,
   100% {
@@ -181,55 +156,11 @@
   }
 }
 
-/* Gentle levitation — moderator photo. */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-
-  50% {
-    transform: translateY(-0.625rem) scale(1.005);
-  }
-}
-
-/* Hero scroll indicator line sweeps downward in a loop. */
-@keyframes scroll-line-sweep {
-  0% {
-    opacity: 1;
-    transform: scaleY(0);
-    transform-origin: top;
-  }
-
-  45% {
-    opacity: 1;
-    transform: scaleY(1);
-    transform-origin: top;
-  }
-
-  55% {
-    opacity: 1;
-    transform: scaleY(1);
-    transform-origin: bottom;
-  }
-
-  100% {
-    opacity: 0.3;
-    transform: scaleY(0);
-    transform-origin: bottom;
-  }
-}
-
-/* One-shot page-load entrance for above-the-fold content (utilities/_motion.css).
-   No `filter: blur()` on purpose: a filter paints through a region derived from
-   the border box plus the blur margin (~9px at 6px blur), but `.hero__title`
-   runs `line-height: 0.88`, so its glyph ink overflows by ~0.22em. WebKit crops
-   to the region and the headline rendered clipped for the whole entrance.
-   Opacity and transform are also the only two the compositor animates alone. */
+/* Retained: sub-page openings still use the plain rise. */
 @keyframes hero-rise {
   from {
     opacity: 0;
-    transform: translate3d(0, 1.25rem, 0);
+    transform: translate3d(0, 0.75rem, 0);
   }
 
   to {

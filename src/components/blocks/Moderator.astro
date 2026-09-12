@@ -1,81 +1,55 @@
 ---
-import { Picture } from 'astro:assets';
-import { resolveAssetImage } from '../../lib/images';
-import { Icon } from 'astro-icon/components';
-
 interface Props {
   data: {
     anchor?: string;
     eyebrow?: string;
     name?: string;
     bio?: string;
-    quote?: string;
-    photo?: string;
+    linkLabel?: string;
+    linkUrl?: string;
   };
 }
 
+/**
+ * Who holds the evening — deliberately the quietest section on the page.
+ *
+ * Sitting between the poster questions above and the orange field below, this
+ * is where the page stops shouting: a marker, a name, two paragraphs and a
+ * link, on a narrow measure at the left edge. The contrast with its neighbours
+ * is the point; making this loud too would flatten the rhythm.
+ *
+ * No portrait here — it is already at full size in the hero a screen above, and
+ * running it twice would be the same picture and the same introduction twice.
+ * The long version is its own page, one link away.
+ */
+
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
-// Portrait alt text, derived from the (HTML) name.
-const photoAlt = data.name
-  ? data.name
-      .replace(/<[^>]*>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-  : 'Begleiter';
-
-const photoAsset = resolveAssetImage(data.photo);
 ---
 
-<section class="section moderator-section" id={anchor}>
-  <span class="moderator__ornament" aria-hidden="true">BEGLEITER</span>
+<section class="section section--ruled home-person" id={anchor} aria-labelledby="person-title">
   <div class="container">
-    <div class="moderator__layout">
-      <div class="moderator__photo-wrapper" data-reveal="right">
-        <div class="moderator__photo" data-motion="image">
-          {
-            photoAsset ? (
-              <Picture
-                src={photoAsset}
-                alt={photoAlt}
-                widths={[400, 700, 900, 1000]}
-                sizes="(max-width: 900px) min(350px, 85vw), 55vw"
-                formats={['avif', 'webp']}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : data.photo ? (
-              <img src={data.photo} loading="lazy" decoding="async" alt={photoAlt} />
-            ) : (
-              <div class="moderator__photo-placeholder">
-                <Icon name="user" aria-hidden="true" />
-                <span>Foto</span>
-              </div>
-            )
-          }
-        </div>
-        <div class="moderator__photo-accent"></div>
-      </div>
+    <div class="bay">
+      <p class="marker bay__marker">{data.eyebrow}</p>
 
-      <div class="moderator__content" data-reveal-group="100">
+      <div class="bay__beside-marker home-person__body">
         {
-          data.eyebrow && (
-            <p class="eyebrow" data-reveal="up">
-              {data.eyebrow}
-            </p>
+          data.name && (
+            <h2 class="home-person__name" id="person-title">
+              {data.name}
+            </h2>
           )
         }
 
-        {data.name && <h2 class="moderator__name" data-reveal="blur" set:html={data.name} />}
+        {data.bio && <div class="home-person__bio prose" set:html={data.bio} />}
 
-        {data.bio && <div class="moderator__bio" data-reveal="up" set:html={data.bio} />}
-
-        {/* A spoken word settles rather than moves — slow fade, no travel. */}
         {
-          data.quote && (
-            <blockquote class="moderator__quote" data-reveal="fade" data-reveal-duration="1200">
-              <p>{data.quote}</p>
-            </blockquote>
+          data.linkLabel && data.linkUrl && (
+            <p class="home-person__link">
+              <a href={data.linkUrl} class="link">
+                {data.linkLabel}
+              </a>
+            </p>
           )
         }
       </div>
@@ -85,176 +59,24 @@ const photoAsset = resolveAssetImage(data.photo);
 
 <style is:global>
   @layer sections {
-    .moderator-section {
-      position: relative;
-      overflow: clip;
-      background: var(--bg-tertiary);
+    .home-person__body {
+      max-inline-size: 62ch;
     }
 
-    .moderator__ornament {
-      position: absolute;
-      inset-block-start: 50%;
-      inset-inline-start: -5%;
-      font-family: var(--font-display);
-      font-size: clamp(4rem, 12vw, 10rem);
-      color: var(--border-light);
-      letter-spacing: 0.1em;
-      white-space: nowrap;
-      pointer-events: none;
-      user-select: none;
-      opacity: 0.5;
-      transform: translateY(-50%) rotate(-90deg);
+    .home-person__name {
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-3xl);
+      line-height: 1;
+      text-transform: uppercase;
     }
 
-    @media (width <= 900px) {
-      .moderator__ornament {
-        display: none;
-      }
-    }
-
-    /* The background word drifts as the section scrolls by. Animates
-       `translate` to keep the rotate/centring on `transform` intact. */
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .moderator-section {
-          view-timeline: --moderator-panel block;
-        }
-
-        .moderator__ornament {
-          animation: moderator-word-drift linear both;
-          animation-timeline: --moderator-panel;
-        }
-      }
-    }
-
-    .moderator__layout {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: var(--space-xl);
-      align-items: center;
-      min-block-size: 90vh;
-      padding-block: var(--space-xl);
-    }
-
-    @media (width <= 900px) {
-      .moderator__layout {
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
-        min-block-size: auto;
-      }
-    }
-
-    .moderator__photo-wrapper {
-      position: relative;
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .moderator__photo-wrapper {
-        animation: float 7s var(--ease-ambient) infinite;
-      }
-    }
-
-    @media (width <= 900px) {
-      .moderator__photo-wrapper {
-        max-inline-size: 350px;
-        margin-inline: auto;
-      }
-    }
-
-    .moderator__photo {
-      --_surface-noise-opacity: 0.04;
-
-      position: relative;
-      background: var(--bg-section-alt);
-    }
-
-    .moderator__photo picture {
-      display: block;
-      inline-size: 100%;
-      block-size: 100%;
-    }
-
-    .moderator__photo-placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-sm);
-      align-items: center;
-      justify-content: center;
-      color: var(--text-on-dark);
-    }
-
-    .moderator__photo-placeholder svg {
-      inline-size: 80px;
-      block-size: 80px;
-      opacity: 0.3;
-      fill: none;
-      stroke: currentcolor;
-      stroke-width: 0.5;
-    }
-
-    .moderator__photo-placeholder span {
-      margin-inline: -0.05em 0.08em;
-      font-style: italic;
-      opacity: 0.5;
-    }
-
-    .moderator__photo-accent {
-      position: absolute;
-      inset-block: var(--space-md) calc(var(--space-md) * -1);
-      inset-inline: var(--space-md) calc(var(--space-md) * -1);
-      z-index: -1;
-      border: 1px solid var(--accent-primary);
-      opacity: 0.5;
-    }
-
-    .moderator__content {
-      position: relative;
-      padding-inline-start: var(--space-lg);
-    }
-
-    @media (width <= 900px) {
-      .moderator__content {
-        padding-inline-start: 0;
-      }
-    }
-
-    .moderator__name {
-      margin-block-end: var(--space-md);
-      font-size: clamp(3.5rem, 7vw, 6.5rem);
-      line-height: 0.93;
-    }
-
-    .moderator__name .light {
-      display: block;
-      font-weight: 300;
-      letter-spacing: 0.02em;
-    }
-
-    .moderator__bio {
-      max-inline-size: var(--content-max-text);
-      margin-block-end: var(--space-md);
+    .home-person__bio p {
       font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
     }
 
-    .moderator__quote {
-      max-inline-size: var(--content-max-text);
-      padding-inline-start: var(--space-md);
-      margin-block-start: var(--space-lg);
-      border-inline-start: 3px solid var(--accent-primary);
-    }
-
-    .moderator__quote p {
-      margin: 0;
-      font-family: var(--font-display);
-      font-size: clamp(1.75rem, 3vw, 2.75rem);
-      font-style: italic;
-      line-height: 1.3;
-      color: var(--text-accent);
-      letter-spacing: -0.025em;
+    .home-person__link {
+      margin-block-start: var(--space-md);
+      font-size: var(--text-section-body);
     }
   }
 </style>

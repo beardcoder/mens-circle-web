@@ -1,0 +1,228 @@
+---
+import site from '../../data/site.json';
+import { primaryAction, type DateStatus } from '../../lib/event-status';
+import NewsletterForm from '../islands/NewsletterForm.svelte';
+import Ring from '../Ring.astro';
+
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    displayLines?: string[];
+    newsletterText?: string;
+    whatsappText?: string;
+  };
+  state: DateStatus;
+}
+
+/**
+ * The close: the date, the one action that fits it, and the way to hear about
+ * the next one.
+ *
+ * An ink field with the ring reprised at the lower left — the page ends on the
+ * same mark it opened with, seen from the other side. The heading returns to the
+ * poster register so the ending has the weight of the beginning; the form under
+ * it goes quiet and functional again.
+ *
+ * The old `#newsletter` and `#whatsapp-community` anchors are kept on their
+ * parts, because the footer, older mails and /event all link to them.
+ */
+
+const { data, state } = Astro.props;
+const action = primaryAction(state, '#newsletter');
+const anchor = data.anchor ?? 'termine';
+const whatsapp = site.whatsappCommunityLink;
+const lines = data.displayLines ?? ['DABEI SEIN.'];
+---
+
+<section class="section section--ink section--clip home-dates" id={anchor} aria-labelledby="termine-title">
+  <Ring place="close" />
+
+  <div class="container home-dates__inner">
+    <div class="bay">
+      <div class="bay__left home-dates__lead">
+        <p class="marker marker--ruled home-dates__marker">{data.eyebrow}</p>
+
+        <h2 class="display home-dates__display" id="termine-title">
+          {lines.map((line) => <span class="display__line">{line}</span>)}
+        </h2>
+
+        <p class="home-dates__status" data-status={state.status}>{action.note}</p>
+
+        {
+          state.status === 'scheduled' && state.next && (
+            <dl class="deflist home-dates__meta">
+              <div class="deflist__row">
+                <dt class="deflist__term">Wann</dt>
+                <dd class="deflist__desc">
+                  {state.next.dateLabel}
+                  {state.next.timeRange && <span class="deflist__note">{state.next.timeRange}</span>}
+                </dd>
+              </div>
+              <div class="deflist__row">
+                <dt class="deflist__term">Wo</dt>
+                <dd class="deflist__desc">
+                  {state.next.place}
+                  <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
+                </dd>
+              </div>
+              <div class="deflist__row">
+                <dt class="deflist__term">Plätze</dt>
+                <dd class="deflist__desc">
+                  {state.isFull
+                    ? 'Ausgebucht – du kannst auf die Warteliste'
+                    : `${state.next.availableSpots} von ${state.next.maxParticipants} frei`}
+                  <span class="deflist__note">
+                    {state.isFull
+                      ? 'Wird ein Platz frei, rückst du automatisch nach.'
+                      : 'Für die Anmeldung genügen Name und E-Mail-Adresse.'}
+                  </span>
+                </dd>
+              </div>
+            </dl>
+          )
+        }
+
+        <p class="home-dates__action">
+          <a
+            href={action.href}
+            class="btn btn--primary btn--large"
+            data-umami-event="cta-click"
+            data-umami-event-location="home-dates"
+            data-umami-event-state={state.status}
+          >
+            {action.label}
+          </a>
+        </p>
+      </div>
+
+      <div class="bay__far-right home-dates__notify" id="newsletter">
+        <h3 class="home-dates__sub">Bei neuen Terminen benachrichtigen</h3>
+        {data.newsletterText && <p class="home-dates__text">{data.newsletterText}</p>}
+        <NewsletterForm client:visible context={{ location: 'home-dates' }} />
+
+        {
+          whatsapp && (
+            <p class="home-dates__alt" id="whatsapp-community">
+              {data.whatsappText}{' '}
+              <a
+                class="link home-dates__alt-link"
+                href={whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="whatsapp-click"
+                data-umami-event-type="community-join"
+              >
+                Zur WhatsApp-Gruppe
+                <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+              </a>
+              .
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .home-dates {
+      padding-block: var(--space-2xl);
+    }
+
+    .home-dates__inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .home-dates__marker {
+      color: var(--color-chalk);
+    }
+
+    .home-dates__display {
+      margin-block-end: var(--space-md);
+      color: var(--color-chalk);
+    }
+
+    .home-dates__status {
+      max-inline-size: var(--measure);
+      margin-block-end: var(--space-md);
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-normal);
+      color: var(--color-chalk);
+    }
+
+    .home-dates__status[data-status='unavailable'] {
+      color: var(--color-orange);
+    }
+
+    .home-dates__meta {
+      margin-block-end: var(--space-md);
+    }
+
+    .home-dates__action {
+      margin: 0;
+    }
+
+    /* The form column. On the ink ground the inputs invert too, otherwise a
+       bright panel would punch a hole in the field. */
+    .home-dates__notify {
+      --control-bg: rgb(243 243 238 / 7%);
+      --control-bg-hover: rgb(243 243 238 / 12%);
+      --control-color: var(--color-chalk);
+      --control-border-color: var(--border-on-dark);
+      --control-placeholder: var(--color-chalk-muted);
+    }
+
+    .home-dates__notify .form-label {
+      color: var(--color-chalk);
+    }
+
+    .home-dates__sub {
+      margin-block-end: var(--space-2xs);
+      font-size: var(--text-xl);
+      line-height: 1.1;
+      color: var(--color-chalk);
+      text-transform: uppercase;
+    }
+
+    .home-dates__text {
+      max-inline-size: var(--measure);
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--color-chalk-muted);
+    }
+
+    .home-dates__alt {
+      max-inline-size: var(--measure);
+      margin-block-start: var(--space-md);
+      font-size: var(--text-caption);
+      line-height: var(--leading-relaxed);
+      color: var(--color-chalk-muted);
+    }
+
+    .home-dates__alt-link {
+      color: var(--color-chalk);
+    }
+
+    @media (width <= 56em) {
+      .home-dates {
+        padding-block: var(--space-xl);
+      }
+
+      .home-dates__notify {
+        padding-block-start: var(--space-md);
+        margin-block-start: var(--space-lg);
+        border-block-start: 1px solid var(--border-on-dark);
+      }
+    }
+
+    @media (width <= 30em) {
+      .home-dates__action .btn {
+        inline-size: 100%;
+      }
+    }
+  }
+</style>

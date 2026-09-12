@@ -1,0 +1,136 @@
+---
+interface Props {
+  /** Where on the page this instance sits — drives size and crop, see the CSS. */
+  place: 'hero' | 'close';
+  class?: string;
+}
+
+/**
+ * The ring.
+ *
+ * One graphic motif, used twice: once in the hero and once at the participation
+ * close. A thick, open orange ring — the circle men sit in, drawn as a mark
+ * rather than as an illustration. It is cropped by the viewport edge on purpose
+ * and it overlaps the display type and the photograph.
+ *
+ * Deliberately *not*: a cluster of floating bubbles, a gradient blob, a rotating
+ * word-wreath, or a mandala. It is a single stroke with one gap in it.
+ *
+ * Drawn as SVG rather than a bordered div because the gap has to be a clean
+ * butt-ended break (a `border-color: … transparent` gap cuts on the diagonal),
+ * and because the stroke then scales with the box instead of needing its own
+ * clamp.
+ *
+ * `aria-hidden` and `focusable="false"`: it carries no information, and it must
+ * never take a tab stop. Nothing readable is ever placed on top of it — the
+ * text sits beside or under it, never over the stroke.
+ */
+
+const { place, class: className } = Astro.props;
+
+// r=88 in a 200 box leaves room for the 24-unit stroke without clipping.
+// Circumference = 2πr ≈ 552.9. A 470/83 dash leaves one ~54° opening.
+const R = 88;
+const CIRCUMFERENCE = 2 * Math.PI * R;
+const GAP = 83;
+---
+
+<svg
+  class:list={['ring', `ring--${place}`, className]}
+  viewBox="0 0 200 200"
+  aria-hidden="true"
+  focusable="false"
+  data-ring={place}
+>
+  <circle
+    class="ring__stroke"
+    cx="100"
+    cy="100"
+    r={R}
+    fill="none"
+    stroke="currentColor"
+    stroke-width="23"
+    stroke-linecap="butt"
+    stroke-dasharray={`${CIRCUMFERENCE - GAP} ${GAP}`}
+    transform="rotate(-152 100 100)"></circle>
+</svg>
+
+<style is:global>
+  @layer sections {
+    .ring {
+      position: absolute;
+      z-index: 0;
+      display: block;
+      color: var(--color-orange);
+      pointer-events: none;
+    }
+
+    /* ─── Hero ────────────────────────────────────────────────────────
+       Sits to the upper right, cropped by the right edge of the viewport.
+       The display type runs across its lower-left arc; the portrait sits
+       inside its lower half. Sized in vw so the crop is proportional
+       rather than a fixed overhang that disappears on a wide screen. */
+    .ring--hero {
+      inset-block-start: -3vw;
+      inset-inline-end: -6vw;
+      inline-size: min(48vw, 42rem);
+      aspect-ratio: 1;
+    }
+
+    /* ─── Close ───────────────────────────────────────────────────────
+       The reprise. Smaller, cropped by the left edge and the bottom, so the
+       page ends on the same mark it opened with, seen from the other side. */
+    .ring--close {
+      inset-block-end: -13vw;
+      inset-inline-start: -11vw;
+      inline-size: min(40vw, 30rem);
+      aspect-ratio: 1;
+      color: var(--color-orange);
+    }
+
+    @media (width <= 56em) {
+      /* On a phone the ring is recomposed, not shrunk: it moves behind the
+         headline's top-right corner and crops harder, so the headline still
+         owns the screen and the action stays above the fold. */
+      .ring--hero {
+        inset-block-start: -16vw;
+        inset-inline-end: -24vw;
+        inline-size: min(70vw, 22rem);
+      }
+
+      .ring--close {
+        inset-block-end: -22vw;
+        inset-inline-start: -24vw;
+        inline-size: min(64vw, 20rem);
+      }
+    }
+
+    /* ─── Scroll reaction ─────────────────────────────────────────────
+       The ring drifts and turns a little as its section passes. Bounded on
+       purpose: ~40px of travel and ~12° of rotation — enough to notice, not
+       enough to chase. Scroll-driven, so it is the browser's compositor doing
+       the work and normal scrolling is untouched: no listeners, no hijacking.
+
+       The transform origin stays on the element's own border box. An earlier
+       pass set `transform-box: fill-box` here; on an `<svg>` root — a replaced
+       element — that resolves against the child bounding box in user units and
+       threw the ring ~1500px off its position as soon as a rotation applied. */
+    .ring {
+      transform-origin: 50% 50%;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) {
+        .ring {
+          animation: ring-drift linear both;
+          animation-timeline: view();
+          animation-range: cover 0% cover 100%;
+        }
+
+        .ring--close {
+          animation-name: ring-drift-reverse;
+        }
+      }
+    }
+  }
+</style>

@@ -81,121 +81,137 @@ const schemas = [
 </Layout>
 
 <style>
-  /* One continuous dark surface. Each band's gradient hands off to the next so
-     the page reads as a single calm column: the intro settles onto
-     --color-earth-deep (where the breathing tool begins) and the CTA picks up
-     from --color-ink (where the tool ends). */
+  /* One continuous dark surface. The exercise itself is a dim room, and the
+     bands above and below it stay on that ground so the page reads as a single
+     calm column rather than bouncing light↔dark around the tool.
+
+     Only the surface changed here: the exercise, its timing, its controls, the
+     full-screen route and the safety note are untouched. */
   .atem-page {
-    background: var(--color-earth-deep);
-    color: var(--text-on-dark);
+    color: var(--color-chalk);
+    background: var(--color-night);
+  }
+
+  /* The orange primary already reads on this ground (5.9:1 for the ink label on
+     orange, and the fill itself against the near-black). Only the hover has to
+     change: it cannot go darker here, so it goes to paper. */
+  .atem-page .btn--primary {
+    --btn-hover-bg: var(--color-paper);
+    --btn-hover-color: var(--color-ink);
+    --btn-hover-border: var(--color-paper);
   }
 
   .atem-intro {
-    display: grid;
-    justify-items: center;
-    padding-block: calc(var(--header-clearance) + var(--space-sm)) var(--space-xl);
-    padding-inline: var(--space-md);
-    background: linear-gradient(180deg, var(--color-earth-dark) 0%, var(--color-earth-deep) 100%);
-    text-align: center;
+    padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
+    padding-inline: var(--container-gutter);
   }
 
   .atem-intro__inner {
-    display: grid;
-    justify-items: center;
-    gap: var(--space-sm);
     inline-size: 100%;
-    max-inline-size: var(--content-max-wide);
+    max-inline-size: var(--container-width);
+    margin-inline: auto;
   }
 
   .atem-intro__eyebrow {
-    display: inline-flex;
-    gap: var(--space-sm);
+    display: flex;
+    gap: 0.6em;
     align-items: center;
-    margin: 0;
-    color: var(--accent-secondary);
+    margin: 0 0 var(--space-sm);
+    font-family: var(--font-display);
+    font-size: var(--text-marker);
     font-weight: 600;
-    font-size: var(--text-caption);
-    letter-spacing: 0.25em;
+    color: var(--color-chalk);
     text-transform: uppercase;
+    letter-spacing: var(--tracking-marker);
   }
 
-  .atem-intro__eyebrow::before,
-  .atem-intro__eyebrow::after {
-    inline-size: clamp(1.75rem, 5vw, 3.5rem);
-    block-size: 1px;
+  .atem-intro__eyebrow::before {
+    flex: none;
+    inline-size: 1.75rem;
+    block-size: 3px;
     content: '';
-    background: color-mix(in oklch, var(--accent-secondary) 60%, transparent);
+    background: var(--color-orange);
   }
 
   .atem-intro__title {
-    margin: 0;
-    color: var(--text-on-dark);
-    font-weight: 500;
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    margin: 0 0 var(--space-sm);
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
-    line-height: var(--leading-tight);
+    font-size: var(--display-3);
+    font-weight: 800;
+    line-height: 0.95;
+    color: var(--color-chalk);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
   }
 
   .atem-intro__accent {
-    color: var(--accent-secondary);
-    font-style: italic;
+    color: var(--color-orange);
   }
 
   .atem-intro__lede {
+    max-inline-size: var(--measure);
     margin: 0;
-    max-inline-size: var(--content-max-description);
-    color: color-mix(in oklch, var(--text-on-dark) 80%, transparent);
     font-size: var(--text-section-body-lg);
     line-height: var(--leading-relaxed);
-    text-wrap: balance;
+    color: var(--color-chalk-muted);
+    text-wrap: pretty;
   }
 
-  /* Detailed steps + safety note, sitting below the tool. The shared
-     `.breathing__steps` / `.breathing__warning` styles already target the dark
-     surface, so they need no recolouring here — just layout. */
+  /* Instructions and the safety note, below the tool. The safety note must stay
+     visible and legible — it is never collapsed, never faded and never moved
+     below the fold of the section it belongs to. */
   .atem-guide {
-    display: grid;
-    justify-items: center;
-    padding-block: var(--space-xl);
-    padding-inline: var(--space-md);
-    background: var(--color-ink);
+    padding-block: var(--space-lg);
+    padding-inline: var(--container-gutter);
+    border-block-start: 1px solid var(--border-on-dark);
   }
 
   .atem-guide__inner {
     inline-size: 100%;
-    max-inline-size: var(--content-max-text);
+    max-inline-size: var(--container-width);
+    margin-inline: auto;
   }
 
   .atem-guide__title {
-    margin: 0 0 var(--space-md);
-    color: var(--text-on-dark);
-    font-weight: 500;
-    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin: 0 0 var(--space-sm);
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
-    text-align: center;
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--color-chalk);
+    text-transform: uppercase;
   }
 
   .atem-guide__steps {
+    max-inline-size: var(--measure);
     margin-block-end: var(--space-md);
   }
 
+  .atem-guide__warning {
+    max-inline-size: var(--measure);
+  }
+
   .atem-cta {
-    display: grid;
-    justify-items: center;
-    gap: var(--space-md);
-    padding-block: var(--space-xl) var(--space-2xl);
-    padding-inline: var(--space-md);
-    background: linear-gradient(180deg, var(--color-ink) 0%, var(--color-earth-deep) 100%);
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-md);
+    align-items: center;
+    padding-block: var(--space-lg) var(--space-xl);
+    padding-inline: var(--container-gutter);
+    border-block-start: 1px solid var(--border-on-dark);
   }
 
   .atem-cta__text {
+    max-inline-size: var(--measure);
     margin: 0;
-    max-inline-size: var(--content-max-text);
-    color: color-mix(in oklch, var(--text-on-dark) 72%, transparent);
     font-size: var(--text-section-body);
     line-height: var(--leading-relaxed);
+    color: var(--color-chalk-muted);
+  }
+
+  @media (width >= 700px) {
+    .atem-cta {
+      justify-content: space-between;
+    }
   }
 </style>
