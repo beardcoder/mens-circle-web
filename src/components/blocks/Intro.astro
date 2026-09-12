@@ -14,11 +14,14 @@ interface Props {
 /**
  * "Der Kreis" — what an evening is about.
  *
- * Sits right of centre, against the ink band above it, so the page's left edge
- * moves rather than every section starting in the same place. The four
- * questions then break back out to the left at poster size: they are the thing
- * to read if you read nothing else on the page, so they get the weight and the
- * prose around them stays small.
+ * A two-column spread: the heading holds the left, the prose the right. Every
+ * other section on the page puts a small marker in the left column, so this one
+ * is deliberately the odd one out — and an earlier pass that shifted the whole
+ * block right instead left a 520x430px hole where the heading now sits.
+ *
+ * The four questions then break out to full width at poster size: they are the
+ * thing to read if you read nothing else on the page, so they get the weight
+ * and the prose around them stays small.
  */
 
 const { data } = Astro.props;
@@ -29,7 +32,7 @@ const questions = data.questions ?? [];
 <section class="section home-circle" id={anchor} aria-labelledby="ueber-title">
   <div class="container">
     <div class="bay">
-      <div class="bay__right home-circle__intro">
+      <div class="home-circle__head">
         <p class="marker marker--ruled">{data.eyebrow}</p>
         {
           data.title && (
@@ -38,8 +41,9 @@ const questions = data.questions ?? [];
             </h2>
           )
         }
-        {data.text && <div class="home-circle__text prose" set:html={data.text} />}
       </div>
+
+      {data.text && <div class="home-circle__text prose" set:html={data.text} />}
     </div>
 
     {
@@ -59,7 +63,7 @@ const questions = data.questions ?? [];
     {
       data.close && (
         <div class="bay">
-          <p class="bay__right home-circle__close">{data.close}</p>
+          <p class="home-circle__close">{data.close}</p>
         </div>
       )
     }
@@ -68,15 +72,41 @@ const questions = data.questions ?? [];
 
 <style is:global>
   @layer sections {
+    /* 5 / 7: the heading takes the narrower column and wraps to three or four
+       short lines, which is what gives the spread its edge. */
+    .home-circle__head {
+      grid-column: 1 / span 5;
+    }
+
+    .home-circle__text {
+      grid-column: 7 / span 6;
+      max-inline-size: var(--measure);
+    }
+
     .home-circle__text p {
       font-size: var(--text-section-body);
+    }
+
+    @media (width <= 56em) {
+      .home-circle__head,
+      .home-circle__text {
+        grid-column: 1 / -1;
+      }
+
+      .home-circle__text {
+        margin-block-start: var(--space-sm);
+      }
     }
 
     .home-circle__questions {
       margin-block: var(--space-xl) var(--space-lg);
     }
 
+    /* `max-inline-size: none` overrides the global paragraph measure: this
+       marker carries the rule that the question list hangs from, and a rule
+       that stops at 72ch mid-page reads as a mistake rather than a margin. */
     .home-circle__questions-label {
+      max-inline-size: none;
       padding-block-end: var(--space-xs);
       margin-block-end: 0;
       border-block-end: 3px solid var(--rule-strong);
@@ -106,6 +136,12 @@ const questions = data.questions ?? [];
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
+    }
+
+    @media (width <= 56em) {
+      .home-circle__close {
+        grid-column: 1 / -1;
+      }
     }
   }
 </style>
