@@ -114,7 +114,7 @@ textarea.form-control {
   outline: 3px solid var(--color-orange);
   outline-offset: 0;
   background: var(--control-bg-hover);
-  border-color: var(--color-ink);
+  border-color: var(--text-primary);
 }
 
 .form-control:disabled,

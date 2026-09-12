@@ -114,9 +114,10 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
       padding: 0.75rem 1.25rem;
       font-size: var(--text-caption);
       font-weight: 600;
-      color: light-dark(var(--color-paper), var(--color-night));
-      background: var(--accent-primary);
-      border-radius: var(--radius-md);
+      /* Ink on orange in both modes — the orange does not flip. */
+      color: var(--color-ink);
+      background: var(--color-orange);
+      border-radius: 0;
       transition: inset-block-start var(--motion-quick);
     }
 

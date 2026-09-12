@@ -79,7 +79,7 @@ const questions = data.questions ?? [];
     .home-circle__questions-label {
       padding-block-end: var(--space-xs);
       margin-block-end: 0;
-      border-block-end: 3px solid var(--color-ink);
+      border-block-end: 3px solid var(--rule-strong);
     }
 
     .home-circle__list {
@@ -99,11 +99,6 @@ const questions = data.questions ?? [];
       color: var(--text-primary);
       border-block-end: 1px solid var(--border-medium);
       text-wrap: balance;
-    }
-
-    /* One question carries the orange, so the block is not a uniform slab. */
-    .home-circle__question:first-child {
-      color: var(--color-ink);
     }
 
     .home-circle__close {

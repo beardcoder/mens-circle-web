@@ -117,7 +117,7 @@ const secondary = nav.header.secondary;
       color: var(--text-primary);
       background: var(--bg-primary);
       /* A 2px ink rule, not a hairline: the bar is part of the poster now. */
-      border-block-end: 2px solid var(--color-ink);
+      border-block-end: 2px solid var(--rule-strong);
     }
 
     .header__inner {
@@ -157,7 +157,7 @@ const secondary = nav.header.secondary;
     }
 
     .logo:focus-visible {
-      outline: 3px solid var(--color-ink);
+      outline: 3px solid var(--text-primary);
       outline-offset: 4px;
       box-shadow: 0 0 0 3px var(--color-orange);
     }
@@ -187,9 +187,10 @@ const secondary = nav.header.secondary;
       font-family: var(--font-display);
       font-size: 0.6875rem;
       font-weight: 600;
-      /* Ink, not orange: at 11px the orange measures 3.52:1 on paper, under the
-         4.5:1 small text requires. */
-      color: var(--color-ink-muted);
+      /* Not orange: at 11px the orange measures 3.52:1 on paper, under the
+         4.5:1 small text requires. `--text-muted`, not the literal ink-muted —
+         a literal would stay dark grey on the dark ground (2.8:1). */
+      color: var(--text-muted);
       letter-spacing: 0.2em;
     }
 
@@ -225,7 +226,7 @@ const secondary = nav.header.secondary;
     }
 
     .nav__link:focus-visible {
-      outline: 3px solid var(--color-ink);
+      outline: 3px solid var(--text-primary);
       outline-offset: 4px;
       box-shadow: 0 0 0 3px var(--color-orange);
     }
@@ -253,10 +254,10 @@ const secondary = nav.header.secondary;
       inline-size: 48px;
       block-size: 48px;
       padding: 0;
-      color: var(--color-ink);
+      color: var(--text-primary);
       cursor: pointer;
       background: none;
-      border: 2px solid var(--color-ink);
+      border: 2px solid var(--rule-strong);
       border-radius: 0;
       transition:
         color var(--motion-quick),
@@ -265,13 +266,14 @@ const secondary = nav.header.secondary;
 
     @media (hover: hover) and (pointer: fine) {
       .nav-toggle:hover {
+        /* Ink on orange in both modes — the orange field does not flip. */
         color: var(--color-ink);
         background: var(--color-orange);
       }
     }
 
     .nav-toggle:focus-visible {
-      outline: 3px solid var(--color-ink);
+      outline: 3px solid var(--text-primary);
       outline-offset: 3px;
       box-shadow: 0 0 0 3px var(--color-orange);
     }
@@ -313,12 +315,12 @@ const secondary = nav.header.secondary;
 
     @media (hover: hover) and (pointer: fine) {
       .theme-switch__btn:hover {
-        border-color: var(--color-ink);
+        border-color: var(--rule-strong);
       }
     }
 
     .theme-switch__btn:focus-visible {
-      outline: 3px solid var(--color-ink);
+      outline: 3px solid var(--text-primary);
       outline-offset: 2px;
       box-shadow: 0 0 0 3px var(--color-orange);
     }
@@ -398,11 +400,11 @@ const secondary = nav.header.secondary;
         flex-direction: column;
         gap: 0;
         align-items: stretch;
-        border-block-start: 2px solid var(--color-ink);
+        border-block-start: 2px solid var(--rule-strong);
       }
 
       .nav__item {
-        border-block-end: 2px solid var(--color-ink);
+        border-block-end: 2px solid var(--rule-strong);
       }
 
       .nav__link {
@@ -444,7 +446,7 @@ const secondary = nav.header.secondary;
       }
 
       .nav__secondary-link:focus-visible {
-        outline: 3px solid var(--color-ink);
+        outline: 3px solid var(--text-primary);
         outline-offset: 4px;
       }
 
@@ -452,7 +454,7 @@ const secondary = nav.header.secondary;
         display: flex;
         margin-block-start: auto;
         padding-block-start: var(--space-sm);
-        border-block-start: 2px solid var(--color-ink);
+        border-block-start: 2px solid var(--rule-strong);
       }
 
       /* The panel covers the page; the body lock lives in lib/site-header.ts. */
