@@ -105,20 +105,19 @@ const steps = data.steps ?? [];
       font-size: var(--display-numeral);
       font-weight: 800;
       line-height: 0.8;
-      /* The deep orange, not the signal one: at this size the numeral is large
-         text and owes 3:1. Signal orange on paper measures 2.64:1, the deep
-         orange 3.52:1. */
-      color: var(--color-orange-deep);
+      /* The burnt orange clears 3.1:1 on paper, which is what a numeral this
+         size owes as large text — the neon it replaced managed only 2.6:1 and
+         had to fall back to the deep tone. */
+      color: var(--color-orange);
       letter-spacing: -0.03em;
     }
 
     .home-evening__title {
       margin-block-end: var(--space-xs);
       font-size: var(--text-3xl);
-      line-height: 1;
+      line-height: 1.02;
       color: var(--text-primary);
-      text-transform: uppercase;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.015em;
     }
 
     .home-evening__text {
