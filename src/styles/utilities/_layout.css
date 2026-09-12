@@ -142,6 +142,22 @@
   color: var(--color-chalk);
 }
 
+/* The third ground: warm sand, a half-step down from the page. Neither the
+   bright oat nor the dark band — a calm, set-apart passage, and what gives the
+   page an earthy middle instead of one long stretch of paper broken only by
+   black and orange.
+
+   Both values must flip with the mode. An earlier pass used the literal
+   `--color-paper-sunk` here and painted an oat panel under chalk text in dark
+   mode (1.12:1 on the Markus heading); `--border-light`, tuned for the oat,
+   likewise all but disappears against the sand. */
+.section--sand {
+  --border-light: var(--border-medium);
+
+  background: var(--bg-secondary);
+  border-block-start: none;
+}
+
 .section--signal {
   color: var(--color-ink);
   background: var(--color-orange);
