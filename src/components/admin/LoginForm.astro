@@ -63,21 +63,24 @@ const { redirect = '/admin' } = Astro.props;
     flex-direction: column;
     gap: 1.5rem;
   }
+  /* Same wordmark as the topbar's `.brand`, one size up. It was set lowercase
+     and tight while the bar above was uppercase — two spellings of one name. */
   .login__brand {
     display: flex;
     align-items: center;
     gap: 0.6rem;
     font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.35rem;
-    letter-spacing: -0.02em;
+    font-weight: 800;
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
   }
   .login__ring {
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 1rem;
+    height: 1rem;
     border-radius: 50%;
     border: 3px solid var(--ember);
-    box-shadow: 0 0 0 4px var(--ember-soft);
   }
   .login__card h1 {
     margin: 0.25rem 0 1.25rem;

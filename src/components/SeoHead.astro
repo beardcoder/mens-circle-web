@@ -8,7 +8,6 @@ import { umamiOrigin } from '../lib/umami-config';
 interface Props {
   title?: string;
   description?: string;
-  keywords?: string;
   ogType?: string;
   /** Open Graph / social title. Falls back to `title` (then the site name). */
   ogTitle?: string;
@@ -33,13 +32,12 @@ interface Props {
 
 const {
   title,
-  description = 'Authentischer Austausch, Gemeinschaft und persönliches Wachstum für Männer in Niederbayern.',
-  keywords = 'Männerkreis, Niederbayern, Männergruppe, persönliches Wachstum, Gemeinschaft, Männer',
+  description = site.description,
   ogType = 'website',
   ogTitle,
   ogDescription,
   ogImage,
-  ogImageAlt = 'Männerkreis Niederbayern/ Straubing - Gemeinschaft für Männer',
+  ogImageAlt = 'Männerkreis Straubing – ein Abend, an dem du nichts darstellen musst',
   robots = 'index, follow',
   schemas = [],
   manifest = '/manifest.webmanifest',
@@ -57,7 +55,11 @@ const analyticsOrigin = umamiOrigin();
 const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
 const socialTitle = ogTitle ?? title ?? site.siteName;
 const socialDescription = ogDescription ?? description;
-const ogImageUrl = new URL(ogImage ?? '/images/logo-color.png', siteUrl).href;
+// The default social card is a real 1200x630 poster (public/images/og-default.png),
+// not the square logo. The og:image:width/height below are declared as 1200x630,
+// and the logo is 512x513 — every share was advertising dimensions the file did
+// not have, which is what downgrades a summary_large_image card to a small one.
+const ogImageUrl = new URL(ogImage ?? '/images/og-default.png', siteUrl).href;
 
 // Global structured data (mirrors the original LocalBusiness/Organization/WebSite).
 const sameAs = site.socialLinks.filter((l) => !['email', 'phone', 'whatsapp'].includes(l.type)).map((l) => l.value);
@@ -66,7 +68,7 @@ const localBusiness = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
   '@id': `${siteUrl.origin}/#organization`,
-  name: 'Männerkreis Niederbayern/ Straubing',
+  name: site.siteName,
   description: site.description,
   url: siteUrl.origin,
   logo: new URL('/images/logo-color.png', siteUrl).href,
@@ -116,7 +118,6 @@ const allSchemas = [localBusiness, website, ...schemas];
 <title>{fullTitle}</title>
 <meta name="title" content={fullTitle} />
 <meta name="description" content={description} />
-<meta name="keywords" content={keywords} />
 <meta name="author" content="Markus Sommer" />
 <link rel="canonical" href={canonical} />
 

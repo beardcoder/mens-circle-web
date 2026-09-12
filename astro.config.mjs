@@ -68,46 +68,36 @@ export default defineConfig({
   // Native Astro Fonts API: self-hosted, subset woff2 with inline @font-face and
   // auto-derived metric-matched fallbacks, so the swap shifts nothing. The <Font>
   // components in src/layouts/Layout.astro wire up the variables and preloads.
+  //
+  // One superfamily, two cuts. Barlow Condensed 800 is the poster voice — the
+  // hero, the statement, the step numerals — and Barlow sets everything that has
+  // to be read. Same skeleton, so the page holds together while the two sit at
+  // wildly different sizes; both OFL-1.1 and served from our own origin.
+  //
+  // The admin shares them. It used to carry two families of its own (Bricolage
+  // Grotesque and IBM Plex Mono) for a separate back-office identity; that
+  // identity is gone, and so are the two extra webfonts.
   fonts: [
     {
-      // Display / headings. The hero heading is the LCP, so this one is preloaded.
-      name: 'Playfair Display',
-      cssVariable: '--font-playfair',
+      // Display. Loaded in two weights only: 800 does the shouting, 600 the
+      // small condensed labels (kickers, meta, nav).
+      name: 'Barlow Condensed',
+      cssVariable: '--font-condensed',
       provider: fontProviders.fontsource(),
-      weights: ['400 900'], // variable range
-      styles: ['normal', 'italic'],
+      weights: ['600', '800'],
+      styles: ['normal'],
       subsets: ['latin'], // covers German äöüß
-      fallbacks: ['Georgia', 'serif'],
+      fallbacks: ['Oswald', 'Arial Narrow', 'system-ui', 'sans-serif'],
     },
     {
-      // Body / UI text.
-      name: 'DM Sans',
-      cssVariable: '--font-dm-sans',
+      // Running text, forms, buttons.
+      name: 'Barlow',
+      cssVariable: '--font-text',
       provider: fontProviders.fontsource(),
-      weights: ['100 1000'], // variable range
+      weights: ['400', '600'],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    {
-      // Admin display face — deliberately not the public site's serif.
-      name: 'Bricolage Grotesque',
-      cssVariable: '--font-bricolage',
-      provider: fontProviders.fontsource(),
-      weights: ['400 800'], // variable range
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    {
-      // Admin data face — dates, counts and IDs read as a logbook.
-      name: 'IBM Plex Mono',
-      cssVariable: '--font-plex-mono',
-      provider: fontProviders.fontsource(),
-      weights: ['400', '500', '600'],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['ui-monospace', 'monospace'],
+      fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
     },
   ],
   integrations: [

@@ -124,6 +124,30 @@ const tryEventDto = async (fetch: () => Promise<Event | null>, label: string): P
 
 export const fetchNextEvent = (): Promise<EventDTO | null> => tryEventDto(getNextEvent, 'fetchNextEvent');
 
+/**
+ * The scheduling state of the site, as three distinct cases.
+ *
+ * `fetchNextEvent` collapses "nothing scheduled" and "the read failed" into the
+ * same `null`, which is fine for a sitemap but not for a page that tells a
+ * visitor whether he can come. A failed read must not be presented as "kein
+ * Termin geplant" — that is a claim, and it would be a false one. Callers that
+ * put the answer in front of a reader use this instead.
+ */
+export type NextEventState =
+  { status: 'scheduled'; event: EventDTO } | { status: 'none'; event: null } | { status: 'unavailable'; event: null };
+
+export const fetchNextEventState = async (): Promise<NextEventState> => {
+  try {
+    const ev = await getNextEvent();
+
+    return ev ? { status: 'scheduled', event: await eventDto(ev) } : { status: 'none', event: null };
+  } catch (err) {
+    console.error('[events] fetchNextEventState failed', String(err));
+
+    return { status: 'unavailable', event: null };
+  }
+};
+
 export const getEventBySlug = (slug: string): Promise<EventDTO | null> =>
   tryEventDto(() => getPublishedEventBySlug(slug), 'getEventBySlug');
 

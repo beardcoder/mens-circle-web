@@ -13,36 +13,40 @@ interface Props {
     buttonLink?: string;
     image?: string;
     imageAlt?: string;
+    imageCaption?: string;
   };
 }
 
+/**
+ * The opening block of a sub-page (the Haltung page, the legal pages).
+ *
+ * Same shape as the home page's opening — text beside an optional photograph, on
+ * the page's own ground. It used to be a dark panel with a radial gradient, two
+ * ring ornaments, a drop-shadowed offset-framed image and a floating animation.
+ *
+ * `align: 'center'` is kept for the legal pages, which have a title and nothing
+ * else and would look stranded in a wide left-aligned column.
+ */
+
 const { data } = Astro.props;
-const align = data.align === 'left' ? 'left' : 'center';
+const align = data.align === 'center' ? 'center' : 'left';
 const hasImage = Boolean(data.image);
 const hasButton = Boolean(data.buttonText && data.buttonLink);
 const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
-// Prefer a build-optimised (responsive AVIF/WebP) asset; fall back to the raw
-// path for external URLs or images that aren't bundled.
 const imageAsset = resolveAssetImage(data.image);
-const imageAlt = data.imageAlt ?? '';
 ---
 
 <section class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`} id={data.anchor}>
-  <div class="page-hero__ornaments" aria-hidden="true">
-    <span class="page-hero__ornament page-hero__ornament--1"></span>
-    <span class="page-hero__ornament page-hero__ornament--2"></span>
-  </div>
-
   <div class="container">
     <div class="page-hero__layout">
       <div class="page-hero__content">
-        {data.eyebrow && <p class="eyebrow page-hero__eyebrow">{data.eyebrow}</p>}
+        {data.eyebrow && <p class="marker marker--ruled page-hero__eyebrow">{data.eyebrow}</p>}
         {data.title && <h1 class="page-hero__title" set:html={data.title} />}
         {data.lead && <p class="page-hero__lead">{data.lead}</p>}
 
         {
           hasButton && (
-            <div class="page-hero__cta">
+            <p class="page-hero__cta">
               <a
                 href={data.buttonLink}
                 class="btn btn--primary btn--large"
@@ -51,29 +55,36 @@ const imageAlt = data.imageAlt ?? '';
               >
                 {data.buttonText}
               </a>
-            </div>
+            </p>
           )
         }
       </div>
 
       {
         hasImage && (
-          <div class="page-hero__media">
+          <figure class="page-hero__media">
             {imageAsset ? (
               <Picture
                 src={imageAsset}
                 class="page-hero__image"
-                widths={[400, 600, 800, 1000]}
-                sizes="(max-width: 800px) 85vw, 40vw"
+                widths={[400, 600, 900]}
+                sizes="(max-width: 860px) 92vw, 380px"
                 formats={['avif', 'webp']}
                 loading="eager"
                 fetchpriority="high"
-                alt={imageAlt}
+                alt={data.imageAlt ?? ''}
               />
             ) : (
-              <img src={data.image} class="page-hero__image" loading="eager" fetchpriority="high" alt={imageAlt} />
+              <img
+                src={data.image}
+                class="page-hero__image"
+                loading="eager"
+                fetchpriority="high"
+                alt={data.imageAlt ?? ''}
+              />
             )}
-          </div>
+            {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
+          </figure>
         )
       }
     </div>
@@ -83,197 +94,89 @@ const imageAlt = data.imageAlt ?? '';
 <style is:global>
   @layer sections {
     .page-hero {
-      position: relative;
-      padding-block: clamp(var(--space-xl), 14vh, calc(var(--space-xl) * 1.5))
-        clamp(var(--space-lg), 8vh, var(--space-xl));
-      overflow: hidden;
-      color: var(--text-on-dark);
-      background:
-        radial-gradient(
-          ellipse 70% 60% at 75% 35%,
-          color-mix(in oklch, var(--accent-primary) 22%, transparent) 0%,
-          transparent 55%
-        ),
-        linear-gradient(135deg, var(--color-earth-deep) 0%, var(--color-earth-dark) 60%, var(--color-earth-mid) 100%);
-      isolation: isolate;
-    }
-
-    body:not(:has(.hero)) .page-hero {
-      margin-block-start: 0;
-    }
-
-    .page-hero__ornaments {
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .page-hero__ornament {
-      position: absolute;
-      border: 1px solid color-mix(in oklch, var(--accent-secondary) 25%, transparent);
-      border-radius: 50%;
-      opacity: 0.5;
-    }
-
-    .page-hero__ornament--1 {
-      inset-block-start: -10%;
-      inset-inline-end: -8%;
-      inline-size: clamp(220px, 28vw, 480px);
-      aspect-ratio: 1;
-    }
-
-    .page-hero__ornament--2 {
-      inset-block-end: -30%;
-      inset-inline-start: -6%;
-      inline-size: clamp(180px, 22vw, 360px);
-      aspect-ratio: 1;
-      opacity: 0.3;
+      padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
+      border-block-end: 2px solid var(--rule-strong);
     }
 
     .page-hero__layout {
       display: grid;
       gap: var(--space-lg);
-      align-items: center;
+      align-items: start;
+    }
+
+    /* Capped in both units — see the note in blocks/Hero.astro. */
+    .page-hero--with-image .page-hero__layout {
+      grid-template-columns: minmax(0, 1fr) minmax(0, min(22rem, 32%));
     }
 
     .page-hero--center .page-hero__layout {
       grid-template-columns: 1fr;
-      justify-items: center;
-      max-inline-size: 64ch;
-      margin-inline: auto;
-    }
-
-    .page-hero--center .page-hero__content {
-      text-align: center;
-    }
-
-    .page-hero--center.page-hero--with-image .page-hero__layout {
-      grid-template-rows: auto auto;
-    }
-
-    .page-hero--center.page-hero--with-image .page-hero__media {
-      order: -1;
-      max-inline-size: clamp(180px, 26vw, 280px);
-    }
-
-    .page-hero--left .page-hero__layout {
-      grid-template-columns: 1fr;
-    }
-
-    @media (width >= 800px) {
-      .page-hero--left.page-hero--with-image .page-hero__layout {
-        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-        gap: var(--space-xl);
-      }
-    }
-
-    .page-hero--left .page-hero__content {
-      text-align: start;
+      max-inline-size: var(--measure-wide);
     }
 
     .page-hero__content {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-md);
+      max-inline-size: 36rem;
     }
 
     .page-hero__eyebrow {
-      color: var(--accent-secondary);
+      margin-block-end: var(--space-sm);
+      color: var(--text-primary);
     }
 
     .page-hero__title {
-      margin: 0;
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 1.5rem + 3vw, 4rem);
-      font-weight: 400;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
+      margin-block-end: var(--space-sm);
+      font-size: var(--display-3);
+      line-height: 0.98;
+      letter-spacing: -0.015em;
+      text-wrap: balance;
     }
 
     .page-hero__lead {
-      max-inline-size: 56ch;
+      max-inline-size: var(--measure);
       margin: 0;
-      font-size: clamp(1rem, 0.95rem + 0.4vw, 1.25rem);
-      line-height: 1.55;
-      color: color-mix(in oklch, var(--text-on-dark) 90%, transparent);
-    }
-
-    .page-hero--center .page-hero__lead {
-      margin-inline: auto;
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
     }
 
     .page-hero__cta {
-      margin-block-start: var(--space-xs);
-      max-inline-size: 100%;
-    }
-
-    /* The hero label can be long ("Zum nächsten Männerkreis anmelden"). The base
-       .btn is `white-space: nowrap` + `overflow: hidden`, so on narrow screens it
-       would force the content column wider than the viewport and get clipped.
-       Let this hero CTA wrap and never exceed its column. */
-    .page-hero__cta .btn {
-      max-inline-size: 100%;
-      white-space: normal;
-      text-align: center;
+      margin-block-start: var(--space-md);
+      margin-block-end: 0;
     }
 
     .page-hero__media {
-      position: relative;
-      display: block;
-      inline-size: 100%;
-      isolation: isolate;
-    }
-
-    /* Offset accent frame — echoes the section's circle ornaments and the
-       Moderator portrait framing, tying the image into the warm palette
-       instead of floating as a plain card. */
-    .page-hero__media::after {
-      position: absolute;
-      inset-block: var(--space-sm) calc(var(--space-sm) * -1);
-      inset-inline: var(--space-sm) calc(var(--space-sm) * -1);
-      z-index: -1;
-      content: '';
-      border: 1px solid color-mix(in oklch, var(--accent-secondary) 55%, transparent);
-      border-radius: var(--radius-lg);
-    }
-
-    .page-hero__media picture {
-      display: block;
-      inline-size: 100%;
+      margin: 0;
     }
 
     .page-hero__image {
       display: block;
       inline-size: 100%;
-      block-size: auto;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 4 / 5;
       object-fit: cover;
-      /* A portrait source loses about half its height in this landscape frame,
-         and a centred crop takes the middle band — on a standing or seated
-         subject that is the torso, with the head cut off above the edge.
-         Biasing the crop upward keeps the face in frame and leaves a little
-         air above it. */
-      object-position: center 30%;
-      border-radius: var(--radius-lg);
-      /* Hairline warm edge + layered warm shadow so the portrait reads as part
-         of the earthy hero rather than a neutral drop-shadowed rectangle. */
-      border: 1px solid color-mix(in oklch, var(--color-sand) 22%, transparent);
-      box-shadow:
-        0 24px 50px -20px color-mix(in oklch, var(--color-ink) 55%, transparent),
-        0 8px 28px -14px color-mix(in oklch, var(--accent-primary) 32%, transparent);
+      /* A centred crop on this portrait takes the torso; bias it upward. */
+      object-position: center 28%;
+      border-radius: 0;
     }
 
-    /* Gentle drift, matching the Moderator portrait's living feel. */
-    @media (prefers-reduced-motion: no-preference) {
-      .page-hero__media {
-        animation: float 7s var(--ease-ambient) infinite;
+    @media (width <= 54em) {
+      .page-hero--with-image .page-hero__layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+      }
+
+      .page-hero__content {
+        max-inline-size: none;
+      }
+
+      .page-hero__image {
+        aspect-ratio: 3 / 2;
+        object-position: center 25%;
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      .page-hero__ornament {
-        transition: none;
+    @media (width <= 480px) {
+      .page-hero__cta .btn {
+        inline-size: 100%;
       }
     }
   }

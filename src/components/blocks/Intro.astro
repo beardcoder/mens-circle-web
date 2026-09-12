@@ -1,191 +1,151 @@
 ---
-interface Value {
-  number?: string;
-  title?: string;
-  description?: string;
-}
-
 interface Props {
   data: {
     anchor?: string;
     eyebrow?: string;
     title?: string;
     text?: string;
-    quote?: string;
-    values?: Value[];
+    questionsLabel?: string;
+    questions?: string[];
+    close?: string;
   };
 }
 
+/**
+ * "Der Kreis" — what an evening is about.
+ *
+ * A two-column spread: the heading holds the left, the prose the right. Every
+ * other section on the page puts a small marker in the left column, so this one
+ * is deliberately the odd one out — and an earlier pass that shifted the whole
+ * block right instead left a 520x430px hole where the heading now sits.
+ *
+ * The four questions then break out to full width at poster size: they are the
+ * thing to read if you read nothing else on the page, so they get the weight
+ * and the prose around them stays small.
+ */
+
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'ueber';
+const questions = data.questions ?? [];
 ---
 
-<section class="intro-section" id={anchor} aria-labelledby="intro-title">
-  <div class="intro__layout">
-    <div class="intro__left">
-      {
-        data.eyebrow && (
-          <p class="eyebrow" data-reveal="up">
-            {data.eyebrow}
-          </p>
-        )
-      }
-
-      {
-        data.title && (
-          <h2
-            class="section-title intro__title"
-            id="intro-title"
-            data-reveal="blur"
-            data-reveal-delay="80"
-            set:html={data.title}
-          />
-        )
-      }
-
-      {
-        data.text && (
-          <p class="intro__text" data-reveal="up" data-reveal-delay="180">
-            {data.text}
-          </p>
-        )
-      }
-
-      {
-        data.values && data.values.length > 0 && (
-          <ol class="intro__values" role="list" data-reveal-group="90">
-            {data.values.map((value) => (
-              <li class="value-item" data-reveal="up">
-                {value.number && (
-                  <span class="value-item__number" aria-hidden="true">
-                    {value.number}
-                  </span>
-                )}
-                {value.title && <h3 class="value-item__title">{value.title}</h3>}
-                {value.description && <p class="value-item__description">{value.description}</p>}
-              </li>
-            ))}
-          </ol>
-        )
-      }
-    </div>
-
-    <div class="intro__image-area">
-      <div class="intro__image-circles" aria-hidden="true">
-        <div class="intro__image-ring intro__image-ring--outer"></div>
-        <div class="intro__image-ring intro__image-ring--inner"></div>
+<section class="section home-circle" id={anchor} aria-labelledby="ueber-title">
+  <div class="container">
+    <div class="bay">
+      <div class="home-circle__head">
+        <p class="marker marker--ruled">{data.eyebrow}</p>
+        {
+          data.title && (
+            <h2 class="section-title" id="ueber-title">
+              {data.title}
+            </h2>
+          )
+        }
       </div>
-      {/* The quote is drawn into the circle — a slow zoom instead of a rise. */}
-      {
-        data.quote && (
-          <p
-            class="intro__image-text"
-            data-reveal="zoom"
-            data-reveal-delay="120"
-            data-reveal-duration="1100"
-            set:html={data.quote}
-          />
-        )
-      }
+
+      {data.text && <div class="home-circle__text prose" set:html={data.text} />}
     </div>
+
+    {
+      questions.length > 0 && (
+        <div class="home-circle__questions">
+          <p class="marker home-circle__questions-label">{data.questionsLabel}</p>
+
+          <ul class="home-circle__list" role="list">
+            {questions.map((question) => (
+              <li class="home-circle__question">{question}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    {
+      data.close && (
+        <div class="bay">
+          <p class="home-circle__close">{data.close}</p>
+        </div>
+      )
+    }
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    .intro-section {
-      position: relative;
-      overflow: clip;
-      background: var(--bg-primary);
+    /* 5 / 7: the heading takes the narrower column and wraps to three or four
+       short lines, which is what gives the spread its edge. */
+    .home-circle__head {
+      grid-column: 1 / span 5;
     }
 
-    .intro__layout {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: var(--space-xl);
-      min-block-size: 100vh;
+    .home-circle__text {
+      grid-column: 7 / span 6;
+      max-inline-size: var(--measure);
     }
 
-    @media (width <= 1000px) {
-      .intro__layout {
-        grid-template-columns: 1fr;
-        min-block-size: auto;
+    .home-circle__text p {
+      font-size: var(--text-section-body);
+    }
+
+    @media (width <= 56em) {
+      .home-circle__head,
+      .home-circle__text {
+        grid-column: 1 / -1;
+      }
+
+      .home-circle__text {
+        margin-block-start: var(--space-sm);
       }
     }
 
-    .intro__left {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: var(--space-xl) var(--space-lg);
-      padding-inline-end: var(--space-xl);
+    .home-circle__questions {
+      margin-block: var(--space-xl) var(--space-lg);
     }
 
-    @media (width <= 1000px) {
-      .intro__left {
-        order: 2;
-        padding: var(--space-xl) var(--space-md);
-      }
+    /* `max-inline-size: none` overrides the global paragraph measure: this
+       marker carries the rule that the question list hangs from, and a rule
+       that stops at 72ch mid-page reads as a mistake rather than a margin. */
+    .home-circle__questions-label {
+      max-inline-size: none;
+      padding-block-end: var(--space-xs);
+      margin-block-end: 0;
+      border-block-end: 3px solid var(--rule-strong);
     }
 
-    .intro__title {
-      max-inline-size: var(--content-max-wide);
+    .home-circle__list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
     }
 
-    .intro__text {
-      max-inline-size: var(--content-max-text);
-      margin-block-end: var(--rhythm-block);
+    /* Poster-scale questions on hairlines. Condensed, sentence case rather than
+       uppercase — these are questions being asked, not a slogan being shouted. */
+    .home-circle__question {
+      padding-block: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 0.9rem + 2.6vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text-primary);
+      border-block-end: 1px solid var(--border-medium);
+      text-wrap: balance;
+    }
+
+    /* Lands under the prose column, mirroring the spread at the top of the
+       section. Without an explicit placement it would auto-place into column 1
+       of the twelve and squeeze to a twelfth of the width. */
+    .home-circle__close {
+      grid-column: 7 / span 6;
+      max-inline-size: var(--measure);
+      margin-block-start: var(--space-sm);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
-    .intro__image-area {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-section-alt);
-    }
-
-    @media (width <= 1000px) {
-      .intro__image-area {
-        order: 1;
-        min-block-size: 50vh;
-      }
-    }
-
-    .intro__image-text {
-      position: relative;
-      z-index: 1;
-      max-inline-size: 500px;
-      margin-block-end: 0;
-      font-family: var(--font-display);
-      font-size: var(--text-2xl);
-      font-style: italic;
-      line-height: 1.3;
-      color: var(--text-on-dark);
-      text-align: center;
-    }
-
-    .intro__values {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    /* Scroll-driven parallax: the rings drift as the panel passes. The quote
-       is left out — its transform belongs to the data-reveal entrance. */
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .intro__image-area {
-          view-timeline: --intro-panel block;
-        }
-
-        .intro__image-circles {
-          animation: intro-rings-drift linear both;
-          animation-timeline: --intro-panel;
-        }
+    @media (width <= 56em) {
+      .home-circle__close {
+        grid-column: 1 / -1;
       }
     }
   }

@@ -1,10 +1,18 @@
 /**
- * Typography System
- * Modern fluid typography with CSS clamp()
+ * Typography.
+ *
+ * Two registers that deliberately do not meet in the middle.
+ *
+ *   POSTER  Barlow Condensed 800, uppercase, leading 0.85. `.display`, the step
+ *           numerals, the statement. Reaches 180px. Always short.
+ *   READING Barlow 400/600 at 17–18px, and section headings in the 30–60px
+ *           band. Sentence case, normal leading, real measure.
+ *
+ * The gap between the two is the design. Nothing sits at 80px.
  */
 
 /* ============================================
-   Heading Styles
+   Headings — the reading register
    ============================================ */
 h1,
 h2,
@@ -13,19 +21,18 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.05em;
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
 }
 
 h1 {
-  font-size: var(--text-5xl);
-  line-height: 0.88;
+  font-size: var(--text-6xl);
 }
 
 h2 {
   font-size: var(--text-4xl);
-  line-height: 0.93;
 }
 
 h3 {
@@ -42,14 +49,78 @@ h5 {
 
 h6 {
   font-size: var(--text-base);
+  font-family: var(--font-body);
   font-weight: 600;
+  letter-spacing: 0;
 }
 
 /* ============================================
-   Body Text
+   The poster register
+   ------------------------------------------------------------------
+   `.display` is a modifier, not an element: it is applied to whichever
+   heading level is semantically right, so an h1 and an h2 can both shout
+   without either lying about the document outline.
+   ============================================ */
+.display {
+  font-family: var(--font-display);
+  font-size: var(--display-2);
+  font-weight: 800;
+  line-height: var(--leading-display);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+  /* At 0.85 leading the line box is shorter than the glyphs, so the first line's
+     ink overflows upward — and German display type overflows further than most,
+     because the umlaut sits above the cap height. The padding reserves exactly
+     that overshoot in em, so it scales with the type instead of needing a
+     per-breakpoint fix, and the Ä never collides with the kicker above it.
+     (`text-box: trim-both cap` would do the opposite: it trims *to* the cap and
+     crops the dots.) */
+  padding-block-start: 0.14em;
+}
+
+.display--xl {
+  font-size: var(--display-1);
+}
+
+.display--sm {
+  font-size: var(--display-3);
+}
+
+/* A line of the poster register. Block-level so each line is its own row and
+   can be staggered independently by the entrance. */
+.display__line {
+  display: block;
+}
+
+/* The one place the orange is allowed to colour type on a light ground: it
+   never does. On paper an emphasised display word is underscored in orange
+   instead, which carries at poster size and owes no contrast ratio. */
+.display__mark {
+  position: relative;
+  display: inline-block;
+}
+
+.display__mark::after {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0.06em;
+  block-size: 0.1em;
+  content: '';
+  background: var(--color-orange);
+}
+
+/* The descender half-leading is real space below the last line; pull it back so
+   the block sits tight against whatever follows. */
+.display {
+  margin-block-end: -0.06em;
+}
+
+/* ============================================
+   Body text
    ============================================ */
 p {
-  margin-block-end: 1.5em;
+  margin-block-end: 1.25em;
 }
 
 p:last-child {
@@ -57,24 +128,31 @@ p:last-child {
 }
 
 /* ============================================
-   Font Style Modifiers
+   Font style modifiers
+   ------------------------------------------------------------------
+   `.text-italic` marks an emphasised phrase inside a heading. It is an
+   emphasis, not a colour swatch: the accent hue stays reserved for state.
    ============================================ */
 .text-italic {
-  margin-inline: -0.05em 0.08em;
   font-style: italic;
 }
 
+/* Inside running prose the italic stays an italic — it is emphasis, not a
+   poster device. */
+.prose .text-italic,
+p .text-italic {
+  box-shadow: none;
+}
+
 /* ============================================
-   Section Header
-   Shared wrapper for the eyebrow + title + intro block at the top of
-   every section. Sets text-block width and the gap to the section body
-   so each section breathes the same way.
+   Section header — the eyebrow + title + intro group at the top of a
+   section. Left-aligned by default: this is an editorial page, not a
+   deck of centred slides.
    ============================================ */
 .section-header {
-  max-inline-size: var(--container-prose);
+  max-inline-size: var(--measure-wide);
   margin-block-end: var(--rhythm-block);
-  margin-inline: auto;
-  text-align: center;
+  text-align: start;
 }
 
 .section-header--start {
@@ -87,76 +165,77 @@ p:last-child {
 }
 
 /* ============================================
-   Eyebrow / Label Style
-   Reusable component for section labels
+   The marker — small condensed uppercase. Kickers, rail labels, meta,
+   navigation. The counterweight to the poster register: the same
+   condensed face at the smallest size on the page.
    ============================================ */
+.marker,
 .eyebrow {
-  --eyebrow-line: color-mix(in oklch, currentcolor 72%, transparent);
-
-  position: relative;
-  display: inline-flex;
-  gap: 0.75rem;
-  align-items: center;
-  margin-block-end: var(--rhythm-stack);
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-accent);
+  display: block;
+  margin-block-end: var(--space-xs);
+  font-family: var(--font-display);
+  font-size: var(--text-marker);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-muted);
   text-align: inherit;
   text-transform: uppercase;
-  letter-spacing: 0.32em;
+  letter-spacing: var(--tracking-marker);
 }
 
-.eyebrow::before {
-  inline-size: clamp(2.5rem, 5vw, 5rem);
-  block-size: 1.5px;
+/* A marker that carries the orange as a leading rule rather than as colour. */
+.marker--ruled {
+  display: flex;
+  gap: 0.6em;
+  align-items: center;
+}
+
+.marker--ruled::before {
+  flex: none;
+  inline-size: 1.75rem;
+  block-size: 3px;
   content: '';
-  background: linear-gradient(90deg, transparent, var(--eyebrow-line) 24%, var(--eyebrow-line));
-  transform: scaleX(1);
-  transform-origin: right;
+  background: var(--color-orange);
 }
 
 .eyebrow--secondary {
-  --eyebrow-line: color-mix(in oklch, var(--accent-secondary) 72%, transparent);
-
-  color: var(--accent-secondary);
+  color: var(--color-chalk-muted);
 }
 
 /* ============================================
-   Section Title Pattern
-   Large display titles with italic accent. The tight `--rhythm-stack`
-   end-margin pairs the title with its intro paragraph; the gap to the
-   section body is owned by `.section-header`.
+   Section title — the reading register's top end.
    ============================================ */
 .section-title {
+  max-inline-size: 18ch;
   margin-block-end: var(--rhythm-stack);
-  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
-  line-height: 1.05;
+  font-size: var(--text-4xl);
+  line-height: 1.04;
+  text-wrap: balance;
 }
 
 .section-title--lg {
-  font-size: clamp(2.75rem, 7vw, 6rem);
-  line-height: 1;
+  font-size: var(--text-5xl);
 }
 
+/* `.text-italic` survives from the old content files. Barlow's italic at
+   display weight is a poor emphasis; underscore it in orange instead, which
+   is the same device the poster register uses. */
 .section-title .text-italic,
 .section-title .highlight {
-  margin-inline: -0.05em 0.08em;
-  font-style: italic;
-  /* `--accent-text`, not `--accent-primary`: in dark mode every surface is a
-     dark one, and the fill tone only reached 2.8:1 there. */
-  color: var(--accent-text);
+  position: relative;
+  font-style: normal;
+  color: inherit;
+  box-shadow: inset 0 -0.12em 0 var(--color-orange);
 }
 
-.section-title--light .text-italic,
-.section-title--light .highlight {
-  color: var(--accent-secondary);
+.section-title--light {
+  color: var(--text-on-dark);
 }
 
-/* Intro paragraph sitting under a .section-title — drops the trailing
-   1.5em from the typography reset so the header's own block margin
-   owns the rhythm to the body. */
+/* Intro paragraph under a `.section-title`. */
 .section-header > p:last-child,
 .section-intro {
+  max-inline-size: var(--measure);
   margin-block-end: 0;
   font-size: var(--text-section-body-lg);
   line-height: var(--leading-relaxed);
@@ -170,35 +249,64 @@ p:last-child {
 
 /* ============================================
    Links
+   ------------------------------------------------------------------
+   The underline is the designed part: a 2px orange rule under ink text,
+   which passes contrast (the text is ink) while the orange still reads.
+   On hover the rule thickens rather than the colour changing.
    ============================================ */
 .link {
-  color: var(--accent-text);
+  color: var(--text-primary);
   text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color var(--motion-quick);
+  text-decoration-color: var(--color-orange);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+  transition: text-decoration-thickness var(--motion-quick);
 }
 
-.link:hover {
-  color: var(--text-accent);
+.link:hover,
+.link:focus-visible {
+  text-decoration-thickness: 4px;
+}
+
+/* A quiet, self-contained text link used next to a primary action. Padded to
+   clear the 44px target without looking like a second button. */
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  font-family: var(--font-display);
+  font-size: var(--text-marker);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-marker);
+  text-decoration: underline;
+  text-decoration-color: var(--color-orange);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.35em;
+  transition: text-decoration-thickness var(--motion-quick);
+}
+
+.text-link:hover,
+.text-link:focus-visible {
+  text-decoration-thickness: 4px;
 }
 
 /* ============================================
-   Prose — long-form rich text from the CMS/JSON
-   ------------------------------------------------------------------
-   The global reset zeroes every margin and the heading defaults are
-   tuned for display use, so raw editorial HTML (legal pages, text
-   sections) needs its own rhythm: heading spacing, list indents,
-   readable links, simple tables.
+   Prose — long-form rich text from the JSON content files
    ============================================ */
+.prose {
+  max-inline-size: var(--measure);
+}
+
 .prose h2 {
-  margin-block: var(--space-xl) var(--space-sm);
-  font-size: 1.5rem;
-  letter-spacing: -0.02em;
+  margin-block: var(--space-lg) var(--space-xs);
+  font-size: var(--text-2xl);
 }
 
 .prose h3 {
-  margin-block: var(--space-lg) var(--space-xs);
-  font-size: 1.125rem;
+  margin-block: var(--space-md) var(--space-3xs);
+  font-size: var(--text-lg);
 }
 
 .prose h2:first-child,
@@ -210,7 +318,7 @@ p:last-child {
 .prose ul,
 .prose ol {
   margin-block-end: var(--space-sm);
-  font-size: 1rem;
+  font-size: var(--text-section-body);
   line-height: var(--leading-relaxed);
   color: var(--text-secondary);
 }
@@ -221,24 +329,35 @@ p:last-child {
 }
 
 .prose li {
-  margin-block-end: 0.5rem;
+  margin-block-end: 0.4rem;
 }
 
 .prose a {
-  color: var(--accent-text);
+  color: var(--text-primary);
   text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color var(--motion-quick);
+  text-decoration-color: var(--color-orange);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+  transition: text-decoration-thickness var(--motion-quick);
 }
 
 .prose a:hover,
 .prose a:focus-visible {
-  color: var(--text-accent);
+  text-decoration-thickness: 4px;
 }
 
 .prose strong {
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.prose blockquote {
+  padding-inline-start: var(--space-sm);
+  margin-block: var(--space-md);
+  font-size: var(--text-lg);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  border-inline-start: 3px solid var(--color-orange);
 }
 
 .prose table {
@@ -249,7 +368,8 @@ p:last-child {
 
 .prose th,
 .prose td {
-  padding: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--text-caption);
   text-align: start;
   border-block-end: 1px solid var(--border-light);
 }
@@ -257,4 +377,77 @@ p:last-child {
 .prose th {
   font-weight: 600;
   color: var(--text-primary);
+}
+
+/* ============================================
+   Shared editorial primitives
+   ------------------------------------------------------------------
+   Used across sections so the page has one vocabulary rather than a new
+   invention per block.
+   ============================================ */
+
+/* A hairline-separated definition list. The ground rules and the event meta
+   use it — same rules, different content. (The home page's practical facts
+   are a poster band of their own; see blocks/Facts.astro.) */
+.deflist {
+  margin: 0;
+  border-block-start: 1px solid var(--border-light);
+}
+
+.deflist__row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 11rem) minmax(0, 1fr);
+  gap: var(--space-2xs) var(--space-md);
+  padding-block: var(--space-sm);
+  border-block-end: 1px solid var(--border-light);
+}
+
+.deflist__term {
+  font-size: var(--text-caption);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.deflist__desc {
+  max-inline-size: var(--measure);
+  margin: 0;
+  font-size: var(--text-section-body);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  text-wrap: pretty;
+}
+
+.deflist__note {
+  display: block;
+  margin-block-start: var(--space-3xs);
+  font-size: var(--text-caption);
+  line-height: var(--leading-normal);
+  color: var(--text-muted);
+}
+
+@media (width <= 560px) {
+  .deflist__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A short marginal heading sitting beside a text column. */
+.rail-heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-marker);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-marker);
+}
+
+/* Image caption. Factual, never a headline. */
+.caption {
+  margin-block-start: var(--space-xs);
+  font-size: var(--text-caption);
+  line-height: var(--leading-normal);
+  color: var(--text-muted);
+  text-wrap: pretty;
 }

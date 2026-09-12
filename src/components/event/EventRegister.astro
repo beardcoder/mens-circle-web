@@ -7,257 +7,95 @@ interface Props {
   event: EventDTO;
 }
 
+/**
+ * Registration for one evening — three states: open, waiting list, past.
+ *
+ * The heading now names the state plainly ("Anmeldung", "Warteliste",
+ * "Dieser Abend hat stattgefunden") instead of selling it ("Sichere dir deinen
+ * Platz"), and the seat count is a sentence rather than a 2rem numeral. The
+ * form itself sits on the page's own ground: it used to be a 100svh dark split
+ * with two breathing rings behind the heading.
+ *
+ * The island, its endpoint and its validation are untouched.
+ */
+
 const { event } = Astro.props;
 const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
+
+const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full ? 'Warteliste' : 'Anmeldung';
 ---
 
-<section class="event-register-section" id="anmeldung">
-  <div class="event-register__layout">
-    <div class="event-register__content" data-reveal-group="100">
-      <div class="event-register__circles" aria-hidden="true">
-        <div class="event-register__circle event-register__circle--1"></div>
-        <div class="event-register__circle event-register__circle--2"></div>
-      </div>
-      {
-        event.is_past ? (
-          <>
-            <p class="eyebrow eyebrow--secondary" data-reveal="up">
-              Rückblick
-            </p>
-            <h2 class="section-title section-title--lg section-title--light event-register__title" data-reveal="blur">
-              Dieses Treffen <br />
-              <span class="text-italic">hat stattgefunden</span>
-            </h2>
-            <p class="event-register__spots" data-reveal="up">
-              <span>
-                Am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time>
-              </span>
-            </p>
-          </>
-        ) : event.is_full ? (
-          <>
-            <p class="eyebrow eyebrow--secondary" data-reveal="up">
-              Warteliste
-            </p>
-            <h2 class="section-title section-title--lg section-title--light event-register__title" data-reveal="blur">
-              Trag dich auf die <br />
-              <span class="text-italic">Warteliste ein</span>
-            </h2>
-            <p class="event-register__spots" data-reveal="up">
-              <span class="event-register__spots-full">Ausgebucht</span>
-            </p>
-            <p class="event-register__spots-hint" data-reveal="up">
-              Bei Absagen rückt die Warteliste automatisch nach. Du wirst sofort per E-Mail informiert.
-            </p>
-          </>
-        ) : (
-          <>
-            <p class="eyebrow eyebrow--secondary" data-reveal="up">
-              Sei dabei
-            </p>
-            <h2 class="section-title section-title--lg section-title--light event-register__title" data-reveal="blur">
-              Sichere dir <br />
-              <span class="text-italic">deinen Platz</span>
-            </h2>
-            <p class="event-register__spots" data-reveal="up">
-              <span class="event-register__spots-available">{event.available_spots}</span>
-              <span>von {event.max_participants} Plätzen frei</span>
-            </p>
-          </>
-        )
-      }
-    </div>
+<section class="section section--ruled event-register-section" id="anmeldung" aria-labelledby="anmeldung-title">
+  <div class="container">
+    <div class="spine">
+      <p class="rail-heading">{event.is_past ? 'Rückblick' : 'Teilnehmen'}</p>
 
-    <div class="event-register__form-wrap">
-      {
-        event.is_past ? (
-          <div class="event-register__past-info" data-reveal="up">
-            <p class="event-register__past-text">
-              Dieses Treffen liegt in der Vergangenheit. Eine Anmeldung ist nicht mehr möglich.
+      <div class="spine__body">
+        <h2 class="event-register__title" id="anmeldung-title">{heading}</h2>
+
+        {
+          event.is_past ? (
+            <p class="event-register__text">
+              Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine
+              Anmeldung ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich
+              benachrichtigen, sobald der nächste Termin feststeht.
             </p>
-            <p class="event-register__past-text">
-              Möchtest du beim nächsten Männerkreis dabei sein? Dann trag dich in unseren Newsletter ein, um über
-              kommende Termine informiert zu werden.
+          ) : event.is_full ? (
+            <p class="event-register__text">
+              Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch
+              nach und bekommst sofort eine E-Mail.
             </p>
-            <a href="/#newsletter" class="btn btn--primary btn--large">
-              Zum Newsletter anmelden
-            </a>
-          </div>
-        ) : (
-          <RegistrationForm client:visible event={event} />
-        )
-      }
+          ) : (
+            <p class="event-register__text">
+              Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen
+              Vor- und Nachname und eine E-Mail-Adresse; den genauen Treffpunkt bekommst du mit der Bestätigung.
+            </p>
+          )
+        }
+
+        <div class="event-register__form-wrap">
+          {
+            event.is_past ? (
+              <a href="/#termine" class="btn btn--primary">
+                Bei neuen Terminen benachrichtigen
+              </a>
+            ) : (
+              <RegistrationForm client:visible event={event} />
+            )
+          }
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    .event-register-section {
-      --_surface-noise-opacity: 0.03;
-
-      position: relative;
-      background: var(--bg-dark);
-      overflow: hidden;
-      color: var(--text-on-dark);
-    }
-
-    .event-register__layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-block-size: 100svh;
-    }
-
-    @media (width <= 900px) {
-      .event-register__layout {
-        grid-template-columns: 1fr;
-        min-block-size: auto;
-      }
-    }
-
-    .event-register__content {
-      display: flex;
-      position: relative;
-      flex-direction: column;
-      justify-content: center;
-      padding: var(--space-xl) var(--space-lg);
-      overflow: hidden;
-    }
-
-    @media (width <= 900px) {
-      .event-register__content {
-        padding: var(--space-xl) var(--space-md);
-        text-align: center;
-      }
-    }
-
-    .event-register__circles {
-      opacity: 0.15;
-    }
-
-    .event-register__circle--1 {
-      animation: breathe 20s var(--ease-ambient) infinite;
-      inset-block-start: -60%;
-      inset-inline-start: -30%;
-      inline-size: 120%;
-      block-size: 120%;
-    }
-
-    .event-register__circle--2 {
-      animation: breathe-slow 26s var(--ease-ambient) infinite -7s;
-      inset-block-end: -40%;
-      inset-inline-end: -20%;
-      inline-size: 80%;
-      block-size: 80%;
-    }
-
-    .event-register__eyebrow {
-      position: relative;
-      z-index: 1;
-    }
-
     .event-register__title {
-      position: relative;
-      z-index: 1;
-      margin-block-end: var(--space-lg);
-      color: var(--text-on-dark);
+      margin-block-end: var(--space-xs);
+      font-size: var(--text-3xl);
+      line-height: 1.15;
     }
 
-    .event-register__spots {
-      display: flex;
-      position: relative;
-      align-items: baseline;
-      gap: var(--space-xs);
-      z-index: 1;
-      color: var(--color-sand);
-      font-size: var(--text-lg);
-    }
-
-    @media (width <= 900px) {
-      .event-register__spots {
-        justify-content: center;
-      }
-    }
-
-    .event-register__spots-available {
-      color: var(--accent-secondary);
-      font-weight: 700;
-      font-size: var(--text-2xl);
-      line-height: 1;
-      font-family: var(--font-display);
-    }
-
-    .event-register__spots-full {
-      color: var(--accent-primary);
-      font-weight: 700;
-      font-size: var(--text-xl);
-      font-family: var(--font-display);
-    }
-
-    .event-register__spots-hint {
-      position: relative;
-      z-index: 1;
-      margin-block-start: var(--space-sm);
-      max-inline-size: 32ch;
-      color: color-mix(in oklch, var(--color-sand) 75%, transparent);
-      font-size: var(--text-body-compact);
-      line-height: 1.5;
+    .event-register__text {
+      max-inline-size: var(--measure);
+      margin-block-end: var(--space-md);
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
     }
 
     .event-register__form-wrap {
-      display: flex;
-      position: relative;
-      justify-content: center;
-      align-items: center;
-      border-inline-start: 1px solid var(--border-on-dark);
-      background: color-mix(in oklch, var(--bg-primary) 5%, transparent);
-      padding: var(--space-xl) var(--space-lg);
-    }
-
-    @media (width <= 900px) {
-      .event-register__form-wrap {
-        border-inline-start: none;
-        border-block-start: 1px solid var(--border-on-dark);
-        padding: var(--space-xl) var(--space-md);
-      }
+      max-inline-size: var(--content-max-form);
     }
 
     .event-register__form {
       inline-size: 100%;
-      max-inline-size: var(--content-max-form);
     }
 
     .event-register__submit {
-      margin-block-start: var(--space-md);
+      margin-block-start: var(--space-sm);
       inline-size: 100%;
-    }
-
-    .event-register__submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .event-register__past-info {
-      inline-size: 100%;
-      max-inline-size: var(--content-max-form);
-      text-align: center;
-    }
-
-    .event-register__past-text {
-      margin-block-end: var(--space-md);
-      color: var(--text-secondary);
-      font-size: var(--text-lg);
-      line-height: 1.6;
-    }
-
-    .event-register__past-text:last-of-type {
-      margin-block-end: var(--space-lg);
-    }
-
-    @media (width <= 900px) {
-      .event-register__past-info {
-        text-align: start;
-      }
     }
   }
 </style>

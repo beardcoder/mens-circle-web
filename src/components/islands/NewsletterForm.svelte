@@ -83,23 +83,32 @@
       <input type="text" name="website" tabindex="-1" autocomplete="off" bind:value={website} />
     </label>
   </div>
-  <input
-    type="email"
-    name="email"
-    placeholder="Deine E-Mail-Adresse"
-    required
-    class="newsletter__input"
-    aria-label="E-Mail-Adresse"
-    autocomplete="email"
-    inputmode="email"
-    aria-invalid={error ? 'true' : undefined}
-    aria-describedby={describedBy(formId, 'email', !!error)}
-    bind:value={email}
-    oninput={() => (error = '')}
-    disabled={submitting}
-  />
+
+  <!-- A real, visible <label>, not an aria-label over a placeholder: the
+       placeholder disappears the moment you type, and a screen-reader-only name
+       leaves sighted users with nothing to click. `formId` keeps the id unique
+       when a page renders this island twice. -->
+  <div class="newsletter__field">
+    <label class="form-label" for={`${formId}-email`}>E-Mail-Adresse</label>
+    <input
+      id={`${formId}-email`}
+      type="email"
+      name="email"
+      placeholder="name@beispiel.de"
+      required
+      class="newsletter__input"
+      autocomplete="email"
+      inputmode="email"
+      aria-invalid={error ? 'true' : undefined}
+      aria-describedby={describedBy(formId, 'email', !!error)}
+      bind:value={email}
+      oninput={() => (error = '')}
+      disabled={submitting}
+    />
+  </div>
+
   <button type="submit" class="btn btn--primary" disabled={submitting}>
-    {submitting ? 'Wird gesendet...' : 'Anmelden'}
+    {submitting ? 'Wird gesendet …' : 'Anmelden'}
   </button>
 </form>
 {#if error}

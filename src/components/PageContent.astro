@@ -1,17 +1,22 @@
 ---
-import Archetypes from './blocks/Archetypes.astro';
+import type { NextEventSummary } from '@lib/event-landing';
+import type { DateStatus } from '@lib/event-status';
+import type { Testimonial } from '@lib/types';
 import Cta from './blocks/Cta.astro';
+import Dates from './blocks/Dates.astro';
+import Facts from './blocks/Facts.astro';
 import Faq from './blocks/Faq.astro';
+import Frame from './blocks/Frame.astro';
 import Hero from './blocks/Hero.astro';
 import Intro from './blocks/Intro.astro';
 import JourneySteps from './blocks/JourneySteps.astro';
 import Moderator from './blocks/Moderator.astro';
 import Newsletter from './blocks/Newsletter.astro';
+import Statement from './blocks/Statement.astro';
 import PageHero from './blocks/PageHero.astro';
 import Testimonials from './blocks/Testimonials.astro';
 import TextSection from './blocks/TextSection.astro';
 import ValueItems from './blocks/ValueItems.astro';
-import WhatsappCommunity from './blocks/WhatsappCommunity.astro';
 
 export interface Block {
   type: string;
@@ -21,9 +26,22 @@ export interface Block {
 
 interface Props {
   blocks: Block[];
+  /**
+   * Live data the page resolved once, handed to whichever blocks need it. The
+   * scheduling state in particular has to be the *same* object everywhere on a
+   * page: the hero's action and the closing block's action must never disagree
+   * about whether a date exists.
+   */
+  state?: DateStatus;
+  next?: NextEventSummary | null;
+  testimonials?: Testimonial[];
 }
 
-const { blocks } = Astro.props;
+const { blocks, state, next = null, testimonials = [] } = Astro.props;
+
+/** Blocks that read live data are skipped when a page renders without it. */
+const emptyState: DateStatus = { status: 'none', next: null, isFull: false };
+const resolvedState = state ?? emptyState;
 ---
 
 {
@@ -31,31 +49,31 @@ const { blocks } = Astro.props;
     const data = block.data ?? {};
     switch (block.type) {
       case 'hero':
-        return <Hero data={data} />;
+        return <Hero data={data} state={resolvedState} />;
+      case 'facts':
+        return <Facts data={data} next={next} />;
       case 'intro':
         return <Intro data={data} />;
       case 'moderator':
         return <Moderator data={data} />;
       case 'journey-steps':
         return <JourneySteps data={data} />;
+      case 'statement':
+        return <Statement data={data} />;
+      case 'frame':
+        return <Frame data={data} />;
       case 'faq':
         return <Faq data={data} />;
       case 'newsletter':
         return <Newsletter data={data} />;
+      case 'dates':
+        return <Dates data={data} state={resolvedState} />;
       case 'cta':
         return <Cta data={data} />;
       case 'value-items':
         return <ValueItems data={data} />;
-      case 'archetypes':
-        return <Archetypes data={data} />;
       case 'testimonials':
-        // Server island: the host page is prerendered (static), but published
-        // testimonials are read from the database per request, so newly
-        // moderated ones appear without a rebuild. Renders nothing until it
-        // resolves.
-        return <Testimonials data={data} server:defer />;
-      case 'whatsapp-community':
-        return <WhatsappCommunity data={data} />;
+        return <Testimonials data={data} testimonials={testimonials} />;
       case 'page-hero':
         return <PageHero data={data} />;
       case 'text-section':

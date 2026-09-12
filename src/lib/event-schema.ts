@@ -82,7 +82,7 @@ export function buildEventSchema(event: EventDTO, siteUrl: URL): Record<string, 
     url,
     organizer: {
       '@type': 'Organization',
-      name: 'Männerkreis Niederbayern/ Straubing',
+      name: site.siteName,
       url: siteUrl.origin,
     },
     // Treffen laufen auf Spendenbasis — als kostenfreies Angebot ausgezeichnet.

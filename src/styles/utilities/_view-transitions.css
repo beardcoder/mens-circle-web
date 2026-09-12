@@ -16,7 +16,7 @@
 :root {
   /* Both halves of the cross-fade must share one duration — see the blend-mode
      note below — so they read it from here. */
-  --vt-duration: 420ms;
+  --vt-duration: 260ms;
 }
 
 ::view-transition-group(root) {
@@ -43,18 +43,10 @@
   animation-name: vt-fade-in;
 }
 
-/* The header deliberately has no `view-transition-name`. It used to, but its
-   appearance comes from scroll position (`header-color-morph` on a scroll
-   timeline), so the snapshot was captured in the *outgoing* page's scroll state
-   and animated on its own shorter clock — parking the old opaque bar over the
-   new dark hero before snapping. In the root snapshot it cross-fades in
-   lock-step with the ground behind it. */
+/* The header deliberately has no `view-transition-name`: a separate snapshot
+   would park the old page's bar over the new page for the length of the
+   transition. In the root snapshot it cross-fades in lock-step with the ground
+   behind it. */
 
-/* A theme swap uses the same API but wants a plain cross-fade — `plus-lighter`
-   flashes when two very different grounds overlap. lib/theme.ts sets
-   `data-theme-transition` while a toggle is in flight. */
-html[data-theme-transition]::view-transition-old(root),
-html[data-theme-transition]::view-transition-new(root) {
-  mix-blend-mode: normal;
-  animation-duration: 300ms;
-}
+/* The light/dark toggle repaints instantly (lib/theme.ts) — no transition to
+   tune here any more. */
