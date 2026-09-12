@@ -62,10 +62,17 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 .85`) and Barlow for everything readable (17–60px). The gap between them _is_
   the hierarchy — nothing sits at 80px. The small condensed uppercase `.marker`
   is the counterweight: same face, smallest size on the page.
-- **Colour: `#F3F3EE` paper / `#171C19` ink / `#FF643D` orange.** The measured
-  ratios decide where each may go: orange on paper is 2.6:1, so it is **fill and
-  stroke only, never text**; white on orange is 2.9:1, so buttons are
-  **ink-on-orange** (5.9:1); orange text is legible only on the ink ground.
+- **Colour: `#F2EDE3` oat paper / `#1C1714` bark ink / `#DD5F33` burnt orange.**
+  Every hue sits on the warm side of neutral — that, and not the layout, is what
+  separates this from a tech-product palette, so the greys are ochre-cast, never
+  blue-cast. The measured ratios decide where each colour may go: orange on
+  paper is 3.1:1, so it is **fill, stroke and large text only** (the step
+  numerals), never small text; white on orange is 3.6:1 and fails for normal
+  text, so buttons are **ink-on-orange** (4.9:1); orange text is legible on the
+  ink ground (4.9:1).
+- **Three grounds, not two.** `.section--sand` (`--bg-secondary`) is the calm
+  middle between the paper and the ink bands — the Markus block and the
+  testimonials sit on it. Like every ground it must flip with the mode.
 - **Anything on the page ground must flip with the mode.** Use `--text-primary`,
   `--text-muted`, `--rule-strong`, `--bg-*`. The literal `--color-ink` /
   `--color-paper` are correct _only_ where the ground itself does not flip: the

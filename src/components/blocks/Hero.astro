@@ -191,16 +191,18 @@ const lines = data.displayLines ?? [];
 
     /* The one line on the page that states the scheduling state: plain text,
        not a badge. A failed read is marked so it cannot be mistaken for a calm
-       "nothing scheduled". */
+       "nothing scheduled".
+
+       Set as a sentence rather than a tracked-out label: it carries a date a
+       reader has to parse, and uppercase makes that slower, not more designed. */
     .home-hero__status {
       margin-block-end: var(--space-sm);
-      font-family: var(--font-display);
-      font-size: 1.0625rem;
+      max-inline-size: 46ch;
+      font-family: var(--font-body);
+      font-size: var(--text-section-body);
       font-weight: 600;
-      line-height: 1.3;
+      line-height: var(--leading-normal);
       color: var(--text-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
     }
 
     /* A failed read is marked, not tinted: orange text at this size measures
