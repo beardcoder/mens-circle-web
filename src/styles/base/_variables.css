@@ -1,18 +1,24 @@
 /**
  * Design tokens.
  *
- * Three colours and two cuts of one typeface. The site is a poster: a bright
- * off-white ground, a near-black that owns whole sections, and a signal orange
- * that is a graphic element — the ring, a full-bleed field, the primary button —
- * rather than a tint on a link.
+ * Three colours and two cuts of one typeface. The site is a poster made of
+ * earth pigments: a warm oat ground, a bark black that owns whole sections, and
+ * a burnt orange that is a graphic element — the ring, a full-bleed field, the
+ * primary button — rather than a tint on a link.
+ *
+ * Every hue sits on the warm side of neutral. That is the whole difference
+ * between this and a tech-product palette, and it is why the greys are ochre-
+ * cast rather than blue-cast.
  *
  * The contrast rules that follow from the palette, measured, not guessed:
- *   ink on paper          15.7:1
- *   paper on ink          15.7:1
- *   orange on ink          5.9:1   → orange TEXT only ever sits on the dark
- *   ink on orange          5.9:1   → the orange field always carries ink text
- *   orange on paper        2.6:1   → never text. Fill and stroke only.
- *   white on orange        2.9:1   → never. This is why buttons are ink-on-orange.
+ *   ink on paper          15.2:1
+ *   paper on ink          15.2:1
+ *   orange on ink          4.9:1   → orange TEXT is legible on the dark
+ *   ink on orange          4.9:1   → the orange field always carries ink text
+ *   orange on paper        3.1:1   → LARGE text only (the step numerals), never
+ *                                    small text. Otherwise fill and stroke.
+ *   white on orange        3.6:1   → fails for normal text. This is why every
+ *                                    button on the orange is ink, not white.
  *
  * Light/dark runs through native `light-dark()`, resolved off `color-scheme`.
  * The dark side swaps ground and ink; the orange is identical in both.
@@ -27,32 +33,38 @@
      Palette primitives
      ============================================ */
 
-  /* Paper — the bright ground. */
-  --color-paper: #f3f3ee;
-  --color-paper-sunk: #e7e7e0; /* a half-step down, for set-apart passages */
-  --color-paper-raised: #f9f9f6; /* a half-step up, for inputs and panels */
+  /* Paper — the ground. Warm oat rather than a cool off-white: every hue on
+     this page sits on the warm side of neutral, which is what keeps the poster
+     from reading as a tech product. */
+  --color-paper: #f2ede3;
+  --color-paper-sunk: #e8e0d2; /* a half-step down, for set-apart passages */
+  --color-paper-raised: #f8f4ec; /* a half-step up, for inputs and panels */
 
-  /* Ink — the near-black. Owns whole sections, not just glyphs. */
-  --color-ink: #171c19;
-  --color-ink-soft: #2c332e; /* one step up, for large dark fields */
-  --color-ink-mid: #444d47; /* running text on paper — 9.4:1 */
-  --color-ink-muted: #5c6460; /* captions, labels — 5.5:1 on paper */
+  /* Ink — a warm bark black, not a blue-black. Owns whole sections, not just
+     glyphs. 15.2:1 on paper. */
+  --color-ink: #1c1714;
+  --color-ink-soft: #241e19; /* one step up, for large dark fields */
+  --color-ink-mid: #4a4139; /* running text on paper — 8.5:1 */
+  --color-ink-muted: #645a50; /* captions, labels — 5.8:1 on paper */
 
-  /* Signal orange. A graphic colour: the ring, the statement field, the button.
-     Never small text on paper — see the contrast table above. */
-  --color-orange: #ff643d;
-  --color-orange-deep: #e54b25; /* pressed / hover on light grounds */
+  /* Burnt orange — red earth pigment, not a neon signal. Still loud enough to
+     carry a full-bleed field and a 180px ring; warm enough to belong to the
+     rest of the palette. A graphic colour first: the ring, the statement field,
+     the button. Never *small* text on paper — see the contrast table above. */
+  --color-orange: #dd5f33;
+  --color-orange-deep: #b9491f; /* pressed / hover on light grounds */
 
-  /* Hairlines */
-  --color-rule: #d3d3cb;
-  --color-rule-strong: #b4b4aa;
+  /* Hairlines — warm, so they read as a crease in the paper rather than a
+     grey UI divider. */
+  --color-rule: #d8cfbe;
+  --color-rule-strong: #bfb29c;
 
   /* On the dark ground */
   --color-night: var(--color-ink);
-  --color-night-soft: #1f2521;
-  --color-night-rule: #333b36;
-  --color-chalk: #f3f3ee;
-  --color-chalk-muted: #9aa39e; /* 6.7:1 on ink */
+  --color-night-soft: #241e19;
+  --color-night-rule: #3d342c;
+  --color-chalk: #f2ede3;
+  --color-chalk-muted: #a39786; /* 6.2:1 on ink */
 
   /* ------------------------------------------------------------------
      The immersive dark surface.
@@ -69,8 +81,8 @@
   --color-sand-light: var(--color-chalk);
   --color-earth-deep: var(--color-night);
   --color-earth-dark: var(--color-night-soft);
-  --color-earth-mid: #2e3631;
-  --color-earth-warm: #444d47;
+  --color-earth-mid: var(--color-night-rule);
+  --color-earth-warm: #4f443a;
   --color-terracotta: var(--color-orange);
   --color-terracotta-light: var(--color-orange);
   --color-terracotta-deep: var(--color-orange-deep);
@@ -98,7 +110,7 @@
 
   /* Text */
   --text-primary: light-dark(var(--color-ink), var(--color-chalk));
-  --text-secondary: light-dark(var(--color-ink-mid), #c3c9c5);
+  --text-secondary: light-dark(var(--color-ink-mid), #cdc3b4); /* 10.2:1 on night */
   --text-muted: light-dark(var(--color-ink-muted), var(--color-chalk-muted));
   --text-on-dark: var(--color-chalk);
   --text-on-dark-secondary: var(--color-chalk-muted);
@@ -137,9 +149,9 @@
      the footer and the breathing exercise. */
   --rule-strong: light-dark(var(--color-ink), var(--color-chalk));
   --border-light: light-dark(var(--color-rule), var(--color-night-rule));
-  --border-medium: light-dark(var(--color-rule-strong), #4a4f47);
-  --border-dark: light-dark(var(--color-ink-muted), #5c625a);
-  --border-on-dark: rgb(243 243 238 / 18%);
+  --border-medium: light-dark(var(--color-rule-strong), #453a31);
+  --border-dark: light-dark(var(--color-ink-muted), #5a5048);
+  --border-on-dark: rgb(242 237 227 / 18%);
   /* The focus ring is the orange at full strength — it has to win over a dark
      field, an orange field and the paper alike, so it is a solid ring plus a
      contrasting outline rather than a soft tint. */
