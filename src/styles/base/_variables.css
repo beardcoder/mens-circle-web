@@ -1,253 +1,310 @@
 /**
- * CSS Custom Properties (Variables)
- * Design tokens — OKLCH primitives, semantic tokens, type/space/motion scales.
+ * Design tokens.
+ *
+ * Three colours and two cuts of one typeface. The site is a poster made of
+ * earth pigments: a warm oat ground, a bark black that owns whole sections, and
+ * a burnt orange that is a graphic element — the ring, a full-bleed field, the
+ * primary button — rather than a tint on a link.
+ *
+ * Every hue sits on the warm side of neutral. That is the whole difference
+ * between this and a tech-product palette, and it is why the greys are ochre-
+ * cast rather than blue-cast.
+ *
+ * The contrast rules that follow from the palette, measured, not guessed:
+ *   ink on paper          15.2:1
+ *   paper on ink          15.2:1
+ *   orange on ink          4.9:1   → orange TEXT is legible on the dark
+ *   ink on orange          4.9:1   → the orange field always carries ink text
+ *   orange on paper        3.1:1   → LARGE text only (the step numerals), never
+ *                                    small text. Otherwise fill and stroke.
+ *   white on orange        3.6:1   → fails for normal text. This is why every
+ *                                    button on the orange is ink, not white.
+ *
+ * Light/dark runs through native `light-dark()`, resolved off `color-scheme`.
+ * The dark side swaps ground and ink; the orange is identical in both.
  */
 
 :root {
-  /* Theme system — two axes, persisted in localStorage and applied before first
-     paint by the layout's inline script:
-
-       • `data-theme`  "warm" (default) | "cool"
-       • `data-mode`   unset (follow OS) | "light" | "dark"
-
-     The palette only redefines the raw OKLCH primitives below; every semantic
-     token derives from those, so one swap cascades everywhere. Light/dark runs
-     through native `light-dark()`, resolved off `color-scheme`. */
+  /* Mode — `data-mode` absent follows the OS, "light"/"dark" pins it. Applied
+     before first paint by the inline boot script in Layout.astro. */
   color-scheme: light dark;
 
   /* ============================================
-     Color Palette - Using OKLCH for 2025
-     OKLCH provides perceptually uniform colors
+     Palette primitives
      ============================================ */
 
-  /* Base Earth Tones */
-  --color-earth-deep: oklch(18% 0.026 68deg);
-  --color-earth-dark: oklch(24% 0.033 68deg);
-  --color-earth-mid: oklch(35% 0.04 68deg);
-  --color-earth-warm: oklch(46% 0.05 68deg);
+  /* Paper — the ground. Warm oat rather than a cool off-white: every hue on
+     this page sits on the warm side of neutral, which is what keeps the poster
+     from reading as a tech product. */
+  --color-paper: #f2ede3;
+  --color-paper-sunk: #e8e0d2; /* a half-step down, for set-apart passages */
+  --color-paper-raised: #f8f4ec; /* a half-step up, for inputs and panels */
 
-  /* Terracotta accents — three lightnesses, because no single one clears WCAG AA
-     in all three jobs:
-       • ...-deep   body-size accent text on a light ground (4.7:1)
-       • base       button/badge fill under a parchment label (4.7:1), and
-                    display-size accent text, which only owes 3:1
-       • ...-light  accent text on the dark earth surfaces (4.8:1) */
-  --color-terracotta-deep: oklch(49% 0.16 44deg);
-  --color-terracotta: oklch(54% 0.16 44deg);
-  --color-terracotta-light: oklch(75% 0.14 45deg);
+  /* Ink — a warm bark black, not a blue-black. Owns whole sections, not just
+     glyphs. 15.2:1 on paper. */
+  --color-ink: #1c1714;
+  --color-ink-soft: #241e19; /* one step up, for large dark fields */
+  --color-ink-mid: #4a4139; /* running text on paper — 8.5:1 */
+  --color-ink-muted: #645a50; /* captions, labels — 5.8:1 on paper */
 
-  /* Neutral Sand Tones */
-  --color-sand: oklch(76% 0.04 75deg);
-  --color-sand-light: oklch(89% 0.02 75deg);
+  /* Burnt orange — red earth pigment, not a neon signal. Still loud enough to
+     carry a full-bleed field and a 180px ring; warm enough to belong to the
+     rest of the palette. A graphic colour first: the ring, the statement field,
+     the button. Never *small* text on paper — see the contrast table above. */
+  --color-orange: #dd5f33;
+  --color-orange-deep: #b9491f; /* pressed / hover on light grounds */
 
-  /* Light Backgrounds */
-  --color-parchment: oklch(95% 0.01 75deg);
-  --color-bone: oklch(98% 0.005 75deg);
+  /* Hairlines — warm, so they read as a crease in the paper rather than a
+     grey UI divider. */
+  --color-rule: #d8cfbe;
+  --color-rule-strong: #bfb29c;
 
-  /* Dark Text */
-  --color-ink: oklch(13% 0.01 68deg);
-  --color-ink-soft: oklch(24% 0.02 68deg);
+  /* On the dark ground */
+  --color-night: var(--color-ink);
+  --color-night-soft: #241e19;
+  --color-night-rule: #3d342c;
+  --color-chalk: #f2ede3;
+  --color-chalk-muted: #a39786; /* 6.2:1 on ink */
 
-  /* Additional Colors for Contrast */
-  --color-sage: oklch(45% 0.08 145deg);
-  --color-sage-light: oklch(55% 0.06 145deg);
+  /* ------------------------------------------------------------------
+     The immersive dark surface.
+
+     The breathing exercise is a dim room by design rather than by decoration,
+     and the map skin follows it. Both were built against the old
+     earth/terracotta primitives, so those names are kept — re-pitched onto this
+     palette — instead of rewriting several hundred lines of layout CSS that has
+     nothing to do with colour. Nothing else on the site may use them.
+     ------------------------------------------------------------------ */
+  --color-bone: var(--color-paper);
+  --color-parchment: var(--color-paper);
+  --color-sand: var(--color-chalk-muted);
+  --color-sand-light: var(--color-chalk);
+  --color-earth-deep: var(--color-night);
+  --color-earth-dark: var(--color-night-soft);
+  --color-earth-mid: var(--color-night-rule);
+  --color-earth-warm: #4f443a;
+  --color-terracotta: var(--color-orange);
+  --color-terracotta-light: var(--color-orange);
+  --color-terracotta-deep: var(--color-orange-deep);
+  --color-sage: #2f6b4a;
+  --color-sage-light: #7fc09a;
 
   /* ============================================
-     Semantic Color Tokens - Light Theme
+     Semantic tokens
      ============================================ */
 
-  /* Backgrounds — light/dark resolved via light-dark() */
-  --bg-primary: light-dark(var(--color-bone), var(--color-ink));
-  --bg-secondary: light-dark(var(--color-parchment), var(--color-earth-deep));
-  --bg-tertiary: light-dark(var(--color-sand-light), var(--color-earth-dark));
-  --bg-dark: var(--color-earth-deep);
-  --bg-dark-alt: var(--color-earth-dark);
-  --bg-elevated: light-dark(var(--color-parchment), var(--color-earth-deep));
-  --bg-section-alt: light-dark(var(--color-earth-mid), var(--color-earth-deep));
-  --bg-input: light-dark(
-    color-mix(in oklch, var(--color-bone) 8%, transparent),
-    color-mix(in oklch, var(--color-earth-dark) 80%, transparent)
-  );
-  --bg-input-focus: light-dark(
-    color-mix(in oklch, var(--color-bone) 12%, transparent),
-    color-mix(in oklch, var(--color-earth-mid) 90%, transparent)
-  );
-  --bg-overlay: light-dark(
-    color-mix(in oklch, var(--color-ink) 70%, transparent),
-    color-mix(in oklch, var(--color-ink) 85%, transparent)
-  );
-  --surface-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  --surface-noise-opacity: 0.035;
-  --surface-glow-strength: 16%;
+  /* Surfaces */
+  --bg-primary: light-dark(var(--color-paper), var(--color-night));
+  --bg-secondary: light-dark(var(--color-paper-sunk), var(--color-night-soft));
+  --bg-tertiary: light-dark(var(--color-paper-sunk), var(--color-night-soft));
+  --bg-elevated: light-dark(var(--color-paper-raised), var(--color-night-soft));
+  --bg-dark: light-dark(var(--color-night), #151714);
+  --bg-dark-alt: light-dark(var(--color-night-soft), var(--color-night));
+  --bg-section-alt: light-dark(var(--color-night), #151714);
+  --bg-light: light-dark(var(--color-paper-sunk), var(--color-night-soft));
+  --bg-overlay: light-dark(rgb(38 40 36 / 55%), rgb(10 11 10 / 70%));
 
-  /* Text — light/dark resolved via light-dark() */
-  --text-primary: light-dark(var(--color-ink), var(--color-parchment));
-  --text-secondary: light-dark(var(--color-ink-soft), oklch(80% 0.02 75deg));
-  /* 52%, not 55%: at 55% this measured 4.19:1 on the forms' parchment ground. */
-  --text-muted: light-dark(oklch(52% 0.02 68deg), oklch(65% 0.02 75deg));
-  --text-on-dark: var(--color-parchment);
-  --text-on-dark-secondary: light-dark(var(--color-sand), var(--color-sand-light));
-  --text-accent: light-dark(var(--color-earth-warm), var(--color-terracotta-light));
-  --text-dark: light-dark(var(--color-ink), var(--color-parchment));
-  --text-light: light-dark(var(--color-parchment), var(--color-ink));
+  /* Form controls sit on the page ground, not on a dark panel. */
+  --bg-input: light-dark(var(--color-paper-raised), var(--color-night-soft));
+  --bg-input-focus: light-dark(#fff, #2e332d);
 
-  /* Surface tone that flips with mode (parchment in light, earth in dark) */
-  --bg-light: light-dark(var(--color-parchment), var(--color-earth-dark));
+  /* Text */
+  --text-primary: light-dark(var(--color-ink), var(--color-chalk));
+  --text-secondary: light-dark(var(--color-ink-mid), #cdc3b4); /* 10.2:1 on night */
+  --text-muted: light-dark(var(--color-ink-muted), var(--color-chalk-muted));
+  --text-on-dark: var(--color-chalk);
+  --text-on-dark-secondary: var(--color-chalk-muted);
+  --text-dark: light-dark(var(--color-ink), var(--color-chalk));
+  --text-light: light-dark(var(--color-paper), var(--color-ink));
 
-  /* `--accent-primary` fills and carries display-size accent text;
-     `--accent-secondary` is the tone for dark surfaces; `--accent-text` is for
-     body-size accent copy and follows the mode. */
-  --accent-primary: var(--color-terracotta);
-  --accent-secondary: var(--color-terracotta-light);
-  --accent-text: light-dark(var(--color-terracotta-deep), var(--color-terracotta-light));
+  /* Accents.
+       --accent-primary   the orange itself: fills, strokes, the ring
+       --accent-on-fill   what sits ON the orange — always ink, never white
+       --accent-text      accent-coloured *text*; only legible on the dark, so on
+                          paper it resolves to ink and the emphasis is carried by
+                          weight and an orange underline instead
+       --accent-secondary the orange on a dark ground (5.9:1 — safe as text) */
+  --accent-primary: var(--color-orange);
+  --accent-on-fill: var(--color-ink);
+  --accent-text: light-dark(var(--color-ink), var(--color-orange));
+  --accent-secondary: var(--color-orange);
+  --accent-rare: var(--color-orange);
+  --text-accent: light-dark(var(--color-ink), var(--color-orange));
 
-  /* Status Colors */
-  --color-success: oklch(58% 0.15 145deg);
-  --color-error: oklch(55% 0.18 25deg);
-  --color-info: oklch(60% 0.12 240deg);
-  --color-warning: oklch(68% 0.16 75deg);
+  /* Status */
+  --color-success: light-dark(#2f6b4a, #7fc09a);
+  --color-error: light-dark(#9c3a2c, #e0907f);
+  --color-info: light-dark(#2f5570, #93b6d0);
+  --color-warning: light-dark(#8a6218, #d9b45f);
 
-  /* Borders — light/dark resolved via light-dark() */
-  --border-light: light-dark(var(--color-sand-light), color-mix(in oklch, var(--color-earth-mid) 40%, transparent));
-  --border-medium: light-dark(
-    color-mix(in oklch, var(--color-sand) 30%, transparent),
-    color-mix(in oklch, var(--color-earth-mid) 50%, transparent)
-  );
-  --border-dark: light-dark(var(--color-earth-mid), var(--color-earth-warm));
-  --border-on-dark: light-dark(
-    color-mix(in oklch, var(--color-sand) 15%, transparent),
-    color-mix(in oklch, var(--color-sand) 30%, transparent)
-  );
-  --focus-ring: 0 0 0 3px color-mix(in oklch, var(--accent-primary) 22%, transparent);
+  /* Borders.
+     `--rule-strong` is the 2-3px structural rule the poster layout is built
+     from — the bar under the header, the line above each step, the edge of the
+     hero's action block. It MUST flip with the mode: a literal `--color-ink`
+     rule is invisible on the dark ground. The same goes for any focus outline
+     that sits on the page ground.
+
+     The literal `--color-ink` / `--color-paper` stay correct only where the
+     ground itself does not flip: the orange statement field, the ink bands,
+     the footer and the breathing exercise. */
+  --rule-strong: light-dark(var(--color-ink), var(--color-chalk));
+  --border-light: light-dark(var(--color-rule), var(--color-night-rule));
+  --border-medium: light-dark(var(--color-rule-strong), #453a31);
+  --border-dark: light-dark(var(--color-ink-muted), #5a5048);
+  --border-on-dark: rgb(242 237 227 / 18%);
+  /* The focus ring is the orange at full strength — it has to win over a dark
+     field, an orange field and the paper alike, so it is a solid ring plus a
+     contrasting outline rather than a soft tint. */
+  --focus-ring: 0 0 0 3px var(--color-orange);
 
   /* ============================================
-     Typography Scale
+     Typography
      ============================================ */
-  /* --font-playfair / --font-dm-sans are defined by the Astro <Font>
-     components (astro.config.mjs `fonts`) and already expand to the full
-     stack: the webfont, an auto-generated metric-matched fallback face, then
-     the configured generic fallbacks. */
-  --font-display: var(--font-playfair);
-  --font-body: var(--font-dm-sans);
-  --font-accent: var(--font-playfair);
+  /* --font-condensed / --font-text are defined by the Astro <Font> components
+     (astro.config.mjs `fonts`) and already expand to the full stack: the
+     webfont, an auto-generated metric-matched fallback face, then the
+     configured generic fallbacks. */
+  --font-display: var(--font-condensed);
+  --font-body: var(--font-text);
+  --font-accent: var(--font-condensed);
 
-  /* Fluid Type Scale using clamp() */
-  --text-xs: clamp(0.625rem, 0.5rem + 0.25vw, 0.75rem);
-  --text-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --text-lg: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
-  --text-xl: clamp(1.25rem, 1rem + 1vw, 2rem);
-  --text-2xl: clamp(1.5rem, 1rem + 2vw, 3rem);
-  --text-3xl: clamp(2rem, 1rem + 3vw, 4rem);
-  --text-4xl: clamp(2.5rem, 1rem + 5vw, 6rem);
-  --text-5xl: clamp(3rem, 1rem + 7vw, 8rem);
-  --text-6xl: clamp(4rem, 1rem + 10vw, 12rem);
-  --text-massive: clamp(5rem, 2rem + 15vw, 18rem);
+  /* Type scale, in two registers that do not overlap.
+     
+     READING SIZES stay where they were — 17–18px body, section titles in the
+     30–48px band. They are set in Barlow.
+     
+     POSTER SIZES start where the reading sizes stop and go far past them:
+     `--display-1` reaches 180px on a wide screen, which is 10× the body. That
+     gap is the point. They are set in Barlow Condensed 800 and are always
+     short — a name, a claim, a numeral — never a paragraph. */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-base: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
+  --text-lg: clamp(1.1875rem, 1.12rem + 0.3vw, 1.375rem);
+  --text-xl: clamp(1.375rem, 1.25rem + 0.55vw, 1.75rem);
+  --text-2xl: clamp(1.625rem, 1.4rem + 1vw, 2.25rem);
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.7vw, 3rem);
+  --text-4xl: clamp(2.25rem, 1.7rem + 2.4vw, 3.75rem);
+  --text-5xl: clamp(2.5rem, 1.7rem + 3.6vw, 4.75rem);
+  --text-6xl: clamp(3rem, 1.9rem + 5vw, 6rem);
 
-  /* Section body text - consistent sizes for content blocks */
-  --text-section-body: 1.0625rem;
-  --text-section-body-lg: 1.125rem;
+  /* Poster register. Condensed 800, uppercase, leading below 1. */
+  --display-1: clamp(3.75rem, 1.2rem + 12.4vw, 11.25rem); /* 60px → 180px */
+  --display-2: clamp(3rem, 1.4rem + 7.4vw, 7rem); /* 48px → 112px */
+  --display-3: clamp(2.25rem, 1.4rem + 4vw, 4rem); /* 36px → 64px */
+  --display-numeral: clamp(3.5rem, 1.6rem + 8vw, 9rem);
 
-  /* Compact sizes — fill the gap between --text-sm and --text-base */
-  --text-body-compact: 0.9375rem; /* author names, compact list items */
-  --text-caption: 0.8125rem; /* captions, meta labels, roles */
+  --leading-display: 0.85;
+  --tracking-display: -0.015em;
 
-  /* Line height scale */
-  --leading-tight: 1.5;
-  --leading-normal: 1.7;
-  --leading-relaxed: 1.8;
+  /* Running text */
+  --text-section-body: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
+  --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.35vw, 1.375rem);
+  --text-body-compact: 1rem;
+  --text-caption: 0.875rem;
 
-  /* Content max widths — 4-tier scale in 60px increments */
-  --content-max-form: 480px; /* form wrappers, compact layout areas */
-  --content-max-text: 540px; /* paragraph / intro body copy */
-  --content-max-description: 600px; /* section descriptions, error/hero text */
-  --content-max-wide: 700px; /* section titles, wide prose blocks */
+  /* The small condensed marker: kickers, rail labels, meta, nav. Uppercase,
+     tracked out, and the only place uppercase is used outside the poster
+     register. */
+  --text-marker: 0.8125rem;
+  --tracking-marker: 0.14em;
+
+  /* Line heights */
+  --leading-tight: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.7;
+
+  /* Measures. The brief's 60–68 characters per line, expressed where it counts:
+     `--measure` is the default for running text, the rest are the exceptions. */
+  --measure: 64ch;
+  --measure-narrow: 54ch;
+  --measure-wide: 72ch;
+  --content-max-form: 30rem;
+  --content-max-text: 64ch;
+  --content-max-description: 64ch;
+  --content-max-wide: 68ch;
 
   /* Form controls */
-  --control-padding-block: var(--space-sm);
-  --control-padding-inline: 1.125rem;
-  --control-radius: var(--radius-md);
+  --control-padding-block: 0.7rem;
+  --control-padding-inline: 0.875rem;
+  --control-radius: 0;
   --control-border-width: 1px;
   --control-border-color: var(--border-medium);
   --control-bg: var(--bg-input);
   --control-bg-hover: var(--bg-input-focus);
   --control-bg-light: var(--bg-primary);
-  --control-color: var(--text-on-dark);
-  --control-placeholder: color-mix(in oklch, var(--color-sand) 60%, transparent);
+  --control-color: var(--text-primary);
+  --control-placeholder: var(--text-muted);
 
   /* ============================================
-     Spacing Scale - Fluid with clamp()
-     Small values stay fixed, large values scale
+     Spacing
      ============================================ */
   --space-3xs: 0.25rem;
   --space-2xs: 0.375rem;
   --space-xs: 0.5rem;
   --space-sm: 1rem;
-  --space-md: clamp(1.5rem, 1rem + 1.5vw, 2rem);
-  --space-lg: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
-  --space-xl: clamp(4.5rem, 2rem + 6vw, 9rem);
-  --space-2xl: clamp(7rem, 3rem + 8vw, 14rem);
-  --space-3xl: clamp(9rem, 4rem + 10vw, 18rem);
+  --space-md: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  --space-lg: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  --space-xl: clamp(3rem, 2.2rem + 3vw, 5rem);
+  --space-2xl: clamp(4rem, 3rem + 4vw, 6.5rem);
+  --space-3xl: clamp(5rem, 3.5rem + 5vw, 8rem);
 
-  /* Vertical rhythm — one source of truth, so every section feels the same
-     regardless of which file styles it. */
-  --rhythm-section: var(--space-xl); /* default section block padding */
-  --rhythm-section-lg: var(--space-2xl); /* prominent section padding */
-  --rhythm-block: var(--space-lg); /* header → body of a section */
-  --rhythm-stack: var(--space-sm); /* eyebrow → title → intro inside a header */
-  --rhythm-cluster: var(--space-xs); /* tight inline groups */
+  /* Vertical rhythm — one source of truth for section spacing. Sections are
+     separated by a hairline as well as by space, so the space itself does not
+     have to do all the work: this is deliberately tighter than the old scale,
+     which left half a screen of nothing between passages. */
+  --rhythm-section: clamp(2.5rem, 1.9rem + 2.2vw, 4rem);
+  --rhythm-section-lg: clamp(3.5rem, 2.6rem + 3vw, 5.5rem);
+  --rhythm-block: var(--space-lg);
+  --rhythm-stack: var(--space-sm);
+  --rhythm-cluster: var(--space-xs);
 
-  /* Motion — "settled weight". Semantic easings, no spring, no bounce. */
-  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1); /* Content arriving: page-load entrance, overlays */
+  /* ============================================
+     Motion — short and functional only.
+     ============================================ */
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-release: cubic-bezier(0.2, 0, 0, 1);
+  --ease-ambient: cubic-bezier(0.43, 0.13, 0.23, 0.96);
+  --ease-emphasised: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-reveal: cubic-bezier(0.33, 0, 0.2, 1);
 
-  --ease-precise: cubic-bezier(0.4, 0, 0.2, 1); /* Interactive: hover, press, toggles */
-
-  --ease-release: cubic-bezier(0.2, 0, 0, 1); /* Content leaving: collapse, dismiss */
-
-  --ease-ambient: cubic-bezier(0.43, 0.13, 0.23, 0.96); /* Ambient motion: breathing circles only */
-
-  --ease-emphasised: cubic-bezier(0.16, 1, 0.3, 1); /* Signature hero entrance: long, deep, confident */
-
-  --ease-reveal: cubic-bezier(
-    0.33,
-    0,
-    0.2,
-    1
-  ); /* Scroll reveals: soft start so motion reads across its full duration,
-        not the front-loaded snap of --ease-emphasised */
-
-  /* Duration scale */
   --duration-instant: 90ms;
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
-  --duration-slow: 500ms;
-  --duration-slower: 700ms;
-  --duration-cinematic: 1100ms;
+  --duration-fast: 140ms;
+  --duration-normal: 220ms;
+  --duration-slow: 340ms;
+  --duration-slower: 460ms;
+  --duration-cinematic: 600ms;
 
-  /* Composite shorthands */
   --motion-quick: var(--duration-fast) var(--ease-precise);
   --motion-standard: var(--duration-normal) var(--ease-precise);
   --motion-enter: var(--duration-slow) var(--ease-settle);
   --motion-slow: var(--duration-slower) var(--ease-settle);
   --motion-cinematic: var(--duration-cinematic) var(--ease-emphasised);
 
-  /* ─── Stagger scale — used for hero entrance + mobile nav cascade ─── */
-  --stagger-1: 80ms;
-  --stagger-2: 160ms;
-  --stagger-3: 280ms;
-  --stagger-4: 420ms;
-  --stagger-5: 560ms;
+  --stagger-1: 40ms;
+  --stagger-2: 80ms;
+  --stagger-3: 120ms;
+  --stagger-4: 160ms;
+  --stagger-5: 200ms;
 
   /* ============================================
      Layout
      ============================================ */
-  --container-width: 1400px;
-  --container-narrow: 900px;
-  --container-wide: 1800px;
-  --container-prose: 760px; /* centered text blocks (section headers, intros) */
+  /* A wide poster measure. Sections place content into a 12-column grid rather
+     than all sharing one centred column, so the left edge genuinely moves from
+     section to section. Graphics may break out of it; reading text may not. */
+  --container-width: 1320px;
+  --container-narrow: 780px;
+  --container-wide: 1320px;
+  --container-prose: 680px;
+  --container-gutter: clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem);
+  --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
 
-  /* Fixed header height + breathing room — used for sticky/offset calculations */
-  --header-clearance: 140px;
+  /* The fixed header's actual height (measured: 77px), plus a little air.
+     Used for `scroll-padding-top`, anchored scrolling and the top of the mobile
+     nav panel — if it drifts from the real height, anchors land under the bar. */
+  --header-clearance: 84px;
 
   /* Safe area insets for mobile */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
@@ -256,46 +313,32 @@
   --safe-area-inset-right: env(safe-area-inset-right, 0px);
 
   /* ============================================
-     Shadows & Effects
-     Layered shadows for perceptual depth
+     Shadows — only where something genuinely floats above the page
+     (the mobile nav panel, a toast, a dialog). Surfaces use rules instead.
      ============================================ */
-  /* Shadow colours flip with mode — deeper casts in the dark. */
-  --shadow-sm: 0 1px 2px
-    light-dark(color-mix(in oklch, var(--color-ink) 5%, transparent), color-mix(in oklch, black 24%, transparent));
-  --shadow-md:
-    0 2px 4px
-      light-dark(color-mix(in oklch, var(--color-ink) 4%, transparent), color-mix(in oklch, black 20%, transparent)),
-    0 6px 12px -2px
-      light-dark(color-mix(in oklch, var(--color-ink) 8%, transparent), color-mix(in oklch, black 30%, transparent));
-  --shadow-lg:
-    0 2px 6px
-      light-dark(color-mix(in oklch, var(--color-ink) 5%, transparent), color-mix(in oklch, black 25%, transparent)),
-    0 12px 24px -6px
-      light-dark(color-mix(in oklch, var(--color-ink) 10%, transparent), color-mix(in oklch, black 35%, transparent));
-  --shadow-xl:
-    0 4px 8px
-      light-dark(color-mix(in oklch, var(--color-ink) 5%, transparent), color-mix(in oklch, black 25%, transparent)),
-    0 20px 40px -10px
-      light-dark(color-mix(in oklch, var(--color-ink) 12%, transparent), color-mix(in oklch, black 40%, transparent));
-  --shadow-2xl:
-    0 6px 12px
-      light-dark(color-mix(in oklch, var(--color-ink) 6%, transparent), color-mix(in oklch, black 30%, transparent)),
-    0 28px 56px -14px
-      light-dark(color-mix(in oklch, var(--color-ink) 22%, transparent), color-mix(in oklch, black 55%, transparent));
-  --shadow-glow-accent: 0 8px 32px color-mix(in oklch, var(--accent-primary) 18%, transparent);
-  --shadow-inset: inset 0 1px 0
-    light-dark(
-      color-mix(in oklch, var(--color-bone) 12%, transparent),
-      color-mix(in oklch, var(--color-sand) 8%, transparent)
-    );
+  --shadow-sm: 0 1px 2px light-dark(rgb(38 40 36 / 6%), rgb(0 0 0 / 30%));
+  --shadow-md: 0 2px 8px light-dark(rgb(38 40 36 / 8%), rgb(0 0 0 / 36%));
+  --shadow-lg: 0 6px 20px light-dark(rgb(38 40 36 / 10%), rgb(0 0 0 / 44%));
+  --shadow-xl: 0 12px 32px light-dark(rgb(38 40 36 / 12%), rgb(0 0 0 / 50%));
+  --shadow-2xl: 0 20px 48px light-dark(rgb(38 40 36 / 16%), rgb(0 0 0 / 58%));
+  --shadow-glow-accent: none;
+  --shadow-inset: none;
+
+  /* The breathing surface still uses a faint texture — it is the one place a
+     flat ground reads as a dead screen rather than a quiet room. Everywhere
+     else the global noise overlay is gone. */
+  --surface-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  --surface-noise-opacity: 0.03;
 
   /* ============================================
-     Border Radius
+     Border radius — square. Nothing on the public site is rounded: the poster
+     language is straight cuts and full-strength rules. `--radius-full` survives
+     for the breathing exercise, where the circle *is* the control.
      ============================================ */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
   --radius-full: 9999px;
 
   /* ============================================
@@ -321,44 +364,6 @@
 
 :root[data-mode='dark'] {
   color-scheme: dark;
-}
-
-/* Cool palette — "kühle Sommer Variante". Only the raw primitives are
-   re-pitched; every semantic token derives from them, so this one block
-   re-themes the site in both modes. Lightness and chroma mirror the warm
-   palette so the contrast ratios hold. */
-:root[data-theme='cool'] {
-  /* Forest shade tones (warm earth → cool spruce) */
-  --color-earth-deep: oklch(20% 0.028 178deg);
-  --color-earth-dark: oklch(26% 0.034 172deg);
-  --color-earth-mid: oklch(37% 0.042 165deg);
-  --color-earth-warm: oklch(48% 0.05 160deg);
-
-  /* Fern accent (terracotta → fresh leaf green) — same three contrast roles
-     as the warm palette, pitched to the green hue. */
-  --color-terracotta-deep: oklch(46% 0.14 156deg);
-  --color-terracotta: oklch(50% 0.14 156deg);
-  --color-terracotta-light: oklch(73% 0.12 154deg);
-
-  /* Cool sage neutrals (sand → eucalyptus) */
-  --color-sand: oklch(76% 0.025 165deg);
-  --color-sand-light: oklch(89% 0.014 168deg);
-
-  /* Cool light grounds */
-  --color-parchment: oklch(95% 0.008 172deg);
-  --color-bone: oklch(98% 0.004 174deg);
-
-  /* Cool ink */
-  --color-ink: oklch(14% 0.012 185deg);
-  --color-ink-soft: oklch(25% 0.018 180deg);
-
-  /* Deeper, cooler sages for status/decoration accents */
-  --color-sage: oklch(48% 0.075 175deg);
-  --color-sage-light: oklch(58% 0.06 172deg);
-
-  /* Re-pitch the few neutral text tokens that bake in a warm hue */
-  --text-secondary: light-dark(var(--color-ink-soft), oklch(80% 0.018 168deg));
-  --text-muted: light-dark(oklch(52% 0.018 168deg), oklch(65% 0.018 168deg));
 }
 
 /* ============================================

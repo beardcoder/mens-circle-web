@@ -1,0 +1,159 @@
+---
+interface Agreement {
+  title?: string;
+  text?: string;
+}
+
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    title?: string;
+    intro?: string;
+    agreements?: Agreement[];
+    boundaryTitle?: string;
+    boundaryItems?: string[];
+    boundaryText?: string;
+  };
+}
+
+/**
+ * The ground rules, and what the circle is not.
+ *
+ * Both belong together: the agreements are what makes the evening safe to try,
+ * and the boundary is what stops it being mistaken for treatment. The boundary
+ * gets a set-apart panel rather than a dark full-bleed section with a glow —
+ * it needs to be unmissable, not dramatic.
+ *
+ * Note the wording of the confidentiality agreement in the content file: it is
+ * described as something the circle agrees on, never as a property of the
+ * evening that could be guaranteed.
+ */
+
+const { data } = Astro.props;
+const anchor = data.anchor ?? 'rahmen';
+const agreements = data.agreements ?? [];
+const boundaryItems = data.boundaryItems ?? [];
+---
+
+<section class="section section--ruled home-frame" id={anchor} aria-labelledby="rahmen-title">
+  <div class="container">
+    <div class="spine">
+      <p class="rail-heading">{data.eyebrow}</p>
+
+      <div class="spine__body" data-reveal-group="60">
+        {
+          data.title && (
+            <h2 class="section-title" id="rahmen-title" data-reveal="up">
+              {data.title}
+            </h2>
+          )
+        }
+        {
+          data.intro && (
+            <p class="section-intro" data-reveal="up">
+              {data.intro}
+            </p>
+          )
+        }
+
+        {
+          agreements.length > 0 && (
+            <dl class="deflist home-frame__list" data-reveal-group="55">
+              {agreements.map((rule) => (
+                <div class="deflist__row" data-reveal="up">
+                  <dt class="deflist__term home-frame__term">{rule.title}</dt>
+                  <dd class="deflist__desc home-frame__text">{rule.text}</dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+      </div>
+    </div>
+
+    {
+      (boundaryItems.length > 0 || data.boundaryText) && (
+        <div class="spine home-frame__boundary-row">
+          <p class="rail-heading" aria-hidden="true">
+            Abgrenzung
+          </p>
+
+          <div class="home-frame__boundary spine__body" data-reveal="up">
+            {data.boundaryTitle && <h3 class="home-frame__boundary-title">{data.boundaryTitle}</h3>}
+
+            {boundaryItems.length > 0 && (
+              <ul class="home-frame__boundary-list" role="list">
+                {boundaryItems.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            )}
+
+            {data.boundaryText && <p class="home-frame__boundary-text">{data.boundaryText}</p>}
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .home-frame__list {
+      margin-block-start: var(--space-md);
+    }
+
+    .home-frame__term {
+      font-size: var(--text-section-body);
+      color: var(--text-primary);
+    }
+
+    .home-frame__text {
+      color: var(--text-secondary);
+    }
+
+    .home-frame__boundary-row {
+      margin-block-start: var(--space-lg);
+    }
+
+    /* Set apart by a change of ground and a single accent rule — the one place
+       on the page the warm accent is used for anything. */
+    /* `--bg-secondary`, not the literal sunk paper: the text inside inherits
+       `--text-primary`, so a fixed light panel put light text on light ground
+       in dark mode (1.1:1) and the whole boundary list vanished. */
+    .home-frame__boundary {
+      padding: var(--space-md);
+      background: var(--bg-secondary);
+      border-inline-start: 6px solid var(--color-orange);
+      border-radius: 0;
+    }
+
+    .home-frame__boundary-title {
+      margin-block-end: var(--space-xs);
+      font-size: var(--text-2xl);
+      line-height: 1.08;
+    }
+
+    .home-frame__boundary-list {
+      padding: 0;
+      margin: 0 0 var(--space-sm);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-primary);
+      list-style: none;
+    }
+
+    .home-frame__boundary-list li {
+      padding-block: 0.15rem;
+    }
+
+    .home-frame__boundary-text {
+      max-inline-size: var(--measure);
+      margin: 0;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+  }
+</style>

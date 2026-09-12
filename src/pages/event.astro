@@ -1,10 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { fetchNextEvent } from '@lib/server/events';
+import { fetchNextEventState } from '@lib/server/events';
 import { fetchTestimonials } from '@lib/server/testimonials';
 import { buildEventFaq, summarizeNextEvent } from '@lib/event-landing';
+import { dateStatus } from '@lib/event-status';
 import EventLanding from '../components/event/EventLanding.astro';
-import site from '../data/site.json';
+import { eventSeriesSchema } from '@lib/series-schema';
 
 /**
  * /event — the permanent landing page for the Männerkreis dates. It never
@@ -14,8 +15,12 @@ import site from '../data/site.json';
  * Server-rendered, not prerendered: the upcoming date belongs in the initial
  * HTML rather than filling in after JS.
  */
-const event = await fetchNextEvent();
+const { status, event } = await fetchNextEventState();
 const next = summarizeNextEvent(event);
+// One object for the whole page, so the date block, the FAQ and the metadata
+// can never disagree about whether a date exists. A failed read is its own
+// state — never rendered as "kein Termin geplant".
+const state = dateStatus(status, next);
 
 // A single published voice for the pull quote after "Du musst nichts können" —
 // the top of the curated order, not a second copy of the home page's grid. The
@@ -28,59 +33,23 @@ const canonical = new URL('/event', siteUrl).href;
 
 // The same builder the component renders from, so the FAQPage markup below can
 // never drift from the questions actually visible on the page.
-const faqItems = buildEventFaq(next);
+const faqItems = buildEventFaq(state.next);
 
 /**
- * `EventSeries` describes the recurring Männerkreis itself — the thing this page
- * is *about* — and stays valid with no date on the books. The individual meeting
- * keeps its own `Event` markup on /event/<slug>, so the two don't compete for the
- * same rich result. When a date exists it is referenced as a `subEvent` pointing
- * at that canonical URL rather than restated as a second standalone Event.
+ * The series is built once in lib/series-schema.ts and shared with the home
+ * page, so both describe one entity under one `@id` rather than two competing
+ * ones. The individual meeting keeps its own `Event` markup on /event/<slug>;
+ * when a date exists it is referenced here as a `subEvent` pointing at that
+ * canonical URL rather than restated as a second standalone Event.
  */
 const eventSeries: Record<string, unknown> = {
-  '@context': 'https://schema.org',
-  '@type': 'EventSeries',
-  '@id': `${canonical}#series`,
-  name: 'Männerkreis Niederbayern/ Straubing',
-  // Kept in step with what the page actually shows: the rhythm, the duration and
-  // the donation basis are all stated in the visible facts section, so the
-  // structured data and the page can't drift apart.
-  description:
-    'Regelmäßiger Männerkreis in Straubing, Niederbayern: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt. Alle zwei bis vier Wochen, zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.',
-  url: canonical,
-  inLanguage: 'de-DE',
-  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-  audience: { '@type': 'Audience', audienceType: 'Männer' },
-  location: {
-    '@type': 'Place',
-    name: `Männerkreis ${site.geo.locality}`,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: site.geo.locality,
-      addressRegion: site.geo.region,
-      addressCountry: site.geo.country,
-    },
-  },
-  organizer: {
-    '@type': 'Organization',
-    '@id': `${siteUrl.origin}/#organization`,
-    name: 'Männerkreis Niederbayern/ Straubing',
-    url: siteUrl.origin,
-  },
-  // Treffen laufen auf Spendenbasis — als kostenfreies Angebot ausgezeichnet.
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'EUR',
-    availability: 'https://schema.org/InStock',
-    url: canonical,
-  },
-  ...(next
+  ...eventSeriesSchema(siteUrl),
+  ...(state.next
     ? {
         subEvent: {
           '@type': 'Event',
-          '@id': new URL(`/event/${next.slug}`, siteUrl).href,
-          url: new URL(`/event/${next.slug}`, siteUrl).href,
+          '@id': new URL(`/event/${state.next.slug}`, siteUrl).href,
+          url: new URL(`/event/${state.next.slug}`, siteUrl).href,
         },
       }
     : {}),
@@ -108,16 +77,15 @@ const breadcrumbs = {
 
 // The description changes with the state so the SERP snippet is never stale,
 // but both variants lead with the same evergreen keywords.
-const description = next
-  ? `Nächster Männerkreis in ${next.place}: ${next.dateLabel}${next.timeRange ? `, ${next.timeRange}` : ''}. Ein Abend unter Männern, an dem du nichts darstellen musst – ohne Vorerfahrung, auf Spendenbasis.`
-  : 'Männerkreis in Straubing/ Niederbayern: was an so einem Abend passiert, was du mitbringen musst (nichts) und wann der nächste Termin ist. Ohne Vorerfahrung, auf Spendenbasis.';
+const description = state.next
+  ? `Nächster Männerkreis in ${state.next.place}: ${state.next.dateLabel}${state.next.timeRange ? `, ${state.next.timeRange}` : ''}. Anmeldung, Ort, Dauer und Beitrag auf einen Blick – ohne Vorerfahrung, auf Spendenbasis.`
+  : 'Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis.';
 ---
 
 <Layout
-  title="Männerkreis Straubing – Termine & Anmeldung | Niederbayern"
+  title="Termine & Anmeldung – Männerkreis Straubing / Niederbayern"
   description={description}
-  keywords="Männerkreis Straubing, Männerkreis Niederbayern, Männergruppe Straubing, Termine, Männerkreis Termine, Anmeldung"
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  <EventLanding next={next} voice={voice} />
+  <EventLanding state={state} voice={voice} />
 </Layout>
