@@ -106,9 +106,13 @@ const timeStr = event.startTime ? `${event.startTime}${event.endTime ? `–${eve
 </section>
 
 <style>
+  /* The one panel that outranks everything under it. It says so with a solid
+     orange rule across the top rather than with a gradient wash — the poster
+     system marks priority with a rule, and has no gradients in it. */
   .next {
-    background: linear-gradient(180deg, var(--ember-soft), transparent 40%), var(--surface);
-    border: 1px solid var(--ember-line);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-top: 4px solid var(--ember);
     border-radius: var(--r);
     padding: clamp(1.1rem, 3vw, 1.6rem);
     margin-bottom: 2.25rem;

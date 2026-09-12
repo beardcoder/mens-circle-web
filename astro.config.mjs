@@ -73,6 +73,10 @@ export default defineConfig({
   // hero, the statement, the step numerals — and Barlow sets everything that has
   // to be read. Same skeleton, so the page holds together while the two sit at
   // wildly different sizes; both OFL-1.1 and served from our own origin.
+  //
+  // The admin shares them. It used to carry two families of its own (Bricolage
+  // Grotesque and IBM Plex Mono) for a separate back-office identity; that
+  // identity is gone, and so are the two extra webfonts.
   fonts: [
     {
       // Display. Loaded in two weights only: 800 does the shouting, 600 the
@@ -94,26 +98,6 @@ export default defineConfig({
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-    },
-    {
-      // Admin display face — deliberately not the public site's condensed.
-      name: 'Bricolage Grotesque',
-      cssVariable: '--font-bricolage',
-      provider: fontProviders.fontsource(),
-      weights: ['400 800'], // variable range
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    {
-      // Admin data face — dates, counts and IDs read as a logbook.
-      name: 'IBM Plex Mono',
-      cssVariable: '--font-plex-mono',
-      provider: fontProviders.fontsource(),
-      weights: ['400', '500', '600'],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['ui-monospace', 'monospace'],
     },
   ],
   integrations: [
