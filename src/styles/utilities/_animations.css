@@ -6,12 +6,12 @@
 
 @keyframes scroll-to-top-reveal {
   0%,
-  8% {
+  10% {
     pointer-events: none;
     opacity: 0;
   }
 
-  16%,
+  18%,
   100% {
     pointer-events: auto;
     opacity: 1;
@@ -20,26 +20,23 @@
 
 .scroll-to-top {
   position: fixed;
-  inset-block-end: var(--space-md);
-  inset-inline-end: var(--space-md);
+  inset-block-end: var(--space-sm);
+  inset-inline-end: var(--space-sm);
   z-index: var(--z-sticky);
   display: flex;
   align-items: center;
   justify-content: center;
-  inline-size: 48px;
-  block-size: 48px;
-  color: var(--text-on-dark);
+  inline-size: 44px;
+  block-size: 44px;
+  /* Ink on orange in both modes — the orange ground does not flip. */
+  color: var(--color-ink);
   cursor: pointer;
-  background: var(--accent-primary);
-  border: none;
-  border-radius: var(--radius-full);
-  box-shadow:
-    var(--shadow-lg),
-    0 0 0 1px color-mix(in oklch, var(--color-bone) 10%, transparent) inset;
+  background: var(--color-orange);
+  border: 2px solid var(--rule-strong);
+  border-radius: 0;
   transition:
     background-color var(--motion-quick),
-    transform var(--motion-quick),
-    box-shadow var(--motion-quick);
+    border-color var(--motion-quick);
 }
 
 @supports (animation-timeline: scroll()) {
@@ -51,21 +48,22 @@
   }
 }
 
-.scroll-to-top:hover {
-  background: var(--bg-dark);
-  box-shadow:
-    var(--shadow-xl),
-    0 0 0 1px color-mix(in oklch, var(--color-bone) 12%, transparent) inset;
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .scroll-to-top:hover {
+    color: var(--bg-primary);
+    background: var(--text-primary);
+  }
 }
 
-.scroll-to-top:active {
-  transform: translateY(0);
+.scroll-to-top:focus-visible {
+  outline: 3px solid var(--text-primary);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--color-orange);
 }
 
 .scroll-to-top svg {
-  inline-size: 20px;
-  block-size: 20px;
+  inline-size: 18px;
+  block-size: 18px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -73,7 +71,6 @@
     .scroll-to-top {
       pointer-events: auto;
       opacity: 1;
-      transform: none;
       transition: none;
       animation: none;
     }

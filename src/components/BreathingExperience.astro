@@ -632,8 +632,18 @@ const { standalone = false } = Astro.props;
       padding-block: var(--space-xs);
     }
 
+    /* The ghost button defaults to the light-mode running-text colour, a dark
+       grey that measured 1.97:1 on this ground. Scoped to the exercise rather
+       than to the page, so the chrome-less /atemuebung/app route gets it too. */
+    .breathing-section .btn--ghost {
+      --btn-color: var(--color-chalk-muted);
+      --btn-hover-color: var(--color-chalk);
+    }
+
     .breathing-app__meta-label {
-      color: color-mix(in oklch, var(--text-on-dark) 48%, transparent);
+      /* 58%, not 48%: at 11px these labels owe 4.5:1, and 48% composited over
+         the exercise's ground measured 4.45:1. */
+      color: color-mix(in oklch, var(--text-on-dark) 58%, transparent);
       font-weight: 500;
       font-size: 0.6875rem;
       letter-spacing: 0.14em;

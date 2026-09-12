@@ -1,7 +1,7 @@
 {
-    "name": "Männerkreis Niederbayern",
+    "name": "Männerkreis Straubing",
     "short_name": "Männerkreis",
-    "description": "Ein Raum für echte Begegnung unter Männern – Termine, Anmeldung und Gemeinschaft in Niederbayern.",
+    "description": "Ein Männerkreis in Straubing: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt.",
     "lang": "de",
     "icons": [
         {
@@ -56,6 +56,6 @@
     "scope": "/",
     "start_url": "/",
     "display": "standalone",
-    "theme_color": "#3d2817",
-    "background_color": "#efe9dd"
+    "theme_color": "#f2ede3",
+    "background_color": "#f2ede3"
 }

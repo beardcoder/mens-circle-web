@@ -1,58 +1,52 @@
 ---
 import type { EventDTO } from '@lib/types';
-import { formatDateShortDE, formatWeekdayDE, toDate } from '@lib/server/format';
+import { formatDayMonthYearDE, formatWeekdayDE, toDate } from '@lib/server/format';
 
 interface Props {
   event: EventDTO;
 }
 
+/**
+ * The opening of a single evening's page. The date is the heading, because the
+ * date is what this page is.
+ *
+ * The event's own image is no longer painted behind the heading: it was a
+ * decorative wash under text that had to stay readable over whatever an admin
+ * uploaded. Everything else that was here — the four breathing ring ornaments,
+ * the full-viewport dark panel, the 13rem title — is gone with it.
+ */
+
 const { event } = Astro.props;
 const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
+const weekday = formatWeekdayDE(event.event_date);
+const dayMonthYear = formatDayMonthYearDE(event.event_date);
+const timeRange = event.start_time ? `${event.start_time}${event.end_time ? `–${event.end_time}` : ''} Uhr` : '';
 ---
 
 <section class="hero event-hero">
-  <div class="hero__bg">
-    {
-      event.image_url && (
-        <img
-          class="hero__bg-image"
-          src={event.image_url}
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          aria-hidden="true"
-          alt=""
-        />
-      )
-    }
-  </div>
-  <div class="hero__circles" aria-hidden="true">
-    <div class="hero__circle hero__circle--1"></div>
-    <div class="hero__circle hero__circle--2"></div>
-    <div class="hero__circle hero__circle--3"></div>
-    <div class="hero__circle hero__circle--4"></div>
-  </div>
-
   <div class="container">
     <div class="hero__content">
-      <p class="hero__label">
-        {event.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}
-      </p>
+      <p class="hero__label">{event.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}</p>
+
       <h1 class="hero__title">
-        <span class="hero__title-line">{event.title}</span>
+        <time datetime={dateOnly}>{weekday}, {dayMonthYear}</time>
       </h1>
+
       <div class="hero__bottom">
-        <p class="hero__description">
-          <time datetime={dateOnly}>{formatWeekdayDE(event.event_date)}, {formatDateShortDE(event.event_date)}</time> ·
-          <time datetime={event.start_time}>{event.start_time}</time> Uhr · {event.location}
-        </p>
+        {
+          /* Built as a string rather than as JSX fragments: the whitespace
+            between elements in the template becomes real text nodes, which put
+            gaps around the en dash of the time range. */
+        }
+        <p class="hero__meta">{[timeRange, event.location].filter(Boolean).join(' · ')}</p>
+
         {
           !event.is_past && (
-            <div class="hero__cta">
-              <a href="#anmeldung" class="btn btn--primary btn--large">
-                Jetzt anmelden
+            <span class="hero__cta">
+              <a href="#anmeldung" class="btn btn--primary">
+                {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
               </a>
-            </div>
+            </span>
           )
         }
       </div>

@@ -1,38 +1,33 @@
 {
   "header": {
     "links": [
-      { "label": "Über", "url": "/#ueber", "umamiTarget": "ueber" },
-      {
-        "label": "Haltung",
-        "url": "/warum-ich-den-maennerkreis-leite",
-        "umamiTarget": "haltung"
-      },
-      { "label": "Die Reise", "url": "/#reise", "umamiTarget": "reise" },
-      { "label": "Fragen", "url": "/#faq", "umamiTarget": "faq" },
-      {
-        "label": "Atemübung",
-        "url": "/atemuebung",
-        "umamiTarget": "atemuebung"
-      }
+      { "label": "Der Kreis", "url": "/#ueber", "umamiTarget": "ueber" },
+      { "label": "Ablauf", "url": "/#reise", "umamiTarget": "ablauf" },
+      { "label": "Markus", "url": "/#moderator", "umamiTarget": "markus" }
     ],
     "cta": [
       {
-        "label": "Nächster Termin",
+        "label": "Termine",
         "url": "/event",
-        "umamiTarget": "naechster-termin"
+        "umamiTarget": "termine"
       }
     ],
-    "meta": "Atme durch. Du bist angekommen."
+    "secondary": [
+      { "label": "Häufige Fragen", "url": "/#faq" },
+      { "label": "Meine Haltung", "url": "/warum-ich-den-maennerkreis-leite" },
+      { "label": "Atemübung", "url": "/atemuebung" }
+    ]
   },
   "footerPrimary": [
-    { "label": "Über uns", "url": "/#ueber" },
-    { "label": "Die Reise", "url": "/#reise" },
-    { "label": "Haltung", "url": "/warum-ich-den-maennerkreis-leite" },
-    { "label": "FAQ", "url": "/#faq" },
-    { "label": "Atemübung", "url": "/atemuebung" },
-    { "label": "Nächster Termin", "url": "/event" }
+    { "label": "Der Kreis", "url": "/#ueber" },
+    { "label": "Ablauf", "url": "/#reise" },
+    { "label": "Markus", "url": "/#moderator" },
+    { "label": "Häufige Fragen", "url": "/#faq" },
+    { "label": "Meine Haltung", "url": "/warum-ich-den-maennerkreis-leite" },
+    { "label": "Termine & Anmeldung", "url": "/event" },
+    { "label": "Atemübung", "url": "/atemuebung" }
   ],
-  "footerContact": [{ "label": "Newsletter", "url": "/#newsletter" }],
+  "footerContact": [{ "label": "Bei neuen Terminen benachrichtigen", "url": "/#termine" }],
   "footerLegal": [
     { "label": "Impressum", "url": "/impressum" },
     { "label": "Datenschutz", "url": "/datenschutz" }

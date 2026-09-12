@@ -12,32 +12,25 @@ interface Props {
   context?: Record<string, string | number | boolean>;
 }
 
+/**
+ * A standalone notification sign-up, for pages that need one outside the
+ * Termine block (the home page and /event both carry their own).
+ *
+ * The copy must not promise more than the list actually sends: it carries the
+ * announcement of the next date and nothing else.
+ */
+
 const { data, context = { location: 'newsletter-block' } } = Astro.props;
 const anchor = data.anchor ?? 'newsletter';
 ---
 
-<section class="section newsletter-section" id={anchor} aria-labelledby="newsletter-title">
+<section class="section section--ruled newsletter-section" id={anchor} aria-labelledby="newsletter-title">
   <div class="container">
-    <div class="newsletter__layout">
-      <div class="newsletter__content" data-reveal-group="100">
-        {
-          data.eyebrow && (
-            <p class="eyebrow eyebrow--secondary" data-reveal="up">
-              {data.eyebrow}
-            </p>
-          )
-        }
+    <div class="spine">
+      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
 
-        {
-          data.title && (
-            <h2
-              class="section-title section-title--light newsletter__title"
-              id="newsletter-title"
-              data-reveal="blur"
-              set:html={data.title}
-            />
-          )
-        }
+      <div class="spine__body">
+        {data.title && <h2 class="newsletter__title" id="newsletter-title" data-reveal="up" set:html={data.title} />}
 
         {
           data.text && (
@@ -46,9 +39,7 @@ const anchor = data.anchor ?? 'newsletter';
             </p>
           )
         }
-      </div>
 
-      <div class="newsletter__form-wrapper" data-reveal="left" data-reveal-delay="120">
         <NewsletterForm client:visible context={context} />
       </div>
     </div>
@@ -57,45 +48,19 @@ const anchor = data.anchor ?? 'newsletter';
 
 <style is:global>
   @layer sections {
-    .newsletter-section {
-      --_surface-noise-opacity: 0.04;
-      --_surface-glow-strength: 15%;
-
-      position: relative;
-      overflow: clip;
-      color: var(--text-on-dark);
-      background: var(--bg-section-alt);
-    }
-
-    .newsletter__layout {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-xl);
-      align-items: center;
-    }
-
-    @media (width <= 800px) {
-      .newsletter__layout {
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
-      }
-    }
-
     .newsletter__title {
-      color: var(--text-on-dark);
+      margin-block-end: var(--space-xs);
+      font-size: var(--text-3xl);
+      line-height: 1.15;
+      text-wrap: balance;
     }
 
     .newsletter__text {
-      margin-block-end: 0;
+      max-inline-size: var(--measure);
+      margin-block-end: var(--space-sm);
       font-size: var(--text-section-body);
       line-height: var(--leading-relaxed);
-      color: var(--color-sand);
-    }
-
-    .newsletter__form-wrapper {
-      position: relative;
+      color: var(--text-secondary);
     }
   }
 </style>

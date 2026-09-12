@@ -11,8 +11,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
-  "theme_color": "#1d160f",
-  "background_color": "#1d160f",
+  "theme_color": "#1c1714",
+  "background_color": "#1c1714",
   "icons": [
     {
       "src": "/favicon-192x192.png",

@@ -96,11 +96,11 @@ const full = seats.length >= capacity && capacity > 0;
   }
   .seating__fire {
     fill: var(--ember);
-    filter: drop-shadow(0 0 10px rgba(224, 138, 74, 0.6));
+    filter: drop-shadow(0 0 10px rgb(221 95 51 / 60%));
   }
   .is-full .seating__fire {
     fill: var(--sage);
-    filter: drop-shadow(0 0 12px rgba(143, 176, 140, 0.6));
+    filter: drop-shadow(0 0 12px rgb(155 181 131 / 60%));
   }
   .is-full .seating__glow {
     fill: var(--sage);
@@ -109,11 +109,12 @@ const full = seats.length >= capacity && capacity > 0;
     font-family: var(--font-mono);
     font-weight: 600;
     font-size: 19px;
-    fill: #1a130c;
+    fill: #1c1714;
   }
+  /* Full strength. At 70% the ink over the orange disc measured 3.2:1, and this
+     is 13px text; the size step alone is enough to subordinate it. */
   .seating__cap {
     font-size: 13px;
-    opacity: 0.7;
   }
 
   /* seats */
@@ -127,7 +128,7 @@ const full = seats.length >= capacity && capacity > 0;
     font-family: var(--font-mono);
     font-weight: 600;
     font-size: 13px;
-    fill: #1a130c;
+    fill: #1c1714;
   }
   .seat--open circle {
     stroke: var(--line-strong);
