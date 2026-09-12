@@ -91,19 +91,19 @@
 .toast--success {
   color: var(--text-primary);
   background: light-dark(
-    color-mix(in oklch, var(--color-sage-light) 15%, var(--bg-elevated)),
+    color-mix(in oklch, var(--color-success) 12%, var(--bg-elevated)),
     color-mix(in oklch, var(--color-success) 18%, var(--bg-elevated))
   );
   border-inline-start: 3px solid var(--color-success);
 }
 
 .toast--success .toast__icon {
-  color: var(--color-bone);
+  color: light-dark(var(--color-paper), var(--color-night));
   background: var(--color-success);
 }
 
 .toast--success .toast__title {
-  color: light-dark(var(--color-sage), var(--color-sage-light));
+  color: var(--color-success);
 }
 
 .toast--error {
@@ -116,30 +116,30 @@
 }
 
 .toast--error .toast__icon {
-  color: var(--color-bone);
+  color: light-dark(var(--color-paper), var(--color-night));
   background: var(--color-error);
 }
 
 .toast--error .toast__title {
-  color: light-dark(var(--color-error), color-mix(in oklch, var(--color-error) 80%, var(--color-bone)));
+  color: var(--color-error);
 }
 
 .toast--info {
   color: var(--text-primary);
   background: light-dark(
     color-mix(in oklch, var(--color-info) 10%, var(--bg-elevated)),
-    color-mix(in oklch, var(--color-terracotta) 18%, var(--bg-elevated))
+    color-mix(in oklch, var(--color-info) 16%, var(--bg-elevated))
   );
-  border-inline-start: 3px solid var(--color-terracotta);
+  border-inline-start: 3px solid var(--color-info);
 }
 
 .toast--info .toast__icon {
-  color: var(--color-bone);
-  background: var(--color-terracotta);
+  color: light-dark(var(--color-paper), var(--color-night));
+  background: var(--color-info);
 }
 
 .toast--info .toast__title {
-  color: light-dark(var(--color-terracotta), var(--color-terracotta-light));
+  color: var(--color-info);
 }
 
 .toast--warning {

@@ -1,162 +1,185 @@
 {
   "meta": {
-    "title": "Männerkreis Niederbayern/ Straubing",
-    "description": "Authentischer Austausch, Gemeinschaft und persönliches Wachstum für Männer in Niederbayern.",
-    "keywords": "Männerkreis, Niederbayern, Männergruppe, persönliches Wachstum, Gemeinschaft, Männer"
+    "title": "Männerkreis Straubing / Niederbayern – ein Abend unter Männern",
+    "description": "Ein Männerkreis in Straubing: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt. Zwei bis drei Stunden, auf Spendenbasis, ohne Vorerfahrung.",
+    "keywords": "Männerkreis, Straubing, Niederbayern, Männergruppe, Männerkreis Straubing, Männerkreis Niederbayern"
   },
   "blocks": [
     {
       "type": "hero",
       "data": {
-        "label": "Straubing / Niederbayern",
-        "title": "<span class=\"hero__title-line\">Ein Raum für</span><span class=\"hero__title-line\"><span class=\"text-italic\">echte</span> Begegnung</span>",
-        "description": "Der Männerkreis ist ein geschützter Ort, an dem du dich zeigen kannst, wie du wirklich bist. Authentischer Austausch. Ehrliche Gemeinschaft. Persönliches Wachstum.",
-        "buttonText": "Dabei sein",
-        "buttonLink": "/event"
+        "kicker": "Männerkreis in Straubing · Niederbayern",
+        "secondaryLabel": "Wie ein Abend abläuft",
+        "secondaryLink": "#reise",
+        "image": "/images/markus-sommer.jpg",
+        "imageAlt": "Markus Sommer sitzt auf einem Felsen und blickt im Abendlicht über eine bewaldete Hügellandschaft.",
+        "imageCaption": "Markus Sommer begleitet den Männerkreis.",
+        "displayLines": ["MÄNNER.", "IM KREIS."],
+        "lede": "Ein Abend, an dem du nichts darstellen musst.",
+        "body": "Wir sitzen im Kreis, und der Reihe nach erzählt jeder, was ihn gerade beschäftigt. Die anderen hören zu, ohne zu bewerten und ohne sofort einen Ratschlag zu geben. Viel mehr passiert an so einem Abend nicht."
+      }
+    },
+    {
+      "type": "facts",
+      "data": {
+        "anchor": "praktisches",
+        "eyebrow": "Praktisches"
       }
     },
     {
       "type": "intro",
       "data": {
         "anchor": "ueber",
-        "eyebrow": "Was uns verbindet",
-        "title": "Was ist ein<br><span class=\"text-italic\">Männerkreis?</span>",
-        "text": "Ein Männerkreis ist ein regelmäßiges Treffen von Männern, die sich in einem geschützten Rahmen begegnen möchten. Hier geht es nicht um Smalltalk oder Leistung – sondern um echte Verbindung, ehrliche Worte und das Gefühl, gehört und gesehen zu werden.",
-        "quote": "„Im Kreis sitzen Männer,<br>die sich trauen,<br>echt zu sein.\"",
-        "values": [
-          {
-            "number": "01",
-            "title": "Authentischer Austausch",
-            "description": "Hier darfst du sagen, was dich wirklich bewegt – ohne Maske, ohne Rolle."
-          },
-          {
-            "number": "02",
-            "title": "Ehrliche Gemeinschaft",
-            "description": "Verbindung entsteht, wenn wir uns gegenseitig wirklich zuhören."
-          },
-          {
-            "number": "03",
-            "title": "Persönliches Wachstum",
-            "description": "Durch Reflexion und Feedback entwickeln wir uns gemeinsam weiter."
-          }
-        ]
+        "eyebrow": "Der Kreis",
+        "title": "Worum es an so einem Abend geht",
+        "text": "<p>Im Alltag läuft vieles: Arbeit, Familie, Beziehung, Entscheidungen, Verantwortung. Vieles davon machen wir erst einmal mit uns selbst aus. Nicht, weil niemand da wäre, sondern weil Gespräche unter Männern oft schnell bei Arbeit, Sport oder beim nächsten Ratschlag landen.</p><p>Im Männerkreis darf einmal das zur Sprache kommen, was darunter liegt. Du musst dafür keine fertigen Antworten haben und nichts mitbringen außer der Bereitschaft, den anderen zuzuhören.</p>",
+        "questionsLabel": "Fragen, um die ein Abend oft kreist",
+        "questions": [
+          "Was beschäftigt dich gerade wirklich?",
+          "Was läuft gerade gut?",
+          "Was kostet dich Kraft?",
+          "Was schiebst du vielleicht schon länger vor dir her?"
+        ],
+        "close": "Du brauchst keinen besonderen Grund, um zu kommen. Manchmal reicht Neugier."
       }
     },
     {
       "type": "moderator",
       "data": {
         "anchor": "moderator",
-        "eyebrow": "Dein Begleiter",
-        "name": "Markus<br><span class=\"light\">Sommer</span>",
-        "photo": "/images/markus-sommer.jpg",
-        "bio": "<p>Ich bin Markus, gebürtiger Niederbayer und Gründer des Männerkreises Straubing. Seit Jahren beschäftige ich mich mit der Frage, was es bedeutet, als Mann authentisch zu leben – jenseits von Rollenbildern und gesellschaftlichen Erwartungen.</p><p>Der Männerkreis ist für mich ein Herzensanliegen: Ein Ort, an dem wir uns gegenseitig stärken, herausfordern und unterstützen können.</p><p>Wenn du wissen willst, warum ich diesen Kreis leite und welche Haltung dahintersteht, findest du hier einen persönlichen Einblick: <a class=\"link\" href=\"/warum-ich-den-maennerkreis-leite\">Warum ich den Männerkreis leite</a>.</p>",
-        "quote": "„Wahre Stärke zeigt sich nicht im Alleingang, sondern in der Bereitschaft, sich anderen zu öffnen.\""
+        "eyebrow": "Wer den Abend hält",
+        "name": "Ich bin Markus",
+        "bio": "<p>Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet. Angefangen habe ich damit, weil mir selbst ein Ort gefehlt hat, an dem Männer auch über das sprechen können, was sie sonst meist mit sich allein ausmachen.</p><p>Ich sehe mich dabei nicht als Lehrer und habe keine Antworten für die Männer im Kreis. Meine Aufgabe ist es, den Rahmen zu erklären, ihn über den Abend zu halten und dafür zu sorgen, dass jeder zu Wort kommt.</p>",
+        "linkLabel": "Warum ich den Männerkreis leite",
+        "linkUrl": "/warum-ich-den-maennerkreis-leite"
+      }
+    },
+    {
+      "type": "statement",
+      "data": {
+        "anchor": "haltung",
+        "eyebrow": "Worauf du dich verlassen kannst",
+        "lines": ["DU MUSST", "NICHTS", "DARSTELLEN."],
+        "text": "Das ist keine Stimmung, die sich von selbst einstellt. Sie hält, weil der Kreis sich zu Beginn jedes Abends auf ein paar Dinge verständigt.",
+        "linkLabel": "Der Rahmen",
+        "linkUrl": "#rahmen"
+      }
+    },
+    {
+      "type": "frame",
+      "data": {
+        "anchor": "rahmen",
+        "eyebrow": "Der Rahmen",
+        "title": "Was wir miteinander vereinbaren",
+        "intro": "Zu Beginn jedes Abends benennen wir, worauf wir uns verständigen. Das sind keine Regeln, die jemand kontrolliert, sondern Absprachen, die der Kreis miteinander trifft.",
+        "agreements": [
+          {
+            "title": "Vertraulichkeit",
+            "text": "Was im Kreis erzählt wird, bleibt im Kreis. Das ist eine Absprache, auf die sich alle Anwesenden zu Beginn des Abends verständigen – keine Eigenschaft, die sich technisch garantieren ließe."
+          },
+          {
+            "title": "Respekt",
+            "text": "Wir hören einander zu, auch wenn Erfahrungen und Sichtweisen weit auseinandergehen."
+          },
+          {
+            "title": "Eigenverantwortung",
+            "text": "Du entscheidest selbst, was du erzählst und woran du teilnimmst. Jeder bleibt für sich selbst verantwortlich."
+          },
+          {
+            "title": "Keine ungefragten Lösungen",
+            "text": "Wir versuchen nicht, den anderen zu reparieren. Oft ist Zuhören hilfreicher als der nächste Ratschlag."
+          }
+        ],
+        "boundaryTitle": "Was der Männerkreis nicht ist",
+        "boundaryItems": [
+          "keine Therapie",
+          "kein Coachingprogramm",
+          "kein religiöses Treffen",
+          "keine Selbstoptimierungsgruppe",
+          "kein Ort, an dem dir jemand erklärt, wie ein Mann zu sein hat"
+        ],
+        "boundaryText": "Wir sitzen als Männer zusammen, hören einander zu und teilen Erfahrungen. Wenn du therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Das eine ersetzt das andere nicht."
       }
     },
     {
       "type": "journey-steps",
       "data": {
         "anchor": "reise",
-        "eyebrow": "Der Weg",
-        "title": "Die Reise <span class=\"text-italic\">im Kreis</span>",
-        "subtitle": "Jedes Treffen folgt einem natürlichen Rhythmus",
+        "eyebrow": "Ablauf",
+        "title": "Wie ein Abend abläuft",
+        "subtitle": "Es gibt kein festes Programm und keinen Minutenplan, aber eine verlässliche Reihenfolge. Wir sitzen im Kreis – das ist mehr als eine Sitzordnung, es steht dafür, dass hier keiner über dem anderen steht.",
         "steps": [
           {
             "number": "1",
             "title": "Ankommen",
-            "description": "Wir beginnen mit einer Runde des Ankommens. Jeder teilt kurz, wie er gerade da ist – körperlich, emotional, mental."
+            "description": "Erst einmal raus aus dem Alltag. Wir nehmen uns Zeit anzukommen und kurz wahrzunehmen, wie jeder gerade da ist. Je nach Abend gehört dazu eine einfache Übung mit Atem oder Körperwahrnehmung."
           },
           {
             "number": "2",
-            "title": "Öffnen",
-            "description": "Im geschützten Raum des Kreises öffnen wir uns. Themen, die uns bewegen, finden Raum und Gehör."
+            "title": "Zuhören",
+            "description": "Einer spricht, die anderen hören zu. Nicht, um sofort eine Lösung zu finden, und nicht, um zu diskutieren, sondern erst einmal, um wirklich zu verstehen."
           },
           {
             "number": "3",
-            "title": "Wachsen",
-            "description": "Durch ehrliches Feedback und Spiegelung entstehen neue Perspektiven. Wir lernen von und mit einander."
+            "title": "Teilen",
+            "description": "Wenn du möchtest, erzählst du, was dich gerade beschäftigt. Wie persönlich das wird, entscheidest du selbst. Niemand wird gedrängt."
           },
           {
             "number": "4",
-            "title": "Integrieren",
-            "description": "Zum Abschluss verankern wir das Erlebte. Was nehmen wir mit? Was setzen wir im Alltag um?"
+            "title": "Mitnehmen",
+            "description": "Am Ende musst du nicht mit einer großen Erkenntnis nach Hause gehen. Manchmal reicht ein Gedanke, eine andere Perspektive oder die Erfahrung, mit etwas nicht allein zu sein."
           }
-        ]
+        ],
+        "close": "<p>Zuhören ist genauso Teil des Kreises wie sprechen. Du entscheidest an jeder Stelle selbst, wie viel du erzählst – und auch nichts zu sagen ist in Ordnung.</p><p>Du brauchst keine Vorerfahrung mit Männerkreisen, Meditation oder Atemarbeit, und du musst dich nicht vorbereiten. Wenn du vorher kurz bei dir ankommen willst, gibt es eine <a class=\"link\" href=\"/atemuebung\">Atemübung</a> – nötig ist sie nicht.</p>"
+      }
+    },
+    {
+      "type": "testimonials",
+      "data": {
+        "anchor": "stimmen",
+        "eyebrow": "Aus dem Kreis",
+        "title": "Was Teilnehmer geschrieben haben"
       }
     },
     {
       "type": "faq",
       "data": {
         "anchor": "faq",
-        "eyebrow": "Fragen & Antworten",
-        "title": "Häufige<br><span class=\"text-italic\">Fragen</span>",
-        "intro": "Alles, was du wissen solltest, bevor du zum ersten Mal dabei bist.",
+        "eyebrow": "Häufige Fragen",
+        "title": "Was Männer vorher wissen wollen",
         "items": [
           {
             "question": "Für wen ist der Männerkreis?",
-            "answer": "Der Männerkreis ist offen für alle Männer, die sich nach authentischem Austausch und echten Verbindungen sehnen. Es spielt keine Rolle, ob du 25 oder 65 bist, ob du in einer Beziehung lebst oder Single bist. Wichtig ist nur die Bereitschaft, dich auf den Prozess einzulassen und anderen Männern ehrlich und respektvoll zu begegnen."
+            "answer": "Für Männer, die sich ehrlichere Gespräche mit anderen Männern wünschen. Alter, Beruf und Lebenssituation spielen keine Rolle. Vorausgesetzt wird nur die Bereitschaft, den anderen zuzuhören und sie respektvoll zu behandeln."
           },
           {
-            "question": "Wo und wie oft trifft sich der Kreis?",
-            "answer": "Wir treffen uns in Straubing – der genaue Ort wird bei der Anmeldung bekannt gegeben. Die Treffen finden regelmäßig statt, in der Regel alle zwei bis vier Wochen."
+            "question": "Muss ich etwas erzählen?",
+            "answer": "Nein. Du entscheidest selbst, was du teilst. Es gibt keinen Zwang, persönliche Dinge zu erzählen, und niemand wird gedrängt. Zuhören ist genauso Teil des Kreises wie sprechen."
           },
           {
-            "question": "Wie läuft ein Treffen ab?",
-            "answer": "Ein Treffen dauert etwa 2-3 Stunden. Wir sitzen im Kreis – das ist mehr als nur eine Sitzordnung, es ist ein Symbol für Gleichwertigkeit. Der Ablauf folgt einem natürlichen Rhythmus: Ankommen, Öffnen, Wachsen, Integrieren. Es gibt keine starren Regeln, aber Leitlinien wie respektvolles Zuhören und Vertraulichkeit."
+            "question": "Ich war noch nie in einem Männerkreis. Ist das ein Problem?",
+            "answer": "Nein. Du brauchst keine Vorerfahrung und musst nichts vorbereiten. Der Rahmen wird zu Beginn erklärt, damit du weißt, worauf du dich einlässt."
           },
           {
-            "question": "Was kostet die Teilnahme?",
-            "answer": "Der Männerkreis funktioniert auf Spendenbasis. Das bedeutet: Jeder gibt, was er kann und was ihm die Erfahrung wert ist. Finanzielle Gründe sollen niemanden davon abhalten, Teil des Kreises zu werden."
+            "question": "Wie vertraulich ist das, was ich erzähle?",
+            "answer": "Vertraulichkeit ist die erste Absprache, auf die sich der Kreis zu Beginn jedes Abends verständigt: Was hier erzählt wird, bleibt hier. Das ist eine Vereinbarung unter den Anwesenden – erzwingen lässt sie sich nicht. Wie viel du erzählst, entscheidest deshalb immer du selbst."
           },
           {
-            "question": "Ist alles vertraulich?",
-            "answer": "Ja, absolut. Vertraulichkeit ist das Fundament des Männerkreises. Alles, was im Kreis geteilt wird, bleibt im Kreis."
-          },
-          {
-            "question": "Ist das Therapie oder Coaching?",
-            "answer": "Nein. Der Männerkreis ist weder Therapie noch Coaching. Es geht nicht darum, Probleme zu lösen oder Ratschläge zu geben. Stattdessen bietet der Kreis einen Raum des Zuhörens und der Verbindung. Bei therapeutischem Bedarf empfehle ich professionelle Hilfe."
+            "question": "Ist der Männerkreis Therapie oder Coaching?",
+            "answer": "Nein. Der Männerkreis ist weder Therapie noch Coaching. Es geht nicht darum, Probleme zu lösen oder Ratschläge zu geben. Wenn du therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg."
           }
         ]
       }
     },
     {
-      "type": "testimonials",
+      "type": "dates",
       "data": {
-        "anchor": "stimmen"
-      }
-    },
-    {
-      "type": "whatsapp-community",
-      "data": {
-        "anchor": "whatsapp-community"
-      }
-    },
-    {
-      "type": "text-section",
-      "data": {
-        "anchor": "ankommen",
-        "eyebrow": "Kurz ankommen",
-        "title": "Bevor du weiterliest: atme einmal durch",
-        "content": "<p>Manchmal beginnt der erste Schritt nicht mit Reden. Sondern mit einem bewussten Atemzug.</p><p>Wenn du kurz bei dir ankommen willst, nutze die <a class=\"link\" href=\"/atemuebung\">Atemübung</a>.</p>"
-      }
-    },
-    {
-      "type": "newsletter",
-      "data": {
-        "anchor": "newsletter",
-        "eyebrow": "In Verbindung bleiben",
-        "title": "Bleib <span class=\"text-italic\">verbunden</span>",
-        "text": "Erhalte Informationen zu kommenden Treffen, Impulse zum Thema Männlichkeit und Neuigkeiten aus dem Männerkreis Niederbayern/ Straubing."
-      }
-    },
-    {
-      "type": "cta",
-      "data": {
-        "eyebrow": "Nächstes Treffen",
-        "title": "Sei beim <span class=\"text-italic\">nächsten</span><br>Mal dabei",
-        "text": "Der nächste Männerkreis findet bald statt. Sichere dir deinen Platz und erlebe, was echte Männergemeinschaft bedeutet.",
-        "buttonText": "Zum Termin & Anmeldung",
-        "buttonLink": "/event"
+        "anchor": "termine",
+        "eyebrow": "Nächster Schritt",
+        "title": "Dabei sein",
+        "newsletterText": "Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler nicht verschickt.",
+        "whatsappText": "Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine WhatsApp-Gruppe.",
+        "displayLines": ["DABEI", "SEIN."]
       }
     }
   ]

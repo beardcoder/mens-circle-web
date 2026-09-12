@@ -1,192 +1,116 @@
 ---
-interface Value {
-  number?: string;
-  title?: string;
-  description?: string;
-}
-
 interface Props {
   data: {
     anchor?: string;
     eyebrow?: string;
     title?: string;
     text?: string;
-    quote?: string;
-    values?: Value[];
+    questionsLabel?: string;
+    questions?: string[];
+    close?: string;
   };
 }
 
+/**
+ * "Der Kreis" — what an evening is about.
+ *
+ * Sits right of centre, against the ink band above it, so the page's left edge
+ * moves rather than every section starting in the same place. The four
+ * questions then break back out to the left at poster size: they are the thing
+ * to read if you read nothing else on the page, so they get the weight and the
+ * prose around them stays small.
+ */
+
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'ueber';
+const questions = data.questions ?? [];
 ---
 
-<section class="intro-section" id={anchor} aria-labelledby="intro-title">
-  <div class="intro__layout">
-    <div class="intro__left">
-      {
-        data.eyebrow && (
-          <p class="eyebrow" data-reveal="up">
-            {data.eyebrow}
-          </p>
-        )
-      }
-
-      {
-        data.title && (
-          <h2
-            class="section-title intro__title"
-            id="intro-title"
-            data-reveal="blur"
-            data-reveal-delay="80"
-            set:html={data.title}
-          />
-        )
-      }
-
-      {
-        data.text && (
-          <p class="intro__text" data-reveal="up" data-reveal-delay="180">
-            {data.text}
-          </p>
-        )
-      }
-
-      {
-        data.values && data.values.length > 0 && (
-          <ol class="intro__values" role="list" data-reveal-group="90">
-            {data.values.map((value) => (
-              <li class="value-item" data-reveal="up">
-                {value.number && (
-                  <span class="value-item__number" aria-hidden="true">
-                    {value.number}
-                  </span>
-                )}
-                {value.title && <h3 class="value-item__title">{value.title}</h3>}
-                {value.description && <p class="value-item__description">{value.description}</p>}
-              </li>
-            ))}
-          </ol>
-        )
-      }
-    </div>
-
-    <div class="intro__image-area">
-      <div class="intro__image-circles" aria-hidden="true">
-        <div class="intro__image-ring intro__image-ring--outer"></div>
-        <div class="intro__image-ring intro__image-ring--inner"></div>
+<section class="section home-circle" id={anchor} aria-labelledby="ueber-title">
+  <div class="container">
+    <div class="bay">
+      <div class="bay__right home-circle__intro">
+        <p class="marker marker--ruled">{data.eyebrow}</p>
+        {
+          data.title && (
+            <h2 class="section-title" id="ueber-title">
+              {data.title}
+            </h2>
+          )
+        }
+        {data.text && <div class="home-circle__text prose" set:html={data.text} />}
       </div>
-      {/* The quote is drawn into the circle — a slow zoom instead of a rise. */}
-      {
-        data.quote && (
-          <p
-            class="intro__image-text"
-            data-reveal="zoom"
-            data-reveal-delay="120"
-            data-reveal-duration="1100"
-            set:html={data.quote}
-          />
-        )
-      }
     </div>
+
+    {
+      questions.length > 0 && (
+        <div class="home-circle__questions">
+          <p class="marker home-circle__questions-label">{data.questionsLabel}</p>
+
+          <ul class="home-circle__list" role="list">
+            {questions.map((question) => (
+              <li class="home-circle__question">{question}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    {
+      data.close && (
+        <div class="bay">
+          <p class="bay__right home-circle__close">{data.close}</p>
+        </div>
+      )
+    }
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    .intro-section {
-      position: relative;
-      overflow: clip;
-      background: var(--bg-primary);
+    .home-circle__text p {
+      font-size: var(--text-section-body);
     }
 
-    .intro__layout {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: var(--space-xl);
-      min-block-size: 100vh;
+    .home-circle__questions {
+      margin-block: var(--space-xl) var(--space-lg);
     }
 
-    @media (width <= 1000px) {
-      .intro__layout {
-        grid-template-columns: 1fr;
-        min-block-size: auto;
-      }
+    .home-circle__questions-label {
+      padding-block-end: var(--space-xs);
+      margin-block-end: 0;
+      border-block-end: 3px solid var(--color-ink);
     }
 
-    .intro__left {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: var(--space-xl) var(--space-lg);
-      padding-inline-end: var(--space-xl);
+    .home-circle__list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
     }
 
-    @media (width <= 1000px) {
-      .intro__left {
-        order: 2;
-        padding: var(--space-xl) var(--space-md);
-      }
+    /* Poster-scale questions on hairlines. Condensed, sentence case rather than
+       uppercase — these are questions being asked, not a slogan being shouted. */
+    .home-circle__question {
+      padding-block: var(--space-sm);
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 0.9rem + 2.6vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text-primary);
+      border-block-end: 1px solid var(--border-medium);
+      text-wrap: balance;
     }
 
-    .intro__title {
-      max-inline-size: var(--content-max-wide);
+    /* One question carries the orange, so the block is not a uniform slab. */
+    .home-circle__question:first-child {
+      color: var(--color-ink);
     }
 
-    .intro__text {
-      max-inline-size: var(--content-max-text);
-      margin-block-end: var(--rhythm-block);
+    .home-circle__close {
+      max-inline-size: var(--measure);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
-    }
-
-    .intro__image-area {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-section-alt);
-    }
-
-    @media (width <= 1000px) {
-      .intro__image-area {
-        order: 1;
-        min-block-size: 50vh;
-      }
-    }
-
-    .intro__image-text {
-      position: relative;
-      z-index: 1;
-      max-inline-size: 500px;
-      margin-block-end: 0;
-      font-family: var(--font-display);
-      font-size: var(--text-2xl);
-      font-style: italic;
-      line-height: 1.3;
-      color: var(--text-on-dark);
-      text-align: center;
-    }
-
-    .intro__values {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    /* Scroll-driven parallax: the rings drift as the panel passes. The quote
-       is left out — its transform belongs to the data-reveal entrance. */
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .intro__image-area {
-          view-timeline: --intro-panel block;
-        }
-
-        .intro__image-circles {
-          animation: intro-rings-drift linear both;
-          animation-timeline: --intro-panel;
-        }
-      }
     }
   }
 </style>

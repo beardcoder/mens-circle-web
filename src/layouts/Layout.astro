@@ -21,8 +21,8 @@ interface Props {
   manifest?: string;
   webAppTitle?: string;
   viewport?: string;
-  /** Chrome-less shell — no header, footer, rails or scroll-to-top, so a page
-   *  can present as a full-screen app (the installable breathing exercise). */
+  /** Chrome-less shell — no header, footer or scroll-to-top, so a page can
+   *  present as a full-screen app (the installable breathing exercise). */
   bare?: boolean;
 }
 
@@ -56,14 +56,14 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
       addEventListener('pagereveal', (event) => {
         if (event.viewTransition) document.documentElement.classList.add('vt-arrival');
       });
+      // One axis only: light or dark, defaulting to the OS. Resolve it before
+      // first paint so nothing flashes.
       (() => {
         try {
           const root = document.documentElement;
-          const theme = localStorage.getItem('mc-theme') === 'cool' ? 'cool' : 'warm';
           const stored = localStorage.getItem('mc-mode');
           const mode = stored === 'light' || stored === 'dark' ? stored : null;
           const resolved = mode || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-          root.setAttribute('data-theme', theme);
           root.setAttribute('data-mode-resolved', resolved);
           if (mode) root.setAttribute('data-mode', mode);
         } catch {
@@ -71,9 +71,9 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
         }
       })();
     </script>
-    {/* Preload Playfair — the hero heading is the LCP. Config in astro.config.mjs. */}
-    <Font cssVariable="--font-playfair" preload />
-    <Font cssVariable="--font-dm-sans" />
+    {/* Preload the condensed — the poster headline is the LCP. Config in astro.config.mjs. */}
+    <Font cssVariable="--font-condensed" preload />
+    <Font cssVariable="--font-text" />
     <SeoHead {...props} />
     {
       /* `async`, NOT `defer`: deferred scripts run in document order, so a stalled
@@ -85,20 +85,6 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
   <body class:list={[{ 'is-bare': bare }]}>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
     {!bare && <span id="top" aria-hidden="true" />}
-
-    {/* Editorial side rails — decorative magazine framing, hidden on small screens */}
-    {
-      !bare && (
-        <>
-          <aside class="side-rail side-rail--left" aria-hidden="true">
-            <span class="side-rail__text">Männerkreis · Niederbayern</span>
-          </aside>
-          <aside class="side-rail side-rail--right" aria-hidden="true">
-            <span class="side-rail__text">Straubing · Bayern</span>
-          </aside>
-        </>
-      )
-    }
 
     <a href="#main" class="skip-link">Zum Inhalt springen</a>
 
@@ -123,19 +109,19 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
     .skip-link {
       position: absolute;
       inset-block-start: -100%;
-      inset-inline-start: 50%;
+      inset-inline-start: var(--space-sm);
       z-index: var(--z-toast);
-      padding: 1rem 2rem;
-      font-size: 0.875rem;
-      color: var(--text-on-dark);
-      background: var(--bg-section-alt);
-      border-radius: var(--radius-full);
-      transform: translateX(-50%);
+      padding: 0.75rem 1.25rem;
+      font-size: var(--text-caption);
+      font-weight: 600;
+      color: light-dark(var(--color-paper), var(--color-night));
+      background: var(--accent-primary);
+      border-radius: var(--radius-md);
       transition: inset-block-start var(--motion-quick);
     }
 
     .skip-link:focus {
-      inset-block-start: var(--space-sm);
+      inset-block-start: var(--space-xs);
     }
   }
 </style>
