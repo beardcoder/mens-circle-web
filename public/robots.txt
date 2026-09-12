@@ -1,4 +1,4 @@
-# robots.txt — Männerkreis Niederbayern/ Straubing
+# robots.txt — Männerkreis Straubing
 
 User-agent: *
 Allow: /
