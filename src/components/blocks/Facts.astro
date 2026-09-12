@@ -1,0 +1,139 @@
+---
+import { buildEventFacts, type NextEventSummary } from '@lib/event-landing';
+
+/**
+ * The practical facts, immediately under the hero — and the page's first hard
+ * tonal cut: a full-bleed ink band right after the bright opening.
+ *
+ * Four answers as a poster band: a small condensed label over a large condensed
+ * value, separated by vertical rules. Not icon tiles, not a definition list —
+ * this is the one row a visitor scans before deciding whether to keep reading,
+ * so the values are set big enough to take in at a glance.
+ *
+ * The same builder feeds /event, so the two pages can never state different
+ * facts, and a scheduled evening sharpens three of the four. The street address
+ * is never here: it goes out with the registration confirmation.
+ */
+
+interface Props {
+  data: { anchor?: string; eyebrow?: string };
+  /** The next scheduled event, when there is one. */
+  next: NextEventSummary | null;
+}
+
+const { data, next } = Astro.props;
+const facts = buildEventFacts(next);
+const anchor = data.anchor ?? 'praktisches';
+---
+
+<section class="section section--ink home-facts" id={anchor} aria-labelledby="praktisches-title">
+  <div class="container">
+    <h2 class="marker home-facts__title" id="praktisches-title">{data.eyebrow ?? 'Praktisches'}</h2>
+
+    <dl class="home-facts__row">
+      {
+        facts.map((fact) => (
+          <div class="home-facts__item">
+            <dt class="home-facts__label">{fact.label}</dt>
+            <dd class="home-facts__value">{fact.value}</dd>
+            <dd class="home-facts__note">{fact.sub}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .home-facts {
+      padding-block: var(--space-lg);
+    }
+
+    .home-facts__title {
+      margin-block-end: var(--space-md);
+      color: var(--color-orange);
+    }
+
+    .home-facts__row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin: 0;
+      border-block-start: 1px solid var(--border-on-dark);
+    }
+
+    .home-facts__item {
+      padding-block: var(--space-md) var(--space-sm);
+      padding-inline-end: var(--space-md);
+    }
+
+    /* Vertical rules between the four, none at the outer edges. */
+    .home-facts__item + .home-facts__item {
+      padding-inline-start: var(--space-md);
+      border-inline-start: 1px solid var(--border-on-dark);
+    }
+
+    .home-facts__label {
+      font-family: var(--font-display);
+      font-size: var(--text-marker);
+      font-weight: 600;
+      color: var(--color-chalk-muted);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-marker);
+    }
+
+    .home-facts__value {
+      margin: var(--space-2xs) 0 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 1.1rem + 2.4vw, 3rem);
+      font-weight: 800;
+      line-height: 0.95;
+      color: var(--color-chalk);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+    }
+
+    .home-facts__note {
+      margin: var(--space-xs) 0 0;
+      font-size: var(--text-caption);
+      line-height: var(--leading-normal);
+      color: var(--color-chalk-muted);
+      text-wrap: pretty;
+    }
+
+    /* Two-up, then stacked. The rules follow the columns. */
+    @media (width <= 62em) {
+      .home-facts__row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .home-facts__item:nth-child(odd) {
+        padding-inline-start: 0;
+        border-inline-start: none;
+      }
+
+      .home-facts__item:nth-child(n + 3) {
+        border-block-start: 1px solid var(--border-on-dark);
+      }
+    }
+
+    @media (width <= 36em) {
+      .home-facts__row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .home-facts__item {
+        padding-inline: 0;
+        border-inline-start: none;
+      }
+
+      .home-facts__item + .home-facts__item {
+        padding-inline-start: 0;
+        border-block-start: 1px solid var(--border-on-dark);
+        border-inline-start: none;
+      }
+    }
+  }
+</style>

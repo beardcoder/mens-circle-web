@@ -3,32 +3,67 @@ import Layout from '../layouts/Layout.astro';
 import type { Block } from '../components/PageContent.astro';
 import PageContent from '../components/PageContent.astro';
 import home from '../content/home.json';
+import site from '../data/site.json';
+import { fetchNextEventState } from '@lib/server/events';
+import { fetchTestimonials } from '@lib/server/testimonials';
+import { summarizeNextEvent } from '@lib/event-landing';
+import { dateStatus } from '@lib/event-status';
 
-// Prerendered (static): served straight off disk by the Bun server, and the
-// Moderator image is optimized at BUILD time (no runtime /_image endpoint). The only
-// live part — the testimonials — is a server island (see PageContent.astro).
-export const prerender = true;
+/**
+ * Server-rendered, not prerendered.
+ *
+ * The page used to be static with the testimonials filling in afterwards as a
+ * server island. It now states the scheduling state in the opening block and
+ * again at the close, and that has to be true when the HTML arrives — a hero
+ * button offering "Platz sichern" for a date that no longer exists is worse than
+ * a slightly more expensive render. Two indexed SQLite reads per request,
+ * in-process, are not what this server's RAM budget is spent on.
+ *
+ * Because the page is server-rendered anyway, the testimonials are read here
+ * rather than deferred: the island would only add a second round trip for data
+ * this render already has.
+ */
+export const prerender = false;
+
+const [{ status, event }, testimonials] = await Promise.all([fetchNextEventState(), fetchTestimonials()]);
+
+const next = summarizeNextEvent(event);
+const state = dateStatus(status, next);
 
 const blocks = home.blocks as Block[];
 
-// Strip inline HTML from titles for schema text.
-const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
+const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 
 // Build per-page structured data from the content blocks.
 const schemas: Record<string, unknown>[] = [];
 
-const journey = blocks.find((b) => b.type === 'journey-steps');
-if (journey?.data?.steps?.length) {
-  // The journey steps describe the flow of a meeting, not an actionable
-  // procedure — and Google retired HowTo rich results in 2023, so HowTo markup
-  // no longer earns any SERP feature. ItemList is the valid, machine-readable
-  // representation that still feeds AI/LLM understanding of the steps.
+const faq = blocks.find((b) => b.type === 'faq');
+if (faq?.data?.items?.length) {
+  schemas.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `${siteUrl.origin}/#faq`,
+    mainEntity: faq.data.items
+      .filter((i: { question?: string; answer?: string }) => i.question && i.answer)
+      .map((i: { question?: string; answer?: string }) => ({
+        '@type': 'Question',
+        name: i.question,
+        acceptedAnswer: { '@type': 'Answer', text: i.answer },
+      })),
+  });
+}
+
+// The steps describe how an evening runs, not an actionable procedure — and
+// Google retired HowTo rich results in 2023, so HowTo markup would earn no SERP
+// feature. ItemList stays the valid, machine-readable representation.
+const evening = blocks.find((b) => b.type === 'journey-steps');
+if (evening?.data?.steps?.length) {
   schemas.push({
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: strip(journey.data.title) || 'Deine Reise zum Männerkreis',
-    description: journey.data.subtitle ?? 'Wie du Teil des Männerkreis wirst',
-    itemListElement: journey.data.steps.map((s: { title?: string; description?: string }, i: number) => ({
+    name: evening.data.title ?? 'Wie ein Abend abläuft',
+    description: evening.data.subtitle ?? '',
+    itemListElement: evening.data.steps.map((s: { title?: string; description?: string }, i: number) => ({
       '@type': 'ListItem',
       position: i + 1,
       name: s.title ?? '',
@@ -37,22 +72,33 @@ if (journey?.data?.steps?.length) {
   });
 }
 
-const faq = blocks.find((b) => b.type === 'faq');
-if (faq?.data?.items?.length) {
-  schemas.push({
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faq.data.items
-      .filter((i: { question?: string; answer?: string }) => i.question && i.answer)
-      .map((i: { question?: string; answer?: string }) => ({
-        '@type': 'Question',
-        name: i.question,
-        acceptedAnswer: { '@type': 'Answer', text: strip(i.answer) },
-      })),
-  });
-}
+// The recurring circle itself. Kept in step with what the page actually shows:
+// the rhythm, the duration and the donation basis are all stated in the visible
+// facts list, so the structured data and the page cannot drift apart.
+schemas.push({
+  '@context': 'https://schema.org',
+  '@type': 'EventSeries',
+  '@id': `${siteUrl.origin}/#series`,
+  name: 'Männerkreis Straubing / Niederbayern',
+  description:
+    'Männerkreis in Straubing, Niederbayern: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt. Alle zwei bis vier Wochen, zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.',
+  url: siteUrl.origin,
+  inLanguage: 'de-DE',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  audience: { '@type': 'Audience', audienceType: 'Männer' },
+  location: {
+    '@type': 'Place',
+    name: `Männerkreis ${site.geo.locality}`,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: site.geo.locality,
+      addressRegion: site.geo.region,
+      addressCountry: site.geo.country,
+    },
+  },
+});
 ---
 
 <Layout title={home.meta.title} description={home.meta.description} keywords={home.meta.keywords} schemas={schemas}>
-  <PageContent blocks={blocks} />
+  <PageContent blocks={blocks} state={state} next={next} testimonials={testimonials} />
 </Layout>

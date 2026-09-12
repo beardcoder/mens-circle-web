@@ -16,42 +16,90 @@ const address =
   fullAddress({ street: event.street, postalCode: event.postal_code, city: event.city }) || event.location;
 ---
 
-<section class="event-map-section">
+<section class="section section--ruled event-map-section" aria-labelledby="anfahrt-title">
   <div class="container">
-    <div class="event-map__header" data-reveal-group="100">
-      <p class="eyebrow" data-reveal="up">Anfahrt</p>
-      <h2 class="section-title section-title--lg event-map__title" data-reveal="blur">
-        So findest du <span class="text-italic">zu uns</span>
-      </h2>
-      <p class="event-map__subtitle" data-reveal="up">{address}</p>
-    </div>
+    <div class="spine">
+      <h2 class="rail-heading" id="anfahrt-title">Anfahrt</h2>
 
-    <div data-reveal="zoom">
-      <EventMap client:visible lat={lat} lng={lng} title={event.location} address={address} />
-    </div>
+      <div class="spine__body--wide">
+        <p class="event-map__address">{address}</p>
 
-    <div class="event-map__actions" data-reveal="up">
-      <a
-        href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
-        target="_blank"
-        rel="noopener"
-        class="btn btn--secondary"
-      >
-        In OpenStreetMap öffnen
-      </a>
-      <a
-        href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
-        target="_blank"
-        rel="noopener"
-        class="btn btn--primary"
-      >
-        Route mit Google Maps
-      </a>
-    </div>
+        <div class="event-map__frame">
+          <EventMap client:visible lat={lat} lng={lng} title={event.location} address={address} />
+        </div>
 
-    <p class="event-map__attribution">
-      Karte von
-      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>-Mitwirkenden
-    </p>
+        <div class="event-map__actions">
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+            target="_blank"
+            rel="noopener"
+            class="btn btn--secondary"
+          >
+            Route planen (Google Maps)
+          </a>
+          <a
+            href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
+            target="_blank"
+            rel="noopener"
+            class="btn btn--secondary"
+          >
+            In OpenStreetMap öffnen
+          </a>
+        </div>
+
+        <p class="event-map__attribution">
+          Karte von
+          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a
+          >-Mitwirkenden
+        </p>
+      </div>
+    </div>
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .event-map__address {
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-normal);
+      color: var(--text-primary);
+    }
+
+    /* A fixed frame so the map can never push the page around as it loads. */
+    .event-map__frame {
+      aspect-ratio: 16 / 9;
+      overflow: clip;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+    }
+
+    .event-map__frame > * {
+      block-size: 100%;
+    }
+
+    @media (width <= 600px) {
+      .event-map__frame {
+        aspect-ratio: 4 / 3;
+      }
+    }
+
+    .event-map__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-block-start: var(--space-sm);
+    }
+
+    .event-map__attribution {
+      margin-block-start: var(--space-xs);
+      font-size: var(--text-caption);
+      color: var(--text-muted);
+    }
+
+    .event-map__attribution a {
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+  }
+</style>

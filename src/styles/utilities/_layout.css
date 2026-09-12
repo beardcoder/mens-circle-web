@@ -1,15 +1,27 @@
 /**
- * Layout Utilities
- * Modern CSS Layout with Logical Properties
+ * Layout.
+ *
+ * Two systems, used for different jobs:
+ *
+ *   .bay    a 12-column grid at 1320px. The composed sections place their
+ *           content into *different* column spans, so the left edge actually
+ *           moves down the page instead of every section starting at the same
+ *           x. Graphics may break out of it; reading text may not.
+ *
+ *   .spine  a narrow marker column beside a text column. Kept for the quiet
+ *           passages and the sub-pages, where a marginal label beside running
+ *           prose is exactly right — and where the previous iteration's mistake
+ *           was using it for *everything*, which is what made the page read as
+ *           a stock theme.
  */
 
 /* ============================================
-   Container System
+   Container
    ============================================ */
 .container {
   inline-size: 100%;
   max-inline-size: var(--container-width);
-  padding-inline: var(--space-md);
+  padding-inline: var(--container-gutter);
   margin-inline: auto;
 }
 
@@ -22,9 +34,71 @@
 }
 
 /* ============================================
-   Section System
-   Block padding wired to the semantic rhythm scale so every section
-   feels evenly weighted regardless of theme.
+   The 12-column bay
+   ============================================ */
+.bay {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+  /* Start-aligned, not stretched: a marker in the rail column would otherwise
+     be stretched to the height of the text column beside it, and a flex marker
+     would then centre its own content halfway down an empty cell. */
+  align-items: start;
+}
+
+/* Named spans, so a section declares its position in words rather than
+   repeating grid-column arithmetic. Below 56em everything collapses to one
+   column — an asymmetric 12-track grid on a phone is just a narrow column
+   with extra steps. */
+.bay__full {
+  grid-column: 1 / -1;
+}
+
+.bay__left {
+  grid-column: 1 / span 7;
+}
+
+.bay__mid {
+  grid-column: 3 / span 8;
+}
+
+.bay__right {
+  grid-column: 6 / span 7;
+}
+
+/* Pairs with `.bay__left` (cols 1–7) without overlapping it — two spans that
+   share a track are pushed onto separate rows by auto-placement, which is not
+   what a side-by-side pair wants. */
+.bay__far-right {
+  grid-column: 8 / span 5;
+}
+
+.bay__marker {
+  grid-column: 1 / span 2;
+}
+
+.bay__beside-marker {
+  grid-column: 3 / span 7;
+}
+
+@media (width <= 56em) {
+  .bay {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bay__full,
+  .bay__left,
+  .bay__mid,
+  .bay__right,
+  .bay__far-right,
+  .bay__marker,
+  .bay__beside-marker {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ============================================
+   Sections
    ============================================ */
 .section {
   position: relative;
@@ -35,47 +109,102 @@
   padding-block: var(--rhythm-section-lg);
 }
 
+/* A section set apart by a hairline rather than by a change of ground. */
+.section--ruled {
+  border-block-start: 1px solid var(--border-light);
+}
+
+/* The two inverted grounds. `--ink` is the quiet one (the facts band, the
+   participation close); `--signal` is the loud one and is used exactly once.
+   Both set their own text colours, so anything dropped inside them stays
+   legible without extra classes at the call site. */
+.section--ink {
+  color: var(--color-chalk);
+  background: var(--color-ink);
+  border-block-start: none;
+}
+
+.section--ink .rail-heading,
+.section--ink .caption,
+.section--ink .marker,
+.section--ink .deflist__term,
+.section--ink .deflist__note {
+  color: var(--color-chalk-muted);
+}
+
+.section--ink .deflist,
+.section--ink .deflist__row {
+  border-color: var(--border-on-dark);
+}
+
+.section--ink .deflist__desc,
+.section--ink .section-title {
+  color: var(--color-chalk);
+}
+
+.section--signal {
+  color: var(--color-ink);
+  background: var(--color-orange);
+  border-block-start: none;
+}
+
+/* Anything that crops a graphic at the viewport edge must clip, or the page
+   gains a horizontal scrollbar on wide screens. */
+.section--clip {
+  overflow: clip;
+}
+
+/* ============================================
+   The prose spine — marker column + text column
+   ============================================ */
+.spine {
+  display: grid;
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+  gap: var(--space-sm) var(--space-lg);
+  align-items: start;
+}
+
+.spine__body {
+  min-inline-size: 0;
+}
+
+.spine__body--wide {
+  min-inline-size: 0;
+}
+
+@media (width <= 56em) {
+  .spine {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+}
+
 /* ============================================
    Rendering performance — skip below-fold sections
    ============================================
-   The long pages (home, event) stack many self-contained sections. With
-   `content-visibility: auto` the browser skips style/layout/paint for the
-   ones far outside the viewport and renders them just-in-time as they
-   approach — first render and every restyle get cheaper, with zero visual
-   difference (each listed section already clips its own decoration, so the
-   paint containment this implies changes nothing).
-
-   The intrinsic-size hint stands in for a skipped section's height so the
-   scrollbar stays sane before first render; `auto` then remembers the real
-   size once rendered. Only sections that never sit above the fold are
-   listed — heroes, intro and the registration split stay always-rendered. */
+   Long pages stack many self-contained sections. With `content-visibility:
+   auto` the browser skips style/layout/paint for the ones far outside the
+   viewport. Only sections that never sit above the fold are listed, and never
+   one carrying a scroll-driven animation — a skipped section has no layout for
+   the timeline to read, so the statement is deliberately absent here. */
 @supports (content-visibility: auto) {
   :where(
-    .moderator-section,
-    .journey-section,
+    .home-person,
+    .home-evening,
+    .home-frame,
     .faq-section,
     .values-section,
-    .archetypes-section,
     .testimonials-section,
     .newsletter-section,
-    .whatsapp-section,
     .cta-section,
     .event-info-section,
     .event-map-section,
     .event-about-section,
     .event-cta-section,
-    .event-landing-everyday,
-    .event-landing-evening,
-    .event-landing-first,
-    .event-landing-voice,
-    .event-landing-fit,
-    .event-landing-not,
-    .event-landing-frame,
     .event-landing-facts,
-    .event-landing-guide,
     .event-landing-more
   ) {
     content-visibility: auto;
-    contain-intrinsic-block-size: auto 800px;
+    contain-intrinsic-block-size: auto 700px;
   }
 }

@@ -2,10 +2,10 @@
 import type { Testimonial } from '@lib/types';
 
 /**
- * One real voice, right after "Du musst nichts können". Deliberately not a
- * second Testimonials grid — that would put the same quotes on two indexed URLs
- * and cost another full query. Takes the top curated entry as a pull quote, and
- * renders nothing when none is published.
+ * One real voice. Deliberately not a second testimonials grid — that would put
+ * the same quotes on two indexed URLs and cost another full query. Takes the top
+ * curated entry as a pull quote, quoted as submitted, and renders nothing when
+ * none is published.
  */
 
 interface Props {
@@ -17,22 +17,21 @@ const { voice } = Astro.props;
 
 {
   voice && (
-    <section class="section event-landing-voice" aria-label="Stimme aus dem Kreis">
+    <section class="section section--ruled event-landing-voice" aria-label="Stimme aus dem Kreis">
       <div class="container">
-        <p class="eyebrow" data-reveal="up">
-          Aus dem Kreis
-        </p>
+        <div class="spine">
+          <p class="rail-heading">Aus dem Kreis</p>
 
-        {/* A spoken word settles rather than moves — slow fade, no travel. */}
-        <figure class="event-landing-voice__figure" data-reveal="fade" data-reveal-duration="1100">
-          <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
-          {(voice.author || voice.role) && (
-            <figcaption class="event-landing-voice__author">
-              {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
-              {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
-            </figcaption>
-          )}
-        </figure>
+          <figure class="event-landing-voice__figure spine__body" data-reveal="fade">
+            <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
+            {(voice.author || voice.role) && (
+              <figcaption class="event-landing-voice__author">
+                {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
+                {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
+              </figcaption>
+            )}
+          </figure>
+        </div>
       </div>
     </section>
   )
@@ -41,22 +40,18 @@ const { voice } = Astro.props;
 <style is:global>
   @layer sections {
     .event-landing-voice__figure {
-      max-inline-size: min(42rem, 100%);
+      max-inline-size: var(--measure);
       margin: 0;
     }
 
-    /* The accent rule of `.moderator__quote`, not the testimonial grid's hanging
-       quote mark: an existing pattern for a single spoken line, and it can't
-       drift out of alignment the way a positioned glyph does. */
+    /* Sized to be read, not to be admired: submitted quotes run to a dozen
+       lines, and a dozen lines of 2rem display serif is a wall. */
     .event-landing-voice__quote {
-      padding-inline-start: var(--space-md);
       margin: 0;
       font-family: var(--font-display);
-      font-size: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
-      font-style: italic;
-      line-height: 1.4;
+      font-size: var(--text-lg);
+      line-height: var(--leading-normal);
       color: var(--text-primary);
-      border-inline-start: 3px solid var(--accent-primary);
       text-wrap: pretty;
     }
 
@@ -65,12 +60,11 @@ const { voice } = Astro.props;
       flex-wrap: wrap;
       gap: var(--space-3xs) var(--space-xs);
       align-items: baseline;
-      padding-inline-start: calc(var(--space-md) + 3px);
       margin-block-start: var(--space-sm);
     }
 
     .event-landing-voice__name {
-      font-size: var(--text-body-compact);
+      font-size: var(--text-caption);
       font-style: normal;
       font-weight: 600;
       color: var(--text-primary);

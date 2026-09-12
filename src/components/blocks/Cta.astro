@@ -12,114 +12,89 @@ interface Props {
   };
 }
 
+/**
+ * A closing invitation on a sub-page. One action, one optional quiet link.
+ *
+ * Used only by the Haltung page now — the home page closes with its own Termine
+ * block, which knows the actual scheduling state. It used to be a centred block
+ * on a separate ground with two breathing circle ornaments behind it.
+ */
+
 const { data } = Astro.props;
 ---
 
-<section class="section section--large cta-section" id={data.anchor}>
-  <div class="cta__ornament cta__ornament--outer" aria-hidden="true"></div>
-  <div class="cta__ornament cta__ornament--inner" aria-hidden="true"></div>
+<section class="section section--ruled cta-section" id={data.anchor}>
   <div class="container">
-    <div class="cta__content" data-reveal-group="100">
-      {
-        data.eyebrow && (
-          <p class="eyebrow" data-reveal="up">
-            {data.eyebrow}
-          </p>
-        )
-      }
+    <div class="spine">
+      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
 
-      {data.title && <h2 class="section-title cta__title" data-reveal="blur" set:html={data.title} />}
+      <div class="spine__body" data-reveal-group="55">
+        {data.title && <h2 class="cta__title" data-reveal="up" set:html={data.title} />}
 
-      {
-        data.text && (
-          <p class="cta__text" data-reveal="up">
-            {data.text}
-          </p>
-        )
-      }
+        {
+          data.text && (
+            <p class="cta__text" data-reveal="up">
+              {data.text}
+            </p>
+          )
+        }
 
-      {/* The final invitation opens toward the reader — a zoom, not a rise. */}
-      {
-        data.buttonText && data.buttonLink && (
-          <a
-            href={data.buttonLink}
-            class="btn btn--primary btn--large"
-            data-reveal="zoom"
-            data-reveal-duration="1000"
-            data-umami-event="cta-click"
-            data-umami-event-location="cta-block"
-            data-umami-event-text={data.buttonText}
-          >
-            {data.buttonText}
-          </a>
-        )
-      }
+        {
+          data.buttonText && data.buttonLink && (
+            <p class="actions" data-reveal="up">
+              <a
+                href={data.buttonLink}
+                class="btn btn--primary btn--large"
+                data-umami-event="cta-click"
+                data-umami-event-location="cta-block"
+                data-umami-event-text={data.buttonText}
+              >
+                {data.buttonText}
+              </a>
 
-      {
-        data.secondaryLabel && data.secondaryLink && (
-          <p class="cta__secondary" data-reveal="up">
-            <a href={data.secondaryLink} class="link">
-              {data.secondaryLabel}
-            </a>
-          </p>
-        )
-      }
+              {data.secondaryLabel && data.secondaryLink && (
+                <a href={data.secondaryLink} class="text-link">
+                  {data.secondaryLabel}
+                </a>
+              )}
+            </p>
+          )
+        }
+      </div>
     </div>
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    .cta-section {
-      position: relative;
-      overflow: clip;
-      text-align: center;
-      background: var(--bg-tertiary);
-    }
-
-    .cta__ornament {
-      position: absolute;
-      inset-block-start: 50%;
-      inset-inline-start: 50%;
-      pointer-events: none;
-      border: 1px solid var(--color-sand);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .cta__ornament--outer {
-      inline-size: 50vw;
-      block-size: 50vw;
-      opacity: 0.3;
-      animation: breathe-slow 24s var(--ease-ambient) infinite;
-    }
-
-    .cta__ornament--inner {
-      inline-size: 35vw;
-      block-size: 35vw;
-      opacity: 0.2;
-      animation: breathe 20s var(--ease-ambient) infinite -8s;
-    }
-
-    .cta__content {
-      position: relative;
-      z-index: 1;
-      max-inline-size: var(--content-max-wide);
-      margin-inline: auto;
+    .cta__title {
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-3xl);
+      line-height: 1.15;
+      text-wrap: balance;
     }
 
     .cta__text {
-      margin-block-end: var(--rhythm-block);
+      max-inline-size: var(--measure);
+      margin-block-end: var(--space-md);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
-    .cta__secondary {
-      margin-block-start: var(--space-md);
-      margin-inline: auto;
-      font-size: var(--text-sm);
-      color: var(--text-secondary);
+    @media (width <= 480px) {
+      .cta-section .actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .cta-section .btn {
+        inline-size: 100%;
+      }
+
+      .cta-section .text-link {
+        justify-content: center;
+      }
     }
   }
 </style>
