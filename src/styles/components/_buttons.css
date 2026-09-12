@@ -23,11 +23,13 @@
    ============================================ */
 .btn {
   --btn-bg: var(--color-orange);
+  /* Ink on orange in both modes: the orange does not flip, so neither does the
+     label on it. The hover inverts to the page's own ink, which does flip. */
   --btn-color: var(--color-ink);
   --btn-border: var(--color-orange);
-  --btn-hover-bg: var(--color-ink);
-  --btn-hover-color: var(--color-paper);
-  --btn-hover-border: var(--color-ink);
+  --btn-hover-bg: var(--text-primary);
+  --btn-hover-color: var(--bg-primary);
+  --btn-hover-border: var(--text-primary);
   --btn-padding-block: 0.85rem;
   --btn-padding-inline: 1.5rem;
   --btn-gap: 0.7em;
@@ -100,18 +102,24 @@
   }
 }
 
-/* The focus ring has to win on paper, on ink and on the orange field alike,
-   so it is a solid ink outline with an orange halo behind it rather than a
-   single tinted ring that would vanish on one of the three grounds. */
+/* The focus ring has to win on paper, on ink and on the orange field alike, so
+   it pairs a solid outline with an orange halo rather than relying on a single
+   tinted ring. The outline flips with the mode; the sections that carry their
+   own fixed ground override it. */
 .btn:focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 3px solid var(--text-primary);
   outline-offset: 3px;
   box-shadow: 0 0 0 3px var(--color-orange);
 }
 
 .section--ink .btn:focus-visible,
+.section--signal .btn:focus-visible,
 .footer .btn:focus-visible {
   outline-color: var(--color-paper);
+}
+
+.section--signal .btn:focus-visible {
+  outline-color: var(--color-ink);
 }
 
 .btn:disabled,
@@ -133,11 +141,15 @@
 
 .btn--primary {
   --btn-bg: var(--color-orange);
+  /* Ink on orange in both modes: the orange does not flip, so neither does its
+     label. 5.9:1 either way. */
   --btn-color: var(--color-ink);
   --btn-border: var(--color-orange);
-  --btn-hover-bg: var(--color-ink);
-  --btn-hover-color: var(--color-paper);
-  --btn-hover-border: var(--color-ink);
+  /* The hover inverts to the page's own ink, which DOES flip — on the dark
+     ground an ink-on-ink hover made the button disappear. */
+  --btn-hover-bg: var(--text-primary);
+  --btn-hover-color: var(--bg-primary);
+  --btn-hover-border: var(--text-primary);
 }
 
 /* On the ink ground the hover cannot go darker, so it goes lighter. */
@@ -158,14 +170,14 @@
   --btn-hover-border: var(--color-ink);
 }
 
-/* Outlined for light surfaces */
+/* Outlined, on whichever ground the page currently has */
 .btn--secondary {
   --btn-bg: transparent;
   --btn-color: var(--text-primary);
-  --btn-border: var(--color-ink);
-  --btn-hover-bg: var(--color-ink);
-  --btn-hover-color: var(--color-paper);
-  --btn-hover-border: var(--color-ink);
+  --btn-border: var(--rule-strong);
+  --btn-hover-bg: var(--text-primary);
+  --btn-hover-color: var(--bg-primary);
+  --btn-hover-border: var(--text-primary);
 }
 
 /* Outlined for dark surfaces */
@@ -201,9 +213,9 @@
   --btn-bg: transparent;
   --btn-color: var(--text-primary);
   --btn-border: var(--border-medium);
-  --btn-hover-bg: var(--color-ink);
-  --btn-hover-color: var(--color-paper);
-  --btn-hover-border: var(--color-ink);
+  --btn-hover-bg: var(--text-primary);
+  --btn-hover-color: var(--bg-primary);
+  --btn-hover-border: var(--text-primary);
 }
 
 /* ============================================
