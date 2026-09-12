@@ -1,95 +1,150 @@
 /**
- * Motion system — single source of truth for frontend animation.
+ * Motion system.
  *
- *   data-reveal   scroll-triggered entrance (driven by lib/motion.ts)
- *   data-hover    pointer micro-interaction (lift / glow / scale / press)
- *   data-motion   intrinsic surface behaviour (image clip-scale, link underline)
+ * Three designed situations, and nothing else that moves:
  *
- * Composited properties only; timing tokens live in base/_variables.css;
- * everything decorative is gated behind `prefers-reduced-motion: no-preference`.
+ *   1. THE ENTRANCE   one staggered introduction of the hero, ~820ms end to end.
+ *   2. THE RING       drifts and turns on scroll (see components/Ring.astro).
+ *   3. THE STATEMENT  three lines settle flush-left as the orange field enters.
+ *
+ * Everything is opacity/transform, everything is gated behind
+ * `prefers-reduced-motion: no-preference`, and no content depends on any of it:
+ * every animation ends in the state a static render already shows, and the
+ * hidden start states are pure CSS with no JS to fail.
+ *
+ * What is deliberately absent: per-paragraph scroll reveals, hover lifts,
+ * custom cursors, magnetic buttons, endless marquees.
  */
 
-/* Hero entrance — the one above-the-fold page-load sequence. */
+/* ── 1. The entrance ──────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: no-preference) {
+  /* The headline arrives line by line, not letter by letter. */
+  .home-hero__display .display__line {
+    animation: poster-line-in 620ms var(--ease-emphasised) both;
+  }
+
+  .home-hero__display .display__line:nth-child(2) {
+    animation-delay: 90ms;
+  }
+
+  .home-hero__kicker {
+    animation: poster-rise 520ms var(--ease-settle) both;
+  }
+
+  .home-hero__lede {
+    animation: poster-rise 560ms var(--ease-settle) 220ms both;
+  }
+
+  .home-hero__body {
+    animation: poster-rise 560ms var(--ease-settle) 300ms both;
+  }
+
+  .home-hero__action {
+    animation: poster-rise 560ms var(--ease-settle) 380ms both;
+  }
+
+  .home-hero .ring--hero {
+    animation: ring-in 760ms var(--ease-emphasised) both;
+  }
+
+  .home-hero__figure {
+    animation: plate-in 620ms var(--ease-emphasised) 260ms both;
+  }
+
+  /* Sub-page openings keep the single quiet rise. */
   .hero__label,
   .hero__title,
   .hero__bottom,
-  .hero__scroll {
-    animation: hero-rise var(--duration-cinematic) var(--ease-emphasised) both;
+  .page-opening__eyebrow,
+  .page-opening__title,
+  .page-opening__lead,
+  .page-opening__cta {
+    animation: hero-rise var(--duration-slow) var(--ease-settle) both;
   }
 
-  .hero__label {
-    animation-duration: 800ms;
+  .hero__title,
+  .page-opening__title {
     animation-delay: var(--stagger-1);
   }
 
-  .hero__title {
-    animation-duration: 1200ms;
+  .hero__bottom,
+  .page-opening__lead {
     animation-delay: var(--stagger-2);
   }
 
-  .hero__bottom {
+  .page-opening__cta {
     animation-delay: var(--stagger-3);
-  }
-
-  .hero__scroll {
-    animation-duration: 900ms;
-    animation-delay: var(--stagger-4);
-  }
-
-  /* Inner-page hero — same signature entrance, lighter stagger. */
-  .page-hero__eyebrow,
-  .page-hero__title,
-  .page-hero__lead,
-  .page-hero__cta,
-  .page-hero__media {
-    animation: hero-rise var(--duration-slower) var(--ease-emphasised) both;
-  }
-
-  .page-hero__eyebrow {
-    animation-delay: var(--stagger-1);
-  }
-
-  .page-hero__title {
-    animation-duration: var(--duration-cinematic);
-    animation-delay: var(--stagger-2);
-  }
-
-  .page-hero__lead {
-    animation-delay: var(--stagger-3);
-  }
-
-  .page-hero__cta {
-    animation-delay: var(--stagger-4);
-  }
-
-  .page-hero__media {
-    animation-duration: var(--duration-cinematic);
-    animation-delay: var(--stagger-2);
   }
 
   /* Arriving through a view transition, the cross-fade already *is* the
-     entrance — running the rise underneath it was two entrances at once, which
-     is what made navigation look like it lurched into place. `.vt-arrival` is
-     set from the `pagereveal` listener in Layout.astro before first paint, and
-     never removed: taking it off later would start these animations from
-     `opacity: 0` and flash the hero. */
+     entrance. `.vt-arrival` is set from the `pagereveal` listener in
+     Layout.astro before first paint, and never removed: taking it off later
+     would restart these from `opacity: 0` and flash the headline. */
+  .vt-arrival .home-hero__display .display__line,
+  .vt-arrival .home-hero__kicker,
+  .vt-arrival .home-hero__lede,
+  .vt-arrival .home-hero__body,
+  .vt-arrival .home-hero__action,
+  .vt-arrival .home-hero .ring--hero,
+  .vt-arrival .home-hero__figure,
   .vt-arrival .hero__label,
   .vt-arrival .hero__title,
   .vt-arrival .hero__bottom,
-  .vt-arrival .hero__scroll,
-  .vt-arrival .page-hero__eyebrow,
-  .vt-arrival .page-hero__title,
-  .vt-arrival .page-hero__lead,
-  .vt-arrival .page-hero__cta,
-  .vt-arrival .page-hero__media {
+  .vt-arrival .page-opening__eyebrow,
+  .vt-arrival .page-opening__title,
+  .vt-arrival .page-opening__lead,
+  .vt-arrival .page-opening__cta {
     animation: none;
   }
 }
 
-/* Reveal-on-scroll hidden start state. CSS owns only this `opacity: 0`, gated
-   behind `.motion-ready`; lib/motion.ts owns the keyframes — not here. */
+/* ── 3. The statement ─────────────────────────────────────────────────────
+   Scroll-driven, so it tracks the section's position rather than firing once
+   on a timer. Each line starts from a different offset and they converge on a
+   flush-left edge — the movement is the composition arriving, not a reveal.
+
+   `animation-range: entry` so it completes while the section is still coming
+   up; by the time the field fills the screen the lines are already set. */
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .statement__line {
+      animation: statement-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 38%;
+    }
+
+    .statement__line:nth-child(1) {
+      --statement-from: 5%;
+    }
+
+    .statement__line:nth-child(2) {
+      --statement-from: 11%;
+    }
+
+    .statement__line:nth-child(3) {
+      --statement-from: 17%;
+    }
+  }
+
+  /* Phones: the lines are near the full width of the screen, so a horizontal
+     settle either clips or forces the section to scroll. Fade them instead. */
+  @media (width <= 40em) {
+    @supports (animation-timeline: view()) {
+      .statement__line {
+        animation-name: poster-rise;
+        animation-range: entry 10% cover 30%;
+      }
+    }
+  }
+}
+
+/* ── Reveal-on-scroll ─────────────────────────────────────────────────────
+   Still available for the few places that use it (the step list, the facts
+   band), driven by lib/motion.ts. The hidden start state lives here behind
+   `.motion-ready`, which carries a dead-man's switch in Layout.astro — without
+   JS, or under reduced motion, nothing is ever hidden. */
 
 @media (prefers-reduced-motion: no-preference) {
   .motion-ready [data-reveal] {
@@ -97,9 +152,9 @@
   }
 }
 
-/* Ambient loop parking. `lib/ambient.ts` marks off-screen sections; the loops
-   inside stop until they come back. Without it a long page keeps a dozen
-   infinite animations — and their layers — running where nobody can see them. */
+/* Ambient loop parking. The only endless loops left are the breathing
+   exercise's, which opt out via `data-motion-essential`; the mechanism stays
+   because that page can be scrolled away from. */
 
 @media (prefers-reduced-motion: no-preference) {
   .is-ambient-paused,
@@ -123,14 +178,12 @@
   }
 }
 
-/* Surface primitives — data-motion */
+/* ── Surface primitives ──────────────────────────────────────────────── */
 
-/* Clipped image frame: the image can scale on hover without nudging neighbours. */
 [data-motion='image'] {
   overflow: clip;
 }
 
-/* Link underline grows from the inline-start edge on hover. */
 [data-motion='link'] {
   position: relative;
   display: inline-flex;
@@ -142,151 +195,83 @@
   position: absolute;
   inset-block-end: -2px;
   inset-inline: 0;
-  block-size: 1px;
+  block-size: 2px;
   pointer-events: none;
   content: '';
-  background: currentcolor;
-  opacity: 0.45;
-  transform: scaleX(0.2);
+  background: var(--color-orange);
+  transform: scaleX(0);
   transform-origin: left;
-  transition:
-    transform 380ms var(--ease-settle),
-    opacity var(--motion-quick);
+  transition: transform var(--motion-standard);
 }
 
 @media (hover: hover) and (pointer: fine) {
   [data-motion='link']:hover::after,
   [data-motion='link']:focus-visible::after {
-    opacity: 1;
     transform: scaleX(1);
   }
 }
 
-/* Micro-interactions — gated to real hover devices so touch never sticks. */
+/* Micro-interactions. `lift` and `glow` survive as aliases from older call
+   sites; both now do the one quiet thing a hairline surface should do. */
 
-[data-hover='lift'] {
-  --hover-lift-y: -4px;
-  --hover-lift-shadow: var(--shadow-lg);
-
-  transition:
-    translate var(--motion-standard),
-    box-shadow var(--motion-standard);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  [data-hover='lift']:hover {
-    box-shadow: var(--hover-lift-shadow);
-    translate: 0 var(--hover-lift-y);
-  }
-
-  [data-hover='lift']:active {
-    translate: 0;
-  }
-}
-
+[data-hover='lift'],
 [data-hover='glow'] {
-  --hover-glow-color: var(--accent-primary);
-
   transition:
-    box-shadow var(--motion-standard),
-    translate var(--motion-standard);
+    border-color var(--motion-quick),
+    background-color var(--motion-quick),
+    color var(--motion-quick);
 }
 
 @media (hover: hover) and (pointer: fine) {
+  [data-hover='lift']:hover,
   [data-hover='glow']:hover {
-    box-shadow:
-      0 0 0 3px color-mix(in oklch, var(--hover-glow-color) 25%, transparent),
-      0 8px 24px -8px color-mix(in oklch, var(--hover-glow-color) 45%, transparent);
-    translate: 0 -2px;
-  }
-
-  [data-hover='glow']:active {
-    translate: 0;
+    border-color: var(--color-orange);
   }
 }
 
-[data-hover='scale'] {
-  transition: scale var(--motion-standard) var(--ease-settle);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  [data-hover='scale']:hover {
-    scale: 1.06;
-  }
-
-  [data-hover='scale']:active {
-    scale: 0.96;
-  }
-}
-
+[data-hover='scale'],
 [data-hover='press'] {
-  transition: scale var(--motion-quick) var(--ease-precise);
+  transition: opacity var(--motion-quick);
 }
 
 @media (hover: hover) and (pointer: fine) {
+  [data-hover='scale']:hover,
   [data-hover='press']:hover {
-    scale: 0.98;
+    opacity: 0.82;
   }
 }
 
-[data-hover='press']:active {
-  scale: 0.95;
-  transition-duration: var(--duration-fast);
-}
-
-/* Touch feedback: press-in on :active where hover doesn't exist. */
-@media (hover: none) {
-  [data-hover='lift']:active,
-  [data-hover='glow']:active,
-  [data-hover='scale']:active {
-    scale: 0.97;
-    transition: scale var(--duration-fast) var(--ease-precise);
-  }
-}
-
-/* Reduced motion — keep colour/shadow feedback, drop positional motion.
-   `data-motion-essential` opts out of the iteration cap. */
+/* ── Reduced motion ───────────────────────────────────────────────────────
+   Everything spatial and everything scroll-bound is off. Colour feedback
+   stays. `data-motion-essential` (the breathing exercise) opts out of the
+   iteration cap so its phase rings keep running — the exercise is unusable
+   without them, and they are its content rather than its decoration. */
 
 @media (prefers-reduced-motion: reduce) {
+  .home-hero__display .display__line,
+  .home-hero__kicker,
+  .home-hero__lede,
+  .home-hero__body,
+  .home-hero__action,
+  .home-hero .ring,
+  .home-hero__figure,
+  .ring,
+  .ring__svg,
+  .statement__line,
   .hero__label,
   .hero__title,
   .hero__bottom,
-  .hero__scroll,
-  .hero__scroll-line,
-  .page-hero__eyebrow,
-  .page-hero__title,
-  .page-hero__lead,
-  .page-hero__cta,
-  .page-hero__media {
+  .page-opening__eyebrow,
+  .page-opening__title,
+  .page-opening__lead,
+  .page-opening__cta {
+    transform: none;
     animation: none;
   }
 
   [data-motion='image'] > img,
   [data-motion='image'] > picture > img {
     transition: none;
-  }
-
-  [data-hover='lift'] {
-    transition:
-      box-shadow var(--motion-standard),
-      background-color var(--motion-standard),
-      color var(--motion-standard);
-  }
-
-  [data-hover='lift']:hover,
-  [data-hover='lift']:active,
-  [data-hover='glow']:hover,
-  [data-hover='glow']:active,
-  [data-hover='scale']:hover,
-  [data-hover='scale']:active,
-  [data-hover='press']:hover,
-  [data-hover='press']:active {
-    scale: 1;
-    translate: 0;
-  }
-
-  [data-hover='glow']:hover {
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--hover-glow-color) 25%, transparent);
   }
 
   *:not([data-motion-essential], [data-motion-essential] *),

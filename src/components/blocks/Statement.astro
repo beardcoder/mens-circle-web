@@ -1,0 +1,127 @@
+---
+interface Props {
+  data: {
+    anchor?: string;
+    eyebrow?: string;
+    /** Poster lines. Each becomes its own block and settles independently. */
+    lines?: string[];
+    /** The hand-over sentence that turns the claim into the next section. */
+    text?: string;
+    linkLabel?: string;
+    linkUrl?: string;
+  };
+}
+
+/**
+ * The interruption.
+ *
+ * A full-bleed orange field carrying one sentence the site already makes —
+ * "Du musst nichts darstellen." — at poster size. It is a restatement, not a
+ * new promise: the same words open the hero as the invitation, and the
+ * paragraph under it hands straight over to the agreements that follow.
+ *
+ * Ink on orange, never white: white on this orange measures 2.9:1 and fails;
+ * ink measures 5.9:1.
+ *
+ * The lines slide in from the right and settle flush-left as the field enters
+ * view (see utilities/_motion.css). The settled state is the readable state and
+ * is what a reduced-motion or unsupported browser gets straight away, so no
+ * word exists only mid-animation. The section clips, so the travel can never
+ * raise a horizontal scrollbar.
+ */
+
+const { data } = Astro.props;
+const anchor = data.anchor ?? 'haltung';
+const lines = data.lines ?? [];
+---
+
+<section class="section section--signal section--clip statement" id={anchor} aria-labelledby="statement-title">
+  <div class="container">
+    {data.eyebrow && <p class="marker statement__marker">{data.eyebrow}</p>}
+
+    <h2 class="display statement__display" id="statement-title">
+      {lines.map((line) => <span class="display__line statement__line">{line}</span>)}
+    </h2>
+
+    {
+      (data.text || data.linkLabel) && (
+        <div class="statement__foot">
+          {data.text && <p class="statement__text">{data.text}</p>}
+          {data.linkLabel && data.linkUrl && (
+            <a href={data.linkUrl} class="text-link statement__link">
+              {data.linkLabel}
+            </a>
+          )}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style is:global>
+  @layer sections {
+    .statement {
+      padding-block: var(--space-2xl);
+    }
+
+    .statement__marker {
+      margin-block-end: var(--space-md);
+      color: var(--color-ink);
+      opacity: 0.7;
+    }
+
+    .statement__display {
+      max-inline-size: none;
+      margin: 0;
+      font-size: var(--display-2);
+      color: var(--color-ink);
+      text-wrap: nowrap;
+    }
+
+    .statement__line {
+      /* Each line is its own row so it can settle on its own offset. */
+      display: block;
+      will-change: transform;
+    }
+
+    .statement__foot {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm) var(--space-lg);
+      align-items: baseline;
+      justify-content: space-between;
+      padding-block-start: var(--space-md);
+      margin-block-start: var(--space-lg);
+      border-block-start: 3px solid var(--color-ink);
+    }
+
+    .statement__text {
+      max-inline-size: 48ch;
+      margin: 0;
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-normal);
+      color: var(--color-ink);
+    }
+
+    .statement__link {
+      color: var(--color-ink);
+      text-decoration-color: var(--color-ink);
+    }
+
+    @media (width <= 40em) {
+      .statement {
+        padding-block: var(--space-xl);
+      }
+
+      /* On a phone the lines are close to the full width, so they wrap rather
+         than being forced onto one line and shrunk into illegibility. */
+      .statement__display {
+        text-wrap: balance;
+      }
+
+      .statement__line {
+        will-change: auto;
+      }
+    }
+  }
+</style>

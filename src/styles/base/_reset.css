@@ -82,32 +82,19 @@ body {
   list-style: none;
 }
 
-/* Set shorter line heights on headings and interactive elements */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
+/* Interactive text stays on one tight line; headings keep the leading set in
+   base/_typography.css — they are sentences here, not display slabs. */
 button,
 input,
 label {
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
-/* Balance text wrapping on headings */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  text-wrap: balance;
-}
-
-/* Improve paragraph readability */
+/* Improve paragraph readability. 68ch is the upper bound of the brief's
+   60–68 characters per line; blocks that want a tighter measure set
+   `--measure` themselves. */
 p {
-  max-inline-size: 75ch;
+  max-inline-size: var(--measure-wide);
   text-wrap: pretty;
 }
 
@@ -181,7 +168,7 @@ fieldset {
 
 /* Selection styles */
 ::selection {
-  color: var(--color-bone);
+  color: light-dark(var(--color-paper), var(--color-night));
   background-color: var(--accent-primary);
 }
 

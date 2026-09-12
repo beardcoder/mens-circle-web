@@ -1,85 +1,315 @@
 ---
 import { Picture } from 'astro:assets';
 import { resolveAssetImage } from '../../lib/images';
+import { primaryAction, type DateStatus } from '../../lib/event-status';
+import Ring from '../Ring.astro';
+
+/**
+ * The home page opening — a composition, not a component.
+ *
+ * Three things share one overlapping grid: the headline, the ring and the
+ * photograph. The headline sets the register at up to 180px; the ring is
+ * cropped by the right edge and passes behind the type and over the top corner
+ * of the photograph; the photograph is a plain rectangle pushed up into the
+ * headline's row.
+ *
+ * Reading order is unchanged by any of it: kicker, heading, invitation, one
+ * paragraph, the action. The image is last in source order so a phone gets the
+ * whole offer before it gets a picture, and nothing readable is ever placed on
+ * top of the ring's stroke — the overlap is type-over-negative-space only.
+ *
+ * No fixed 100vh: the block is as tall as its content plus air, so nothing is
+ * cut off on a short laptop screen.
+ */
 
 interface Props {
   data: {
-    label?: string;
-    title?: string;
-    description?: string;
-    buttonText?: string;
-    buttonLink?: string;
-    anchor?: string;
-    backgroundImage?: string;
+    kicker?: string;
+    /** Poster lines, e.g. ["MÄNNER.", "IM KREIS."] — one block element each. */
+    displayLines?: string[];
+    /** The invitation, set below the poster lines and inside the same h1. */
+    lede?: string;
+    body?: string;
+    secondaryLabel?: string;
+    secondaryLink?: string;
+    image?: string;
+    imageAlt?: string;
+    imageCaption?: string;
   };
+  /** Scheduling state, resolved once per request by the page. */
+  state: DateStatus;
 }
 
-const { data } = Astro.props;
-const anchor = data.anchor;
-
-// Prefer the build-optimised asset, fall back to the raw path.
-const bgAsset = resolveAssetImage(data.backgroundImage);
+const { data, state } = Astro.props;
+const action = primaryAction(state);
+const photo = resolveAssetImage(data.image);
+const lines = data.displayLines ?? [];
 ---
 
-<section class="hero" id={anchor}>
-  <div class="hero__bg">
-    {
-      bgAsset ? (
-        <Picture
-          src={bgAsset}
-          class="hero__bg-image"
-          widths={[768, 1280, 1920]}
-          sizes="100vw"
-          formats={['avif', 'webp']}
-          loading="eager"
-          fetchpriority="high"
-          aria-hidden="true"
-          alt=""
-        />
-      ) : data.backgroundImage ? (
-        <img
-          src={data.backgroundImage}
-          class="hero__bg-image"
-          loading="eager"
-          fetchpriority="high"
-          aria-hidden="true"
-          alt=""
-        />
-      ) : null
-    }
-    <div class="hero__bg-glow" aria-hidden="true"></div>
-  </div>
-
-  <div class="hero__circles" aria-hidden="true">
-    <div class="hero__circle hero__circle--1"></div>
-    <div class="hero__circle hero__circle--2"></div>
-    <div class="hero__circle hero__circle--3"></div>
-    <div class="hero__circle hero__circle--4"></div>
-  </div>
+<section class="home-hero section--clip">
+  <Ring place="hero" />
 
   <div class="container">
-    <div class="hero__content">
-      {data.label && <p class="hero__label">{data.label}</p>}
+    <div class="home-hero__grid">
+      <div class="home-hero__type">
+        {data.kicker && <p class="marker marker--ruled home-hero__kicker">{data.kicker}</p>}
 
-      {data.title && <h1 class="hero__title" set:html={data.title} />}
-
-      <div class="hero__bottom">
-        {data.description && <p class="hero__description">{data.description}</p>}
-
-        {
-          data.buttonText && data.buttonLink && (
-            <div class="hero__cta">
-              <a href={data.buttonLink} class="btn btn--primary btn--large">
-                {data.buttonText}
-              </a>
-              <span class="hero__scroll" aria-hidden="true">
-                Entdecken
-                <span class="hero__scroll-line" aria-hidden="true" />
-              </span>
-            </div>
-          )
-        }
+        <h1 class="home-hero__heading">
+          <span class="display display--xl home-hero__display">
+            {lines.map((line) => <span class="display__line">{line}</span>)}
+          </span>
+          {data.lede && <span class="home-hero__lede">{data.lede}</span>}
+        </h1>
       </div>
+
+      {data.body && <p class="home-hero__body">{data.body}</p>}
+
+      <div class="home-hero__action">
+        <p class="home-hero__status" data-status={state.status}>{action.note}</p>
+        <div class="actions">
+          <a
+            href={action.href}
+            class="btn btn--primary btn--large"
+            data-umami-event="cta-click"
+            data-umami-event-location="home-hero"
+            data-umami-event-state={state.status}
+          >
+            {action.label}
+          </a>
+          {
+            data.secondaryLabel && data.secondaryLink && (
+              <a href={data.secondaryLink} class="text-link">
+                {data.secondaryLabel}
+              </a>
+            )
+          }
+        </div>
+      </div>
+
+      {
+        photo && (
+          <figure class="home-hero__figure">
+            <Picture
+              src={photo}
+              class="home-hero__image"
+              widths={[420, 640, 900]}
+              sizes="(max-width: 56em) 92vw, 34vw"
+              formats={['avif', 'webp']}
+              loading="eager"
+              fetchpriority="high"
+              alt={data.imageAlt ?? ''}
+            />
+            {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
+          </figure>
+        )
+      }
     </div>
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .home-hero {
+      position: relative;
+      padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-xl);
+      isolation: isolate;
+    }
+
+    /* The composition grid. Twelve columns, and the elements are placed so they
+       overlap rather than queue up:
+
+         type    cols 1–9   row 1
+         body    cols 1–5   row 2
+         action  cols 1–6   row 3
+         figure  cols 8–13  rows 2–3   ← pulled up into the type's row */
+    .home-hero__grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      align-items: start;
+    }
+
+    .home-hero__type {
+      grid-row: 1;
+      grid-column: 1 / span 8;
+    }
+
+    .home-hero__kicker {
+      margin-block-end: var(--space-sm);
+      color: var(--text-primary);
+    }
+
+    .home-hero__heading {
+      margin: 0;
+      font-size: inherit;
+      letter-spacing: normal;
+    }
+
+    .home-hero__display {
+      display: block;
+      color: var(--text-primary);
+    }
+
+    /* The invitation. Set in the reading face at a size that clearly belongs to
+       the reading register — the jump from 180px to 28px is the hierarchy. */
+    .home-hero__lede {
+      display: block;
+      max-inline-size: 26ch;
+      margin-block-start: var(--space-sm);
+      font-family: var(--font-body);
+      font-size: var(--text-2xl);
+      font-weight: 400;
+      line-height: 1.25;
+      color: var(--text-primary);
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    .home-hero__body {
+      grid-row: 2;
+      grid-column: 1 / span 5;
+      max-inline-size: 44ch;
+      margin-block: var(--space-md) 0;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+
+    /* Under the paragraph, spanning half the grid so the button never has to
+       wrap or collide with the plate beside it. The vertical rhythm above is
+       tuned so this still lands above the fold on a 900px-tall laptop screen —
+       the one thing that must never be below the fold is the next step. */
+    .home-hero__action {
+      grid-row: 3;
+      grid-column: 1 / span 6;
+      padding-block-start: var(--space-sm);
+      margin-block-start: var(--space-md);
+      border-block-start: 3px solid var(--rule-strong);
+    }
+
+    /* The one line on the page that states the scheduling state: plain text,
+       not a badge. A failed read is marked so it cannot be mistaken for a calm
+       "nothing scheduled".
+
+       Set as a sentence rather than a tracked-out label: it carries a date a
+       reader has to parse, and uppercase makes that slower, not more designed. */
+    .home-hero__status {
+      margin-block-end: var(--space-sm);
+      max-inline-size: 46ch;
+      font-family: var(--font-body);
+      font-size: var(--text-section-body);
+      font-weight: 600;
+      line-height: var(--leading-normal);
+      color: var(--text-primary);
+    }
+
+    /* A failed read is marked, not tinted: orange text at this size measures
+       3.52:1 on paper and would fail. The block carries the signal, the ink
+       carries the words. */
+    .home-hero__status[data-status='unavailable'] {
+      display: flex;
+      gap: 0.6em;
+      align-items: baseline;
+      color: var(--text-primary);
+    }
+
+    .home-hero__status[data-status='unavailable']::before {
+      flex: none;
+      inline-size: 0.7em;
+      block-size: 0.7em;
+      content: '';
+      background: var(--color-orange);
+    }
+
+    /* The plate. Pulled up into the headline's row so the ring, the type and
+       the photograph genuinely overlap instead of sitting in three tidy boxes. */
+    /* The plate. Sits in the headline's row, so the ring, the type and the
+       photograph genuinely overlap instead of forming three tidy boxes: the
+       ring's lower arc runs behind the plate's top edge. */
+    .home-hero__figure {
+      grid-row: 1 / span 3;
+      grid-column: 9 / -1;
+      align-self: center;
+      margin: 0;
+    }
+
+    .home-hero__image {
+      display: block;
+      inline-size: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      /* The subject sits in the upper half of the source; a centred crop takes
+         the torso and loses the head. */
+      object-position: center 26%;
+      border-radius: 0;
+    }
+
+    .home-hero__figure .caption {
+      max-inline-size: 34ch;
+    }
+
+    /* ─── Phone: recomposed, not stacked ────────────────────────────────
+       The headline still owns the screen, the ring crops into its top-right
+       corner, the action stays above the image, and the photograph becomes a
+       wide plate at the end. */
+    @media (width <= 56em) {
+      .home-hero {
+        padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
+      }
+
+      .home-hero__grid {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: var(--space-md);
+      }
+
+      .home-hero__type,
+      .home-hero__body,
+      .home-hero__action,
+      .home-hero__figure {
+        grid-row: auto;
+        grid-column: 1 / -1;
+        align-self: auto;
+      }
+
+      .home-hero__lede {
+        max-inline-size: none;
+        font-size: var(--text-xl);
+      }
+
+      .home-hero__body {
+        max-inline-size: none;
+        margin-block-start: 0;
+      }
+
+      .home-hero__action {
+        margin-block-start: 0;
+      }
+
+      .home-hero__figure {
+        margin-block-start: var(--space-xs);
+      }
+
+      .home-hero__image {
+        aspect-ratio: 3 / 2;
+        object-position: center 22%;
+      }
+    }
+
+    @media (width <= 30em) {
+      .home-hero__action .actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .home-hero__action .btn {
+        inline-size: 100%;
+      }
+
+      .home-hero__action .text-link {
+        justify-content: center;
+      }
+    }
+  }
+</style>
