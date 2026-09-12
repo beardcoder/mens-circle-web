@@ -78,11 +78,17 @@ Schriftfamilie in zwei Schnitten, ein grafisches Motiv.
   Dazwischen liegt nichts — der Sprung _ist_ die Hierarchie. Gegengewicht ist
   der kleine Marker (`.marker`): dieselbe schmale Schrift in der kleinsten
   Größe der Seite.
-- **Farben:** Papier `#F3F3EE`, Tinte `#171C19`, Signalorange `#FF643D`. Wo
-  welche stehen darf, entscheiden die gemessenen Kontraste: Orange auf Papier
-  ist 2,6:1 und deshalb **nur Fläche und Strich, nie Schrift**; Weiß auf Orange
-  ist 2,9:1, deshalb sind Buttons **Tinte auf Orange** (5,9:1); als Schriftfarbe
-  taugt das Orange nur auf dem dunklen Grund.
+- **Farben:** Haferpapier `#F2EDE3`, Rindentinte `#1C1714`, gebranntes Orange
+  `#DD5F33`. Jeder Ton liegt auf der warmen Seite von Neutral — das unterscheidet
+  die Palette von einer Produktpalette, deshalb sind auch die Grautöne ocker-
+  statt blaustichig. Wo welche Farbe stehen darf, entscheiden die gemessenen
+  Kontraste: Orange auf Papier ist 3,1:1 und deshalb **Fläche, Strich und große
+  Schrift** (die Schrittziffern), nie kleine Schrift; Weiß auf Orange ist 3,6:1
+  und reicht für Fließtext nicht, deshalb sind Buttons **Tinte auf Orange**
+  (4,9:1); auf dem dunklen Grund trägt das Orange auch als Schriftfarbe (4,9:1).
+- **Drei Gründe, nicht zwei.** `.section--sand` (`--bg-secondary`) ist die ruhige
+  Mitte zwischen Papier und dunklen Bändern — der Markus-Block und die Stimmen
+  stehen darauf. Wie jeder Grund schaltet er mit dem Modus um.
 - **Alles auf dem Seitengrund muss mit dem Modus umschalten** —
   `--text-primary`, `--text-muted`, `--rule-strong`, `--bg-*`. Die literalen
   `--color-ink` / `--color-paper` sind nur dort richtig, wo der Grund selbst
