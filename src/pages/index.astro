@@ -3,11 +3,11 @@ import Layout from '../layouts/Layout.astro';
 import type { Block } from '../components/PageContent.astro';
 import PageContent from '../components/PageContent.astro';
 import home from '../content/home.json';
-import site from '../data/site.json';
 import { fetchNextEventState } from '@lib/server/events';
 import { fetchTestimonials } from '@lib/server/testimonials';
 import { summarizeNextEvent } from '@lib/event-landing';
 import { dateStatus } from '@lib/event-status';
+import { eventSeriesSchema } from '@lib/series-schema';
 
 /**
  * Server-rendered, not prerendered.
@@ -72,33 +72,10 @@ if (evening?.data?.steps?.length) {
   });
 }
 
-// The recurring circle itself. Kept in step with what the page actually shows:
-// the rhythm, the duration and the donation basis are all stated in the visible
-// facts list, so the structured data and the page cannot drift apart.
-schemas.push({
-  '@context': 'https://schema.org',
-  '@type': 'EventSeries',
-  '@id': `${siteUrl.origin}/#series`,
-  name: 'Männerkreis Straubing / Niederbayern',
-  description:
-    'Männerkreis in Straubing, Niederbayern: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt. Alle zwei bis vier Wochen, zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.',
-  url: siteUrl.origin,
-  inLanguage: 'de-DE',
-  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-  audience: { '@type': 'Audience', audienceType: 'Männer' },
-  location: {
-    '@type': 'Place',
-    name: `Männerkreis ${site.geo.locality}`,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: site.geo.locality,
-      addressRegion: site.geo.region,
-      addressCountry: site.geo.country,
-    },
-  },
-});
+// The recurring circle itself — one shared entity, also emitted by /event.
+schemas.push(eventSeriesSchema(siteUrl));
 ---
 
-<Layout title={home.meta.title} description={home.meta.description} keywords={home.meta.keywords} schemas={schemas}>
+<Layout title={home.meta.title} description={home.meta.description} schemas={schemas}>
   <PageContent blocks={blocks} state={state} next={next} testimonials={testimonials} />
 </Layout>
