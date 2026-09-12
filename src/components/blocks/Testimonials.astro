@@ -1,48 +1,60 @@
 ---
-// Server island: published entries are fetched per request, so new
-// testimonials go live without a rebuild. The dynamic import keeps
-// `bun:sqlite` out of the build-time prerender. Renders nothing when empty.
+import type { Testimonial } from '@lib/types';
+
+/**
+ * Published voices from the circle.
+ *
+ * These are the entries men actually submitted and Markus moderated — they are
+ * quoted as written. Nothing is added, reworded or invented here, and the
+ * section renders nothing at all when none is published.
+ *
+ * The page passes them in: the home page is server-rendered, so a server island
+ * would only mean a second request for data the page already has.
+ */
+
 interface Props {
-  data?: { anchor?: string };
+  data?: { anchor?: string; eyebrow?: string; title?: string };
+  testimonials: Testimonial[];
 }
 
-const { data } = Astro.props;
+const { data, testimonials } = Astro.props;
 const anchor = data?.anchor ?? 'stimmen';
-const { fetchTestimonials } = await import('@lib/server/testimonials');
-const testimonials = await fetchTestimonials();
 ---
 
 {
   testimonials.length > 0 && (
-    <section class="section section--large testimonials-section" id={anchor} aria-labelledby="testimonials-title">
-      <div class="testimonials__pattern" aria-hidden="true" />
+    <section class="section section--sand testimonials-section" id={anchor} aria-labelledby="testimonials-title">
       <div class="container">
-        <div class="section-header" data-reveal-group>
-          <p class="eyebrow" data-reveal="up">
-            Community Stimmen
-          </p>
-          <h2 class="section-title" id="testimonials-title" data-reveal="blur">
-            Was <span class="highlight">Teilnehmer</span> sagen
-          </h2>
-          <p class="testimonials__subtitle" data-reveal="up">
-            Authentische Einblicke von Männern, die den Kreis erleben
-          </p>
-        </div>
+        <div class="spine">
+          <p class="rail-heading">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
 
-        {/* Voices don't travel — they arise: a slow fade, one after another. */}
-        <ul class="testimonials__grid" role="list" data-reveal-group="160">
-          {testimonials.map((t) => (
-            <li class="testimonial-item" data-reveal="fade" data-reveal-duration="1100">
-              <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
-              {(t.author || t.role) && (
-                <div class="testimonial-item__author">
-                  {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
-                  {t.role && <span class="testimonial-item__role">{t.role}</span>}
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+          <div class="spine__body--wide">
+            <h2 class="section-title" id="testimonials-title" data-reveal="up">
+              {data?.title ?? 'Was Teilnehmer geschrieben haben'}
+            </h2>
+
+            <ul class="testimonials__list" role="list" data-reveal-group="55">
+              {testimonials.map((t) => (
+                <li class="testimonial-item" data-reveal="up">
+                  <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
+                  {(t.author || t.role) && (
+                    <p class="testimonial-item__author">
+                      {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
+                      {t.role && <span class="testimonial-item__role">{t.role}</span>}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            <p class="testimonials__note">
+              Die Zitate stammen von Männern, die beim Kreis waren.{' '}
+              <a class="link" href="/teile-deine-erfahrung">
+                Du warst dabei und möchtest etwas beitragen?
+              </a>
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   )
@@ -50,75 +62,42 @@ const testimonials = await fetchTestimonials();
 
 <style is:global>
   @layer sections {
-    .testimonials-section {
-      position: relative;
-      overflow: clip;
-      background: var(--bg-secondary);
-    }
-
-    .testimonials__pattern {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234a5f4f' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-      opacity: 0.25;
-    }
-
-    .testimonials__subtitle {
-      max-inline-size: 58ch;
-      margin-block: 0;
-      margin-inline: auto;
-      font-size: var(--text-section-body);
-      font-style: italic;
-      line-height: var(--leading-normal);
-      color: var(--text-muted);
-    }
-
-    .testimonials-section .section-title .highlight {
-      color: var(--accent-primary);
+    /* A single column, not a two-up grid. Submitted quotes run from two lines
+       to fifteen, so a grid left one cell half-empty beside a wall of text and
+       halved the measure of both. Read down instead. */
+    .testimonials__list {
+      max-inline-size: var(--measure);
+      margin-block-start: var(--space-md);
+      padding: 0;
+      list-style: none;
+      border-block-start: 1px solid var(--border-light);
     }
 
     .testimonial-item {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      min-block-size: 16rem;
-      padding: var(--space-lg) var(--space-md);
-      border-inline-start: 1px solid var(--border-light);
+      padding-block: var(--space-md);
+      border-block-end: 1px solid var(--border-light);
     }
 
     .testimonial-item__quote {
-      position: relative;
-      flex-grow: 1;
-      padding-inline-start: var(--space-md);
       margin: 0;
-      margin-block-end: var(--space-lg);
-      font-style: italic;
-      line-height: var(--leading-relaxed);
-      color: var(--text-primary);
-    }
-
-    .testimonial-item__quote::before {
-      position: absolute;
-      inset-block-start: -0.2rem;
-      inset-inline-start: 0;
       font-family: var(--font-display);
-      font-size: clamp(2.1rem, 3vw, 2.9rem);
-      line-height: 1;
-      color: color-mix(in oklch, var(--accent-primary) 70%, transparent);
-      content: '\201E';
+      font-size: var(--text-lg);
+      line-height: var(--leading-normal);
+      color: var(--text-primary);
+      text-wrap: pretty;
     }
 
     .testimonial-item__author {
       display: flex;
-      flex-direction: column;
-      gap: var(--space-xs);
-      padding-block-start: var(--space-md);
-      border-block-start: 1px solid var(--border-light);
+      flex-wrap: wrap;
+      gap: var(--space-3xs) var(--space-xs);
+      align-items: baseline;
+      margin: 0;
+      padding-block-start: var(--space-xs);
     }
 
     .testimonial-item__name {
-      font-size: var(--text-body-compact);
+      font-size: var(--text-caption);
       font-style: normal;
       font-weight: 600;
       color: var(--text-primary);
@@ -126,6 +105,14 @@ const testimonials = await fetchTestimonials();
 
     .testimonial-item__role {
       font-size: var(--text-caption);
+      color: var(--text-muted);
+    }
+
+    .testimonials__note {
+      max-inline-size: var(--measure);
+      margin-block-start: var(--space-md);
+      font-size: var(--text-caption);
+      line-height: var(--leading-relaxed);
       color: var(--text-muted);
     }
   }

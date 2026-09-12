@@ -1,37 +1,24 @@
 /**
- * Theme manager — palette + light/dark, persisted across visits. Two axes live
- * on <html> and in localStorage:
+ * Theme manager — light/dark only, persisted across visits.
  *
- *   • `data-theme`         "warm" (default) | "cool"
  *   • `data-mode`          absent (follow OS) | "light" | "dark"
  *   • `data-mode-resolved` the mode actually in effect, mirrored for the icons
  *
- * The layout's inline boot script sets these before first paint so nothing
- * flashes; this module re-syncs on load, wires the buttons and follows the OS
- * while no mode is pinned. Returns a cleanup that detaches everything.
- *
- * A user toggle cross-fades through the View Transitions API (tuned in
- * `_view-transitions.css` under `[data-theme-transition]`) and degrades to an
- * instant swap. OS-driven flips are always instant.
+ * The site has a single palette; the warm/cool axis this module used to carry
+ * is gone. The layout's inline boot script sets both attributes before first
+ * paint so nothing flashes; this module re-syncs on load, wires the button and
+ * follows the OS while no mode is pinned. Returns a cleanup that detaches
+ * everything.
  */
 
-import { prefersReducedMotion } from './helpers';
-
-export type Palette = 'warm' | 'cool';
 export type Mode = 'light' | 'dark';
 
-/** `Document.startViewTransition` is not in the DOM lib yet — narrow locally. */
-type ViewTransitionDocument = Document & {
-  startViewTransition?: (callback: () => void) => { finished: Promise<unknown> };
-};
-
-const STORAGE_THEME = 'mc-theme';
 const STORAGE_MODE = 'mc-mode';
 
-/** Mobile browser chrome color per palette × resolved mode (≈ --bg-primary). */
-const THEME_COLOR: Record<Palette, Record<Mode, string>> = {
-  warm: { light: '#faf8f4', dark: '#1d1712' },
-  cool: { light: '#f4f8f7', dark: '#141a19' },
+/** Mobile browser chrome colour per resolved mode (matches --bg-primary). */
+const THEME_COLOR: Record<Mode, string> = {
+  light: '#f3f0e9',
+  dark: '#1c1e1b',
 };
 
 const prefersDark = (): boolean =>
@@ -53,9 +40,6 @@ const writeStored = (key: string, value: string): void => {
   }
 };
 
-/** The active palette: a stored "cool", else "warm". */
-const getPalette = (): Palette => (readStored(STORAGE_THEME) === 'cool' ? 'cool' : 'warm');
-
 /** The explicit mode the user pinned, or `null` when following the OS. */
 const getStoredMode = (): Mode | null => {
   const raw = readStored(STORAGE_MODE);
@@ -66,32 +50,30 @@ const getStoredMode = (): Mode | null => {
 /** The mode actually in effect: explicit choice, else OS preference. */
 const resolveMode = (): Mode => getStoredMode() ?? (prefersDark() ? 'dark' : 'light');
 
-/** Point the mobile `theme-color` meta at the active palette × resolved mode. */
-const syncThemeColor = (palette: Palette, resolved: Mode): void => {
+/** Point the mobile `theme-color` meta at the resolved mode. */
+const syncThemeColor = (resolved: Mode): void => {
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
 
-  if (meta) meta.content = THEME_COLOR[palette][resolved];
+  if (meta) meta.content = THEME_COLOR[resolved];
 };
 
-/** Push the current palette/mode/resolved state onto <html> + the meta tag. */
+/** Push the current mode onto <html> + the meta tag. */
 const apply = (): void => {
   const root = document.documentElement;
-  const palette = getPalette();
   const stored = getStoredMode();
   const resolved = resolveMode();
 
-  root.setAttribute('data-theme', palette);
   root.setAttribute('data-mode-resolved', resolved);
 
   if (stored) root.setAttribute('data-mode', stored);
   else root.removeAttribute('data-mode');
 
-  syncThemeColor(palette, resolved);
+  syncThemeColor(resolved);
 };
 
 /**
- * Wire the header theme controls. Returns a cleanup function that removes
- * every listener. No-op cleanup if the switch isn't on the page.
+ * Wire the header theme control. Returns a cleanup function that removes every
+ * listener. No-op cleanup if the switch isn't on the page.
  */
 export function initTheme(): () => void {
   const teardown: Array<() => void> = [];
@@ -103,56 +85,25 @@ export function initTheme(): () => void {
   // Re-assert state on load (covers stored choices made before this ran).
   apply();
 
-  // The switch is rendered twice (bar + nav overlay, see Header.astro) with CSS
+  // The switch is rendered twice (bar + nav panel, see Header.astro) with CSS
   // picking one. Wire both so the hidden copy is never stale when it takes over.
-  const paletteBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]'));
   const modeBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-mode-toggle]'));
 
   const syncButtons = (): void => {
-    const palettePressed = String(getPalette() === 'cool');
-    const modePressed = String(resolveMode() === 'dark');
+    const pressed = String(resolveMode() === 'dark');
 
-    for (const btn of paletteBtns) btn.setAttribute('aria-pressed', palettePressed);
-    for (const btn of modeBtns) btn.setAttribute('aria-pressed', modePressed);
+    for (const btn of modeBtns) btn.setAttribute('aria-pressed', pressed);
   };
 
   syncButtons();
 
-  /**
-   * Persist a choice, then repaint — inside a view transition where supported
-   * and welcome, so the page cross-fades instead of snapping.
-   */
-  const commit = (mutate: () => void): void => {
-    mutate();
-
-    const repaint = (): void => {
-      apply();
-      syncButtons();
-    };
-
-    const root = document.documentElement;
-    const doc = document as ViewTransitionDocument;
-
-    if (prefersReducedMotion() || typeof doc.startViewTransition !== 'function') {
-      repaint();
-
-      return;
-    }
-
-    root.setAttribute('data-theme-transition', '');
-    const transition = doc.startViewTransition(repaint);
-    const clear = (): void => root.removeAttribute('data-theme-transition');
-
-    transition.finished.then(clear, clear);
-  };
-
-  for (const btn of paletteBtns) {
-    listen(btn, 'click', () => commit(() => writeStored(STORAGE_THEME, getPalette() === 'cool' ? 'warm' : 'cool')));
-  }
-
   // Toggle relative to what's actually showing, then pin it explicitly.
   for (const btn of modeBtns) {
-    listen(btn, 'click', () => commit(() => writeStored(STORAGE_MODE, resolveMode() === 'dark' ? 'light' : 'dark')));
+    listen(btn, 'click', () => {
+      writeStored(STORAGE_MODE, resolveMode() === 'dark' ? 'light' : 'dark');
+      apply();
+      syncButtons();
+    });
   }
 
   // Keep the resolved mode live when the OS flips and nothing is pinned.

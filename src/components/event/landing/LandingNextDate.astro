@@ -1,163 +1,218 @@
 ---
-import type { NextEventSummary } from '@lib/event-landing';
+import site from '@data/site.json';
+import { primaryAction, type DateStatus } from '@lib/event-status';
+import NewsletterForm from '../../islands/NewsletterForm.svelte';
 
 /**
- * The one slot on /event that depends on live data.
+ * The one block on /event that depends on live data — and the reason the page
+ * exists.
  *
- * Registration deliberately stays on /event/<slug> — that URL is canonical for
- * a single evening and carries its own Event markup. This card links there.
+ * Three states, each said plainly:
+ *   scheduled    date, time, place, seats, and a link to register
+ *   none         "kein Termin" plus the way to be told when there is one
+ *   unavailable  the read failed — say *that*, rather than dressing a failure
+ *                up as an empty calendar
  *
- * With nothing scheduled the panel stays calm: no "die Plätze sind schnell weg"
- * when there is no date to be quick about. Real capacity numbers are only shown
- * when a real event supplies them.
+ * Registration itself deliberately stays on /event/<slug>: that URL is canonical
+ * for a single evening and carries its own Event markup. No "die Plätze sind
+ * schnell weg" anywhere; when seats exist the actual number is shown.
  */
 
 interface Props {
-  next: NextEventSummary | null;
+  state: DateStatus;
 }
 
-const { next } = Astro.props;
+const { state } = Astro.props;
+const { next } = state;
+const action = primaryAction(state, '#benachrichtigung');
+const whatsapp = site.whatsappCommunityLink;
 ---
 
-<section class="section event-landing-next" id="naechster-termin" aria-labelledby="naechster-termin-title">
+<section class="section section--ink event-next" id="naechster-termin" aria-labelledby="naechster-termin-title">
   <div class="container">
-    {
-      next ? (
-        <div class="event-landing-next__card" data-reveal="up">
-          <p class="eyebrow">Nächster Termin</p>
-          <h2 class="event-landing-next__title" id="naechster-termin-title">
-            {next.dateLabel}
-          </h2>
+    <div class="spine">
+      <p class="rail-heading event-next__rail">Nächster Termin</p>
 
-          <dl class="event-landing-next__meta">
-            {next.timeRange && (
-              <div class="event-landing-next__row">
-                <dt>Uhrzeit</dt>
-                <dd>{next.timeRange}</dd>
-              </div>
-            )}
-            <div class="event-landing-next__row">
-              <dt>Ort</dt>
-              <dd>{next.place}</dd>
-            </div>
-            <div class="event-landing-next__row">
-              <dt>Plätze</dt>
-              <dd>
-                {next.isFull
-                  ? 'Ausgebucht – Warteliste möglich'
-                  : `${next.availableSpots} von ${next.maxParticipants} frei`}
-              </dd>
-            </div>
-          </dl>
+      <div class="spine__body">
+        {
+          next ? (
+            <>
+              <h2 class="display display--sm event-next__title" id="naechster-termin-title">
+                <time datetime={next.slug}>{next.dateLabel}</time>
+              </h2>
 
-          <a href={`/event/${next.slug}`} class="btn btn--primary btn--large">
-            {next.isFull ? 'Zur Warteliste' : 'Termin ansehen & anmelden'}
-          </a>
+              <dl class="deflist event-next__meta">
+                {next.timeRange && (
+                  <div class="deflist__row">
+                    <dt class="deflist__term">Uhrzeit</dt>
+                    <dd class="deflist__desc">{next.timeRange}</dd>
+                  </div>
+                )}
+                <div class="deflist__row">
+                  <dt class="deflist__term">Ort</dt>
+                  <dd class="deflist__desc">
+                    {next.place}
+                    <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
+                  </dd>
+                </div>
+                <div class="deflist__row">
+                  <dt class="deflist__term">Plätze</dt>
+                  <dd class="deflist__desc">
+                    {state.isFull
+                      ? 'Ausgebucht – du kannst auf die Warteliste'
+                      : `${next.availableSpots} von ${next.maxParticipants} frei`}
+                    <span class="deflist__note">
+                      {state.isFull
+                        ? 'Wird ein Platz frei, rückst du automatisch nach.'
+                        : 'Für die Anmeldung genügen Vor- und Nachname und eine E-Mail-Adresse.'}
+                    </span>
+                  </dd>
+                </div>
+                {next.costBasis && (
+                  <div class="deflist__row">
+                    <dt class="deflist__term">Beitrag</dt>
+                    <dd class="deflist__desc">{next.costBasis}</dd>
+                  </div>
+                )}
+              </dl>
 
-          <p class="event-landing-next__hint">
-            Die Anmeldung läuft über die Terminseite. Name und E-Mail genügen – den genauen Treffpunkt bekommst du mit
-            der Bestätigung.
-          </p>
-        </div>
-      ) : (
-        <div class="event-landing-next__card event-landing-next__card--pending" data-reveal="up">
-          <p class="eyebrow">Nächster Männerkreis</p>
-          <h2 class="event-landing-next__title" id="naechster-termin-title">
-            Der nächste Kreis <span class="text-italic">entsteht gerade</span>
-          </h2>
-          <p class="event-landing-next__text">
-            Aktuell steht noch kein neuer Termin fest. Wenn du neugierig bist, musst du deshalb nicht regelmäßig
-            nachsehen: Über den Newsletter oder die WhatsApp-Community erfährst du, sobald der nächste Abend geplant
-            ist.
-          </p>
-          <div class="event-landing-next__actions">
-            <a href="#newsletter" class="btn btn--primary btn--large">
-              Über neuen Termin informieren
-            </a>
-            <a href="#whatsapp-community" class="btn btn--secondary btn--large">
-              WhatsApp-Community
-            </a>
-          </div>
-        </div>
-      )
-    }
+              <p class="event-next__action">
+                <a
+                  href={action.href}
+                  class="btn btn--primary btn--large"
+                  data-umami-event="cta-click"
+                  data-umami-event-location="event-landing"
+                  data-umami-event-state={state.status}
+                >
+                  {action.label}
+                </a>
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 class="display display--sm event-next__title" id="naechster-termin-title">
+                {state.status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
+              </h2>
+
+              <p class="event-next__text" data-status={state.status}>
+                {state.status === 'unavailable'
+                  ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
+                  : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich unten ein, dann bekommst du eine kurze Nachricht.'}
+              </p>
+            </>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="spine event-next__notify" id="benachrichtigung">
+      <p class="rail-heading">Benachrichtigung</p>
+
+      <div class="spine__body">
+        <h3 class="event-next__sub">Bei neuen Terminen benachrichtigen</h3>
+        <p class="event-next__text">
+          Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler
+          nicht verschickt.
+        </p>
+
+        <NewsletterForm client:visible context={{ page: 'event-landing' }} />
+
+        {
+          whatsapp && (
+            <p class="event-next__alt" id="whatsapp-community">
+              Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine{' '}
+              <a
+                class="link"
+                href={whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="whatsapp-click"
+                data-umami-event-type="community-join"
+              >
+                WhatsApp-Gruppe
+                <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+              </a>
+              .
+            </p>
+          )
+        }
+      </div>
+    </div>
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    .event-landing-next {
-      padding-block-start: 0;
+    .event-next__rail {
+      color: var(--color-orange);
     }
 
-    .event-landing-next__card {
-      padding: clamp(1.75rem, 4vw, 3rem);
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-light);
-      border-inline-start: 4px solid var(--accent-primary);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
+    .event-next__title {
+      margin-block-end: var(--space-md);
+      color: var(--color-chalk);
     }
 
-    .event-landing-next__title {
-      margin-block: var(--space-2xs) var(--space-sm);
-      font-family: var(--font-display);
-      font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.5rem);
-      line-height: 1.15;
-      color: var(--text-primary);
-      text-wrap: balance;
-    }
-
-    .event-landing-next__meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-sm) var(--space-lg);
+    .event-next__meta {
       margin-block-end: var(--space-md);
     }
 
-    .event-landing-next__row dt {
-      font-size: var(--text-caption);
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .event-landing-next__row dd {
+    .event-next__action {
       margin: 0;
-      font-size: var(--text-lg);
-      color: var(--text-primary);
     }
 
-    .event-landing-next__text {
-      max-inline-size: var(--content-max-description);
-      margin-block-end: var(--space-md);
+    .event-next__text {
+      max-inline-size: var(--measure);
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-      text-wrap: pretty;
+      color: var(--color-chalk-muted);
     }
 
-    .event-landing-next__hint {
-      max-inline-size: var(--content-max-description);
-      margin-block-start: var(--space-sm);
-      font-size: var(--text-sm);
+    /* A failed read is not a calm "nothing scheduled" — mark it. */
+    .event-next__text[data-status='unavailable'] {
+      color: var(--color-orange);
+    }
+
+    /* The form inverts with the section, or a bright panel would punch a hole
+       in the field. */
+    .event-next__notify {
+      --control-bg: rgb(242 237 227 / 7%);
+      --control-bg-hover: rgb(242 237 227 / 12%);
+      --control-color: var(--color-chalk);
+      --control-border-color: var(--border-on-dark);
+      --control-placeholder: var(--color-chalk-muted);
+
+      margin-block-start: var(--space-lg);
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid var(--border-on-dark);
+    }
+
+    .event-next__notify .form-label {
+      color: var(--color-chalk);
+    }
+
+    .event-next__sub {
+      margin-block-end: var(--space-3xs);
+      font-size: var(--text-xl);
+      line-height: 1.15;
+      color: var(--color-chalk);
+    }
+
+    .event-next__alt {
+      max-inline-size: var(--measure);
+      margin-block-start: var(--space-md);
+      font-size: var(--text-caption);
       line-height: var(--leading-relaxed);
-      color: var(--text-muted);
-      text-wrap: pretty;
+      color: var(--color-chalk-muted);
     }
 
-    .event-landing-next__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-sm);
+    .event-next__alt .link {
+      color: var(--color-chalk);
     }
 
-    /* Long German CTA labels must wrap on a phone rather than force a
-       horizontal scroll — `.btn` sets `white-space: nowrap` by default. */
     @media (width <= 480px) {
-      .event-landing-next__card .btn {
+      .event-next__action .btn {
         inline-size: 100%;
-        white-space: normal;
       }
     }
   }

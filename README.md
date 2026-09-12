@@ -57,40 +57,89 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
   listmonk gepflegt (Quelldateien + Anleitung in
   [`listmonk/tx-templates/`](listmonk/tx-templates/)).
 - **RAM-schonend & nachhaltig.** Die meisten Seiten sind vorgerendert (statisch);
-  nur Event-Seiten und die Testimonials der Startseite rendern serverseitig live.
-  Ein Rebuild bei Content-Änderung entfällt — neue Events/Testimonials sind
-  sofort sichtbar.
+  die Startseite und die Event-Seiten rendern serverseitig live, weil sie den
+  echten Terminstatus zeigen. Ein Rebuild bei Content-Änderung entfällt — neue
+  Events/Testimonials sind sofort sichtbar. (Nebenwirkung: `astro-llms-md`
+  verarbeitet nur vorgerenderte Seiten, `/` steht daher nicht mehr in
+  `llms.txt`.)
 - **Statischer Content** (Texte, FAQ, Hero, Moderator …) liegt als **JSON** im
   Repo (`src/content/`, `src/data/`).
 - **Dynamische Teile** (Anmeldung, Warteliste, Newsletter, Testimonial,
   Atemübung) sind **Svelte-5-Islands**, die per `fetch` mit der API sprechen.
 
+## Gestaltung
+
+Die Seite ist als **Plakat** gebaut, nicht als Theme: drei Farben, eine
+Schriftfamilie in zwei Schnitten, ein grafisches Motiv.
+
+- **Typografie in zwei Registern**, die sich bewusst nicht überschneiden.
+  **Barlow Condensed 800** für das Plakat-Register (`.display`, bis 180px,
+  Versalien, `line-height: .85`), **Barlow** für alles Lesbare (17–60px).
+  Dazwischen liegt nichts — der Sprung _ist_ die Hierarchie. Gegengewicht ist
+  der kleine Marker (`.marker`): dieselbe schmale Schrift in der kleinsten
+  Größe der Seite.
+- **Farben:** Haferpapier `#F2EDE3`, Rindentinte `#1C1714`, gebranntes Orange
+  `#DD5F33`. Jeder Ton liegt auf der warmen Seite von Neutral — das unterscheidet
+  die Palette von einer Produktpalette, deshalb sind auch die Grautöne ocker-
+  statt blaustichig. Wo welche Farbe stehen darf, entscheiden die gemessenen
+  Kontraste: Orange auf Papier ist 3,1:1 und deshalb **Fläche, Strich und große
+  Schrift** (die Schrittziffern), nie kleine Schrift; Weiß auf Orange ist 3,6:1
+  und reicht für Fließtext nicht, deshalb sind Buttons **Tinte auf Orange**
+  (4,9:1); auf dem dunklen Grund trägt das Orange auch als Schriftfarbe (4,9:1).
+- **Drei Gründe, nicht zwei.** `.section--sand` (`--bg-secondary`) ist die ruhige
+  Mitte zwischen Papier und dunklen Bändern — der Markus-Block und die Stimmen
+  stehen darauf. Wie jeder Grund schaltet er mit dem Modus um.
+- **Alles auf dem Seitengrund muss mit dem Modus umschalten** —
+  `--text-primary`, `--text-muted`, `--rule-strong`, `--bg-*`. Die literalen
+  `--color-ink` / `--color-paper` sind nur dort richtig, wo der Grund selbst
+  nicht umschaltet: oranges Statement, dunkle Bänder (`.section--ink`), Footer,
+  Atemübung. Ein Fehler hier fällt im Hellmodus nicht auf und lässt im
+  Dunkelmodus Text verschwinden.
+- **Zwei Rastersysteme.** `.bay` ist ein 12-Spalten-Raster (1320px); die
+  Abschnitte liegen in _verschiedenen_ Spalten, damit die linke Kante wandert.
+  `.spine` (Markerspalte + Textspalte) bleibt den ruhigen Passagen und
+  Unterseiten vorbehalten — es überall zu benutzen war der Grund, warum eine
+  frühere Fassung wie ein Standard-Theme wirkte.
+- **Der Kreis** ([`src/components/Ring.astro`](src/components/Ring.astro)) ist
+  das einzige grafische Motiv: ein dicker, offener oranger SVG-Ring, genau
+  zweimal eingesetzt (Hero, Abschluss), am Bildschirmrand angeschnitten, nie
+  über Text oder Bedienelementen.
+- **Radius ist überall 0.** `--radius-full` überlebt nur für die Atemübung, wo
+  der Kreis das Bedienelement _ist_.
+
 ## Motion & Seitenübergänge
 
-Ein System, CSS-first und ausschließlich auf compositor-fähigen Eigenschaften
-(`opacity`, `transform`). Alles Dekorative hängt hinter
-`prefers-reduced-motion: no-preference`.
+Drei gestaltete Bewegungssituationen, sonst nichts. Alles CSS-first, nur
+`opacity`/`transform`, alles hinter `prefers-reduced-motion: no-preference` —
+und jede Animation endet in dem Zustand, den ein statischer Render ohnehin
+zeigt.
 
-- **Regeln** in [`src/styles/utilities/_motion.css`](src/styles/utilities/_motion.css)
-  (Hero-Entrance, die Primitives `data-reveal` / `data-hover` / `data-motion`,
-  das Parken der Ambient-Loops), **Keyframes** ungelayert in
+1. **Einstieg** — die Hero-Überschrift kommt zeilenweise, Ring und Bildfläche
+   leicht versetzt, zusammen ~820ms.
+2. **Der Ring auf Scroll** — Drift und leichte Drehung über eine
+   `view()`-Timeline, begrenzt auf ±20px und ±6°. Kein Listener, kein
+   Scroll-Hijacking.
+3. **Das Statement** — die drei Zeilen im orangen Feld rücken beim Eintritt
+   flush-links ein.
+
+- **Regeln** in [`src/styles/utilities/_motion.css`](src/styles/utilities/_motion.css),
+  **Keyframes** ungelayert in
   [`src/styles/base/_keyframes.css`](src/styles/base/_keyframes.css).
-- **Scroll-Reveals** treibt [`src/lib/motion.ts`](src/lib/motion.ts) über Motions
-  `inView` + die Web Animations API. Der versteckte Startzustand steht hinter
-  `.motion-ready`, das eine Totmannschaltung im Layout wieder abräumt — ohne JS
-  bleibt also alles sichtbar.
-- **Ambient-Loops** (atmende Kreise, Section-Glows) laufen endlos und würden
-  auch weit außerhalb des Viewports weiterticken.
-  [`src/lib/ambient.ts`](src/lib/ambient.ts) beobachtet jede `<section>` und
-  pausiert die Loops darin, solange sie nicht sichtbar ist. Sections mit
-  `[data-motion-essential]` (die Atemübung) sind ausgenommen.
+- **Scroll-Reveals** (nur noch an wenigen Stellen) treibt
+  [`src/lib/motion.ts`](src/lib/motion.ts) über Motions `inView` + die Web
+  Animations API. Der versteckte Startzustand steht hinter `.motion-ready`, das
+  eine Totmannschaltung im Layout wieder abräumt — ohne JS bleibt alles sichtbar.
+- **Ambient-Loops** gibt es nur noch in der Atemübung, wo die atmenden Kreise der
+  Inhalt sind. [`src/lib/ambient.ts`](src/lib/ambient.ts) pausiert sie, solange
+  ihre `<section>` nicht sichtbar ist; `[data-motion-essential]` nimmt sie von
+  der Iterationsbremse aus.
 - **Seitenübergänge** sind native Cross-Document View Transitions
   ([`src/styles/utilities/_view-transitions.css`](src/styles/utilities/_view-transitions.css)),
   kein Router. Ein `pagereveal`-Listener im Layout setzt `.vt-arrival` vor dem
   ersten Paint, damit die ankommende Seite ihre eigene Entrance auslässt und nur
   der Cross-Fade läuft.
 
-Zwei Fallen, die hier schon zugeschnappt sind:
+Vier Fallen, die hier schon zugeschnappt sind:
 
 1. **Keine Layout-Eigenschaften animieren.** Der Header hat `padding-block` auf
    einer Scroll-Timeline animiert — das lief nicht auf dem Compositor, sondern
@@ -98,6 +147,15 @@ Zwei Fallen, die hier schon zugeschnappt sind:
 2. **Kein `filter: blur()` auf eng gesetzter Display-Schrift.** Ein Filter malt
    durch eine Region, die aus der Border-Box abgeleitet wird; bei
    `line-height: 0.88` ragen die Glyphen darüber hinaus und WebKit schneidet ab.
+3. **Ein Element, eine `animation`-Kurzschreibweise.** Einstieg und Scroll-Drift
+   des Rings animieren beide `transform`. Solange sie auf demselben Element
+   lagen, hat die `.vt-arrival`-Regel (`animation: none`, die den Einstieg nach
+   einem Seitenwechsel stilllegt) die Drift stillschweigend mit abgeschaltet.
+   Jetzt trägt ein Wrapper den Einstieg und das innere `<svg>` die Drift.
+4. **Deutsche Display-Schrift ragt aus ihrer Zeilenbox.** Bei `line-height: .85`
+   sitzt der Umlaut auf dem `Ä` über der Versalhöhe und kollidiert mit dem, was
+   darüber steht; `.display` reserviert diesen Überstand mit
+   `padding-block-start: .14em`.
 
 Beim Cross-Fade gilt zusätzlich: `mix-blend-mode: plus-lighter` stimmt nur,
 solange beide Hälften dieselbe **lineare** Kurve und dieselbe Dauer
@@ -110,14 +168,16 @@ hell auf.
 src/
   content/        home.json (Block-Reihenfolge + Texte), legal/*.json
   data/           site.json, navigation.json
-  components/      Astro-Blöcke (Hero, Intro, FAQ …), Header, Footer, SEO
+  components/      Astro-Blöcke (Hero, Facts, Intro, Statement, FAQ …),
+                  Ring.astro (das Kreismotiv), Header, Footer, SEO
   components/event/    Server-gerenderte Event-Seite (Hero, Anmeldung, Infos, Karte …)
   components/islands/  Svelte-5-Islands (Formulare, Breathing, Kalender-Modal, Map)
   components/admin/    Svelte-5-Islands der Admin-UI (Events, Anmeldungen, Stimmen)
   layouts/        Layout.astro (Seite), AdminLayout.astro (Back-Office)
   actions/        Astro Actions (`/_actions/*`) — die Admin-RPC-Schicht
   lib/            api.ts (Client-Formulare), motion.ts (Scroll-Reveals),
-                  ambient.ts (Ambient-Loops parken), site-header.ts (Mobile-Nav),
+                  event-status.ts (Terminstatus → Text + Hauptaktion),
+                  ambient.ts (Loops der Atemübung parken), site-header.ts,
                   theme.ts, types, umami-config, Utils
   lib/server/     Datenschicht (db/, events, registrations, testimonials,
                   listmonk, email, auth, reminders, ics, format) — NUR serverseitig
@@ -125,7 +185,8 @@ src/
   pages/          index, event, atemuebung, teile-deine-erfahrung, [slug], health
   pages/api/      Public-API (Formular-Endpunkte + /api/public/*)
   pages/admin/    Admin-UI-Seiten
-  styles/         vollständiges CSS-Designsystem (OKLCH, @layer, kein Tailwind);
+  styles/         vollständiges CSS-Designsystem (@layer, light-dark(), kein
+                  Tailwind); utilities/_layout.css = .bay + .spine,
                   utilities/_motion.css + base/_keyframes.css = Animation
 astro-integrations/  Build-Integrationen (Sitemap/llms.txt in das Static-Manifest
                   des Bun-Adapters nachtragen — s. serve-with-bun-adapter.mjs)

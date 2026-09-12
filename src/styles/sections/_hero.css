@@ -1,142 +1,58 @@
 /**
- * Full-bleed hero, shared by the homepage Hero block and the SSR event
- * pages (EventHero.astro / NoEvent.astro), so it lives here globally.
+ * Page opening — the block at the top of a sub-page.
+ *
+ * Shared by the single-event page (components/event/EventHero.astro) and the
+ * testimonial form page. It is a heading and a line of facts on the page's own
+ * ground: no full-bleed dark panel, no 100vh, no ring ornaments, no background
+ * image behind the text.
+ *
+ * The home page does not use this — its opening is an asymmetric two-column
+ * block of its own (components/blocks/Hero.astro).
  */
 
 .hero {
   position: relative;
-  display: flex;
-  align-items: flex-end;
-  block-size: 100svh;
-  min-block-size: 700px;
-  padding-block-end: var(--space-xl);
-  overflow: hidden;
-  background: var(--bg-dark);
-}
-
-@media (width > 600px) {
-  .hero {
-    min-block-size: min(880px, 100svh);
-  }
-}
-
-.hero__bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, var(--color-earth-deep) 0%, var(--color-earth-dark) 100%);
-}
-
-.hero__bg-glow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 80% 60% at 70% 30%,
-      color-mix(in oklch, var(--accent-primary) 22%, transparent) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      ellipse 60% 50% at 20% 80%,
-      color-mix(in oklch, var(--accent-primary) 12%, transparent) 0%,
-      transparent 40%
-    );
-}
-
-.hero__circles {
-  overflow: hidden;
-}
-
-.hero__circle--1 {
-  inset-block-start: -15vw;
-  inset-inline-end: -25vw;
-  inline-size: 70vw;
-  block-size: 70vw;
-}
-
-.hero__circle--2 {
-  inset-block-start: -5vw;
-  inset-inline-end: -15vw;
-  inline-size: 50vw;
-  block-size: 50vw;
-}
-
-.hero__circle--3 {
-  inset-block-start: 2vw;
-  inset-inline-end: -8vw;
-  inline-size: 35vw;
-  block-size: 35vw;
-}
-
-.hero__circle--4 {
-  inset-block-end: -45vw;
-  inset-inline-start: -45vw;
-  inline-size: 90vw;
-  block-size: 90vw;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero__circle--1 {
-    animation: breathe 18s var(--ease-ambient) infinite;
-  }
-
-  .hero__circle--2 {
-    animation: breathe-slow 22s var(--ease-ambient) infinite -5s;
-  }
-
-  .hero__circle--3 {
-    animation: breathe 25s var(--ease-ambient) infinite -10s;
-  }
-
-  .hero__circle--4 {
-    animation: breathe-slow 30s var(--ease-ambient) infinite -3s;
-  }
+  padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
+  border-block-end: 2px solid var(--rule-strong);
 }
 
 .hero__content {
-  position: relative;
-  z-index: 2;
-  inline-size: 100%;
+  max-inline-size: var(--measure-wide);
 }
 
 .hero__label {
-  display: inline-flex;
-  gap: var(--space-sm);
+  display: flex;
+  gap: 0.6em;
   align-items: center;
-  margin-block-end: var(--space-lg);
-  font-size: var(--text-caption);
+  margin-block-end: var(--space-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-marker);
   font-weight: 600;
-  color: var(--accent-secondary);
+  color: var(--text-primary);
   text-transform: uppercase;
-  letter-spacing: 0.25em;
+  letter-spacing: var(--tracking-marker);
 }
 
 .hero__label::before {
-  inline-size: clamp(2.5rem, 6vw, 5rem);
-  block-size: 1px;
+  flex: none;
+  inline-size: 1.75rem;
+  block-size: 3px;
   content: '';
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in oklch, var(--accent-secondary) 72%, transparent) 24%,
-    color-mix(in oklch, var(--accent-secondary) 72%, transparent)
-  );
-  transform: scaleX(1);
-  transform-origin: right;
+  background: var(--color-orange);
 }
 
 .hero__title {
-  max-inline-size: 100%;
-  margin-block-end: var(--space-md);
-  font-size: clamp(3rem, 8vw + 1rem, 11rem);
-  line-height: 0.88;
-  color: var(--text-on-dark);
-  hyphens: auto;
-  overflow-wrap: break-word;
+  margin-block-end: var(--space-sm);
+  font-size: var(--display-3);
+  line-height: 0.98;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
-.hero__title .text-italic {
-  color: var(--accent-secondary);
+.hero__title .text-italic,
+.hero__title .highlight {
+  font-style: italic;
 }
 
 .hero__title-line {
@@ -145,152 +61,41 @@
 
 .hero__bottom {
   display: flex;
-  gap: var(--space-lg);
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-block-start: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  align-items: center;
+  margin-block-start: var(--space-md);
 }
 
-.hero__description {
-  max-inline-size: var(--content-max-form);
-  font-size: clamp(1rem, 1.5vw + 0.5rem, 1.125rem);
-  line-height: 1.9;
-  color: var(--color-sand);
+.hero__description,
+.hero__subtitle {
+  max-inline-size: var(--measure);
+  margin: 0;
+  font-size: var(--text-section-body-lg);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  text-wrap: pretty;
 }
 
 .hero__cta {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  align-items: flex-end;
-}
-
-.hero__scroll {
-  display: inline-flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
   align-items: center;
-  margin-block-start: var(--space-lg);
-  font-size: var(--text-xs);
-  color: var(--color-sand);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  writing-mode: vertical-rl;
 }
 
-.hero__scroll-line {
-  display: block;
-  inline-size: 1px;
-  block-size: 80px;
-  pointer-events: none;
-  background: linear-gradient(to bottom, var(--accent-primary), transparent);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero__scroll-line {
-    animation: scroll-line-sweep 2s var(--ease-settle) infinite;
-  }
-}
-
-@media (width <= 900px) {
-  .hero {
-    align-items: center;
-    padding-block-start: var(--space-3xl);
-  }
-
-  .hero__title {
-    font-size: clamp(2.5rem, 8vw + 0.75rem, 6rem);
-  }
-
-  .hero__bottom {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .hero__cta {
-    align-items: flex-start;
-  }
-
-  .hero__scroll {
-    display: none;
-  }
-}
-
-@media (width <= 600px) {
-  .hero__cta .btn--large {
-    --btn-padding-block: 0.95rem;
-    --btn-padding-inline: 1.85rem;
-    --btn-font-size: var(--text-caption);
-  }
-}
-
-@media (width <= 480px) {
-  .hero__title {
-    font-size: clamp(3rem, 14vw, 5rem);
-  }
-
-  .hero__label {
-    margin-block-end: var(--space-md);
-    font-size: var(--text-xs);
-  }
-
-  .hero__description {
-    font-size: var(--text-body-compact);
-  }
-}
-
-.event-hero {
-  align-items: flex-end;
-  min-block-size: 70vh;
-  padding-block: var(--header-clearance) var(--space-xl);
-}
-
-.event-hero .hero__title {
-  font-size: clamp(4rem, 14vw, 13rem);
-  line-height: 0.88;
-}
-
-.event-hero .hero__bottom {
-  margin-block-start: var(--space-lg);
-}
-
-.event-hero .hero__description {
-  max-inline-size: var(--content-max-description);
+/* The single-event page: same opening, with the date carrying the weight. */
+.event-hero .hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+  align-items: baseline;
+  margin: 0;
   font-size: var(--text-section-body-lg);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
 }
 
-.hero__bg-image {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.hero__bg picture {
-  position: absolute;
-  inset: 0;
-  inline-size: 100%;
-  block-size: 100%;
-}
-
-/* Scroll-driven parallax: the content lifts and fades as the rings drift
-   down behind it. The entrance animates the content's *children*, so
-   animating the wrappers here never collides with it. */
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: scroll()) {
-    .hero__content {
-      animation: hero-content-leave linear both;
-      animation-timeline: scroll(root);
-      animation-range: 10vh 92vh;
-    }
-
-    .hero__circles {
-      animation: hero-rings-drift linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 92vh;
-    }
-  }
+.event-hero .hero__meta-sep {
+  color: var(--border-strong, var(--border-medium));
 }
