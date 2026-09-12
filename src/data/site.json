@@ -1,21 +1,29 @@
 {
-  "siteName": "Männerkreis Niederbayern",
-  "tagline": "Ein Raum für echte Begegnung",
-  "description": "Der Männerkreis ist ein geschützter Ort, an dem du dich zeigen kannst, wie du wirklich bist.",
-  "footerDescription": "Ein Raum für echte Begegnung unter Männern. Authentischer Austausch, Gemeinschaft und persönliches Wachstum in Niederbayern.",
+  "siteName": "Männerkreis Straubing",
+  "tagline": "Ein Abend, an dem du nichts darstellen musst",
+  "description": "Ein Männerkreis in Straubing: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt.",
+  "footerDescription": "Ein Männerkreis in Straubing, Niederbayern. Wir treffen uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.",
   "contactEmail": "hallo@mens-circle.de",
   "contactPhone": "0151 26072643",
-  "location": "Niederbayern",
+  "location": "Straubing, Niederbayern",
   "whatsappCommunityLink": "https://chat.whatsapp.com/BHxhiej3uUg5syYzLCSKn4",
-  "footerText": "© 2026 Männerkreis Niederbayern. Alle Rechte vorbehalten.",
+  "footerText": "© 2026 Männerkreis Straubing",
   "socialLinks": [
     {
       "type": "whatsapp",
       "value": "https://chat.whatsapp.com/BHxhiej3uUg5syYzLCSKn4",
       "label": "WhatsApp Community"
     },
-    { "type": "email", "value": "hallo@mens-circle.de", "label": "E-Mail" },
-    { "type": "phone", "value": "015126072643", "label": "Telefon" }
+    {
+      "type": "email",
+      "value": "hallo@mens-circle.de",
+      "label": "E-Mail"
+    },
+    {
+      "type": "phone",
+      "value": "015126072643",
+      "label": "Telefon"
+    }
   ],
   "geo": {
     "lat": 48.8777,
@@ -25,5 +33,5 @@
     "postalCode": "94315",
     "country": "DE"
   },
-  "themeColor": "#3d2817"
+  "themeColor": "#f3f0e9"
 }

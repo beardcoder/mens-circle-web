@@ -8,6 +8,14 @@ interface Props {
   };
 }
 
+/**
+ * A passage of running prose with a marginal heading.
+ *
+ * The same asymmetric spine the home page uses, so a long personal text reads as
+ * one continuous piece with its subheads in the margin, rather than as a stack
+ * of centred slides.
+ */
+
 const { data } = Astro.props;
 const slug = (data.title ?? '')
   .toLowerCase()
@@ -16,29 +24,37 @@ const slug = (data.title ?? '')
 const anchor = data.anchor ?? slug;
 ---
 
-<section class="section" id={anchor || undefined}>
-  <div class="container--narrow container">
-    <div class="section-header section-header--start" data-reveal-group>
-      {
-        data.eyebrow && (
-          <p class="eyebrow" data-reveal="up">
-            {data.eyebrow}
-          </p>
-        )
-      }
-      {
-        data.title && (
-          <h2 class="section-title" data-reveal="blur">
-            {data.title}
-          </h2>
-        )
-      }
-    </div>
+<section class="section section--ruled text-section" id={anchor || undefined}>
+  <div class="container">
+    <div class="spine">
+      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
 
-    {
-      data.content && (
-        <div class="section__content prose" data-reveal="up" data-reveal-delay="120" set:html={data.content} />
-      )
-    }
+      <div class="spine__body">
+        {
+          data.title && (
+            <h2 class="text-section__title" data-reveal="up">
+              {data.title}
+            </h2>
+          )
+        }
+
+        {data.content && <div class="prose" data-reveal="up" set:html={data.content} />}
+      </div>
+    </div>
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .text-section__title {
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-3xl);
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+
+    .text-section .prose p {
+      font-size: var(--text-section-body-lg);
+    }
+  }
+</style>

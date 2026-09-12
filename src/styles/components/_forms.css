@@ -2,39 +2,44 @@
  * Form components
  *
  * One control system for event registration, newsletter, and testimonial forms.
+ * Every form now sits on the page's own light ground, so the controls are light
+ * too: a bordered box with a real, readable label above it. Labels are sentence
+ * case — an uppercase, wide-tracked label is decoration on a field name.
  */
 
 .form-group,
 .form-field {
   position: relative;
   margin-block-end: var(--space-sm);
-  transition: transform 420ms var(--ease-settle);
 }
 
 .form-field--spaced {
-  margin-block-end: var(--space-lg);
+  margin-block-end: var(--space-md);
 }
 
-.form-group:focus-within,
-.form-field:focus-within {
-  transform: translate3d(0, -2px, 0);
-}
-
+/* Field names take the small condensed marker. The consent checkbox does NOT:
+   its label is a sentence a reader has to actually read before agreeing to it,
+   and setting a sentence in tracked-out uppercase condensed makes it harder to
+   read, not more designed. */
 .form-label,
-.form-group label {
+.form-group label:not(.form-checkbox):not(.form-checkbox-label) {
   display: block;
-  margin-block-end: var(--space-3xs);
-  font-size: var(--text-caption);
+  margin-block-end: var(--space-2xs);
+  font-family: var(--font-display);
+  font-size: var(--text-marker);
   font-weight: 600;
-  color: var(--accent-secondary);
+  color: var(--text-primary);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  transition: color var(--motion-standard);
+  letter-spacing: var(--tracking-marker);
 }
 
-.form-field:focus-within .form-label,
-.form-group:focus-within label {
-  color: var(--accent-primary);
+.form-checkbox,
+.form-checkbox-label,
+.form-checkbox span,
+.form-checkbox-text {
+  font-family: var(--font-body);
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .form-label--plain {
@@ -58,6 +63,8 @@
     textarea
   ) {
   inline-size: 100%;
+  /* 16px minimum: anything smaller makes iOS Safari zoom the page on focus. */
+  min-block-size: 44px;
   padding-block: var(--control-padding-block);
   padding-inline: var(--control-padding-inline);
   font-family: var(--font-body);
@@ -68,19 +75,17 @@
   border: var(--control-border-width) solid var(--control-border-color);
   border-radius: var(--control-radius);
   transition:
-    border-color var(--motion-standard),
-    background-color var(--motion-standard),
-    box-shadow var(--motion-standard),
-    transform var(--motion-quick);
+    border-color var(--motion-quick),
+    background-color var(--motion-quick),
+    box-shadow var(--motion-quick);
 }
 
+/* Kept as a no-op modifier: every control is light now, and call sites still
+   pass it. */
 .form-control--light {
-  --control-bg: var(--control-bg-light);
-  --control-bg-hover: var(--control-bg-light);
+  --control-bg: var(--bg-input);
+  --control-bg-hover: var(--bg-input-focus);
   --control-color: var(--text-primary);
-  --control-border-width: 2px;
-
-  box-shadow: var(--shadow-sm);
 }
 
 textarea.form-control {
@@ -99,11 +104,6 @@ textarea.form-control {
 .newsletter__input:hover:not(:focus, :disabled),
 .form-group input:hover:not(:focus, :disabled),
 .form-group textarea:hover:not(:focus, :disabled) {
-  background: var(--control-bg-hover);
-  border-color: color-mix(in oklch, var(--accent-primary) 40%, transparent);
-}
-
-.form-control--light:hover:not(:focus, :disabled) {
   border-color: var(--border-dark);
 }
 
@@ -111,19 +111,10 @@ textarea.form-control {
 .newsletter__input:focus-visible,
 .form-group input:focus-visible,
 .form-group textarea:focus-visible {
-  outline: none;
+  outline: 3px solid var(--color-orange);
+  outline-offset: 0;
   background: var(--control-bg-hover);
-  border-color: var(--accent-primary);
-  box-shadow:
-    var(--focus-ring),
-    0 6px 16px -4px color-mix(in oklch, var(--accent-primary) 20%, transparent),
-    0 16px 32px -8px color-mix(in oklch, var(--accent-primary) 12%, transparent);
-}
-
-.form-control--light:focus-visible {
-  background: var(--control-bg-light);
-  box-shadow: var(--focus-ring);
-  transform: translate3d(0, -0.0625rem, 0);
+  border-color: var(--color-ink);
 }
 
 .form-control:disabled,
@@ -158,17 +149,14 @@ textarea.form-control {
 .newsletter__input[aria-invalid='true']:not(:focus),
 .form-group input[aria-invalid='true']:not(:focus),
 .form-group textarea[aria-invalid='true']:not(:focus) {
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-error) 22%, transparent);
+  box-shadow: 0 0 0 3px rgb(156 58 44 / 22%);
 }
 
 /* The message carries its OWN background rather than inheriting the section's.
-   These forms sit on three very different surfaces — the testimonial page is
-   near-white (rgb 242,238,231), the event register a dark brown (rgb 41,31,19),
-   the newsletter a mid brown (rgb 84,59,39) — and measured against them a single
-   red text colour cannot clear 4.5:1 everywhere: `--color-error` scores 4.59:1 on
-   the light surface but only 1.95:1 on the newsletter. Giving the chip a fixed
-   pair of its own makes the contrast a constant instead of a function of
-   whichever section the form happens to be dropped into. */
+   Every form now sits on a light ground, but the newsletter block still inverts,
+   and a single red text colour cannot clear 4.5:1 on both. Giving the chip a
+   fixed pair of its own makes the contrast a constant instead of a function of
+   whichever section the form is dropped into. Measured 7.6:1. */
 .form-error {
   display: flex;
   gap: var(--space-3xs);
@@ -178,10 +166,10 @@ textarea.form-control {
   padding: 0.3em 0.6em;
   font-size: var(--text-caption);
   font-weight: 600;
-  color: oklch(38% 0.16 25deg);
+  color: #7a2a1c;
   text-wrap: pretty;
-  background: oklch(95% 0.035 30deg);
-  border-radius: var(--radius-sm);
+  background: #f7e0d9;
+  border-radius: 0;
 }
 
 /* Colour alone must never be the only signal (WCAG 1.4.1), so each message
@@ -217,11 +205,11 @@ textarea.form-control {
 }
 
 .form-checkbox {
-  margin-block-start: var(--space-md);
+  margin-block-start: var(--space-sm);
 }
 
 .form-field--checkbox {
-  margin-block-start: var(--space-xl);
+  margin-block-start: var(--space-md);
 }
 
 .form-checkbox input,
@@ -232,9 +220,7 @@ textarea.form-control {
   margin-block-start: 0.2rem;
   accent-color: var(--accent-primary);
   cursor: pointer;
-  transition:
-    box-shadow var(--motion-standard),
-    transform var(--motion-quick);
+  transition: box-shadow var(--motion-quick);
 }
 
 .form-checkbox-control {
@@ -244,20 +230,15 @@ textarea.form-control {
 
 .form-checkbox input:focus-visible,
 .form-checkbox-control:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent-primary) 22%, transparent);
-}
-
-.form-checkbox input:active,
-.form-checkbox-control:active {
-  transform: scale(0.94);
+  outline: 3px solid var(--color-orange);
+  outline-offset: 2px;
 }
 
 .form-checkbox-text,
 .form-checkbox span {
-  font-size: var(--text-sm);
-  line-height: 1.5;
-  color: var(--color-sand);
+  font-size: var(--text-caption);
+  line-height: var(--leading-normal);
+  color: var(--text-secondary);
 }
 
 .form-checkbox-text {
@@ -272,8 +253,9 @@ textarea.form-control {
   text-underline-offset: 2px;
 }
 
-.form-checkbox a:hover {
-  color: var(--accent-primary);
+.form-checkbox a:hover,
+.form-checkbox a:focus-visible {
+  color: var(--accent-rare);
 }
 
 .form-row {
@@ -290,13 +272,19 @@ textarea.form-control {
 
 .form-actions {
   display: flex;
-  justify-content: center;
-  margin-block-end: var(--space-md);
+  margin-block-end: var(--space-sm);
 }
 
 .newsletter__form {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--space-xs) var(--space-sm);
+  align-items: end;
+  max-inline-size: var(--content-max-form);
+}
+
+.newsletter__field {
+  flex: 1;
+  min-inline-size: 0;
 }
 
 /* Sits after the form, not inside it — the form is a flex row and a third item
@@ -308,11 +296,10 @@ textarea.form-control {
 @media (width <= 600px) {
   .newsletter__form {
     flex-direction: column;
+    align-items: stretch;
   }
 }
 
 .newsletter__input {
-  --control-radius: var(--radius-full);
-
-  flex: 1;
+  inline-size: 100%;
 }

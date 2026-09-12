@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { fetchNextEvent } from '@lib/server/events';
+import { fetchNextEventState } from '@lib/server/events';
 import { fetchTestimonials } from '@lib/server/testimonials';
 import { buildEventFaq, summarizeNextEvent } from '@lib/event-landing';
+import { dateStatus } from '@lib/event-status';
 import EventLanding from '../components/event/EventLanding.astro';
 import site from '../data/site.json';
 
@@ -14,8 +15,12 @@ import site from '../data/site.json';
  * Server-rendered, not prerendered: the upcoming date belongs in the initial
  * HTML rather than filling in after JS.
  */
-const event = await fetchNextEvent();
+const { status, event } = await fetchNextEventState();
 const next = summarizeNextEvent(event);
+// One object for the whole page, so the date block, the FAQ and the metadata
+// can never disagree about whether a date exists. A failed read is its own
+// state — never rendered as "kein Termin geplant".
+const state = dateStatus(status, next);
 
 // A single published voice for the pull quote after "Du musst nichts können" —
 // the top of the curated order, not a second copy of the home page's grid. The
@@ -28,7 +33,7 @@ const canonical = new URL('/event', siteUrl).href;
 
 // The same builder the component renders from, so the FAQPage markup below can
 // never drift from the questions actually visible on the page.
-const faqItems = buildEventFaq(next);
+const faqItems = buildEventFaq(state.next);
 
 /**
  * `EventSeries` describes the recurring Männerkreis itself — the thing this page
@@ -75,12 +80,12 @@ const eventSeries: Record<string, unknown> = {
     availability: 'https://schema.org/InStock',
     url: canonical,
   },
-  ...(next
+  ...(state.next
     ? {
         subEvent: {
           '@type': 'Event',
-          '@id': new URL(`/event/${next.slug}`, siteUrl).href,
-          url: new URL(`/event/${next.slug}`, siteUrl).href,
+          '@id': new URL(`/event/${state.next.slug}`, siteUrl).href,
+          url: new URL(`/event/${state.next.slug}`, siteUrl).href,
         },
       }
     : {}),
@@ -108,9 +113,9 @@ const breadcrumbs = {
 
 // The description changes with the state so the SERP snippet is never stale,
 // but both variants lead with the same evergreen keywords.
-const description = next
-  ? `Nächster Männerkreis in ${next.place}: ${next.dateLabel}${next.timeRange ? `, ${next.timeRange}` : ''}. Ein Abend unter Männern, an dem du nichts darstellen musst – ohne Vorerfahrung, auf Spendenbasis.`
-  : 'Männerkreis in Straubing/ Niederbayern: was an so einem Abend passiert, was du mitbringen musst (nichts) und wann der nächste Termin ist. Ohne Vorerfahrung, auf Spendenbasis.';
+const description = state.next
+  ? `Nächster Männerkreis in ${state.next.place}: ${state.next.dateLabel}${state.next.timeRange ? `, ${state.next.timeRange}` : ''}. Anmeldung, Ort, Dauer und Beitrag auf einen Blick – ohne Vorerfahrung, auf Spendenbasis.`
+  : 'Termine des Männerkreises in Straubing/ Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis.';
 ---
 
 <Layout
@@ -119,5 +124,5 @@ const description = next
   keywords="Männerkreis Straubing, Männerkreis Niederbayern, Männergruppe Straubing, Termine, Männerkreis Termine, Anmeldung"
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  <EventLanding next={next} voice={voice} />
+  <EventLanding state={state} voice={voice} />
 </Layout>

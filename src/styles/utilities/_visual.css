@@ -1,17 +1,13 @@
 /**
- * Visual Utilities
- * Accessibility helpers, editorial chrome
+ * Visual utilities — accessibility helpers only.
+ *
+ * The global paper-noise overlay and the fixed editorial side rails that used to
+ * live here are gone: both were decoration with no job, and the noise sat on
+ * `body::before` with `mix-blend-mode: overlay` over every surface on every page.
  */
 
-/* The "next event" CTAs used to be hidden here by default and revealed at
-   runtime (`body.has-upcoming-event`) only once a client-side fetch confirmed a
-   date existed. That is gone: /event is now a permanent landing page that reads
-   well with or without a date on the books, so the links never point anywhere
-   dead and are always rendered — no runtime probe, no flicker, and a crawlable
-   internal link to /event on every page instead of an orphaned URL. */
-
 /* ============================================
-   Screen Reader Only
+   Screen reader only
    ============================================ */
 .sr-only {
   position: absolute;
@@ -37,79 +33,4 @@
   inline-size: 1px;
   block-size: 1px;
   overflow: hidden;
-}
-
-/* ============================================
-   Global Paper Noise Overlay
-   Warm organic texture applied over all surfaces.
-   mix-blend-mode: overlay lifts light areas on dark
-   sections and deepens shadow areas on light ones —
-   net effect is a subtle print/grain warmth.
-   ============================================ */
-body::before {
-  position: fixed;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  content: '';
-  background-image: var(--surface-noise);
-  background-size: 400px 400px;
-  mix-blend-mode: overlay;
-  opacity: 0.06;
-}
-
-/* ============================================
-   Side Rails
-   Fixed editorial vertical markers inspired by
-   magazine layout — thin inner border + rotated
-   metadata text. Hidden below 1200px so they never
-   crowd small screens or interfere with the mobile nav.
-   ============================================ */
-.side-rail {
-  position: fixed;
-  inset-block: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  inline-size: 44px;
-  pointer-events: none;
-  transition: opacity var(--motion-standard);
-}
-
-.side-rail--left {
-  inset-inline-start: 0;
-  border-inline-end: 1px solid color-mix(in oklch, var(--text-muted) 18%, transparent);
-}
-
-.side-rail--right {
-  inset-inline-end: 0;
-  border-inline-start: 1px solid color-mix(in oklch, var(--text-muted) 18%, transparent);
-}
-
-.side-rail__text {
-  font-family: var(--font-body);
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: color-mix(in oklch, var(--text-muted) 65%, transparent);
-  text-transform: uppercase;
-  letter-spacing: 0.42em;
-  white-space: nowrap;
-  writing-mode: vertical-rl;
-}
-
-.side-rail--left .side-rail__text {
-  transform: rotate(180deg);
-}
-
-/* Fade out during open nav — the panel paints over the rail area */
-body.nav-open .side-rail {
-  opacity: 0;
-}
-
-/* Only render on wide viewports */
-@media (width <= 1200px) {
-  .side-rail {
-    display: none;
-  }
 }
