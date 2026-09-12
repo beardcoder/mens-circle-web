@@ -131,8 +131,13 @@ const questions = data.questions ?? [];
       text-wrap: balance;
     }
 
+    /* Lands under the prose column, mirroring the spread at the top of the
+       section. Without an explicit placement it would auto-place into column 1
+       of the twelve and squeeze to a twelfth of the width. */
     .home-circle__close {
+      grid-column: 7 / span 6;
       max-inline-size: var(--measure);
+      margin-block-start: var(--space-sm);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
