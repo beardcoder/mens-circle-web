@@ -15,46 +15,66 @@ interface Props {
   };
 }
 
+/**
+ * A numbered list of positions — used once, for "Was mir im Kreis wichtig ist"
+ * on the Haltung page. Same spine as the surrounding prose so it reads as part
+ * of the text rather than as a widget dropped into it.
+ */
+
 const { data } = Astro.props;
 const items = data.items ?? [];
 ---
 
-<section class="section values-section" id={data.anchor}>
+<section class="section section--ruled values-section" id={data.anchor}>
   <div class="container">
-    <div class="section-header" data-reveal-group>
-      {
-        data.eyebrow && (
-          <p class="eyebrow" data-reveal="up">
-            {data.eyebrow}
-          </p>
-        )
-      }
-      {data.title && <h2 class="section-title" data-reveal="blur" set:html={data.title} />}
-      {
-        data.intro && (
-          <p class="section-intro" data-reveal="up">
-            {data.intro}
-          </p>
-        )
-      }
-    </div>
+    <div class="spine">
+      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
 
-    {
-      items.length > 0 && (
-        <ol class="intro__values" role="list" data-reveal-group="90">
-          {items.map((item) => (
-            <li class="value-item" data-reveal="up">
-              {item.number && (
-                <span class="value-item__number" aria-hidden="true">
-                  {item.number}
-                </span>
-              )}
-              {item.title && <h3 class="value-item__title">{item.title}</h3>}
-              {item.description && <p class="value-item__description">{item.description}</p>}
-            </li>
-          ))}
-        </ol>
-      )
-    }
+      <div class="spine__body">
+        {data.title && <h2 class="values-section__title" data-reveal="up" set:html={data.title} />}
+        {
+          data.intro && (
+            <p class="section-intro" data-reveal="up">
+              {data.intro}
+            </p>
+          )
+        }
+
+        {
+          items.length > 0 && (
+            <ol class="values-section__list" role="list" data-reveal-group="55">
+              {items.map((item) => (
+                <li class="value-item" data-reveal="up">
+                  {item.number && (
+                    <span class="value-item__number" aria-hidden="true">
+                      {item.number}
+                    </span>
+                  )}
+                  {item.title && <h3 class="value-item__title">{item.title}</h3>}
+                  {item.description && <p class="value-item__description">{item.description}</p>}
+                </li>
+              ))}
+            </ol>
+          )
+        }
+      </div>
+    </div>
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .values-section__title {
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-3xl);
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+
+    .values-section__list {
+      padding: 0;
+      margin: var(--space-md) 0 0;
+      list-style: none;
+    }
+  }
+</style>

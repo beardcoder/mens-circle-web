@@ -4,6 +4,10 @@
  * `.motion-ready`, so without JS or under reduced motion everything stays
  * visible. A MutationObserver picks up content added after load.
  *
+ * These are short and small on purpose: a paragraph should look like it was
+ * already there, not like it performed an entrance. Travel is a few pixels and
+ * the whole thing is over in about a third of a second.
+ *
  * Markup:
  *   data-reveal="up|down|left|right|fade|zoom|blur"   (default "up")
  *   data-reveal-delay / data-reveal-duration          ms overrides
@@ -31,21 +35,21 @@ interface Tuning {
 }
 
 const DESKTOP: Tuning = {
-  shift: '1.5rem',
-  zoom: 0.94,
-  blur: '12px',
-  duration: 0.88,
-  blurDuration: 1.15,
-  step: 110,
+  shift: '0.6rem',
+  zoom: 0.985,
+  blur: '0px',
+  duration: 0.36,
+  blurDuration: 0.36,
+  step: 55,
 };
 
 const MOBILE: Tuning = {
-  shift: '0.75rem',
-  zoom: 0.94,
+  shift: '0.4rem',
+  zoom: 0.99,
   blur: '0px',
-  duration: 0.7,
-  blurDuration: 0.76,
-  step: 80,
+  duration: 0.3,
+  blurDuration: 0.3,
+  step: 45,
 };
 
 interface Keyframes {
@@ -83,17 +87,15 @@ function keyframesFor(variant: Variant, t: Tuning): Keyframes {
       return { opacity: [0, 1] };
     case 'zoom':
       return { opacity: [0, 1], transform: [`scale(${t.zoom})`, 'scale(1)'] };
+    // `blur` is retained as a name so existing call sites keep working, but it
+    // no longer blurs: a filter on tightly-set display text gets cropped to the
+    // filter region by WebKit, and it cost a re-rasterise every frame. It now
+    // resolves to the same plain rise as the default.
     case 'blur':
-      return t.blur === '0px'
-        ? {
-            opacity: [0, 1],
-            transform: ['translateY(0.75rem)', 'translateY(0)'],
-          }
-        : {
-            opacity: [0, 1],
-            transform: ['translateY(0.6rem)', 'translateY(0)'],
-            filter: [`blur(${t.blur})`, 'blur(0px)'],
-          };
+      return {
+        opacity: [0, 1],
+        transform: [`translateY(${t.shift})`, 'translateY(0)'],
+      };
     default:
       return {
         opacity: [0, 1],
@@ -115,6 +117,9 @@ function ms(value: string | undefined): number | null {
 function defaultDuration(variant: Variant, t: Tuning): number {
   return variant === 'blur' ? t.blurDuration * 1000 : t.duration * 1000;
 }
+
+/** Cap what a call site can ask for — no reveal on this site runs long. */
+const MAX_DURATION_MS = 520;
 
 const configs = new WeakMap<HTMLElement, RevealConfig>();
 const registered = new WeakSet<HTMLElement>();
@@ -139,7 +144,7 @@ function configFor(el: HTMLElement, tuning: Tuning, extraDelay = 0): RevealConfi
 
   return {
     enter: keyframesFor(variant, tuning),
-    duration: (ms(el.dataset.revealDuration) ?? defaultDuration(variant, tuning)) / 1000,
+    duration: Math.min(ms(el.dataset.revealDuration) ?? defaultDuration(variant, tuning), MAX_DURATION_MS) / 1000,
     delay: ((ms(el.dataset.revealDelay) ?? 0) + extraDelay) / 1000,
     repeat: el.dataset.revealRepeat !== undefined,
   };

@@ -12,223 +12,144 @@ interface Props {
     title?: string;
     subtitle?: string;
     steps?: Step[];
+    close?: string;
   };
 }
+
+/**
+ * "Wie ein Abend abläuft" — the evening as an open sequence.
+ *
+ * Big condensed numerals in the margin, a full-width rule above each step, and
+ * the text set against the numeral rather than inside a box. Reading down a
+ * ruled ladder, not across a row of cards and not along a process diagram with
+ * arrows.
+ *
+ * The numerals are `aria-hidden`: the ordered list already conveys the order to
+ * assistive technology, and reading "one" twice per step is noise.
+ *
+ * The `#reise` id is kept even though the label is "Ablauf" — that anchor has
+ * been linked from the nav, the footer and /event for as long as the page has
+ * existed.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
 const steps = data.steps ?? [];
 ---
 
-<section class="section section--large journey-section" id={anchor} aria-labelledby="journey-title">
-  <div class="journey__glow" aria-hidden="true"></div>
+<section class="section home-evening" id={anchor} aria-labelledby="ablauf-title">
   <div class="container">
-    <div class="section-header section-header--on-dark" data-reveal-group>
-      {
-        data.eyebrow && (
-          <p class="eyebrow eyebrow--secondary" data-reveal="up">
-            {data.eyebrow}
-          </p>
-        )
-      }
+    <div class="bay home-evening__head">
+      <p class="marker marker--ruled bay__marker">{data.eyebrow}</p>
 
-      {
-        data.title && (
-          <h2 class="section-title section-title--light" id="journey-title" data-reveal="blur" set:html={data.title} />
-        )
-      }
-
-      {
-        data.subtitle && (
-          <p class="journey__subtitle" data-reveal="up">
-            {data.subtitle}
-          </p>
-        )
-      }
+      <div class="bay__beside-marker">
+        {
+          data.title && (
+            <h2 class="section-title" id="ablauf-title">
+              {data.title}
+            </h2>
+          )
+        }
+        {data.subtitle && <p class="section-intro">{data.subtitle}</p>}
+      </div>
     </div>
 
-    {/* Each step enters moving forward along the reading direction — walking the path. */}
     {
       steps.length > 0 && (
-        <ol class="journey__steps" role="list" data-reveal-group="150">
+        <ol class="home-evening__list" role="list">
           {steps.map((step) => (
-            <li class="journey__step" data-reveal="right">
-              {step.number && (
-                <div class="journey__step-number" aria-hidden="true">
-                  {step.number}
-                </div>
-              )}
-              {step.title && <h3 class="journey__step-title">{step.title}</h3>}
-              {step.description && <p class="journey__step-text">{step.description}</p>}
+            <li class="home-evening__step">
+              <p class="home-evening__number" aria-hidden="true">
+                {step.number}
+              </p>
+              <div class="home-evening__text-col">
+                {step.title && <h3 class="home-evening__title">{step.title}</h3>}
+                {step.description && <p class="home-evening__text">{step.description}</p>}
+              </div>
             </li>
           ))}
         </ol>
       )
     }
+
+    {data.close && <div class="home-evening__close prose" set:html={data.close} />}
   </div>
 </section>
+
 <style is:global>
   @layer sections {
-    .journey-section {
-      --_surface-noise-opacity: 0.03;
-
-      position: relative;
-      overflow: clip;
-      color: var(--text-on-dark);
-      background: var(--bg-dark);
+    .home-evening__head {
+      margin-block-end: var(--space-lg);
     }
 
-    .journey__glow {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: radial-gradient(
-        ellipse 80% 60% at 50% 100%,
-        color-mix(in oklch, var(--accent-primary) 16%, transparent) 0%,
-        transparent 50%
-      );
-    }
-
-    .journey-section .section-header {
-      position: relative;
-      z-index: 1;
-    }
-
-    .journey__subtitle {
-      margin-block: 0;
-      font-family: var(--font-display);
-      font-size: 1.375rem;
-      font-style: italic;
-      color: var(--color-sand);
-      opacity: 0.8;
-    }
-
-    .journey__steps {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      overflow: hidden;
+    .home-evening__list {
+      padding: 0;
+      margin: 0;
       list-style: none;
     }
 
-    /* The glowing thread across the top of the steps. */
-    .journey__steps::before {
-      position: absolute;
-      inset-block-start: 0;
-      inset-inline: 0;
-      block-size: 1px;
-      pointer-events: none;
-      content: '';
-      background: linear-gradient(
-        90deg,
-        transparent,
-        color-mix(in oklch, var(--accent-secondary) 68%, transparent),
-        transparent
-      );
-      opacity: 0.7;
-      transform-origin: left;
+    /* Each step is a full-width row with a 3px rule on top — the ladder reads
+       as one continuous structure rather than four separate objects. */
+    .home-evening__step {
+      display: grid;
+      grid-template-columns: minmax(0, 3.5fr) minmax(0, 8.5fr);
+      column-gap: var(--col-gap);
+      align-items: start;
+      padding-block: var(--space-md) var(--space-lg);
+      border-block-start: 3px solid var(--color-ink);
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-      .journey__steps::before {
-        animation: thread-drift 7s var(--ease-ambient) infinite;
-      }
-    }
-
-    /* With scroll-driven animations the thread draws itself across as the
-       steps enter view; otherwise it keeps the ambient drift above. */
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .journey__steps {
-          view-timeline: --journey-progress block;
-        }
-
-        .journey__steps::before {
-          animation: journey-thread-draw linear both;
-          animation-timeline: --journey-progress;
-          animation-range: entry 10% cover 30%;
-        }
-      }
-    }
-
-    @media (width <= 1000px) {
-      .journey__steps {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (width <= 600px) {
-      .journey__steps {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .journey__step {
-      position: relative;
-      padding: var(--space-lg) var(--space-md);
-      border-inline-start: 1px solid var(--border-on-dark);
-    }
-
-    .journey__step:first-child {
-      border-inline-start: none;
-    }
-
-    @media (width <= 1000px) {
-      .journey__step {
-        border-block-start: 1px solid var(--border-on-dark);
-        border-inline-start: none;
-      }
-
-      .journey__step:nth-child(-n + 2) {
-        border-block-start: none;
-      }
-    }
-
-    @media (width <= 600px) {
-      .journey__step {
-        border-block-start: 1px solid var(--border-on-dark);
-      }
-
-      .journey__step:first-child {
-        border-block-start: none;
-      }
-    }
-
-    .journey__step-number {
-      margin-block-end: var(--space-md);
-      font-family: var(--font-display);
-      font-size: clamp(5.5rem, 12vw, 10rem);
-      line-height: 0.78;
-      color: var(--accent-primary);
-      letter-spacing: -0.05em;
-      opacity: 0.3;
-    }
-
-    /* Gradient numerals, solid-colour fallback without background-clip: text. */
-    @supports (background-clip: text) or (-webkit-background-clip: text) {
-      .journey__step-number {
-        background-image: linear-gradient(150deg, var(--accent-secondary), var(--accent-primary) 85%);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-    }
-
-    .journey__step-title {
-      margin-block-end: var(--space-sm);
-      font-family: var(--font-display);
-      font-size: clamp(1.6rem, 2.2vw, 2.25rem);
-      color: var(--text-on-dark);
-      letter-spacing: -0.025em;
-    }
-
-    .journey__step-text {
+    .home-evening__number {
       margin: 0;
-      font-size: var(--text-body-compact);
-      line-height: var(--leading-normal);
-      color: var(--color-sand);
-      opacity: 0.9;
+      font-family: var(--font-display);
+      font-size: var(--display-numeral);
+      font-weight: 800;
+      line-height: 0.8;
+      /* The deep orange, not the signal one: at this size the numeral is large
+         text and owes 3:1. Signal orange on paper measures 2.64:1, the deep
+         orange 3.52:1. */
+      color: var(--color-orange-deep);
+      letter-spacing: -0.03em;
+    }
+
+    .home-evening__title {
+      margin-block-end: var(--space-xs);
+      font-size: var(--text-3xl);
+      line-height: 1;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+
+    .home-evening__text {
+      max-inline-size: var(--measure);
+      margin: 0;
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+
+    .home-evening__close {
+      max-inline-size: var(--measure);
+      padding-block-start: var(--space-md);
+      margin-block-start: 0;
+      border-block-start: 3px solid var(--color-ink);
+    }
+
+    .home-evening__close p {
+      font-size: var(--text-section-body);
+    }
+
+    @media (width <= 56em) {
+      .home-evening__step {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: var(--space-2xs);
+        padding-block: var(--space-sm) var(--space-md);
+      }
+
+      .home-evening__number {
+        font-size: clamp(2.75rem, 2rem + 4vw, 4rem);
+      }
     }
   }
 </style>

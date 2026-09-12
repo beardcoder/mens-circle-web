@@ -13,10 +13,7 @@ import site from '../data/site.json';
     <div class="error-page__content">
       <p class="error-page__code" aria-hidden="true">404</p>
       <h1 class="error-page__title">Diese Seite gibt es nicht</h1>
-      <p class="error-page__text">
-        Die Seite, die du suchst, wurde verschoben, umbenannt oder hat nie existiert. Kein Grund zur Sorge – der Kreis
-        bleibt offen.
-      </p>
+      <p class="error-page__text">Die Seite, die du suchst, wurde verschoben, umbenannt oder hat es nie gegeben.</p>
       <div class="error-page__actions">
         <a href="/" class="btn btn--primary">Zur Startseite</a>
         <a href="/event" class="btn btn--secondary">Termine &amp; Anmeldung</a>
@@ -35,61 +32,62 @@ import site from '../data/site.json';
 <style is:global>
   @layer sections {
     .error-page {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      /* Clear the fixed header, and fill the viewport so the footer never
+      /* Clear the fixed header, and leave enough height that the footer never
          floats into view on short error content. */
-      min-block-size: 100svh;
-      padding-block: var(--header-clearance) var(--space-xl);
-      text-align: center;
+      min-block-size: 70svh;
+      padding-block: calc(var(--header-clearance) + var(--space-lg)) var(--space-xl);
+      padding-inline: var(--container-gutter);
     }
 
     .error-page__content {
-      max-inline-size: var(--content-max-description);
+      max-inline-size: var(--container-width);
       margin-inline: auto;
     }
 
     .error-page__code {
-      margin-block-end: var(--space-sm);
-      font-family: var(--font-display);
-      font-size: clamp(5rem, 18vw, 9rem);
+      margin-block-end: var(--space-xs);
+      font-family: var(--font-body);
+      font-size: var(--text-caption);
+      font-weight: 600;
       line-height: 1;
-      color: var(--text-accent);
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
     }
 
     .error-page__title {
-      margin-block-end: var(--space-md);
-      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      margin-block-end: var(--space-sm);
+      font-size: var(--text-4xl);
+      line-height: 1.1;
       color: var(--text-primary);
     }
 
     .error-page__text {
+      max-inline-size: var(--measure);
       margin-block-end: var(--space-md);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
-      color: var(--text-muted);
+      color: var(--text-secondary);
     }
 
     .error-page__actions {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--space-sm);
-      justify-content: center;
+      gap: var(--space-xs) var(--space-sm);
     }
 
     .error-page__contact {
+      max-inline-size: var(--measure);
       margin-block-start: var(--space-md);
-      font-size: 1rem;
+      font-size: var(--text-caption);
       color: var(--text-muted);
     }
 
     .error-page__contact a,
     .error-page__text a {
-      color: var(--accent-primary);
+      color: var(--accent-text);
       text-decoration: underline;
-      text-underline-offset: 3px;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.2em;
       transition: color var(--motion-quick);
     }
 
@@ -97,7 +95,7 @@ import site from '../data/site.json';
     .error-page__contact a:focus-visible,
     .error-page__text a:hover,
     .error-page__text a:focus-visible {
-      color: var(--text-accent);
+      color: var(--accent-rare);
     }
   }
 </style>

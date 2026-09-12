@@ -4,28 +4,37 @@ import site from '../data/site.json';
 import Logo from './Logo.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 
+/**
+ * Site header.
+ *
+ * A wordmark, three destinations and one action. What used to be here — a
+ * numbered five-item list, a full-screen panel with three breathing rings and a
+ * radial-gradient ground, a four-button theme cluster and a blurred glass bar —
+ * is gone. The bar is opaque, sits on a hairline and does not change on scroll.
+ *
+ * The navigation labels changed but the anchors did not: "Ablauf" still points
+ * at `#reise` and "Markus" at `#moderator`, so every link that was ever shared
+ * still lands where it did. The pages that dropped out of the bar (Haltung,
+ * Fragen, Atemübung) are reachable from the mobile panel and the footer.
+ */
+
 const links = nav.header.links;
 const ctaLinks = nav.header.cta;
+const secondary = nav.header.secondary;
 ---
 
 <header class="header" id="header" data-lume="site-header">
   <div class="container">
     <div class="header__inner">
-      <a href="/" class="header__logo logo" aria-label={`${site.siteName} - Startseite`}>
+      <a href="/" class="header__logo logo" aria-label={`${site.siteName} – Startseite`}>
         <Logo class="logo__icon" />
-        <span class="logo__text">Männerkreis</span>
+        <span class="logo__text">Männerkreis<span class="logo__place">Straubing</span></span>
       </a>
 
       <nav class="nav" id="nav" data-lume-part="nav" aria-label="Hauptnavigation">
-        <span class="nav__ambient" aria-hidden="true">
-          <span class="nav__ring"></span>
-          <span class="nav__ring"></span>
-          <span class="nav__ring"></span>
-        </span>
-
         <ul class="nav__list">
           {
-            links.map((link, i) => (
+            links.map((link) => (
               <li class="nav__item">
                 <a
                   href={link.url}
@@ -33,13 +42,21 @@ const ctaLinks = nav.header.cta;
                   data-lume-part="nav-link"
                   data-umami-event="nav-click"
                   data-umami-event-target={link.umamiTarget}
-                  target={(link as { target?: string }).target}
-                  rel={(link as { target?: string }).target === '_blank' ? 'noopener' : undefined}
                 >
-                  <span class="nav__index" aria-hidden="true">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span class="nav__label">{link.label}</span>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        {/* Only rendered inside the mobile panel — the bar keeps three items. */}
+        <ul class="nav__secondary">
+          {
+            secondary.map((link) => (
+              <li>
+                <a href={link.url} class="nav__secondary-link" data-lume-part="nav-link">
+                  {link.label}
                 </a>
               </li>
             ))
@@ -48,7 +65,6 @@ const ctaLinks = nav.header.cta;
 
         <div class="nav__footer">
           <ThemeSwitch class="theme-switch--nav" />
-          <p class="nav__meta">{nav.header.meta}</p>
         </div>
       </nav>
 
@@ -91,511 +107,249 @@ const ctaLinks = nav.header.cta;
 </header>
 
 <style is:global>
-  /* Unlayered so animation lookup never crosses a layer boundary. */
-  @keyframes ring-breath {
-    0%,
-    100% {
-      opacity: 0.45;
-      scale: 1;
-    }
-
-    50% {
-      opacity: 0.85;
-      scale: 1.08;
-    }
-  }
-
-  @keyframes meta-ember {
-    0%,
-    100% {
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent-secondary) 45%, transparent);
-      opacity: 0.5;
-    }
-
-    50% {
-      box-shadow: 0 0 0 6px color-mix(in oklch, var(--accent-secondary) 0%, transparent);
-      opacity: 1;
-    }
-  }
-
-  @keyframes toggle-breath {
-    0%,
-    100% {
-      opacity: 0;
-      scale: 0.7;
-    }
-
-    50% {
-      opacity: 0.9;
-      scale: 1.12;
-    }
-  }
-
   @layer components {
     .header {
       position: fixed;
       inset-block-start: 0;
       inset-inline: 0;
       z-index: var(--z-header);
-      /* One height, always. The bar used to re-pad itself on scroll — a layout
-         property, so it stepped instead of gliding and dragged the fixed header
-         through layout every frame. Only the tone transitions now. */
-      padding-block: clamp(0.875rem, 0.65rem + 0.7vw, 1.25rem);
+      padding-block: var(--space-xs);
       color: var(--text-primary);
-      transition: color var(--motion-standard);
-    }
-
-    .header::before {
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      content: '';
-      background: color-mix(in oklch, var(--bg-primary) 55%, transparent);
-      border-block-end: 1px solid color-mix(in oklch, var(--border-light) 45%, transparent);
-      box-shadow:
-        0 1px 0 color-mix(in oklch, var(--color-ink) 2%, transparent),
-        0 10px 24px -10px color-mix(in oklch, var(--color-ink) 8%, transparent);
-      opacity: 0;
-      backdrop-filter: blur(24px) saturate(150%);
-      transition: opacity var(--motion-standard);
-    }
-
-    /* The blur is the most expensive thing this bar does — a backdrop-filter
-       re-blurs the full viewport width on every scroll frame, and without a hero
-       it is on for the whole scroll. Touch devices (least GPU headroom, where the
-       stutter shows) and anyone asking for less transparency get an opaque bar
-       instead. Delete this block to put the glass back everywhere. */
-    @media (hover: none) and (pointer: coarse), (prefers-reduced-transparency: reduce) {
-      .header::before {
-        background: var(--bg-primary);
-        backdrop-filter: none;
-      }
+      background: var(--bg-primary);
+      /* A 2px ink rule, not a hairline: the bar is part of the poster now. */
+      border-block-end: 2px solid var(--color-ink);
     }
 
     .header__inner {
       display: grid;
       /* `minmax(0, …)` on every track: the default `auto` minimum is min-content,
-         which let the actions cluster push past the header box. The header is
-         fixed, so that overflow never raised a scrollbar — it just pushed the
-         nav toggle off-screen. */
+         which lets the actions cluster push past the header box. */
       grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
       gap: var(--header-gap, var(--space-md));
       align-items: center;
-    }
-
-    .header__logo,
-    .header__actions {
-      position: relative;
-      z-index: calc(var(--z-header) + 2);
+      min-block-size: 60px;
     }
 
     .header__logo {
       grid-column: 1;
       justify-self: start;
+      /* `min-inline-size: 0` so the wordmark yields instead of growing the
+         track and painting over the actions on a 320px screen. */
+      min-inline-size: 0;
+      overflow: hidden;
     }
 
     .header__actions {
       display: flex;
       grid-column: 3;
-      gap: var(--header-gap, var(--space-sm));
+      gap: var(--header-gap, var(--space-xs));
       align-items: center;
       justify-self: end;
       min-inline-size: 0;
     }
 
+    /* ─── Wordmark ────────────────────────────────────────────────── */
     .logo {
       display: flex;
-      gap: var(--space-sm);
+      gap: var(--space-xs);
       align-items: center;
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
       color: inherit;
-      letter-spacing: -0.02em;
-      transition: opacity var(--motion-standard);
-    }
-
-    .logo:hover {
-      opacity: 0.9;
     }
 
     .logo:focus-visible {
-      outline: 2px solid var(--accent-primary);
-      outline-offset: 6px;
-      border-radius: var(--radius-sm);
+      outline: 3px solid var(--color-ink);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 3px var(--color-orange);
     }
 
     .logo__icon {
       flex-shrink: 0;
-      inline-size: 42px;
-      block-size: 42px;
+      inline-size: 28px;
+      block-size: 28px;
     }
 
     .logo__text {
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      letter-spacing: -0.02em;
-    }
-
-    .nav {
-      position: fixed;
-      inset: 0;
-      z-index: calc(var(--z-header) + 1);
-      display: grid;
-      visibility: hidden;
-      grid-auto-rows: 1fr auto;
-      place-items: center;
-      inline-size: 100%;
-      min-block-size: 100dvh;
-      padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-xl);
-      padding-inline: var(--space-md);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      color: var(--text-on-dark);
-      pointer-events: none;
-      background:
-        radial-gradient(
-          ellipse at 50% 32%,
-          color-mix(in oklch, var(--color-terracotta) 20%, transparent),
-          transparent 58%
-        ),
-        radial-gradient(ellipse at 85% 90%, color-mix(in oklch, var(--color-sand) 10%, transparent), transparent 55%),
-        linear-gradient(155deg, var(--color-earth-deep) 0%, var(--color-earth-dark) 58%, var(--color-earth-mid) 100%);
-      clip-path: circle(0 at 100% 0);
-    }
-
-    .nav.is-open {
-      visibility: visible;
-      pointer-events: auto;
-    }
-
-    .nav__ambient {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      display: grid;
-      place-items: center;
-      pointer-events: none;
-    }
-
-    .nav__ring {
-      grid-area: 1 / 1;
-      aspect-ratio: 1;
-      border: 1px solid color-mix(in oklch, var(--color-sand) 22%, transparent);
-      border-radius: var(--radius-full);
-    }
-
-    .nav__ring:nth-child(1) {
-      inline-size: min(78vmin, 38rem);
-    }
-
-    .nav__ring:nth-child(2) {
-      inline-size: min(54vmin, 26rem);
-      border-color: color-mix(in oklch, var(--color-terracotta) 26%, transparent);
-    }
-
-    .nav__ring:nth-child(3) {
-      inline-size: min(32vmin, 16rem);
-      background: radial-gradient(
-        circle,
-        color-mix(in oklch, var(--color-terracotta) 14%, transparent),
-        transparent 70%
-      );
-      border-color: color-mix(in oklch, var(--color-terracotta) 18%, transparent);
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .nav.is-open .nav__ring {
-        animation: ring-breath 7s var(--ease-ambient) infinite;
-      }
-
-      .nav.is-open .nav__ring:nth-child(2) {
-        animation-delay: -0.9s;
-      }
-
-      .nav.is-open .nav__ring:nth-child(3) {
-        animation-delay: -1.8s;
-      }
-    }
-
-    .nav__list {
-      position: relative;
-      z-index: 1;
       display: flex;
       flex-direction: column;
-      gap: clamp(1.1rem, 3vh, 2.25rem);
-      place-self: center;
+      min-inline-size: 0;
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      line-height: 0.95;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    /* The locality belongs in the wordmark: it is the single most useful thing
+       a visitor can learn in the first second. */
+    .logo__place {
+      font-family: var(--font-display);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      /* Ink, not orange: at 11px the orange measures 3.52:1 on paper, under the
+         4.5:1 small text requires. */
+      color: var(--color-ink-muted);
+      letter-spacing: 0.2em;
+    }
+
+    /* ─── Bar navigation (wide screens) ───────────────────────────── */
+    .nav__list {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      justify-content: center;
       padding: 0;
       margin: 0;
-      text-align: center;
       list-style: none;
     }
 
-    .nav__item {
-      display: flex;
-      justify-content: center;
-    }
-
     .nav__link {
-      position: relative;
       display: inline-flex;
-      flex-direction: column;
-      gap: 0.4em;
       align-items: center;
+      min-block-size: 44px;
       font-family: var(--font-display);
-      font-size: clamp(1.7rem, 1rem + 3.6vw, 3.5rem);
-      font-weight: 500;
-      line-height: 1;
-      color: color-mix(in oklch, var(--text-on-dark) 88%, transparent);
-      letter-spacing: -0.02em;
-      transition:
-        color var(--motion-standard),
-        transform 360ms var(--ease-precise);
-    }
-
-    .nav__index {
-      display: inline-block;
-      font-family: var(--font-body);
-      font-size: clamp(0.62rem, 0.55rem + 0.25vw, 0.78rem);
+      font-size: var(--text-marker);
       font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-      color: color-mix(in oklch, var(--accent-secondary) 60%, transparent);
-      text-indent: 0.32em;
-      letter-spacing: 0.32em;
-      transition: color var(--motion-standard);
-    }
-
-    .nav__label {
-      position: relative;
-      display: inline-block;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-marker);
+      border-block-end: 3px solid transparent;
+      transition: border-color var(--motion-quick);
     }
 
     @media (hover: hover) and (pointer: fine) {
       .nav__link:hover {
-        color: var(--text-on-dark);
-      }
-
-      .nav__link:hover .nav__index {
-        color: var(--accent-secondary);
+        border-block-end-color: var(--color-orange);
       }
     }
 
     .nav__link:focus-visible {
-      color: var(--text-on-dark);
-      outline: 2px solid var(--accent-primary);
-      outline-offset: 8px;
-      border-radius: var(--radius-sm);
+      outline: 3px solid var(--color-ink);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 3px var(--color-orange);
     }
 
-    .nav__label::after {
-      position: absolute;
-      inset-block-end: -0.22em;
-      inset-inline: 0;
-      block-size: 2px;
-      content: '';
-      background: var(--accent-primary);
-      border-radius: var(--radius-full);
-      transform: scaleX(0);
-      transform-origin: center;
-      transition: transform 360ms var(--ease-precise);
+    .nav__secondary {
+      display: none;
     }
 
-    @media (hover: hover) and (pointer: fine) {
-      .nav__link:hover .nav__label::after {
-        transform: scaleX(1);
-      }
-    }
-
-    .nav__link:focus-visible .nav__label::after {
-      transform: scaleX(1);
-    }
-
-    /* Overlay foot — theme controls above the meta line, clear of the links. */
     .nav__footer {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-md);
-      place-self: center;
-      align-items: center;
-    }
-
-    .nav__meta {
-      display: flex;
-      flex-direction: column;
-      gap: 1.1em;
-      align-items: center;
-      margin: 0;
-      font-size: var(--text-caption);
-      color: color-mix(in oklch, var(--color-sand) 75%, transparent);
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    .nav__meta::before {
-      inline-size: 6px;
-      block-size: 6px;
-      content: '';
-      background: var(--accent-secondary);
-      border-radius: var(--radius-full);
-      box-shadow: 0 0 0 0 color-mix(in oklch, var(--accent-secondary) 50%, transparent);
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .nav.is-open .nav__meta::before {
-        animation: meta-ember 4.5s var(--ease-ambient) infinite;
-      }
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .motion-ready .nav__item,
-      .motion-ready .nav__footer {
-        opacity: 0;
-      }
+      display: none;
     }
 
     .nav__cta {
-      --btn-padding-block: 0.7rem;
-      --btn-padding-inline: clamp(1.1rem, 1.6vw, 1.6rem);
+      --btn-padding-block: 0.5rem;
+      --btn-padding-inline: 1rem;
       --btn-font-size: var(--text-caption);
 
       white-space: nowrap;
     }
 
+    /* ─── Mobile panel ────────────────────────────────────────────── */
     .nav-toggle {
-      position: relative;
-      display: grid;
+      display: none;
       place-items: center;
       inline-size: 48px;
       block-size: 48px;
       padding: 0;
-      color: inherit;
+      color: var(--color-ink);
       cursor: pointer;
-      background: color-mix(in oklch, currentcolor 0%, transparent);
-      border: 1px solid color-mix(in oklch, currentcolor 20%, transparent);
-      border-radius: var(--radius-full);
+      background: none;
+      border: 2px solid var(--color-ink);
+      border-radius: 0;
       transition:
-        background-color var(--motion-standard),
-        border-color var(--motion-standard);
+        color var(--motion-quick),
+        background-color var(--motion-quick);
     }
 
     @media (hover: hover) and (pointer: fine) {
       .nav-toggle:hover {
-        background: color-mix(in oklch, currentcolor 8%, transparent);
-        border-color: color-mix(in oklch, currentcolor 42%, transparent);
+        color: var(--color-ink);
+        background: var(--color-orange);
       }
     }
 
     .nav-toggle:focus-visible {
-      outline: 2px solid var(--accent-primary);
+      outline: 3px solid var(--color-ink);
       outline-offset: 3px;
-    }
-
-    .nav-toggle::before {
-      position: absolute;
-      inset: -2px;
-      pointer-events: none;
-      content: '';
-      border: 1px solid color-mix(in oklch, currentcolor 35%, transparent);
-      border-radius: var(--radius-full);
-      opacity: 0;
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .nav-toggle:not(.is-open)::before {
-        animation: toggle-breath 4.5s var(--ease-ambient) infinite;
-      }
+      box-shadow: 0 0 0 3px var(--color-orange);
     }
 
     .nav-toggle__bars {
-      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       align-items: center;
     }
 
     .nav-toggle__bar {
       display: block;
-      inline-size: 24px;
-      block-size: 2px;
+      inline-size: 22px;
+      block-size: 2.5px;
       background: currentcolor;
-      border-radius: var(--radius-full);
       transform-origin: center;
     }
 
-    /* ─── Theme switch (palette + light/dark) ─────────────────────────── */
+    /* ─── Theme control ───────────────────────────────────────────── */
     .theme-switch {
       display: flex;
-      gap: var(--space-2xs);
       align-items: center;
     }
 
     .theme-switch__btn {
       display: grid;
       place-items: center;
-      inline-size: 42px;
-      block-size: 42px;
+      inline-size: 44px;
+      block-size: 44px;
       padding: 0;
       color: inherit;
       cursor: pointer;
-      background: color-mix(in oklch, currentcolor 0%, transparent);
-      border: 1px solid color-mix(in oklch, currentcolor 20%, transparent);
-      border-radius: var(--radius-full);
-      transition:
-        background-color var(--motion-standard),
-        border-color var(--motion-standard),
-        transform var(--motion-quick);
+      background: none;
+      border: 2px solid transparent;
+      border-radius: 0;
+      transition: border-color var(--motion-quick);
     }
 
     @media (hover: hover) and (pointer: fine) {
       .theme-switch__btn:hover {
-        background: color-mix(in oklch, currentcolor 8%, transparent);
-        border-color: color-mix(in oklch, currentcolor 42%, transparent);
+        border-color: var(--color-ink);
       }
     }
 
-    .theme-switch__btn:active {
-      transform: scale(0.92);
-    }
-
     .theme-switch__btn:focus-visible {
-      outline: 2px solid var(--accent-primary);
-      outline-offset: 3px;
+      outline: 3px solid var(--color-ink);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px var(--color-orange);
     }
 
     .theme-switch__icon {
-      inline-size: 20px;
-      block-size: 20px;
+      inline-size: 18px;
+      block-size: 18px;
       fill: none;
       stroke: currentcolor;
-      stroke-width: 1.9;
+      stroke-width: 1.7;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
-    /* Only the icon matching the active palette / resolved mode. Both attributes
-       are set before first paint by the layout's boot script, so nothing flashes. */
-    :root:not([data-theme='cool']) .theme-switch__icon--cool,
-    :root[data-theme='cool'] .theme-switch__icon--warm,
+    /* Only the icon matching the resolved mode. The attribute is set before
+       first paint by the layout's boot script, so nothing flashes. */
     :root:not([data-mode-resolved='dark']) .theme-switch__icon--dark,
     :root[data-mode-resolved='dark'] .theme-switch__icon--light {
       display: none;
     }
 
-    /* Where the theme controls live. The bar must hold logo + CTA + toggle at
-       every width, and below 768px the two theme buttons no longer fit (~562px
-       of content in a ~433px track), which pushed the nav toggle off-screen. So
-       they move into the nav overlay there. Exactly one copy is in the a11y tree
-       at any width. */
     .theme-switch--nav {
       display: none;
     }
 
-    @media (width < 768px) {
+    /* ─── Narrow screens: the panel takes over ────────────────────── */
+    @media (width <= 54em) {
+      .nav-toggle {
+        display: grid;
+      }
+
       .theme-switch--bar {
         display: none;
       }
@@ -603,87 +357,147 @@ const ctaLinks = nav.header.cta;
       .theme-switch--nav {
         display: flex;
       }
-    }
 
-    body:has(.hero) .header {
-      color: var(--color-bone);
-    }
+      /* The panel hangs off the bottom edge of the bar.
 
-    body:not(:has(.hero)) .header::before {
-      opacity: 1;
-    }
-
-    @supports not selector(body:has(.hero)) {
-      body.has-hero .header {
-        color: var(--color-bone);
+         It cannot be `position: fixed; inset: 0` with a lower z-index: the nav
+         is a *child* of the header, and a positioned descendant paints above
+         its ancestor's own content whatever the z-index says — which hid the
+         wordmark, the CTA and the close button behind the panel. Positioning it
+         absolutely against the header instead puts its top edge exactly on the
+         bar's bottom edge, with no measured clearance to drift out of sync and
+         no sliver of page between the two. */
+      .nav {
+        position: absolute;
+        inset-block-start: 100%;
+        inset-inline: 0;
+        block-size: calc(100dvh - 100%);
+        display: flex;
+        visibility: hidden;
+        flex-direction: column;
+        gap: var(--space-md);
+        padding-block: var(--space-md) var(--space-lg);
+        padding-inline: var(--container-gutter);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        pointer-events: none;
+        background: var(--bg-primary);
+        opacity: 0;
+        transition:
+          opacity var(--motion-standard),
+          visibility var(--motion-standard);
       }
 
-      body.no-hero .header::before {
+      .nav.is-open {
+        visibility: visible;
+        pointer-events: auto;
         opacity: 1;
       }
-    }
 
-    @supports (animation-timeline: scroll()) {
-      body:has(.hero) .header {
-        animation: header-color-morph linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0 180px;
+      .nav__list {
+        flex-direction: column;
+        gap: 0;
+        align-items: stretch;
+        border-block-start: 2px solid var(--color-ink);
       }
 
-      body:has(.hero) .header::before {
-        animation: header-overlay-fade linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0 180px;
+      .nav__item {
+        border-block-end: 2px solid var(--color-ink);
       }
-    }
 
-    @supports not (animation-timeline: scroll()) {
-      body:has(.hero) .header.is-scrolled {
+      .nav__link {
+        inline-size: 100%;
+        padding-block: var(--space-sm);
+        font-family: var(--font-display);
+        font-size: var(--text-4xl);
+        font-weight: 800;
+        line-height: 1;
         color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+        border-block-end: none;
       }
 
-      body:has(.hero) .header.is-scrolled::before {
-        opacity: 1;
+      .nav__secondary {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .nav__secondary-link {
+        display: inline-flex;
+        align-items: center;
+        min-block-size: 44px;
+        font-family: var(--font-display);
+        font-size: var(--text-marker);
+        font-weight: 600;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-marker);
+        text-decoration: underline;
+        text-decoration-color: var(--color-orange);
+        text-decoration-thickness: 2px;
+        text-underline-offset: 0.3em;
+      }
+
+      .nav__secondary-link:focus-visible {
+        outline: 3px solid var(--color-ink);
+        outline-offset: 4px;
+      }
+
+      .nav__footer {
+        display: flex;
+        margin-block-start: auto;
+        padding-block-start: var(--space-sm);
+        border-block-start: 2px solid var(--color-ink);
+      }
+
+      /* The panel covers the page; the body lock lives in lib/site-header.ts. */
+      body.nav-open {
+        position: fixed;
+        inline-size: 100%;
+        min-block-size: 100%;
+        overflow: hidden;
       }
     }
 
-    /* Compact bar. The wordmark and roomier CTA return only once the track can
-       carry them — the full-size pair needs ~445px, so this holds to 560px. */
-    @media (width <= 560px) {
-      .logo__text {
-        display: none;
-      }
-
-      .nav__cta {
-        --btn-padding-block: 0.6rem;
-        --btn-padding-inline: 1rem;
-        --btn-font-size: var(--text-xs);
-      }
-    }
-
-    /* Smallest phones: tighten the slot gaps so the CTA keeps its label. */
-    @media (width <= 400px) {
+    /* The smallest phones. Everything gives a little rather than one element
+       giving everything: the wordmark drops its locality line and a type step,
+       the CTA tightens, and the gaps close. Measured at 320px the row then
+       comes to ~280px of content in a 280px track, with the CTA keeping a
+       readable label and the toggle keeping its 44px box. */
+    @media (width <= 420px) {
       .header__inner,
       .header__actions {
         --header-gap: var(--space-xs);
       }
+
+      .logo__place {
+        display: none;
+      }
+
+      .logo__icon {
+        inline-size: 24px;
+        block-size: 24px;
+      }
+
+      .logo__text {
+        font-size: 1rem;
+      }
+
+      .nav__cta {
+        --btn-padding-inline: 0.75rem;
+        --btn-font-size: var(--text-xs);
+      }
     }
 
-    body.nav-open .header {
-      color: var(--color-bone) !important;
-      animation: none !important;
-    }
-
-    body.nav-open .header::before {
-      opacity: 0 !important;
-      animation: none !important;
-    }
-
-    body.nav-open {
-      position: fixed;
-      inline-size: 100%;
-      min-block-size: 100%;
-      overflow: hidden;
+    @media (prefers-reduced-motion: reduce) {
+      .nav {
+        transition: none;
+      }
     }
   }
 </style>
