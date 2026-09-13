@@ -179,17 +179,17 @@
     margin: auto;
     color: var(--text-primary);
     background: var(--bg-primary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-2xl);
+    /* Square, closed by the structural rule rather than lifted by a shadow —
+       the poster system separates surfaces with a border, not with depth. */
+    border: 2px solid var(--rule-strong);
+    border-radius: 0;
 
-    /* Closed / pre-open resting state */
+    /* Closed / pre-open resting state. A rise, no scale: the same vocabulary as
+       every other entrance here. */
     opacity: 0;
-    scale: 0.96;
     translate: 0 12px;
     transition:
       opacity var(--motion-standard),
-      scale var(--motion-standard),
       translate var(--motion-standard),
       overlay var(--motion-standard) allow-discrete,
       display var(--motion-standard) allow-discrete;
@@ -197,7 +197,6 @@
 
   :global(.calendar-modal[open]) {
     opacity: 1;
-    scale: 1;
     translate: 0 0;
   }
 
@@ -205,7 +204,6 @@
   @starting-style {
     :global(.calendar-modal[open]) {
       opacity: 0;
-      scale: 0.96;
       translate: 0 12px;
     }
   }
@@ -251,7 +249,7 @@
     cursor: pointer;
     background: none;
     border: none;
-    border-radius: var(--radius-full);
+    border-radius: 0;
     transition:
       color var(--motion-quick),
       background-color var(--motion-quick);
