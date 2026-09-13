@@ -578,9 +578,11 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         border-color: var(--ember-line);
         background: var(--ember-soft);
       }
+      /* `--faint` already sits at the 4.8:1 floor on this surface; the extra
+         20% transparency pushed it to 3.6:1. The muted colour alone is enough
+         to mark the badge as inactive. */
       .badge--off {
         color: var(--faint);
-        opacity: 0.8;
       }
 
       /* ── Capacity ring ── */
