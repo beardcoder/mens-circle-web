@@ -64,10 +64,13 @@ const lines = data.lines ?? [];
       padding-block: var(--space-2xl);
     }
 
+    /* Full-strength ink. At 70% it composited to #562d1d on the orange and
+       measured 3.2:1 at 13px — Lighthouse caught it where a contrast audit that
+       reads `color` but ignores element `opacity` does not. The marker is
+       subordinate by size and tracking; it does not need to be faded too. */
     .statement__marker {
       margin-block-end: var(--space-md);
       color: var(--color-ink);
-      opacity: 0.7;
     }
 
     .statement__display {

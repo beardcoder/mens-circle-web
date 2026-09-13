@@ -2,6 +2,7 @@
 import { BREATHING_STEPS, BREATHING_WARNING } from '@lib/breathing';
 import Layout from '../layouts/Layout.astro';
 import BreathingExperience from '../components/BreathingExperience.astro';
+import { canonicalUrl } from '@lib/canonical';
 
 // Embedded breathing tool — the public-site page. Opened from the nav/footer it
 // presents inside the normal site chrome (header/footer). The whole page is one
@@ -11,7 +12,7 @@ import BreathingExperience from '../components/BreathingExperience.astro';
 export const prerender = true;
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
-const canonical = new URL(Astro.url.pathname, siteUrl).href;
+const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 
 const schemas = [
   {
