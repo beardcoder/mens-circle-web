@@ -189,13 +189,29 @@
     fill: currentcolor;
   }
 
+  /* Leaflet ships its own attribution chrome: a translucent white box with
+     #0078a8 links, which measures 3.3:1 on that box and is the only text on the
+     site that fails. It is a required credit, so it has to be legible — put it
+     on our own ground with our own colours. */
+  :global(.event-map .leaflet-control-attribution) {
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+    border-radius: 0;
+  }
+
+  :global(.event-map .leaflet-control-attribution a) {
+    color: var(--text-primary);
+    text-decoration: underline;
+  }
+
   :global(.event-map .leaflet-popup-content-wrapper) {
     color: var(--text-primary);
     font-family: var(--font-body);
     background: var(--bg-elevated);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
+    border: 2px solid var(--rule-strong);
+    border-radius: 0;
   }
 
   :global(.event-map .leaflet-popup-content) {

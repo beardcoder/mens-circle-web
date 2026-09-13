@@ -1,10 +1,20 @@
 /**
  * Toast Notifications
  *
- * Entry + exit animations are pure CSS. JS appends the element and removes
- * it after the lifetime expires — `@starting-style` handles the rise-in,
- * `transition-behavior: allow-discrete` and `.toast--hiding` handle the
- * fall-out without a single requestAnimationFrame in JS.
+ * Brought onto the poster system: square, opaque, hairline-and-rule. It used to
+ * be the last survivor of the pre-redesign theme — 14px radii, a 2xl drop
+ * shadow, a 12px backdrop blur and four tinted `color-mix()` grounds — which is
+ * everything the rest of the site stopped doing.
+ *
+ * The type is carried by a solid bar on the inline start and by the colour of
+ * the marker title, not by tinting the panel. That is how priority is marked
+ * everywhere else here (the orange rule over the admin's "next event" panel, the
+ * orange marker rules on the page), and it keeps the text on a known ground
+ * instead of on four slightly different tinted ones.
+ *
+ * Entry + exit motion is pure CSS. JS appends the element and removes it after
+ * the lifetime expires — `@starting-style` handles the rise-in, `.toast--hiding`
+ * the fall-out, without a single requestAnimationFrame in JS.
  */
 
 .toast {
@@ -19,25 +29,25 @@
   max-inline-size: 420px;
   padding: var(--space-sm) var(--space-md);
   font-family: var(--font-body);
+  color: var(--text-primary);
   pointer-events: auto;
-  background: light-dark(transparent, color-mix(in oklch, var(--bg-elevated) 95%, transparent));
-  border: 1px solid light-dark(var(--border-medium), var(--border-light));
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-2xl);
+  /* Opaque. The base used to be `transparent` in light mode and relied on every
+     variant to supply a ground; a variant-less toast was unreadable text over
+     blurred page content. */
+  background: var(--bg-elevated);
+  border: 2px solid var(--rule-strong);
+  border-radius: 0;
   opacity: 1;
-  backdrop-filter: blur(12px);
-  scale: 1;
   translate: 0 0;
   transition:
     opacity 320ms var(--ease-settle),
-    translate 320ms var(--ease-settle),
-    scale 320ms var(--ease-settle),
-    box-shadow 320ms var(--ease-settle);
+    translate 320ms var(--ease-settle);
 
-  /* Enter: animates from the @starting-style snapshot to the rules above */
+  /* Enter: animates from the @starting-style snapshot to the rules above.
+     Opacity and translate only — the poster's motion vocabulary is a rise, and
+     the old `scale: .96` popped. */
   @starting-style {
     opacity: 0;
-    scale: 0.96;
     translate: 0 -16px;
   }
 }
@@ -45,7 +55,6 @@
 .toast--hiding {
   pointer-events: none;
   opacity: 0;
-  scale: 0.98;
   translate: 0 -12px;
 }
 
@@ -54,11 +63,13 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  inline-size: 24px;
-  block-size: 24px;
+  inline-size: 26px;
+  block-size: 26px;
+  font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 700;
-  border-radius: var(--radius-full);
+  line-height: 1;
+  border-radius: 0;
 }
 
 .toast__content {
@@ -66,35 +77,42 @@
   flex: 1;
   flex-direction: column;
   gap: var(--space-3xs);
+  min-inline-size: 0;
 }
 
+/* The marker register: the title is one short status word ("Erfolg", "Fehler"),
+   which is a label, not a sentence. */
 .toast__title {
   font-family: var(--font-display);
-  font-size: var(--text-base);
+  font-size: var(--text-marker);
   font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-marker);
 }
 
+/* No `opacity: .9` here. The size step already subordinates it, and dimming
+   text with opacity is what put three other labels on this site under 4.5:1. */
 .toast__message {
   font-size: var(--text-sm);
   line-height: 1.5;
-  opacity: 0.9;
+  color: var(--text-primary);
 }
 
 /* ============================================
    Type variants
+
+   Ground and text stay put; only the bar, the title and the icon change. Each
+   title colour was measured against `--bg-elevated` in both modes and clears
+   4.5:1 (lowest is the light-mode warning at 5.0:1).
    ============================================ */
 
-/* Per-type backgrounds + titles flip with mode via light-dark() so a
-   forced light/dark choice tints toasts even against the OS preference. */
 .toast--success {
-  color: var(--text-primary);
-  background: light-dark(
-    color-mix(in oklch, var(--color-success) 12%, var(--bg-elevated)),
-    color-mix(in oklch, var(--color-success) 18%, var(--bg-elevated))
-  );
-  border-inline-start: 3px solid var(--color-success);
+  border-inline-start: 6px solid var(--color-success);
+}
+
+.toast--success .toast__title {
+  color: var(--color-success);
 }
 
 .toast--success .toast__icon {
@@ -102,17 +120,12 @@
   background: var(--color-success);
 }
 
-.toast--success .toast__title {
-  color: var(--color-success);
+.toast--error {
+  border-inline-start: 6px solid var(--color-error);
 }
 
-.toast--error {
-  color: var(--text-primary);
-  background: light-dark(
-    color-mix(in oklch, var(--color-error) 12%, var(--bg-elevated)),
-    color-mix(in oklch, var(--color-error) 15%, var(--bg-elevated))
-  );
-  border-inline-start: 3px solid var(--color-error);
+.toast--error .toast__title {
+  color: var(--color-error);
 }
 
 .toast--error .toast__icon {
@@ -120,17 +133,12 @@
   background: var(--color-error);
 }
 
-.toast--error .toast__title {
-  color: var(--color-error);
+.toast--info {
+  border-inline-start: 6px solid var(--color-info);
 }
 
-.toast--info {
-  color: var(--text-primary);
-  background: light-dark(
-    color-mix(in oklch, var(--color-info) 10%, var(--bg-elevated)),
-    color-mix(in oklch, var(--color-info) 16%, var(--bg-elevated))
-  );
-  border-inline-start: 3px solid var(--color-info);
+.toast--info .toast__title {
+  color: var(--color-info);
 }
 
 .toast--info .toast__icon {
@@ -138,26 +146,20 @@
   background: var(--color-info);
 }
 
-.toast--info .toast__title {
-  color: var(--color-info);
-}
-
 .toast--warning {
-  color: var(--text-primary);
-  background: light-dark(
-    color-mix(in oklch, var(--color-warning) 12%, var(--bg-elevated)),
-    color-mix(in oklch, var(--color-warning) 15%, var(--bg-elevated))
-  );
-  border-inline-start: 3px solid var(--color-warning);
-}
-
-.toast--warning .toast__icon {
-  color: var(--color-ink);
-  background: var(--color-warning);
+  border-inline-start: 6px solid var(--color-warning);
 }
 
 .toast--warning .toast__title {
-  color: light-dark(color-mix(in oklch, var(--color-warning) 85%, var(--color-ink)), var(--color-warning));
+  color: var(--color-warning);
+}
+
+/* The same light-dark pair as the others. It used to be a flat `--color-ink`,
+   which is correct on the dark mode's pale gold but measured 3.3:1 on the light
+   mode's dark ochre. */
+.toast--warning .toast__icon {
+  color: light-dark(var(--color-paper), var(--color-night));
+  background: var(--color-warning);
 }
 
 @media (width <= 768px) {
@@ -174,13 +176,11 @@
     transition: opacity 120ms linear;
 
     @starting-style {
-      scale: 1;
       translate: 0;
     }
   }
 
   .toast--hiding {
-    scale: 1;
     translate: 0;
   }
 }
