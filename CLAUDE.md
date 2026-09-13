@@ -130,8 +130,24 @@ sets `.vt-arrival` before first paint so the arriving page skips its own entranc
 - **Path aliases:** `@lib/*`, `@components/*`, `@data/*` (see `tsconfig.json`, extends `astro/tsconfigs/strict`).
 - **Styling:** hand-organized CSS under `src/styles/` (base/components/sections/utilities, entry `app.css`). LightningCSS transforms/minifies; `light-dark()` resolves the mode off `color-scheme`. CSS is inlined into each page's `<head>`. Animation belongs in `utilities/_motion.css` and `base/_keyframes.css` — see **Motion** above.
 - **Radius is 0 everywhere on the public site.** `--radius-full` survives only for the breathing exercise, where the circle _is_ the control.
-- Fonts are self-hosted via the native Astro Fonts API (configured in `astro.config.mjs`, wired in `src/layouts/Layout.astro`). Barlow Condensed 600/800 + Barlow 400/600 for the public site; Bricolage Grotesque + IBM Plex Mono for `/admin`, deliberately a different voice.
+- Fonts are self-hosted via the native Astro Fonts API (configured in `astro.config.mjs`, wired in `src/layouts/Layout.astro`). Barlow Condensed 600/800 + Barlow 400/600 — **the admin shares them.** It used to carry Bricolage Grotesque + IBM Plex Mono for a separate back-office voice; that identity is gone and so are the two extra webfonts (6 woff2 files, not 10).
 - **Home blocks** are dispatched by `components/PageContent.astro` from `home.json`'s `blocks` array: `hero`, `facts`, `intro`, `moderator`, `statement`, `frame`, `journey-steps`, `testimonials`, `faq`, `dates`. Adding a block means adding a component _and_ a case there.
+- **One brand name: `site.siteName`.** Titles, manifests, robots.txt and every
+  schema `name` read it. Four spellings had drifted in before, including one
+  with a stray space (`Niederbayern/ Straubing`). Never type the name out again.
+- **Canonical URLs come from `lib/canonical.ts`.** `trailingSlash: 'ignore'`
+  plus the build format means `Astro.url.pathname` arrives with a slash on
+  prerendered pages and without one on SSR routes; a page that builds its own
+  canonical string will disagree with the `<link rel="canonical">` and dangle a
+  JSON-LD reference.
+- **The entity graph is one graph.** `#organization`, `#markus` (Person),
+  `#website` and `#series` are defined once each and referenced by `@id`. The
+  circle was once described as two `EventSeries` under two ids with two names.
+  After touching structured data, check for dangling `@id` refs.
+- **`llms.txt` needs help with SSR pages.** `astro-llms-md` reads built HTML, so
+  `/` and `/event` are invisible to it; `astro-integrations/llms-extra.mjs`
+  appends them, and must run between `llms()` and `serveLlmsWithBunAdapter()`
+  for the same manifest reason as the sitemap.
 - **The scheduling state is `lib/event-status.ts`.** It has three cases, not two: `scheduled`, `none` and `unavailable` (the DB read failed). A failed read must never render as "kein Termin geplant" — that is a claim, and it would be false. The header, the hero, the close block and `/event` all read the same object.
 
 ## Environment
