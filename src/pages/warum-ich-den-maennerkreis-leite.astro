@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import type { Block } from '../components/PageContent.astro';
 import PageContent from '../components/PageContent.astro';
 import page from '../content/warum-ich-den-maennerkreis-leite.json';
+import { canonicalUrl } from '@lib/canonical';
 
 // Prerendered (static): a personal, content-only page (no live data), served
 // straight off disk by the Bun server.
@@ -14,7 +15,7 @@ const blocks = page.blocks as Block[];
 const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
-const canonical = new URL(Astro.url.pathname, siteUrl).href;
+const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 
 // Build per-page structured data from the content blocks.
 const schemas: Record<string, unknown>[] = [];
@@ -44,15 +45,30 @@ schemas.push({
   ],
 });
 
-// WebPage so the personal page is explicitly part of the site graph.
+// `Article`, not a bare `WebPage`: this is a signed piece of writing with an
+// author and a date, and typing it as one is what lets the text be attributed
+// to Markus (the `Person` entity in SeoHead) rather than floating free.
+//
+// The dates come from the content file, where they are set by hand from this
+// page's real history. Deliberately not derived from the file's mtime: a Docker
+// build checks the repo out fresh, so every file would claim to have been
+// modified at build time.
+const articleImage = new URL('/images/og-markus.jpg', siteUrl).href;
+
 schemas.push({
   '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  '@id': canonical,
+  '@type': 'Article',
+  '@id': `${canonical}#article`,
   url: canonical,
-  name: strip(page.meta.title),
+  mainEntityOfPage: canonical,
+  headline: page.meta.ogTitle ?? strip(page.meta.title),
   description: page.meta.description,
+  image: articleImage,
   inLanguage: 'de-DE',
+  datePublished: page.meta.datePublished,
+  dateModified: page.meta.dateModified,
+  author: { '@id': `${siteUrl.origin}/#markus` },
+  publisher: { '@id': `${siteUrl.origin}/#organization` },
   isPartOf: { '@id': `${siteUrl.origin}/#website` },
   about: { '@id': `${siteUrl.origin}/#organization` },
 });
@@ -63,6 +79,11 @@ schemas.push({
   description={page.meta.description}
   ogTitle={page.meta.ogTitle}
   ogDescription={page.meta.ogDescription}
+  ogType="article"
+  ogImage="/images/og-markus.jpg"
+  ogImageAlt="Markus Sommer, der den Männerkreis in Straubing leitet"
+  publishedTime={page.meta.datePublished}
+  modifiedTime={page.meta.dateModified}
   schemas={schemas}
 >
   <PageContent blocks={blocks} />

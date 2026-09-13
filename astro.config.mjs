@@ -6,10 +6,19 @@ import bun from '@wyattjoh/astro-bun-adapter';
 import umami from '@yeskunall/astro-umami';
 import icon from 'astro-icon';
 import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
+import { addPagesToLlmsTxt } from './astro-integrations/llms-extra.mjs';
 import { defineConfig, fontProviders } from 'astro/config';
 import { addSitemapsToIndex } from './astro-integrations/sitemap-index-extra.mjs';
 import { serveLlmsWithBunAdapter, serveSitemapWithBunAdapter } from './astro-integrations/serve-with-bun-adapter.mjs';
 import { UMAMI_ENDPOINT, UMAMI_WEBSITE_ID } from './src/lib/umami-config.ts';
+import site from './src/data/site.json' with { type: 'json' };
+
+// One source of truth for the brand, shared with SeoHead and the manifests.
+// These used to be typed out again inside the llms() options, where they went
+// stale: llms.txt still announced the site under a name and a marketing voice
+// the rest of the site had already dropped.
+const SITE_NAME = site.siteName;
+const SITE_DESCRIPTION = site.description;
 
 // SSR on Bun: the adapter builds dist/server/entry.mjs, and that single process
 // is the public edge — static assets, prerendered HTML and on-demand routes.
@@ -131,14 +140,36 @@ export default defineConfig({
     // ignores `exclude` — it scrapes /admin/* from the *live* site at build time and
     // publishes it as .md. Revisit once `exclude` covers SSR routes again.
     llms({
-      name: 'Männerkreis Niederbayern/ Straubing',
-      description:
-        'Ein Männerkreis in Straubing / Niederbayern – ein geschützter Raum für echte Begegnung, authentischen Austausch und persönliches Wachstum unter Männern. Die Treffen finden regelmäßig statt und laufen auf Spendenbasis. Es ist keine Vorerfahrung nötig.',
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
       contentSelector: 'main',
       // Strip chrome (nav/footer/forms/aria-hidden) so the markdown is prose.
       excludeSelectors: [...DEFAULT_NOISE_SELECTORS],
-      // Back-office and the noindex breathing app stay out of the AI index.
-      exclude: ['admin/**', 'atemuebung/app/**'],
+      // Back-office and the noindex breathing app stay out of the AI index — and
+      // so do the legal pages. They are noindex for search for the same reason
+      // they are noise here: llms-full.txt was 19KB of which the privacy policy
+      // was the larger half, so a model reading it learned our data-retention
+      // periods and not what the Männerkreis is. Same exclusion list as the
+      // sitemap, for the same reason.
+      exclude: ['admin/**', 'atemuebung/app/**', 'impressum/**', 'datenschutz/**'],
+    }),
+    // Must sit BETWEEN llms() and serveLlmsWithBunAdapter(), same ordering
+    // reason as the sitemap: the file must exist, and the manifest records its
+    // length afterwards.
+    addPagesToLlmsTxt({
+      entries: [
+        {
+          path: '/',
+          title: 'Männerkreis Straubing',
+          description: SITE_DESCRIPTION,
+        },
+        {
+          path: '/event',
+          title: 'Termine & Anmeldung',
+          description:
+            'Wann der nächste Männerkreis stattfindet, wo er stattfindet, wie lange er dauert, was er kostet und wie du dich anmeldest.',
+        },
+      ],
     }),
     // Must run AFTER llms(), same manifest reason as serveSitemapWithBunAdapter.
     serveLlmsWithBunAdapter(),

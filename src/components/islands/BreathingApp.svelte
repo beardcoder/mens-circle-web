@@ -656,7 +656,7 @@
       </div>
 
       <div class="breathing-app__setting breathing-app__setting--stepper">
-        <span class="breathing-app__setting-label">Runden</span>
+        <span class="breathing-app__setting-label" id="breathing-rounds-label">Runden</span>
 
         <div class="breathing-stepper">
           <button
@@ -672,6 +672,7 @@
           <span
             class="breathing-stepper__value"
             role="spinbutton"
+            aria-labelledby="breathing-rounds-label"
             aria-valuemin="1"
             aria-valuemax="6"
             aria-valuenow={settingRounds}
@@ -692,7 +693,7 @@
       </div>
 
       <div class="breathing-app__setting breathing-app__setting--stepper">
-        <span class="breathing-app__setting-label">Erholungs-Halt (Sek.)</span>
+        <span class="breathing-app__setting-label" id="breathing-recovery-label">Erholungs-Halt (Sek.)</span>
 
         <div class="breathing-stepper">
           <button
@@ -708,6 +709,7 @@
           <span
             class="breathing-stepper__value"
             role="spinbutton"
+            aria-labelledby="breathing-recovery-label"
             aria-valuemin="5"
             aria-valuemax="30"
             aria-valuenow={settingRecovery}
