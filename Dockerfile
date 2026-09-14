@@ -32,7 +32,14 @@ ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 # Astro's Rollup build, while `bun run` still uses Bun for everything else.
 RUN bun run build
 
-# 2) Final runtime image — Bun runtime only.
+# 2) Install only runtime dependencies; keep native packages on the same base
+#    and target architecture as the build/runtime stages (not the host's tree).
+FROM oven/bun:1 AS production-deps
+WORKDIR /app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production
+
+# 3) Final runtime image — Bun runtime only.
 FROM oven/bun:1
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
@@ -44,7 +51,7 @@ WORKDIR /app
 # The Astro server bundle + its runtime dependencies + the static client (the
 # Bun server serves these). The build path is baked in, so /app must match.
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
+COPY --from=production-deps /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 # Drizzle migrations — applied at runtime on boot (resolved against the WORKDIR).
 COPY --from=build /app/drizzle ./drizzle

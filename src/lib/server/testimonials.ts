@@ -60,7 +60,7 @@ export async function submitTestimonial(payload: TestimonialPayload): Promise<Su
 export async function fetchTestimonials(limit = 200): Promise<TestimonialDTO[]> {
   try {
     const rows = await db
-      .select()
+      .select({ quote: testimonials.quote, authorName: testimonials.authorName, role: testimonials.role })
       .from(testimonials)
       .where(and(eq(testimonials.isPublished, true), isNull(testimonials.deleted)))
       .orderBy(asc(testimonials.sortOrder), desc(testimonials.createdAt))
