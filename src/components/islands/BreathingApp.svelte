@@ -73,7 +73,7 @@
   // ─── Scheduling handles ───────────────────────────────────────────
   let timeoutHandle: number | null = null;
   let intervalHandle: number | null = null;
-  let rafHandle: number | null = null;
+  let retentionStartedAt: number | null = null;
 
   const isActive = $derived(phase === 'breathing' || phase === 'retention' || phase === 'recovery');
 
@@ -150,10 +150,7 @@
       intervalHandle = null;
     }
 
-    if (rafHandle !== null) {
-      window.cancelAnimationFrame(rafHandle);
-      rafHandle = null;
-    }
+    retentionStartedAt = null;
   }
 
   // ─── Audio cues ────────────────────────────────────────────────────
@@ -309,16 +306,24 @@
 
     chime([392], 0, 0.6); // calm low tone: hold your breath
 
-    const startedAt = performance.now();
+    retentionStartedAt = performance.now();
+    updateRetention();
+  }
 
-    const loop = (): void => {
-      if (phase !== 'retention') return;
+  function updateRetention(): void {
+    if (phase !== 'retention' || retentionStartedAt === null) return;
 
-      timerSeconds = Math.floor((performance.now() - startedAt) / 1000);
-      rafHandle = window.requestAnimationFrame(loop);
-    };
+    if (timeoutHandle !== null) window.clearTimeout(timeoutHandle);
+    timeoutHandle = null;
 
-    rafHandle = window.requestAnimationFrame(loop);
+    // Derive from elapsed time, not callback count: throttling must not lose
+    // seconds. Park while hidden and refresh immediately on visibility/pageshow.
+    const elapsed = performance.now() - retentionStartedAt;
+    timerSeconds = Math.floor(elapsed / 1000);
+
+    if (!document.hidden) {
+      timeoutHandle = window.setTimeout(updateRetention, Math.ceil(1000 - (elapsed % 1000)));
+    }
   }
 
   function startRecovery(): void {
@@ -508,10 +513,14 @@
 
     window.addEventListener('pointerdown', prime, { once: true });
     window.addEventListener('touchend', prime, { once: true });
+    document.addEventListener('visibilitychange', updateRetention);
+    window.addEventListener('pageshow', updateRetention);
 
     return () => {
       window.removeEventListener('pointerdown', prime);
       window.removeEventListener('touchend', prime);
+      document.removeEventListener('visibilitychange', updateRetention);
+      window.removeEventListener('pageshow', updateRetention);
     };
   });
 

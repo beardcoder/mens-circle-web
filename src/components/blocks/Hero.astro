@@ -65,7 +65,12 @@ const lines = data.displayLines ?? [];
       {data.body && <p class="home-hero__body">{data.body}</p>}
 
       <div class="home-hero__action">
-        <p class="home-hero__status" data-status={state.status}>{action.note}</p>
+        <p
+          class="home-hero__status"
+          data-status={state.status}
+        >
+          {action.note}
+        </p>
         <div class="actions">
           <a
             href={action.href}
@@ -78,7 +83,10 @@ const lines = data.displayLines ?? [];
           </a>
           {
             data.secondaryLabel && data.secondaryLink && (
-              <a href={data.secondaryLink} class="text-link">
+              <a
+                href={data.secondaryLink}
+                class="text-link"
+              >
                 {data.secondaryLabel}
               </a>
             )
@@ -93,7 +101,7 @@ const lines = data.displayLines ?? [];
               src={photo}
               class="home-hero__image"
               widths={[420, 640, 900]}
-              sizes="(max-width: 56em) 92vw, 34vw"
+              sizes="(max-width: 56em) calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)), calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem) - 2 * clamp(1rem, 0.6rem + 1.6vw, 2rem)) / 3)"
               formats={['avif', 'webp']}
               loading="eager"
               fetchpriority="high"
@@ -228,6 +236,8 @@ const lines = data.displayLines ?? [];
     /* The plate. Sits in the headline's row, so the ring, the type and the
        photograph genuinely overlap instead of forming three tidy boxes: the
        ring's lower arc runs behind the plate's top edge. */
+    /* Picture sizes mirrors the container gutter and four of twelve columns:
+       (content width - 2 column gaps) / 3. Keep both in sync with the tokens. */
     .home-hero__figure {
       grid-row: 1 / span 3;
       grid-column: 9 / -1;
