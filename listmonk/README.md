@@ -1,17 +1,43 @@
-# listmonk — Männerkreis Niederbayern/ Straubing
+# listmonk — Männerkreis Straubing
 
 E-Mail-Templates und Public-Page-CSS für die listmonk-Instanz (Newsletter:
-Abonnenten, Double-Opt-In, Versand, Abmeldung). Marke wie auf **mens-circle.de**:
-heller, warmer Pergament-Hintergrund (`#f2eee7`) mit Karte in `#faf8f5`,
-Terracotta-/Kupfer-Akzent (`#ce5c22` / Links `#b24e1f`), Serifen-Headlines
-(Playfair Display → Fallback Georgia) und sans-serif Fließtext (DM Sans →
-Helvetica/Arial), Editorial-Look mit feinen Linien. Die Hex-Werte sind aus den
-Website-Tokens (`src/styles/base/_variables.css`, OKLCH) abgeleitet.
+Abonnenten, Double-Opt-In, Versand, Abmeldung). **Die Mail ist das Plakat** —
+dasselbe Design wie auf mens-circle.de, siehe `src/styles/base/_variables.css`:
+
+| Rolle | Hex | Regel |
+|---|---|---|
+| Sand | `#e8e0d2` | der Grund, auf dem das Blatt liegt |
+| Papier | `#f2ede3` | das Blatt selbst |
+| Tinte | `#1c1714` | Masthead- und Footer-Band, Überschriften |
+| Tinte mittel | `#4a4139` | Fließtext auf Papier (8,5:1) |
+| Muted | `#645a50` | Marker, Labels, Meta (5,8:1) |
+| Orange | `#dd5f33` | Fläche, Linie, Button — **nie** kleiner Text auf Papier (3,1:1) |
+| Haarlinie | `#d8cfbe` | zwischen Zeilen |
+| Chalk muted | `#a39786` | der einzige gedämpfte Text, der auf der Tinte trägt (6,2:1) |
+
+Zwei Register, die sich nicht in der Mitte treffen: **Barlow Condensed 800**
+versal für Plakatgrößen (44 px, mobil 32 px) und **Barlow** 400/600 für alles
+Lesbare (16–17 px). Der 12-px-Marker (condensed, `letter-spacing: .14em`) ist
+das Gegengewicht. Die Fonts kommen aus Google Fonts; Apple Mail zeigt sie,
+Gmail und Outlook fallen auf Arial Narrow / Helvetica zurück — das
+Condensed/Normal-Gefälle bleibt dabei erhalten, nichts hängt am Webfont.
+
+**Radius 0, keine Karte, kein Schatten.** Die weiße Karte mit 14 px Radius auf
+Pergament war die alte Identität. Buttons tragen **Tinte auf Orange** (Weiß auf
+diesem Orange misst 3,6:1 und fällt durch), Links sind Tinte mit oranger
+Unterstreichung.
+
+Zwei bewusste Auslassungen: **kein Ring** (das SVG-Motiv der Website überlebt
+keinen Mail-Client — die 4 px orange Linie unter dem Masthead ist sein Ersatz)
+und **kein Dark Mode** (`color-scheme: light only` ist in jedem Head gesetzt).
+Die Display-Zeilenhöhe ist 0.94 statt 0.85: deutsche Umlaute überschießen die
+Versalhöhe, und der `padding-block-start`-Trick der Website greift im
+Mail-Client nicht zuverlässig.
 
 Alle Mails sind **e-mail-client-robust** gebaut: table-basiertes Layout,
-durchgängig Inline-CSS, web-safe Fonts, MSO-Conditionals und „bulletproof"
-Buttons — damit sie auch in Gmail und Outlook solide aussehen (nicht zu 100 %
-pixelgleich, aber sauber).
+durchgängig Inline-CSS, MSO-Conditionals und „bulletproof" Buttons — damit sie
+auch in Gmail und Outlook solide aussehen (nicht zu 100 % pixelgleich, aber
+sauber).
 
 > Getestet gegen **listmonk v6.1.0** (`listmonk/listmonk:latest`, Stand der
 > Einrichtung). listmonk nutzt Go `html/template` + Sprig.
@@ -175,10 +201,12 @@ der Web-App als `LISTMONK_TX_*`-Env-Variablen gesetzt.
 
 - **Opt-In:** Über das Newsletter-Formular (oder Admin → Subscribers → Add) eine
   Adresse zu einer Double-Opt-In-Liste hinzufügen → die Bestätigungsmail muss im
-  hellen Männerkreis-Layout (Pergament, Terracotta-Button) ankommen; „Anmeldung
-  bestätigen" zeigt auf `{{ .OptinURL }}`.
-- **Testkampagne:** Kampagne mit Template „Männerkreis Niederbayern" anlegen → Admin →
-  „Send test message" an eine eigene Adresse. Prüfen: Hero/Quote/Footer,
+  Plakat-Layout ankommen (Tinte-Band oben, oranger 4-px-Schnitt, Sandgrund,
+  Button orange mit Tinte-Label); „Anmeldung bestätigen" zeigt auf
+  `{{ .OptinURL }}`.
+- **Testkampagne:** Kampagne mit Template „Männerkreis Straubing" anlegen → Admin →
+  „Send test message" an eine eigene Adresse. Prüfen: Hero, oranges
+  Statement-Feld, Footer,
   „Im Browser ansehen" (`MessageURL`), Abmeldelink (`UnsubscribeURL`),
   Tracking-Pixel am Ende (`TrackView`).
 - **System-Mails:** SMTP-Test (Settings → SMTP → Test) und ggf. Import-/

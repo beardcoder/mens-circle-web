@@ -1,60 +1,113 @@
-<body style="margin:0;padding:0;background-color:#efe9dd;">
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#efe9dd;padding:24px 0;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;overflow:hidden;">
-        <tr><td style="padding:40px 40px 32px;font-family:'DM Sans',Helvetica,Arial,sans-serif;color:#2c2418;">
+<!doctype html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
+  <title>{{ .Tx.Data.subject }}</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&amp;family=Barlow:wght@400;600&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin:0 !important; padding:0 !important; width:100% !important; }
+    table { border-collapse:collapse !important; }
+    img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; max-width:100%; }
+    a { color:#1c1714; }
+    @media only screen and (max-width:620px) {
+      .em-sheet { width:100% !important; }
+      .em-pad { padding-left:22px !important; padding-right:22px !important; }
+      .em-display { font-size:32px !important; }
+      .em-label, .em-value { display:block !important; width:auto !important; }
+      .em-label { padding-bottom:0 !important; }
+      .em-value { border-top:0 !important; padding-top:1px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#e8e0d2;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#e8e0d2;opacity:0;">{{ .Tx.Data.subject }}</div>
 
-<p style="text-align:center;margin:0 0 6px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#b86f52;text-transform:uppercase;letter-spacing:0.2em;">Warteliste</p>
-<h1 style="text-align:center;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.3;color:#2c2418;margin:0 0 16px;">Du bist auf der Warteliste!</h1>
-<p style="text-align:center;color:#5c4a3a;font-size:15px;line-height:1.6;margin:0 0 32px;">Hallo {{ .Tx.Data.firstName }}, du bist auf der Warteliste für <strong>{{ .Tx.Data.eventTitle }}</strong>.<br />Wir benachrichtigen dich sofort, wenn ein Platz frei wird.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#e8e0d2;">
+  <tr><td align="center" style="padding:28px 12px;">
+    <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+    <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#f2ede3;">
 
-<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 24px;">
-  <tr><td style="height:2px;background-color:#c4b49a;font-size:0;line-height:0;">&nbsp;</td></tr>
-  <tr><td style="background-color:#f4f0e8;padding:28px;">
-    <p style="margin:0 0 20px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#b86f52;text-transform:uppercase;letter-spacing:0.15em;">Veranstaltung</p>
-    <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+      <!-- Masthead -->
+      <tr><td class="em-pad" style="padding:26px 40px 22px;background-color:#1c1714;">
+        <div style="font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:27px;font-weight:800;line-height:1;letter-spacing:0.01em;text-transform:uppercase;color:#f2ede3;">Männerkreis Straubing</div>
+        <div style="margin-top:9px;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1;letter-spacing:0.14em;text-transform:uppercase;color:#a39786;">Niederbayern</div>
+      </td></tr>
+      <tr><td style="height:4px;background-color:#dd5f33;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+      <!-- Content -->
+      <tr><td class="em-pad" style="padding:34px 40px 30px;">
+
+<p style="margin:0 0 14px;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1.2;letter-spacing:0.14em;text-transform:uppercase;color:#645a50;">Warteliste</p>
+<h1 class="em-display" style="margin:0 0 20px;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:44px;font-weight:800;line-height:0.94;letter-spacing:-0.01em;text-transform:uppercase;color:#1c1714;">Auf der<br>Warteliste.</h1>
+<p style="margin:0 0 30px;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.6;color:#4a4139;">Hallo {{ .Tx.Data.firstName }}, du stehst auf der Warteliste für <strong style="font-weight:600;color:#1c1714;">{{ .Tx.Data.eventTitle }}</strong>. Wir melden uns, sobald ein Platz frei wird.</p>
+<!-- Veranstaltung -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 30px;">
+  <tr><td style="height:3px;background-color:#1c1714;font-size:0;line-height:0;">&nbsp;</td></tr>
+  <tr><td style="background-color:#e8e0d2;padding:24px 26px 26px;">
+    <p style="margin:0 0 10px;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1.2;letter-spacing:0.14em;text-transform:uppercase;color:#645a50;">Veranstaltung</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td width="90" style="padding:6px 0;vertical-align:top;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#7a6248;text-transform:uppercase;letter-spacing:0.08em;">Datum</td>
-        <td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#2c2418;">{{ .Tx.Data.dateLong }}</td>
+        <td class="em-label" width="104" style="padding:10px 10px 10px 0;border-top:1px solid #d8cfbe;vertical-align:top;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1.5;letter-spacing:0.12em;text-transform:uppercase;color:#645a50;">Datum</td>
+        <td class="em-value" style="padding:10px 0;border-top:1px solid #d8cfbe;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#1c1714;">{{ .Tx.Data.dateLong }}</td>
       </tr>
-      {{ if .Tx.Data.timeRange }}
+{{ if .Tx.Data.timeRange }}
       <tr>
-        <td width="90" style="padding:6px 0;vertical-align:top;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#7a6248;text-transform:uppercase;letter-spacing:0.08em;">Uhrzeit</td>
-        <td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#2c2418;">{{ .Tx.Data.timeRange }}</td>
+        <td class="em-label" width="104" style="padding:10px 10px 10px 0;border-top:1px solid #d8cfbe;vertical-align:top;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1.5;letter-spacing:0.12em;text-transform:uppercase;color:#645a50;">Uhrzeit</td>
+        <td class="em-value" style="padding:10px 0;border-top:1px solid #d8cfbe;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#1c1714;">{{ .Tx.Data.timeRange }}</td>
       </tr>
-      {{ end }}
-      {{ if .Tx.Data.location }}
+{{ end }}
+{{ if .Tx.Data.location }}
       <tr>
-        <td width="90" style="padding:6px 0;vertical-align:top;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#7a6248;text-transform:uppercase;letter-spacing:0.08em;">Ort</td>
-        <td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#2c2418;">{{ .Tx.Data.location }}</td>
+        <td class="em-label" width="104" style="padding:10px 10px 10px 0;border-top:1px solid #d8cfbe;vertical-align:top;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1.5;letter-spacing:0.12em;text-transform:uppercase;color:#645a50;">Ort</td>
+        <td class="em-value" style="padding:10px 0;border-top:1px solid #d8cfbe;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#1c1714;">{{ .Tx.Data.location }}</td>
       </tr>
-      {{ end }}
-      {{ if .Tx.Data.locationDetails }}
+{{ end }}
+{{ if .Tx.Data.locationDetails }}
       <tr>
-        <td width="90" style="padding:6px 0;vertical-align:top;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#7a6248;text-transform:uppercase;letter-spacing:0.08em;">Hinweis</td>
-        <td style="padding:6px 0;font-family:'DM Sans',sans-serif;font-size:15px;color:#2c2418;white-space:pre-line;">{{ .Tx.Data.locationDetails }}</td>
+        <td class="em-label" width="104" style="padding:10px 10px 10px 0;border-top:1px solid #d8cfbe;vertical-align:top;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1.5;letter-spacing:0.12em;text-transform:uppercase;color:#645a50;">Hinweis</td>
+        <td class="em-value" style="padding:10px 0;border-top:1px solid #d8cfbe;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#1c1714;white-space:pre-line;">{{ .Tx.Data.locationDetails }}</td>
       </tr>
-      {{ end }}
+{{ end }}
     </table>
   </td></tr>
 </table>
 
-<h2 style="font-family:Georgia,'Times New Roman',serif;font-size:19px;color:#2c2418;margin:32px 0 12px;">Was jetzt?</h2>
-<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">Wir informieren dich automatisch per E-Mail, sobald ein Platz frei wird. Du musst nichts weiter tun. Solltest du doch nicht mehr teilnehmen können, schreib uns kurz an <a href="mailto:{{ .Tx.Data.contactEmail }}" style="color:#b86f52;">{{ .Tx.Data.contactEmail }}</a>, damit wir deinen Platz weitergeben können.</p>
-
-<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin:32px 0;">
-  <tr><td style="height:1px;background-color:#c4b49a;font-size:0;line-height:0;">&nbsp;</td></tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px;">
+  <tr><td style="height:2px;background-color:#1c1714;font-size:0;line-height:0;">&nbsp;</td></tr>
+  <tr><td style="padding-top:12px;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;line-height:1.1;letter-spacing:0.01em;text-transform:uppercase;color:#1c1714;">Was jetzt?</td></tr>
+</table>
+<p style="margin:0 0 30px;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.7;color:#4a4139;">Du musst nichts weiter tun. Sobald ein Platz frei wird, rückst du automatisch nach und bekommst eine E-Mail von uns.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 30px;">
+  <tr><td style="padding:12px 0;border-top:1px solid #d8cfbe;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#4a4139;">Falls du in der Zwischenzeit doch nicht mehr kannst, schreib uns kurz an <a href="mailto:{{ .Tx.Data.contactEmail }}" style="color:#1c1714;font-weight:600;text-decoration:underline;text-decoration-color:#dd5f33;text-decoration-thickness:2px;text-underline-offset:0.18em;">{{ .Tx.Data.contactEmail }}</a>.</td></tr>
+  <tr><td style="padding:12px 0;border-top:1px solid #d8cfbe;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#4a4139;">Wir geben frei werdende Plätze in der Reihenfolge der Anmeldungen weiter.</td></tr>
 </table>
 
-<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">Wir freuen uns, dich vielleicht bald begrüßen zu dürfen.</p>
-<p style="font-size:15px;line-height:1.7;color:#3a342c;margin:0 0 16px;">Herzliche Grüße,<br /><strong>{{ .Tx.Data.siteName }}</strong></p>
+<p style="margin:0;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.7;color:#4a4139;">Herzliche Grüße<br><strong style="font-weight:600;color:#1c1714;">{{ .Tx.Data.siteName }}</strong></p>
 
-<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="margin-top:28px;">
-  <tr><td style="border-top:1px solid #e3dccb;padding-top:16px;font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.6;color:#8a7c66;">Diese E-Mail wurde an {{ .Tx.Data.recipientEmail }} gesendet, weil du dich auf die Warteliste für unsere Veranstaltung eingetragen hast.</td></tr>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td class="em-pad" style="padding:30px 40px 34px;background-color:#1c1714;">
+        <div style="font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;line-height:1.1;letter-spacing:0.01em;text-transform:uppercase;color:#f2ede3;">Männerkreis Straubing</div>
+        <p style="margin:12px 0 0;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.7;color:#a39786;">Ein Männerkreis in Straubing, Niederbayern. Wir treffen uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.</p>
+        <p style="margin:16px 0 0;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1.2;letter-spacing:0.14em;text-transform:uppercase;">
+          <a href="https://mens-circle.de" target="_blank" style="color:#dd5f33;text-decoration:none;">mens-circle.de</a>
+          <span style="color:#a39786;">&nbsp;·&nbsp;</span>
+          <a href="mailto:{{ .Tx.Data.contactEmail }}" style="color:#dd5f33;text-decoration:none;">{{ .Tx.Data.contactEmail }}</a>
+        </p>
+        <p style="margin:18px 0 0;padding-top:16px;border-top:1px solid #3d342c;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#a39786;">Diese E-Mail wurde an {{ .Tx.Data.recipientEmail }} gesendet, weil du dich auf die Warteliste für diese Veranstaltung eingetragen hast.</p>
+      </td></tr>
+
+    </table>
+    <!--[if mso]></td></tr></table><![endif]-->
+  </td></tr>
 </table>
-
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
 </body>
+</html>
