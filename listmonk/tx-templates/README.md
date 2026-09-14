@@ -31,6 +31,30 @@ Then set the matching environment variables (see `.env.example`):
 If a template ID is left empty the corresponding email is simply skipped (and a
 line is logged) — useful while you set them up one at a time.
 
+## The design
+
+Every file is a **complete HTML document** (doctype, head, Google-Fonts link,
+one media query), not a body fragment — listmonk sends the template body as the
+message, and the head is where the webfonts and the mobile breakpoint have to
+live. `_layout-snippet.html` documents the shared skeleton and the palette in
+full; the short version is: sand ground, paper sheet, ink masthead and footer
+band, a 4px orange rule between them, Barlow Condensed 800 for the poster lines
+and Barlow for everything readable, radius 0, and an ink label on every orange
+button.
+
+Because the templates are standalone, the skeleton is duplicated across the six
+files. Change it in one, change it in all six — `_layout-snippet.html` is the
+reference, not an include.
+
+**Each template may only read fields the app actually sends** for that mail.
+Go's `html/template` renders a missing field as the literal `<no value>`, so a
+field borrowed from a sibling template shows up in the recipient's inbox. The
+narrowest payload is `event-message.html` (`subject`, `content`, `eventTitle`,
+`siteName`, `recipientEmail`) — it carries no `contactEmail`, which is why its
+footer links to the website only. `admin-notification.html` has no `siteName`
+either, so it signs off with neither. Check `src/lib/server/email.ts` before
+adding a placeholder.
+
 ## How sending works
 
 - The app ensures the recipient exists as a listmonk subscriber (a requirement
