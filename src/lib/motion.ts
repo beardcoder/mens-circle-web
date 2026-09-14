@@ -2,7 +2,9 @@
  * Scroll-triggered reveals. `inView()` shares one IntersectionObserver, the mini
  * `animate()` drives WAAPI directly. The hidden start state lives in CSS behind
  * `.motion-ready`, so without JS or under reduced motion everything stays
- * visible. A MutationObserver picks up content added after load.
+ * visible. All reveal targets arrive in the initial Astro HTML; the hydrated
+ * islands only update controls/maps, never reveal targets. Native navigation
+ * boots a new document, so no body-wide mutation observer is needed.
  *
  * These are short and small on purpose: a paragraph should look like it was
  * already there, not like it performed an entrance. Travel is a few pixels and
@@ -232,17 +234,6 @@ export function initMotion(): void {
   // The reveals are under observation, so the layout's dead-man's switch (which
   // would drop `.motion-ready` and just show everything) is no longer needed.
   clearMotionFallback();
-
-  // Server islands swap their content in after load — register what arrives.
-  new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      for (const node of mutation.addedNodes) {
-        if (node instanceof HTMLElement) {
-          observe(register(node, tuning));
-        }
-      }
-    }
-  }).observe(document.body, { childList: true, subtree: true });
 }
 
 // `will-change` is held only for the life of the animation. The `blur` variant

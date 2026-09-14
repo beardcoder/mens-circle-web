@@ -14,7 +14,7 @@
   } from '@lib/form-errors';
 
   interface Props {
-    event: EventDTO;
+    event: Pick<EventDTO, 'id' | 'is_full'>;
   }
 
   const { event }: Props = $props();

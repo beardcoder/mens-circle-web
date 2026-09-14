@@ -25,13 +25,22 @@ const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
 const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full ? 'Warteliste' : 'Anmeldung';
 ---
 
-<section class="section section--ruled event-register-section" id="anmeldung" aria-labelledby="anmeldung-title">
+<section
+  class="section section--ruled event-register-section"
+  id="anmeldung"
+  aria-labelledby="anmeldung-title"
+>
   <div class="container">
     <div class="spine">
       <p class="rail-heading">{event.is_past ? 'Rückblick' : 'Teilnehmen'}</p>
 
       <div class="spine__body">
-        <h2 class="event-register__title" id="anmeldung-title">{heading}</h2>
+        <h2
+          class="event-register__title"
+          id="anmeldung-title"
+        >
+          {heading}
+        </h2>
 
         {
           event.is_past ? (
@@ -56,11 +65,17 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
         <div class="event-register__form-wrap">
           {
             event.is_past ? (
-              <a href="/#termine" class="btn btn--primary">
+              <a
+                href="/#termine"
+                class="btn btn--primary"
+              >
                 Bei neuen Terminen benachrichtigen
               </a>
             ) : (
-              <RegistrationForm client:visible event={event} />
+              <RegistrationForm
+                client:visible
+                event={{ id: event.id, is_full: event.is_full }}
+              />
             )
           }
         </div>

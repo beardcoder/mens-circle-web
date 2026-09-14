@@ -1,12 +1,13 @@
 /* eslint-disable no-console */
 import { and, asc, eq, isNull } from 'drizzle-orm';
 import type { ApiResponse, RegistrationPayload } from '../types';
+import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import type { Event, Participant, Registration, RegistrationStatus } from './db/schema';
 import { participants, registrations } from './db/schema';
 import { sendEventMessage, sendRegistrationEmails, sendWaitlistPromotion } from './email';
 import { countActiveRegistrations, ensureEventList, getEventById, isEventPast } from './events';
-import { addToLists, removeFromList } from './listmonk';
+import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
 
 /** Alias kept for the existing call sites; the union lives with the column. */
 export type RegStatus = RegistrationStatus;
@@ -122,11 +123,23 @@ export const register = async (payload: RegistrationPayload): Promise<RegisterRe
   }
 
   const freshCount = await countActiveRegistrations(event.id);
-  fireAndForget('[registrations] emails failed', sendRegistrationEmails(event, participant, status, freshCount));
   fireAndForget(
-    '[registrations] listmonk assignment failed',
-    ensureEventList(event).then((listId) => {
-      if (listId) return addToLists(email, `${firstName} ${lastName}`.trim(), [listId], true);
+    '[registrations] side effects failed',
+    withSubscriberScope(async () => {
+      const results = await Promise.allSettled([
+        sendRegistrationEmails(event, participant, status, freshCount),
+        ensureEventList(event).then(async (listId) => {
+          if (listId) {
+            const result = await addToLists(email, `${firstName} ${lastName}`.trim(), [listId], true);
+            if (!result.ok) throw new Error('listmonk assignment rejected');
+          }
+        }),
+      ]);
+      for (const [i, result] of results.entries()) {
+        if (result.status === 'rejected') {
+          console.error(`[registrations] ${i === 0 ? 'emails' : 'listmonk assignment'} failed`, String(result.reason));
+        }
+      }
     }),
   );
 
@@ -236,8 +249,8 @@ export const broadcastEventMessage = async (
       and(eq(registrations.eventId, eventId), isNull(registrations.deleted), eq(registrations.status, 'registered')),
     );
 
-  const results = await Promise.allSettled(
-    recipients.map(({ participant }) => sendEventMessage(event, participant, subject, content)),
+  const results = await settleWithConcurrency(recipients, ({ participant }) =>
+    sendEventMessage(event, participant, subject, content),
   );
   const sent = results.filter((r) => r.status === 'fulfilled' && r.value).length;
   return { sent, total: recipients.length };

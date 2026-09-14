@@ -53,19 +53,9 @@ export function initAmbient(): () => void {
 
   watch(document.body);
 
-  // The testimonials block is `server:defer` — catch sections added after load.
-  const mutations = new MutationObserver((records) => {
-    for (const record of records) {
-      for (const node of record.addedNodes) {
-        if (node instanceof HTMLElement) watch(node);
-      }
-    }
-  });
-
-  mutations.observe(document.body, { childList: true, subtree: true });
-
+  // All sections (including testimonials and the essential breathing island)
+  // are server-rendered. Hydration adds no sections; navigation is native.
   return (): void => {
-    mutations.disconnect();
     observer.disconnect();
   };
 }
