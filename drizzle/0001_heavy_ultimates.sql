@@ -1,0 +1,1 @@
+CREATE INDEX `idx_testimonials_public_order` ON `testimonials` (`is_published`,`sort_order`,"created_at" desc) WHERE "testimonials"."deleted" is null;

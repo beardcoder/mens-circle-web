@@ -8,6 +8,7 @@
  *   • Timestamps are ISO-8601 strings (UTC), so they sort lexicographically.
  *   • Booleans are stored as integers (0/1).
  */
+import { desc, isNull } from 'drizzle-orm';
 import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 const uuid = () => crypto.randomUUID();
@@ -93,19 +94,25 @@ export const registrations = sqliteTable(
   ],
 );
 
-export const testimonials = sqliteTable('testimonials', {
-  id: text('id').primaryKey().$defaultFn(uuid),
-  quote: text('quote').notNull(),
-  authorName: text('author_name').notNull().default(''),
-  email: text('email').notNull().default(''),
-  role: text('role').notNull().default(''),
-  isPublished: integer('is_published', { mode: 'boolean' }).notNull().default(false),
-  publishedAt: text('published_at'),
-  sortOrder: integer('sort_order').notNull().default(0),
-  deleted: text('deleted'),
-  createdAt: text('created_at').notNull().$defaultFn(nowIso),
-  updatedAt: text('updated_at').notNull().$defaultFn(nowIso).$onUpdateFn(nowIso),
-});
+export const testimonials = sqliteTable(
+  'testimonials',
+  {
+    id: text('id').primaryKey().$defaultFn(uuid),
+    quote: text('quote').notNull(),
+    authorName: text('author_name').notNull().default(''),
+    email: text('email').notNull().default(''),
+    role: text('role').notNull().default(''),
+    isPublished: integer('is_published', { mode: 'boolean' }).notNull().default(false),
+    publishedAt: text('published_at'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    deleted: text('deleted'),
+    createdAt: text('created_at').notNull().$defaultFn(nowIso),
+    updatedAt: text('updated_at').notNull().$defaultFn(nowIso).$onUpdateFn(nowIso),
+  },
+  (t) => [
+    index('idx_testimonials_public_order').on(t.isPublished, t.sortOrder, desc(t.createdAt)).where(isNull(t.deleted)),
+  ],
+);
 
 export type Event = typeof events.$inferSelect;
 export type NewEvent = typeof events.$inferInsert;

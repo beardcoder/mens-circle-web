@@ -7,13 +7,18 @@ import SocialIcon from './SocialIcon.astro';
 
 const socialLinks = site.socialLinks as SocialLink[];
 const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]/g, '')}` : null;
+// Only these prerendered pages are safe to fetch before a click.
+const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung', '/impressum', '/datenschutz']);
 ---
 
 <footer class="footer">
   <div class="container">
     <div class="footer__top">
       <div class="footer__brand">
-        <a href="/" class="footer__logo">
+        <a
+          href="/"
+          class="footer__logo"
+        >
           <Logo class="footer__logo-icon" />
           <span>{site.siteName}</span>
         </a>
@@ -23,7 +28,10 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
             <ul class="footer__social-links">
               {socialLinks.map((link) => (
                 <li>
-                  <SocialIcon link={link} variant="link" />
+                  <SocialIcon
+                    link={link}
+                    variant="link"
+                  />
                 </li>
               ))}
             </ul>
@@ -31,7 +39,10 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         }
       </div>
 
-      <nav class="footer__nav" aria-label="Fußnavigation">
+      <nav
+        class="footer__nav"
+        aria-label="Fußnavigation"
+      >
         <h3 class="footer__heading">Navigation</h3>
         <ul class="footer__links">
           {
@@ -40,6 +51,7 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
                 <a
                   href={item.url}
                   data-umami-event="footer-link"
+                  data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
                   target={(item as { target?: string }).target}
                   rel={(item as { target?: string }).target === '_blank' ? 'noopener' : undefined}
                 >
@@ -57,7 +69,11 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
           {
             site.contactEmail && (
               <li>
-                <a href={`mailto:${site.contactEmail}`} data-umami-event="contact-click" data-umami-event-type="email">
+                <a
+                  href={`mailto:${site.contactEmail}`}
+                  data-umami-event="contact-click"
+                  data-umami-event-type="email"
+                >
                   E-Mail schreiben
                 </a>
               </li>
@@ -66,7 +82,11 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
           {
             phoneHref && (
               <li>
-                <a href={phoneHref} data-umami-event="contact-click" data-umami-event-type="phone">
+                <a
+                  href={phoneHref}
+                  data-umami-event="contact-click"
+                  data-umami-event-type="phone"
+                >
                   {site.contactPhone}
                 </a>
               </li>
@@ -75,7 +95,10 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
           {
             nav.footerContact.map((item) => (
               <li>
-                <a href={item.url} data-umami-event="footer-link">
+                <a
+                  href={item.url}
+                  data-umami-event="footer-link"
+                >
                   {item.label}
                 </a>
               </li>
@@ -87,10 +110,17 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
 
     <div class="footer__bottom">
       <p class="footer__copyright">{site.footerText}</p>
-      <nav class="footer__legal" aria-label="Rechtliches">
+      <nav
+        class="footer__legal"
+        aria-label="Rechtliches"
+      >
         {
           nav.footerLegal.map((item) => (
-            <a href={item.url} data-umami-event="footer-link">
+            <a
+              href={item.url}
+              data-umami-event="footer-link"
+              data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
+            >
               {item.label}
             </a>
           ))

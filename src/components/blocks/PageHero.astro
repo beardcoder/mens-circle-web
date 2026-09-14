@@ -36,12 +36,22 @@ const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
 const imageAsset = resolveAssetImage(data.image);
 ---
 
-<section class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`} id={data.anchor}>
+<section
+  class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`}
+  id={data.anchor}
+>
   <div class="container">
     <div class="page-hero__layout">
       <div class="page-hero__content">
         {data.eyebrow && <p class="marker marker--ruled page-hero__eyebrow">{data.eyebrow}</p>}
-        {data.title && <h1 class="page-hero__title" set:html={data.title} />}
+        {
+          data.title && (
+            <h1
+              class="page-hero__title"
+              set:html={data.title}
+            />
+          )
+        }
         {data.lead && <p class="page-hero__lead">{data.lead}</p>}
 
         {
@@ -68,7 +78,7 @@ const imageAsset = resolveAssetImage(data.image);
                 src={imageAsset}
                 class="page-hero__image"
                 widths={[400, 600, 900]}
-                sizes="(max-width: 860px) 92vw, 380px"
+                sizes="(max-width: 54em) calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)), min(22rem, calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)) * 0.32))"
                 formats={['avif', 'webp']}
                 loading="eager"
                 fetchpriority="high"
@@ -104,7 +114,8 @@ const imageAsset = resolveAssetImage(data.image);
       align-items: start;
     }
 
-    /* Capped in both units — see the note in blocks/Hero.astro. */
+    /* Picture sizes mirrors this cap, the container gutter and the 54em
+       breakpoint below. The percentage is of the grid's content width. */
     .page-hero--with-image .page-hero__layout {
       grid-template-columns: minmax(0, 1fr) minmax(0, min(22rem, 32%));
     }

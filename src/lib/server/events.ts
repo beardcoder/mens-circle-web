@@ -31,8 +31,7 @@ export const isEventPast = (ev: Pick<Event, 'eventDate'>): boolean => {
   return endOfDay.getTime() < Date.now();
 };
 
-export const eventDto = async (ev: Event): Promise<EventDTO> => {
-  const activeCount = await countActiveRegistrations(ev.id);
+const eventDtoWithCount = (ev: Event, activeCount: number): EventDTO => {
   const available = Math.max(0, ev.maxParticipants - activeCount);
   return {
     id: ev.id,
@@ -58,6 +57,26 @@ export const eventDto = async (ev: Event): Promise<EventDTO> => {
   };
 };
 
+export const eventDto = async (ev: Event): Promise<EventDTO> =>
+  eventDtoWithCount(ev, await countActiveRegistrations(ev.id));
+
+interface EventWithCapacity {
+  event: Event;
+  activeCount: number;
+}
+
+// Count only registrations for the selected event, using the existing event_id
+// index. Keeping this in the lookup statement also gives the DTO one snapshot.
+// Nest the predicate so Drizzle's single-table projection keeps column qualifiers.
+const eventWithCapacityQuery = () =>
+  db
+    .select({
+      event: events,
+      activeCount: sql<number>`(select count(*) from ${registrations}
+        where ${and(eq(registrations.eventId, events.id), holdsASeat())})`,
+    })
+    .from(events);
+
 const startOfTodayIso = (): string => {
   const now = new Date();
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0)).toISOString();
@@ -67,6 +86,14 @@ export const getNextEvent = async (): Promise<Event | null> => {
   const rows = await db
     .select()
     .from(events)
+    .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, startOfTodayIso())))
+    .orderBy(asc(events.eventDate))
+    .limit(1);
+  return rows[0] ?? null;
+};
+
+const getNextEventWithCapacity = async (): Promise<EventWithCapacity | null> => {
+  const rows = await eventWithCapacityQuery()
     .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, startOfTodayIso())))
     .orderBy(asc(events.eventDate))
     .limit(1);
@@ -112,17 +139,17 @@ export const getEventById = async (id: string): Promise<Event | null> => {
   return rows[0] ?? null;
 };
 
-const tryEventDto = async (fetch: () => Promise<Event | null>, label: string): Promise<EventDTO | null> => {
+const tryEventDto = async (fetch: () => Promise<EventWithCapacity | null>, label: string): Promise<EventDTO | null> => {
   try {
-    const ev = await fetch();
-    return ev ? await eventDto(ev) : null;
+    const row = await fetch();
+    return row ? eventDtoWithCount(row.event, row.activeCount) : null;
   } catch (err) {
     console.error(`[events] ${label} failed`, String(err));
     return null;
   }
 };
 
-export const fetchNextEvent = (): Promise<EventDTO | null> => tryEventDto(getNextEvent, 'fetchNextEvent');
+export const fetchNextEvent = (): Promise<EventDTO | null> => tryEventDto(getNextEventWithCapacity, 'fetchNextEvent');
 
 /**
  * The scheduling state of the site, as three distinct cases.
@@ -138,9 +165,11 @@ export type NextEventState =
 
 export const fetchNextEventState = async (): Promise<NextEventState> => {
   try {
-    const ev = await getNextEvent();
+    const row = await getNextEventWithCapacity();
 
-    return ev ? { status: 'scheduled', event: await eventDto(ev) } : { status: 'none', event: null };
+    return row
+      ? { status: 'scheduled', event: eventDtoWithCount(row.event, row.activeCount) }
+      : { status: 'none', event: null };
   } catch (err) {
     console.error('[events] fetchNextEventState failed', String(err));
 
@@ -149,7 +178,12 @@ export const fetchNextEventState = async (): Promise<NextEventState> => {
 };
 
 export const getEventBySlug = (slug: string): Promise<EventDTO | null> =>
-  tryEventDto(() => getPublishedEventBySlug(slug), 'getEventBySlug');
+  tryEventDto(async () => {
+    const rows = await eventWithCapacityQuery()
+      .where(and(eq(events.slug, slug), eq(events.isPublished, true), isNull(events.deleted)))
+      .limit(1);
+    return rows[0] ?? null;
+  }, 'getEventBySlug');
 
 export const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
   const base = String(eventDate).slice(0, 10);
