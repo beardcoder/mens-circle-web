@@ -80,7 +80,13 @@ services:
       LISTMONK_ADMIN_USER: ${SERVICE_USER_LISTMONKADMIN}
       LISTMONK_ADMIN_PASSWORD: ${SERVICE_PASSWORD_LISTMONKADMIN}
     healthcheck:
-      test: ['CMD-SHELL', 'curl -sf http://localhost:9000/api/ping || exit 1']
+      # `wget`, not `curl` — the listmonk image ships no curl, so a curl probe
+      # exits 1 forever and the container never leaves "starting". That is not
+      # cosmetic: Traefik's Docker provider skips unhealthy or starting
+      # containers, so the router for the newsletter host is never created and
+      # the domain 404s. And the endpoint is `/health` (a bare `{"data":true}`)
+      # — `/api/ping` does not exist and `/api/health` is behind auth (403).
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:9000/health || exit 1']
       start_period: 120s
       interval: 30s
       timeout: 5s
