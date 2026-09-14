@@ -8,6 +8,13 @@
       "when": 1781874590403,
       "tag": "0000_foamy_kabuki",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789395512716,
+      "tag": "0001_heavy_ultimates",
+      "breakpoints": true
     }
   ]
 }

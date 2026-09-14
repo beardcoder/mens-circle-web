@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { config, listmonkApiConfigured, listmonkConfigured } from './config';
 
 export interface ListmonkSubscriber {
@@ -72,17 +73,66 @@ export const findSubscriber = async (email: string): Promise<ListmonkSubscriber 
   return null;
 };
 
-export const ensureSubscriber = async (email: string, name: string): Promise<number> => {
-  if (!listmonkApiConfigured()) return 0;
+interface SubscriberIdentity {
+  subscriber: ListmonkSubscriber;
+  created: boolean;
+}
+
+type SubscriberWork = Map<string, Promise<SubscriberIdentity | null>>;
+const inFlightSubscribers: SubscriberWork = new Map();
+const subscriberScope = new AsyncLocalStorage<SubscriberWork>();
+
+/** Reuse identity only for the lifetime of one awaited workflow, never across completed requests. */
+export const withSubscriberScope = async <T>(work: () => Promise<T>): Promise<T> => {
+  const identities: SubscriberWork = new Map();
+  return subscriberScope.run(identities, async () => {
+    try {
+      return await work();
+    } finally {
+      identities.clear();
+    }
+  });
+};
+
+const provisionSubscriber = async (email: string, name: string): Promise<SubscriberIdentity | null> => {
   const created = await request('POST', '/api/subscribers', {
     email,
     name: name && name.trim() ? name.trim() : email,
     status: 'enabled',
     preconfirm_subscriptions: true,
   });
-  if (created?.ok) return Number(created.body?.data?.id) || 0;
+  if (created?.ok) {
+    const id = Number(created.body?.data?.id) || 0;
+    return id
+      ? {
+          subscriber: { ...created.body.data, id, email, name: name.trim() || email, status: 'enabled' },
+          created: true,
+        }
+      : null;
+  }
+  // Authentication, validation, transport and server errors are not evidence of an existing subscriber.
+  if (created?.status !== 409) return null;
   const sub = await findSubscriber(email);
-  return sub?.id ?? 0;
+  return sub?.id ? { subscriber: sub, created: false } : null;
+};
+
+const resolveSubscriber = (email: string, name: string): Promise<SubscriberIdentity | null> => {
+  const key = email.trim().toLowerCase();
+  const scope = subscriberScope.getStore();
+  const scoped = scope?.get(key);
+  if (scoped) return scoped;
+  let pending = inFlightSubscribers.get(key);
+  if (!pending) {
+    pending = provisionSubscriber(key, name).finally(() => inFlightSubscribers.delete(key));
+    inFlightSubscribers.set(key, pending);
+  }
+  scope?.set(key, pending);
+  return pending;
+};
+
+export const ensureSubscriber = async (email: string, name: string): Promise<number> => {
+  if (!listmonkApiConfigured()) return 0;
+  return (await resolveSubscriber(email, name))?.subscriber.id ?? 0;
 };
 
 export const eventListName = (title: string, dateShort: string): string => {
@@ -114,29 +164,39 @@ export const addToLists = async (
   const cleanName = name && name.trim() ? name.trim() : '';
   const status = confirmed ? 'confirmed' : 'unconfirmed';
 
-  const created = await request('POST', '/api/subscribers', {
-    email,
-    name: cleanName || email,
-    status: 'enabled',
-    lists: listIds,
-    preconfirm_subscriptions: confirmed,
-  });
-  if (!created) return { ok: false, status: 'error' };
-  if (created.ok) return { ok: true, status: 'subscribed' };
-  if (created.status !== 409) {
-    console.error('[listmonk] event subscribe rejected', email, created.status, JSON.stringify(created.body));
-    return { ok: false, status: 'error' };
+  let identity: SubscriberIdentity | null;
+  if (subscriberScope.getStore()) {
+    identity = await resolveSubscriber(email, name);
+  } else {
+    const created = await request('POST', '/api/subscribers', {
+      email,
+      name: cleanName || email,
+      status: 'enabled',
+      lists: listIds,
+      preconfirm_subscriptions: confirmed,
+    });
+    if (!created) return { ok: false, status: 'error' };
+    if (created.ok) return { ok: true, status: 'subscribed' };
+    if (created.status !== 409) {
+      console.error('[listmonk] event subscribe rejected', email, created.status, JSON.stringify(created.body));
+      return { ok: false, status: 'error' };
+    }
+    const subscriber = await findSubscriber(email);
+    identity = subscriber ? { subscriber, created: false } : null;
   }
-
-  const sub = await findSubscriber(email);
+  const sub = identity?.subscriber;
   if (!sub?.id) return { ok: false, status: 'error' };
 
-  await request('PUT', '/api/subscribers/lists', {
+  const membership = await request('PUT', '/api/subscribers/lists', {
     ids: [sub.id],
     action: 'add',
     target_list_ids: listIds,
     status,
   });
+  if (!membership?.ok) {
+    console.error('[listmonk] list membership rejected', email, membership?.status);
+    return { ok: false, status: 'error' };
+  }
 
   const subName = (sub.name || '').trim();
   const nameMissing = subName === '' || subName.toLowerCase() === String(email).toLowerCase();
@@ -152,7 +212,7 @@ export const addToLists = async (
     });
   }
 
-  return { ok: true, status: 'exists' };
+  return { ok: true, status: identity?.created ? 'subscribed' : 'exists' };
 };
 
 export const removeFromList = async (email: string, listId: number): Promise<boolean> => {

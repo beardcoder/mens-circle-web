@@ -6,6 +6,11 @@ dist
 .vscode
 .idea
 docs
+data
+.shots
+.claude
+.codex
+tests
 *.log
 .env
 .env.*

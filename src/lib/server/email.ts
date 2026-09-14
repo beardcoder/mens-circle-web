@@ -80,8 +80,8 @@ export const sendWaitlistPromotion = async (ev: Event, participant: Participant)
   });
 };
 
-export const sendEventReminder = async (ev: Event, participant: Participant, isToday: boolean): Promise<void> => {
-  await sendTransactional(config.TX_EVENT_REMINDER, participant.email, fullName(participant), {
+export const sendEventReminder = async (ev: Event, participant: Participant, isToday: boolean): Promise<boolean> => {
+  return sendTransactional(config.TX_EVENT_REMINDER, participant.email, fullName(participant), {
     subject: `Erinnerung: ${ev.title} ist ${isToday ? 'heute' : 'morgen'}!`,
     ...participantCtx(participant),
     eventTitle: ev.title,

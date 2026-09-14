@@ -235,6 +235,10 @@ PORT=3000 DATABASE_PATH=./data/mens-circle.db \
 
 ## Deployment mit Coolify
 
+Das Runtime-Image enthält nur Produktionsabhängigkeiten. Lokale Datenbanken,
+Screenshots und Testdateien bleiben außerhalb des Docker-Build-Kontexts;
+Migrationen aus `drizzle/` werden weiterhin mitgeliefert.
+
 1. Neue Ressource → **Dockerfile**-basiert, dieses Repo.
 2. **Persistent Volume** mounten auf `/data` (die SQLite-Datenbank).
 3. Port **8090** exposen (Bun-Server/Edge). Coolify terminiert TLS.
@@ -285,3 +289,24 @@ Alle Event-Mails laufen über listmonks **Transactional API**:
 
 Newsletter (Willkommen/Double-Opt-In + Kampagnen) ebenfalls über listmonk.
 Setup der transaktionalen Templates: [`listmonk/tx-templates/README.md`](listmonk/tx-templates/README.md).
+
+## Performance & Regressionstests
+
+- `bun test` prüft die Performance-Regressionen mit temporären Datenbanken und
+  simuliertem HTTP; echte Empfänger werden nicht angeschrieben.
+- `bun run check`, `bun run lint` und `bun run build` prüfen Typen, Stil und
+  Produktionsbuild. Beim Build weiterhin **kein zusätzliches `--bun`** verwenden.
+- Öffentliche Event-Daten inklusive Platzanzahl werden in einer SQL-Abfrage
+  gelesen. Terminstatus und freie Plätze bleiben pro Request aktuell; es gibt
+  keinen gemeinsamen HTML-Cache für diese Seiten.
+- Erinnerungen und Teilnehmer-Nachrichten nutzen je Aufruf höchstens vier
+  parallele Empfänger-Workflows. Nur von listmonk akzeptierte Erinnerungen
+  erhalten einen Versandstempel. Das ist keine dauerhafte Queue und keine
+  Exactly-once-Garantie bei Prozessabbrüchen.
+- Prefetch ist auf ausgewählte statische Links bei Hover beschränkt. Der
+  Service Worker verwendet gehashte Assets direkt aus dem Cache und speichert
+  nur die App-Navigation für Offline-Nutzung, keine Live-Terminseiten.
+
+ISR bleibt für den Bildcache des Bun-Adapters aktiv. Dessen zusätzlicher Aufwand
+für nicht cachebare SSR-Antworten ist noch nicht behoben. Kompression muss am
+Coolify-Proxy geprüft werden; der Bun-Adapter komprimiert Antworten nicht selbst.

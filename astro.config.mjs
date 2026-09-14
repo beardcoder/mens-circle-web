@@ -55,16 +55,12 @@ export default defineConfig({
     // Interim URL from before @astrojs/sitemap.
     '/sitemap.xml': '/sitemap-index.xml',
   },
-  // Prefetch in-viewport internal links; pairs with the cross-document view
-  // transitions in styles/utilities/_view-transitions.css.
+  // Only explicitly marked static links prefetch on intent. Live scheduling,
+  // admin and the breathing app must not render/execute speculatively.
+  // Native cross-document view transitions do not require prerendering.
   prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport',
-  },
-  experimental: {
-    // Speculation Rules where supported: the next page is rendered off-screen
-    // before the click, so the view transition starts from a ready frame.
-    clientPrerender: true,
+    prefetchAll: false,
+    defaultStrategy: 'hover',
   },
   build: {
     // Keep asset URLs stable and cache-friendly.
