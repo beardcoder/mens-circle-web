@@ -6,62 +6,71 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="color-scheme" content="light only">
   <meta name="supported-color-schemes" content="light only">
-  <title>Männerkreis Niederbayern/ Straubing</title>
+  <title>Männerkreis Straubing</title>
   <!--[if mso]>
   <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
   <![endif]-->
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&amp;family=Barlow:wght@400;600&amp;display=swap" rel="stylesheet">
   <style>
     /* Client resets */
-    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
-    table { border-collapse: collapse !important; }
-    img { border: 0; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
-    a { color: #b24e1f; }
-    .em-link { color: #b24e1f !important; text-decoration: underline; text-underline-offset: 2px; }
+    body { margin:0 !important; padding:0 !important; width:100% !important; }
+    table { border-collapse:collapse !important; }
+    img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; max-width:100%; }
+    a { color:#1c1714; }
+    /* Ink text with an orange underline — the site's link, as far as email
+       clients will follow it. Where they will not, a plain ink underline is
+       still correct; the orange is never the thing carrying the contrast. */
+    .em-link { color:#1c1714 !important; font-weight:600; text-decoration:underline; text-decoration-color:#dd5f33; text-decoration-thickness:2px; text-underline-offset:0.18em; }
     /* Mobile */
-    @media only screen and (max-width: 620px) {
-      .em-card { width: 100% !important; }
-      .em-pad { padding-left: 26px !important; padding-right: 26px !important; }
-      .em-h1 { font-size: 27px !important; }
+    @media only screen and (max-width:620px) {
+      .em-sheet { width:100% !important; }
+      .em-pad { padding-left:22px !important; padding-right:22px !important; }
+      .em-display { font-size:32px !important; }
+      .em-label, .em-value { display:block !important; width:auto !important; }
+      .em-label { padding-bottom:0 !important; }
+      .em-value { border-top:0 !important; padding-top:1px !important; }
     }
   </style>
 </head>
-<body style="margin:0; padding:0; background-color:#f2eee7;">
+<body style="margin:0;padding:0;background-color:#e8e0d2;">
   <!-- Preheader (kept empty for system mails; set per-template if useful) -->
-  <div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#f2eee7; opacity:0;">&nbsp;</div>
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#e8e0d2;opacity:0;">&nbsp;</div>
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f2eee7;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#e8e0d2;">
     <tr>
-      <td align="center" style="padding:36px 12px;">
+      <td align="center" style="padding:28px 12px;">
         <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-        <table role="presentation" class="em-card" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#faf8f5; border:1px solid #e3d9cd; border-radius:14px;">
+        <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#f2ede3;">
 
-          <!-- Masthead -->
+          <!-- Masthead — the ink band -->
           <tr>
-            <td class="em-pad" align="center" style="padding:34px 40px 26px; border-bottom:1px solid #ece3d6;">
-              <div style="font-family:Georgia,'Times New Roman',serif; font-size:23px; line-height:1; color:#1a1308; letter-spacing:-0.01em;">Männerkreis</div>
-              <div style="margin-top:9px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:11px; line-height:1; letter-spacing:0.22em; text-transform:uppercase; color:#a4724a;">Niederbayern&nbsp;/&nbsp;Straubing</div>
+            <td class="em-pad" style="padding:26px 40px 22px;background-color:#1c1714;">
+              <div style="font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:27px;font-weight:800;line-height:1;letter-spacing:0.01em;text-transform:uppercase;color:#f2ede3;">Männerkreis Straubing</div>
+              <div style="margin-top:9px;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1;letter-spacing:0.14em;text-transform:uppercase;color:#a39786;">Niederbayern</div>
             </td>
           </tr>
+          <tr><td style="height:4px;background-color:#dd5f33;font-size:0;line-height:0;">&nbsp;</td></tr>
 
           <!-- Content -->
           <tr>
-            <td class="em-pad" style="padding:40px 40px 16px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:16px; line-height:1.7; color:#2b2118;">
+            <td class="em-pad" style="padding:34px 40px 30px;">
 {{ end }}
 
 {{ define "footer" }}
             </td>
           </tr>
 
-          <!-- Footer -->
+          <!-- Footer — the ink band -->
           <tr>
-            <td class="em-pad" style="padding:30px 40px 40px; border-top:1px solid #ece3d6;">
-              <div style="font-family:Georgia,'Times New Roman',serif; font-size:18px; line-height:1.2; color:#1a1308; letter-spacing:-0.01em;">Männerkreis Niederbayern/ Straubing</div>
-              <p style="margin:12px 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.7; color:#7a7065;">
-                Ein Raum für echte Begegnung unter Männern. Authentischer Austausch,
-                Gemeinschaft und persönliches Wachstum in Niederbayern.
+            <td class="em-pad" style="padding:30px 40px 34px;background-color:#1c1714;">
+              <div style="font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:20px;font-weight:800;line-height:1.1;letter-spacing:0.01em;text-transform:uppercase;color:#f2ede3;">Männerkreis Straubing</div>
+              <p style="margin:12px 0 0;font-family:'Barlow','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.7;color:#a39786;">
+                Ein Männerkreis in Straubing, Niederbayern. Wir treffen uns alle
+                zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis
+                und ohne Vorerfahrung.
               </p>
-              <p style="margin:14px 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; line-height:1.7;">
-                <a class="em-link" href="https://mens-circle.de" target="_blank" style="color:#b24e1f; text-decoration:underline; text-underline-offset:2px;">mens-circle.de</a>
+              <p style="margin:16px 0 0;font-family:'Barlow Condensed','Arial Narrow',Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;line-height:1.2;letter-spacing:0.14em;text-transform:uppercase;">
+                <a href="https://mens-circle.de" target="_blank" style="color:#dd5f33;text-decoration:none;">mens-circle.de</a>
               </p>
             </td>
           </tr>

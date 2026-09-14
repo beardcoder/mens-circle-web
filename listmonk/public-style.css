@@ -1,100 +1,119 @@
-/* listmonk public pages — Settings → Appearance → Custom CSS (public pages). */
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap");
+/* listmonk public pages — Settings → Appearance → Custom CSS (public pages).
+ *
+ * The poster, as far as a page we do not control the markup of allows: three
+ * colours, one condensed superfamily, square corners, structure carried by
+ * full-strength rules rather than by cards and shadows. Mirrors
+ * src/styles/base/_variables.css and the e-mail templates in this folder.
+ *
+ * Light only. The site's dark mode has no counterpart here, and a half-flipped
+ * listmonk page would be worse than a consistent light one. */
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;600&display=swap");
 
 :root {
-  /* Palette mirrors the website design tokens (src/styles/base/_variables.css),
-     converted from OKLCH to email/CSS-safe hex so the public pages, the
-     listmonk e-mails and mens-circle.de all share one warm, light identity. */
-  --mk-bg: #f2eee7; /* parchment */
-  --mk-ink: #1a1308; /* headings (near-black warm) */
-  --mk-muted: #3a3128; /* body copy */
-  --mk-faint: #7a7065; /* meta / footer */
-  --mk-accent: #b24e1f; /* links */
-  --mk-accent-dark: #983f17;
-  --mk-btn: #c1592a; /* button fill (terracotta) */
-  --mk-btn-dark: #a8481f;
-  --mk-line: #ece3d6;
-  --mk-rule: #e3d9cd;
-  --mk-sans: "DM Sans", Helvetica, Arial, sans-serif;
-  --mk-serif: "Playfair Display", Georgia, serif;
+  --mk-sand: #e8e0d2; /* the ground the sheet lies on */
+  --mk-paper: #f2ede3; /* the sheet */
+  --mk-ink: #1c1714; /* headings, rules, the label on the orange */
+  --mk-ink-mid: #4a4139; /* running text — 8.5:1 on paper */
+  --mk-muted: #645a50; /* markers, meta — 5.8:1 */
+  --mk-orange: #dd5f33; /* fill and stroke, never small text on paper */
+  --mk-rule: #d8cfbe;
+  --mk-cond: "Barlow Condensed", "Arial Narrow", Arial, Helvetica, sans-serif;
+  --mk-text: "Barlow", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 body {
-  background-color: var(--mk-bg);
-  color: var(--mk-ink);
-  font-family: var(--mk-sans);
-  line-height: 1.6;
+  background-color: var(--mk-sand);
+  color: var(--mk-ink-mid);
+  font-family: var(--mk-text);
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 .container {
-  max-width: 560px;
-  margin: 48px auto;
-  padding: 0 16px;
+  max-width: 600px;
+  margin: 28px auto;
+  padding: 0 12px;
 }
 
+/* The sheet. No radius, no shadow — it sits flat on the sand, with the orange
+   rule standing in for the site's ring as the one graphic accent. */
 .wrap {
-  background: #fff;
-  color: var(--mk-ink);
-  border: 1px solid var(--mk-line);
-  border-radius: 8px;
-  padding: 40px;
-  box-shadow: 0 10px 30px rgba(44, 36, 24, 0.08);
+  background: var(--mk-paper);
+  color: var(--mk-ink-mid);
+  border: 0;
+  border-top: 4px solid var(--mk-orange);
+  border-radius: 0;
+  padding: 34px 40px 36px;
+  box-shadow: none;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 620px) {
   .container {
-    margin: 24px auto;
+    margin: 16px auto;
   }
   .wrap {
-    padding: 28px 22px;
+    padding: 26px 22px 28px;
   }
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 24px;
+.header,
+.logo {
+  text-align: left;
+  margin-bottom: 26px;
 }
 .header img,
 .logo img {
-  max-height: 56px;
+  max-height: 48px;
   width: auto;
 }
 
+/* The poster register. Always short, always uppercase, leading under 1. */
 h1,
 h2,
 h3 {
-  font-family: var(--mk-serif);
+  font-family: var(--mk-cond);
+  font-weight: 800;
   color: var(--mk-ink);
-  font-weight: 700;
-  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.02;
 }
 h1 {
-  font-size: 26px;
-  margin: 0 0 16px;
+  font-size: 40px;
+  line-height: 0.96;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px;
 }
 h2 {
-  font-size: 20px;
-  margin: 28px 0 12px;
+  font-size: 24px;
+  margin: 32px 0 12px;
+  padding-top: 12px;
+  border-top: 2px solid var(--mk-ink);
 }
 h3 {
-  font-size: 17px;
+  font-size: 19px;
   margin: 24px 0 10px;
 }
 
 p,
 label,
 li {
-  color: var(--mk-muted);
-  font-size: 15px;
+  color: var(--mk-ink-mid);
+  font-size: 16px;
 }
 
+/* Ink text, orange rule — the orange never carries the contrast. */
 a {
-  color: var(--mk-accent);
-  text-decoration: none;
+  color: var(--mk-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--mk-orange);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
 }
 a:hover {
-  color: var(--mk-accent-dark);
-  text-decoration: underline;
+  color: var(--mk-ink);
+  text-decoration-thickness: 4px;
 }
 
 hr {
@@ -110,72 +129,92 @@ select,
 textarea {
   width: 100%;
   box-sizing: border-box;
-  font-family: var(--mk-sans);
-  font-size: 15px;
+  font-family: var(--mk-text);
+  font-size: 16px;
   color: var(--mk-ink);
-  background: #fbf9f4;
-  border: 1px solid var(--mk-rule);
-  border-radius: 6px;
+  background: #f8f4ec;
+  border: 1px solid #bfb29c;
+  border-radius: 0;
   padding: 12px 14px;
 }
 input:focus,
 select:focus,
 textarea:focus {
-  outline: none;
-  border-color: var(--mk-accent);
-  box-shadow: 0 0 0 3px rgba(184, 111, 82, 0.18);
+  outline: 3px solid var(--mk-ink);
+  outline-offset: 2px;
+  border-color: var(--mk-ink);
+  box-shadow: 0 0 0 3px var(--mk-orange);
 }
 
+/* Ink on orange, never white: white on this orange is 3.6:1 and fails. */
 .button,
 button,
 input[type="submit"] {
-  background: var(--mk-btn);
-  border: 1px solid var(--mk-btn);
-  color: #faf8f5;
-  font-family: var(--mk-sans);
+  background: var(--mk-orange);
+  border: 2px solid var(--mk-orange);
+  color: var(--mk-ink);
+  font-family: var(--mk-cond);
   font-size: 15px;
   font-weight: 600;
-  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  border-radius: 0;
   padding: 13px 26px;
+  min-height: 48px;
   cursor: pointer;
 }
 .button:hover,
 button:hover,
 input[type="submit"]:hover {
-  background: var(--mk-btn-dark);
-  border-color: var(--mk-btn-dark);
+  background: var(--mk-ink);
+  border-color: var(--mk-ink);
+  color: var(--mk-paper);
 }
 
 .button.button-outline {
   background: transparent;
-  color: var(--mk-btn);
+  border-color: var(--mk-ink);
+  color: var(--mk-ink);
 }
 .button.button-outline:hover {
-  background: var(--mk-accent);
-  color: #fff;
+  background: var(--mk-ink);
+  color: var(--mk-paper);
 }
 
+/* Lists of lists — hairline-separated rows, not bullets. */
 .lists {
   margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
 }
 .lists li {
-  margin-bottom: 14px;
+  margin: 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--mk-rule);
 }
 .lists .description {
-  color: var(--mk-faint);
-  font-size: 13px;
+  color: var(--mk-muted);
+  font-size: 14px;
 }
 
 .unsub-all {
   margin-top: 28px;
   padding-top: 20px;
-  border-top: 1px solid var(--mk-line);
+  border-top: 2px solid var(--mk-ink);
 }
 
+/* The marker: the condensed face at the smallest size on the page. */
 .footer,
 footer {
-  margin-top: 28px;
-  color: var(--mk-faint);
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 1px solid var(--mk-rule);
+  color: var(--mk-muted);
+  font-family: var(--mk-cond);
   font-size: 12px;
-  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
 }
