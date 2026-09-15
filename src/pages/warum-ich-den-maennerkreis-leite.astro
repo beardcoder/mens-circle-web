@@ -72,6 +72,12 @@ schemas.push({
   isPartOf: { '@id': `${siteUrl.origin}/#website` },
   about: { '@id': `${siteUrl.origin}/#organization` },
 });
+
+// This page ships its own card image, so it also declares its size — the shared
+// head only knows the dimensions of the site default. public/images/og-markus.jpg
+// is 1200x630, the same poster format; a card whose declared size does not match
+// the file is what gets a large card downgraded to a small one.
+const OG_IMAGE = { width: 1200, height: 630 };
 ---
 
 <Layout
@@ -81,6 +87,8 @@ schemas.push({
   ogDescription={page.meta.ogDescription}
   ogType="article"
   ogImage="/images/og-markus.jpg"
+  ogImageWidth={OG_IMAGE.width}
+  ogImageHeight={OG_IMAGE.height}
   ogImageAlt="Markus Sommer, der den Männerkreis in Straubing leitet"
   publishedTime={page.meta.datePublished}
   modifiedTime={page.meta.dateModified}

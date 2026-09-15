@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "description": "Männerkreis Niederbayern/ Straubing — Astro 7 + Svelte 5, SSR on the Bun runtime, with Drizzle (bun:sqlite) as the backend and listmonk for email.",
+  "description": "M\u00e4nnerkreis Niederbayern/ Straubing \u2014 Astro 7 + Svelte 5, SSR on the Bun runtime, with Drizzle (bun:sqlite) as the backend and listmonk for email.",
   "scripts": {
     "dev": "bun --bun astro dev",
     "build": "astro build",
@@ -16,6 +16,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "db:generate": "drizzle-kit generate",
+    "og:fonts": "bun run scripts/generate-og-fonts.ts",
     "db:studio": "drizzle-kit studio",
     "db:backup": "bun run scripts/backup-db.ts"
   },
@@ -29,6 +30,8 @@
     "drizzle-orm": "^0.45.2",
     "leaflet": "^1.9.4",
     "motion": "^13.2.0",
+    "satori": "^0.33.4",
+    "sharp": "^0.35.4",
     "svelte": "^5.57.0"
   },
   "devDependencies": {
