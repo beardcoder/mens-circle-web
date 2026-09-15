@@ -42,26 +42,36 @@ const request = async (method: string, path: string, body?: unknown): Promise<Li
 
 export type SubscribeStatus = 'subscribed' | 'exists' | 'error';
 
-export const subscribeToNewsletter = async (
-  email: string,
-  name: string,
-): Promise<{ ok: boolean; status: SubscribeStatus }> => {
+export interface SubscribeResult {
+  ok: boolean;
+  status: SubscribeStatus;
+}
+
+/** Fresh object per call — callers get a result they may keep, not a shared constant. */
+const failed = (): SubscribeResult => ({ ok: false, status: 'error' });
+
+const trimmedName = (name: string): string => (name ?? '').trim();
+
+/** listmonk insists on a name, so an unnamed subscriber is stored under its address. */
+const displayName = (name: string, email: string): string => trimmedName(name) || email;
+
+export const subscribeToNewsletter = async (email: string, name: string): Promise<SubscribeResult> => {
   if (!listmonkConfigured()) {
     console.error('[listmonk] not configured — set LISTMONK_URL / API_USER / API_TOKEN / LIST_IDS');
-    return { ok: false, status: 'error' };
+    return failed();
   }
   const res = await request('POST', '/api/subscribers', {
     email,
-    name: name && name.trim() ? name.trim() : email,
+    name: displayName(name, email),
     status: 'enabled',
     lists: config.LISTMONK_LIST_IDS,
     preconfirm_subscriptions: false,
   });
-  if (!res) return { ok: false, status: 'error' };
+  if (!res) return failed();
   if (res.ok) return { ok: true, status: 'subscribed' };
   if (res.status === 409) return { ok: true, status: 'exists' };
   console.error('[listmonk] subscribe rejected', email, res.status, JSON.stringify(res.body));
-  return { ok: false, status: 'error' };
+  return failed();
 };
 
 export const findSubscriber = async (email: string): Promise<ListmonkSubscriber | null> => {
@@ -97,7 +107,7 @@ export const withSubscriberScope = async <T>(work: () => Promise<T>): Promise<T>
 const provisionSubscriber = async (email: string, name: string): Promise<SubscriberIdentity | null> => {
   const created = await request('POST', '/api/subscribers', {
     email,
-    name: name && name.trim() ? name.trim() : email,
+    name: displayName(name, email),
     status: 'enabled',
     preconfirm_subscriptions: true,
   });
@@ -105,7 +115,7 @@ const provisionSubscriber = async (email: string, name: string): Promise<Subscri
     const id = Number(created.body?.data?.id) || 0;
     return id
       ? {
-          subscriber: { ...created.body.data, id, email, name: name.trim() || email, status: 'enabled' },
+          subscriber: { ...created.body.data, id, email, name: displayName(name, email), status: 'enabled' },
           created: true,
         }
       : null;
@@ -154,65 +164,91 @@ export const renameList = async (listId: number, name: string): Promise<boolean>
   return !!res?.ok;
 };
 
-export const addToLists = async (
+/**
+ * Give a subscriber the name we now know, and only that.
+ *
+ * A name listmonk already holds is never overwritten; the address it stores in
+ * place of a missing name counts as no name at all. The PUT replaces the whole
+ * record, so the lists it already belongs to have to be sent back with it —
+ * otherwise saving a name would silently unsubscribe the person.
+ */
+const backfillName = async (sub: ListmonkSubscriber, email: string, name: string, listIds: number[]): Promise<void> => {
+  const held = (sub.name || '').trim();
+  if (!name || (held !== '' && held.toLowerCase() !== String(email).toLowerCase())) return;
+
+  const existingIds = (sub.lists ?? []).flatMap((l) => (l?.id ? [l.id] : []));
+  await request('PUT', `/api/subscribers/${sub.id}`, {
+    email: sub.email || email,
+    name,
+    status: sub.status || 'enabled',
+    lists: [...new Set([...existingIds, ...listIds])],
+    preconfirm_subscriptions: false,
+  });
+};
+
+/** Add `listIds` to a subscriber that already exists, then fill in its name if it has none. */
+const applyMembership = async (
+  identity: SubscriberIdentity | null,
   email: string,
   name: string,
   listIds: number[],
   confirmed: boolean,
-): Promise<{ ok: boolean; status: SubscribeStatus }> => {
-  if (!listmonkApiConfigured() || listIds.length === 0) return { ok: false, status: 'error' };
-  const cleanName = name && name.trim() ? name.trim() : '';
-  const status = confirmed ? 'confirmed' : 'unconfirmed';
-
-  let identity: SubscriberIdentity | null;
-  if (subscriberScope.getStore()) {
-    identity = await resolveSubscriber(email, name);
-  } else {
-    const created = await request('POST', '/api/subscribers', {
-      email,
-      name: cleanName || email,
-      status: 'enabled',
-      lists: listIds,
-      preconfirm_subscriptions: confirmed,
-    });
-    if (!created) return { ok: false, status: 'error' };
-    if (created.ok) return { ok: true, status: 'subscribed' };
-    if (created.status !== 409) {
-      console.error('[listmonk] event subscribe rejected', email, created.status, JSON.stringify(created.body));
-      return { ok: false, status: 'error' };
-    }
-    const subscriber = await findSubscriber(email);
-    identity = subscriber ? { subscriber, created: false } : null;
-  }
+): Promise<SubscribeResult> => {
   const sub = identity?.subscriber;
-  if (!sub?.id) return { ok: false, status: 'error' };
+  if (!sub?.id) return failed();
 
   const membership = await request('PUT', '/api/subscribers/lists', {
     ids: [sub.id],
     action: 'add',
     target_list_ids: listIds,
-    status,
+    status: confirmed ? 'confirmed' : 'unconfirmed',
   });
   if (!membership?.ok) {
     console.error('[listmonk] list membership rejected', email, membership?.status);
-    return { ok: false, status: 'error' };
+    return failed();
   }
 
-  const subName = (sub.name || '').trim();
-  const nameMissing = subName === '' || subName.toLowerCase() === String(email).toLowerCase();
-  if (cleanName && nameMissing) {
-    const existingIds = (sub.lists ?? []).flatMap((l) => (l?.id ? [l.id] : []));
-    const union = [...new Set([...existingIds, ...listIds])];
-    await request('PUT', `/api/subscribers/${sub.id}`, {
-      email: sub.email || email,
-      name: cleanName,
-      status: sub.status || 'enabled',
-      lists: union,
-      preconfirm_subscriptions: false,
-    });
-  }
-
+  await backfillName(sub, email, trimmedName(name), listIds);
   return { ok: true, status: identity?.created ? 'subscribed' : 'exists' };
+};
+
+/**
+ * Subscribe an address to `listIds`, by whichever route costs fewer round trips.
+ *
+ * Inside a workflow scope the subscriber has already been provisioned (or is
+ * being provisioned right now), so that identity is reused rather than raced.
+ * Outside one, a single POST creates the subscriber *with* its lists — so a
+ * success there is the whole job, and only the 409 needs the membership call.
+ */
+export const addToLists = async (
+  email: string,
+  name: string,
+  listIds: number[],
+  confirmed: boolean,
+): Promise<SubscribeResult> => {
+  if (!listmonkApiConfigured() || listIds.length === 0) return failed();
+
+  if (subscriberScope.getStore()) {
+    return applyMembership(await resolveSubscriber(email, name), email, name, listIds, confirmed);
+  }
+
+  const created = await request('POST', '/api/subscribers', {
+    email,
+    name: displayName(name, email),
+    status: 'enabled',
+    lists: listIds,
+    preconfirm_subscriptions: confirmed,
+  });
+  if (!created) return failed();
+  if (created.ok) return { ok: true, status: 'subscribed' };
+  if (created.status !== 409) {
+    console.error('[listmonk] event subscribe rejected', email, created.status, JSON.stringify(created.body));
+    return failed();
+  }
+
+  // 409 — the subscriber predates this call, so look it up and add the lists.
+  const subscriber = await findSubscriber(email);
+  return applyMembership(subscriber ? { subscriber, created: false } : null, email, name, listIds, confirmed);
 };
 
 export const removeFromList = async (email: string, listId: number): Promise<boolean> => {
@@ -227,20 +263,23 @@ export const removeFromList = async (email: string, listId: number): Promise<boo
   return !!res?.ok;
 };
 
-export const sendNewsletterCampaign = async (opts: {
+export interface CampaignOptions {
   name: string;
   subject: string;
   bodyHtml: string;
   listIds: number[];
   templateId?: number;
-}): Promise<{ ok: boolean; campaignId: number; error?: string }> => {
-  if (!listmonkApiConfigured()) {
-    return { ok: false, campaignId: 0, error: 'listmonk ist nicht konfiguriert.' };
-  }
-  if (opts.listIds.length === 0) {
-    return { ok: false, campaignId: 0, error: 'Keine Newsletter-Liste konfiguriert (LISTMONK_LIST_IDS).' };
-  }
+}
 
+export interface CampaignResult {
+  ok: boolean;
+  campaignId: number;
+  /** Shown to the admin as-is, so every failure carries its own German wording. */
+  error?: string;
+}
+
+/** Create the campaign as a draft. Returns its id, or the message to show the admin. */
+const createCampaign = async (opts: CampaignOptions): Promise<{ id: number } | { error: string }> => {
   const created = await request('POST', '/api/campaigns', {
     name: opts.name,
     subject: opts.subject,
@@ -254,21 +293,45 @@ export const sendNewsletterCampaign = async (opts: {
   });
   if (!created?.ok) {
     console.error('[listmonk] campaign create rejected', created?.status, JSON.stringify(created?.body));
-    return { ok: false, campaignId: 0, error: 'Kampagne konnte nicht erstellt werden.' };
+    return { error: 'Kampagne konnte nicht erstellt werden.' };
   }
-  const campaignId = Number(created.body?.data?.id) || 0;
-  if (!campaignId) return { ok: false, campaignId: 0, error: 'Kampagne wurde ohne ID angelegt.' };
+  const id = Number(created.body?.data?.id) || 0;
+  return id ? { id } : { error: 'Kampagne wurde ohne ID angelegt.' };
+};
 
+const startCampaign = async (campaignId: number): Promise<boolean> => {
   const started = await request('PUT', `/api/campaigns/${campaignId}/status`, { status: 'running' });
-  if (!started?.ok) {
-    console.error('[listmonk] campaign start rejected', campaignId, started?.status, JSON.stringify(started?.body));
+  if (started?.ok) return true;
+  console.error('[listmonk] campaign start rejected', campaignId, started?.status, JSON.stringify(started?.body));
+  return false;
+};
+
+/**
+ * Create a newsletter campaign and set it running.
+ *
+ * The two steps are reported apart on purpose: a campaign that was created but
+ * not started still exists in listmonk as a draft, and the admin needs to be
+ * told that rather than being invited to send the same thing twice.
+ */
+export const sendNewsletterCampaign = async (opts: CampaignOptions): Promise<CampaignResult> => {
+  if (!listmonkApiConfigured()) {
+    return { ok: false, campaignId: 0, error: 'listmonk ist nicht konfiguriert.' };
+  }
+  if (opts.listIds.length === 0) {
+    return { ok: false, campaignId: 0, error: 'Keine Newsletter-Liste konfiguriert (LISTMONK_LIST_IDS).' };
+  }
+
+  const created = await createCampaign(opts);
+  if ('error' in created) return { ok: false, campaignId: 0, error: created.error };
+
+  if (!(await startCampaign(created.id))) {
     return {
       ok: false,
-      campaignId,
-      error: `Kampagne #${campaignId} wurde als Entwurf angelegt, konnte aber nicht gestartet werden.`,
+      campaignId: created.id,
+      error: `Kampagne #${created.id} wurde als Entwurf angelegt, konnte aber nicht gestartet werden.`,
     };
   }
-  return { ok: true, campaignId };
+  return { ok: true, campaignId: created.id };
 };
 
 export const sendTransactional = async (

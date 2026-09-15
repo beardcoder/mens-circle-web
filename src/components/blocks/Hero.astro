@@ -65,10 +65,7 @@ const lines = data.displayLines ?? [];
       {data.body && <p class="home-hero__body">{data.body}</p>}
 
       <div class="home-hero__action">
-        <p
-          class="home-hero__status"
-          data-status={state.status}
-        >
+        <p class="home-hero__status" data-status={state.status}>
           {action.note}
         </p>
         <div class="actions">
@@ -83,10 +80,7 @@ const lines = data.displayLines ?? [];
           </a>
           {
             data.secondaryLabel && data.secondaryLink && (
-              <a
-                href={data.secondaryLink}
-                class="text-link"
-              >
+              <a href={data.secondaryLink} class="text-link">
                 {data.secondaryLabel}
               </a>
             )
