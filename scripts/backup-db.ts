@@ -100,27 +100,37 @@ try {
 rmSync(snapshotPath, { force: true });
 
 // 5) Prune backups older than the retention window (best-effort).
+
+/** Objects in the prefix that are past the cutoff — never the upload just made. */
+type Listed = { key?: string; lastModified?: string | Date };
+function isExpired(obj: Listed | undefined, cutoff: number): obj is Listed & { key: string } {
+  if (!obj?.key || obj.key === key) return false;
+  const modified = obj.lastModified ? new Date(obj.lastModified).getTime() : NaN;
+  return Number.isFinite(modified) && modified < cutoff;
+}
+
+async function pruneExpired(cutoff: number): Promise<number> {
+  let token: string | undefined;
+  let pruned = 0;
+  do {
+    const page = await s3.list({
+      prefix: `${prefix}/`,
+      maxKeys: 1000,
+      ...(token ? { continuationToken: token } : {}),
+    });
+    for (const obj of page?.contents ?? []) {
+      if (!isExpired(obj, cutoff)) continue;
+      await s3.delete(obj.key);
+      pruned++;
+    }
+    token = page?.isTruncated ? page?.nextContinuationToken : undefined;
+  } while (token);
+  return pruned;
+}
+
 if (retentionDays > 0 && typeof s3.list === 'function') {
-  const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
   try {
-    let token: string | undefined;
-    let pruned = 0;
-    do {
-      const page = await s3.list({
-        prefix: `${prefix}/`,
-        maxKeys: 1000,
-        ...(token ? { continuationToken: token } : {}),
-      });
-      for (const obj of page?.contents ?? []) {
-        if (!obj?.key || obj.key === key) continue;
-        const modified = obj.lastModified ? new Date(obj.lastModified).getTime() : NaN;
-        if (Number.isFinite(modified) && modified < cutoff) {
-          await s3.delete(obj.key);
-          pruned++;
-        }
-      }
-      token = page?.isTruncated ? page?.nextContinuationToken : undefined;
-    } while (token);
+    const pruned = await pruneExpired(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
     if (pruned > 0) {
       console.log(`[backup] pruned ${pruned} backup(s) older than ${retentionDays} day(s)`);
     }

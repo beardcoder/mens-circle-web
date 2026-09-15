@@ -10,6 +10,7 @@
     "start": "bun run dist/server/entry.mjs",
     "preview": "bun run build && bun run start",
     "check": "astro check",
+    "test": "bun test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",

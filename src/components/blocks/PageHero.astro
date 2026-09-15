@@ -36,22 +36,12 @@ const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
 const imageAsset = resolveAssetImage(data.image);
 ---
 
-<section
-  class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`}
-  id={data.anchor}
->
+<section class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`} id={data.anchor}>
   <div class="container">
     <div class="page-hero__layout">
       <div class="page-hero__content">
         {data.eyebrow && <p class="marker marker--ruled page-hero__eyebrow">{data.eyebrow}</p>}
-        {
-          data.title && (
-            <h1
-              class="page-hero__title"
-              set:html={data.title}
-            />
-          )
-        }
+        {data.title && <h1 class="page-hero__title" set:html={data.title} />}
         {data.lead && <p class="page-hero__lead">{data.lead}</p>}
 
         {

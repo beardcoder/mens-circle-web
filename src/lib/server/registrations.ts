@@ -1,10 +1,19 @@
 /* eslint-disable no-console */
 import { and, asc, eq, isNull } from 'drizzle-orm';
-import type { ApiResponse, RegistrationPayload } from '../types';
+import type { RegistrationPayload } from '../types';
 import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import type { Event, Participant, Registration, RegistrationStatus } from './db/schema';
 import { participants, registrations } from './db/schema';
+import {
+  accepted,
+  consented,
+  type FormResult,
+  INVALID_EMAIL,
+  isHoneypotFilled,
+  MISSING_CONSENT,
+  rejected,
+} from './form-submission';
 import { sendEventMessage, sendRegistrationEmails, sendWaitlistPromotion } from './email';
 import { countActiveRegistrations, ensureEventList, getEventById, isEventPast } from './events';
 import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
@@ -12,10 +21,8 @@ import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
 /** Alias kept for the existing call sites; the union lives with the column. */
 export type RegStatus = RegistrationStatus;
 
-export interface RegisterResult {
-  status: number;
-  body: ApiResponse;
-}
+/** The two statuses a fresh registration can be given; the rest are admin transitions. */
+type IntakeStatus = Extract<RegStatus, 'registered' | 'waitlist'>;
 
 const fireAndForget = (label: string, promise: Promise<unknown>): void => {
   void promise.catch((err) => console.error(label, String(err)));
@@ -45,108 +52,140 @@ const upsertParticipant = async (
   )[0];
 };
 
-const truthy = (v: unknown): boolean => v === true || v === 'true' || v === 1 || v === '1';
+interface RegistrationFields {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  eventId: string;
+}
 
-export const register = async (payload: RegistrationPayload): Promise<RegisterResult> => {
-  const firstName = (payload.first_name || '').trim();
-  const lastName = (payload.last_name || '').trim();
-  const email = (payload.email || '').trim().toLowerCase();
-  const phone = (payload.phone_number || '').trim();
-  const eventId = payload.event_id;
+const readFields = (payload: RegistrationPayload): RegistrationFields => ({
+  firstName: (payload.first_name || '').trim(),
+  lastName: (payload.last_name || '').trim(),
+  email: (payload.email || '').trim().toLowerCase(),
+  phone: (payload.phone_number || '').trim(),
+  eventId: payload.event_id,
+});
 
-  if (typeof payload.website === 'string' && payload.website.trim() !== '') {
-    return {
-      status: 200,
-      body: {
-        success: true,
-        message: `Vielen Dank, ${firstName}! Deine Anmeldung war erfolgreich. Du erhältst in Kürze eine Bestätigung per E-Mail.`,
-      },
-    };
-  }
+const confirmationMessage = (firstName: string): string =>
+  `Vielen Dank, ${firstName}! Deine Anmeldung war erfolgreich. Du erhältst in Kürze eine Bestätigung per E-Mail.`;
 
-  if (!truthy(payload.privacy)) {
-    return { status: 422, body: { success: false, message: 'Bitte bestätige die Datenschutzerklärung.' } };
-  }
-  if (!email || !email.includes('@')) {
-    return { status: 422, body: { success: false, message: 'Bitte gib eine gültige E-Mail-Adresse an.' } };
-  }
-  if (!eventId) {
-    return { status: 422, body: { success: false, message: 'Es wurde keine Veranstaltung angegeben.' } };
-  }
-
+/** The event this registration may still join, or the answer explaining why it may not. */
+const openEvent = async (eventId: string): Promise<{ event: Event } | { error: FormResult }> => {
   const event = await getEventById(eventId);
   if (!event || !event.isPublished || event.deleted) {
-    return { status: 404, body: { success: false, message: 'Diese Veranstaltung ist nicht verfügbar.' } };
+    return { error: rejected(404, 'Diese Veranstaltung ist nicht verfügbar.') };
   }
   if (isEventPast(event)) {
     return {
-      status: 410,
-      body: {
-        success: false,
-        message: 'Diese Veranstaltung hat bereits stattgefunden. Eine Anmeldung ist nicht mehr möglich.',
-      },
+      error: rejected(410, 'Diese Veranstaltung hat bereits stattgefunden. Eine Anmeldung ist nicht mehr möglich.'),
     };
   }
+  return { event };
+};
 
-  const activeCount = await countActiveRegistrations(event.id);
-  const isWaitlist = activeCount >= event.maxParticipants;
-  const status: RegStatus = isWaitlist ? 'waitlist' : 'registered';
-
-  const participant = await upsertParticipant(email, { firstName, lastName, phone });
-
+/**
+ * Take the seat: revive the participant's cancelled registration or write a new
+ * one. Returns the conflict to answer with when he already holds a live one.
+ */
+const claimSeat = async (participantId: string, eventId: string, status: IntakeStatus): Promise<FormResult | null> => {
   const existing = (
     await db
       .select()
       .from(registrations)
-      .where(and(eq(registrations.participantId, participant.id), eq(registrations.eventId, event.id)))
+      .where(and(eq(registrations.participantId, participantId), eq(registrations.eventId, eventId)))
       .limit(1)
   )[0];
 
   if (existing && !existing.deleted) {
-    const msg =
+    return rejected(
+      409,
       existing.status === 'waitlist'
         ? 'Du bist bereits auf der Warteliste für diese Veranstaltung.'
-        : 'Du bist bereits für diese Veranstaltung angemeldet.';
-    return { status: 409, body: { success: false, message: msg } };
+        : 'Du bist bereits für diese Veranstaltung angemeldet.',
+    );
   }
 
-  const nowIso = new Date().toISOString();
+  const registeredAt = new Date().toISOString();
   if (existing) {
     await db
       .update(registrations)
-      .set({ status, registeredAt: nowIso, cancelledAt: null, deleted: null })
+      .set({ status, registeredAt, cancelledAt: null, deleted: null })
       .where(eq(registrations.id, existing.id));
   } else {
-    await db
-      .insert(registrations)
-      .values({ participantId: participant.id, eventId: event.id, status, registeredAt: nowIso });
+    await db.insert(registrations).values({ participantId, eventId, status, registeredAt });
   }
+  return null;
+};
 
-  const freshCount = await countActiveRegistrations(event.id);
+const assignToEventList = async (event: Event, fields: RegistrationFields): Promise<void> => {
+  const listId = await ensureEventList(event);
+  if (!listId) return;
+  const result = await addToLists(fields.email, `${fields.firstName} ${fields.lastName}`.trim(), [listId], true);
+  if (!result.ok) throw new Error('listmonk assignment rejected');
+};
+
+/**
+ * Confirmation mail and event-list membership, once the seat is already booked.
+ *
+ * Deliberately not awaited: the visitor gets his answer the moment the row is
+ * written, and neither a slow mailer nor a listmonk outage may turn a booked
+ * seat into an error page. Both halves run inside one subscriber scope so they
+ * provision the same listmonk identity instead of racing to create it twice.
+ */
+const dispatchSideEffects = (
+  event: Event,
+  participant: Participant,
+  fields: RegistrationFields,
+  status: IntakeStatus,
+  activeCount: number,
+): void => {
   fireAndForget(
     '[registrations] side effects failed',
     withSubscriberScope(async () => {
-      const results = await Promise.allSettled([
-        sendRegistrationEmails(event, participant, status, freshCount),
-        ensureEventList(event).then(async (listId) => {
-          if (listId) {
-            const result = await addToLists(email, `${firstName} ${lastName}`.trim(), [listId], true);
-            if (!result.ok) throw new Error('listmonk assignment rejected');
-          }
-        }),
-      ]);
-      for (const [i, result] of results.entries()) {
+      const tasks: Array<[string, Promise<unknown>]> = [
+        ['emails', sendRegistrationEmails(event, participant, status, activeCount)],
+        ['listmonk assignment', assignToEventList(event, fields)],
+      ];
+      const results = await Promise.allSettled(tasks.map(([, task]) => task));
+      results.forEach((result, i) => {
         if (result.status === 'rejected') {
-          console.error(`[registrations] ${i === 0 ? 'emails' : 'listmonk assignment'} failed`, String(result.reason));
+          console.error(`[registrations] ${tasks[i][0]} failed`, String(result.reason));
         }
-      }
+      });
     }),
   );
+};
 
-  const message = isWaitlist
-    ? `Du wurdest auf die Warteliste eingetragen, ${firstName}. Wir benachrichtigen dich per E-Mail, sobald ein Platz frei wird.`
-    : `Vielen Dank, ${firstName}! Deine Anmeldung war erfolgreich. Du erhältst in Kürze eine Bestätigung per E-Mail.`;
-  return { status: 200, body: { success: true, message } };
+export const register = async (payload: RegistrationPayload): Promise<FormResult> => {
+  const fields = readFields(payload);
+  const confirmation = confirmationMessage(fields.firstName);
+
+  if (isHoneypotFilled(payload.website)) return accepted(confirmation);
+
+  if (!consented(payload.privacy)) return rejected(422, MISSING_CONSENT);
+  if (!fields.email.includes('@')) return rejected(422, INVALID_EMAIL);
+  if (!fields.eventId) return rejected(422, 'Es wurde keine Veranstaltung angegeben.');
+
+  const found = await openEvent(fields.eventId);
+  if ('error' in found) return found.error;
+  const { event } = found;
+
+  const isWaitlist = (await countActiveRegistrations(event.id)) >= event.maxParticipants;
+  const status: IntakeStatus = isWaitlist ? 'waitlist' : 'registered';
+
+  const participant = await upsertParticipant(fields.email, fields);
+  const conflict = await claimSeat(participant.id, event.id, status);
+  if (conflict) return conflict;
+
+  dispatchSideEffects(event, participant, fields, status, await countActiveRegistrations(event.id));
+
+  return accepted(
+    isWaitlist
+      ? `Du wurdest auf die Warteliste eingetragen, ${fields.firstName}. Wir benachrichtigen dich per E-Mail, sobald ein Platz frei wird.`
+      : confirmation,
+  );
 };
 
 export interface RegistrationRow {

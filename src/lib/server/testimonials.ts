@@ -2,53 +2,48 @@
  * Testimonial submission, public fetch, and admin moderation (server-only).
  */
 import { and, asc, desc, eq, isNull } from 'drizzle-orm';
-import type { ApiResponse, Testimonial as TestimonialDTO, TestimonialPayload } from '../types';
+import type { Testimonial as TestimonialDTO, TestimonialPayload } from '../types';
 import { db } from './db';
 import type { Testimonial } from './db/schema';
 import { testimonials } from './db/schema';
-
-export interface SubmitResult {
-  status: number;
-  body: ApiResponse;
-}
+import {
+  accepted,
+  consented,
+  type FormResult,
+  INVALID_EMAIL,
+  isHoneypotFilled,
+  MISSING_CONSENT,
+  rejected,
+} from './form-submission';
 
 const SUCCESS_MESSAGE = 'Vielen Dank! Dein Testimonial wurde eingereicht und wird nach Prüfung veröffentlicht.';
+const QUOTE_MIN = 10;
+const QUOTE_MAX = 1000;
 
 /** Public testimonial submission — always stored unpublished for moderation. */
-export async function submitTestimonial(payload: TestimonialPayload): Promise<SubmitResult> {
+export async function submitTestimonial(payload: TestimonialPayload): Promise<FormResult> {
   const quote = (payload.quote || '').trim();
-  const authorName = (payload.author_name || '').trim();
-  const role = (payload.role || '').trim();
   const email = (payload.email || '').trim().toLowerCase();
 
-  // Honeypot — fake success, store nothing.
-  if (typeof payload.website === 'string' && payload.website.trim() !== '') {
-    return { status: 200, body: { success: true, message: SUCCESS_MESSAGE } };
-  }
+  if (isHoneypotFilled(payload.website)) return accepted(SUCCESS_MESSAGE);
 
-  if (!(payload.privacy === true || (payload.privacy as unknown) === 'true')) {
-    return { status: 422, body: { success: false, message: 'Bitte bestätige die Datenschutzerklärung.' } };
+  if (!consented(payload.privacy)) return rejected(422, MISSING_CONSENT);
+  if (quote.length < QUOTE_MIN || quote.length > QUOTE_MAX) {
+    return rejected(422, `Dein Testimonial muss zwischen ${QUOTE_MIN} und ${QUOTE_MAX} Zeichen lang sein.`);
   }
-  if (quote.length < 10 || quote.length > 1000) {
-    return {
-      status: 422,
-      body: { success: false, message: 'Dein Testimonial muss zwischen 10 und 1000 Zeichen lang sein.' },
-    };
-  }
-  if (email && !email.includes('@')) {
-    return { status: 422, body: { success: false, message: 'Bitte gib eine gültige E-Mail-Adresse an.' } };
-  }
+  // The address is optional here — only a given one has to be usable.
+  if (email && !email.includes('@')) return rejected(422, INVALID_EMAIL);
 
   await db.insert(testimonials).values({
     quote,
-    authorName,
-    role,
+    authorName: (payload.author_name || '').trim(),
+    role: (payload.role || '').trim(),
     email,
     isPublished: false,
     sortOrder: 0,
   });
 
-  return { status: 200, body: { success: true, message: SUCCESS_MESSAGE } };
+  return accepted(SUCCESS_MESSAGE);
 }
 
 /**
