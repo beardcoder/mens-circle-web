@@ -36,6 +36,10 @@
   --btn-font-size: 1rem;
   --btn-radius: 0;
   --btn-border-width: 2px;
+  --btn-arrow-size: 1.05em;
+  /* 24x24 viewBox, geometry mirrored about y=12 so the mask box centres it.
+     Stroke 2.5 lands near the 2px border weight at this size. */
+  --btn-arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5'%3E%3Cpath d='M3 12h17.5M13.5 5 20.5 12l-7 7'/%3E%3C/svg%3E");
 
   display: inline-flex;
   gap: var(--btn-gap);
@@ -65,13 +69,28 @@
 }
 
 /* The arrow. Drawn with a pseudo-element so no call site has to carry an icon,
-   and so it can shift independently of the label. */
+   and so it can shift independently of the label.
+
+   It is a masked SVG, not the '\2192' glyph it used to be. Two reasons, both
+   visible on the page: the fonts are subset to `latin`, which carries U+2191
+   and U+2193 but NOT U+2192, so the arrow dropped out of Barlow Condensed and
+   was drawn by the fallback stack in a different hand; and a text arrow rides
+   its font's math axis, which sits well below the optical centre of an
+   all-caps label, so it hung low next to the words. The SVG is symmetric
+   about its viewBox centre, so `align-items: center` on the button now
+   actually centres it. `currentColor` keeps it on the label's colour through
+   the hover transition. */
 .btn--primary::after,
 .btn--arrow::after {
   flex: none;
-  content: '\2192';
-  font-size: 1.15em;
-  line-height: 1;
+  inline-size: var(--btn-arrow-size);
+  block-size: var(--btn-arrow-size);
+  content: '';
+  background-color: currentcolor;
+  mask-image: var(--btn-arrow-icon);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
   transition: translate var(--motion-quick);
 }
 
