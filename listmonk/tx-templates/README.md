@@ -5,21 +5,59 @@ The web app sends all event emails through listmonk's **transactional API**
 listmonk; the app only passes a data payload (`{{ .Tx.Data.<field> }}`). This
 keeps the markup editable in listmonk and the data/subject logic in the app.
 
-## One-time setup in the listmonk UI
+## Diese Dateien sind nicht automatisch live
 
-For each file in this folder (except `_layout-snippet.html`):
+Anders als die System-Templates unter `listmonk/static/email-templates/` (die
+via `--static-dir` im Image mitfahren und darum immer aktuell sind) leben die
+Transaktions-Templates in listmonks **Datenbank**. `--static-dir` überlagert
+nur die *dateibasierten* System-Templates — eine Änderung hier erreicht kein
+einziges Postfach, bis die Vorlage in listmonk ersetzt wird.
 
-1. listmonk → **Campaigns → Templates → New**.
+Genau so ist der Plakat-Redesign zuerst ins Leere gelaufen: die Dateien waren
+neu, die Mails im Posteingang trugen weiter das alte Design.
+
+### Der normale Weg: synchronisieren
+
+```bash
+bun run listmonk:sync --dry-run   # zeigt, was sich ändern würde
+bun run listmonk:sync             # schreibt
+```
+
+Das Skript (`scripts/sync-tx-templates.ts`) schiebt jede Datei aus diesem
+Ordner **und** das Kampagnen-Template über die listmonk-API in die Datenbank.
+Es ist idempotent — eine Vorlage, deren gespeicherter Body schon zur Datei
+passt, wird nicht angefasst — und es ordnet jede Datei in dieser Reihenfolge zu:
+
+1. die ID in ihrer `LISTMONK_TX_*`-Variable,
+2. sonst eine vorhandene Vorlage mit gleichem Namen,
+3. sonst wird sie neu angelegt und die neue ID ausgegeben.
+
+Zeigt eine Env-Variable auf eine Vorlage vom falschen Typ (eine `tx`-Datei auf
+eine `campaign`-Zeile), bricht das Skript für diese Vorlage ab, statt sie zu
+überschreiben — sonst nähme ein falsch gesetztes `LISTMONK_TX_*` das
+Newsletter-Design mit.
+
+Es braucht `LISTMONK_URL`, `LISTMONK_API_USER` und `LISTMONK_API_TOKEN` (dieselben
+Variablen wie der Server) und läuft gegen jede Instanz — lokal wie in Produktion.
+
+**Nach jeder Änderung an einer Datei in diesem Ordner erneut laufen lassen.**
+
+### Der manuelle Weg (listmonk-UI)
+
+Falls kein API-Token zur Hand ist, geht es auch von Hand. Für jede Datei in
+diesem Ordner (außer `_layout-snippet.html`):
+
+1. listmonk → **Campaigns → Templates → New** (bzw. die bestehende öffnen).
 2. **Type:** `Transactional`.
-3. **Name:** anything descriptive (e.g. „Anmeldebestätigung").
-4. **Subject:** `{{ .Tx.Data.subject }}` — the app builds the German subject
-   line and passes it in the data payload.
-5. **Body:** paste the full contents of the corresponding `*.html` file.
-6. Save and note the **numeric template ID** (visible in the URL / list).
+3. **Name:** etwas Beschreibendes (z. B. „Anmeldebestätigung").
+4. **Subject:** `{{ .Tx.Data.subject }}` — die deutsche Betreffzeile baut die
+   App und übergibt sie im Daten-Payload.
+5. **Body:** den **vollständigen** Inhalt der zugehörigen `*.html` einfügen.
+6. Speichern und die numerische **Template-ID** notieren (in der URL / Liste).
 
-Then set the matching environment variables (see `.env.example`):
+### Die Zuordnung
 
-| File | Env var | Used for |
+| Datei | Env-Variable | Wofür |
 |---|---|---|
 | `registration-confirmation.html` | `LISTMONK_TX_REGISTRATION_CONFIRMATION` | Anmeldebestätigung |
 | `waitlist-confirmation.html` | `LISTMONK_TX_WAITLIST_CONFIRMATION` | Warteliste-Bestätigung |
@@ -28,8 +66,8 @@ Then set the matching environment variables (see `.env.example`):
 | `event-reminder.html` | `LISTMONK_TX_EVENT_REMINDER` | Erinnerung (heute/morgen) |
 | `event-message.html` | `LISTMONK_TX_EVENT_MESSAGE` | Freie Nachricht an Teilnehmer |
 
-If a template ID is left empty the corresponding email is simply skipped (and a
-line is logged) — useful while you set them up one at a time.
+Bleibt eine Template-ID leer, wird die zugehörige E-Mail schlicht übersprungen
+(und eine Zeile geloggt) — praktisch, solange man sie einzeln einrichtet.
 
 ## The design
 
@@ -68,5 +106,5 @@ adding a placeholder.
 
 > Note: transactional templates live in listmonk's **database**, not the
 > file system, so they are **not** auto-seeded by `--static-dir` (that only
-> overlays the file-based *system* templates). Create them once in the UI as
-> described above.
+> overlays the file-based *system* templates). `bun run listmonk:sync` pushes
+> them over the API — see „Diese Dateien sind nicht automatisch live" above.

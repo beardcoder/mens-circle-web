@@ -1,3 +1,4 @@
+import { config } from './config';
 import type { Event } from './db/schema';
 import { fullAddress, toDate } from './format';
 
@@ -38,7 +39,7 @@ export const buildIcs = (ev: Event): string => {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Maennerkreis Niederbayern Straubing//Web//DE',
+    `PRODID:-//${icsEscape(config.SITE_NAME)}//Web//DE`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VTIMEZONE',

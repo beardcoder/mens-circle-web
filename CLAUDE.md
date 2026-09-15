@@ -20,6 +20,8 @@ bun run format                   # prettier --write  (format:check to verify)
 
 bun test                         # test suite (isolated Bun processes, no services needed)
 
+bun run listmonk:sync            # push listmonk/**-templates into listmonk (--dry-run to preview)
+
 bun run db:generate              # generate drizzle/<n>_*.sql after editing schema.ts
 bun run og:fonts                 # regenerate src/lib/server/og-fonts.ts from src/assets/fonts/
 bun run db:studio                # Drizzle Studio DB browser
@@ -180,6 +182,8 @@ sets `.vt-arrival` before first paint so the arriving page skips its own entranc
 **Cron (reminders):** In-process, on a plain self-rescheduling timer. `scripts/reminder-cron.ts` fires every 15 minutes on the UTC quarter hour and calls `runReminders()` from `src/lib/server/reminders.ts` — a single idempotent pass that stamps `reminder_sent_at`. It's loaded as a **`bun --preload`** module in `docker-entrypoint.sh`, so it registers once at process startup, before the Astro entry boots, in the same long-lived web process. (`--preload` must precede the entry file; the `bun run` subcommand is dropped — preload is a runtime flag.) This replaces the old "start lazily from middleware" trick, which relied on a `__MC_RUNTIME` flag the new Bun adapter never sets. The runtime image ships `src/lib/server` so the preload can reuse the data/email layer. **Do not reach for `Bun.cron` here:** the runtime only implements the OS-level `(path, schedule, title)` form, which writes to a crontab the image has no daemon for — the in-process callback overload exists only in `@types/bun`, so it type-checks and then throws at boot, killing the preload and the whole server with it. To trigger a pass manually: `bun run scripts/send-reminders.ts`.
 
 **Email — listmonk (external service):** The app does not render emails. It calls listmonk's transactional API (`POST /api/tx`) with a template ID + data; templates are maintained in listmonk. Source templates + setup in `listmonk/tx-templates/`. Newsletter (double-opt-in + campaigns) also via listmonk. Template IDs are wired through `LISTMONK_TX_*` env vars.
+
+**Editing a template file changes nothing on its own.** Only the _system_ templates (`listmonk/static/email-templates/`) ride along in the image via `--static-dir`. The six transactional templates and the campaign template are rows in listmonk's **database**, so a redesign reaches exactly zero inboxes until it is pushed: `bun run listmonk:sync` (`scripts/sync-tx-templates.ts`) does that over the API — idempotent, `--dry-run` first. This is not hypothetical; the poster redesign of the mails sat in the repo unsent, while every mail still went out in the old identity. The mail design itself is documented in `listmonk/tx-templates/_layout-snippet.html`, and it is the site's palette exactly — after changing `_variables.css`, the templates do not follow automatically.
 
 ## Content & conventions
 

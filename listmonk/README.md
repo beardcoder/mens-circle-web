@@ -59,7 +59,7 @@ listmonk/
       forgot-password.html       (define "forgot-password" — Passwort-Reset)
       smtp-test.html             (define "smtp-test" — SMTP-Verbindungstest)
     campaign-templates/
-      mens-circle.html           Kampagnen-Template (Quelldatei, manuell in der UI anlegen)
+      mens-circle.html           Kampagnen-Template (DB-Vorlage, via `bun run listmonk:sync`)
   public-style.css               Settings → Appearance → Custom CSS (public pages)
 ```
 
@@ -132,12 +132,26 @@ Kampagnen-Templates leben in listmonk in der **Datenbank**, nicht im Dateisystem
 — `--static-dir` überlagert nur die file-basierten **System**-Templates, **nicht**
 die Kampagnen-Templates.
 
-### Manuell in der UI anlegen (kein Auto-Seed)
+### Synchronisieren (kein Auto-Seed)
 
-Das Kampagnen-Template wird **nicht** automatisch geseedet. Einmalig anlegen:
-Admin → Campaigns → Templates → „New" → Inhalt von
-`static/campaign-templates/mens-circle.html` einfügen → als Standard setzen
-(`Set as default`).
+Das Kampagnen-Template wird **nicht** automatisch geseedet. Aus dem Repo-Root:
+
+```bash
+bun run listmonk:sync --dry-run   # zeigt, was sich ändern würde
+bun run listmonk:sync             # schreibt
+```
+
+Das Skript legt die Vorlage an bzw. aktualisiert sie (zugeordnet über
+`LISTMONK_CAMPAIGN_TEMPLATE_ID`, sonst über den Namen) — zusammen mit den
+Transaktions-Templates aus `tx-templates/`. **Nach jeder Änderung an der
+Quelldatei erneut laufen lassen**, sonst verschickt listmonk weiter die alte
+Fassung.
+
+Beim ersten Mal muss die Vorlage danach noch einmal in der UI als Standard
+gesetzt werden (`Set as default`) — das kann die API nicht mit erledigen.
+
+Von Hand geht es auch: Admin → Campaigns → Templates → „New" → Inhalt von
+`static/campaign-templates/mens-circle.html` einfügen → `Set as default`.
 
 Pflicht im Body: genau **einmal** `{{ template "content" . }}`. Verwendete
 Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
@@ -149,8 +163,9 @@ Kampagnen-Funktionen: `{{ .Campaign.Subject }}`, `{{ MessageURL }}`,
 1. Als Super-Admin einloggen (Passwort = Coolify `SERVICE_PASSWORD_LISTMONKADMIN`).
 2. Settings → SMTP konfigurieren (Absender `hallo@mens-circle.de`).
 3. Liste (Double-Opt-In) anlegen, `public-style.css` unter Appearance einfügen.
-4. Kampagnen-Template einmalig in der UI anlegen (Campaigns → Templates) und als
-   Standard setzen — Quelldatei `static/campaign-templates/mens-circle.html`.
+4. Kampagnen- und Transaktions-Templates einspielen: `bun run listmonk:sync`
+   (Quelldateien `static/campaign-templates/` + `tx-templates/`), danach das
+   Kampagnen-Template in der UI als Standard setzen.
 5. API-User anlegen → Token in der Web-App als `LISTMONK_API_USER` /
    `LISTMONK_API_TOKEN` + `LISTMONK_LIST_IDS` setzen. Die Web-App ruft listmonk
    intern über `http://listmonk:9000` auf.
@@ -193,9 +208,11 @@ listmonk nicht konfiguriert, laufen Anmeldungen normal weiter (Listen-Sync wird
 
 Die Event-Mails (Anmeldebestätigung, Warteliste, Erinnerung …) werden über
 listmonks **Transactional API** (`POST /api/tx`) versendet. Die Templates dafür
-werden einmalig in listmonk angelegt; Quelldateien und Anleitung liegen unter
-[`tx-templates/`](tx-templates/README.md). Die zugehörigen Template-IDs werden in
-der Web-App als `LISTMONK_TX_*`-Env-Variablen gesetzt.
+liegen als Quelldateien unter [`tx-templates/`](tx-templates/README.md) und
+werden mit `bun run listmonk:sync` in listmonks Datenbank geschrieben — sie
+fahren **nicht** im Image mit, eine Änderung an den Dateien erreicht also erst
+nach einem Sync ein Postfach. Die zugehörigen Template-IDs werden in der Web-App
+als `LISTMONK_TX_*`-Env-Variablen gesetzt.
 
 ## Testen
 

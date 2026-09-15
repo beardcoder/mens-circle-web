@@ -18,7 +18,8 @@
     "db:generate": "drizzle-kit generate",
     "og:fonts": "bun run scripts/generate-og-fonts.ts",
     "db:studio": "drizzle-kit studio",
-    "db:backup": "bun run scripts/backup-db.ts"
+    "db:backup": "bun run scripts/backup-db.ts",
+    "listmonk:sync": "bun run scripts/sync-tx-templates.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

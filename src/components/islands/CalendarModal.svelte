@@ -1,4 +1,5 @@
 <script lang="ts">
+  import site from '@data/site.json';
   import type { EventData } from '@lib/types';
   import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
   import { onDestroy, onMount } from 'svelte';
@@ -31,7 +32,7 @@
     return [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Männerkreis Niederbayern/ Straubing//DE',
+      `PRODID:-//${site.siteName}//DE`,
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
       'BEGIN:VEVENT',

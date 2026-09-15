@@ -24,13 +24,27 @@ export const parseIntList = (raw: string): number[] =>
         })
     : [];
 
+/**
+ * One brand name (see CLAUDE.md) — the sender line every recipient reads in
+ * their inbox list, the admin label and the mail signature all derive from it,
+ * so overriding SITE_NAME moves all three together. Four spellings had drifted
+ * in before; MAIL_FROM_NAME kept the one with the stray space long after the
+ * templates were redesigned, which put the old identity above every mail.
+ *
+ * Typed here rather than read from `src/data/site.json`: this module is pulled
+ * in by the `bun --preload` reminder cron, which runs from raw source in an
+ * image that ships only `src/lib/server` — importing `src/data` would fail to
+ * resolve at boot and take the whole web process down with it.
+ */
+const siteName = env('SITE_NAME', 'Männerkreis Straubing');
+
 export const config = {
   APP_URL: env('APP_URL', env('PUBLIC_SITE_URL', 'https://mens-circle.de')).replace(/\/+$/, ''),
-  SITE_NAME: env('SITE_NAME', 'Männerkreis Straubing'),
+  SITE_NAME: siteName,
   MAIL_FROM_ADDRESS: env('MAIL_FROM_ADDRESS', 'hallo@mens-circle.de'),
-  MAIL_FROM_NAME: env('MAIL_FROM_NAME', 'Männerkreis Niederbayern/ Straubing'),
+  MAIL_FROM_NAME: env('MAIL_FROM_NAME', siteName),
   MAIL_ADMIN_ADDRESS: env('MAIL_ADMIN_ADDRESS', 'hallo@mens-circle.de'),
-  MAIL_ADMIN_NAME: env('MAIL_ADMIN_NAME', 'Männerkreis Admin'),
+  MAIL_ADMIN_NAME: env('MAIL_ADMIN_NAME', `${siteName} Admin`),
   CONTACT_EMAIL: env('MAIL_CONTACT_ADDRESS', 'hallo@mens-circle.de'),
   DATABASE_PATH: env('DATABASE_PATH', './data/mens-circle.db'),
   ADMIN_EMAIL: env('ADMIN_EMAIL', ''),
