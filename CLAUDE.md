@@ -102,6 +102,29 @@ they are only emitted when known: the card is a fixed 1200x630, but an
 admin-entered `image_url` is an arbitrary picture, so it rides along as a second
 `image` in the JSON-LD and never as the card.
 
+**Map tiles — keyless on purpose.** `components/islands/EventMap.svelte` draws
+the Anfahrt map with Leaflet on the **Humanitarian (HOT) style hosted by
+OpenStreetMap France** (`{s}.tile.openstreetmap.fr/hot/…`, subdomains `abc`,
+max zoom 20). It replaced CARTO's `basemaps.cartocdn.com`, which began asking
+for an API key — there is no account to hang one on, and a key in a client
+bundle is public anyway. It was also the best-looking of the keyless options:
+its ground is warm beige and it draws few POI icons, where the standard OSM
+style paints blue cycle routes, red retail labels and cyan shop pins across the
+frame, against the rule that the greys here are ochre-cast and never blue-cast.
+
+The provider is one constant (`TILE_URL` / `TILE_SUBDOMAINS` / `TILE_ATTRIBUTION`),
+so swapping it is a one-line change. The two other verified keyless rasters:
+`tile.openstreetmap.org` (standard style, and the only one behind a real CDN —
+Fastly) and `tile.openstreetmap.de` (same style, German labels). **Stadia and
+Wikimedia are not options** — they answer 401 and 403 for third-party use.
+`tests/map-tiles.test.ts` pins all of this down, including the attribution,
+which every one of these providers requires.
+
+A tile outage now degrades instead of showing a grey rectangle: after
+`TILE_ERROR_LIMIT` tile errors the island says so in one sentence and the frame
+releases its reserved 16/9 box. The address sits above it and the route links
+below, so nothing the reader actually needs depends on the tiles loading.
+
 **Data layer — `src/lib/server/db/`:** Drizzle on `bun:sqlite`. Schema in `schema.ts`; migrations in `drizzle/` are **applied automatically on boot** (`index.ts`). `bun:sqlite` is a Bun builtin kept `external` in `astro.config.mjs` (Rollup must not bundle it). After changing the schema, run `bun run db:generate`.
 
 **`src/lib/server/*` is server-only** (db, events, registrations, testimonials, listmonk, email, auth, reminders, ics, format, ratelimit, config). Never import it into client/Svelte code — it pulls in `bun:sqlite`. This is the business-logic layer; the two RPC surfaces below are thin wrappers over it.
