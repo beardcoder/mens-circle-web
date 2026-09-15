@@ -16,6 +16,14 @@ interface Props {
   ogDescription?: string;
   ogImage?: string;
   ogImageAlt?: string;
+  /** Pixel size of `ogImage`. Only pass them when they are actually known —
+   *  see the note at `ogImageUrl` below. Both or neither. */
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  /** Up to two labelled facts a card can render as fields (`twitter:label1`
+   *  / `data1`, `label2` / `data2`). Slack and X both show them; the event
+   *  pages use them for the date and the place. */
+  socialDetails?: { label: string; value: string }[];
   robots?: string;
   /** Extra JSON-LD objects to embed (Article, FAQPage, Event, …). */
   schemas?: Record<string, unknown>[];
@@ -41,8 +49,15 @@ const {
   ogTitle,
   ogDescription,
   ogImage,
-  ogImageAlt = 'Männerkreis Straubing – ein Abend, an dem du nichts darstellen musst',
-  robots = 'index, follow',
+  ogImageAlt = `${site.siteName} – ${site.tagline}`,
+  ogImageWidth,
+  ogImageHeight,
+  socialDetails = [],
+  // `index, follow` alone leaves Google's *preview* limits at their defaults:
+  // a thumbnail-sized image and a snippet the crawler shortens on its own.
+  // The three max-* directives lift them, which is what lets a result carry a
+  // large image in Search and makes the page eligible for Discover.
+  robots = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
   schemas = [],
   publishedTime,
   modifiedTime,
@@ -65,10 +80,31 @@ const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.taglin
 const socialTitle = ogTitle ?? title ?? site.siteName;
 const socialDescription = ogDescription ?? description;
 // The default social card is a real 1200x630 poster (public/images/og-default.png),
-// not the square logo. The og:image:width/height below are declared as 1200x630,
-// and the logo is 512x513 — every share was advertising dimensions the file did
-// not have, which is what downgrades a summary_large_image card to a small one.
+// not the square logo. Declared dimensions must match the file: the logo is
+// 512x513, and every share used to advertise 1200x630 for it, which is what
+// downgrades a summary_large_image card to a small one.
+//
+// So width/height are emitted only when the caller knows them. A page passing
+// an image of its own (an event's picture, entered in the admin as an arbitrary
+// URL) passes no dimensions, and the scraper measures the file itself — slower
+// than a declaration, but never wrong.
+const usesDefaultImage = !ogImage;
 const ogImageUrl = new URL(ogImage ?? '/images/og-default.png', siteUrl).href;
+const imageWidth = usesDefaultImage ? 1200 : ogImageWidth;
+const imageHeight = usesDefaultImage ? 630 : ogImageHeight;
+
+const MIME_BY_EXTENSION: Record<string, string> = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  webp: 'image/webp',
+  gif: 'image/gif',
+  avif: 'image/avif',
+};
+const imageType = MIME_BY_EXTENSION[new URL(ogImageUrl).pathname.split('.').pop()?.toLowerCase() ?? ''];
+
+// Two labelled facts at most — the card formats define label1/2 only.
+const cardDetails = socialDetails.slice(0, 2);
 
 // Global structured data (mirrors the original LocalBusiness/Organization/WebSite).
 const sameAs = site.socialLinks.filter((l) => !['email', 'phone', 'whatsapp'].includes(l.type)).map((l) => l.value);
@@ -168,8 +204,9 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <meta property="og:title" content={socialTitle} />
 <meta property="og:description" content={socialDescription} />
 <meta property="og:image" content={ogImageUrl} />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
+{imageType && <meta property="og:image:type" content={imageType} />}
+{imageWidth && imageHeight && <meta property="og:image:width" content={String(imageWidth)} />}
+{imageWidth && imageHeight && <meta property="og:image:height" content={String(imageHeight)} />}
 <meta property="og:image:alt" content={ogImageAlt} />
 <meta property="og:locale" content="de_DE" />
 <meta property="og:site_name" content={site.siteName} />
@@ -184,6 +221,14 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <meta name="twitter:description" content={socialDescription} />
 <meta name="twitter:image" content={ogImageUrl} />
 <meta name="twitter:image:alt" content={ogImageAlt} />
+{
+  cardDetails.map((detail, index) => (
+    <>
+      <meta name={`twitter:label${index + 1}`} content={detail.label} />
+      <meta name={`twitter:data${index + 1}`} content={detail.value} />
+    </>
+  ))
+}
 
 <!-- Robots -->
 <meta name="robots" content={robots} />

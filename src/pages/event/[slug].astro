@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getEventBySlug } from '@lib/server/events';
+import { buildEventMeta } from '@lib/event-meta';
 import { buildEventSchema } from '@lib/event-schema';
 import EventPageContent from '../../components/event/EventPageContent.astro';
 
@@ -12,17 +13,50 @@ const { slug } = Astro.params;
 const event = slug ? await getEventBySlug(slug) : null;
 if (!event) return Astro.redirect('/event', 302);
 
-const cleanTitle = event.title?.trim() || 'Termin';
+const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 
-// Per-event Event structured data (this is the canonical URL for the event).
-const schemas = [buildEventSchema(event, Astro.site ?? new URL('https://mens-circle.de'))];
+// Title, description, card image and the two labelled card fields, all derived
+// from the record — see lib/event-meta.ts for why they are built there. This is
+// the page people forward, so the preview has to answer "when, where, still a
+// seat?" without anyone opening the link.
+const meta = buildEventMeta(event, siteUrl);
+
+// No `ogType="event"`: Open Graph defines website / article / book / profile
+// and the music+video namespaces, and nothing else. "event" was never a
+// registered type, so every scraper fell back to "website" anyway — this now
+// says so rather than shipping a value none of them accept. What actually
+// carries the event-ness is the Event JSON-LD below.
+
+// Per-event Event structured data (this is the canonical URL for the event),
+// built from the same strings.
+const eventSchema = buildEventSchema(event, siteUrl);
+
+// Startseite → Termine → dieser Abend. /event already carries the first two
+// levels; without this the individual date sat outside the site's hierarchy.
+const breadcrumbs = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl.origin },
+    { '@type': 'ListItem', position: 2, name: 'Termine', item: new URL('/event', siteUrl).href },
+    {
+      '@type': 'ListItem',
+      position: 3,
+      name: meta.ogTitle,
+      item: new URL(`/event/${event.slug}`, siteUrl).href,
+    },
+  ],
+};
 ---
 
 <Layout
-  title={`${cleanTitle} – Männerkreis Straubing`}
-  description={`${cleanTitle} in ${event.location || 'Straubing'}. Sieh dir den Termin an und sichere dir deinen Platz.`}
-  ogType="event"
-  schemas={schemas}
+  title={meta.title}
+  description={meta.description}
+  ogTitle={meta.ogTitle}
+  ogImage={meta.imageIsDefault ? undefined : meta.image}
+  ogImageAlt={meta.imageAlt}
+  socialDetails={meta.details}
+  schemas={[eventSchema, breadcrumbs]}
 >
   <EventPageContent event={event} />
 </Layout>
