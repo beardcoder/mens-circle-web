@@ -47,8 +47,13 @@ const address =
           </a>
         </div>
 
+        {
+          /* `{' '}` rather than a newline: Astro collapses the break between the
+            text and the link to nothing, and this rendered as
+            "Karte vonOpenStreetMap-Mitwirkenden". */
+        }
         <p class="event-map__attribution">
-          Karte von
+          Karte von{' '}
           <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a
           >-Mitwirkenden
         </p>
