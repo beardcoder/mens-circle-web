@@ -25,28 +25,15 @@ const secondary = nav.header.secondary;
 const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung']);
 ---
 
-<header
-  class="header"
-  id="header"
-  data-lume="site-header"
->
+<header class="header" id="header" data-lume="site-header">
   <div class="container">
     <div class="header__inner">
-      <a
-        href="/"
-        class="header__logo logo"
-        aria-label={`${site.siteName} – Startseite`}
-      >
+      <a href="/" class="header__logo logo" aria-label={`${site.siteName} – Startseite`}>
         <Logo class="logo__icon" />
         <span class="logo__text">Männerkreis<span class="logo__place">Straubing</span></span>
       </a>
 
-      <nav
-        class="nav"
-        id="nav"
-        data-lume-part="nav"
-        aria-label="Hauptnavigation"
-      >
+      <nav class="nav" id="nav" data-lume-part="nav" aria-label="Hauptnavigation">
         <ul class="nav__list">
           {
             links.map((link) => (
@@ -115,10 +102,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
           aria-expanded="false"
           aria-label="Menü öffnen"
         >
-          <span
-            class="nav-toggle__bars"
-            aria-hidden="true"
-          >
+          <span class="nav-toggle__bars" aria-hidden="true">
             <span class="nav-toggle__bar"></span>
             <span class="nav-toggle__bar"></span>
             <span class="nav-toggle__bar"></span>
