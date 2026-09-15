@@ -115,27 +115,57 @@ function shareDetails(event: EventDTO): { label: string; value: string }[] {
 }
 
 /**
- * Resolve the card image: the evening's own picture when the admin set one and
- * it resolves to http(s), otherwise the site's 1200x630 poster.
+ * A short, stable token for everything the card draws.
  *
- * The flag matters downstream: `og:image:width/height` may only be emitted for
- * the default, whose dimensions we know. Advertising 1200x630 for an arbitrary
- * uploaded URL is what downgrades a large card to a small one — the bug the
- * default image was introduced to fix, and it would come straight back.
+ * It rides along as `?v=` on the card URL, which is what makes a cached card
+ * safe: Facebook and WhatsApp keep a scraped image for a long time and key it
+ * by URL, so when an evening fills up or its time changes, the URL has to
+ * change with it or the old picture keeps going out. Slug, date, time, place
+ * and the seat state are exactly the values the card shows.
  */
-function shareImage(event: EventDTO, siteUrl: URL): { url: string; isDefault: boolean } {
-  const raw = event.image_url?.trim();
-  if (raw) {
-    try {
-      const resolved = new URL(raw, siteUrl);
-      if (resolved.protocol === 'https:' || resolved.protocol === 'http:') {
-        return { url: resolved.href, isDefault: false };
-      }
-    } catch {
-      /* Unparseable admin input — fall through to the default poster. */
-    }
+function cardVersion(event: EventDTO): string {
+  const source = [
+    event.slug,
+    event.event_date,
+    event.start_time,
+    event.end_time,
+    eventPlace(event),
+    eventName(event),
+    event.is_past ? 'p' : '',
+    event.is_full ? 'f' : '',
+    event.available_spots,
+    event.max_participants,
+  ].join('|');
+  // A tiny FNV-1a: this is a cache key, not a signature.
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < source.length; i++) {
+    hash ^= source.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
   }
-  return { url: new URL('/images/og-default.png', siteUrl).href, isDefault: true };
+  return hash.toString(36);
+}
+
+/** The generated 1200x630 poster for this evening — see lib/server/og-card.ts. */
+export const eventCardUrl = (event: EventDTO, siteUrl: URL): string =>
+  new URL(`/event/${event.slug}/card.png?v=${cardVersion(event)}`, siteUrl).href;
+
+/**
+ * The evening's own picture, when the admin entered a usable http(s) URL.
+ *
+ * It is no longer the share card — the generated one carries the date, which
+ * a forwarded link needs far more than a photograph does — but it is still a
+ * real image of this evening, so it goes out as a second `image` in the
+ * structured data, where Google takes a list.
+ */
+export function adminImage(event: EventDTO, siteUrl: URL): string | null {
+  const raw = event.image_url?.trim();
+  if (!raw) return null;
+  try {
+    const resolved = new URL(raw, siteUrl);
+    return resolved.protocol === 'https:' || resolved.protocol === 'http:' ? resolved.href : null;
+  } catch {
+    return null;
+  }
 }
 
 export interface EventMeta {
@@ -145,11 +175,12 @@ export interface EventMeta {
   ogTitle: string;
   /** Shared by `<meta name="description">`, `og:description` and the JSON-LD. */
   description: string;
-  /** Absolute card image URL. */
+  /** Absolute URL of the generated 1200x630 card. */
   image: string;
-  /** True only for the site poster, whose 1200x630 we may advertise. */
-  imageIsDefault: boolean;
   imageAlt: string;
+  /** The evening's own picture, when the admin set one — extra `image` for the
+   *  structured data, never the share card. */
+  extraImage: string | null;
   /** Labelled fields for `twitter:label1/data1` and `label2/data2`. */
   details: { label: string; value: string }[];
 }
@@ -160,7 +191,7 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
   const place = eventPlace(event);
   const day = formatDayMonthYearDE(event.event_date);
   const longDate = formatDateLongDE(event.event_date);
-  const { url: image, isDefault } = shareImage(event, siteUrl);
+  const image = eventCardUrl(event, siteUrl);
 
   // The brand is appended only when the evening's own title does not already
   // carry it — "Männerkreis Straubing am 18. September 2026 – Männerkreis
@@ -174,8 +205,8 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
       [eventWhenWhere(event), statusSentence(event), tailSentence(event)].map(asSentence).join(' '),
     ),
     image,
-    imageIsDefault: isDefault,
     imageAlt: day ? `${name} am ${day} in ${place}` : `${name} in ${place}`,
+    extraImage: adminImage(event, siteUrl),
     details: shareDetails(event),
   };
 }

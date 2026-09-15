@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getEventBySlug } from '@lib/server/events';
 import { buildEventMeta } from '@lib/event-meta';
+import { CARD_HEIGHT, CARD_WIDTH } from '@lib/server/og-card';
 import { buildEventSchema } from '@lib/event-schema';
 import EventPageContent from '../../components/event/EventPageContent.astro';
 
@@ -53,7 +54,9 @@ const breadcrumbs = {
   title={meta.title}
   description={meta.description}
   ogTitle={meta.ogTitle}
-  ogImage={meta.imageIsDefault ? undefined : meta.image}
+  ogImage={meta.image}
+  ogImageWidth={CARD_WIDTH}
+  ogImageHeight={CARD_HEIGHT}
   ogImageAlt={meta.imageAlt}
   socialDetails={meta.details}
   schemas={[eventSchema, breadcrumbs]}

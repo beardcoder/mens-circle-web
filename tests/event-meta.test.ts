@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { buildEventMeta, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/event-meta';
+import { buildEventMeta, eventCardUrl, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/event-meta';
 import { buildEventSchema } from '../src/lib/event-schema';
 import type { EventDTO } from '../src/lib/types';
 
@@ -71,20 +71,42 @@ test('the brand is appended once, never twice', () => {
   );
 });
 
-test('the card image is the evening picture when there is one, else the site poster', () => {
-  const fallback = buildEventMeta(event(), SITE);
-  expect(fallback.image).toBe('https://mens-circle.de/images/og-default.png');
-  expect(fallback.imageIsDefault).toBe(true);
+test("the share card is this evening's generated poster, at a known size", () => {
+  const meta = buildEventMeta(event(), SITE);
+  expect(meta.image).toMatch(/^https:\/\/mens-circle\.de\/event\/2026-09-18\/card\.png\?v=[a-z0-9]+$/);
+  // The evening has no picture of its own, so nothing extra goes to the graph.
+  expect(meta.extraImage).toBeNull();
+});
 
+test('the card URL changes whenever anything the card draws changes', () => {
+  // Facebook and WhatsApp keep a scraped image for a long time and key it by
+  // URL. A filling evening whose card URL stayed put would keep sending out a
+  // picture that says seats are free.
+  const base = eventCardUrl(event(), SITE);
+  const changed = [
+    { available_spots: 3 },
+    { is_full: true },
+    { is_past: true },
+    { start_time: '18:00' },
+    { city: 'Regensburg' },
+    { title: 'Wintersonnwende' },
+    { event_date: '2026-09-19T00:00:00.000Z' },
+  ];
+  for (const patch of changed) {
+    expect(eventCardUrl(event(patch), SITE)).not.toBe(base);
+  }
+  // …and is stable for anything it does not draw.
+  expect(eventCardUrl(event({ description: 'anderer Text' }), SITE)).toBe(base);
+});
+
+test("the admin's own picture rides along as a second image, never as the card", () => {
   const own = buildEventMeta(event({ image_url: 'https://cdn.example/abend.jpg' }), SITE);
-  expect(own.image).toBe('https://cdn.example/abend.jpg');
-  // Dimensions are unknown for an admin-entered URL, so the page must not
-  // advertise the poster's 1200x630 for it.
-  expect(own.imageIsDefault).toBe(false);
+  expect(own.image).toContain('/card.png');
+  expect(own.extraImage).toBe('https://cdn.example/abend.jpg');
 
-  // Unusable admin input falls back rather than emitting a broken og:image.
+  // Unusable admin input is dropped rather than emitted as a broken image.
   for (const bad of ['javascript:alert(1)', '   ', 'http://[bad']) {
-    expect(buildEventMeta(event({ image_url: bad }), SITE).imageIsDefault).toBe(true);
+    expect(buildEventMeta(event({ image_url: bad }), SITE).extraImage).toBeNull();
   }
 });
 
@@ -128,7 +150,8 @@ test('the Event node joins the site graph instead of starting a second one', () 
   expect(schema.endDate).toBe('2026-09-18T21:30:00+02:00');
   expect(schema.maximumAttendeeCapacity).toBe(12);
   expect(schema.remainingAttendeeCapacity).toBe(4);
-  expect(schema.image).toEqual(['https://mens-circle.de/images/og-default.png']);
+  expect(schema.image).toHaveLength(1);
+  expect(String((schema.image as string[])[0])).toContain('/event/2026-09-18/card.png');
   expect(schema.offers).toMatchObject({ availability: 'https://schema.org/InStock', validThrough: schema.startDate });
 });
 
