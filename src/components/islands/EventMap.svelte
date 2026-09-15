@@ -17,10 +17,44 @@
 
   const { lat, lng, title, address }: Props = $props();
 
+  /**
+   * The basemap. CARTO's `basemaps.cartocdn.com` used to serve this and started
+   * asking for an API key — the one thing a tile source for this site must not
+   * do, since there is no account to hang a key on and a key in a client bundle
+   * is public anyway.
+   *
+   * This is the Humanitarian style, rendered by the HOT team and hosted by
+   * OpenStreetMap France: no key, no account, no quota to sign up for. It was
+   * also the best fit of the keyless options — its ground is warm beige and it
+   * draws few POI icons, where the standard OSM style paints blue cycle routes,
+   * red retail labels and cyan shop pins across the frame. The design system is
+   * explicit that the greys here are ochre-cast, never blue-cast.
+   *
+   * Two other keyless options, if this one ever has to be swapped (it is a
+   * one-line change): `https://tile.openstreetmap.org/{z}/{x}/{y}.png` is the
+   * standard style and the only keyless raster behind a real CDN (Fastly), at
+   * the cost of the busier look; `https://tile.openstreetmap.de/{z}/{x}/{y}.png`
+   * is the same style with German labels. Stadia and Wikimedia are NOT options
+   * — they answer 401 and 403 respectively for third-party use.
+   */
+  const TILE_URL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+  const TILE_SUBDOMAINS = 'abc';
+  const TILE_MAX_ZOOM = 20;
+  const TILE_ATTRIBUTION =
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
+    ' &middot; Kacheln: <a href="https://www.hotosm.org/">HOT</a>' +
+    ' / <a href="https://openstreetmap.fr/">OSM France</a>';
+
+  /** How many tiles may fail before the map admits it cannot draw itself. One
+   *  tile missing at the edge of a pan is noise; a whole screenful is an outage,
+   *  and a grey box that says nothing is the worst of both. */
+  const TILE_ERROR_LIMIT = 4;
+
   let canvas: HTMLElement;
-  let state = $state<'idle' | 'loading' | 'ready'>('idle');
+  let state = $state<'idle' | 'loading' | 'ready' | 'failed'>('idle');
   let map: LeafletMap | null = null;
   let disposed = false;
+  let tileErrors = 0;
 
   function buildDirectionsUrl(): string {
     if (isCoarsePointer()) {
@@ -55,13 +89,25 @@
         attributionControl: true,
       }).setView([lat, lng], 16);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd',
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
-          ' &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      }).addTo(map);
+      const tiles = L.tileLayer(TILE_URL, {
+        maxZoom: TILE_MAX_ZOOM,
+        subdomains: TILE_SUBDOMAINS,
+        attribution: TILE_ATTRIBUTION,
+      });
+
+      // Say so rather than showing an empty frame. The address and the route
+      // links live in the section around this island, so a map that cannot
+      // draw costs the reader nothing — a silent grey rectangle would have him
+      // wondering whether the venue is the problem.
+      tiles.on('tileerror', () => {
+        tileErrors += 1;
+        if (tileErrors >= TILE_ERROR_LIMIT && state !== 'failed') state = 'failed';
+      });
+      tiles.on('tileload', () => {
+        tileErrors = 0;
+      });
+
+      tiles.addTo(map);
 
       const icon = L.divIcon({
         className: 'event-map__marker',
@@ -100,7 +146,7 @@
         canvas.removeEventListener('mouseleave', disableZoom);
       };
 
-      state = 'ready';
+      if (state !== 'failed') state = 'ready';
     })();
 
     return () => {
@@ -117,6 +163,13 @@
 
 <div class="event-map" data-state={state} aria-label="Karte zum Veranstaltungsort">
   <div bind:this={canvas} class="event-map__canvas" role="application" aria-label="Interaktive Karte"></div>
+
+  {#if state === 'failed'}
+    <p class="event-map__fallback">
+      Die Karte lässt sich gerade nicht laden. Die Adresse steht über dieser Box, und die Routen-Links darunter
+      funktionieren weiterhin.
+    </p>
+  {/if}
 </div>
 
 <style>
@@ -175,6 +228,26 @@
 
   :global(.event-map__canvas:has(.leaflet-container)::before) {
     display: none;
+  }
+
+  :global(.event-map[data-state='failed'] .event-map__canvas) {
+    display: none;
+  }
+
+  /* The frame in EventMapSection.astro reserves a 16/9 box so a loading map
+     cannot shift the page. Once there is no map to load, that box is just a
+     large empty rectangle around one sentence — release it. */
+  :global(.event-map__frame:has(.event-map[data-state='failed'])) {
+    aspect-ratio: auto;
+  }
+
+  :global(.event-map__fallback) {
+    padding: var(--space-sm);
+    margin: 0;
+    font-size: var(--text-caption);
+    line-height: var(--leading-normal);
+    color: var(--text-muted);
+    text-wrap: balance;
   }
 
   :global(.event-map__marker) {
