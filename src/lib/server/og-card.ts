@@ -1,0 +1,224 @@
+/**
+ * The share card for one evening — a real 1200x630 poster with this date on it,
+ * rendered per request.
+ *
+ * Why it exists: a forwarded link is what actually carries this circle to new
+ * people, and in WhatsApp and Facebook the image is most of the message. Every
+ * event used to share the same generic poster, so ten different evenings looked
+ * like one. Now the card *is* the date, set in the site's own poster voice.
+ *
+ * How it is drawn, and why that shape:
+ *
+ *   satori lays the card out with flexbox and converts every glyph to an SVG
+ *   PATH (no `<text>` survives), then sharp rasterises that path-only SVG to
+ *   PNG. The path step is the whole point: it means the renderer needs no fonts
+ *   installed anywhere. sharp's bundled libvips cannot draw SVG text at all —
+ *   it silently renders nothing, with or without fontconfig — so a card built
+ *   as `<text>` would have deployed as a blank rectangle.
+ *
+ * Both dependencies are server-side only; the pages themselves ship no extra
+ * byte. Budget on this machine: ~120ms satori + ~60ms sharp for a ~35KB PNG.
+ *
+ * The palette and the type are the design system's, not a second look:
+ * oat paper, bark ink, burnt orange, Barlow Condensed 800 for the date and 600
+ * for the labels, no rounded corners. Orange stays fill and large text only —
+ * the status strip is ink ON orange (4.9:1), never the other way round.
+ */
+import satori from 'satori';
+import sharp from 'sharp';
+import site from '../../data/site.json';
+import { formatDayMonthYearDE, formatWeekdayDE } from './format';
+import { ogFonts } from './og-fonts';
+
+export const CARD_WIDTH = 1200;
+export const CARD_HEIGHT = 630;
+
+const PAPER = '#f2ede3';
+const INK = '#1c1714';
+const INK_MID = '#4a4139';
+const ORANGE = '#dd5f33';
+
+/** What the card has to say. Deliberately not the EventDTO: this module is also
+ *  the one that must never reach into the database. */
+export interface CardContent {
+  /** Small line above the date — the brand, plus the evening's own name when
+   *  it has one that is not just "Männerkreis". */
+  kicker: string;
+  /** "DONNERSTAG", or empty when the date could not be read. */
+  weekday: string;
+  /** "18. SEPTEMBER 2026" — the poster line. */
+  date: string;
+  /** "19:00–21:30 UHR · STRAUBING" */
+  meta: string;
+  /** The orange strip: seats, waiting list, or that the evening is over. */
+  status: string;
+}
+
+/**
+ * The two cuts, decoded once per process.
+ *
+ * They come from `og-fonts.ts` (generated — `bun run og:fonts`) rather than
+ * from disk. Reading them from disk is the obvious approach and it silently
+ * does not work: Vite leaves `new URL('…', import.meta.url)` untouched in the
+ * Astro SSR build, so the path resolves against `dist/server/chunks/` at
+ * runtime and every production card fell back to the static poster. The one
+ * failure mode a share card must not have is the quiet one.
+ */
+let fontCache: { name: string; data: Buffer; weight: 800 | 600; style: 'normal' }[] | null = null;
+const loadFonts = () => {
+  fontCache ??= ogFonts().map((face) => ({
+    name: 'Condensed',
+    data: face.data,
+    weight: face.weight as 800 | 600,
+    style: 'normal' as const,
+  }));
+  return fontCache;
+};
+
+/** German display type is wide. The date line drops a step when it runs long
+ *  ("30. SEPTEMBER 2026") so it never collides with the ring or wraps oddly. */
+const dateSize = (text: string): number => {
+  if (text.length > 18) return 88;
+  if (text.length > 15) return 100;
+  return 116;
+};
+
+/** satori takes React-ish nodes; we build them as plain objects so this file
+ *  needs no JSX pragma and no .tsx extension in a project that has none. */
+type Node = { type: string; props: Record<string, unknown> };
+const box = (style: Record<string, unknown>, children: unknown): Node => ({
+  type: 'div',
+  props: { style: { display: 'flex', ...style }, children },
+});
+
+/**
+ * The ring — the site's one graphic motif, cropped at the card's edge exactly
+ * as it is cropped by the viewport on the page, and never over text.
+ *
+ * Geometry copied from components/Ring.astro: r=88 in a 200 box, stroke 23,
+ * and a 470/83 dash that leaves one ~54° opening. The gap is the point — the
+ * motif is "a single stroke with one gap in it", and Ring.astro documents why
+ * it cannot be a bordered div: a transparent border segment cuts the opening on
+ * the diagonal instead of leaving clean butt ends. satori has no SVG elements,
+ * but it does take an SVG data URI as an image, so the real stroke goes in.
+ */
+const R = 88;
+const GAP = 83;
+const RING_SVG =
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">` +
+  `<circle cx="100" cy="100" r="${R}" fill="none" stroke="${ORANGE}" stroke-width="23"` +
+  ` stroke-dasharray="${(2 * Math.PI * R - GAP).toFixed(1)} ${GAP}" stroke-linecap="butt"` +
+  ` transform="rotate(-60 100 100)"/></svg>`;
+
+const ring = (): Node => ({
+  type: 'img',
+  props: {
+    src: `data:image/svg+xml;base64,${Buffer.from(RING_SVG).toString('base64')}`,
+    width: 560,
+    height: 560,
+    style: { position: 'absolute', top: -120, right: -190 },
+  },
+});
+
+function layout(content: CardContent): Node {
+  return box(
+    {
+      position: 'relative',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      width: '100%',
+      height: '100%',
+      padding: '72px 80px',
+      background: PAPER,
+      fontFamily: 'Condensed',
+      overflow: 'hidden',
+    },
+    [
+      ring(),
+      box({ fontSize: 28, fontWeight: 600, letterSpacing: 4, color: ORANGE }, content.kicker.toUpperCase()),
+      box({ flexDirection: 'column' }, [
+        content.weekday
+          ? box({ fontSize: 46, fontWeight: 600, letterSpacing: 2, color: INK_MID }, content.weekday.toUpperCase())
+          : box({}, []),
+        box(
+          {
+            fontSize: dateSize(content.date),
+            fontWeight: 800,
+            lineHeight: 1,
+            letterSpacing: -1,
+            color: INK,
+            // German display type overshoots its line box on Ä/Ö/Ü — the same
+            // reason `.display` reserves padding on the page.
+            paddingTop: 10,
+          },
+          content.date.toUpperCase(),
+        ),
+      ]),
+      box({ flexDirection: 'column' }, [
+        box({ fontSize: 34, fontWeight: 600, color: INK_MID, paddingBottom: 22 }, content.meta.toUpperCase()),
+        // Ink on orange, the same pairing the buttons use. White on orange is
+        // 3.6:1 and fails; this is 4.9:1.
+        box(
+          {
+            alignSelf: 'flex-start',
+            padding: '14px 26px',
+            background: ORANGE,
+            fontSize: 30,
+            fontWeight: 600,
+            letterSpacing: 2,
+            color: INK,
+          },
+          content.status.toUpperCase(),
+        ),
+      ]),
+    ],
+  );
+}
+
+/** Render the card to PNG bytes. Throws if satori or sharp fail — the route
+ *  above is what decides to fall back to the static poster. */
+export async function renderCard(content: CardContent): Promise<Uint8Array> {
+  const svg = await satori(layout(content) as never, {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    fonts: loadFonts(),
+  });
+  return sharp(Buffer.from(svg)).png({ compressionLevel: 9, palette: true }).toBuffer();
+}
+
+/** The date/time/place/seat strings a card shows, from the values the event
+ *  page already displays. Kept here so the route stays a thin wrapper. */
+export interface CardInput {
+  title: string;
+  eventDate: string;
+  timeRange: string;
+  place: string;
+  isPast: boolean;
+  isFull: boolean;
+  availableSpots: number;
+  maxParticipants: number;
+}
+
+function statusText(input: CardInput): string {
+  if (input.isPast) return 'Vergangenes Treffen';
+  if (input.isFull) return 'Ausgebucht · Warteliste offen';
+  if (input.maxParticipants > 0 && input.availableSpots > 0) {
+    return `Noch ${input.availableSpots} von ${input.maxParticipants} Plätzen frei`;
+  }
+  return 'Anmeldung offen';
+}
+
+export function cardContent(input: CardInput): CardContent {
+  // The brand always leads, so a forwarded card is recognisable; a themed
+  // evening adds its own name after it rather than replacing it.
+  const ownName = input.title.trim();
+  const distinct = ownName && ownName.toLowerCase() !== site.siteName.toLowerCase() && ownName !== 'Männerkreis';
+
+  return {
+    kicker: distinct ? `${site.siteName} · ${ownName}` : site.siteName,
+    weekday: formatWeekdayDE(input.eventDate),
+    date: formatDayMonthYearDE(input.eventDate) || 'Termin folgt',
+    meta: [input.timeRange, input.place].filter(Boolean).join(' · '),
+    status: statusText(input),
+  };
+}
