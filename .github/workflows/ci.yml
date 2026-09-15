@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    name: Lint · Format · Types · Build
+    name: Lint · Format · Types · Test · Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,6 +38,11 @@ jobs:
 
       - name: Type check
         run: bun run check
+
+      # The suite spawns each isolated case as its own Bun process with its own
+      # SQLite file and HTTP fake, so it needs no services and no build output.
+      - name: Test
+        run: bun test
 
       - name: Build
         run: bun run build

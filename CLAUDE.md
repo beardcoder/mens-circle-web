@@ -18,6 +18,8 @@ bun run check                    # astro check (type-check .astro/.ts)
 bun run lint                     # eslint .   (lint:fix to autofix)
 bun run format                   # prettier --write  (format:check to verify)
 
+bun test                         # test suite (isolated Bun processes, no services needed)
+
 bun run db:generate              # generate drizzle/<n>_*.sql after editing schema.ts
 bun run db:studio                # Drizzle Studio DB browser
 ```
@@ -34,7 +36,23 @@ compiler API that both `bun run lint` (typescript-eslint, peer `<6.1.0`) and
 `bun run check` (@astrojs/check, peer `^5 || ^6`) still consume, so a TS 7 bump
 breaks both at config-load time. Dependabot is configured to skip the major.
 
-There is no test suite. Verify changes with `bun run check` + `bun run lint` and by exercising the app.
+`tests/` holds the suite: concurrency, the email/listmonk backend, database and
+frontend performance. Each `*.fixture.ts` case is spawned as **its own Bun
+process** with its own SQLite file and its own `fetch` fake, so no case can leak
+module state into another and the suite needs neither a listmonk nor a build.
+CI runs `bun test` between the type check and the build. Verify changes with
+`bun run check` + `bun run lint` + `bun test`, and by exercising the app.
+
+**The complexity budget is enforced, not advisory.** `eslint.config.ts` sets
+`complexity: ['error', 12]` and `max-depth: ['error', 4]` at the measured
+ceiling of the code, so a function that grows past it fails `bun run lint` and
+therefore CI. The one exemption is `PageContent.astro` (the block dispatcher is
+a lookup table, not branching); `inputToColumns` in `events.ts` carries an
+inline disable for the same reason. Raising either number is a decision to
+argue for in the commit message, not a way around a lint failure.
+
+`drizzle/meta/*.json` is generated **and** Prettier-formatted in this repo, so
+run `bun run format` after `bun run db:generate` or `format:check` fails in CI.
 
 ## Architecture
 

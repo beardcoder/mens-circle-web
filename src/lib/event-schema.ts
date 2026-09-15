@@ -45,28 +45,37 @@ function localDateTime(isoDate: string, time: string): string {
   return `${datePart}T${time}:00${berlinOffset(d)}`;
 }
 
+/**
+ * The `Place` an event happens at.
+ *
+ * Locality, region and country always fall back to the circle's home town, so
+ * the address is never half-stated; street and postal code are simply left out
+ * when the event does not carry them.
+ */
+function buildPlace(event: EventDTO): Record<string, unknown> {
+  const hasCoordinates = event.latitude != null && event.longitude != null;
+  return {
+    '@type': 'Place',
+    name: event.location || `Männerkreis ${site.geo.locality}`,
+    address: {
+      '@type': 'PostalAddress',
+      ...(event.street ? { streetAddress: event.street } : {}),
+      ...(event.postal_code ? { postalCode: event.postal_code } : {}),
+      addressLocality: event.city || site.geo.locality,
+      addressRegion: site.geo.region,
+      addressCountry: site.geo.country,
+    },
+    ...(hasCoordinates
+      ? { geo: { '@type': 'GeoCoordinates', latitude: event.latitude, longitude: event.longitude } }
+      : {}),
+  };
+}
+
 /** Build a schema.org/Event object for an event, resolving URLs against `siteUrl`. */
 export function buildEventSchema(event: EventDTO, siteUrl: URL): Record<string, unknown> {
   const startDate = localDateTime(event.event_date, event.start_time);
   const endDate = event.end_time ? localDateTime(event.event_date, event.end_time) : undefined;
   const url = new URL(`/event/${event.slug}`, siteUrl).href;
-
-  const hasAddress = Boolean(event.street || event.postal_code || event.city);
-  const location: Record<string, unknown> = {
-    '@type': 'Place',
-    name: event.location || `Männerkreis ${site.geo.locality}`,
-    address: {
-      '@type': 'PostalAddress',
-      ...(hasAddress && event.street ? { streetAddress: event.street } : {}),
-      ...(hasAddress && event.postal_code ? { postalCode: event.postal_code } : {}),
-      addressLocality: event.city || site.geo.locality,
-      addressRegion: site.geo.region,
-      addressCountry: site.geo.country,
-    },
-    ...(event.latitude != null && event.longitude != null
-      ? { geo: { '@type': 'GeoCoordinates', latitude: event.latitude, longitude: event.longitude } }
-      : {}),
-  };
 
   return {
     '@context': 'https://schema.org',
@@ -77,7 +86,7 @@ export function buildEventSchema(event: EventDTO, siteUrl: URL): Record<string, 
     ...(endDate ? { endDate } : {}),
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    location,
+    location: buildPlace(event),
     image: [new URL(event.image_url || '/images/logo-color.png', siteUrl).href],
     url,
     organizer: {

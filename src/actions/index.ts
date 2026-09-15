@@ -45,31 +45,36 @@ const numOrNull = (v: number | string | null | undefined): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
+/** Optional text field from the admin form; an omitted one is the empty string. */
+const text = (v: string | undefined): string => (v ?? '').trim();
+
+/** A date-only value from `<input type="date">` becomes midnight UTC; anything else is passed through. */
+const toEventDate = (v: string | undefined): string => {
+  const value = text(v);
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00.000Z` : value;
+};
+
 type EventRaw = z.output<typeof eventSchema>;
 
-const toEventInput = (raw: EventRaw): EventInput => {
-  let eventDate = (raw.eventDate ?? '').trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) eventDate = `${eventDate}T00:00:00.000Z`;
-  return {
-    title: (raw.title ?? '').trim(),
-    slug: (raw.slug ?? '').trim() || undefined,
-    description: raw.description ?? '',
-    eventDate,
-    startTime: (raw.startTime ?? '').trim(),
-    endTime: (raw.endTime ?? '').trim(),
-    location: (raw.location ?? '').trim(),
-    locationDetails: raw.locationDetails ?? '',
-    street: (raw.street ?? '').trim(),
-    postalCode: (raw.postalCode ?? '').trim(),
-    city: (raw.city ?? '').trim(),
-    latitude: numOrNull(raw.latitude),
-    longitude: numOrNull(raw.longitude),
-    maxParticipants: Number(raw.maxParticipants) || 8,
-    costBasis: (raw.costBasis ?? '').trim(),
-    isPublished: raw.isPublished === true,
-    imageUrl: (raw.imageUrl ?? '').trim() || null,
-  };
-};
+const toEventInput = (raw: EventRaw): EventInput => ({
+  title: text(raw.title),
+  slug: text(raw.slug) || undefined,
+  description: raw.description ?? '',
+  eventDate: toEventDate(raw.eventDate),
+  startTime: text(raw.startTime),
+  endTime: text(raw.endTime),
+  location: text(raw.location),
+  locationDetails: raw.locationDetails ?? '',
+  street: text(raw.street),
+  postalCode: text(raw.postalCode),
+  city: text(raw.city),
+  latitude: numOrNull(raw.latitude),
+  longitude: numOrNull(raw.longitude),
+  maxParticipants: Number(raw.maxParticipants) || 8,
+  costBasis: text(raw.costBasis),
+  isPublished: raw.isPublished === true,
+  imageUrl: text(raw.imageUrl) || null,
+});
 
 export const server = {
   login: defineAction({
