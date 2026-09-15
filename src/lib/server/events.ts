@@ -310,6 +310,9 @@ export const listEventsForAdmin = async (): Promise<Array<Event & { activeCount:
   return rows.map(({ event, activeCount }) => ({ ...event, activeCount }));
 };
 
+// A field-by-field default for the event form — a table, not a branch. The
+// cyclomatic count treats every `??` as a decision and reads it as complexity 15.
+// eslint-disable-next-line complexity
 const inputToColumns = (input: EventInput): Partial<NewEvent> => ({
   title: input.title.trim(),
   description: input.description ?? '',

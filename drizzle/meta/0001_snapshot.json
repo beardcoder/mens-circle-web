@@ -177,16 +177,12 @@
       "indexes": {
         "idx_events_slug": {
           "name": "idx_events_slug",
-          "columns": [
-            "slug"
-          ],
+          "columns": ["slug"],
           "isUnique": true
         },
         "idx_events_date": {
           "name": "idx_events_date",
-          "columns": [
-            "event_date"
-          ],
+          "columns": ["event_date"],
           "isUnique": false
         }
       },
@@ -254,9 +250,7 @@
       "indexes": {
         "idx_participants_email": {
           "name": "idx_participants_email",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },
@@ -349,17 +343,12 @@
       "indexes": {
         "idx_registrations_participant_event": {
           "name": "idx_registrations_participant_event",
-          "columns": [
-            "participant_id",
-            "event_id"
-          ],
+          "columns": ["participant_id", "event_id"],
           "isUnique": true
         },
         "idx_registrations_event": {
           "name": "idx_registrations_event",
-          "columns": [
-            "event_id"
-          ],
+          "columns": ["event_id"],
           "isUnique": false
         }
       },
@@ -368,12 +357,8 @@
           "name": "registrations_participant_id_participants_id_fk",
           "tableFrom": "registrations",
           "tableTo": "participants",
-          "columnsFrom": [
-            "participant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["participant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -381,12 +366,8 @@
           "name": "registrations_event_id_events_id_fk",
           "tableFrom": "registrations",
           "tableTo": "events",
-          "columnsFrom": [
-            "event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -484,11 +465,7 @@
       "indexes": {
         "idx_testimonials_public_order": {
           "name": "idx_testimonials_public_order",
-          "columns": [
-            "is_published",
-            "sort_order",
-            "\"created_at\" desc"
-          ],
+          "columns": ["is_published", "sort_order", "\"created_at\" desc"],
           "isUnique": false,
           "where": "\"testimonials\".\"deleted\" is null"
         }
