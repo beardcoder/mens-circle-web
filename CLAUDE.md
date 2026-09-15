@@ -21,6 +21,7 @@ bun run format                   # prettier --write  (format:check to verify)
 bun test                         # test suite (isolated Bun processes, no services needed)
 
 bun run db:generate              # generate drizzle/<n>_*.sql after editing schema.ts
+bun run og:fonts                 # regenerate src/lib/server/og-fonts.ts from src/assets/fonts/
 bun run db:studio                # Drizzle Studio DB browser
 ```
 
@@ -53,6 +54,7 @@ argue for in the commit message, not a way around a lint failure.
 
 `drizzle/meta/*.json` is generated **and** Prettier-formatted in this repo, so
 run `bun run format` after `bun run db:generate` or `format:check` fails in CI.
+`src/lib/server/og-fonts.ts` is the same deal — `bun run og:fonts && bun run format`.
 
 ## Architecture
 
@@ -61,6 +63,44 @@ A **single Bun process** is the public edge **and** the backend — no nginx, no
 **Rendering:** Most pages are prerendered (static, RAM-friendly). The **home page and the event pages** render on demand (SSR): the home page states the real scheduling status in its hero and again at its close, and that has to be true when the HTML arrives. Consequence to know about: `astro-llms-md` only processes prerendered pages, so `/` is no longer in `llms.txt`.
 
 **SEO / sitemap:** `/event` is a permanent landing page (`components/event/EventLanding.astro`) that reads correctly with or without a scheduled date — it never redirects, and `/event/<slug>` stays the canonical URL for one meeting. The sitemap is in **two parts**: `@astrojs/sitemap` emits `sitemap-0.xml` for the build-time routes, and `src/pages/sitemap-events.xml.ts` lists the event pages per request (their slugs live in SQLite and are unknown at build time). `astro-integrations/sitemap-index-extra.mjs` adds that route to `sitemap-index.xml` — it **must** be registered between `sitemap()` and `serveSitemapWithBunAdapter()`, because the latter writes the index's byte length into the static manifest and patching the file afterwards would serve a truncated document.
+
+**Share cards — `/event/<slug>/card.png`:** Every event page ships its own
+1200x630 Open Graph poster, rendered per request from the record: the date as
+the headline, time and place under it, and an orange strip with the seat state
+("Noch 4 von 12 Plätzen frei" / "Ausgebucht" / "Vergangenes Treffen"). A
+forwarded link is how this circle actually reaches people, and in WhatsApp and
+Facebook the image is most of the message — ten evenings used to share one
+generic picture.
+
+`src/lib/server/og-card.ts` lays the card out with **satori** (flexbox → SVG,
+every glyph converted to a `<path>`) and rasterises it with **sharp**. The path
+step is load-bearing: sharp's libvips **cannot draw SVG text at all** — it
+renders nothing, silently, with or without fontconfig, so a card built from
+`<text>` deploys as a blank rectangle. Neither dependency touches the client
+bundle. Budget: ~200ms and ~21KB per card.
+
+Four things here are the way they are for a reason:
+
+1. **The route is NOT under `/api/`.** robots.txt disallows that prefix and
+   Facebook's crawler honours robots.txt — an og:image it may not fetch is an
+   og:image that does not exist.
+2. **The fonts are inlined as base64** (`og-fonts.ts`, generated). Reading them
+   from disk is the obvious approach and it quietly does not work: Vite leaves
+   `new URL('…', import.meta.url)` untouched in the Astro SSR build, so the path
+   resolves against `dist/server/chunks/` and every production card fell back to
+   the static poster while dev looked fine.
+3. **The URL carries a `?v=` token** over everything the card draws (date, time,
+   place, seat state — `cardVersion` in `lib/event-meta.ts`). Facebook and
+   WhatsApp cache a scraped image by URL for a long time; without the token a
+   filling evening keeps sending out "Plätze frei".
+4. **It never fails into a broken image.** Any error redirects to
+   `/images/og-default.png` with a 200. A scraper that gets a 500 shows no
+   picture, and WhatsApp remembers that.
+
+The `og:image:width/height` the page declares must match the file. That is why
+they are only emitted when known: the card is a fixed 1200x630, but an
+admin-entered `image_url` is an arbitrary picture, so it rides along as a second
+`image` in the JSON-LD and never as the card.
 
 **Data layer — `src/lib/server/db/`:** Drizzle on `bun:sqlite`. Schema in `schema.ts`; migrations in `drizzle/` are **applied automatically on boot** (`index.ts`). `bun:sqlite` is a Bun builtin kept `external` in `astro.config.mjs` (Rollup must not bundle it). After changing the schema, run `bun run db:generate`.
 
