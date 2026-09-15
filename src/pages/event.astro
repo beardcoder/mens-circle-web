@@ -6,6 +6,7 @@ import { buildEventFaq, summarizeNextEvent } from '@lib/event-landing';
 import { dateStatus } from '@lib/event-status';
 import EventLanding from '../components/event/EventLanding.astro';
 import { eventSeriesSchema } from '@lib/series-schema';
+import site from '@data/site.json';
 
 /**
  * /event — the permanent landing page for the Männerkreis dates. It never
@@ -80,11 +81,31 @@ const breadcrumbs = {
 const description = state.next
   ? `Nächster Männerkreis in ${state.next.place}: ${state.next.dateLabel}${state.next.timeRange ? `, ${state.next.timeRange}` : ''}. Anmeldung, Ort, Dauer und Beitrag auf einen Blick – ohne Vorerfahrung, auf Spendenbasis.`
   : 'Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis.';
+
+// Shared links land on /event at least as often as on a single date, so the
+// card has to carry the same answer the page does. The <title> stays
+// evergreen — it is what ranks — while the social title leads with the date
+// when there is one. The `unavailable` state deliberately gets neither: it
+// falls through to the evergreen wording rather than claiming an empty
+// calendar, exactly as the visible page does.
+const socialTitle = state.next
+  ? `Nächster Männerkreis: ${state.next.dateLabel} in ${state.next.place}`
+  : `Termine – ${site.siteName}`;
+
+// Two labelled facts for the cards that render them (Slack, X).
+const socialDetails = state.next
+  ? [
+      { label: 'Nächster Termin', value: [state.next.dateLabel, state.next.timeRange].filter(Boolean).join(', ') },
+      { label: 'Ort', value: state.next.place },
+    ]
+  : [];
 ---
 
 <Layout
-  title="Termine & Anmeldung – Männerkreis Straubing / Niederbayern"
+  title={`Termine & Anmeldung – ${site.siteName} / Niederbayern`}
   description={description}
+  ogTitle={socialTitle}
+  socialDetails={socialDetails}
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
   <EventLanding state={state} voice={voice} />
