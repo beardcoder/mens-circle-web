@@ -14,7 +14,7 @@ import {
   MISSING_CONSENT,
   rejected,
 } from './form-submission';
-import { sendEventMessage, sendRegistrationEmails, sendWaitlistPromotion } from './email';
+import { sendEventMessage, sendRegistrationConfirmation, sendRegistrationEmails, sendWaitlistPromotion } from './email';
 import { countActiveRegistrations, ensureEventList, getEventById, isEventPast } from './events';
 import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
 
@@ -87,9 +87,14 @@ const openEvent = async (eventId: string): Promise<{ event: Event } | { error: F
 
 /**
  * Take the seat: revive the participant's cancelled registration or write a new
- * one. Returns the conflict to answer with when he already holds a live one.
+ * one. Returns the id of the booked row, or the conflict to answer with when he
+ * already holds a live one.
  */
-const claimSeat = async (participantId: string, eventId: string, status: IntakeStatus): Promise<FormResult | null> => {
+const claimSeat = async (
+  participantId: string,
+  eventId: string,
+  status: IntakeStatus,
+): Promise<{ registrationId: string } | { error: FormResult }> => {
   const existing = (
     await db
       .select()
@@ -99,24 +104,37 @@ const claimSeat = async (participantId: string, eventId: string, status: IntakeS
   )[0];
 
   if (existing && !existing.deleted) {
-    return rejected(
-      409,
-      existing.status === 'waitlist'
-        ? 'Du bist bereits auf der Warteliste für diese Veranstaltung.'
-        : 'Du bist bereits für diese Veranstaltung angemeldet.',
-    );
+    return {
+      error: rejected(
+        409,
+        existing.status === 'waitlist'
+          ? 'Du bist bereits auf der Warteliste für diese Veranstaltung.'
+          : 'Du bist bereits für diese Veranstaltung angemeldet.',
+      ),
+    };
   }
 
   const registeredAt = new Date().toISOString();
   if (existing) {
+    // A revived seat starts over: the confirmation for the previous one no longer describes it.
     await db
       .update(registrations)
-      .set({ status, registeredAt, cancelledAt: null, deleted: null })
+      .set({ status, registeredAt, cancelledAt: null, deleted: null, confirmationSentAt: null })
       .where(eq(registrations.id, existing.id));
-  } else {
-    await db.insert(registrations).values({ participantId, eventId, status, registeredAt });
+    return { registrationId: existing.id };
   }
-  return null;
+  const inserted = (
+    await db.insert(registrations).values({ participantId, eventId, status, registeredAt }).returning()
+  )[0];
+  return { registrationId: inserted.id };
+};
+
+/** Record that the participant's copy of the confirmation actually left listmonk. */
+const markConfirmationSent = async (registrationId: string): Promise<void> => {
+  await db
+    .update(registrations)
+    .set({ confirmationSentAt: new Date().toISOString() })
+    .where(eq(registrations.id, registrationId));
 };
 
 const assignToEventList = async (event: Event, fields: RegistrationFields): Promise<void> => {
@@ -140,12 +158,17 @@ const dispatchSideEffects = (
   fields: RegistrationFields,
   status: IntakeStatus,
   activeCount: number,
+  registrationId: string,
 ): void => {
   fireAndForget(
     '[registrations] side effects failed',
     withSubscriberScope(async () => {
+      const mails = sendRegistrationEmails(event, participant, status, activeCount).then(async (userSent) => {
+        if (userSent) await markConfirmationSent(registrationId);
+        return userSent;
+      });
       const tasks: Array<[string, Promise<unknown>]> = [
-        ['emails', sendRegistrationEmails(event, participant, status, activeCount)],
+        ['emails', mails],
         ['listmonk assignment', assignToEventList(event, fields)],
       ];
       const results = await Promise.allSettled(tasks.map(([, task]) => task));
@@ -176,10 +199,17 @@ export const register = async (payload: RegistrationPayload): Promise<FormResult
   const status: IntakeStatus = isWaitlist ? 'waitlist' : 'registered';
 
   const participant = await upsertParticipant(fields.email, fields);
-  const conflict = await claimSeat(participant.id, event.id, status);
-  if (conflict) return conflict;
+  const seat = await claimSeat(participant.id, event.id, status);
+  if ('error' in seat) return seat.error;
 
-  dispatchSideEffects(event, participant, fields, status, await countActiveRegistrations(event.id));
+  dispatchSideEffects(
+    event,
+    participant,
+    fields,
+    status,
+    await countActiveRegistrations(event.id),
+    seat.registrationId,
+  );
 
   return accepted(
     isWaitlist
@@ -193,6 +223,7 @@ export interface RegistrationRow {
   status: RegStatus;
   registeredAt: string | null;
   cancelledAt: string | null;
+  confirmationSentAt: string | null;
   reminderSentAt: string | null;
   firstName: string;
   lastName: string;
@@ -207,6 +238,7 @@ export const listRegistrationsForEvent = async (eventId: string): Promise<Regist
       status: registrations.status,
       registeredAt: registrations.registeredAt,
       cancelledAt: registrations.cancelledAt,
+      confirmationSentAt: registrations.confirmationSentAt,
       reminderSentAt: registrations.reminderSentAt,
       firstName: participants.firstName,
       lastName: participants.lastName,
@@ -293,4 +325,53 @@ export const broadcastEventMessage = async (
   );
   const sent = results.filter((r) => r.status === 'fulfilled' && r.value).length;
   return { sent, total: recipients.length };
+};
+
+export interface ResendResult {
+  sent: number;
+  failed: number;
+  skipped: number;
+}
+
+/**
+ * Send the anmeldung confirmation again — the repair for a batch that listmonk
+ * never delivered. Only live `registered`/`waitlist` seats are eligible; a
+ * cancelled or attended one would be confirming something that is no longer
+ * true, so it is counted as skipped rather than mailed. Each success re-stamps
+ * `confirmation_sent_at`, so the admin list shows what actually went out.
+ */
+export const resendRegistrationConfirmations = async (
+  eventId: string,
+  opts: { ids?: string[]; onlyMissing?: boolean } = {},
+): Promise<ResendResult> => {
+  const event = await getEventById(eventId);
+  if (!event) return { sent: 0, failed: 0, skipped: 0 };
+
+  const wanted = opts.ids?.length ? new Set(opts.ids) : null;
+  const rows = await db
+    .select({ registration: registrations, participant: participants })
+    .from(registrations)
+    .innerJoin(participants, eq(registrations.participantId, participants.id))
+    .where(and(eq(registrations.eventId, eventId), isNull(registrations.deleted)))
+    .orderBy(asc(registrations.registeredAt));
+
+  const selected = rows.filter(({ registration }) => !wanted || wanted.has(registration.id));
+  // flatMap, not filter: the guard narrows `status` to the two the mailer accepts.
+  const eligible = selected.flatMap(({ registration, participant }) => {
+    const { id, status, confirmationSentAt } = registration;
+    if (status !== 'registered' && status !== 'waitlist') return [];
+    if (opts.onlyMissing && confirmationSentAt) return [];
+    return [{ id, status, participant }];
+  });
+
+  const results = await withSubscriberScope(() =>
+    settleWithConcurrency(eligible, async ({ id, status, participant }) => {
+      const ok = await sendRegistrationConfirmation(event, participant, status);
+      if (ok) await markConfirmationSent(id);
+      return ok;
+    }),
+  );
+
+  const sent = results.filter((r) => r.status === 'fulfilled' && r.value).length;
+  return { sent, failed: results.length - sent, skipped: selected.length - eligible.length };
 };

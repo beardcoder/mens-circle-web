@@ -1,0 +1,1 @@
+ALTER TABLE `registrations` ADD `confirmation_sent_at` text;
