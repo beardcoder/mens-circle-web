@@ -6,6 +6,7 @@ interface Reg {
   id: string;
   status: Status;
   registeredAt: string | null;
+  confirmationSentAt: string | null;
   firstName: string;
   lastName: string;
   email: string;
@@ -27,6 +28,10 @@ const STATUS_LABEL: Record<Status, string> = {
 };
 const activeCount = registrations.filter((r) => r.status === 'registered' || r.status === 'attended').length;
 const waitlistCount = registrations.filter((r) => r.status === 'waitlist').length;
+/** Seats that should hold a confirmation but don't — what the "fehlende" button will target. */
+const missingConfirmation = registrations.filter(
+  (r) => (r.status === 'registered' || r.status === 'waitlist') && !r.confirmationSentAt,
+).length;
 
 function fmt(iso: string | null): string {
   if (!iso) return '–';
@@ -60,11 +65,36 @@ function badgeClass(s: Status): string {
   </div>
 </div>
 
+<section class="confirm card" data-event={eventId}>
+  <div class="confirm__text">
+    <h2 class="confirm__title">Anmeldebestätigungen</h2>
+    <p class="muted confirm__hint">
+      {
+        missingConfirmation > 0 ? (
+          <Fragment>
+            Bei <strong>{missingConfirmation}</strong> Anmeldung{missingConfirmation === 1 ? '' : 'en'} ist keine
+            Bestätigung nachgewiesen.
+          </Fragment>
+        ) : (
+          'Für alle aktiven Anmeldungen ist eine Bestätigung nachgewiesen.'
+        )
+      }
+      {' '}Der Versand geht nur an die Teilnehmer:innen, nicht an die Admin-Adresse.
+    </p>
+  </div>
+  <div class="confirm__actions">
+    <button class="btn js-resend-missing" type="button" disabled={missingConfirmation === 0}> Fehlende senden </button>
+    <button class="btn btn--ghost js-resend-all" type="button" disabled={registrations.length === 0}>
+      Alle erneut senden
+    </button>
+  </div>
+</section>
+
 {
   registrations.length === 0 ? (
     <div class="empty">Noch keine Anmeldungen.</div>
   ) : (
-    <ul id="reg-list" class="regs">
+    <ul id="reg-list" class="regs" data-event={eventId}>
       {registrations.map((reg) => (
         <li class="reg card" data-id={reg.id} data-name={`${reg.firstName} ${reg.lastName}`}>
           <div class="reg__head">
@@ -78,8 +108,22 @@ function badgeClass(s: Status): string {
             {reg.phone && <span class="faint"> · {reg.phone}</span>}
           </div>
           <div class="reg__foot">
-            <span class="reg__when mono faint">angemeldet {fmt(reg.registeredAt)}</span>
+            <span class="reg__when mono faint">
+              angemeldet {fmt(reg.registeredAt)}
+              {reg.confirmationSentAt ? (
+                <span> · Bestätigung {fmt(reg.confirmationSentAt)}</span>
+              ) : (
+                (reg.status === 'registered' || reg.status === 'waitlist') && (
+                  <span class="reg__warn"> · keine Bestätigung gesendet</span>
+                )
+              )}
+            </span>
             <div class="reg__actions">
+              {(reg.status === 'registered' || reg.status === 'waitlist') && (
+                <button class="btn btn--ghost btn--sm js-resend-one" type="button">
+                  Bestätigung senden
+                </button>
+              )}
               <select class="js-status" aria-label="Status ändern">
                 <option value="registered" selected={reg.status === 'registered'}>
                   Angemeldet
@@ -151,6 +195,26 @@ function badgeClass(s: Status): string {
         if (status === 'cancelled') setTimeout(() => window.location.reload(), 700);
       });
 
+      // Re-send one confirmation.
+      list.addEventListener('click', async (e) => {
+        const btn = (e.target as HTMLElement).closest('.js-resend-one') as HTMLButtonElement | null;
+        if (!btn) return;
+        const row = btn.closest('.reg') as HTMLElement;
+        const { id, name } = row.dataset;
+        if (!id || !confirm(`Anmeldebestätigung an ${name} senden?`)) return;
+        btn.disabled = true;
+        btn.textContent = 'Senden…';
+        const { data, error } = await actions.resendConfirmations({ eventId: list.dataset.event!, ids: [id] });
+        btn.disabled = false;
+        btn.textContent = 'Bestätigung senden';
+        if (error) {
+          window.adminToast?.('err', error.message);
+          return;
+        }
+        window.adminToast?.(data.sent > 0 ? 'ok' : 'err', data.message);
+        if (data.sent > 0) setTimeout(() => window.location.reload(), 700);
+      });
+
       // Remove.
       list.addEventListener('click', async (e) => {
         const btn = (e.target as HTMLElement).closest('.js-del-reg') as HTMLButtonElement | null;
@@ -167,6 +231,40 @@ function badgeClass(s: Status): string {
         }
         window.adminToast?.('ok', 'Anmeldung entfernt.');
         row.remove();
+      });
+    }
+
+    const confirmBar = document.querySelector('.confirm') as HTMLElement | null;
+    if (confirmBar && !confirmBar.dataset.bound) {
+      confirmBar.dataset.bound = '1';
+      const eventId = confirmBar.dataset.event!;
+
+      const run = async (btn: HTMLButtonElement, onlyMissing: boolean) => {
+        const label = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Senden…';
+        const { data, error } = await actions.resendConfirmations({ eventId, onlyMissing });
+        btn.disabled = false;
+        btn.textContent = label;
+        if (error) {
+          window.adminToast?.('err', error.message);
+          return;
+        }
+        window.adminToast?.(data.failed > 0 ? 'err' : 'ok', data.message);
+        if (data.sent > 0) setTimeout(() => window.location.reload(), 1200);
+      };
+
+      confirmBar.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        const missing = target.closest('.js-resend-missing') as HTMLButtonElement | null;
+        if (missing) {
+          void run(missing, true);
+          return;
+        }
+        const all = target.closest('.js-resend-all') as HTMLButtonElement | null;
+        if (!all) return;
+        if (!confirm('Bestätigung an ALLE angemeldeten und wartenden Teilnehmer:innen erneut senden?')) return;
+        void run(all, false);
       });
     }
 
@@ -219,6 +317,33 @@ function badgeClass(s: Status): string {
     color: var(--ember);
     font-weight: 600;
     font-size: 1.15rem;
+  }
+  .confirm {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    padding: 1.15rem 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+  .confirm__title {
+    margin: 0 0 0.3rem;
+    font-size: 1.02rem;
+  }
+  .confirm__hint {
+    margin: 0;
+    font-size: 0.85rem;
+    max-width: 52ch;
+  }
+  .confirm__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .reg__warn {
+    color: var(--ember);
   }
   .regs {
     list-style: none;
