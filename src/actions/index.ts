@@ -4,7 +4,12 @@ import type { ActionAPIContext } from 'astro:actions';
 import { createSession, readSession, SESSION_COOKIE, SESSION_TTL_S, verifyCredentials } from '@lib/server/auth';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';
 import { createEvent, type EventInput, sendEventNewsletter, softDeleteEvent, updateEvent } from '@lib/server/events';
-import { broadcastEventMessage, changeRegistrationStatus, softDeleteRegistration } from '@lib/server/registrations';
+import {
+  broadcastEventMessage,
+  changeRegistrationStatus,
+  resendRegistrationConfirmations,
+  softDeleteRegistration,
+} from '@lib/server/registrations';
 import {
   setTestimonialPublished,
   setTestimonialSortOrder,
@@ -155,6 +160,25 @@ export const server = {
         throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: res.error ?? 'Versand fehlgeschlagen.' });
       }
       return { message: `Newsletter wird an die Liste gesendet (Kampagne #${res.campaignId}).` };
+    },
+  }),
+
+  resendConfirmations: defineAction({
+    input: z.object({
+      eventId: z.string(),
+      ids: z.array(z.string()).optional(),
+      onlyMissing: z.boolean().optional(),
+    }),
+    handler: async ({ eventId, ids, onlyMissing }, context) => {
+      await requireAdmin(context);
+      const { sent, failed, skipped } = await resendRegistrationConfirmations(eventId, { ids, onlyMissing });
+      if (sent === 0 && failed === 0) {
+        return { sent, failed, message: 'Keine passende Anmeldung gefunden — nichts gesendet.' };
+      }
+      const parts = [`${sent} Bestätigung${sent === 1 ? '' : 'en'} gesendet`];
+      if (failed > 0) parts.push(`${failed} fehlgeschlagen`);
+      if (skipped > 0) parts.push(`${skipped} übersprungen`);
+      return { sent, failed, message: `${parts.join(', ')}.` };
     },
   }),
 

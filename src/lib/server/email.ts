@@ -23,33 +23,49 @@ const eventDetail = (ev: Event, opts: { includeAddress?: boolean } = {}) => ({
   locationDetails: ev.locationDetails,
 });
 
+/**
+ * The mail the participant himself receives when his seat is booked. Kept apart
+ * from the admin notification below so the admin can re-send a confirmation
+ * that never arrived without announcing the anmeldung a second time.
+ */
+export const sendRegistrationConfirmation = async (
+  ev: Event,
+  participant: Participant,
+  status: 'registered' | 'waitlist',
+): Promise<boolean> => {
+  const recipient = participant.email;
+  const recipientName = fullName(participant);
+  const ctx = participantCtx(participant);
+
+  return status === 'waitlist'
+    ? sendTransactional(config.TX_WAITLIST_CONFIRMATION, recipient, recipientName, {
+        subject: `Warteliste: ${ev.title}`,
+        ...ctx,
+        eventTitle: ev.title,
+        ...eventDetail(ev),
+      })
+    : sendTransactional(config.TX_REGISTRATION_CONFIRMATION, recipient, recipientName, {
+        subject: `Anmeldebestätigung: ${ev.title}`,
+        ...ctx,
+        eventTitle: ev.title,
+        ...eventDetail(ev, { includeAddress: true }),
+        description: ev.description,
+        costBasis: ev.costBasis,
+        icsUrl: icsUrlFor(ev.slug),
+      });
+};
+
+/** Both mails one registration triggers. Resolves to whether the *participant's* copy went out. */
 export const sendRegistrationEmails = async (
   ev: Event,
   participant: Participant,
   status: 'registered' | 'waitlist',
   activeCount: number,
-): Promise<void> => {
+): Promise<boolean> => {
   const recipient = participant.email;
   const recipientName = fullName(participant);
-  const ctx = participantCtx(participant);
 
-  const userSend =
-    status === 'waitlist'
-      ? sendTransactional(config.TX_WAITLIST_CONFIRMATION, recipient, recipientName, {
-          subject: `Warteliste: ${ev.title}`,
-          ...ctx,
-          eventTitle: ev.title,
-          ...eventDetail(ev),
-        })
-      : sendTransactional(config.TX_REGISTRATION_CONFIRMATION, recipient, recipientName, {
-          subject: `Anmeldebestätigung: ${ev.title}`,
-          ...ctx,
-          eventTitle: ev.title,
-          ...eventDetail(ev, { includeAddress: true }),
-          description: ev.description,
-          costBasis: ev.costBasis,
-          icsUrl: icsUrlFor(ev.slug),
-        });
+  const userSend = sendRegistrationConfirmation(ev, participant, status);
 
   const adminSend = sendTransactional(config.TX_ADMIN_NOTIFICATION, config.MAIL_ADMIN_ADDRESS, config.MAIL_ADMIN_NAME, {
     subject: `Neue Anmeldung: ${ev.title}`,
@@ -65,7 +81,8 @@ export const sendRegistrationEmails = async (
     statusLabel: status === 'waitlist' ? 'Warteliste' : 'Angemeldet',
   });
 
-  await Promise.all([userSend, adminSend]);
+  const [userSent] = await Promise.all([userSend, adminSend]);
+  return userSent;
 };
 
 export const sendWaitlistPromotion = async (ev: Event, participant: Participant): Promise<void> => {
