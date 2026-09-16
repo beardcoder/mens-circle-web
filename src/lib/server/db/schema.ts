@@ -82,6 +82,8 @@ export const registrations = sqliteTable(
     status: text('status').$type<RegistrationStatus>().notNull(),
     registeredAt: text('registered_at'),
     cancelledAt: text('cancelled_at'),
+    /** Last successful delivery of the confirmation/waitlist mail — null = never arrived. */
+    confirmationSentAt: text('confirmation_sent_at'),
     reminderSentAt: text('reminder_sent_at'),
     smsReminderSentAt: text('sms_reminder_sent_at'),
     deleted: text('deleted'),
