@@ -77,9 +77,12 @@ every glyph converted to a `<path>`) and rasterises it with **sharp**. The path
 step is load-bearing: sharp's libvips **cannot draw SVG text at all** — it
 renders nothing, silently, with or without fontconfig, so a card built from
 `<text>` deploys as a blank rectangle. Neither dependency touches the client
-bundle. Budget: ~200ms and ~21KB per card.
+bundle. Budget: ~165ms and ~21KB per card — **once**. That render is largely
+synchronous CPU, so on a one-core box it is time the single process is not
+answering anything else; nothing used to hold on to the result, and every
+scrape, every CDN revalidation and every re-check paid it again.
 
-Four things here are the way they are for a reason:
+Five things here are the way they are for a reason:
 
 1. **The route is NOT under `/api/`.** robots.txt disallows that prefix and
    Facebook's crawler honours robots.txt — an og:image it may not fetch is an
@@ -93,9 +96,25 @@ Four things here are the way they are for a reason:
    place, seat state — `cardVersion` in `lib/event-meta.ts`). Facebook and
    WhatsApp cache a scraped image by URL for a long time; without the token a
    filling evening keeps sending out "Plätze frei".
-4. **It never fails into a broken image.** Any error redirects to
+4. **Each card is drawn once.** `renderCard` keeps finished PNGs in a bounded
+   map keyed by `cardFingerprint` — a token over the drawn strings, so a taken
+   seat changes the key and a stale card cannot be served — and concurrent
+   requests for one card share a single render. On top of that the route sends
+   an `ETag` (so a revalidation is a 304, not another render) and, when the
+   request carries the current `?v=`, `immutable`. The three tokens are one
+   FNV-1a (`lib/helpers.ts`) on purpose: three hashes could drift.
+   **`isr: true` does not cover this** — the adapter stores a response only if
+   its `cache-control` has `s-maxage`, and its cache key drops the query string,
+   so an ISR-cached card would cross-contaminate `?v=` versions.
+5. **It never fails into a broken image.** Any error redirects to
    `/images/og-default.png` with a 200. A scraper that gets a 500 shows no
    picture, and WhatsApp remembers that.
+
+The card's **pixel size lives in `lib/og-card-size.ts`**, not in the renderer:
+`og-card.ts` imports satori and sharp at module scope, so a page importing the
+two constants from there dragged ~50MB of libvips into the process on every
+event-page render — on a server the entrypoint runs with `--smol`. Two integers
+have no dependencies; keep it that way.
 
 The `og:image:width/height` the page declares must match the file. That is why
 they are only emitted when known: the card is a fixed 1200x630, but an
