@@ -3,32 +3,13 @@ import Layout from '../layouts/Layout.astro';
 import type { Block } from '../components/PageContent.astro';
 import PageContent from '../components/PageContent.astro';
 import home from '../content/home.json';
-import { fetchNextEventState } from '@lib/server/events';
-import { fetchTestimonials } from '@lib/server/testimonials';
-import { summarizeNextEvent } from '@lib/event-landing';
-import { dateStatus } from '@lib/event-status';
 import { eventSeriesSchema } from '@lib/series-schema';
 
-/**
- * Server-rendered, not prerendered.
- *
- * The page used to be static with the testimonials filling in afterwards as a
- * server island. It now states the scheduling state in the opening block and
- * again at the close, and that has to be true when the HTML arrives — a hero
- * button offering "Platz sichern" for a date that no longer exists is worse than
- * a slightly more expensive render. Two indexed SQLite reads per request,
- * in-process, are not what this server's RAM budget is spent on.
- *
- * Because the page is server-rendered anyway, the testimonials are read here
- * rather than deferred: the island would only add a second round trip for data
- * this render already has.
- */
-export const prerender = false;
-
-const [{ status, event }, testimonials] = await Promise.all([fetchNextEventState(), fetchTestimonials()]);
-
-const next = summarizeNextEvent(event);
-const state = dateStatus(status, next);
+// Static shell and native <Picture> assets; live content uses server:defer.
+export const prerender = true;
+// Native island parameters are encrypted per build. Revalidate the static HTML
+// on navigation so a new deployment never receives parameters from an old build.
+Astro.response.headers.set('Cache-Control', 'no-cache');
 
 const blocks = home.blocks as Block[];
 
@@ -77,5 +58,5 @@ schemas.push(eventSeriesSchema(siteUrl));
 ---
 
 <Layout title={home.meta.title} description={home.meta.description} schemas={schemas}>
-  <PageContent blocks={blocks} state={state} next={next} testimonials={testimonials} />
+  <PageContent blocks={blocks} />
 </Layout>

@@ -14,7 +14,7 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 │   Astro-Server (Bun, Edge + Backend, :8090 — der nach außen exposte Port)   │
 │   ├─ liefert statische Assets + vorgerenderte HTML direkt → /app/dist/client│
 │   │    (gehashte Assets immutable, Security-Header)                         │
-│   ├─ On-Demand-SSR: Startseite (Testimonials) + Event-Seiten                │
+│   ├─ On-Demand-SSR: Server Islands + Event-Seiten                │
 │   ├─ Public API  → /api/* (Anmeldung, Newsletter, Testimonial, Events, ICS) │
 │   ├─ Admin-UI    → /admin/* (Events anlegen, Anmeldungen verwalten)         │
 │   ├─ Datenhaltung → Drizzle ORM auf bun:sqlite (Datei im /data-Volume)      │
@@ -56,12 +56,11 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
   der externen Instanz gepflegt. Dieses Repo enthält nur die Integration,
   keine listmonk-Images, Dienste, Assets oder Vorlagen. Einrichtung und
   Payload-Vertrag stehen unter [E-Mails](#e-mails).
-- **RAM-schonend & nachhaltig.** Die meisten Seiten sind vorgerendert (statisch);
-  die Startseite und die Event-Seiten rendern serverseitig live, weil sie den
-  echten Terminstatus zeigen. Ein Rebuild bei Content-Änderung entfällt — neue
-  Events/Testimonials sind sofort sichtbar. (Nebenwirkung: `astro-llms-md`
-  verarbeitet nur vorgerenderte Seiten, `/` steht daher nicht mehr in
-  `llms.txt`.)
+- **Statische Startseite mit nativen Server Islands.** Astro rendert die Seite
+  und ihre Bilder beim Build. Termine, Fakten und Stimmen laden über
+  `server:defer` live nach. Event-Seiten bleiben vollständig SSR. Neue Events
+  und freigegebene Stimmen benötigen keinen Rebuild. Ohne JavaScript verweist
+  die Startseite auf die weiterhin serverseitig gerenderte Terminseite.
 - **Statischer Content** (Texte, FAQ, Hero, Moderator …) liegt als **JSON** im
   Repo (`src/content/`, `src/data/`).
 - **Dynamische Teile** (Anmeldung, Warteliste, Newsletter, Testimonial,
@@ -385,7 +384,7 @@ auf der externen Instanz gepflegt.
 
 ## Performance & Regressionstests
 
-- `bun test` prüft die Performance-Regressionen mit temporären Datenbanken und
+- `bun run test` prüft die Performance-Regressionen mit temporären Datenbanken und
   simuliertem HTTP; echte Empfänger werden nicht angeschrieben.
 - `bun run check`, `bun run lint` und `bun run build` prüfen Typen, Stil und
   Produktionsbuild. Beim Build weiterhin **kein zusätzliches `--bun`** verwenden.
@@ -400,6 +399,45 @@ auf der externen Instanz gepflegt.
   Service Worker verwendet gehashte Assets direkt aus dem Cache und speichert
   nur die App-Navigation für Offline-Nutzung, keine Live-Terminseiten.
 
-ISR bleibt für den Bildcache des Bun-Adapters aktiv. Dessen zusätzlicher Aufwand
-für nicht cachebare SSR-Antworten ist noch nicht behoben. Kompression muss am
+ISR ist deaktiviert; alle Bilder sind fertige statische Dateien. Kompression muss am
 Coolify-Proxy geprüft werden; der Bun-Adapter komprimiert Antworten nicht selbst.
+
+## Bilder: Astro-Bordmittel, keine Runtime-Verarbeitung
+
+Die Startseite ist vorgerendert; Live-Termine und Stimmen laden über Astros
+native Server Islands (`server:defer`). Event-Seiten, API und Admin bleiben SSR.
+Die vorhandenen `<Picture>`-Elemente aus `astro:assets` erzeugen beim regulären
+`bun run build` AVIF-, WebP- und JPEG-Dateien unter `dist/client/assets/`.
+`srcset`, `sizes`, Abmessungen, Ladeprioritäten und Bildausschnitte bleiben
+bei den Bildkomponenten. Es gibt keine eigene Bildpipeline und kein Bildmanifest.
+Die Startseite setzt `Cache-Control: no-cache`, damit nach einem Deployment
+die verschlüsselten Server-Island-Parameter zum aktuellen Build passen.
+
+Alle Events verwenden `/images/og-default.png` (1200×630), auch direkt nach dem
+Anlegen. Datum und Platzstatus bleiben in den Live-Texten und Metadaten.
+Die alte Route `/event/<slug>/card.png` leitet nur mit 301 auf dieses Poster um.
+Zusätzliche Admin-Bild-URLs im JSON-LD bleiben direkte Original-URLs; dort nur
+fertige statische Bilddateien hinterlegen, keine On-Demand-Bilddienste. Neue
+Repo-Fotos werden durch einen Rebuild verfügbar. Ein CMS-Export ist nicht nötig.
+
+`/_image` ist ausdrücklich ein HTTP-410-Endpunkt ohne Quellabruf oder
+Transformation, auch bei veränderten Parametern. Astros CSRF-Schutz kann fremde
+POST-Anfragen vorher mit 403 abweisen. Satori, der OG-Renderer und dessen lokale
+Fontkopien sind entfernt. Sharp ist ausschließlich Build-/Test-Abhängigkeit,
+bei Vite extern und im Docker-Runtime-Layer nicht installiert. Astro kann seinen
+ungenutzten Image-Service-Wrapper mitliefern; Sharp/libvips werden dadurch weder
+mitgeliefert noch geladen. ISR ist deaktiviert.
+
+```bash
+bun run build
+# Gebauten Server starten, dann in einem zweiten Terminal:
+bun run images:verify http://127.0.0.1:8090 optionaler-event-slug
+```
+
+Der separate Prüfer decodiert die von den Seiten referenzierten Bilddateien,
+prüft die nativen Server Islands und testet frühere Bildendpunkte direkt.
+Sharp läuft nur in diesem Prüfprozess. Das Produktionsimage enthält ihn nicht.
+
+Eine RAM-Reduktion durch entfallene Renderer/Caches wird erwartet; eine belastbare
+Vorher/Nachher-Messung liegt nicht vor. Für Rollback das vorherige Container-Image
+mit seinen zugehörigen Assets verwenden. Die SQLite-Daten bleiben unverändert.

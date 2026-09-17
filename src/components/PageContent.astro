@@ -1,7 +1,4 @@
 ---
-import type { NextEventSummary } from '@lib/event-landing';
-import type { DateStatus } from '@lib/event-status';
-import type { Testimonial } from '@lib/types';
 import Cta from './blocks/Cta.astro';
 import Dates from './blocks/Dates.astro';
 import Facts from './blocks/Facts.astro';
@@ -26,22 +23,8 @@ export interface Block {
 
 interface Props {
   blocks: Block[];
-  /**
-   * Live data the page resolved once, handed to whichever blocks need it. The
-   * scheduling state in particular has to be the *same* object everywhere on a
-   * page: the hero's action and the closing block's action must never disagree
-   * about whether a date exists.
-   */
-  state?: DateStatus;
-  next?: NextEventSummary | null;
-  testimonials?: Testimonial[];
 }
-
-const { blocks, state, next = null, testimonials = [] } = Astro.props;
-
-/** Blocks that read live data are skipped when a page renders without it. */
-const emptyState: DateStatus = { status: 'none', next: null, isFull: false };
-const resolvedState = state ?? emptyState;
+const { blocks } = Astro.props;
 ---
 
 {
@@ -49,9 +32,13 @@ const resolvedState = state ?? emptyState;
     const data = block.data ?? {};
     switch (block.type) {
       case 'hero':
-        return <Hero data={data} state={resolvedState} />;
+        return <Hero data={data} />;
       case 'facts':
-        return <Facts data={data} next={next} />;
+        return (
+          <Facts data={data} server:defer>
+            <Facts data={data} next={null} slot="fallback" />
+          </Facts>
+        );
       case 'intro':
         return <Intro data={data} />;
       case 'moderator':
@@ -67,13 +54,17 @@ const resolvedState = state ?? emptyState;
       case 'newsletter':
         return <Newsletter data={data} />;
       case 'dates':
-        return <Dates data={data} state={resolvedState} />;
+        return <Dates data={data} />;
       case 'cta':
         return <Cta data={data} />;
       case 'value-items':
         return <ValueItems data={data} />;
       case 'testimonials':
-        return <Testimonials data={data} testimonials={testimonials} />;
+        return (
+          <Testimonials data={data} server:defer>
+            <Testimonials data={data} testimonials={[]} loading slot="fallback" />
+          </Testimonials>
+        );
       case 'page-hero':
         return <PageHero data={data} />;
       case 'text-section':
