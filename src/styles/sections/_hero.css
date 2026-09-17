@@ -50,15 +50,6 @@
   text-wrap: balance;
 }
 
-.hero__title .text-italic,
-.hero__title .highlight {
-  font-style: italic;
-}
-
-.hero__title-line {
-  display: block;
-}
-
 .hero__bottom {
   display: flex;
   flex-wrap: wrap;
@@ -67,7 +58,6 @@
   margin-block-start: var(--space-md);
 }
 
-.hero__description,
 .hero__subtitle {
   max-inline-size: var(--measure);
   margin: 0;
@@ -94,8 +84,4 @@
   font-size: var(--text-section-body-lg);
   line-height: var(--leading-normal);
   color: var(--text-primary);
-}
-
-.event-hero .hero__meta-sep {
-  color: var(--border-strong, var(--border-medium));
 }
