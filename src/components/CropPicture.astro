@@ -1,0 +1,101 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+/**
+ * A `<picture>` whose variants already carry the aspect ratio they are shown at.
+ *
+ * `<Picture>` can only emit one crop, so a square source shown in a portrait box
+ * on desktop and a landscape band on phones was delivered square to both and cut
+ * to shape by `object-fit: cover` — the cropped-away pixels still travelled. On
+ * the home hero that was a third of the phone's download.
+ *
+ * Each width is requested on its own because `aspectRatio` is ignored once
+ * `widths` is set: Astro's srcset path passes only a width to the image service,
+ * which then keeps the source's ratio. Passing `width` *and* `height` is what
+ * reaches sharp's cover-crop. `position` is sharp's, not CSS's — it takes
+ * keywords ('center', 'top', …), never percentages.
+ */
+
+interface Crop {
+  /** Width ÷ height of the box this crop has to fill. */
+  ratio: number;
+  /** Rendered widths, in CSS pixels × the device ratios worth serving. */
+  widths: number[];
+  sizes: string;
+  /** Which part of the source survives the crop. Defaults to the centre. */
+  position?: string;
+}
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  class?: string;
+  /** Used below `breakpoint`. */
+  narrow: Crop;
+  /** Used from `breakpoint` upwards. */
+  wide: Crop;
+  /** A media query width, e.g. `56em`. */
+  breakpoint: string;
+  loading?: 'eager' | 'lazy';
+  fetchpriority?: 'high' | 'auto';
+}
+
+const { src, alt, class: className, narrow, wide, breakpoint, loading, fetchpriority } = Astro.props;
+
+const FORMATS = ['avif', 'webp'] as const;
+
+const crop = (source: ImageMetadata, spec: Crop, format: (typeof FORMATS)[number] | 'jpeg', width: number) =>
+  getImage({
+    src: source,
+    format,
+    width,
+    height: Math.round(width / spec.ratio),
+    fit: 'cover',
+    position: spec.position ?? 'center',
+  });
+
+/** One `<source>`'s worth: the same crop and format at every width. */
+async function srcset(spec: Crop, format: (typeof FORMATS)[number] | 'jpeg'): Promise<string> {
+  const images = await Promise.all(spec.widths.map((width) => crop(src, spec, format, width)));
+  return images.map((image, i) => `${image.src} ${spec.widths[i]}w`).join(', ');
+}
+
+const sources = await Promise.all(
+  [
+    ...FORMATS.map((format) => ({ spec: narrow, format, media: `(max-width: ${breakpoint})` })),
+    ...FORMATS.map((format) => ({ spec: wide, format, media: `(min-width: ${breakpoint})` })),
+  ].map(async ({ spec, format, media }) => ({
+    media,
+    type: `image/${format}`,
+    sizes: spec.sizes,
+    srcset: await srcset(spec, format),
+  })),
+);
+
+// The fallback carries the wide crop: a browser without avif or webp is not a
+// phone. Its intrinsic size is what reserves the box before the image lands.
+const fallbackSrcset = await srcset(wide, 'jpeg');
+const width = Math.max(...wide.widths);
+const fallback = await crop(src, wide, 'jpeg', width);
+---
+
+<picture>
+  {
+    sources.map((source) => (
+      <source media={source.media} type={source.type} srcset={source.srcset} sizes={source.sizes} />
+    ))
+  }
+  <img
+    src={fallback.src}
+    srcset={fallbackSrcset}
+    sizes={wide.sizes}
+    width={width}
+    height={Math.round(width / wide.ratio)}
+    alt={alt}
+    class={className}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    decoding="async"
+  />
+</picture>
