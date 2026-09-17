@@ -1,5 +1,5 @@
 ---
-import { Picture } from 'astro:assets';
+import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
 import HomeEventStatus from '../HomeEventStatus.astro';
 import Ring from '../Ring.astro';
@@ -72,12 +72,23 @@ const lines = data.displayLines ?? [];
       {
         photo && (
           <figure class="home-hero__figure">
-            <Picture
+            <CropPicture
               src={photo}
               class="home-hero__image"
-              widths={[420, 640, 900]}
-              sizes="(max-width: 56em) calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)), calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem) - 2 * clamp(1rem, 0.6rem + 1.6vw, 2rem)) / 3)"
-              formats={['avif', 'webp']}
+              breakpoint="56em"
+              narrow={{
+                ratio: 3 / 2,
+                widths: [420, 700, 900],
+                sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
+                // The subject sits high in the frame; a centred band takes the torso.
+                position: 'top',
+              }}
+              wide={{
+                ratio: 3 / 4,
+                widths: [400, 560, 768],
+                sizes:
+                  'calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem) - 2 * clamp(1rem, 0.6rem + 1.6vw, 2rem)) / 3)',
+              }}
               loading="eager"
               fetchpriority="high"
               alt={data.imageAlt ?? ''}
@@ -223,11 +234,9 @@ const lines = data.displayLines ?? [];
     .home-hero__image {
       display: block;
       inline-size: 100%;
+      /* The variant already carries this ratio, so `cover` never has to crop. */
       aspect-ratio: 3 / 4;
       object-fit: cover;
-      /* The subject sits in the upper half of the source; a centred crop takes
-         the torso and loses the head. */
-      object-position: center 26%;
       border-radius: 0;
     }
 
@@ -278,7 +287,6 @@ const lines = data.displayLines ?? [];
 
       .home-hero__image {
         aspect-ratio: 3 / 2;
-        object-position: center 22%;
       }
     }
 
