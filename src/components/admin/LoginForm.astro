@@ -27,33 +27,28 @@ const { redirect = '/admin' } = Astro.props;
 
 <script>
   import { actions } from 'astro:actions';
+  import { bindOnce, ok } from '@lib/admin';
 
-  function init() {
-    const form = document.getElementById('login-form') as HTMLFormElement | null;
-    if (!form || form.dataset.bound) return;
-    form.dataset.bound = '1';
+  bindOnce<HTMLFormElement>('#login-form', (form) => {
     const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(form);
+
       btn.disabled = true;
       btn.textContent = 'Anmelden…';
-      const { error } = await actions.login({
+      const result = await actions.login({
         email: String(fd.get('email') ?? '').trim(),
         password: String(fd.get('password') ?? ''),
       });
       btn.disabled = false;
       btn.textContent = 'Anmelden';
-      if (error) {
-        window.adminToast?.('err', error.message);
-        return;
-      }
+
+      if (!ok(result)) return;
       window.location.href = form.dataset.redirect || '/admin';
     });
-  }
-
-  document.addEventListener('astro:page-load', init);
+  });
 </script>
 
 <style>

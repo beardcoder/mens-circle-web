@@ -1,16 +1,8 @@
 <script lang="ts">
   import { isValidEmail } from '@lib/helpers';
   import { submitTestimonial } from '@lib/api';
-  import { showToast } from '@lib/toast';
-  import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
-  import {
-    describedBy,
-    errorId,
-    type FieldErrors,
-    firstError,
-    focusFirstInvalid,
-    takeOverValidation,
-  } from '@lib/form-errors';
+  import { TRACKING_EVENTS } from '@lib/umami';
+  import { describedBy, errorId, type FieldErrors, submitForm, takeOverValidation, withoutError } from '@lib/form';
 
   const FORM = 'testimonial';
 
@@ -30,12 +22,9 @@
     takeOverValidation(formEl);
   });
 
-  function clearError(field: string): void {
-    if (errors[field]) {
-      const { [field]: _removed, ...rest } = errors;
-      errors = rest;
-    }
-  }
+  const clearError = (field: string): void => {
+    errors = withoutError(errors, field);
+  };
 
   function validate(): FieldErrors {
     const next: FieldErrors = {};
@@ -56,57 +45,38 @@
   async function handleSubmit(e: SubmitEvent): Promise<void> {
     e.preventDefault();
 
-    errors = validate();
-
-    if (Object.keys(errors).length > 0) {
-      // The inline messages carry the detail; the toast is only the summary.
-      showToast('error', firstError(errors) ?? 'Bitte prüfe deine Eingaben.');
-      await focusFirstInvalid(formEl);
-      return;
-    }
-
-    const text = quote.trim();
-    const name = authorName.trim();
-    const roleValue = role.trim();
-    const mail = email.trim();
-
-    trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUBMIT, {
-      has_name: name ? 'yes' : 'no',
-      has_role: roleValue ? 'yes' : 'no',
-      char_count: text.length,
-    });
-    submitting = true;
-
-    try {
-      const { success, message } = await submitTestimonial({
-        quote: text,
-        author_name: name || null,
-        role: roleValue || null,
-        email: mail,
-        privacy: true,
-        website,
-      });
-
-      if (success) {
-        showToast('success', message);
-        trackEvent(TRACKING_EVENTS.TESTIMONIAL_SUCCESS);
+    await submitForm({
+      form: formEl,
+      validate,
+      setErrors: (next) => (errors = next),
+      setSubmitting: (value) => (submitting = value),
+      events: {
+        submit: TRACKING_EVENTS.TESTIMONIAL_SUBMIT,
+        success: TRACKING_EVENTS.TESTIMONIAL_SUCCESS,
+        error: TRACKING_EVENTS.TESTIMONIAL_ERROR,
+      },
+      context: {
+        has_name: authorName.trim() ? 'yes' : 'no',
+        has_role: role.trim() ? 'yes' : 'no',
+        char_count: quote.trim().length,
+      },
+      send: () =>
+        submitTestimonial({
+          quote: quote.trim(),
+          author_name: authorName.trim() || null,
+          role: role.trim() || null,
+          email: email.trim(),
+          privacy: true,
+          website,
+        }),
+      reset: () => {
         quote = '';
         authorName = '';
         role = '';
         email = '';
         privacy = false;
-        errors = {};
-      } else {
-        showToast('error', message);
-        trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: message });
-      }
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Network error';
-      showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
-      trackEvent(TRACKING_EVENTS.TESTIMONIAL_ERROR, { error: msg });
-    } finally {
-      submitting = false;
-    }
+      },
+    });
   }
 </script>
 

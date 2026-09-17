@@ -3,20 +3,16 @@
  * `.toast--hiding`; this only appends the element and removes it on expiry.
  */
 
-type ToastType = 'success' | 'error' | 'info' | 'warning';
+type ToastType = 'success' | 'error';
 
 const ICONS: Record<ToastType, string> = {
   success: '✓',
   error: '✕',
-  info: 'i',
-  warning: '!',
 };
 
 const DEFAULT_TITLES: Record<ToastType, string> = {
   success: 'Erfolg',
   error: 'Fehler',
-  info: 'Information',
-  warning: 'Warnung',
 };
 
 const VISIBLE_MS = 5000;
@@ -29,7 +25,7 @@ function buildToast(type: ToastType, message: string, title?: string): HTMLDivEl
 
   // Problems interrupt, confirmations wait for a pause. `role="alert"` already
   // implies `aria-live="assertive"`, so never pair it with an explicit politeness.
-  const urgent = type === 'error' || type === 'warning';
+  const urgent = type === 'error';
 
   toast.role = urgent ? 'alert' : 'status';
   toast.ariaLive = urgent ? 'assertive' : 'polite';

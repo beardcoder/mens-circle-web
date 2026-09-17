@@ -58,8 +58,7 @@
   .hero__bottom,
   .page-opening__eyebrow,
   .page-opening__title,
-  .page-opening__lead,
-  .page-opening__cta {
+  .page-opening__lead {
     animation: hero-rise var(--duration-slow) var(--ease-settle) both;
   }
 
@@ -71,10 +70,6 @@
   .hero__bottom,
   .page-opening__lead {
     animation-delay: var(--stagger-2);
-  }
-
-  .page-opening__cta {
-    animation-delay: var(--stagger-3);
   }
 
   /* Arriving through a view transition, the cross-fade already *is* the
@@ -93,8 +88,7 @@
   .vt-arrival .hero__bottom,
   .vt-arrival .page-opening__eyebrow,
   .vt-arrival .page-opening__title,
-  .vt-arrival .page-opening__lead,
-  .vt-arrival .page-opening__cta {
+  .vt-arrival .page-opening__lead {
     animation: none;
   }
 }
@@ -263,8 +257,7 @@
   .hero__bottom,
   .page-opening__eyebrow,
   .page-opening__title,
-  .page-opening__lead,
-  .page-opening__cta {
+  .page-opening__lead {
     transform: none;
     animation: none;
   }

@@ -170,128 +170,114 @@ function badgeClass(s: Status): string {
 
 <script>
   import { actions } from 'astro:actions';
+  import { adminToast, bindOnce, ok } from '@lib/admin';
 
-  function init() {
-    const list = document.getElementById('reg-list');
-    if (list && !list.dataset.bound) {
-      list.dataset.bound = '1';
+  bindOnce('#reg-list', (list) => {
+    list.addEventListener('change', async (e) => {
+      const sel = (e.target as HTMLElement).closest('.js-status') as HTMLSelectElement | null;
+      if (!sel) return;
+      const row = sel.closest('.reg') as HTMLElement;
+      const status = sel.value as 'registered' | 'waitlist' | 'cancelled' | 'attended';
 
-      list.addEventListener('change', async (e) => {
-        const sel = (e.target as HTMLElement).closest('.js-status') as HTMLSelectElement | null;
-        if (!sel) return;
-        const row = sel.closest('.reg') as HTMLElement;
-        const id = row.dataset.id!;
-        const status = sel.value as 'registered' | 'waitlist' | 'cancelled' | 'attended';
-        sel.disabled = true;
-        const { error } = await actions.setRegistrationStatus({ id, status });
-        sel.disabled = false;
-        if (error) {
-          window.adminToast?.('err', error.message);
-          return;
-        }
-        window.adminToast?.('ok', 'Status aktualisiert.');
-        // A cancellation can promote someone from the waitlist.
-        if (status === 'cancelled') setTimeout(() => window.location.reload(), 700);
-      });
+      sel.disabled = true;
+      const result = await actions.setRegistrationStatus({ id: row.dataset.id!, status });
+      sel.disabled = false;
+      if (!ok(result)) return;
 
-      list.addEventListener('click', async (e) => {
-        const btn = (e.target as HTMLElement).closest('.js-resend-one') as HTMLButtonElement | null;
-        if (!btn) return;
-        const row = btn.closest('.reg') as HTMLElement;
-        const { id, name } = row.dataset;
-        if (!id || !confirm(`Anmeldebestätigung an ${name} senden?`)) return;
-        btn.disabled = true;
-        btn.textContent = 'Senden…';
-        const { data, error } = await actions.resendConfirmations({ eventId: list.dataset.event!, ids: [id] });
+      adminToast('ok', 'Status aktualisiert.');
+      // A cancellation can promote someone from the waitlist.
+      if (status === 'cancelled') setTimeout(() => window.location.reload(), 700);
+    });
+
+    list.addEventListener('click', async (e) => {
+      const btn = (e.target as HTMLElement).closest('.js-resend-one') as HTMLButtonElement | null;
+      if (!btn) return;
+      const row = btn.closest('.reg') as HTMLElement;
+      const { id, name } = row.dataset;
+      if (!id || !confirm(`Anmeldebestätigung an ${name} senden?`)) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Senden…';
+      const result = await actions.resendConfirmations({ eventId: list.dataset.event!, ids: [id] });
+      btn.disabled = false;
+      btn.textContent = 'Bestätigung senden';
+      if (!ok(result)) return;
+
+      adminToast(result.data.sent > 0 ? 'ok' : 'err', result.data.message);
+      if (result.data.sent > 0) setTimeout(() => window.location.reload(), 700);
+    });
+
+    list.addEventListener('click', async (e) => {
+      const btn = (e.target as HTMLElement).closest('.js-del-reg') as HTMLButtonElement | null;
+      if (!btn) return;
+      const row = btn.closest('.reg') as HTMLElement;
+      const { id, name } = row.dataset;
+      if (!id || !confirm(`Anmeldung von ${name} entfernen?`)) return;
+
+      btn.disabled = true;
+      if (!ok(await actions.deleteRegistration({ id }))) {
         btn.disabled = false;
-        btn.textContent = 'Bestätigung senden';
-        if (error) {
-          window.adminToast?.('err', error.message);
-          return;
-        }
-        window.adminToast?.(data.sent > 0 ? 'ok' : 'err', data.message);
-        if (data.sent > 0) setTimeout(() => window.location.reload(), 700);
+        return;
+      }
+
+      adminToast('ok', 'Anmeldung entfernt.');
+      row.remove();
+    });
+  });
+
+  bindOnce('.confirm', (confirmBar) => {
+    const eventId = confirmBar.dataset.event!;
+
+    const run = async (btn: HTMLButtonElement, onlyMissing: boolean) => {
+      const label = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Senden…';
+      const result = await actions.resendConfirmations({ eventId, onlyMissing });
+      btn.disabled = false;
+      btn.textContent = label;
+      if (!ok(result)) return;
+
+      adminToast(result.data.failed > 0 ? 'err' : 'ok', result.data.message);
+      if (result.data.sent > 0) setTimeout(() => window.location.reload(), 1200);
+    };
+
+    confirmBar.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const missing = target.closest('.js-resend-missing') as HTMLButtonElement | null;
+      if (missing) {
+        void run(missing, true);
+        return;
+      }
+
+      const all = target.closest('.js-resend-all') as HTMLButtonElement | null;
+      if (!all) return;
+      if (!confirm('Bestätigung an ALLE angemeldeten und wartenden Teilnehmer:innen erneut senden?')) return;
+      void run(all, false);
+    });
+  });
+
+  bindOnce<HTMLFormElement>('#broadcast-form', (form) => {
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+
+      btn.disabled = true;
+      btn.textContent = 'Senden…';
+      const result = await actions.sendEventMessage({
+        id: form.dataset.event!,
+        subject: String(fd.get('subject') ?? ''),
+        content: String(fd.get('content') ?? ''),
       });
+      btn.disabled = false;
+      btn.textContent = 'Nachricht senden';
+      if (!ok(result)) return;
 
-      list.addEventListener('click', async (e) => {
-        const btn = (e.target as HTMLElement).closest('.js-del-reg') as HTMLButtonElement | null;
-        if (!btn) return;
-        const row = btn.closest('.reg') as HTMLElement;
-        const { id, name } = row.dataset;
-        if (!id || !confirm(`Anmeldung von ${name} entfernen?`)) return;
-        btn.disabled = true;
-        const { error } = await actions.deleteRegistration({ id });
-        if (error) {
-          btn.disabled = false;
-          window.adminToast?.('err', error.message);
-          return;
-        }
-        window.adminToast?.('ok', 'Anmeldung entfernt.');
-        row.remove();
-      });
-    }
-
-    const confirmBar = document.querySelector('.confirm') as HTMLElement | null;
-    if (confirmBar && !confirmBar.dataset.bound) {
-      confirmBar.dataset.bound = '1';
-      const eventId = confirmBar.dataset.event!;
-
-      const run = async (btn: HTMLButtonElement, onlyMissing: boolean) => {
-        const label = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Senden…';
-        const { data, error } = await actions.resendConfirmations({ eventId, onlyMissing });
-        btn.disabled = false;
-        btn.textContent = label;
-        if (error) {
-          window.adminToast?.('err', error.message);
-          return;
-        }
-        window.adminToast?.(data.failed > 0 ? 'err' : 'ok', data.message);
-        if (data.sent > 0) setTimeout(() => window.location.reload(), 1200);
-      };
-
-      confirmBar.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        const missing = target.closest('.js-resend-missing') as HTMLButtonElement | null;
-        if (missing) {
-          void run(missing, true);
-          return;
-        }
-        const all = target.closest('.js-resend-all') as HTMLButtonElement | null;
-        if (!all) return;
-        if (!confirm('Bestätigung an ALLE angemeldeten und wartenden Teilnehmer:innen erneut senden?')) return;
-        void run(all, false);
-      });
-    }
-
-    const form = document.getElementById('broadcast-form') as HTMLFormElement | null;
-    if (form && !form.dataset.bound) {
-      form.dataset.bound = '1';
-      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fd = new FormData(form);
-        btn.disabled = true;
-        btn.textContent = 'Senden…';
-        const { data, error } = await actions.sendEventMessage({
-          id: form.dataset.event!,
-          subject: String(fd.get('subject') ?? ''),
-          content: String(fd.get('content') ?? ''),
-        });
-        btn.disabled = false;
-        btn.textContent = 'Nachricht senden';
-        if (error) {
-          window.adminToast?.('err', error.message);
-          return;
-        }
-        window.adminToast?.('ok', data.message);
-        form.reset();
-      });
-    }
-  }
-
-  document.addEventListener('astro:page-load', init);
+      adminToast('ok', result.data.message);
+      form.reset();
+    });
+  });
 </script>
 
 <style>
