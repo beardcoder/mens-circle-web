@@ -54,16 +54,11 @@
      skin. Both were built against the old earth/terracotta primitives, so those
      names are kept, re-pitched onto this palette. Nothing else may use them. */
   --color-bone: var(--color-paper);
-  --color-parchment: var(--color-paper);
   --color-sand: var(--color-chalk-muted);
   --color-sand-light: var(--color-chalk);
   --color-earth-deep: var(--color-night);
-  --color-earth-dark: var(--color-night-soft);
-  --color-earth-mid: var(--color-night-rule);
-  --color-earth-warm: #4f443a;
   --color-terracotta: var(--color-orange);
   --color-terracotta-light: var(--color-orange);
-  --color-terracotta-deep: var(--color-orange-deep);
   --color-sage: #2f6b4a;
   --color-sage-light: #7fc09a;
 
@@ -72,12 +67,7 @@
   /* Surfaces */
   --bg-primary: light-dark(var(--color-paper), var(--color-night));
   --bg-secondary: light-dark(var(--color-paper-sunk), var(--color-night-soft));
-  --bg-tertiary: light-dark(var(--color-paper-sunk), var(--color-night-soft));
   --bg-elevated: light-dark(var(--color-paper-raised), var(--color-night-soft));
-  --bg-dark: light-dark(var(--color-night), #151714);
-  --bg-dark-alt: light-dark(var(--color-night-soft), var(--color-night));
-  --bg-section-alt: light-dark(var(--color-night), #151714);
-  --bg-light: light-dark(var(--color-paper-sunk), var(--color-night-soft));
   --bg-overlay: light-dark(rgb(38 40 36 / 55%), rgb(10 11 10 / 70%));
 
   /* Form controls sit on the page ground, not on a dark panel. */
@@ -89,9 +79,6 @@
   --text-secondary: light-dark(var(--color-ink-mid), #cdc3b4); /* 10.2:1 on night */
   --text-muted: light-dark(var(--color-ink-muted), var(--color-chalk-muted));
   --text-on-dark: var(--color-chalk);
-  --text-on-dark-secondary: var(--color-chalk-muted);
-  --text-dark: light-dark(var(--color-ink), var(--color-chalk));
-  --text-light: light-dark(var(--color-paper), var(--color-ink));
 
   /* Accents.
        --accent-primary   the orange itself: fills, strokes, the ring
@@ -101,11 +88,8 @@
                           weight and an orange underline instead
        --accent-secondary the orange on a dark ground (5.9:1 — safe as text) */
   --accent-primary: var(--color-orange);
-  --accent-on-fill: var(--color-ink);
   --accent-text: light-dark(var(--color-ink), var(--color-orange));
-  --accent-secondary: var(--color-orange);
   --accent-rare: var(--color-orange);
-  --text-accent: light-dark(var(--color-ink), var(--color-orange));
 
   /* Status */
   --color-success: light-dark(#2f6b4a, #7fc09a);
@@ -130,7 +114,6 @@
   /* The focus ring is the orange at full strength — it has to win over a dark
      field, an orange field and the paper alike, so it is a solid ring plus a
      contrasting outline rather than a soft tint. */
-  --focus-ring: 0 0 0 3px var(--color-orange);
 
   /* Typography */
   /* --font-condensed / --font-text are defined by the Astro <Font> components
@@ -139,7 +122,6 @@
      configured generic fallbacks. */
   --font-display: var(--font-condensed);
   --font-body: var(--font-text);
-  --font-accent: var(--font-condensed);
 
   /* Type scale, in two registers that do not overlap.
      
@@ -182,19 +164,14 @@
   --tracking-marker: 0.14em;
 
   /* Line heights */
-  --leading-tight: 1.35;
   --leading-normal: 1.6;
   --leading-relaxed: 1.7;
 
   /* Measures. The brief's 60–68 characters per line, expressed where it counts:
      `--measure` is the default for running text, the rest are the exceptions. */
   --measure: 64ch;
-  --measure-narrow: 54ch;
   --measure-wide: 72ch;
   --content-max-form: 30rem;
-  --content-max-text: 64ch;
-  --content-max-description: 64ch;
-  --content-max-wide: 68ch;
 
   /* Form controls */
   --control-padding-block: 0.7rem;
@@ -204,7 +181,6 @@
   --control-border-color: var(--border-medium);
   --control-bg: var(--bg-input);
   --control-bg-hover: var(--bg-input-focus);
-  --control-bg-light: var(--bg-primary);
   --control-color: var(--text-primary);
   --control-placeholder: var(--text-muted);
 
@@ -217,26 +193,20 @@
   --space-lg: clamp(2rem, 1.5rem + 2vw, 3.25rem);
   --space-xl: clamp(3rem, 2.2rem + 3vw, 5rem);
   --space-2xl: clamp(4rem, 3rem + 4vw, 6.5rem);
-  --space-3xl: clamp(5rem, 3.5rem + 5vw, 8rem);
 
   /* Vertical rhythm — one source of truth for section spacing. Sections are
      separated by a hairline as well as by space, so the space itself does not
      have to do all the work: this is deliberately tighter than the old scale,
      which left half a screen of nothing between passages. */
   --rhythm-section: clamp(2.5rem, 1.9rem + 2.2vw, 4rem);
-  --rhythm-block: var(--space-lg);
   --rhythm-stack: var(--space-sm);
-  --rhythm-cluster: var(--space-xs);
 
   /* Motion — short and functional only. */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-release: cubic-bezier(0.2, 0, 0, 1);
   --ease-ambient: cubic-bezier(0.43, 0.13, 0.23, 0.96);
   --ease-emphasised: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-reveal: cubic-bezier(0.33, 0, 0.2, 1);
 
-  --duration-instant: 90ms;
   --duration-fast: 140ms;
   --duration-normal: 220ms;
   --duration-slow: 340ms;
@@ -245,15 +215,9 @@
 
   --motion-quick: var(--duration-fast) var(--ease-precise);
   --motion-standard: var(--duration-normal) var(--ease-precise);
-  --motion-enter: var(--duration-slow) var(--ease-settle);
-  --motion-slow: var(--duration-slower) var(--ease-settle);
-  --motion-cinematic: var(--duration-cinematic) var(--ease-emphasised);
 
   --stagger-1: 40ms;
   --stagger-2: 80ms;
-  --stagger-3: 120ms;
-  --stagger-4: 160ms;
-  --stagger-5: 200ms;
 
   /* Layout */
   /* A wide poster measure. Sections place content into a 12-column grid rather
@@ -261,7 +225,6 @@
      section to section. Graphics may break out of it; reading text may not. */
   --container-width: 1320px;
   --container-narrow: 780px;
-  --container-wide: 1320px;
   --container-gutter: clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem);
   --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
 
@@ -278,13 +241,7 @@
 
   /* Shadows — only where something genuinely floats above the page
      (the mobile nav panel, a toast, a dialog). Surfaces use rules instead. */
-  --shadow-sm: 0 1px 2px light-dark(rgb(38 40 36 / 6%), rgb(0 0 0 / 30%));
-  --shadow-md: 0 2px 8px light-dark(rgb(38 40 36 / 8%), rgb(0 0 0 / 36%));
-  --shadow-lg: 0 6px 20px light-dark(rgb(38 40 36 / 10%), rgb(0 0 0 / 44%));
-  --shadow-xl: 0 12px 32px light-dark(rgb(38 40 36 / 12%), rgb(0 0 0 / 50%));
   --shadow-2xl: 0 20px 48px light-dark(rgb(38 40 36 / 16%), rgb(0 0 0 / 58%));
-  --shadow-glow-accent: none;
-  --shadow-inset: none;
 
   /* The breathing surface still uses a faint texture — it is the one place a
      flat ground reads as a dead screen rather than a quiet room. Everywhere
@@ -298,18 +255,12 @@
   --radius-sm: 0;
   --radius-md: 0;
   --radius-lg: 0;
-  --radius-xl: 0;
   --radius-full: 9999px;
 
   /* Z-Index Scale */
-  --z-base: 0;
-  --z-elevated: 10;
   --z-sticky: 100;
   --z-header: 1000;
-  --z-dropdown: 1100;
-  --z-modal-backdrop: 1200;
   --z-modal: 1300;
-  --z-tooltip: 1400;
   --z-toast: 1500;
 }
 
