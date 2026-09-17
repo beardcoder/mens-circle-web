@@ -429,8 +429,15 @@ describe('retention scheduling (actual component functions)', () => {
 
 // Evaluate the checked-in sizes expressions in isolation (not a browser layout
 // measurement). Commas inside min/clamp must not split source-size entries.
+//
+// Two spellings, because the two heroes build their markup differently: PageHero
+// hands `sizes` to <Picture> as an attribute, while Hero (on demand, so its
+// variants come from astro-integrations/hero-images.mjs) shares one `SIZES`
+// constant across the <source>s and the <img>. Same expression either way, and
+// that expression is what this asserts.
 function imageSlot(component: string, viewport: number): number {
-  const sizes = read(`src/components/blocks/${component}.astro`).match(/sizes="([^"]+)"/)![1];
+  const source = read(`src/components/blocks/${component}.astro`);
+  const sizes = (source.match(/sizes="([^"]+)"/) ?? source.match(/const SIZES =\s*'([^']+)'/))![1];
   let depth = 0;
   let separator = -1;
   for (let index = 0; index < sizes.length; index++) {
@@ -494,6 +501,21 @@ describe('frontend performance contracts', () => {
     }
     expect(read('src/styles/utilities/_view-transitions.css')).toContain('@view-transition');
     expect(read('src/layouts/Layout.astro')).toContain("addEventListener('pagereveal'");
+  });
+
+  test('the on-demand hero ships build-time variants, never the runtime image endpoint', () => {
+    // `astro:assets` resizes on request for a page that is not prerendered, and
+    // that endpoint is libvips resident in the single web process — ~55MB of
+    // native memory, outside the Bun heap where `--smol` cannot reach it. The
+    // home page is on demand, so its photo is encoded during the build instead.
+    const hero = read('src/components/blocks/Hero.astro');
+    expect(hero).not.toMatch(/from 'astro:assets'/);
+    expect(hero).toContain("from 'virtual:hero-images'");
+    expect(read('astro.config.mjs')).toContain('heroImages(');
+
+    // PageHero keeps <Picture>: every page that uses it is prerendered, so
+    // Astro already emits those variants at build time.
+    expect(read('src/components/blocks/PageHero.astro')).toMatch(/from 'astro:assets'/);
   });
 
   test('registration hydration serializes only id and capacity state', () => {

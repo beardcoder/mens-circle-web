@@ -14,13 +14,14 @@ export DATABASE_PATH="${DATABASE_PATH:-/data/mens-circle.db}"
 
 # Cap glibc's per-thread malloc arenas.
 #
-# Astro's /_image endpoint optimises the SSR home page's photo per request, and
-# it runs on libvips (sharp's native core). libvips is threaded, and glibc hands
-# every thread that allocates its own 64MB arena and keeps it. That memory is
-# native, outside the Bun heap, so `--smol` never touches it. Measured on the
-# built server, cold, over the 15 variants the home page's photo has: 178MB with
-# the default arenas, 160MB with two. Two is the usual floor that still lets the
-# pool threads work.
+# Insurance, not a hot path: no page this server renders asks for an image any
+# more (astro-integrations/hero-images.mjs resizes them during the build), so
+# libvips never loads under normal traffic. But Astro always registers its
+# /_image endpoint, and a hand-written request to it still pulls libvips in.
+# libvips is threaded, and glibc hands every thread that allocates its own 64MB
+# arena and keeps it — native memory, outside the Bun heap, where `--smol`
+# cannot reach it. Measured on the built server, 15 such requests: 189MB with
+# the default arenas, 159MB with two. Normal traffic sits at ~100MB either way.
 export MALLOC_ARENA_MAX="${MALLOC_ARENA_MAX:-2}"
 
 echo "→ Starting Astro server on $ASTRO_HOST:$ASTRO_PORT (db: $DATABASE_PATH)"

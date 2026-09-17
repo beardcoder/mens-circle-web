@@ -1,6 +1,5 @@
 ---
-import { Picture } from 'astro:assets';
-import { resolveAssetImage } from '../../lib/images';
+import { heroImages } from 'virtual:hero-images';
 import { primaryAction, type DateStatus } from '../../lib/event-status';
 import Ring from '../Ring.astro';
 
@@ -42,8 +41,18 @@ interface Props {
 
 const { data, state } = Astro.props;
 const action = primaryAction(state);
-const photo = resolveAssetImage(data.image);
+// Resized at build time — NOT through `astro:assets`. This page renders on
+// demand, and `<Picture>` would point every variant at the runtime /_image
+// endpoint, which is libvips resident in the web process for the life of the
+// container. astro-integrations/hero-images.mjs encodes these during the build
+// and hands over finished URLs; adding an image here means adding it there.
+const photo = data.image ? heroImages[data.image] : undefined;
 const lines = data.displayLines ?? [];
+
+// One `sizes` for the whole <picture>: full width minus the gutters up to 56em,
+// a third of the content column above it — the figure's span in the hero grid.
+const SIZES =
+  '(max-width: 56em) calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)), calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem) - 2 * clamp(1rem, 0.6rem + 1.6vw, 2rem)) / 3)';
 ---
 
 <section class="home-hero section--clip">
@@ -91,16 +100,23 @@ const lines = data.displayLines ?? [];
       {
         photo && (
           <figure class="home-hero__figure">
-            <Picture
-              src={photo}
-              class="home-hero__image"
-              widths={[420, 640, 900]}
-              sizes="(max-width: 56em) calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)), calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem) - 2 * clamp(1rem, 0.6rem + 1.6vw, 2rem)) / 3)"
-              formats={['avif', 'webp']}
-              loading="eager"
-              fetchpriority="high"
-              alt={data.imageAlt ?? ''}
-            />
+            <picture>
+              {photo.sources.map((source) => (
+                <source type={source.type} srcset={source.srcset} sizes={SIZES} />
+              ))}
+              <img
+                class="home-hero__image"
+                src={photo.src}
+                srcset={photo.srcset}
+                sizes={SIZES}
+                width={photo.width}
+                height={photo.height}
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+                alt={data.imageAlt ?? ''}
+              />
+            </picture>
             {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
           </figure>
         )

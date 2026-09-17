@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "description": "M\u00e4nnerkreis Niederbayern/ Straubing \u2014 Astro 7 + Svelte 5, SSR on the Bun runtime, with Drizzle (bun:sqlite) as the backend and listmonk for email.",
+  "description": "Männerkreis Niederbayern/ Straubing — Astro 7 + Svelte 5, SSR on the Bun runtime, with Drizzle (bun:sqlite) as the backend and listmonk for email.",
   "scripts": {
     "dev": "bun --bun astro dev",
     "build": "astro build",
@@ -48,6 +48,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-svelte": "^4.1.1",
+    "sharp": "^0.35.4",
     "svelte-eslint-parser": "^1.8.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.70.0"

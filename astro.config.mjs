@@ -7,6 +7,7 @@ import umami from '@yeskunall/astro-umami';
 import icon from 'astro-icon';
 import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
 import { addPagesToLlmsTxt } from './astro-integrations/llms-extra.mjs';
+import { heroImages } from './astro-integrations/hero-images.mjs';
 import { defineConfig, fontProviders } from 'astro/config';
 import { addSitemapsToIndex } from './astro-integrations/sitemap-index-extra.mjs';
 import { serveLlmsWithBunAdapter, serveSitemapWithBunAdapter } from './astro-integrations/serve-with-bun-adapter.mjs';
@@ -106,6 +107,12 @@ export default defineConfig({
     },
   ],
   integrations: [
+    // The home page renders on demand, so `astro:assets` would hand its hero
+    // photo to the runtime /_image endpoint — and that endpoint is libvips,
+    // ~55MB of native memory held for the life of the container. Resized here
+    // at build time instead; the page ships finished URLs. See the integration
+    // and **RAM** in CLAUDE.md before adding an on-demand page with a picture.
+    heroImages({ sources: [{ src: '/images/markus-sommer.jpg', widths: [420, 640, 900] }] }),
     svelte(),
     // Local SVGs from src/icons/, inlined via <Icon name="…" />.
     icon(),

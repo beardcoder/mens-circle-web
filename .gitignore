@@ -22,3 +22,6 @@ data/
 .idea/
 .vscode/
 .shots/
+
+# generated at build time by astro-integrations/hero-images.mjs
+public/generated/
