@@ -72,7 +72,9 @@ Live scheduling and testimonials use `server:defer` in `HomeEventStatus.astro`,
 Event pages remain SSR. Do not add pictures or image transforms to server islands.
 
 Every event uses `/images/og-default.png` (1200×630). The legacy card route is
-only a 301 redirect; `/_image` is a 410 tombstone. No custom image pipeline,
+deleted (404). Astro always registers `/_image` in SSR builds, so its endpoint
+override must remain: it only returns 404, without fetching or transforming.
+Removing that override would restore Astro's runtime transformer. No custom image pipeline,
 manifest, CMS export, Satori renderer or runtime Sharp dependency. Sharp is
 external to the server bundle and only installed for builds/tests. ISR is off.
 Run `bun run images:verify <origin> [event-slug]` against the production artifact.

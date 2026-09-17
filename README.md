@@ -415,13 +415,15 @@ die verschlüsselten Server-Island-Parameter zum aktuellen Build passen.
 
 Alle Events verwenden `/images/og-default.png` (1200×630), auch direkt nach dem
 Anlegen. Datum und Platzstatus bleiben in den Live-Texten und Metadaten.
-Die alte Route `/event/<slug>/card.png` leitet nur mit 301 auf dieses Poster um.
+Die alte Route `/event/<slug>/card.png` ist gelöscht und liefert 404.
 Zusätzliche Admin-Bild-URLs im JSON-LD bleiben direkte Original-URLs; dort nur
 fertige statische Bilddateien hinterlegen, keine On-Demand-Bilddienste. Neue
 Repo-Fotos werden durch einen Rebuild verfügbar. Ein CMS-Export ist nicht nötig.
 
-`/_image` ist ausdrücklich ein HTTP-410-Endpunkt ohne Quellabruf oder
-Transformation, auch bei veränderten Parametern. Astros CSRF-Schutz kann fremde
+Astro registriert `/_image` bei SSR-Builds automatisch. Der minimale
+Endpoint-Override liefert deshalb nur 404 ohne Quellabruf oder Transformation,
+auch bei veränderten Parametern. Die Konfiguration darf nicht einfach entfallen,
+sonst aktiviert Astro wieder seinen Runtime-Transformer. Astros CSRF-Schutz kann fremde
 POST-Anfragen vorher mit 403 abweisen. Satori, der OG-Renderer und dessen lokale
 Fontkopien sind entfernt. Sharp ist ausschließlich Build-/Test-Abhängigkeit,
 bei Vite extern und im Docker-Runtime-Layer nicht installiert. Astro kann seinen

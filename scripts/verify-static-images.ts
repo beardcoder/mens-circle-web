@@ -77,17 +77,17 @@ for (const query of [
       method,
       headers: { origin: origin.origin, 'content-type': 'application/json' },
     });
-    assert.equal(response.status, 410, `${method} ${query}`);
+    assert.equal(response.status, 404, `${method} ${query}`);
     assert.ok(!(response.headers.get('content-type') || '').startsWith('image/'));
   }
 }
 for (const slug of [eventSlug || 'unknown', 'missing-event']) {
   for (const query of ['', '?v=old&w=1&f=avif', '?href=https://example.invalid/new.png&q=1']) {
     const response = await fetch(new URL(`/event/${slug}/card.png${query}`, origin), { redirect: 'manual' });
-    assert.equal(response.status, 301);
-    assert.equal(new URL(response.headers.get('location')!).pathname, '/images/og-default.png');
+    assert.equal(response.status, 404);
+    assert.equal(response.headers.get('location'), null);
   }
 }
 console.log(
-  `Production verification passed: ${images.size} static images, native server islands, pages and legacy endpoints.`,
+  `Production verification passed: ${images.size} static images, native server islands, pages and retired image URLs (404).`,
 );
