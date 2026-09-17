@@ -106,7 +106,7 @@ services:
       POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES}
       POSTGRES_DB: listmonk
     volumes:
-      - listmonk-db:/var/lib/postgresql/data
+      - listmonk-db:/var/lib/postgresql
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 30s
