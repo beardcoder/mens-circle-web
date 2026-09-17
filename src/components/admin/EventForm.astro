@@ -175,20 +175,19 @@ const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
 
 <script>
   import { actions } from 'astro:actions';
+  import { adminToast, bindOnce, ok } from '@lib/admin';
 
-  function init() {
-    const form = document.getElementById('event-form') as HTMLFormElement | null;
-    if (!form || form.dataset.bound) return;
-    form.dataset.bound = '1';
+  bindOnce<HTMLFormElement>('#event-form', (form) => {
     const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(form);
       const get = (k: string) => String(fd.get(k) ?? '');
+
       btn.disabled = true;
       btn.textContent = 'Speichern…';
-      const { data, error } = await actions.saveEvent({
+      const result = await actions.saveEvent({
         id: form.dataset.id || undefined,
         title: get('title'),
         slug: get('slug'),
@@ -210,46 +209,39 @@ const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
       });
       btn.disabled = false;
       btn.textContent = 'Speichern';
-      if (error) {
-        window.adminToast?.('err', error.message);
-        return;
-      }
+      if (!ok(result)) return;
+
       // A new event returns to the list; an edit stays, with confirmation.
       if (!form.dataset.edit) {
         window.location.href = '/admin';
         return;
       }
-      window.adminToast?.('ok', data.message);
+      adminToast('ok', result.data.message);
     });
+  });
 
-    const nlForm = document.getElementById('newsletter-form') as HTMLFormElement | null;
-    if (nlForm && !nlForm.dataset.bound) {
-      nlForm.dataset.bound = '1';
-      const nlBtn = nlForm.querySelector('button[type="submit"]') as HTMLButtonElement;
-      nlForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fd = new FormData(nlForm);
-        const subject = String(fd.get('subject') ?? '');
-        if (!confirm('Newsletter jetzt an die gesamte Newsletter-Liste senden?')) return;
-        nlBtn.disabled = true;
-        nlBtn.textContent = 'Senden…';
-        const { data, error } = await actions.sendEventNewsletter({
-          id: nlForm.dataset.id!,
-          subject,
-          intro: String(fd.get('intro') ?? ''),
-        });
-        nlBtn.disabled = false;
-        nlBtn.textContent = 'Newsletter senden';
-        if (error) {
-          window.adminToast?.('err', error.message);
-          return;
-        }
-        window.adminToast?.('ok', data.message);
+  bindOnce<HTMLFormElement>('#newsletter-form', (nlForm) => {
+    const nlBtn = nlForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    nlForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(nlForm);
+      if (!confirm('Newsletter jetzt an die gesamte Newsletter-Liste senden?')) return;
+
+      nlBtn.disabled = true;
+      nlBtn.textContent = 'Senden…';
+      const result = await actions.sendEventNewsletter({
+        id: nlForm.dataset.id!,
+        subject: String(fd.get('subject') ?? ''),
+        intro: String(fd.get('intro') ?? ''),
       });
-    }
-  }
+      nlBtn.disabled = false;
+      nlBtn.textContent = 'Newsletter senden';
+      if (!ok(result)) return;
 
-  document.addEventListener('astro:page-load', init);
+      adminToast('ok', result.data.message);
+    });
+  });
 </script>
 
 <style>

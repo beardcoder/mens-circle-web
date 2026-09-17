@@ -89,23 +89,6 @@ h6 {
   display: block;
 }
 
-/* The one place the orange is allowed to colour type on a light ground: it
-   never does. On paper an emphasised display word is underscored in orange
-   instead, which carries at poster size and owes no contrast ratio. */
-.display__mark {
-  position: relative;
-  display: inline-block;
-}
-
-.display__mark::after {
-  position: absolute;
-  inset-inline: 0;
-  inset-block-end: 0.06em;
-  block-size: 0.1em;
-  content: '';
-  background: var(--color-orange);
-}
-
 /* The descender half-leading is real space below the last line; pull it back so
    the block sits tight against whatever follows. */
 .display {
@@ -119,39 +102,6 @@ p {
 
 p:last-child {
   margin-block-end: 0;
-}
-
-/* Font style modifiers
-   ------------------------------------------------------------------
-   `.text-italic` marks an emphasised phrase inside a heading. It is an
-   emphasis, not a colour swatch: the accent hue stays reserved for state. */
-.text-italic {
-  font-style: italic;
-}
-
-/* Inside running prose the italic stays an italic — it is emphasis, not a
-   poster device. */
-.prose .text-italic,
-p .text-italic {
-  box-shadow: none;
-}
-
-/* Section header — the eyebrow + title + intro group at the top of a
-   section. Left-aligned by default: this is an editorial page, not a
-   deck of centred slides. */
-.section-header {
-  max-inline-size: var(--measure-wide);
-  margin-block-end: var(--rhythm-block);
-  text-align: start;
-}
-
-.section-header--start {
-  margin-inline: 0;
-  text-align: start;
-}
-
-.section-header--on-dark {
-  color: var(--text-on-dark);
 }
 
 /* The marker — small condensed uppercase. Kickers, rail labels, meta,
@@ -186,10 +136,6 @@ p .text-italic {
   background: var(--color-orange);
 }
 
-.eyebrow--secondary {
-  color: var(--color-chalk-muted);
-}
-
 /* Section title — the reading register's top end. */
 .section-title {
   max-inline-size: 18ch;
@@ -199,38 +145,13 @@ p .text-italic {
   text-wrap: balance;
 }
 
-.section-title--lg {
-  font-size: var(--text-5xl);
-}
-
-/* `.text-italic` survives from the old content files. Barlow's italic at
-   display weight is a poor emphasis; underscore it in orange instead, which
-   is the same device the poster register uses. */
-.section-title .text-italic,
-.section-title .highlight {
-  position: relative;
-  font-style: normal;
-  color: inherit;
-  box-shadow: inset 0 -0.12em 0 var(--color-orange);
-}
-
-.section-title--light {
-  color: var(--text-on-dark);
-}
-
 /* Intro paragraph under a `.section-title`. */
-.section-header > p:last-child,
 .section-intro {
   max-inline-size: var(--measure);
   margin-block-end: 0;
   font-size: var(--text-section-body-lg);
   line-height: var(--leading-relaxed);
   color: var(--text-secondary);
-}
-
-.section-header--on-dark .section-intro,
-.section-header--on-dark > p:last-child {
-  color: var(--text-on-dark-secondary);
 }
 
 /* Links
