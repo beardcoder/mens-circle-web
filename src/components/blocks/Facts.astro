@@ -18,10 +18,16 @@ import { buildEventFacts, type NextEventSummary } from '@lib/event-landing';
 interface Props {
   data: { anchor?: string; eyebrow?: string };
   /** The next scheduled event, when there is one. */
-  next: NextEventSummary | null;
+  next?: NextEventSummary | null;
 }
 
-const { data, next } = Astro.props;
+const { data } = Astro.props;
+const next =
+  Astro.props.next !== undefined
+    ? Astro.props.next
+    : (await import('../../lib/event-landing')).summarizeNextEvent(
+        (await (await import('../../lib/server/events')).fetchNextEventState()).event,
+      );
 const facts = buildEventFacts(next);
 const anchor = data.anchor ?? 'praktisches';
 ---
@@ -64,12 +70,14 @@ const anchor = data.anchor ?? 'praktisches';
     }
 
     .home-facts__item {
+      min-block-size: 11rem;
       padding-block: var(--space-md) var(--space-sm);
       padding-inline-end: var(--space-md);
     }
 
     /* Vertical rules between the four, none at the outer edges. */
     .home-facts__item + .home-facts__item {
+      min-block-size: 11rem;
       padding-inline-start: var(--space-md);
       border-inline-start: 1px solid var(--border-on-dark);
     }
