@@ -1,0 +1,123 @@
+---
+import { primaryAction, dateStatus } from '../lib/event-status';
+import { summarizeNextEvent } from '../lib/event-landing';
+
+interface Props {
+  placement: 'hero' | 'dates';
+  secondaryLabel?: string;
+  secondaryLink?: string;
+  fallback?: boolean;
+}
+const { placement, secondaryLabel, secondaryLink, fallback = false } = Astro.props;
+// The static fallback never opens SQLite. Only the server-island request reads live data.
+const result = fallback ? null : await (await import('../lib/server/events')).fetchNextEventState();
+const state = dateStatus(result?.status ?? 'unavailable', summarizeNextEvent(result?.event ?? null));
+const status = fallback ? 'loading' : state.status;
+const action = fallback
+  ? {
+      note: 'Aktuelle Termine und Anmeldung findest du auf der Terminseite.',
+      label: 'Termine ansehen',
+      href: '/event',
+    }
+  : primaryAction(state, placement === 'dates' ? '#newsletter' : '#termine');
+---
+
+<div class={`home-live-event home-live-event--${placement}`}>
+  {
+    placement === 'hero' ? (
+      <>
+        <p class="home-hero__status" data-status={status}>
+          {action.note}
+        </p>
+        <div class="actions">
+          <a
+            href={action.href}
+            class="btn btn--primary btn--large"
+            data-umami-event="cta-click"
+            data-umami-event-location="home-hero"
+            data-umami-event-state={status}
+          >
+            {action.label}
+          </a>
+          {secondaryLabel && secondaryLink && (
+            <a href={secondaryLink} class="text-link">
+              {secondaryLabel}
+            </a>
+          )}
+        </div>
+      </>
+    ) : (
+      <>
+        <p class="home-dates__status" data-status={status}>
+          {action.note}
+        </p>
+
+        {state.status === 'scheduled' && state.next && (
+          <dl class="deflist home-dates__meta">
+            <div class="deflist__row">
+              <dt class="deflist__term">Wann</dt>
+              <dd class="deflist__desc">
+                {state.next.dateLabel}
+                {state.next.timeRange && <span class="deflist__note">{state.next.timeRange}</span>}
+              </dd>
+            </div>
+            <div class="deflist__row">
+              <dt class="deflist__term">Wo</dt>
+              <dd class="deflist__desc">
+                {state.next.place}
+                <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
+              </dd>
+            </div>
+            <div class="deflist__row">
+              <dt class="deflist__term">Plätze</dt>
+              <dd class="deflist__desc">
+                {state.isFull
+                  ? 'Ausgebucht – du kannst auf die Warteliste'
+                  : `${state.next.availableSpots} von ${state.next.maxParticipants} frei`}
+                <span class="deflist__note">
+                  {state.isFull
+                    ? 'Wird ein Platz frei, rückst du automatisch nach.'
+                    : 'Für die Anmeldung genügen Name und E-Mail-Adresse.'}
+                </span>
+              </dd>
+            </div>
+          </dl>
+        )}
+
+        <p class="home-dates__action">
+          <a
+            href={action.href}
+            class="btn btn--primary btn--large"
+            data-umami-event="cta-click"
+            data-umami-event-location="home-dates"
+            data-umami-event-state={state.status}
+          >
+            {action.label}
+          </a>
+        </p>
+      </>
+    )
+  }
+</div>
+<style is:global>
+  @layer sections {
+    /* Reserve space while the native island loads; the image stays outside it. */
+    .home-live-event--hero {
+      min-block-size: 15rem;
+    }
+    .home-live-event--dates {
+      min-block-size: 34rem;
+    }
+    .home-live-event .home-hero__status {
+      min-block-size: 4lh;
+    }
+    @media (width <= 30em) {
+      .home-live-event--hero {
+        min-block-size: 23rem;
+      }
+      .home-live-event--dates {
+        min-block-size: 38rem;
+      }
+    }
+  }
+</style>

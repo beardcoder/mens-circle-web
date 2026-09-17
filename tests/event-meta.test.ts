@@ -71,43 +71,16 @@ test('the brand is appended once, never twice', () => {
   );
 });
 
-test("the share card is this evening's generated poster, at a known size", () => {
-  const meta = buildEventMeta(event(), SITE);
-  expect(meta.image).toMatch(/^https:\/\/mens-circle\.de\/event\/2026-09-18\/card\.png\?v=[a-z0-9]+$/);
-  // The evening has no picture of its own, so nothing extra goes to the graph.
-  expect(meta.extraImage).toBeNull();
+test('unknown/new events use a real static poster without transformation URLs', () => {
+  expect(buildEventMeta(event(), SITE).image).toBe('https://mens-circle.de/images/og-default.png');
+  expect(eventCardUrl(event({ available_spots: 3 }), SITE)).toBe(eventCardUrl(event(), SITE));
+  expect(buildEventMeta(event(), SITE).extraImage).toBeNull();
 });
 
-test('the card URL changes whenever anything the card draws changes', () => {
-  // Facebook and WhatsApp keep a scraped image for a long time and key it by
-  // URL. A filling evening whose card URL stayed put would keep sending out a
-  // picture that says seats are free.
-  const base = eventCardUrl(event(), SITE);
-  const changed = [
-    { available_spots: 3 },
-    { is_full: true },
-    { is_past: true },
-    { start_time: '18:00' },
-    { city: 'Regensburg' },
-    { title: 'Wintersonnwende' },
-    { event_date: '2026-09-19T00:00:00.000Z' },
-  ];
-  for (const patch of changed) {
-    expect(eventCardUrl(event(patch), SITE)).not.toBe(base);
-  }
-  // …and is stable for anything it does not draw.
-  expect(eventCardUrl(event({ description: 'anderer Text' }), SITE)).toBe(base);
-});
-
-test("the admin's own picture rides along as a second image, never as the card", () => {
-  const own = buildEventMeta(event({ image_url: 'https://cdn.example/abend.jpg' }), SITE);
-  expect(own.image).toContain('/card.png');
-  expect(own.extraImage).toBe('https://cdn.example/abend.jpg');
-
-  // Unusable admin input is dropped rather than emitted as a broken image.
-  for (const bad of ['javascript:alert(1)', '   ', 'http://[bad']) {
-    expect(buildEventMeta(event({ image_url: bad }), SITE).extraImage).toBeNull();
-  }
+test('additional event images remain direct original URLs', () => {
+  expect(buildEventMeta(event({ image_url: 'https://cdn.example/abend.jpg' }), SITE).extraImage).toBe(
+    'https://cdn.example/abend.jpg',
+  );
 });
 
 test('missing or unparseable dates never produce a half-written line', () => {
@@ -151,7 +124,7 @@ test('the Event node joins the site graph instead of starting a second one', () 
   expect(schema.maximumAttendeeCapacity).toBe(12);
   expect(schema.remainingAttendeeCapacity).toBe(4);
   expect(schema.image).toHaveLength(1);
-  expect(String((schema.image as string[])[0])).toContain('/event/2026-09-18/card.png');
+  expect(String((schema.image as string[])[0])).toContain('/images/og-default.png');
   expect(schema.offers).toMatchObject({ availability: 'https://schema.org/InStock', validThrough: schema.startDate });
 });
 

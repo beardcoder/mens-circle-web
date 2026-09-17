@@ -7,7 +7,7 @@
 #
 #   Astro server (Bun runtime, :8090 — the exposed port, the public edge)
 #   ├─ serves the build's static assets + prerendered HTML (immutable caching)
-#   ├─ on-demand SSR (event pages + home testimonials)
+#   ├─ on-demand SSR (event pages + home server islands)
 #   ├─ the public API (/api/*) and the admin UI (/admin/*)
 #   └─ data layer: Drizzle on bun:sqlite (file in the mounted /data volume),
 #      migrations applied automatically on boot
@@ -58,7 +58,7 @@ COPY --from=build /app/drizzle ./drizzle
 # Operational scripts: the SQLite → S3 backup (scheduled `docker exec <web> bun
 # run scripts/backup-db.ts`), the reminder cron loaded via `bun --preload`
 # (scripts/reminder-cron.ts), and its one-shot manual variant (send-reminders.ts).
-COPY --from=build /app/scripts ./scripts
+COPY --from=build /app/scripts/backup-db.ts /app/scripts/reminder-cron.ts /app/scripts/send-reminders.ts ./scripts/
 # Server-only business logic the reminder cron reuses at runtime (db, email,
 # listmonk…). Imported directly by the preload module — no astro: deps, no path
 # aliases, so it runs under plain Bun without the build toolchain.

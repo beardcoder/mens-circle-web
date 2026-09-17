@@ -1,7 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import { resolveAssetImage } from '../../lib/images';
-import { primaryAction, type DateStatus } from '../../lib/event-status';
+import HomeEventStatus from '../HomeEventStatus.astro';
 import Ring from '../Ring.astro';
 
 /**
@@ -36,12 +36,9 @@ interface Props {
     imageAlt?: string;
     imageCaption?: string;
   };
-  /** Scheduling state, resolved once per request by the page. */
-  state: DateStatus;
 }
 
-const { data, state } = Astro.props;
-const action = primaryAction(state);
+const { data } = Astro.props;
 const photo = resolveAssetImage(data.image);
 const lines = data.displayLines ?? [];
 ---
@@ -65,27 +62,20 @@ const lines = data.displayLines ?? [];
       {data.body && <p class="home-hero__body">{data.body}</p>}
 
       <div class="home-hero__action">
-        <p class="home-hero__status" data-status={state.status}>
-          {action.note}
-        </p>
-        <div class="actions">
-          <a
-            href={action.href}
-            class="btn btn--primary btn--large"
-            data-umami-event="cta-click"
-            data-umami-event-location="home-hero"
-            data-umami-event-state={state.status}
-          >
-            {action.label}
-          </a>
-          {
-            data.secondaryLabel && data.secondaryLink && (
-              <a href={data.secondaryLink} class="text-link">
-                {data.secondaryLabel}
-              </a>
-            )
-          }
-        </div>
+        <HomeEventStatus
+          placement="hero"
+          secondaryLabel={data.secondaryLabel}
+          secondaryLink={data.secondaryLink}
+          server:defer
+        >
+          <HomeEventStatus
+            placement="hero"
+            secondaryLabel={data.secondaryLabel}
+            secondaryLink={data.secondaryLink}
+            fallback
+            slot="fallback"
+          />
+        </HomeEventStatus>
       </div>
 
       {
