@@ -20,9 +20,8 @@
 
   const BREATH_VALUES = Array.from({ length: 11 }, (_, i) => 10 + i * 5);
 
-  // Must match the CSS `--picker-item-width` (BreathingExperience.astro): this
-  // value drives the track offset, so any CSS override of the item width would
-  // slide the selected number off-centre from the indicator.
+  // Must match the CSS `--picker-item-width` in BreathingExperience.astro: it
+  // drives the track offset, so a mismatch slides the selection off-centre.
   const PICKER_ITEM_WIDTH = 72;
   const DRAG_THRESHOLD_PX = 4;
   const INHALE_MS = 1800;
@@ -49,7 +48,7 @@
     return clamp(Math.round((value - 10) / 5), 0, BREATH_VALUES.length - 1);
   }
 
-  // ─── Reactive state ────────────────────────────────────────────────
+  // Reactive state.
   let phase = $state<Phase>('idle');
   let round = $state(0);
   let breath = $state(0);
@@ -61,7 +60,7 @@
 
   let session = $state<SessionConfig | null>(null);
 
-  // ─── Picker state ─────────────────────────────────────────────────
+  // Picker state.
   let breathIndex = $state(closestBreathIndex(settingBreaths));
   let pickerOffset = $state(0);
   let isDraggingPicker = $state(false);
@@ -70,7 +69,7 @@
   let dragStartX = 0;
   let hasDragged = false;
 
-  // ─── Scheduling handles ───────────────────────────────────────────
+  // Scheduling handles.
   let timeoutHandle: number | null = null;
   let intervalHandle: number | null = null;
   let retentionStartedAt: number | null = null;
@@ -101,9 +100,8 @@
   // live while dragging so the focused number lights up under the thumb.
   const focusedIndex = $derived(clamp(Math.round(centerFloat), 0, BREATH_VALUES.length - 1));
 
-  // Native picker-wheel depth: items scale and fade with their distance from
-  // the centre. Driven inline (not via :class) so it tracks the drag frame by
-  // frame; the CSS transition only kicks in on release to settle.
+  // Items scale and fade with their distance from the centre. Driven inline so
+  // it tracks the drag frame by frame; the CSS transition settles on release.
   function itemDepth(index: number): string {
     const distance = Math.abs(index - centerFloat);
     const scale = clamp(1.18 - distance * 0.32, 0.62, 1.18);
@@ -138,7 +136,7 @@
   const showStart = $derived(phase === 'idle' || phase === 'complete');
   const showHold = $derived(phase === 'retention' || phase === 'recovery');
 
-  // ─── Scheduling ────────────────────────────────────────────────────
+  // Scheduling.
   function clearScheduled(): void {
     if (timeoutHandle !== null) {
       window.clearTimeout(timeoutHandle);
@@ -153,11 +151,8 @@
     retentionStartedAt = null;
   }
 
-  // ─── Audio cues ────────────────────────────────────────────────────
-  // Short, gentle chimes mark each new stage (next round, breath-hold,
-  // recovery, finish). Pure Web Audio — no files. The context is created
-  // lazily on the first user gesture (the start press) and reused; sound can
-  // be muted with the toggle.
+  // Short chimes mark each new stage. Pure Web Audio, no files; the context is
+  // created lazily on the first user gesture and reused.
   let soundEnabled = $state(true);
   let audioCtx: AudioContext | null = null;
   let audioUnlocked = false;
@@ -176,11 +171,9 @@
     return audioCtx;
   }
 
-  // iOS only lets Web Audio make sound once it has been started from inside a
-  // real user gesture: the context boots "suspended" and stays silent until it
-  // is both resumed AND has played a buffer within a touch/click. We run this on
-  // the first interaction (and again when a session starts), so every later,
-  // timer-scheduled chime is audible. Without it, sound is dead on iOS.
+  // iOS boots the context suspended and keeps it silent until it is both
+  // resumed AND has played a buffer inside a real gesture. Running this on the
+  // first interaction is what makes every later timer-scheduled chime audible.
   function unlockAudio(): void {
     const ctx = getAudioContext();
     if (!ctx) return;
@@ -226,7 +219,7 @@
     });
   }
 
-  // ─── Phase transitions ─────────────────────────────────────────────
+  // Phase transitions.
   function enterIdle(): void {
     clearScheduled();
 
@@ -316,8 +309,8 @@
     if (timeoutHandle !== null) window.clearTimeout(timeoutHandle);
     timeoutHandle = null;
 
-    // Derive from elapsed time, not callback count: throttling must not lose
-    // seconds. Park while hidden and refresh immediately on visibility/pageshow.
+    // Derived from elapsed time, not callback count, so throttling loses no
+    // seconds. Parked while hidden, refreshed on visibility and pageshow.
     const elapsed = performance.now() - retentionStartedAt;
     timerSeconds = Math.floor(elapsed / 1000);
 
@@ -359,7 +352,7 @@
     startBreathing();
   }
 
-  // ─── Actions ───────────────────────────────────────────────────────
+  // Actions.
   function onCircleClick(): void {
     if (phase === 'idle' || phase === 'complete') {
       beginSession();
@@ -404,7 +397,7 @@
     settingRecovery = clamp(settingRecovery + delta, 5, 30);
   }
 
-  // ─── Picker events ─────────────────────────────────────────────────
+  // Picker events.
   function onPickerPointerDown(event: PointerEvent): void {
     if (isActive) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
@@ -507,8 +500,8 @@
   }
 
   onMount(() => {
-    // Prime audio on the very first interaction anywhere, so iOS has an unlocked
-    // context ready before the first chime — `once` cleans each up after firing.
+    // Prime audio on the first interaction anywhere, so iOS has an unlocked
+    // context before the first chime. `once` cleans each listener up.
     const prime = (): void => unlockAudio();
 
     window.addEventListener('pointerdown', prime, { once: true });

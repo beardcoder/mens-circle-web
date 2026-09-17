@@ -5,23 +5,16 @@ import Logo from './Logo.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 
 /**
- * Site header.
- *
- * A wordmark, three destinations and one action. What used to be here — a
- * numbered five-item list, a full-screen panel with three breathing rings and a
- * radial-gradient ground, a four-button theme cluster and a blurred glass bar —
- * is gone. The bar is opaque, sits on a hairline and does not change on scroll.
- *
- * The navigation labels changed but the anchors did not: "Ablauf" still points
- * at `#reise` and "Markus" at `#moderator`, so every link that was ever shared
- * still lands where it did. The pages that dropped out of the bar (Haltung,
- * Fragen, Atemübung) are reachable from the mobile panel and the footer.
+ * A wordmark, three destinations and one action. The bar is opaque, sits on a
+ * hairline and does not change on scroll. The anchors are load-bearing —
+ * "Ablauf" points at `#reise`, "Markus" at `#moderator` — so every link ever
+ * shared still lands where it did.
  */
 
 const links = nav.header.links;
 const ctaLinks = nav.header.cta;
 const secondary = nav.header.secondary;
-// Explicit allowlist: new navigation entries do not silently become speculative.
+// Explicit allowlist, so new entries do not silently become speculative.
 const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung']);
 ---
 
@@ -155,7 +148,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
       min-inline-size: 0;
     }
 
-    /* ─── Wordmark ────────────────────────────────────────────────── */
+    /* Wordmark. */
     .logo {
       display: flex;
       gap: var(--space-xs);
@@ -201,7 +194,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
       letter-spacing: 0.2em;
     }
 
-    /* ─── Bar navigation (wide screens) ───────────────────────────── */
+    /* Bar navigation (wide screens). */
     .nav__list {
       display: flex;
       gap: var(--space-md);
@@ -254,7 +247,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
       white-space: nowrap;
     }
 
-    /* ─── Mobile panel ────────────────────────────────────────────── */
+    /* Mobile panel. */
     .nav-toggle {
       display: none;
       place-items: center;
@@ -300,7 +293,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
       transform-origin: center;
     }
 
-    /* ─── Theme control ───────────────────────────────────────────── */
+    /* Theme control. */
     .theme-switch {
       display: flex;
       align-items: center;
@@ -353,7 +346,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
       display: none;
     }
 
-    /* ─── Narrow screens: the panel takes over ────────────────────── */
+    /* Narrow screens: the panel takes over. */
     @media (width <= 54em) {
       .nav-toggle {
         display: grid;

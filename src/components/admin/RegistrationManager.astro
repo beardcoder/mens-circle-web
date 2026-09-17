@@ -28,7 +28,7 @@ const STATUS_LABEL: Record<Status, string> = {
 };
 const activeCount = registrations.filter((r) => r.status === 'registered' || r.status === 'attended').length;
 const waitlistCount = registrations.filter((r) => r.status === 'waitlist').length;
-/** Seats that should hold a confirmation but don't — what the "fehlende" button will target. */
+/** Seats that should hold a confirmation but do not — the "fehlende" target. */
 const missingConfirmation = registrations.filter(
   (r) => (r.status === 'registered' || r.status === 'waitlist') && !r.confirmationSentAt,
 ).length;
@@ -176,7 +176,6 @@ function badgeClass(s: Status): string {
     if (list && !list.dataset.bound) {
       list.dataset.bound = '1';
 
-      // Status change.
       list.addEventListener('change', async (e) => {
         const sel = (e.target as HTMLElement).closest('.js-status') as HTMLSelectElement | null;
         if (!sel) return;
@@ -191,11 +190,10 @@ function badgeClass(s: Status): string {
           return;
         }
         window.adminToast?.('ok', 'Status aktualisiert.');
-        // A cancellation can promote someone from the waitlist — reload to reflect it.
+        // A cancellation can promote someone from the waitlist.
         if (status === 'cancelled') setTimeout(() => window.location.reload(), 700);
       });
 
-      // Re-send one confirmation.
       list.addEventListener('click', async (e) => {
         const btn = (e.target as HTMLElement).closest('.js-resend-one') as HTMLButtonElement | null;
         if (!btn) return;
@@ -215,7 +213,6 @@ function badgeClass(s: Status): string {
         if (data.sent > 0) setTimeout(() => window.location.reload(), 700);
       });
 
-      // Remove.
       list.addEventListener('click', async (e) => {
         const btn = (e.target as HTMLElement).closest('.js-del-reg') as HTMLButtonElement | null;
         if (!btn) return;

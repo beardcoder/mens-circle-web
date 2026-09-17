@@ -13,7 +13,7 @@
   let icsBlobUrl = $state('');
   const googleUrl = $derived(buildGoogleCalendarUrl(event));
 
-  // ── Calendar helpers (inlined, single consumer) ──────────────
+  // Calendar helpers (inlined, single consumer).
 
   function formatICSDate(date: string, time: string): string {
     const d = new Date(`${date}T${time}:00`);
@@ -70,14 +70,9 @@
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
   }
 
-  // ── Component logic ──────────────────────────────────────────
-  //
-  // Native <dialog> + showModal() gives us, for free, the things a hand-rolled
-  // role="dialog" never quite gets right: a focus trap, focus restoration to
-  // the trigger on close, Escape-to-dismiss, an inert background and top-layer
-  // rendering (no z-index battles). The open/close transition itself is pure
-  // CSS — `@starting-style` rises the card in, `allow-discrete` on `display` +
-  // `overlay` lets it fall back out instead of snapping shut.
+  // Native <dialog> + showModal() gives the focus trap, focus restoration,
+  // Escape-to-dismiss, an inert background and top-layer rendering for free.
+  // The transition is pure CSS: `@starting-style` in, `allow-discrete` out.
 
   onMount(() => {
     icsBlobUrl = buildIcsBlobUrl(event);
@@ -97,9 +92,8 @@
     dialogEl?.close();
   }
 
-  // A click whose coordinates fall outside the dialog's box is a backdrop
-  // click (the ::backdrop pseudo still targets the dialog element). Clicks on
-  // the card itself land inside the rect and are ignored.
+  // ::backdrop still targets the dialog element, so a click outside its box is
+  // a backdrop click; one on the card lands inside the rect and is ignored.
   function onBackdropClick(e: MouseEvent): void {
     if (!dialogEl || e.target !== dialogEl) return;
 
@@ -166,7 +160,7 @@
 </div>
 
 <style>
-  /* The dialog *is* the card — centred in the top layer, animated in and out.
+  /* The dialog is the card — centred in the top layer, animated in and out.
      Styles are global so the [open] state, ::backdrop and @starting-style
      resolve without Svelte's scope class interfering with the pseudo-element. */
   :global(.calendar-modal) {

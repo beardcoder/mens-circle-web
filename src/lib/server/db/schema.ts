@@ -1,12 +1,9 @@
 /**
- * Drizzle schema — the four SQLite tables behind the site: participants, events,
- * registrations, testimonials.
- *
- * Conventions, applied consistently across all of them:
+ * Conventions across all four tables:
  *   • Text UUID primary keys.
- *   • `deleted` is a soft-delete timestamp (ISO string) — null = live.
- *   • Timestamps are ISO-8601 strings (UTC), so they sort lexicographically.
- *   • Booleans are stored as integers (0/1).
+ *   • `deleted` is a soft-delete timestamp; null means live.
+ *   • Timestamps are ISO-8601 UTC strings, so they sort lexicographically.
+ *   • Booleans are stored as integers.
  */
 import { desc, isNull } from 'drizzle-orm';
 import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
@@ -18,11 +15,9 @@ const nowIso = () => new Date().toISOString();
 export type RegistrationStatus = 'registered' | 'waitlist' | 'cancelled' | 'attended';
 
 /**
- * The statuses that occupy a seat — i.e. what "how full is this event" counts.
- * `waitlist` does not hold a seat and `cancelled` released theirs; `attended` is
- * a past-tense `registered`, so it still counts. Shared by the capacity queries
- * (lib/server/events.ts) and the reminder pass (lib/server/reminders.ts) so the
- * two can never disagree about who is actually booked in.
+ * What "how full is this event" counts. `waitlist` holds no seat and `cancelled`
+ * released theirs; `attended` is a past-tense `registered`, so it still counts.
+ * Shared by the capacity queries and the reminder pass.
  */
 export const ACTIVE_REGISTRATION_STATUSES = ['registered', 'attended'] as const satisfies RegistrationStatus[];
 
@@ -82,7 +77,7 @@ export const registrations = sqliteTable(
     status: text('status').$type<RegistrationStatus>().notNull(),
     registeredAt: text('registered_at'),
     cancelledAt: text('cancelled_at'),
-    /** Last successful delivery of the confirmation/waitlist mail — null = never arrived. */
+    /** Last successful delivery of the confirmation mail; null means it never arrived. */
     confirmationSentAt: text('confirmation_sent_at'),
     reminderSentAt: text('reminder_sent_at'),
     smsReminderSentAt: text('sms_reminder_sent_at'),

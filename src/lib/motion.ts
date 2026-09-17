@@ -1,14 +1,8 @@
 /**
- * Scroll-triggered reveals. `inView()` shares one IntersectionObserver, the mini
- * `animate()` drives WAAPI directly. The hidden start state lives in CSS behind
+ * Scroll-triggered reveals. The hidden start state lives in CSS behind
  * `.motion-ready`, so without JS or under reduced motion everything stays
- * visible. All reveal targets arrive in the initial Astro HTML; the hydrated
- * islands only update controls/maps, never reveal targets. Native navigation
- * boots a new document, so no body-wide mutation observer is needed.
- *
- * These are short and small on purpose: a paragraph should look like it was
- * already there, not like it performed an entrance. Travel is a few pixels and
- * the whole thing is over in about a third of a second.
+ * visible. All reveal targets arrive in the initial Astro HTML, so no body-wide
+ * mutation observer is needed.
  *
  * Markup:
  *   data-reveal="up|down|left|right|fade|zoom|blur"   (default "up")
@@ -67,7 +61,6 @@ interface RevealConfig {
   repeat: boolean;
 }
 
-// Composited properties only (transform/filter/opacity) — nothing reflows.
 function keyframesFor(variant: Variant, t: Tuning): Keyframes {
   switch (variant) {
     case 'down':
@@ -89,10 +82,8 @@ function keyframesFor(variant: Variant, t: Tuning): Keyframes {
       return { opacity: [0, 1] };
     case 'zoom':
       return { opacity: [0, 1], transform: [`scale(${t.zoom})`, 'scale(1)'] };
-    // `blur` is retained as a name so existing call sites keep working, but it
-    // no longer blurs: a filter on tightly-set display text gets cropped to the
-    // filter region by WebKit, and it cost a re-rasterise every frame. It now
-    // resolves to the same plain rise as the default.
+    // `blur` no longer blurs: WebKit crops tightly-set display text to the
+    // filter region. Kept as a name so call sites keep working.
     case 'blur':
       return {
         opacity: [0, 1],
@@ -120,7 +111,7 @@ function defaultDuration(variant: Variant, t: Tuning): number {
   return variant === 'blur' ? t.blurDuration * 1000 : t.duration * 1000;
 }
 
-/** Cap what a call site can ask for — no reveal on this site runs long. */
+/** Cap what a call site can ask for. */
 const MAX_DURATION_MS = 520;
 
 const configs = new WeakMap<HTMLElement, RevealConfig>();
@@ -133,7 +124,7 @@ declare global {
   }
 }
 
-/** Stand down the layout's "show everything" timer — reveals are running. */
+/** Stand down the layout's "show everything" timer. */
 function clearMotionFallback(): void {
   if (window.__mcMotionFallback !== undefined) {
     clearTimeout(window.__mcMotionFallback);
@@ -199,7 +190,6 @@ function observe(elements: HTMLElement[]): void {
     return;
   }
 
-  // Fire slightly before full visibility so the entrance reads as the eye arrives.
   inView(
     elements,
     (element) => {
@@ -212,7 +202,7 @@ function observe(elements: HTMLElement[]): void {
 
       reveal(el, config);
 
-      // Returning a handler keeps the element observed (repeat) and replays on re-entry.
+      // Returning a handler keeps the element observed and replays on re-entry.
       return config.repeat ? () => hide(el, config) : undefined;
     },
     { margin: '0px 0px -12% 0px', amount: 'some' },
@@ -220,7 +210,6 @@ function observe(elements: HTMLElement[]): void {
 }
 
 export function initMotion(): void {
-  // Under reduced motion the CSS start state never applies — nothing to do.
   if (globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     clearMotionFallback();
 
@@ -231,14 +220,12 @@ export function initMotion(): void {
 
   observe(register(document.body, tuning));
 
-  // The reveals are under observation, so the layout's dead-man's switch (which
-  // would drop `.motion-ready` and just show everything) is no longer needed.
+  // Reveals are observed now, so the layout's dead-man's switch can stand down.
   clearMotionFallback();
 }
 
-// `will-change` is held only for the life of the animation. The `blur` variant
-// must name `filter` too, or the browser re-rasterises every frame instead of
-// filtering a cached layer — that was a source of stutter.
+// Held only for the life of the animation. The `blur` variant must name
+// `filter` too, or the browser re-rasterises every frame instead of caching.
 function reveal(el: HTMLElement, config: RevealConfig): void {
   el.style.willChange = config.enter.filter ? 'transform, opacity, filter' : 'transform, opacity';
 

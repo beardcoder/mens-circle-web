@@ -4,9 +4,8 @@ import { Icon } from 'astro-icon/components';
 import BreathingApp from './islands/BreathingApp.svelte';
 
 interface Props {
-  /** Full-screen, chrome-less app surface (the installable standalone route).
-   *  When false the exercise sits inside the normal site page: it is sized to
-   *  its content and the floating info button + modal are dropped, because the
+  /** Full-screen app surface. When false the exercise sits inside the normal
+   *  page, sized to its content and without the info button, because the
    *  embedding page shows the instructions inline. */
   standalone?: boolean;
 }
@@ -64,10 +63,8 @@ const { standalone = false } = Astro.props;
 </section>
 
 <script>
-  // Instructions live in a native <dialog> opened from the floating info button
-  // (standalone surface only). showModal() gives the focus trap, Escape-to-close
-  // and backdrop for free; a click outside the card also closes it. The queries
-  // no-op on the embedded page, where these elements aren't rendered.
+  // Standalone surface only: showModal() gives the focus trap, Escape-to-close
+  // and backdrop for free. The queries no-op on the embedded page.
   const infoModal = document.querySelector<HTMLDialogElement>('#info-modal');
   const infoOpen = document.querySelector<HTMLButtonElement>('#info-open');
   const infoClose = document.querySelector<HTMLButtonElement>('#info-close');
@@ -90,7 +87,7 @@ const { standalone = false } = Astro.props;
 </script>
 
 <style is:global>
-  /* @property kept unlayered — must be at top level for interpolation to work */
+  /* Unlayered: @property must be at top level for interpolation to work. */
   @property --ring-scale {
     syntax: '<number>';
     initial-value: 1;
@@ -187,7 +184,7 @@ const { standalone = false } = Astro.props;
       z-index: 1;
     }
 
-    /* Floating info button — opens the instructions dialog. */
+    /* Floating info button, opens the instructions dialog. */
     .breathing-info-btn {
       display: grid;
       position: absolute;
@@ -383,7 +380,7 @@ const { standalone = false } = Astro.props;
       font-size: var(--text-body-compact);
     }
 
-    /* Shown only when the browser offers a native install (beforeinstallprompt). */
+    /* Shown only when the browser offers a native install. */
     .breathing__install {
       display: inline-flex;
       align-items: center;
@@ -674,7 +671,7 @@ const { standalone = false } = Astro.props;
       margin-inline-start: 3px;
     }
 
-    /* Sound toggle — compact, square ghost icon button. */
+    /* Sound toggle. */
     .breathing-app__sound {
       --btn-padding-inline: var(--space-xs);
 
@@ -941,7 +938,7 @@ const { standalone = false } = Astro.props;
         padding-block-start: var(--space-sm);
       }
 
-      /* NB: only the height is tuned here. `--picker-item-width` must stay in
+      /* Only the height is tuned here. `--picker-item-width` must stay in
          sync with the JS `PICKER_ITEM_WIDTH` constant that drives the track
          offset — overriding it here knocked the selected number out from under
          the centre indicator on short screens. */

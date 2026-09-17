@@ -18,9 +18,7 @@
  *   <a class="btn btn--icon"       — round, icon-only
  */
 
-/* ============================================
-   Base
-   ============================================ */
+/* Base */
 .btn {
   --btn-bg: var(--color-orange);
   /* Ink on orange in both modes: the orange does not flip, so neither does the
@@ -154,9 +152,7 @@
   block-size: 1.15em;
 }
 
-/* ============================================
-   Variants
-   ============================================ */
+/* Variants */
 
 .btn--primary {
   --btn-bg: var(--color-orange);
@@ -237,9 +233,7 @@
   --btn-hover-border: var(--text-primary);
 }
 
-/* ============================================
-   Sizes
-   ============================================ */
+/* Sizes */
 
 .btn--large {
   --btn-padding-block: 1.05rem;
@@ -275,9 +269,7 @@
   block-size: var(--btn-icon-size, 28px);
 }
 
-/* ============================================
-   Action row — a primary button with at most one quiet text link beside it.
-   ============================================ */
+/* Action row — a primary button with at most one quiet text link beside it. */
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -285,9 +277,7 @@
   align-items: center;
 }
 
-/* ============================================
-   Social / icon buttons (footer)
-   ============================================ */
+/* Social / icon buttons (footer) */
 .social-icon {
   display: inline-flex;
   align-items: center;

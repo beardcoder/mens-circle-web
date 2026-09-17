@@ -3,7 +3,6 @@
  * Based on Josh Comeau's Reset + Modern Best Practices
  */
 
-/* Box sizing rules */
 *,
 *::before,
 *::after {
@@ -12,9 +11,7 @@
   margin: 0;
 }
 
-/* Prevent font size inflation */
 html {
-  /* Base font size for rem calculations */
   font-size: 16px;
   /* Guard against mobile font-size inflation. Lightning CSS autoprefixes this
      from the configured browser targets (e.g. the -webkit- form Safari/iOS
@@ -60,7 +57,6 @@ summary,
   }
 }
 
-/* Set core body defaults */
 body {
   min-block-size: 100vh;
   /* biome-ignore lint/suspicious/noDuplicateProperties: dvh fallback for browsers without dynamic viewport support */
@@ -77,7 +73,6 @@ body {
   background-color: var(--bg-primary);
 }
 
-/* Remove list styles on ul, ol with a list role */
 :where(ul, ol)[role='list'] {
   list-style: none;
 }
@@ -98,20 +93,17 @@ p {
   text-wrap: pretty;
 }
 
-/* Links */
 a {
   color: inherit;
   text-decoration: none;
   transition: color var(--motion-quick);
 }
 
-/* A elements that don't have a class get default styles */
 a:not([class]) {
   color: currentcolor;
   text-decoration-skip-ink: auto;
 }
 
-/* Make images easier to work with */
 img,
 picture,
 video,
@@ -122,7 +114,6 @@ svg {
   block-size: auto;
 }
 
-/* Inherit fonts for inputs and buttons */
 input,
 button,
 textarea,
@@ -131,17 +122,14 @@ select {
   color: inherit;
 }
 
-/* Textarea without rows attribute should be tall */
 textarea:not([rows]) {
   min-block-size: 10em;
 }
 
-/* Anything that has been anchored to should have extra scroll margin */
 :target {
   scroll-margin-block: 5ex;
 }
 
-/* Remove default button styles */
 button {
   color: inherit;
   cursor: pointer;
@@ -149,36 +137,30 @@ button {
   border: none;
 }
 
-/* Remove default fieldset styles */
 fieldset {
   border: none;
 }
 
-/* Focus styles */
 :focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: 3px;
   transition: outline-offset var(--motion-quick);
 }
 
-/* Remove focus outline for mouse users */
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-/* Selection styles */
 ::selection {
   color: light-dark(var(--color-paper), var(--color-night));
   background-color: var(--accent-primary);
 }
 
-/* Ensure tables inherit font */
 table {
   font: inherit;
   border-collapse: collapse;
 }
 
-/* Hidden attribute support */
 [hidden] {
   display: none;
 }

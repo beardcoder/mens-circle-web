@@ -47,7 +47,7 @@ export interface SubscribeResult {
   status: SubscribeStatus;
 }
 
-/** Fresh object per call — callers get a result they may keep, not a shared constant. */
+/** Fresh object per call, so callers may keep the result. */
 const failed = (): SubscribeResult => ({ ok: false, status: 'error' });
 
 const trimmedName = (name: string): string => (name ?? '').trim();
@@ -74,7 +74,7 @@ export const subscribeToNewsletter = async (email: string, name: string): Promis
   return failed();
 };
 
-export const findSubscriber = async (email: string): Promise<ListmonkSubscriber | null> => {
+const findSubscriber = async (email: string): Promise<ListmonkSubscriber | null> => {
   const q = `subscribers.email = '${String(email).replace(/'/g, "''")}'`;
   const res = await request('GET', `/api/subscribers?per_page=1&query=${encodeURIComponent(q)}`);
   if (!res || !res.ok) return null;
@@ -92,7 +92,7 @@ type SubscriberWork = Map<string, Promise<SubscriberIdentity | null>>;
 const inFlightSubscribers: SubscriberWork = new Map();
 const subscriberScope = new AsyncLocalStorage<SubscriberWork>();
 
-/** Reuse identity only for the lifetime of one awaited workflow, never across completed requests. */
+/** Reused for one awaited workflow only, never across completed requests. */
 export const withSubscriberScope = async <T>(work: () => Promise<T>): Promise<T> => {
   const identities: SubscriberWork = new Map();
   return subscriberScope.run(identities, async () => {
@@ -120,7 +120,7 @@ const provisionSubscriber = async (email: string, name: string): Promise<Subscri
         }
       : null;
   }
-  // Authentication, validation, transport and server errors are not evidence of an existing subscriber.
+  // Auth, validation, transport and server errors do not prove the subscriber exists.
   if (created?.status !== 409) return null;
   const sub = await findSubscriber(email);
   return sub?.id ? { subscriber: sub, created: false } : null;
@@ -165,12 +165,9 @@ export const renameList = async (listId: number, name: string): Promise<boolean>
 };
 
 /**
- * Give a subscriber the name we now know, and only that.
- *
- * A name listmonk already holds is never overwritten; the address it stores in
- * place of a missing name counts as no name at all. The PUT replaces the whole
- * record, so the lists it already belongs to have to be sent back with it —
- * otherwise saving a name would silently unsubscribe the person.
+ * Fill in a name listmonk does not have; an existing one is never overwritten,
+ * and a stored address counts as no name. The PUT replaces the whole record, so
+ * the current lists have to ride along or saving a name unsubscribes the person.
  */
 const backfillName = async (sub: ListmonkSubscriber, email: string, name: string, listIds: number[]): Promise<void> => {
   const held = (sub.name || '').trim();
@@ -213,12 +210,9 @@ const applyMembership = async (
 };
 
 /**
- * Subscribe an address to `listIds`, by whichever route costs fewer round trips.
- *
- * Inside a workflow scope the subscriber has already been provisioned (or is
- * being provisioned right now), so that identity is reused rather than raced.
- * Outside one, a single POST creates the subscriber *with* its lists — so a
- * success there is the whole job, and only the 409 needs the membership call.
+ * Inside a workflow scope the subscriber is already provisioned, so reuse that
+ * identity rather than racing it. Outside one, a single POST creates the
+ * subscriber with its lists, and only a 409 needs the membership call.
  */
 export const addToLists = async (
   email: string,
@@ -246,7 +240,7 @@ export const addToLists = async (
     return failed();
   }
 
-  // 409 — the subscriber predates this call, so look it up and add the lists.
+  // 409: the subscriber predates this call, so look it up and add the lists.
   const subscriber = await findSubscriber(email);
   return applyMembership(subscriber ? { subscriber, created: false } : null, email, name, listIds, confirmed);
 };
@@ -274,7 +268,7 @@ export interface CampaignOptions {
 export interface CampaignResult {
   ok: boolean;
   campaignId: number;
-  /** Shown to the admin as-is, so every failure carries its own German wording. */
+  /** Shown to the admin verbatim, so every failure carries its own wording. */
   error?: string;
 }
 
@@ -307,11 +301,9 @@ const startCampaign = async (campaignId: number): Promise<boolean> => {
 };
 
 /**
- * Create a newsletter campaign and set it running.
- *
- * The two steps are reported apart on purpose: a campaign that was created but
- * not started still exists in listmonk as a draft, and the admin needs to be
- * told that rather than being invited to send the same thing twice.
+ * Create a campaign and start it. The two steps report separately: a created but
+ * unstarted campaign still exists as a draft, and the admin has to be told that
+ * rather than invited to send the same thing twice.
  */
 export const sendNewsletterCampaign = async (opts: CampaignOptions): Promise<CampaignResult> => {
   if (!listmonkApiConfigured()) {

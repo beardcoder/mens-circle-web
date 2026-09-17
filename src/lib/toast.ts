@@ -1,9 +1,6 @@
 /**
- * Toast Notifications
- *
- * Thin DOM helper. All entry/exit motion lives in CSS via `@starting-style`
- * and `.toast--hiding` — JS just appends the element and removes it after
- * the lifetime expires.
+ * Thin DOM helper. All entry/exit motion lives in CSS via `@starting-style` and
+ * `.toast--hiding`; this only appends the element and removes it on expiry.
  */
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -30,17 +27,14 @@ function buildToast(type: ToastType, message: string, title?: string): HTMLDivEl
 
   toast.className = `toast toast--${type}`;
 
-  // Match the announcement urgency to the message. `role="alert"` already
-  // implies `aria-live="assertive"`, so the previous pairing of alert +
-  // aria-live="polite" asked screen readers for both at once — an explicit
-  // politeness that contradicts the role it sits on. Problems interrupt;
-  // confirmations wait for a pause.
+  // Problems interrupt, confirmations wait for a pause. `role="alert"` already
+  // implies `aria-live="assertive"`, so never pair it with an explicit politeness.
   const urgent = type === 'error' || type === 'warning';
 
   toast.role = urgent ? 'alert' : 'status';
   toast.ariaLive = urgent ? 'assertive' : 'polite';
-  // The whole toast is one message: read the title and body together rather
-  // than announcing whichever text node happened to change.
+  // One message: read title and body together rather than whichever text node
+  // happened to change.
   toast.ariaAtomic = 'true';
 
   const icon = document.createElement('div');

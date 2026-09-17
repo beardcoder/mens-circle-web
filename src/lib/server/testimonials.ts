@@ -1,6 +1,3 @@
-/**
- * Testimonial submission, public fetch, and admin moderation (server-only).
- */
 import { and, asc, desc, eq, isNull } from 'drizzle-orm';
 import type { Testimonial as TestimonialDTO, TestimonialPayload } from '../types';
 import { db } from './db';
@@ -20,7 +17,7 @@ const SUCCESS_MESSAGE = 'Vielen Dank! Dein Testimonial wurde eingereicht und wir
 const QUOTE_MIN = 10;
 const QUOTE_MAX = 1000;
 
-/** Public testimonial submission — always stored unpublished for moderation. */
+/** Always stored unpublished, for moderation. */
 export async function submitTestimonial(payload: TestimonialPayload): Promise<FormResult> {
   const quote = (payload.quote || '').trim();
   const email = (payload.email || '').trim().toLowerCase();
@@ -31,7 +28,7 @@ export async function submitTestimonial(payload: TestimonialPayload): Promise<Fo
   if (quote.length < QUOTE_MIN || quote.length > QUOTE_MAX) {
     return rejected(422, `Dein Testimonial muss zwischen ${QUOTE_MIN} und ${QUOTE_MAX} Zeichen lang sein.`);
   }
-  // The address is optional here — only a given one has to be usable.
+  // Optional here — only a given address has to be usable.
   if (email && !email.includes('@')) return rejected(422, INVALID_EMAIL);
 
   await db.insert(testimonials).values({
@@ -46,12 +43,7 @@ export async function submitTestimonial(payload: TestimonialPayload): Promise<Fo
   return accepted(SUCCESS_MESSAGE);
 }
 
-/**
- * Published testimonials for the public site, sorted by sortOrder then newest.
- *
- * `limit` exists for callers that only want the top of the curated order — the
- * /event landing page shows a single voice and has no use for the other 199.
- */
+/** Published testimonials, sorted by sortOrder then newest. */
 export async function fetchTestimonials(limit = 200): Promise<TestimonialDTO[]> {
   try {
     const rows = await db
@@ -77,7 +69,7 @@ export async function listTestimonialsForAdmin(): Promise<Testimonial[]> {
   return db.select().from(testimonials).where(isNull(testimonials.deleted)).orderBy(desc(testimonials.createdAt));
 }
 
-/** Publish / unpublish a testimonial (sets published_at on first publish). */
+/** Publish or unpublish; stamps published_at on first publish. */
 export async function setTestimonialPublished(id: string, publish: boolean): Promise<Testimonial | null> {
   const existing = (await db.select().from(testimonials).where(eq(testimonials.id, id)).limit(1))[0];
   if (!existing) return null;
@@ -95,7 +87,7 @@ export async function setTestimonialSortOrder(id: string, sortOrder: number): Pr
   await db.update(testimonials).set({ sortOrder }).where(eq(testimonials.id, id));
 }
 
-/** Edit a testimonial's content (quote/author/role/email). */
+/** Edit quote, author, role or email. */
 export async function updateTestimonialContent(
   id: string,
   fields: { quote: string; authorName: string; role: string; email: string },
