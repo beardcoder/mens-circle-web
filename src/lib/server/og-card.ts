@@ -27,11 +27,14 @@
 import satori from 'satori';
 import sharp from 'sharp';
 import site from '../../data/site.json';
+import { fnv1a } from '../helpers';
+import { CARD_HEIGHT, CARD_WIDTH } from '../og-card-size';
 import { formatDayMonthYearDE, formatWeekdayDE } from './format';
 import { ogFonts } from './og-fonts';
 
-export const CARD_WIDTH = 1200;
-export const CARD_HEIGHT = 630;
+// Declared in lib/og-card-size.ts so a page can state the size in its meta tags
+// without importing satori and sharp — see the note there.
+export { CARD_HEIGHT, CARD_WIDTH };
 
 const PAPER = '#f2ede3';
 const INK = '#1c1714';
@@ -175,15 +178,73 @@ function layout(content: CardContent): Node {
   );
 }
 
-/** Render the card to PNG bytes. Throws if satori or sharp fail — the route
- *  above is what decides to fall back to the static poster. */
-export async function renderCard(content: CardContent): Promise<Uint8Array> {
+/** Lay the card out and rasterise it. Throws if satori or sharp fail — the
+ *  route is what decides to fall back to the static poster. */
+async function draw(content: CardContent): Promise<Uint8Array> {
   const svg = await satori(layout(content) as never, {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
     fonts: loadFonts(),
   });
   return sharp(Buffer.from(svg)).png({ compressionLevel: 9, palette: true }).toBuffer();
+}
+
+/**
+ * Rendered cards, kept in the process and keyed by what they draw.
+ *
+ * A card costs ~165ms of mostly *synchronous* CPU (satori lays out and converts
+ * every glyph to a path; sharp then rasterises). Nothing used to hold on to the
+ * result, so every scrape re-rendered: WhatsApp, Facebook, Signal, Slack, the
+ * search crawlers and every CDN revalidation each paid the full price, and on a
+ * one-core box that time is not spent in parallel with anything — it is time
+ * the server is not answering other requests. That is what a slow site looks
+ * like from the outside even when no page got slower.
+ *
+ * The key is a token over the drawn strings, so a card can never be served for
+ * a state it no longer shows: a seat taken changes `status`, which changes the
+ * key. Sized for "every event this site will ever have open at once" times a
+ * couple of states — 32 entries at ~21KB is under a megabyte, against the ~46MB
+ * sharp brings in anyway.
+ */
+const CACHE_LIMIT = 32;
+const rendered = new Map<string, Uint8Array>();
+/** Renders in flight, so a crawler hitting one URL n times pays for one. */
+const pending = new Map<string, Promise<Uint8Array>>();
+
+/** Everything the card draws, as one short token. */
+export const cardFingerprint = (content: CardContent): string =>
+  fnv1a([content.kicker, content.weekday, content.date, content.meta, content.status].join('|'));
+
+function remember(key: string, body: Uint8Array): Uint8Array {
+  rendered.set(key, body);
+  // Map iterates in insertion order and `take` below re-inserts on a hit, so
+  // the first key is the least recently used one.
+  if (rendered.size > CACHE_LIMIT) rendered.delete(rendered.keys().next().value!);
+  return body;
+}
+
+function take(key: string): Uint8Array | undefined {
+  const hit = rendered.get(key);
+  if (!hit) return undefined;
+  rendered.delete(key);
+  rendered.set(key, hit);
+  return hit;
+}
+
+/** Render the card to PNG bytes, reusing an identical card already drawn. */
+export function renderCard(content: CardContent): Promise<Uint8Array> {
+  const key = cardFingerprint(content);
+  const hit = take(key);
+  if (hit) return Promise.resolve(hit);
+
+  const inFlight = pending.get(key);
+  if (inFlight) return inFlight;
+
+  const work = draw(content)
+    .then((body) => remember(key, body))
+    .finally(() => pending.delete(key));
+  pending.set(key, work);
+  return work;
 }
 
 /** The date/time/place/seat strings a card shows, from the values the event
