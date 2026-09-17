@@ -8,11 +8,7 @@ import { config, listmonkApiConfigured } from './config';
 import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
 import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
 
-/**
- * A registration that occupies a seat: live (not soft-deleted) and in a
- * seat-holding status. The single predicate behind every capacity number, so a
- * one-off count and the grouped admin listing can't drift apart.
- */
+/** The single predicate behind every capacity number: live and seat-holding. */
 const holdsASeat = () =>
   and(isNull(registrations.deleted), inArray(registrations.status, ACTIVE_REGISTRATION_STATUSES));
 
@@ -65,9 +61,8 @@ interface EventWithCapacity {
   activeCount: number;
 }
 
-// Count only registrations for the selected event, using the existing event_id
-// index. Keeping this in the lookup statement also gives the DTO one snapshot.
-// Nest the predicate so Drizzle's single-table projection keeps column qualifiers.
+// Nest the predicate so Drizzle's single-table projection keeps the column
+// qualifiers, and so the DTO reads one snapshot.
 const eventWithCapacityQuery = () =>
   db
     .select({
@@ -118,14 +113,10 @@ export interface SitemapEvent {
 }
 
 /**
- * Every event that resolves to a public page, newest first.
- *
- * Deliberately includes past events: their pages render a real "Rückblick"
- * state with their own date, place and description, they answer 200, and the
- * landing page only ever links the *next* one — so without the sitemap they are
- * reachable but undiscoverable. The filter mirrors getPublishedEventBySlug
- * exactly (published, not soft-deleted), because listing a URL that route would
- * refuse to serve is worse than not listing it at all.
+ * Every event that resolves to a public page, newest first. Past events are
+ * included: their pages answer 200 with a real "Rückblick" state, and only the
+ * next one is linked, so the sitemap is the only way to discover them. The
+ * filter mirrors getPublishedEventBySlug exactly.
  */
 export const listPublishedEventsForSitemap = async (): Promise<SitemapEvent[]> =>
   db
@@ -152,13 +143,9 @@ const tryEventDto = async (fetch: () => Promise<EventWithCapacity | null>, label
 export const fetchNextEvent = (): Promise<EventDTO | null> => tryEventDto(getNextEventWithCapacity, 'fetchNextEvent');
 
 /**
- * The scheduling state of the site, as three distinct cases.
- *
- * `fetchNextEvent` collapses "nothing scheduled" and "the read failed" into the
- * same `null`, which is fine for a sitemap but not for a page that tells a
- * visitor whether he can come. A failed read must not be presented as "kein
- * Termin geplant" — that is a claim, and it would be a false one. Callers that
- * put the answer in front of a reader use this instead.
+ * The scheduling state as three cases. `fetchNextEvent` collapses "nothing
+ * scheduled" and "the read failed" into one `null`; anything that puts the
+ * answer in front of a reader must tell them apart and uses this instead.
  */
 export type NextEventState =
   { status: 'scheduled'; event: EventDTO } | { status: 'none'; event: null } | { status: 'unavailable'; event: null };
@@ -185,7 +172,7 @@ export const getEventBySlug = (slug: string): Promise<EventDTO | null> =>
     return rows[0] ?? null;
   }, 'getEventBySlug');
 
-export const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
+const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
   const base = String(eventDate).slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(base)) {
     return `event-${Date.now().toString(36)}`;
@@ -291,11 +278,9 @@ export interface EventInput {
 }
 
 export const listEventsForAdmin = async (): Promise<Array<Event & { activeCount: number }>> => {
-  // One grouped LEFT JOIN instead of a COUNT round-trip per event: the admin
-  // list previously issued 1 + N queries, so it got linearly slower as the event
-  // archive grew. `count(<column>)` (not `count(*)`) is what makes the LEFT JOIN
-  // correct — it counts matched rows only, so an event with no registrations
-  // still yields 0 rather than 1.
+  // One grouped LEFT JOIN instead of a COUNT per event. `count(<column>)`, not
+  // `count(*)`: it counts matched rows only, so an event with no registrations
+  // yields 0 rather than 1.
   const rows = await db
     .select({
       event: events,
@@ -310,8 +295,8 @@ export const listEventsForAdmin = async (): Promise<Array<Event & { activeCount:
   return rows.map(({ event, activeCount }) => ({ ...event, activeCount }));
 };
 
-// A field-by-field default for the event form — a table, not a branch. The
-// cyclomatic count treats every `??` as a decision and reads it as complexity 15.
+// A lookup table, not branching: the cyclomatic count reads every `??` as a
+// decision and lands on 15.
 // eslint-disable-next-line complexity
 const inputToColumns = (input: EventInput): Partial<NewEvent> => ({
   title: input.title.trim(),

@@ -17,19 +17,12 @@ interface Props {
 }
 
 /**
- * "Wie ein Abend abläuft" — the evening as an open sequence.
+ * The evening as a ruled ladder: big condensed numerals in the margin, a
+ * full-width rule above each step. The numerals are `aria-hidden` — the ordered
+ * list already conveys the order.
  *
- * Big condensed numerals in the margin, a full-width rule above each step, and
- * the text set against the numeral rather than inside a box. Reading down a
- * ruled ladder, not across a row of cards and not along a process diagram with
- * arrows.
- *
- * The numerals are `aria-hidden`: the ordered list already conveys the order to
- * assistive technology, and reading "one" twice per step is noise.
- *
- * The `#reise` id is kept even though the label is "Ablauf" — that anchor has
- * been linked from the nav, the footer and /event for as long as the page has
- * existed.
+ * The `#reise` id is load-bearing even though the label reads "Ablauf": the nav,
+ * the footer and /event have linked it for as long as the page has existed.
  */
 
 const { data } = Astro.props;

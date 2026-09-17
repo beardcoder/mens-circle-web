@@ -1,8 +1,4 @@
-/**
- * Shared type definitions for the Männerkreis frontend.
- */
-
-/** Standard response contract for all form-handling API routes. */
+/** Response contract for every form-handling API route. */
 export interface ApiResponse {
   success: boolean;
   message: string;
@@ -20,10 +16,8 @@ export interface EventData {
 }
 
 /**
- * Public event shape: what `GET /api/public/events/next` returns, and what the
- * SSR event pages render from. Capacity values are computed server-side
- * (registration counts are not exposed to the public), so the client never sees
- * raw registration data.
+ * Public event shape. Capacity values are computed server-side, so the client
+ * never sees raw registration data.
  */
 export interface EventDTO {
   id: string;
@@ -62,7 +56,7 @@ export interface RegistrationPayload {
   email: string;
   phone_number: string | null;
   privacy: boolean;
-  /** Honeypot anti-spam field — real users leave it empty. */
+  /** Honeypot — real users leave it empty. */
   website?: string;
 }
 
@@ -73,7 +67,7 @@ export interface TestimonialPayload {
   role: string | null;
   email: string;
   privacy: boolean;
-  /** Honeypot anti-spam field — real users leave it empty. */
+  /** Honeypot — real users leave it empty. */
   website?: string;
 }
 

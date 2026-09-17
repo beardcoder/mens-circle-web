@@ -99,13 +99,10 @@
   color: var(--text-primary);
 }
 
-/* ============================================
-   Type variants
-
+/* Type variants
    Ground and text stay put; only the bar, the title and the icon change. Each
    title colour was measured against `--bg-elevated` in both modes and clears
-   4.5:1 (lowest is the light-mode warning at 5.0:1).
-   ============================================ */
+   4.5:1 (lowest is the light-mode warning at 5.0:1). */
 
 .toast--success {
   border-inline-start: 6px solid var(--color-success);

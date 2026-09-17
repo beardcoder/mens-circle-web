@@ -132,7 +132,7 @@ textarea.form-control {
   color: var(--text-secondary);
 }
 
-/* ── Validation ──────────────────────────────────────────────────────────
+/* Validation.
    A rejected field says so in place, next to the input, and keeps saying it
    until corrected — a toast alone disappears and never tells you *which*
    field. Keyed off [aria-invalid="true"] rather than a class so the visual

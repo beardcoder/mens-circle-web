@@ -18,14 +18,9 @@ interface Props {
 }
 
 /**
- * The opening block of a sub-page (the Haltung page, the legal pages).
- *
- * Same shape as the home page's opening — text beside an optional photograph, on
- * the page's own ground. It used to be a dark panel with a radial gradient, two
- * ring ornaments, a drop-shadowed offset-framed image and a floating animation.
- *
- * `align: 'center'` is kept for the legal pages, which have a title and nothing
- * else and would look stranded in a wide left-aligned column.
+ * The opening block of a sub-page: text beside an optional photograph, on the
+ * page's own ground. `align: 'center'` exists for the legal pages, which have a
+ * title and nothing else and would look stranded in a wide left-aligned column.
  */
 
 const { data } = Astro.props;

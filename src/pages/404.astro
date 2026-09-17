@@ -2,10 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import site from '../data/site.json';
 
-// Server-rendered: the Bun adapter hands every unmatched route to
-// `app.render()`, which resolves to this 404 route. It must NOT be
-// prerendered — the adapter has no static-file fallback for 404.html, so a
-// prerendered version would leave unmatched routes with an empty body.
+// Must NOT be prerendered: the adapter has no static-file fallback for
+// 404.html, so a prerendered version leaves unmatched routes with an empty body.
 ---
 
 <Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow">

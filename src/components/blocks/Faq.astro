@@ -15,15 +15,9 @@ interface Props {
 }
 
 /**
- * Frequently asked questions, as a keyboard-operable `<details>` list.
- *
- * No `name` attribute on the elements: an exclusive accordion closes the answer
- * you were reading the moment you open another, which is the wrong behaviour for
- * a list of questions someone is comparing. Several can be open at once.
- *
- * The practical facts (place, duration, contribution) are never *only* here —
- * they are stated in the open, in the facts list near the top of the page. This
- * section answers the doubts, not the logistics.
+ * A keyboard-operable `<details>` list. No `name` attribute: an exclusive
+ * accordion closes the answer you were reading the moment you open another.
+ * This section answers doubts, not logistics — the facts are stated in the open.
  */
 
 const { data } = Astro.props;

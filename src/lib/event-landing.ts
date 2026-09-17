@@ -1,23 +1,9 @@
 /**
- * Content and display helpers for the pages that talk about dates.
+ * Content helpers for the date pages. Outside the components because /event both
+ * renders these strings and emits some as FAQPage JSON-LD — Google flags FAQ
+ * markup that does not match the visible text, so both read one source.
  *
- * Kept outside the components because the /event page both renders these strings
- * and emits some as JSON-LD (FAQPage) — Google flags FAQ markup that doesn't
- * match the visible text, so both must read from one source.
- *
- * The editorial constants that used to live here (the evening's rhythm, the
- * ground rules, the boundary list, the "what you don't need to bring" list) are
- * gone: those sections now appear once, on the home page, and their copy lives
- * in src/content/home.json with the rest of the editable content. What remains
- * is what is genuinely date-shaped — the facts row and the questions someone
- * asks right before signing up.
- *
- * The FAQ set here is deliberately disjoint from the home page's: two FAQPage
- * blocks asking the same questions on two URLs would only compete. The home page
- * answers "what is this at all", this one answers "how do I take part".
- *
- * Server-render only — it imports lib/server/format, so it has no business in a
- * client bundle.
+ * Server-render only — it imports lib/server/format.
  */
 import type { EventDTO } from './types';
 import { formatDayMonthYearDE, formatWeekdayDE } from './server/format';
@@ -28,16 +14,16 @@ export interface FaqEntry {
   answer: string;
 }
 
-/** The upcoming event reduced to the strings the landing page actually shows. */
+/** The upcoming event reduced to the strings the landing page shows. */
 export interface NextEventSummary {
   slug: string;
   /** "Donnerstag, 18. September 2026" */
   dateLabel: string;
   /** "19:00–21:30 Uhr", or empty when no time is set. */
   timeRange: string;
-  /** City, falling back to the venue name and then the site's own locality. */
+  /** City, then venue name, then the site's own locality. */
   place: string;
-  /** Free-text participation fee for this evening, empty when not set. */
+  /** Free-text participation fee, empty when not set. */
   costBasis: string;
   isFull: boolean;
   availableSpots: number;
@@ -69,10 +55,9 @@ export interface EventFact {
 }
 
 /**
- * The quick-scan facts. General by nature, but a scheduled evening overrides
- * what it actually knows: its city, its time window, its participation fee. The
- * venue is never hardcoded beyond the city — the exact address only goes out
- * with the registration confirmation.
+ * Quick-scan facts. A scheduled event overrides what it knows: city, time
+ * window, fee. Never more precise than the city — the exact address goes out
+ * with the registration confirmation only.
  */
 export const buildEventFacts = (next: NextEventSummary | null): EventFact[] => [
   {
@@ -82,9 +67,8 @@ export const buildEventFacts = (next: NextEventSummary | null): EventFact[] => [
   },
   {
     label: 'Wie oft',
-    // Non-breaking space after "Alle": set large and condensed, this value wraps,
-    // and the only acceptable break is before "Wochen" — not between the 2 and
-    // the 4, which reads as a stray hyphen.
+    // Non-breaking space: the only acceptable break is before "Wochen" — between
+    // the 2 and the 4 it reads as a stray hyphen.
     value: 'Alle\u00A02–4 Wochen',
     sub: 'Ein fester Rhythmus, keine Mitgliedschaft',
   },
@@ -94,8 +78,7 @@ export const buildEventFacts = (next: NextEventSummary | null): EventFact[] => [
     sub: next?.timeRange ? `Nächster Termin: ${next.timeRange}` : 'Ein Abend, kein Wochenendseminar',
   },
   {
-    // The evening's own fee text wins when the admin set one — it may name a
-    // suggested amount that the generic "Spendenbasis" would swallow.
+    // The event's own fee text wins: it may name an amount "Spendenbasis" swallows.
     label: 'Beitrag',
     value: next?.costBasis || 'Spendenbasis',
     sub: 'Jeder gibt, was für ihn machbar ist',
@@ -103,15 +86,9 @@ export const buildEventFacts = (next: NextEventSummary | null): EventFact[] => [
 ];
 
 /**
- * The questions that come up between "this sounds interesting" and actually
- * turning up: when, where, how much, how do I sign up, can I come alone.
- *
- * Deliberately disjoint from the home page's FAQ set (src/content/home.json),
- * which answers what a Männerkreis is, whether you have to talk, how
- * confidentiality works and why it is not therapy.
- *
- * The first answer is the only one that depends on live data, which is exactly
- * why this is a function.
+ * The questions asked right before signing up. Deliberately disjoint from the
+ * home page's FAQ set (src/content/home.json): two FAQPage blocks asking the
+ * same questions on two URLs only compete.
  */
 export const buildEventFaq = (next: NextEventSummary | null): FaqEntry[] => [
   {

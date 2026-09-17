@@ -1,14 +1,12 @@
 /**
- * Theme manager — light/dark only, persisted across visits.
+ * Theme manager — light/dark, persisted across visits.
  *
  *   • `data-mode`          absent (follow OS) | "light" | "dark"
  *   • `data-mode-resolved` the mode actually in effect, mirrored for the icons
  *
- * The site has a single palette; the warm/cool axis this module used to carry
- * is gone. The layout's inline boot script sets both attributes before first
- * paint so nothing flashes; this module re-syncs on load, wires the button and
- * follows the OS while no mode is pinned. Returns a cleanup that detaches
- * everything.
+ * The layout's inline boot script sets both attributes before first paint so
+ * nothing flashes; this re-syncs on load, wires the button, and follows the OS
+ * while no mode is pinned.
  */
 
 export type Mode = 'light' | 'dark';
@@ -36,7 +34,7 @@ const writeStored = (key: string, value: string): void => {
   try {
     localStorage.setItem(key, value);
   } catch {
-    // Storage unavailable (private mode / disabled) — choice just won't persist.
+    // Storage unavailable (private mode) — the choice just will not persist.
   }
 };
 
@@ -57,7 +55,7 @@ const syncThemeColor = (resolved: Mode): void => {
   if (meta) meta.content = THEME_COLOR[resolved];
 };
 
-/** Push the current mode onto <html> + the meta tag. */
+/** Push the current mode onto <html> and the meta tag. */
 const apply = (): void => {
   const root = document.documentElement;
   const stored = getStoredMode();
@@ -71,10 +69,7 @@ const apply = (): void => {
   syncThemeColor(resolved);
 };
 
-/**
- * Wire the header theme control. Returns a cleanup function that removes every
- * listener. No-op cleanup if the switch isn't on the page.
- */
+/** Returns a cleanup; no-op when the switch isn't on the page. */
 export function initTheme(): () => void {
   const teardown: Array<() => void> = [];
   const listen = (target: EventTarget, type: string, handler: EventListener): void => {
@@ -82,11 +77,10 @@ export function initTheme(): () => void {
     teardown.push(() => target.removeEventListener(type, handler));
   };
 
-  // Re-assert state on load (covers stored choices made before this ran).
   apply();
 
-  // The switch is rendered twice (bar + nav panel, see Header.astro) with CSS
-  // picking one. Wire both so the hidden copy is never stale when it takes over.
+  // Rendered twice (bar + nav panel) with CSS picking one. Wire both so the
+  // hidden copy is never stale when it takes over.
   const modeBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-mode-toggle]'));
 
   const syncButtons = (): void => {
@@ -97,7 +91,6 @@ export function initTheme(): () => void {
 
   syncButtons();
 
-  // Toggle relative to what's actually showing, then pin it explicitly.
   for (const btn of modeBtns) {
     listen(btn, 'click', () => {
       writeStored(STORAGE_MODE, resolveMode() === 'dark' ? 'light' : 'dark');
@@ -106,7 +99,6 @@ export function initTheme(): () => void {
     });
   }
 
-  // Keep the resolved mode live when the OS flips and nothing is pinned.
   if (typeof matchMedia === 'function') {
     const mq = matchMedia('(prefers-color-scheme: dark)');
 

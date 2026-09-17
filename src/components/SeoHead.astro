@@ -3,8 +3,7 @@ import site from '../data/site.json';
 import { umamiOrigin } from '../lib/umami-config';
 import { canonicalUrl } from '../lib/canonical';
 
-// Font preloading is handled by the native <Font preload /> component in the
-// layout head (fonts configured in astro.config.mjs).
+// Font preloading is handled by <Font preload /> in the layout head.
 
 interface Props {
   title?: string;
@@ -16,13 +15,10 @@ interface Props {
   ogDescription?: string;
   ogImage?: string;
   ogImageAlt?: string;
-  /** Pixel size of `ogImage`. Only pass them when they are actually known —
-   *  see the note at `ogImageUrl` below. Both or neither. */
+  /** Pixel size of `ogImage`. Both or neither, and only when actually known. */
   ogImageWidth?: number;
   ogImageHeight?: number;
-  /** Up to two labelled facts a card can render as fields (`twitter:label1`
-   *  / `data1`, `label2` / `data2`). Slack and X both show them; the event
-   *  pages use them for the date and the place. */
+  /** Up to two labelled facts for `twitter:label1/data1` and `label2/data2`. */
   socialDetails?: { label: string; value: string }[];
   robots?: string;
   /** Extra JSON-LD objects to embed (Article, FAQPage, Event, …). */
@@ -30,15 +26,12 @@ interface Props {
   /** ISO dates for an `ogType="article"` page. Emitted as `article:*` meta. */
   publishedTime?: string;
   modifiedTime?: string;
-  /** Web app manifest to link. Defaults to the site-wide manifest; a page can
-   *  point at a focused one (e.g. the installable breathing app). */
+  /** Defaults to the site-wide manifest; a page can point at a focused one. */
   manifest?: string;
-  /** When set, the page advertises itself as an installable standalone web app
-   *  (adds the iOS/Android web-app metas with this as the home-screen title). */
+  /** Advertises the page as an installable web app, with this as the home-screen title. */
   webAppTitle?: string;
-  /** Viewport meta content. Defaults to a zoomable viewport with
-   *  `viewport-fit=cover` so `env(safe-area-inset-*)` actually resolves; an
-   *  app-like page can override it (e.g. to lock zoom). */
+  /** Defaults to a zoomable viewport with `viewport-fit=cover`, so
+   *  `env(safe-area-inset-*)` resolves. App-like pages may override it. */
   viewport?: string;
 }
 
@@ -53,10 +46,8 @@ const {
   ogImageWidth,
   ogImageHeight,
   socialDetails = [],
-  // `index, follow` alone leaves Google's *preview* limits at their defaults:
-  // a thumbnail-sized image and a snippet the crawler shortens on its own.
-  // The three max-* directives lift them, which is what lets a result carry a
-  // large image in Search and makes the page eligible for Discover.
+  // `index, follow` alone leaves Google's preview limits at their defaults. The
+  // max-* directives lift them, which is what allows a large image in Search.
   robots = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
   schemas = [],
   publishedTime,
@@ -68,26 +59,17 @@ const {
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 
-// One spelling per page, shared with the pages' own structured data — see
-// lib/canonical.ts. og:url and twitter:url below inherit it.
+// One spelling per page, shared with the pages' own structured data.
 const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 
-// Only third-party origin we ever load: the Umami analytics endpoint. Preconnect
-// to it so the tracker script connects faster. Everything else (fonts, CSS, JS,
-// API) is same-origin, so no other preconnect candidates exist.
+// The only third-party origin the site loads. Everything else is same-origin.
 const analyticsOrigin = umamiOrigin();
 const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
 const socialTitle = ogTitle ?? title ?? site.siteName;
 const socialDescription = ogDescription ?? description;
-// The default social card is a real 1200x630 poster (public/images/og-default.png),
-// not the square logo. Declared dimensions must match the file: the logo is
-// 512x513, and every share used to advertise 1200x630 for it, which is what
-// downgrades a summary_large_image card to a small one.
-//
-// So width/height are emitted only when the caller knows them. A page passing
-// an image of its own (an event's picture, entered in the admin as an arbitrary
-// URL) passes no dimensions, and the scraper measures the file itself — slower
-// than a declaration, but never wrong.
+// Declared dimensions must match the file, or a summary_large_image card gets
+// downgraded to a small one. So width/height go out only when the caller knows
+// them; otherwise the scraper measures the file itself.
 const usesDefaultImage = !ogImage;
 const ogImageUrl = new URL(ogImage ?? '/images/og-default.png', siteUrl).href;
 const imageWidth = usesDefaultImage ? 1200 : ogImageWidth;
@@ -101,20 +83,15 @@ const MIME_BY_EXTENSION: Record<string, string> = {
   gif: 'image/gif',
   avif: 'image/avif',
 };
-// From the PATH, not the href: the event card carries a `?v=` cache token, and
-// splitting the full URL on "." would read the token as the extension.
+// From the path, not the href: a `?v=` cache token would read as the extension.
 const imageType = MIME_BY_EXTENSION[new URL(ogImageUrl).pathname.split('.').pop()?.toLowerCase() ?? ''];
 
-// Two labelled facts at most — the card formats define label1/2 only.
 const cardDetails = socialDetails.slice(0, 2);
 
-// Global structured data (mirrors the original LocalBusiness/Organization/WebSite).
 const sameAs = site.socialLinks.filter((l) => !['email', 'phone', 'whatsapp'].includes(l.type)).map((l) => l.value);
 
-// Markus as a first-class entity rather than an `author` string. He runs the
-// circle, the site has a page about him, and he is the author of the essay —
-// three mentions that a crawler previously had no way to tie together. One
-// `@id`, referenced from the business below and from the Article on his page.
+// One `@id` for Markus, referenced from the business below and from the Article
+// on his page, so the three mentions tie together.
 const person = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -132,8 +109,7 @@ const localBusiness = {
   name: site.siteName,
   description: site.description,
   url: siteUrl.origin,
-  // An ImageObject rather than a bare URL: Google prefers explicit dimensions
-  // when picking an organisation logo.
+  // An ImageObject, not a bare URL: Google prefers explicit logo dimensions.
   logo: {
     '@type': 'ImageObject',
     url: new URL('/images/logo-color.png', siteUrl).href,
@@ -249,7 +225,7 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <link rel="manifest" href={manifest} />
 
 {
-  /* Installable standalone web app (e.g. the breathing exercise). */
+  /* Installable standalone web app. */
   webAppTitle && (
     <>
       <meta name="mobile-web-app-capable" content="yes" />

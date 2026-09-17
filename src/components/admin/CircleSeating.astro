@@ -1,9 +1,8 @@
 ---
 /**
- * The Sitzkreis. The capacity ring taken to its literal end: the gathering
- * drawn as a circle. Each registered participant is a seat around the fire
- * (ember glow at the centre); open places are hollow seats. The circle fills
- * clockwise from the top, matching the numbered roster beside it.
+ * The event drawn as a circle: each registered participant is a seat around the
+ * fire, open places are hollow. It fills clockwise from the top, matching the
+ * numbered roster beside it.
  */
 interface Seat {
   initials: string;
@@ -41,7 +40,6 @@ const full = seats.length >= capacity && capacity > 0;
   >
     <circle class="seating__ring" cx={C} cy={C} r={R} fill="none"></circle>
 
-    <!-- the fire -->
     <circle class="seating__glow" cx={C} cy={C} r="46"></circle>
     <circle class="seating__fire" cx={C} cy={C} r="30"></circle>
     <text class="seating__count" x={C} y={C} text-anchor="middle" dominant-baseline="central">
@@ -87,7 +85,6 @@ const full = seats.length >= capacity && capacity > 0;
     stroke-width: 1.5;
   }
 
-  /* fire */
   .seating__glow {
     fill: var(--ember);
     opacity: 0.18;
@@ -117,7 +114,6 @@ const full = seats.length >= capacity && capacity > 0;
     font-size: 13px;
   }
 
-  /* seats */
   .seat--taken circle {
     fill: var(--ember);
   }

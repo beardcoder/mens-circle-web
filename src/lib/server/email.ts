@@ -24,9 +24,8 @@ const eventDetail = (ev: Event, opts: { includeAddress?: boolean } = {}) => ({
 });
 
 /**
- * The mail the participant himself receives when his seat is booked. Kept apart
- * from the admin notification below so the admin can re-send a confirmation
- * that never arrived without announcing the anmeldung a second time.
+ * The participant's own confirmation. Kept apart from the admin notification so
+ * a missing confirmation can be re-sent without announcing the seat twice.
  */
 export const sendRegistrationConfirmation = async (
   ev: Event,
@@ -55,7 +54,7 @@ export const sendRegistrationConfirmation = async (
       });
 };
 
-/** Both mails one registration triggers. Resolves to whether the *participant's* copy went out. */
+/** Both mails one registration triggers; resolves to whether the participant's copy went out. */
 export const sendRegistrationEmails = async (
   ev: Event,
   participant: Participant,

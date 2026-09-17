@@ -1,13 +1,7 @@
 /**
- * Database connection (bun:sqlite + Drizzle).
- *
- * Server-only. Opens the SQLite file from `DATABASE_PATH`, applies the
- * Drizzle migrations under `./drizzle` on first import, and exports a ready
- * `db` handle.
- *
- * Migrations run once at process start (the Bun server is long-lived), so a
- * fresh deploy provisions its schema with no manual step. The migrations
- * folder is shipped alongside the bundle (see Dockerfile).
+ * Opens the SQLite file from `DATABASE_PATH` and applies the migrations under
+ * `./drizzle` on first import. The Bun server is long-lived, so this runs once
+ * per process and a fresh deploy provisions its schema with no manual step.
  */
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
@@ -23,8 +17,7 @@ function resolveDbPath(): string {
 }
 
 const dbPath = resolveDbPath();
-// Ensure the parent directory exists (the data volume may be empty on a fresh
-// deploy). Skip for the special in-memory database.
+// The data volume may be empty on a fresh deploy.
 if (dbPath !== ':memory:') {
   const dir = dirname(dbPath);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
@@ -32,12 +25,11 @@ if (dbPath !== ':memory:') {
 
 const sqlite = new Database(dbPath, { create: true });
 // Tuned for a long-lived, low-RAM single-writer server:
-//   • WAL            → readers never block the writer (live SSR + admin writes).
-//   • synchronous=NORMAL → the recommended WAL companion: drops a full fsync per
-//     transaction (much less disk I/O) while staying durable across an app
-//     crash; only a hard OS/power loss can lose the last commit, acceptable here.
-//   • foreign_keys   → enforce the registration↔event/participant relations.
-//   • busy_timeout   → wait out a brief writer lock instead of erroring.
+//   • WAL                 readers never block the writer.
+//   • synchronous=NORMAL  drops a full fsync per transaction, still durable
+//                         across an app crash; only power loss costs the last commit.
+//   • foreign_keys        enforce the registration↔event/participant relations.
+//   • busy_timeout        wait out a brief writer lock instead of erroring.
 sqlite.run('PRAGMA journal_mode = WAL;');
 sqlite.run('PRAGMA synchronous = NORMAL;');
 sqlite.run('PRAGMA foreign_keys = ON;');
@@ -45,8 +37,7 @@ sqlite.run('PRAGMA busy_timeout = 5000;');
 
 export const db = drizzle(sqlite, { schema });
 
-// Apply migrations once. The folder is resolved against cwd so it works both in
-// local dev (project root) and in the container (WORKDIR /app).
+// Resolved against cwd so it works in local dev and in the container.
 const migrationsFolder = resolve(process.cwd(), process.env.MIGRATIONS_DIR || './drizzle');
 try {
   migrate(db, { migrationsFolder });
