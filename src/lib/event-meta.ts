@@ -22,6 +22,7 @@
  * Server-render only — it imports lib/server/format.
  */
 import site from '../data/site.json';
+import { fnv1a } from './helpers';
 import { formatDateLongDE, formatDayMonthYearDE } from './server/format';
 import type { EventDTO } from './types';
 
@@ -122,27 +123,25 @@ function shareDetails(event: EventDTO): { label: string; value: string }[] {
  * by URL, so when an evening fills up or its time changes, the URL has to
  * change with it or the old picture keeps going out. Slug, date, time, place
  * and the seat state are exactly the values the card shows.
+ *
+ * The card route reads it too — as the ETag, and to tell a current URL (which
+ * may then be cached forever) from a token left over in an old share.
  */
-function cardVersion(event: EventDTO): string {
-  const source = [
-    event.slug,
-    event.event_date,
-    event.start_time,
-    event.end_time,
-    eventPlace(event),
-    eventName(event),
-    event.is_past ? 'p' : '',
-    event.is_full ? 'f' : '',
-    event.available_spots,
-    event.max_participants,
-  ].join('|');
-  // A tiny FNV-1a: this is a cache key, not a signature.
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < source.length; i++) {
-    hash ^= source.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193) >>> 0;
-  }
-  return hash.toString(36);
+export function cardVersion(event: EventDTO): string {
+  return fnv1a(
+    [
+      event.slug,
+      event.event_date,
+      event.start_time,
+      event.end_time,
+      eventPlace(event),
+      eventName(event),
+      event.is_past ? 'p' : '',
+      event.is_full ? 'f' : '',
+      event.available_spots,
+      event.max_participants,
+    ].join('|'),
+  );
 }
 
 /** The generated 1200x630 poster for this evening — see lib/server/og-card.ts. */
