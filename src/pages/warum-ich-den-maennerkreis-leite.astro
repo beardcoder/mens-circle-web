@@ -5,8 +5,7 @@ import PageContent from '../components/PageContent.astro';
 import page from '../content/warum-ich-den-maennerkreis-leite.json';
 import { canonicalUrl } from '@lib/canonical';
 
-// Prerendered (static): a personal, content-only page (no live data), served
-// straight off disk by the Bun server.
+// Prerendered: content only, no live data.
 export const prerender = true;
 
 const blocks = page.blocks as Block[];
@@ -35,7 +34,7 @@ if (faq?.data?.items?.length) {
   });
 }
 
-// Breadcrumb: Startseite → diese Seite.
+// Breadcrumb: home → this page.
 schemas.push({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -45,14 +44,9 @@ schemas.push({
   ],
 });
 
-// `Article`, not a bare `WebPage`: this is a signed piece of writing with an
-// author and a date, and typing it as one is what lets the text be attributed
-// to Markus (the `Person` entity in SeoHead) rather than floating free.
-//
-// The dates come from the content file, where they are set by hand from this
-// page's real history. Deliberately not derived from the file's mtime: a Docker
-// build checks the repo out fresh, so every file would claim to have been
-// modified at build time.
+// `Article`, not a bare `WebPage`: a signed piece of writing, attributed to the
+// `Person` entity in SeoHead. The dates are set by hand in the content file —
+// a file mtime would claim every page was modified at build time.
 const articleImage = new URL('/images/og-markus.jpg', siteUrl).href;
 
 schemas.push({
@@ -73,10 +67,8 @@ schemas.push({
   about: { '@id': `${siteUrl.origin}/#organization` },
 });
 
-// This page ships its own card image, so it also declares its size — the shared
-// head only knows the dimensions of the site default. public/images/og-markus.jpg
-// is 1200x630, the same poster format; a card whose declared size does not match
-// the file is what gets a large card downgraded to a small one.
+// This page ships its own card image, so it declares its size too: a declared
+// size that does not match the file downgrades a large card to a small one.
 const OG_IMAGE = { width: 1200, height: 630 };
 ---
 

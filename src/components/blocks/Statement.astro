@@ -13,21 +13,12 @@ interface Props {
 }
 
 /**
- * The interruption.
+ * A full-bleed orange field carrying one sentence at poster size. Ink on orange,
+ * never white: white measures 2.9:1 here and fails, ink measures 5.9:1.
  *
- * A full-bleed orange field carrying one sentence the site already makes —
- * "Du musst nichts darstellen." — at poster size. It is a restatement, not a
- * new promise: the same words open the hero as the invitation, and the
- * paragraph under it hands straight over to the agreements that follow.
- *
- * Ink on orange, never white: white on this orange measures 2.9:1 and fails;
- * ink measures 5.9:1.
- *
- * The lines slide in from the right and settle flush-left as the field enters
- * view (see utilities/_motion.css). The settled state is the readable state and
- * is what a reduced-motion or unsupported browser gets straight away, so no
- * word exists only mid-animation. The section clips, so the travel can never
- * raise a horizontal scrollbar.
+ * The lines settle flush-left as the field enters view (utilities/_motion.css).
+ * The settled state is the readable one, so no word exists only mid-animation,
+ * and the section clips so the travel cannot raise a horizontal scrollbar.
  */
 
 const { data } = Astro.props;

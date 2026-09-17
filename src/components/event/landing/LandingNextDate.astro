@@ -4,18 +4,13 @@ import { primaryAction, type DateStatus } from '@lib/event-status';
 import NewsletterForm from '../../islands/NewsletterForm.svelte';
 
 /**
- * The one block on /event that depends on live data — and the reason the page
- * exists.
- *
- * Three states, each said plainly:
+ * The one block on /event that depends on live data. Three states, each said
+ * plainly:
  *   scheduled    date, time, place, seats, and a link to register
  *   none         "kein Termin" plus the way to be told when there is one
- *   unavailable  the read failed — say *that*, rather than dressing a failure
- *                up as an empty calendar
+ *   unavailable  the read failed — say that, rather than claiming an empty calendar
  *
- * Registration itself deliberately stays on /event/<slug>: that URL is canonical
- * for a single evening and carries its own Event markup. No "die Plätze sind
- * schnell weg" anywhere; when seats exist the actual number is shown.
+ * Registration stays on /event/<slug>, the canonical URL for a single event.
  */
 
 interface Props {

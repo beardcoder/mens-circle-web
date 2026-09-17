@@ -4,18 +4,12 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Make files that OTHER integrations generate at `astro:build:done` reachable
- * under `@wyattjoh/astro-bun-adapter`.
- *
- * The adapter serves static files from a `static-manifest.json` it builds in its
- * own `astro:build:done` hook — and Astro unshifts the adapter to the front of
- * the integration list, so that hook always runs first. Anything written later
- * (the sitemap index, llms.txt, the per-page `*.md`) never enters the manifest
- * and 404s in production.
- *
- * This factory returns an integration that appends the matching files to the
- * manifest afterwards. Register it *after* the integration whose output it
- * publishes. No-op without the adapter manifest (dev, or a different adapter).
+ * Publish files that OTHER integrations generate at `astro:build:done` under
+ * `@wyattjoh/astro-bun-adapter`. The adapter builds its `static-manifest.json`
+ * in its own `astro:build:done` hook, and Astro unshifts the adapter to the
+ * front of the list, so anything written later never enters the manifest and
+ * 404s in production. Register this AFTER the integration whose output it
+ * publishes. No-op without the adapter manifest.
  *
  * @param {object} options
  * @param {string} options.name Integration name, as it appears in build logs.
@@ -52,7 +46,6 @@ export function serveWithBunAdapter({
         try {
           manifest = JSON.parse(await readFile(manifestPath, 'utf-8'));
         } catch {
-          // No adapter manifest (dev build or non-Bun adapter) — nothing to do.
           return;
         }
 
@@ -61,10 +54,10 @@ export function serveWithBunAdapter({
 
         for (const file of files) {
           const pathname = `/${file}`;
-          if (manifest[pathname]) continue; // already served (e.g. adapter fixed upstream)
+          if (manifest[pathname]) continue;
 
-          // One read serves both the length and the ETag — `content-length` must
-          // be the byte length, which is what the buffer's own length is.
+          // One read serves both the ETag and `content-length`, which must be
+          // the byte length.
           const content = await readFile(new URL(file, dir));
           const etag = createHash('sha256').update(content).digest('hex').slice(0, 16);
 
@@ -102,9 +95,8 @@ export const serveSitemapWithBunAdapter = () =>
   });
 
 /**
- * Publish the `astro-llms-md` output: the llms index/full files plus the
- * per-page markdown that llms.txt links to, all emitted at the client root.
- * Register AFTER `llms()`.
+ * Publish the `astro-llms-md` output: the index/full files plus the per-page
+ * markdown llms.txt links to. Register AFTER `llms()`.
  *
  * @returns {import('astro').AstroIntegration}
  */

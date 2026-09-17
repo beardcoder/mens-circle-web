@@ -2,39 +2,29 @@
 import Layout from '../../layouts/Layout.astro';
 import { getEventBySlug } from '@lib/server/events';
 import { buildEventMeta } from '@lib/event-meta';
-// Dimensions of the shared static event poster.
 import { CARD_HEIGHT, CARD_WIDTH } from '@lib/og-card-size';
 import { buildEventSchema } from '@lib/event-schema';
 import EventPageContent from '../../components/event/EventPageContent.astro';
 
-// SSR: one page per event (date-based slug, e.g. /event/2026-06-12), covering
-// past and upcoming events. The record is read from the database per request, so
-// new/edited events get a live page with no rebuild. An unknown slug falls back
-// to /event (the current "next" event).
+// One SSR page per event, read per request, so a new or edited event is live
+// with no rebuild. An unknown slug falls back to /event.
 const { slug } = Astro.params;
 const event = slug ? await getEventBySlug(slug) : null;
 if (!event) return Astro.redirect('/event', 302);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 
-// Title, description, card image and the two labelled card fields, all derived
-// from the record — see lib/event-meta.ts for why they are built there. This is
-// the page people forward, so the preview has to answer "when, where, still a
+// This is the page people forward, so the preview answers "when, where, still a
 // seat?" without anyone opening the link.
 const meta = buildEventMeta(event, siteUrl);
 
-// No `ogType="event"`: Open Graph defines website / article / book / profile
-// and the music+video namespaces, and nothing else. "event" was never a
-// registered type, so every scraper fell back to "website" anyway — this now
-// says so rather than shipping a value none of them accept. What actually
-// carries the event-ness is the Event JSON-LD below.
+// No `ogType="event"`: Open Graph never registered that type, so every scraper
+// falls back to "website". The Event JSON-LD below carries the event-ness.
 
-// Per-event Event structured data (this is the canonical URL for the event),
-// built from the same strings.
 const eventSchema = buildEventSchema(event, siteUrl);
 
-// Startseite → Termine → dieser Abend. /event already carries the first two
-// levels; without this the individual date sat outside the site's hierarchy.
+// /event carries the first two levels; without this the individual date sits
+// outside the site's hierarchy.
 const breadcrumbs = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',

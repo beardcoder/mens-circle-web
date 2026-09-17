@@ -8,16 +8,11 @@ import EventMapSection from './EventMapSection.astro';
 import EventRegister from './EventRegister.astro';
 
 /**
- * The body of a single event's page (/event/<slug>), server-rendered. Only the
- * genuinely interactive pieces hydrate as islands (registration form,
- * add-to-calendar dialog, map, newsletter form) — everything else is plain HTML,
- * so the page ships a fraction of the JS the old whole-page Svelte island needed.
+ * The server-rendered body of /event/<slug>. Only the interactive pieces hydrate
+ * as islands — registration form, add-to-calendar dialog, map, newsletter form.
  *
- * The event is required. This used to accept `null` and fall back to a
- * "no upcoming event" body, but that branch is unreachable now: /event/<slug>
- * redirects to /event when the slug resolves to nothing, and /event itself is the
- * permanent landing page (components/event/EventLanding.astro) which owns the
- * empty state.
+ * The event is required: the route redirects to /event when a slug resolves to
+ * nothing, and EventLanding.astro owns the empty state.
  */
 
 interface Props {

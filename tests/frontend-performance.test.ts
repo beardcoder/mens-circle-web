@@ -3,8 +3,7 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import ts from 'typescript';
 
-// No app/server imports, live fetches or database access. Each worker/timer gets
-// a fresh VM so these tests can run alongside the backend agents' test suites.
+// No app or server imports, live fetches or database access.
 const root = new URL('../', import.meta.url);
 const read = (path: string): string => readFileSync(new URL(path, root), 'utf8');
 const workerSource = read('public/sw.js');
@@ -427,8 +426,8 @@ describe('retention scheduling (actual component functions)', () => {
   });
 });
 
-// Evaluate the checked-in sizes expressions in isolation (not a browser layout
-// measurement). Commas inside min/clamp must not split source-size entries.
+// Evaluates the checked-in sizes expressions in isolation. Commas inside
+// min/clamp must not split source-size entries.
 function imageSlot(component: string, viewport: number): number {
   const sizes = read(`src/components/blocks/${component}.astro`).match(/sizes="([^"]+)"/)![1];
   let depth = 0;

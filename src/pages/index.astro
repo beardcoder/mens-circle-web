@@ -7,8 +7,8 @@ import { eventSeriesSchema } from '@lib/series-schema';
 
 // Static shell and native <Picture> assets; live content uses server:defer.
 export const prerender = true;
-// Native island parameters are encrypted per build. Revalidate the static HTML
-// on navigation so a new deployment never receives parameters from an old build.
+// Island parameters are encrypted per build, so revalidate on navigation or a
+// new deployment receives parameters from an old build.
 Astro.response.headers.set('Cache-Control', 'no-cache');
 
 const blocks = home.blocks as Block[];
@@ -34,9 +34,8 @@ if (faq?.data?.items?.length) {
   });
 }
 
-// The steps describe how an evening runs, not an actionable procedure — and
-// Google retired HowTo rich results in 2023, so HowTo markup would earn no SERP
-// feature. ItemList stays the valid, machine-readable representation.
+// ItemList, not HowTo: the steps describe how an evening runs rather than an
+// actionable procedure, and Google retired HowTo rich results in 2023.
 const evening = blocks.find((b) => b.type === 'journey-steps');
 if (evening?.data?.steps?.length) {
   schemas.push({
@@ -53,7 +52,7 @@ if (evening?.data?.steps?.length) {
   });
 }
 
-// The recurring circle itself — one shared entity, also emitted by /event.
+// One shared entity, also emitted by /event.
 schemas.push(eventSeriesSchema(siteUrl));
 ---
 

@@ -1,17 +1,9 @@
-/**
- * Umami Analytics Tracking Utility
- * Provides type-safe event tracking for Umami Analytics
- *
- * The `window.umami` global is declared in `./types`.
- */
+/** Type-safe Umami event tracking. The `window.umami` global lives in `./types`. */
 
 export interface UmamiEventData {
   [key: string]: string | number | boolean | undefined;
 }
 
-/**
- * Track a custom event in Umami Analytics
- */
 export function trackEvent(eventName: string, eventData?: UmamiEventData): void {
   if (typeof window.umami === 'undefined') {
     if (import.meta.env.DEV) {
@@ -33,12 +25,8 @@ export function trackEvent(eventName: string, eventData?: UmamiEventData): void 
 }
 
 /**
- * Predefined event names for programmatic tracking (form islands, calendar).
- *
- * Click-style events (cta-click, nav-click, footer-link, contact-click,
- * social-click, whatsapp-click, faq-expand) are tracked declaratively via
- * `data-umami-event` attributes in the markup — Umami's own tracker script
- * handles those, no custom code involved.
+ * Event names for programmatic tracking (form islands, calendar). Click-style
+ * events are tracked declaratively via `data-umami-event` in the markup.
  */
 export const TRACKING_EVENTS = {
   NEWSLETTER_SUBMIT: 'newsletter-submit',

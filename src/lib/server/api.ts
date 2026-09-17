@@ -2,10 +2,10 @@
 import type { APIRoute } from 'astro';
 import { clientIp, rateLimit } from './ratelimit';
 
-export const tooManyRequests = (): Response =>
+const tooManyRequests = (): Response =>
   Response.json({ success: false, message: 'Zu viele Anfragen. Bitte versuche es später erneut.' }, { status: 429 });
 
-export const internalError = (): Response =>
+const internalError = (): Response =>
   Response.json(
     { success: false, message: 'Es ist ein Fehler aufgetreten. Bitte versuche es später erneut.' },
     { status: 500 },
