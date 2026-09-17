@@ -22,7 +22,6 @@
  * Server-render only — it imports lib/server/format.
  */
 import site from '../data/site.json';
-import { fnv1a } from './helpers';
 import { formatDateLongDE, formatDayMonthYearDE } from './server/format';
 import type { EventDTO } from './types';
 
@@ -115,47 +114,10 @@ function shareDetails(event: EventDTO): { label: string; value: string }[] {
   ];
 }
 
-/**
- * A short, stable token for everything the card draws.
- *
- * It rides along as `?v=` on the card URL, which is what makes a cached card
- * safe: Facebook and WhatsApp keep a scraped image for a long time and key it
- * by URL, so when an evening fills up or its time changes, the URL has to
- * change with it or the old picture keeps going out. Slug, date, time, place
- * and the seat state are exactly the values the card shows.
- *
- * The card route reads it too — as the ETag, and to tell a current URL (which
- * may then be cached forever) from a token left over in an old share.
- */
-export function cardVersion(event: EventDTO): string {
-  return fnv1a(
-    [
-      event.slug,
-      event.event_date,
-      event.start_time,
-      event.end_time,
-      eventPlace(event),
-      eventName(event),
-      event.is_past ? 'p' : '',
-      event.is_full ? 'f' : '',
-      event.available_spots,
-      event.max_participants,
-    ].join('|'),
-  );
-}
+/** One static 1200×630 poster for every event, including newly created events. */
+export const eventCardUrl = (_event: EventDTO, siteUrl: URL): string => new URL('/images/og-default.png', siteUrl).href;
 
-/** The generated 1200x630 poster for this evening — see lib/server/og-card.ts. */
-export const eventCardUrl = (event: EventDTO, siteUrl: URL): string =>
-  new URL(`/event/${event.slug}/card.png?v=${cardVersion(event)}`, siteUrl).href;
-
-/**
- * The evening's own picture, when the admin entered a usable http(s) URL.
- *
- * It is no longer the share card — the generated one carries the date, which
- * a forwarded link needs far more than a photograph does — but it is still a
- * real image of this evening, so it goes out as a second `image` in the
- * structured data, where Google takes a list.
- */
+/** Optional static original, included as an additional JSON-LD image. */
 export function adminImage(event: EventDTO, siteUrl: URL): string | null {
   const raw = event.image_url?.trim();
   if (!raw) return null;
@@ -174,7 +136,7 @@ export interface EventMeta {
   ogTitle: string;
   /** Shared by `<meta name="description">`, `og:description` and the JSON-LD. */
   description: string;
-  /** Absolute URL of the generated 1200x630 card. */
+  /** Absolute URL of the shared static 1200x630 poster. */
   image: string;
   imageAlt: string;
   /** The evening's own picture, when the admin set one — extra `image` for the
@@ -204,7 +166,7 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
       [eventWhenWhere(event), statusSentence(event), tailSentence(event)].map(asSentence).join(' '),
     ),
     image,
-    imageAlt: day ? `${name} am ${day} in ${place}` : `${name} in ${place}`,
+    imageAlt: site.siteName,
     extraImage: adminImage(event, siteUrl),
     details: shareDetails(event),
   };

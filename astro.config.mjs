@@ -22,16 +22,21 @@ const SITE_DESCRIPTION = site.description;
 
 // SSR on Bun: the adapter builds dist/server/entry.mjs, and that single process
 // is the public edge — static assets, prerendered HTML and on-demand routes.
-// Only the event pages and the home testimonials render per request.
+// Event pages and home server islands render per request; photos are prerendered.
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://mens-circle.de',
   output: 'server',
-  adapter: bun({ isr: true }),
+  adapter: bun({ isr: false }),
+  image: {
+    endpoint: { entrypoint: './src/lib/disabled-image-endpoint.ts', route: '/_image' },
+  },
   // `session: false` is deliberately absent: adapter 2.1.1 overwrites it with an
   // fs-lite driver, so the opt-out is a no-op. Set it once the adapter honours it.
   // `bun:sqlite` is a Bun builtin — external, or Rollup tries to bundle it.
   vite: {
-    ssr: { external: ['bun:sqlite'] },
+    // Sharp is used by Astro's prerender build, but never bundled into the
+    // production server (and is not installed in the runtime image).
+    ssr: { noExternal: true, external: ['bun:sqlite', 'sharp'] },
     optimizeDeps: { exclude: ['bun:sqlite'] },
     // Lightning CSS autoprefixes from real compat data (so `-webkit-backdrop-filter`
     // is handled for us). `cssTarget` stays modern so the tokens' `oklch()` and
@@ -140,7 +145,7 @@ export default defineConfig({
       description: SITE_DESCRIPTION,
       contentSelector: 'main',
       // Strip chrome (nav/footer/forms/aria-hidden) so the markdown is prose.
-      excludeSelectors: [...DEFAULT_NOISE_SELECTORS],
+      excludeSelectors: [...DEFAULT_NOISE_SELECTORS, '.home-live-event', '.testimonials-section'],
       // Back-office and the noindex breathing app stay out of the AI index — and
       // so do the legal pages. They are noindex for search for the same reason
       // they are noise here: llms-full.txt was 19KB of which the privacy policy
@@ -154,11 +159,6 @@ export default defineConfig({
     // length afterwards.
     addPagesToLlmsTxt({
       entries: [
-        {
-          path: '/',
-          title: 'Männerkreis Straubing',
-          description: SITE_DESCRIPTION,
-        },
         {
           path: '/event',
           title: 'Termine & Anmeldung',
