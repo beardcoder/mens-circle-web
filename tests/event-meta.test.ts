@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { buildEventMeta, eventCardUrl, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/event-meta';
+import { buildEventMeta, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/event-meta';
 import { buildEventSchema } from '../src/lib/event-schema';
 import type { EventDTO } from '../src/lib/types';
 
@@ -71,37 +71,20 @@ test('the brand is appended once, never twice', () => {
   );
 });
 
-test("the share card is this evening's generated poster, at a known size", () => {
+test("the share picture is the site's standing poster", () => {
   const meta = buildEventMeta(event(), SITE);
-  expect(meta.image).toMatch(/^https:\/\/mens-circle\.de\/event\/2026-09-18\/card\.png\?v=[a-z0-9]+$/);
+  // The same file SeoHead.astro falls back to, so og:image and the JSON-LD
+  // cannot name two different pictures. No per-event render is involved: the
+  // date a forwarded link has to answer for is carried by ogTitle and the
+  // description, which every preview shows as text beside the image.
+  expect(meta.image).toBe('https://mens-circle.de/images/og-default.png');
   // The evening has no picture of its own, so nothing extra goes to the graph.
   expect(meta.extraImage).toBeNull();
 });
 
-test('the card URL changes whenever anything the card draws changes', () => {
-  // Facebook and WhatsApp keep a scraped image for a long time and key it by
-  // URL. A filling evening whose card URL stayed put would keep sending out a
-  // picture that says seats are free.
-  const base = eventCardUrl(event(), SITE);
-  const changed = [
-    { available_spots: 3 },
-    { is_full: true },
-    { is_past: true },
-    { start_time: '18:00' },
-    { city: 'Regensburg' },
-    { title: 'Wintersonnwende' },
-    { event_date: '2026-09-19T00:00:00.000Z' },
-  ];
-  for (const patch of changed) {
-    expect(eventCardUrl(event(patch), SITE)).not.toBe(base);
-  }
-  // …and is stable for anything it does not draw.
-  expect(eventCardUrl(event({ description: 'anderer Text' }), SITE)).toBe(base);
-});
-
-test("the admin's own picture rides along as a second image, never as the card", () => {
+test("the admin's own picture rides along as a second image, never as og:image", () => {
   const own = buildEventMeta(event({ image_url: 'https://cdn.example/abend.jpg' }), SITE);
-  expect(own.image).toContain('/card.png');
+  expect(own.image).toBe('https://mens-circle.de/images/og-default.png');
   expect(own.extraImage).toBe('https://cdn.example/abend.jpg');
 
   // Unusable admin input is dropped rather than emitted as a broken image.
@@ -151,7 +134,7 @@ test('the Event node joins the site graph instead of starting a second one', () 
   expect(schema.maximumAttendeeCapacity).toBe(12);
   expect(schema.remainingAttendeeCapacity).toBe(4);
   expect(schema.image).toHaveLength(1);
-  expect(String((schema.image as string[])[0])).toContain('/event/2026-09-18/card.png');
+  expect(String((schema.image as string[])[0])).toBe('https://mens-circle.de/images/og-default.png');
   expect(schema.offers).toMatchObject({ availability: 'https://schema.org/InStock', validThrough: schema.startDate });
 });
 

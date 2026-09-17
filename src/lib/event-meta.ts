@@ -22,7 +22,6 @@
  * Server-render only — it imports lib/server/format.
  */
 import site from '../data/site.json';
-import { fnv1a } from './helpers';
 import { formatDateLongDE, formatDayMonthYearDE } from './server/format';
 import type { EventDTO } from './types';
 
@@ -116,45 +115,25 @@ function shareDetails(event: EventDTO): { label: string; value: string }[] {
 }
 
 /**
- * A short, stable token for everything the card draws.
+ * The site's standing 1200x630 poster — `public/images/og-default.png`.
  *
- * It rides along as `?v=` on the card URL, which is what makes a cached card
- * safe: Facebook and WhatsApp keep a scraped image for a long time and key it
- * by URL, so when an evening fills up or its time changes, the URL has to
- * change with it or the old picture keeps going out. Slug, date, time, place
- * and the seat state are exactly the values the card shows.
- *
- * The card route reads it too — as the ETag, and to tell a current URL (which
- * may then be cached forever) from a token left over in an old share.
+ * Every event page shares it. The per-event card that used to be generated
+ * here is gone: rendering it cost a native image stack (satori + sharp) in the
+ * one long-lived web process, and the date it carried is already in `ogTitle`
+ * and in the description, which is what a WhatsApp or Facebook preview shows
+ * as text next to the picture. `SeoHead.astro` reaches for the same file when
+ * a page passes no image of its own, so the `og:image` and the JSON-LD agree.
  */
-export function cardVersion(event: EventDTO): string {
-  return fnv1a(
-    [
-      event.slug,
-      event.event_date,
-      event.start_time,
-      event.end_time,
-      eventPlace(event),
-      eventName(event),
-      event.is_past ? 'p' : '',
-      event.is_full ? 'f' : '',
-      event.available_spots,
-      event.max_participants,
-    ].join('|'),
-  );
-}
-
-/** The generated 1200x630 poster for this evening — see lib/server/og-card.ts. */
-export const eventCardUrl = (event: EventDTO, siteUrl: URL): string =>
-  new URL(`/event/${event.slug}/card.png?v=${cardVersion(event)}`, siteUrl).href;
+export const defaultImage = (siteUrl: URL): string => new URL('/images/og-default.png', siteUrl).href;
 
 /**
  * The evening's own picture, when the admin entered a usable http(s) URL.
  *
- * It is no longer the share card — the generated one carries the date, which
- * a forwarded link needs far more than a photograph does — but it is still a
- * real image of this evening, so it goes out as a second `image` in the
- * structured data, where Google takes a list.
+ * A real image of this evening, so it goes out as a second `image` in the
+ * structured data, where Google takes a list. It stays out of `og:image`: the
+ * dimensions of an arbitrary admin-entered URL are unknown, and a declared
+ * size that does not match the file downgrades a large share card to a small
+ * one.
  */
 export function adminImage(event: EventDTO, siteUrl: URL): string | null {
   const raw = event.image_url?.trim();
@@ -174,11 +153,11 @@ export interface EventMeta {
   ogTitle: string;
   /** Shared by `<meta name="description">`, `og:description` and the JSON-LD. */
   description: string;
-  /** Absolute URL of the generated 1200x630 card. */
+  /** Absolute URL of the standing 1200x630 poster — the JSON-LD's first
+   *  `image`, and what `SeoHead.astro` emits as `og:image`. */
   image: string;
-  imageAlt: string;
   /** The evening's own picture, when the admin set one — extra `image` for the
-   *  structured data, never the share card. */
+   *  structured data, never the `og:image`. */
   extraImage: string | null;
   /** Labelled fields for `twitter:label1/data1` and `label2/data2`. */
   details: { label: string; value: string }[];
@@ -190,7 +169,7 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
   const place = eventPlace(event);
   const day = formatDayMonthYearDE(event.event_date);
   const longDate = formatDateLongDE(event.event_date);
-  const image = eventCardUrl(event, siteUrl);
+  const image = defaultImage(siteUrl);
 
   // The brand is appended only when the evening's own title does not already
   // carry it — "Männerkreis Straubing am 18. September 2026 – Männerkreis
@@ -204,7 +183,6 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
       [eventWhenWhere(event), statusSentence(event), tailSentence(event)].map(asSentence).join(' '),
     ),
     image,
-    imageAlt: day ? `${name} am ${day} in ${place}` : `${name} in ${place}`,
     extraImage: adminImage(event, siteUrl),
     details: shareDetails(event),
   };

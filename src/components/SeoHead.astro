@@ -101,8 +101,8 @@ const MIME_BY_EXTENSION: Record<string, string> = {
   gif: 'image/gif',
   avif: 'image/avif',
 };
-// From the PATH, not the href: the event card carries a `?v=` cache token, and
-// splitting the full URL on "." would read the token as the extension.
+// From the PATH, not the href: an admin-entered image URL may carry a query
+// string, and splitting the full URL on "." would read that as the extension.
 const imageType = MIME_BY_EXTENSION[new URL(ogImageUrl).pathname.split('.').pop()?.toLowerCase() ?? ''];
 
 // Two labelled facts at most — the card formats define label1/2 only.

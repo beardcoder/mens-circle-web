@@ -16,7 +16,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "db:generate": "drizzle-kit generate",
-    "og:fonts": "bun run scripts/generate-og-fonts.ts",
     "db:studio": "drizzle-kit studio",
     "db:backup": "bun run scripts/backup-db.ts"
   },
@@ -30,8 +29,6 @@
     "drizzle-orm": "^0.45.2",
     "leaflet": "^1.9.4",
     "motion": "^13.2.0",
-    "satori": "^0.33.4",
-    "sharp": "^0.35.4",
     "svelte": "^5.57.0"
   },
   "devDependencies": {
