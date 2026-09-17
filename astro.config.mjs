@@ -28,6 +28,8 @@ export default defineConfig({
   output: 'server',
   adapter: bun({ isr: false }),
   image: {
+    // Astro always registers this SSR route. Removing the override would
+    // restore its runtime transformer; this handler only returns 404.
     endpoint: { entrypoint: './src/lib/disabled-image-endpoint.ts', route: '/_image' },
   },
   // `session: false` is deliberately absent: adapter 2.1.1 overwrites it with an
