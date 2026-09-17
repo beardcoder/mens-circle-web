@@ -4,11 +4,8 @@ import Layout from '../layouts/Layout.astro';
 import BreathingExperience from '../components/BreathingExperience.astro';
 import { canonicalUrl } from '@lib/canonical';
 
-// Embedded breathing tool — the public-site page. Opened from the nav/footer it
-// presents inside the normal site chrome (header/footer). The whole page is one
-// continuous dark surface (intro → tool → guide → CTA) so it shares the calm,
-// earthy language of the rest of the site instead of bouncing light↔dark. The
-// chrome-less, installable full-screen variant lives at /atemuebung/app.
+// The breathing tool inside the normal site chrome, as one continuous dark
+// surface. The chrome-less installable variant lives at /atemuebung/app.
 export const prerender = true;
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');

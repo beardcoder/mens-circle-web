@@ -18,24 +18,15 @@
   const { lat, lng, title, address }: Props = $props();
 
   /**
-   * The basemap. CARTO's `basemaps.cartocdn.com` used to serve this and started
-   * asking for an API key — the one thing a tile source for this site must not
-   * do, since there is no account to hang a key on and a key in a client bundle
-   * is public anyway.
+   * The Humanitarian style, hosted by OpenStreetMap France: keyless on purpose,
+   * since there is no account to hang a key on and a key in a client bundle is
+   * public anyway. Its warm ground and sparse POI icons also suit a palette that
+   * is ochre-cast, never blue-cast.
    *
-   * This is the Humanitarian style, rendered by the HOT team and hosted by
-   * OpenStreetMap France: no key, no account, no quota to sign up for. It was
-   * also the best fit of the keyless options — its ground is warm beige and it
-   * draws few POI icons, where the standard OSM style paints blue cycle routes,
-   * red retail labels and cyan shop pins across the frame. The design system is
-   * explicit that the greys here are ochre-cast, never blue-cast.
-   *
-   * Two other keyless options, if this one ever has to be swapped (it is a
-   * one-line change): `https://tile.openstreetmap.org/{z}/{x}/{y}.png` is the
-   * standard style and the only keyless raster behind a real CDN (Fastly), at
-   * the cost of the busier look; `https://tile.openstreetmap.de/{z}/{x}/{y}.png`
-   * is the same style with German labels. Stadia and Wikimedia are NOT options
-   * — they answer 401 and 403 respectively for third-party use.
+   * Swapping it is a one-line change. The two other verified keyless rasters are
+   * tile.openstreetmap.org (standard style, behind Fastly) and
+   * tile.openstreetmap.de (same style, German labels). Stadia and Wikimedia are
+   * not options — they answer 401 and 403 for third-party use.
    */
   const TILE_URL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
   const TILE_SUBDOMAINS = 'abc';
@@ -45,9 +36,7 @@
     ' &middot; Kacheln: <a href="https://www.hotosm.org/">HOT</a>' +
     ' / <a href="https://openstreetmap.fr/">OSM France</a>';
 
-  /** How many tiles may fail before the map admits it cannot draw itself. One
-   *  tile missing at the edge of a pan is noise; a whole screenful is an outage,
-   *  and a grey box that says nothing is the worst of both. */
+  /** How many tiles may fail before the map admits it cannot draw itself. */
   const TILE_ERROR_LIMIT = 4;
 
   let canvas: HTMLElement;
@@ -95,10 +84,8 @@
         attribution: TILE_ATTRIBUTION,
       });
 
-      // Say so rather than showing an empty frame. The address and the route
-      // links live in the section around this island, so a map that cannot
-      // draw costs the reader nothing — a silent grey rectangle would have him
-      // wondering whether the venue is the problem.
+      // Say so rather than showing an empty frame: the address and route links
+      // live around this island, so a map that cannot draw costs nothing.
       tiles.on('tileerror', () => {
         tileErrors += 1;
         if (tileErrors >= TILE_ERROR_LIMIT && state !== 'failed') state = 'failed';
@@ -173,7 +160,7 @@
 </div>
 
 <style>
-  /* @keyframes kept outside layer — unlayered for animation lookup */
+  /* Unlayered, so the animation lookup finds it. */
   @keyframes event-map-skeleton {
     0%,
     100% {

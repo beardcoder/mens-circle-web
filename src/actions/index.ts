@@ -50,10 +50,10 @@ const numOrNull = (v: number | string | null | undefined): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
-/** Optional text field from the admin form; an omitted one is the empty string. */
+/** Optional admin-form text; an omitted field becomes the empty string. */
 const text = (v: string | undefined): string => (v ?? '').trim();
 
-/** A date-only value from `<input type="date">` becomes midnight UTC; anything else is passed through. */
+/** A date-only `<input type="date">` value becomes midnight UTC. */
 const toEventDate = (v: string | undefined): string => {
   const value = text(v);
   return /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00.000Z` : value;

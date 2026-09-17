@@ -2,12 +2,9 @@
 import { buildEventFacts, type NextEventSummary } from '@lib/event-landing';
 
 /**
- * The quick-scan facts, same builder as the home page's list — so the two pages
- * can never state different facts. A scheduled evening overrides what it
- * actually knows (city, time window, participation fee).
- *
- * The venue is never stated beyond the city: the exact address goes out with the
- * registration confirmation, not on a public page.
+ * The quick-scan facts, same builder as the home page's list, so the two pages
+ * cannot state different facts. Never more precise than the city: the exact
+ * address goes out with the registration confirmation.
  */
 
 interface Props {

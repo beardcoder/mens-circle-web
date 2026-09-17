@@ -1,4 +1,4 @@
-/** Social link type → icon name (src/icons/social-*.svg) + German label. */
+/** Social link type → icon name (src/icons/social-*.svg) and label. */
 export type SocialType =
   | 'email'
   | 'phone'

@@ -1,19 +1,8 @@
 ---
 /**
- * Admin shell — the public poster system, after dark.
- *
- * The back-office used to be its own design ("Dusk Circle": Bricolage, IBM Plex
- * Mono, an ember accent, 14px radii, blur and shadow). It now runs on the same
- * palette, the same two cuts of Barlow and the same square, hairline geometry as
- * the public site — the dark ground is the site's own ink, not a second one.
- * Dropping the two admin-only families also takes two webfonts off the build.
- *
- * It stays dark and it stays denser than the public pages: this is a tool, used
- * at a desk, and a full-height oat ground would glare. What it no longer is is a
- * different product.
- *
- * The capacity ring is kept — it is the one piece of admin-specific iconography
- * that earns its place, and it rhymes with the circle motif out front.
+ * Admin shell — the public poster system, after dark. Same palette, same two
+ * cuts of Barlow, same square hairline geometry as the public site; it stays
+ * dark and denser because it is a tool used at a desk.
  *
  * Auth is enforced by middleware; `Astro.locals.admin` holds the operator email.
  */
@@ -89,8 +78,8 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         }
       }
 
-      // Shared toast — defined once, persists on `window` across view-transition
-      // swaps. Components call `window.adminToast('ok' | 'err', text)`.
+      // Persists on `window` across view-transition swaps. Components call
+      // `window.adminToast('ok' | 'err', text)`.
       if (!window.adminToast) {
         window.adminToast = (kind: ToastKind, text: string) => {
           const host = document.getElementById('toasts');
@@ -108,8 +97,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         };
       }
 
-      // Re-bind logout after every navigation (`astro:page-load` fires on first
-      // load and after each swap; the button is a fresh node each time).
+      // The button is a fresh node after each swap, so re-bind every time.
       document.addEventListener('astro:page-load', () => {
         const btn = document.getElementById('admin-logout');
         btn?.addEventListener('click', async () => {
@@ -168,7 +156,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
       * {
         box-sizing: border-box;
       }
-      /* `hidden` must win over component `display` rules (e.g. flex/grid). */
+      /* `hidden` must win over component `display` rules. */
       [hidden] {
         display: none !important;
       }
@@ -191,7 +179,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         background: var(--ember-soft);
       }
 
-      /* ── Topbar ── */
+      /* Topbar. */
       .topbar {
         position: sticky;
         top: 0;
@@ -282,7 +270,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         white-space: nowrap;
       }
 
-      /* ── Layout ── */
+      /* Layout. */
       .main {
         max-width: 940px;
         margin: 0 auto;
@@ -294,7 +282,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         min-height: calc(100dvh - 0px);
       }
 
-      /* ── Type ── */
+      /* Type. */
       /* The page title is the one poster-register element in the admin: condensed
          800, uppercase, set tight. Everything below it is working text. */
       h1 {
@@ -317,7 +305,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
       a {
         color: var(--ember);
       }
-      /* Was IBM Plex Mono. Dates, counts, slugs and addresses still need to line
+      /* Dates, counts, slugs and addresses still need to line
          up and to read as machine data, but they get that from tabular figures
          and a little tracking instead of from a third typeface. */
       .mono {
@@ -330,7 +318,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
       .faint {
         color: var(--faint);
       }
-      /* Section eyebrow — small mono label above a heading. */
+      /* Section eyebrow above a heading. */
       .eyebrow {
         font-family: var(--font-display);
         font-size: 0.8125rem;
@@ -340,7 +328,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         color: var(--muted);
       }
 
-      /* ── Page header row ── */
+      /* Page header row. */
       .pagehead {
         display: flex;
         align-items: flex-end;
@@ -355,7 +343,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         gap: 0.35rem;
       }
 
-      /* ── Card ── */
+      /* Card. */
       .card {
         background: var(--surface);
         border: 1px solid var(--line-strong);
@@ -363,7 +351,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         padding: clamp(1rem, 3vw, 1.5rem);
       }
 
-      /* ── Buttons ── */
+      /* Buttons. */
       /* Square, condensed uppercase, 2px border, ink label on orange — the public
          `.btn`, at back-office density. Hover swaps the ground instead of
          brightening it: a filter change reads as a glow, and nothing on the
@@ -447,7 +435,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         width: 100%;
       }
 
-      /* ── Forms ── */
+      /* Forms. */
       .field {
         display: flex;
         flex-direction: column;
@@ -538,7 +526,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         cursor: pointer;
       }
 
-      /* ── Badges ── */
+      /* Badges. */
       /* Square chips with a condensed uppercase label. The status dot stays: it
          is the fastest thing to scan down a column of sixteen rows. */
       .badge {
@@ -585,7 +573,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         color: var(--faint);
       }
 
-      /* ── Capacity ring ── */
+      /* Capacity ring. */
       .ring {
         display: inline-grid;
         place-items: center;
@@ -618,7 +606,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         line-height: 1;
       }
 
-      /* ── Empty state ── */
+      /* Empty state. */
       .empty {
         text-align: center;
         padding: 3rem 1rem;
@@ -627,7 +615,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         color: var(--muted);
       }
 
-      /* ── Toasts ── */
+      /* Toasts. */
       .toasts {
         position: fixed;
         left: 50%;

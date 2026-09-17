@@ -13,11 +13,8 @@ interface Props {
 }
 
 /**
- * A standalone notification sign-up, for pages that need one outside the
- * Termine block (the home page and /event both carry their own).
- *
- * The copy must not promise more than the list actually sends: it carries the
- * announcement of the next date and nothing else.
+ * A standalone notification sign-up for pages outside the Termine block. The
+ * copy must not promise more than the list sends: the next date, nothing else.
  */
 
 const { data, context = { location: 'newsletter-block' } } = Astro.props;
