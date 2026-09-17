@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 // No server imports or global/module mocks in the suite process. Each case owns its HTTP fake and DB.
 const cases = [
+  'external-url',
   'provisioning-dedupe',
   'provisioning-conflict',
   'provisioning-errors',
@@ -24,21 +25,29 @@ for (const scenario of cases) {
     const dir = await mkdtemp(join(tmpdir(), 'mens-circle-email-'));
     try {
       const child = Bun.spawn(
-        [process.execPath, 'run', fileURLToPath(new URL('./email-backend.fixture.ts', import.meta.url)), scenario],
+        [
+          process.execPath,
+          '--no-env-file',
+          fileURLToPath(new URL('./email-backend.fixture.ts', import.meta.url)),
+          scenario,
+        ],
         {
-          cwd: fileURLToPath(new URL('../', import.meta.url)),
+          cwd: dir,
           env: {
-            ...process.env,
+            PATH: process.env.PATH,
+            TMPDIR: tmpdir(),
+            NODE_ENV: 'test',
             EMAIL_TEST_DIR: dir,
             DATABASE_PATH: join(dir, 'test.sqlite'),
             MIGRATIONS_DIR: fileURLToPath(new URL('../drizzle', import.meta.url)),
-            LISTMONK_URL: 'http://listmonk.invalid',
+            LISTMONK_URL: 'https://newsletter.example.invalid///',
             LISTMONK_API_USER: 'test',
             LISTMONK_API_TOKEN: 'test',
             LISTMONK_LIST_IDS: '9',
             LISTMONK_TX_REGISTRATION_CONFIRMATION: '1',
             LISTMONK_TX_WAITLIST_CONFIRMATION: '2',
             LISTMONK_TX_ADMIN_NOTIFICATION: '3',
+            LISTMONK_TX_WAITLIST_PROMOTION: '6',
             LISTMONK_TX_EVENT_REMINDER: '4',
             LISTMONK_TX_EVENT_MESSAGE: '5',
             MAIL_ADMIN_ADDRESS: 'admin@example.invalid',

@@ -12,7 +12,7 @@
 #   └─ data layer: Drizzle on bun:sqlite (file in the mounted /data volume),
 #      migrations applied automatically on boot
 #
-# Transactional + newsletter email is delegated to listmonk (see docker-compose).
+# Transactional + newsletter email uses externally managed listmonk via LISTMONK_URL.
 # The frontend runs in the Bun runtime (NOT Node); the Bun server is the single
 # public edge (no nginx, no separate backend process).
 # ─────────────────────────────────────────────────────────────────────────────

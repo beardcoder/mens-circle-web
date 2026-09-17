@@ -20,14 +20,13 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 │   ├─ Datenhaltung → Drizzle ORM auf bun:sqlite (Datei im /data-Volume)      │
 │   │    Migrationen werden beim Boot automatisch angewendet (drizzle/)       │
 │   └─ Scheduler   → Event-Erinnerungen (alle 15 min, In-Process-Timer)       │
-│                                           │                                 │
-│                                           ▼ (E-Mail)                         │
-│                                        listmonk (externer Dienst)           │
-│                                        ├─ Newsletter + Kampagnen            │
-│                                        ├─ Pro-Event-Listen                  │
-│                                        └─ Transactional API (/api/tx)       │
-│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
+                         │ HTTPS / LISTMONK_URL
+                         ▼
+              listmonk (extern verwaltet, nicht Teil dieses Deployments)
+              ├─ Newsletter + Kampagnen
+              ├─ Pro-Event-Listen
+              └─ Transactional API (/api/tx) → SMTP
 ```
 
 - **Bun-Server als Edge + Backend.** Ein einziger Bun-Prozess ist der
@@ -54,8 +53,9 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
   auch die **transaktionalen** Event-Mails laufen über listmonk. Die App rendert
   die Mails nicht selbst, sondern ruft listmonks **Transactional API**
   (`POST /api/tx`) mit einer Template-ID + Daten auf; die Templates werden in
-  listmonk gepflegt (Quelldateien + Anleitung in
-  [`listmonk/tx-templates/`](listmonk/tx-templates/)).
+  der externen Instanz gepflegt. Dieses Repo enthält nur die Integration,
+  keine listmonk-Images, Dienste, Assets oder Vorlagen. Einrichtung und
+  Payload-Vertrag stehen unter [E-Mails](#e-mails).
 - **RAM-schonend & nachhaltig.** Die meisten Seiten sind vorgerendert (statisch);
   die Startseite und die Event-Seiten rendern serverseitig live, weil sie den
   echten Terminstatus zeigen. Ein Rebuild bei Content-Änderung entfällt — neue
@@ -194,7 +194,6 @@ scripts/          reminder-cron.ts (Timer-Scheduler via --preload), send-reminde
                   backup-db.ts (SQLite → S3)
 drizzle/          generierte SQL-Migrationen (beim Boot angewendet)
 drizzle.config.ts drizzle-kit-Konfiguration
-listmonk/         listmonk-Templates (System, Kampagne) + tx-templates/ (Transactional)
 Dockerfile        Multi-Stage: Bun-Build → Bun-Runtime (ein Prozess)
 ```
 
@@ -238,29 +237,64 @@ PORT=3000 DATABASE_PATH=./data/mens-circle.db \
 Das Runtime-Image enthält nur Produktionsabhängigkeiten. Lokale Datenbanken,
 Screenshots und Testdateien bleiben außerhalb des Docker-Build-Kontexts;
 Migrationen aus `drizzle/` werden weiterhin mitgeliefert.
+Deployt wird ausschließlich die Web-App; listmonk samt PostgreSQL, Uploads,
+SMTP und Vorlagen wird unabhängig davon extern betrieben und gesichert.
 
 1. Neue Ressource → **Dockerfile**-basiert, dieses Repo.
 2. **Persistent Volume** mounten auf `/data` (die SQLite-Datenbank).
 3. Port **8090** exposen (Bun-Server/Edge). Coolify terminiert TLS.
 4. Environment-Variablen setzen (siehe `.env.example`):
 
-| Variable                                                  | Zweck                                              |
-| --------------------------------------------------------- | -------------------------------------------------- |
-| `APP_URL`                                                 | öffentliche URL (E-Mail-Links, iCal, Bild-URLs)    |
-| `DATABASE_PATH`                                           | SQLite-Datei (Default `/data/mens-circle.db`)      |
-| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`                     | Absender transaktionaler Mails                     |
-| `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME`                   | Empfänger der Admin-Benachrichtigungen             |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD`                           | Login der Admin-UI (`/admin`)                      |
-| `ADMIN_SESSION_SECRET`                                    | langer Zufallswert, signiert das Session-Cookie    |
-| `LISTMONK_URL`, `LISTMONK_API_USER`, `LISTMONK_API_TOKEN` | listmonk-Admin-API                                 |
-| `LISTMONK_LIST_IDS`                                       | numerische Newsletter-Listen-ID(s), z. B. `1`      |
-| `LISTMONK_TX_*`                                           | IDs der transaktionalen listmonk-Templates (s. u.) |
-| `PUBLIC_SITE_URL`                                         | **Build-Arg**: Canonical/Sitemap                   |
-| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                | optional: Umami-Analytics                          |
+| Variable                                   | Zweck                                                           |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `APP_URL`                                  | öffentliche URL (E-Mail-Links, iCal, Bild-URLs)                 |
+| `DATABASE_PATH`                            | SQLite-Datei (Default `/data/mens-circle.db`)                   |
+| `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`      | Absender transaktionaler Mails                                  |
+| `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME`    | Empfänger der Admin-Benachrichtigungen                          |
+| `MAIL_CONTACT_ADDRESS`, `SITE_NAME`        | Kontaktadresse und Name im Transaktions-Payload                 |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD`            | Login der Admin-UI (`/admin`)                                   |
+| `ADMIN_SESSION_SECRET`                     | langer Zufallswert, signiert das Session-Cookie                 |
+| `LISTMONK_URL`                             | externe Basisadresse ohne `/api`-Suffix, HTTPS empfohlen        |
+| `LISTMONK_API_USER`, `LISTMONK_API_TOKEN`  | API-Benutzer und Token der externen Instanz                     |
+| `LISTMONK_LIST_IDS`                        | numerische Newsletter-Listen-IDs, kommasepariert, keine UUIDs   |
+| `LISTMONK_CAMPAIGN_TEMPLATE_ID`            | optionale numerische Kampagnen-Template-ID der externen Instanz |
+| `LISTMONK_TX_*`                            | sechs numerische Transaktions-Template-IDs (siehe E-Mails)      |
+| `PUBLIC_SITE_URL`                          | **Build-Arg**: Canonical/Sitemap                                |
+| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT` | optional: Umami-Analytics                                       |
 
-Die `LISTMONK_TX_*`-IDs verweisen auf die transaktionalen Templates, die einmalig
-in listmonk angelegt werden — Anleitung + Quelldateien in
-[`listmonk/tx-templates/`](listmonk/tx-templates/README.md).
+`LISTMONK_URL` muss aus dem Web-Container erreichbar sein; die App ergänzt die
+API-Pfade selbst und entfernt abschließende Slashes. Zugangsdaten nur als
+Runtime-Secrets hinterlegen. Nach Änderungen an URL, Zugangsdaten oder IDs die
+Web-App neu starten. Die App richtet den externen Dienst nicht ein; siehe
+[Externe Instanz einrichten](#externe-instanz-einrichten).
+
+Alternativ als **Docker-Compose**-Ressource mit `docker-compose.yml` deployen:
+Die Datei enthält nur `web` und das SQLite-Volume `app-data`. Coolify setzt
+`SERVICE_URL_WEB` für Build- und App-URL; `LISTMONK_URL` explizit als
+Environment-Variable der Ressource setzen. Sie wird unverändert an den
+Web-Container weitergegeben; es gibt keine lokale listmonk-Startabhängigkeit.
+
+### Migration einer bisherigen listmonk-Instanz
+
+**Vor dem Abschalten oder Entfernen alter Dienste/Volumes:** listmonks
+PostgreSQL-Datenbank, Uploads, System-/Kampagnen-/Transaktionsvorlagen und
+Appearance-Anpassungen sichern und extern übernehmen; auch die SQLite-Datenbank
+der Web-App sichern. Eine vollständige Datenbankübernahme ist einer leeren
+Neuinstallation vorzuziehen, damit Abonnenten, Opt-in-Status und IDs erhalten
+bleiben.
+
+Alle vorhandenen Listen- und Template-IDs müssen auf der Zielinstanz weiterhin
+dieselben Objekte bezeichnen: `LISTMONK_LIST_IDS`, `LISTMONK_CAMPAIGN_TEMPLATE_ID`,
+alle sechs `LISTMONK_TX_*` und besonders **`events.listmonk_list_id` in SQLite**.
+Nur die URL umzuschalten reicht bei einer leeren Zielinstanz nicht; andernfalls
+können IDs fehlen oder auf fremde Listen/Vorlagen zeigen. Abweichende IDs vor der
+Umschaltung kontrolliert zuordnen und migrieren, nicht blind wiederverwenden.
+
+SMTP, öffentliche Opt-in-/Abmeldelinks und Vorlagen der Zielinstanz vor der
+Stilllegung prüfen; Versandtests nur mit freigegebenen Testempfängern durchführen.
+Die Repository-Bereinigung migriert keine Live-Daten und löscht keine laufenden
+Dienste oder Volumes. Alte Volumes erst nach verifiziertem Backup und erfolgreicher
+Übernahme ausdrücklich freigeben — keine pauschale Volume-Löschung beim Redeploy.
 
 ## Content pflegen
 
@@ -276,19 +310,78 @@ gerendert — eine Änderung in der Admin-UI ist **sofort** sichtbar, ohne Rebui
 
 ## E-Mails
 
-Alle Event-Mails laufen über listmonks **Transactional API**:
+### Externe Instanz einrichten
 
-| Email                   | Auslöser                           |
-| ----------------------- | ---------------------------------- |
-| Anmeldebestätigung      | Anmeldung (Status `registered`)    |
-| Wartelisten-Bestätigung | Anmeldung bei vollem Event         |
-| Admin-Benachrichtigung  | jede Anmeldung                     |
-| Wartelisten-Nachrückung | Stornierung → nächste:r rückt nach |
-| Event-Erinnerung        | Cron, Event heute/morgen           |
-| Teilnehmer-Nachricht    | manueller Versand aus der Admin-UI |
+1. In listmonk SMTP, erlaubten Absender und die öffentliche Basisadresse für
+   Opt-in-, Abmelde- und Browserlinks konfigurieren. Systemvorlagen und Public-Page-
+   Branding dort verwalten; sie werden nicht mehr mit dieser App ausgeliefert.
+2. Newsletter-Listen mit **Double-Opt-In** anlegen und deren numerische IDs als
+   `LISTMONK_LIST_IDS` setzen. Die App meldet Newsletter-Abonnenten unbestätigt an.
+3. Einen API-Benutzer mit den benötigten Rechten für Abonnenten, Listen, Kampagnen
+   und Transaktionsversand einrichten. `LISTMONK_URL`, `LISTMONK_API_USER` und
+   `LISTMONK_API_TOKEN` in der Web-App setzen. Die Authentifizierung verwendet
+   `Authorization: token <API_USER>:<API_TOKEN>`.
+4. Eine Kampagnenvorlage extern pflegen: im Body genau einmal
+   `{{ template "content" . }}` und einen Abmeldelink (`{{ UnsubscribeURL }}`)
+   vorsehen. Optional ihre ID als `LISTMONK_CAMPAIGN_TEMPLATE_ID` setzen; ohne ID
+   übergibt die App keine explizite Vorlage an listmonk.
+5. Unter **Campaigns → Templates → New** die folgenden sechs Vorlagen vom Typ
+   **Transactional** anlegen bzw. übernehmen. Jeweils den Betreff auf
+   **`{{ .Tx.Data.subject }}`** setzen, ein vollständiges HTML-Dokument als Body
+   hinterlegen und die numerische ID der Web-App zuweisen. Diese Vorlagen leben
+   in listmonks Datenbank; sie werden nicht durch einen Dateisystem-Overlay angelegt.
 
-Newsletter (Willkommen/Double-Opt-In + Kampagnen) ebenfalls über listmonk.
-Setup der transaktionalen Templates: [`listmonk/tx-templates/README.md`](listmonk/tx-templates/README.md).
+| Environment-Variable                    | Mail / Auslöser                            |
+| --------------------------------------- | ------------------------------------------ |
+| `LISTMONK_TX_REGISTRATION_CONFIRMATION` | Anmeldebestätigung (`registered`)          |
+| `LISTMONK_TX_WAITLIST_CONFIRMATION`     | Wartelisten-Bestätigung bei vollem Event   |
+| `LISTMONK_TX_ADMIN_NOTIFICATION`        | Admin-Benachrichtigung bei jeder Anmeldung |
+| `LISTMONK_TX_WAITLIST_PROMOTION`        | Stornierung → nächste:r rückt nach         |
+| `LISTMONK_TX_EVENT_REMINDER`            | Cron, Event heute/morgen                   |
+| `LISTMONK_TX_EVENT_MESSAGE`             | Teilnehmer-Nachricht aus der Admin-UI      |
+
+Fehlt eine Transaktions-Template-ID, wird die entsprechende Mail übersprungen
+und protokolliert. Ohne API-Konfiguration funktionieren E-Mail-Versand und
+Listen-Synchronisierung nicht; Newsletter benötigt zusätzlich `LISTMONK_LIST_IDS`.
+
+**Event-Listen bleiben Teil der Integration.** Die App erzeugt private
+Single-Opt-In-Listen pro Veranstaltung, speichert deren IDs in
+`events.listmonk_list_id` und synchronisiert Anmeldung/Stornierung. Diese IDs
+sind unabhängig von `LISTMONK_LIST_IDS` (nur Newsletter); dafür sind keine
+zusätzlichen Env-Variablen nötig.
+
+### Transaktions-Payload-Vertrag
+
+Maßgeblich sind [`src/lib/server/email.ts`](src/lib/server/email.ts) und
+[`src/lib/server/listmonk.ts`](src/lib/server/listmonk.ts). Die App stellt zunächst
+sicher, dass der Empfänger als Abonnent existiert, und sendet dann
+`{ subscriber_id, template_id, data, content_type: "html", from_email }` an
+`POST /api/tx`. Platzhalter greifen auf `{{ .Tx.Data.<field> }}` zu.
+
+Alle sechs Payloads enthalten `subject` und `eventTitle`. Für **Bestätigung,
+Warteliste, Nachrücken und Erinnerung** kommen gemeinsam hinzu:
+`firstName`, `recipientEmail`, `siteName`, `contactEmail`, `dateLong`, `dateShort`,
+`timeRange`, `location`, `address`, `locationDetails`.
+
+- **Bestätigung und Nachrücken:** zusätzlich `description`, `costBasis`, `icsUrl`;
+  `address` enthält die vollständige Adresse. `icsUrl` basiert auf `APP_URL`.
+- **Warteliste:** nur die gemeinsamen Felder; `address` ist leer.
+- **Erinnerung:** zusätzlich `description`, `costBasis`, `whenWord` (`heute`/`morgen`),
+  `whenWordCap` (`Heute`/`Morgen`), `closingWord` (`gleich`/`morgen`); `address` ist leer,
+  kein `icsUrl`.
+- **Admin-Benachrichtigung:** neben `subject`/`eventTitle` ausschließlich
+  `participantName`, `participantEmail`, `participantPhone`, `dateShort`,
+  `timeRange`, `location`, `activeCount`, `maxParticipants`, `statusLabel`
+  (`Warteliste`/`Angemeldet`). Kein `siteName` oder Teilnehmer-Kontext.
+- **Teilnehmer-Nachricht:** neben `subject`/`eventTitle` ausschließlich `content`,
+  `siteName`, `recipientEmail`. Die App ersetzt `{first_name}` bereits in `content`;
+  kein `firstName` oder `contactEmail` im Payload.
+
+Vorlagen dürfen nur die für ihren Typ gelieferten Felder lesen und müssen leere
+Werte berücksichtigen. Go-HTML-Template-Escaping beibehalten; mehrzeiligen Klartext
+(`description`, `locationDetails`, `content`) etwa mit `white-space: pre-line`
+darstellen, nicht als ungeprüftes HTML. Layout und Texte werden ausschließlich
+auf der externen Instanz gepflegt.
 
 ## Performance & Regressionstests
 
