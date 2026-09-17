@@ -8,7 +8,7 @@ import { events, participants, registrations } from '../src/lib/server/db/schema
 
 assert(process.env.EMAIL_TEST_DIR, 'requires the isolated test harness');
 assert.equal(config.DATABASE_PATH, join(process.env.EMAIL_TEST_DIR, 'test.sqlite'));
-assert.equal(config.LISTMONK_URL, 'http://listmonk.invalid');
+assert.equal(config.LISTMONK_URL, 'https://newsletter.example.invalid');
 
 type Call = { method: string; path: string; body: Record<string, unknown> };
 const calls: Call[] = [];
@@ -30,7 +30,9 @@ let handler: (call: Call) => Response | Promise<Response> = () => {
 // Never retain a reference to real fetch, even on an assertion failure.
 globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
   const url = new URL(String(input));
-  assert.equal(url.origin, 'http://listmonk.invalid');
+  assert.equal(url.origin, 'https://newsletter.example.invalid');
+  assert(url.pathname.startsWith('/api/'), 'base URL must not introduce duplicate slashes');
+  assert.equal(new Headers(init?.headers).get('Authorization'), 'token test:test');
   assert(init?.signal instanceof AbortSignal);
   const call = {
     method: init?.method ?? 'GET',
@@ -90,6 +92,20 @@ const txHandler = (call: Call) => {
 };
 
 const scenarios: Record<string, () => Promise<void>> = {
+  async 'external-url'() {
+    handler = (call) => (call.path === '/api/subscribers' ? json({ data: subscriber }) : json({}));
+    assert.deepEqual(await lm.subscribeToNewsletter(subscriber.email, 'Person'), { ok: true, status: 'subscribed' });
+    assert.equal(await lm.sendTransactional(1, subscriber.email, 'Person', { subject: 'External service' }), true);
+    assert.deepEqual(
+      calls.map((call) => [call.method, call.path]),
+      [
+        ['POST', '/api/subscribers'],
+        ['POST', '/api/subscribers'],
+        ['POST', '/api/tx'],
+      ],
+    );
+    assert.deepEqual(calls[2].body.data, { subject: 'External service' });
+  },
   async 'provisioning-dedupe'() {
     handler = () => json({ data: subscriber });
     assert.deepEqual(
