@@ -25,16 +25,14 @@ interface Props {
   manifest?: string;
   webAppTitle?: string;
   viewport?: string;
-  /** Chrome-less shell — no header, footer or scroll-to-top, so a page can
-   *  present as a full-screen app (the installable breathing exercise). */
+  /** No header, footer or scroll-to-top, so a page can present as a full-screen app. */
   bare?: boolean;
 }
 
 const { bare = false, ...props } = Astro.props;
 
-// Umami heatmap recorder, alongside the tracker the astro-umami integration
-// injects (both read lib/umami-config). Production only. Sample rate and the
-// heatmaps toggle live in the Umami admin.
+// Heatmap recorder, alongside the tracker the astro-umami integration injects.
+// Production only; sample rate and the heatmaps toggle live in the Umami admin.
 const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` : null;
 ---
 
@@ -44,24 +42,20 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
     <meta charset="UTF-8" />
     <script is:inline>
       // `.motion-ready` lets CSS hide every [data-reveal] until lib/motion.ts
-      // animates it in. Set here rather than from the module so nothing flashes
-      // — but a module that never arrives would then leave the page blank, so
-      // the class carries a dead-man's switch: initMotion() clears the timer
-      // once the reveals are observed, otherwise the hidden state lifts itself.
+      // animates it in. Set here so nothing flashes, with a dead-man's switch:
+      // initMotion() clears the timer, otherwise the hidden state lifts itself.
       document.documentElement.classList.add('motion-ready');
       window.__mcMotionFallback = setTimeout(() => {
         document.documentElement.classList.remove('motion-ready');
       }, 4000);
       // `pagereveal` fires in the incoming document before its first rendering
-      // opportunity and carries the ViewTransition when the navigation animates.
-      // Marking the document here — the only point early enough — lets CSS stand
-      // the page's own entrance down so the cross-fade is the only thing moving.
-      // Inline because our module is deferred and would miss the event.
+      // opportunity — the only point early enough to stand the page's own
+      // entrance down, so the cross-fade is the only thing moving. Inline
+      // because the deferred module would miss the event.
       addEventListener('pagereveal', (event) => {
         if (event.viewTransition) document.documentElement.classList.add('vt-arrival');
       });
-      // One axis only: light or dark, defaulting to the OS. Resolve it before
-      // first paint so nothing flashes.
+      // Resolve the mode before first paint so nothing flashes.
       (() => {
         try {
           const root = document.documentElement;
@@ -71,7 +65,7 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
           root.setAttribute('data-mode-resolved', resolved);
           if (mode) root.setAttribute('data-mode', mode);
         } catch {
-          /* localStorage / matchMedia unavailable — fall back to CSS defaults. */
+          /* localStorage or matchMedia unavailable — fall back to CSS defaults. */
         }
       })();
     </script>

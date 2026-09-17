@@ -1,19 +1,10 @@
 /**
  * Site header — navigation, mobile panel, in-page anchor scrolling.
  *
- * The panel used to expand as a `clip-path` circle out of the toggle button,
- * with the links rising on a stagger and an inhale on close. It is now a plain
- * cross-fade owned by CSS: opening a menu is not an event worth animating, and
- * the whole thing is ~120 lines lighter and has no in-flight animation to
- * interrupt.
- *
- * What this module still owns, because CSS cannot: the open/closed state, the
- * body scroll lock (and restoring the scroll position afterwards), the
- * hamburger⇄X morph, Escape-to-close, and anchor scrolling that clears the
- * fixed header.
- *
- * Vanilla initialiser over the Astro-rendered DOM. Returns a cleanup that
- * detaches every listener.
+ * The panel's cross-fade is owned by CSS. What lives here is what CSS cannot
+ * do: open/closed state, the body scroll lock and restoring the scroll position
+ * afterwards, the hamburger⇄X morph, Escape-to-close, and anchor scrolling that
+ * clears the fixed header.
  */
 
 import { prefersReducedMotion } from './helpers';
@@ -47,7 +38,7 @@ const samePageHash = (link: HTMLAnchorElement): string | null => {
   return url.hash;
 };
 
-/** Wire the header. Returns a cleanup; no-op when the DOM isn't there. */
+/** Returns a cleanup; no-op when the DOM isn't there. */
 export function initSiteHeader(): () => void {
   const root = document.querySelector<HTMLElement>('header.header#header[data-lume="site-header"]');
 
@@ -61,7 +52,6 @@ export function initSiteHeader(): () => void {
   const navLinks = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-lume-part="nav-link"]'));
   const bars = Array.from(toggle.querySelectorAll<HTMLElement>('.nav-toggle__bar'));
 
-  // Track every binding so the returned cleanup can detach them all.
   const teardown: Array<() => void> = [];
   const listen = <K extends keyof DocumentEventMap>(
     target: EventTarget,
@@ -76,7 +66,6 @@ export function initSiteHeader(): () => void {
   let isOpen = false;
   let scrollPosition = 0;
 
-  // ─── In-page anchor scrolling ──────────────────────────────────────
   const scrollToAnchor = (hash: string): boolean => {
     const id = decodeURIComponent(hash.replace(/^#/, ''));
     const target = id === '' ? null : document.getElementById(id);
@@ -96,7 +85,6 @@ export function initSiteHeader(): () => void {
     return true;
   };
 
-  // ─── Toggle ⇄ X morph. Transforms only, so it composites. ──────────
   const renderToggle = (open: boolean): void => {
     toggle.classList.toggle('is-open', open);
     toggle.setAttribute('aria-expanded', String(open));
@@ -115,7 +103,6 @@ export function initSiteHeader(): () => void {
     mid.style.opacity = open ? '0' : '1';
   };
 
-  // ─── Open / close ──────────────────────────────────────────────────
   const openMenu = (): void => {
     if (isOpen) return;
     isOpen = true;
@@ -127,10 +114,8 @@ export function initSiteHeader(): () => void {
     renderToggle(true);
   };
 
-  /**
-   * With a `targetHash`, scroll there once the body lock lifts instead of
-   * restoring the pre-open position.
-   */
+  /** With a `targetHash`, scroll there once the body lock lifts instead of
+   *  restoring the pre-open position. */
   const closeMenu = (targetHash: string | null = null): void => {
     if (!isOpen) return;
     isOpen = false;
@@ -145,7 +130,6 @@ export function initSiteHeader(): () => void {
     window.scrollTo({ top: scrollPosition, left: 0, behavior: 'instant' });
   };
 
-  // ─── Interactions ──────────────────────────────────────────────────
   listen(toggle, 'click', () => {
     if (isOpen) closeMenu();
     else openMenu();
@@ -155,15 +139,13 @@ export function initSiteHeader(): () => void {
     listen(link, 'click', (event) => {
       const hash = samePageHash(link);
 
-      // Plain links navigate normally; just dismiss an open menu.
       if (hash === null) {
         closeMenu();
 
         return;
       }
 
-      // Own the scroll so the header is cleared and closing the panel doesn't
-      // snap back to the saved position.
+      // Own the scroll so the header is cleared and closing does not snap back.
       (event as MouseEvent).preventDefault();
 
       if (isOpen) closeMenu(hash);
@@ -175,8 +157,8 @@ export function initSiteHeader(): () => void {
     if ((event as KeyboardEvent).key === 'Escape' && isOpen) closeMenu();
   });
 
-  // Widening past the panel breakpoint while it is open would otherwise leave
-  // the body locked with no visible panel.
+  // Widening past the panel breakpoint while open would leave the body locked
+  // with no visible panel.
   if (typeof matchMedia === 'function') {
     const mq = matchMedia('(width > 860px)');
 
@@ -185,7 +167,6 @@ export function initSiteHeader(): () => void {
     });
   }
 
-  // ─── Initial paint ─────────────────────────────────────────────────
   renderToggle(false);
 
   return (): void => {

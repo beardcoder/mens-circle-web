@@ -1,10 +1,6 @@
 /**
- * Shared copy for the breathing exercise (Atemübung).
- *
- * The same instructions appear on the embedded page (src/pages/atemuebung.astro)
- * and in the standalone app's info dialog (components/BreathingExperience.astro).
- * Keeping them here is the single source of truth so the two surfaces can never
- * drift apart. Build-time only — plain data, no runtime/server imports.
+ * Shared copy for the breathing exercise, used by both src/pages/atemuebung.astro
+ * and the standalone app's info dialog in components/BreathingExperience.astro.
  */
 
 export interface BreathingStep {

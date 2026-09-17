@@ -32,9 +32,8 @@ function init(): void {
   try {
     initMotion();
   } catch (error) {
-    // Reveals are hidden by CSS until they animate in, so a failure here would
-    // otherwise leave the page blank. Drop the hidden state immediately rather
-    // than waiting out the layout's fallback timer.
+    // Reveals are hidden by CSS until they animate in, so drop the hidden state
+    // immediately rather than waiting out the layout's fallback timer.
     document.documentElement.classList.remove('motion-ready');
     // eslint-disable-next-line no-console
     console.error('[client] initMotion failed:', error);
@@ -43,8 +42,7 @@ function init(): void {
   try {
     initAmbient();
   } catch (error) {
-    // Purely an optimisation — a failure just means the ambient loops keep
-    // running off-screen, which is what they did before.
+    // Purely an optimisation — a failure just leaves the loops running.
     // eslint-disable-next-line no-console
     console.error('[client] initAmbient failed:', error);
   }

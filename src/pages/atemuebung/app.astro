@@ -2,9 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import BreathingExperience from '../../components/BreathingExperience.astro';
 
-// Standalone, chrome-less breathing app — the installable PWA surface
-// (manifest start_url / scope point here). Reached from /atemuebung via its
-// "Im Vollbild öffnen" CTA, or launched directly once installed. Prerendered.
+// The installable PWA surface: manifest start_url and scope point here.
 export const prerender = true;
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');

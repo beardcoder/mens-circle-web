@@ -16,7 +16,7 @@
  * custom cursors, magnetic buttons, endless marquees.
  */
 
-/* ── 1. The entrance ──────────────────────────────────────────────────── */
+/* 1. The entrance. */
 
 @media (prefers-reduced-motion: no-preference) {
   /* The headline arrives line by line, not letter by letter. */
@@ -99,7 +99,7 @@
   }
 }
 
-/* ── 3. The statement ─────────────────────────────────────────────────────
+/* 3. The statement.
    Scroll-driven, so it tracks the section's position rather than firing once
    on a timer. Each line starts from a different offset and they converge on a
    flush-left edge — the movement is the composition arriving, not a reveal.
@@ -140,7 +140,7 @@
   }
 }
 
-/* ── Reveal-on-scroll ─────────────────────────────────────────────────────
+/* Reveal-on-scroll.
    Still available for the few places that use it (the step list, the facts
    band), driven by lib/motion.ts. The hidden start state lives here behind
    `.motion-ready`, which carries a dead-man's switch in Layout.astro — without
@@ -178,7 +178,7 @@
   }
 }
 
-/* ── Surface primitives ──────────────────────────────────────────────── */
+/* Surface primitives. */
 
 [data-motion='image'] {
   overflow: clip;
@@ -241,7 +241,7 @@
   }
 }
 
-/* ── Reduced motion ───────────────────────────────────────────────────────
+/* Reduced motion.
    Everything spatial and everything scroll-bound is off. Colour feedback
    stays. `data-motion-essential` (the breathing exercise) opts out of the
    iteration cap so its phase rings keep running — the exercise is unusable

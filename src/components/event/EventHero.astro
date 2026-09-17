@@ -7,13 +7,9 @@ interface Props {
 }
 
 /**
- * The opening of a single evening's page. The date is the heading, because the
- * date is what this page is.
- *
- * The event's own image is no longer painted behind the heading: it was a
- * decorative wash under text that had to stay readable over whatever an admin
- * uploaded. Everything else that was here — the four breathing ring ornaments,
- * the full-viewport dark panel, the 13rem title — is gone with it.
+ * The opening of a single event's page. The date is the heading, because the
+ * date is what this page is. The event's own image is never painted behind it:
+ * the text has to stay readable over whatever an admin uploaded.
  */
 
 const { event } = Astro.props;

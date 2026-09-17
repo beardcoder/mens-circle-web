@@ -2,14 +2,11 @@
 import type { Testimonial } from '@lib/types';
 
 /**
- * Published voices from the circle.
+ * Submitted and moderated entries, quoted as written — nothing is added or
+ * reworded, and the section renders nothing when none is published.
  *
- * These are the entries men actually submitted and Markus moderated — they are
- * quoted as written. Nothing is added, reworded or invented here, and the
- * section renders nothing at all when none is published.
- *
- * Native server island on the static home page. Supplied testimonials are
- * used only for the build-time fallback; live requests read the database.
+ * A server island on the static home page: supplied testimonials feed the
+ * build-time fallback only, live requests read the database.
  */
 
 interface Props {

@@ -2,10 +2,9 @@
 import type { Testimonial } from '@lib/types';
 
 /**
- * One real voice. Deliberately not a second testimonials grid — that would put
- * the same quotes on two indexed URLs and cost another full query. Takes the top
- * curated entry as a pull quote, quoted as submitted, and renders nothing when
- * none is published.
+ * The top curated entry as a pull quote, quoted as submitted; nothing when none
+ * is published. Not a second testimonials grid — that would put the same quotes
+ * on two indexed URLs.
  */
 
 interface Props {

@@ -31,8 +31,8 @@ const isDuplicate = !!event && !event.id;
 const v = event ?? {};
 const dateValue = v.eventDate ? String(v.eventDate).slice(0, 10) : '';
 const num = (n: number | null | undefined) => (n == null ? '' : String(n));
-// Short alias so the textarea stays a single line — whitespace inside
-// <textarea> is significant and would otherwise leak into the field value.
+// Short alias so the textarea stays one line: whitespace inside <textarea> is
+// significant and would leak into the field value.
 const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
 ---
 
@@ -214,7 +214,7 @@ const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
         window.adminToast?.('err', error.message);
         return;
       }
-      // New event → back to the list; edit → stay with confirmation.
+      // A new event returns to the list; an edit stays, with confirmation.
       if (!form.dataset.edit) {
         window.location.href = '/admin';
         return;

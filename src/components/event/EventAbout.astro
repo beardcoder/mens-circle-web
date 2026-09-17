@@ -6,20 +6,12 @@ interface Props {
   event: EventDTO;
 }
 
-/**
- * Whatever Markus wrote about this particular evening, in the admin.
- *
- * That text is the whole point of the section, so it is the whole of the
- * section: the invented pull quote ("»Gemeinsam wachsen, einander stärken«")
- * that used to sit beside it inside three concentric rings is gone — nobody
- * said it, and it competed with the words that someone actually wrote.
- *
- * Renders nothing when the evening has no description.
- */
+/** The admin's own text about this event, and nothing else. Renders nothing
+ *  when the event has no description. */
 
 const { event } = Astro.props;
 
-// Plain-text description → HTML with hard line breaks (matches admin input).
+// Plain text to HTML with hard line breaks, matching the admin input.
 const description = event.description?.trim() ?? '';
 const descriptionHtml = escapeHtml(description).replace(/\r\n|\r|\n/g, '<br />');
 ---

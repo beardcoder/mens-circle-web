@@ -5,21 +5,12 @@ import HomeEventStatus from '../HomeEventStatus.astro';
 import Ring from '../Ring.astro';
 
 /**
- * The home page opening — a composition, not a component.
+ * The home page opening: headline, ring and photograph sharing one overlapping
+ * grid. The image is last in source order so a phone gets the whole offer before
+ * it gets a picture, and nothing readable sits on top of the ring's stroke.
  *
- * Three things share one overlapping grid: the headline, the ring and the
- * photograph. The headline sets the register at up to 180px; the ring is
- * cropped by the right edge and passes behind the type and over the top corner
- * of the photograph; the photograph is a plain rectangle pushed up into the
- * headline's row.
- *
- * Reading order is unchanged by any of it: kicker, heading, invitation, one
- * paragraph, the action. The image is last in source order so a phone gets the
- * whole offer before it gets a picture, and nothing readable is ever placed on
- * top of the ring's stroke — the overlap is type-over-negative-space only.
- *
- * No fixed 100vh: the block is as tall as its content plus air, so nothing is
- * cut off on a short laptop screen.
+ * No fixed 100vh — the block is as tall as its content, so a short laptop screen
+ * cuts nothing off.
  */
 
 interface Props {
@@ -244,7 +235,7 @@ const lines = data.displayLines ?? [];
       max-inline-size: 34ch;
     }
 
-    /* ─── Phone: recomposed, not stacked ────────────────────────────────
+    /* Phone: recomposed, not stacked.
        The headline still owns the screen, the ring crops into its top-right
        corner, the action stays above the image, and the photograph becomes a
        wide plate at the end. */

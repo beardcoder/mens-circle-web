@@ -15,9 +15,7 @@
  *           a stock theme.
  */
 
-/* ============================================
-   Container
-   ============================================ */
+/* Container */
 .container {
   inline-size: 100%;
   max-inline-size: var(--container-width);
@@ -33,9 +31,7 @@
   max-inline-size: var(--container-prose);
 }
 
-/* ============================================
-   The 12-column bay
-   ============================================ */
+/* The 12-column bay */
 .bay {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -97,9 +93,7 @@
   }
 }
 
-/* ============================================
-   Sections
-   ============================================ */
+/* Sections */
 .section {
   position: relative;
   padding-block: var(--rhythm-section);
@@ -170,9 +164,7 @@
   overflow: clip;
 }
 
-/* ============================================
-   The prose spine — marker column + text column
-   ============================================ */
+/* The prose spine — marker column + text column */
 .spine {
   display: grid;
   grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
@@ -195,14 +187,10 @@
   }
 }
 
-/* ============================================
-   Rendering performance — skip below-fold sections
-   ============================================
-   Long pages stack many self-contained sections. With `content-visibility:
-   auto` the browser skips style/layout/paint for the ones far outside the
-   viewport. Only sections that never sit above the fold are listed, and never
-   one carrying a scroll-driven animation — a skipped section has no layout for
-   the timeline to read, so the statement is deliberately absent here. */
+/* `content-visibility: auto` skips style, layout and paint for sections far
+   outside the viewport. Only sections that never sit above the fold are listed,
+   and never one carrying a scroll-driven animation — a skipped section has no
+   layout for the timeline to read. */
 @supports (content-visibility: auto) {
   :where(
     .home-person,

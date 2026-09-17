@@ -9,39 +9,31 @@ import { eventSeriesSchema } from '@lib/series-schema';
 import site from '@data/site.json';
 
 /**
- * /event — the permanent landing page for the Männerkreis dates. It never
- * redirects to /event/<slug>, so this URL holds evergreen content of its own and
- * can rank, with a slot for the next date when one is scheduled.
- *
- * Server-rendered, not prerendered: the upcoming date belongs in the initial
- * HTML rather than filling in after JS.
+ * The permanent landing page for the dates. It never redirects to
+ * /event/<slug>, so this URL holds evergreen content and can rank. SSR, not
+ * prerendered: the upcoming date belongs in the initial HTML.
  */
 const { status, event } = await fetchNextEventState();
 const next = summarizeNextEvent(event);
 // One object for the whole page, so the date block, the FAQ and the metadata
-// can never disagree about whether a date exists. A failed read is its own
-// state — never rendered as "kein Termin geplant".
+// cannot disagree. A failed read is its own state, never "kein Termin geplant".
 const state = dateStatus(status, next);
 
-// A single published voice for the pull quote after "Du musst nichts können" —
-// the top of the curated order, not a second copy of the home page's grid. The
-// page is server-rendered anyway, so this is one extra one-row read per request;
-// `null` when nothing is published, and the section then renders nothing.
+// One published voice for the pull quote — the top of the curated order, not a
+// second copy of the home page's grid. `null` renders no section.
 const [voice = null] = await fetchTestimonials(1);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = new URL('/event', siteUrl).href;
 
-// The same builder the component renders from, so the FAQPage markup below can
-// never drift from the questions actually visible on the page.
+// The same builder the component renders from, so the FAQPage markup cannot
+// drift from the visible questions.
 const faqItems = buildEventFaq(state.next);
 
 /**
  * The series is built once in lib/series-schema.ts and shared with the home
- * page, so both describe one entity under one `@id` rather than two competing
- * ones. The individual meeting keeps its own `Event` markup on /event/<slug>;
- * when a date exists it is referenced here as a `subEvent` pointing at that
- * canonical URL rather than restated as a second standalone Event.
+ * page, so both describe one entity under one `@id`. A scheduled meeting is
+ * referenced as a `subEvent` pointing at its canonical URL, never restated.
  */
 const eventSeries: Record<string, unknown> = {
   ...eventSeriesSchema(siteUrl),
@@ -76,23 +68,19 @@ const breadcrumbs = {
   ],
 };
 
-// The description changes with the state so the SERP snippet is never stale,
-// but both variants lead with the same evergreen keywords.
+// Changes with the state so the SERP snippet is never stale, but both variants
+// lead with the same evergreen keywords.
 const description = state.next
   ? `Nächster Männerkreis in ${state.next.place}: ${state.next.dateLabel}${state.next.timeRange ? `, ${state.next.timeRange}` : ''}. Anmeldung, Ort, Dauer und Beitrag auf einen Blick – ohne Vorerfahrung, auf Spendenbasis.`
   : 'Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis.';
 
-// Shared links land on /event at least as often as on a single date, so the
-// card has to carry the same answer the page does. The <title> stays
-// evergreen — it is what ranks — while the social title leads with the date
-// when there is one. The `unavailable` state deliberately gets neither: it
-// falls through to the evergreen wording rather than claiming an empty
-// calendar, exactly as the visible page does.
+// The <title> stays evergreen because that is what ranks; the social title
+// leads with the date when there is one. `unavailable` gets the evergreen
+// wording rather than a claim about an empty calendar.
 const socialTitle = state.next
   ? `Nächster Männerkreis: ${state.next.dateLabel} in ${state.next.place}`
   : `Termine – ${site.siteName}`;
 
-// Two labelled facts for the cards that render them (Slack, X).
 const socialDetails = state.next
   ? [
       { label: 'Nächster Termin', value: [state.next.dateLabel, state.next.timeRange].filter(Boolean).join(', ') },

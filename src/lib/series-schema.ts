@@ -1,22 +1,9 @@
 import site from '../data/site.json';
 
 /**
- * The recurring Männerkreis as one `EventSeries` entity.
- *
- * The home page and /event both describe it, and they used to each emit their
- * own copy under a different `@id` (`/#series` vs `/event#series`) and a
- * different `name` ("Männerkreis Straubing / Niederbayern" vs "Männerkreis
- * Straubing"). That is two entities for one real-world thing: a crawler has no
- * way to know they are the same circle, and the conflicting names are exactly
- * the kind of ambiguity that keeps a knowledge panel from forming.
- *
- * So there is one `@id`, site-level (`/#series`), built here and emitted by both
- * pages. `url` points at /event, because that is the page about the series —
- * the home page is about the circle as a whole.
- *
- * Everything stated here is also stated in visible copy (the facts band on the
- * home page, the facts list on /event), so the markup cannot drift away from
- * what a reader sees. Nothing is asserted that the page does not show.
+ * The recurring circle as one `EventSeries` entity under one site-level `@id`
+ * (`/#series`), emitted by both the home page and /event. `url` points at
+ * /event, the page about the series itself.
  */
 export function eventSeriesSchema(siteUrl: URL): Record<string, unknown> {
   const seriesUrl = new URL('/event', siteUrl).href;
@@ -48,7 +35,7 @@ export function eventSeriesSchema(siteUrl: URL): Record<string, unknown> {
       name: site.siteName,
       url: siteUrl.origin,
     },
-    // Treffen laufen auf Spendenbasis — als kostenfreies Angebot ausgezeichnet.
+    // Meetings run on a donation basis, marked up as a free offer.
     offers: {
       '@type': 'Offer',
       price: '0',

@@ -6,9 +6,7 @@
  * `body::before` with `mix-blend-mode: overlay` over every surface on every page.
  */
 
-/* ============================================
-   Screen reader only
-   ============================================ */
+/* Screen reader only */
 .sr-only {
   position: absolute;
   inline-size: 1px;
@@ -21,12 +19,10 @@
   clip-path: inset(50%);
 }
 
-/* ============================================
-   Honeypot anti-spam field
+/* Honeypot anti-spam field
    Pushed far off-screen (not display:none, which some bots skip) and hidden
    from assistive tech + keyboard. Real users never interact with it; bots that
-   auto-fill every input give themselves away.
-   ============================================ */
+   auto-fill every input give themselves away. */
 .hp-field {
   position: absolute;
   left: -9999px;

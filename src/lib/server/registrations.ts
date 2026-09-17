@@ -18,7 +18,7 @@ import { sendEventMessage, sendRegistrationConfirmation, sendRegistrationEmails,
 import { countActiveRegistrations, ensureEventList, getEventById, isEventPast } from './events';
 import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
 
-/** Alias kept for the existing call sites; the union lives with the column. */
+/** Alias for the existing call sites; the union lives with the column. */
 export type RegStatus = RegistrationStatus;
 
 /** The two statuses a fresh registration can be given; the rest are admin transitions. */
@@ -86,9 +86,8 @@ const openEvent = async (eventId: string): Promise<{ event: Event } | { error: F
 };
 
 /**
- * Take the seat: revive the participant's cancelled registration or write a new
- * one. Returns the id of the booked row, or the conflict to answer with when he
- * already holds a live one.
+ * Take the seat: revive a cancelled registration or write a new one. Returns the
+ * booked row's id, or the conflict to answer with when a live one exists.
  */
 const claimSeat = async (
   participantId: string,
@@ -116,7 +115,7 @@ const claimSeat = async (
 
   const registeredAt = new Date().toISOString();
   if (existing) {
-    // A revived seat starts over: the confirmation for the previous one no longer describes it.
+    // A revived seat starts over: the old confirmation no longer describes it.
     await db
       .update(registrations)
       .set({ status, registeredAt, cancelledAt: null, deleted: null, confirmationSentAt: null })
@@ -145,12 +144,10 @@ const assignToEventList = async (event: Event, fields: RegistrationFields): Prom
 };
 
 /**
- * Confirmation mail and event-list membership, once the seat is already booked.
- *
- * Deliberately not awaited: the visitor gets his answer the moment the row is
- * written, and neither a slow mailer nor a listmonk outage may turn a booked
- * seat into an error page. Both halves run inside one subscriber scope so they
- * provision the same listmonk identity instead of racing to create it twice.
+ * Confirmation mail and list membership, after the seat is booked. Not awaited:
+ * neither a slow mailer nor a listmonk outage may turn a booked seat into an
+ * error page. Both halves share one subscriber scope so they provision the same
+ * listmonk identity instead of racing to create it twice.
  */
 const dispatchSideEffects = (
   event: Event,
@@ -334,11 +331,9 @@ export interface ResendResult {
 }
 
 /**
- * Send the anmeldung confirmation again — the repair for a batch that listmonk
- * never delivered. Only live `registered`/`waitlist` seats are eligible; a
- * cancelled or attended one would be confirming something that is no longer
- * true, so it is counted as skipped rather than mailed. Each success re-stamps
- * `confirmation_sent_at`, so the admin list shows what actually went out.
+ * Re-send confirmations listmonk never delivered. Only live `registered` and
+ * `waitlist` seats are eligible — a cancelled or attended one would confirm
+ * something no longer true — and each success re-stamps `confirmation_sent_at`.
  */
 export const resendRegistrationConfirmations = async (
   eventId: string,
@@ -356,7 +351,7 @@ export const resendRegistrationConfirmations = async (
     .orderBy(asc(registrations.registeredAt));
 
   const selected = rows.filter(({ registration }) => !wanted || wanted.has(registration.id));
-  // flatMap, not filter: the guard narrows `status` to the two the mailer accepts.
+  // flatMap, not filter: the guard narrows `status` to what the mailer accepts.
   const eligible = selected.flatMap(({ registration, participant }) => {
     const { id, status, confirmationSentAt } = registration;
     if (status !== 'registered' && status !== 'waitlist') return [];

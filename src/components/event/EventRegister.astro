@@ -8,15 +8,9 @@ interface Props {
 }
 
 /**
- * Registration for one evening — three states: open, waiting list, past.
- *
- * The heading now names the state plainly ("Anmeldung", "Warteliste",
- * "Dieser Abend hat stattgefunden") instead of selling it ("Sichere dir deinen
- * Platz"), and the seat count is a sentence rather than a 2rem numeral. The
- * form itself sits on the page's own ground: it used to be a 100svh dark split
- * with two breathing rings behind the heading.
- *
- * The island, its endpoint and its validation are untouched.
+ * Registration for one event, in three states: open, waiting list, past. The
+ * heading names the state plainly rather than selling it, and the seat count is
+ * a sentence rather than a numeral.
  */
 
 const { event } = Astro.props;
