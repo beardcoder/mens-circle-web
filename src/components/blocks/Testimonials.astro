@@ -8,34 +8,44 @@ import type { Testimonial } from '@lib/types';
  * quoted as written. Nothing is added, reworded or invented here, and the
  * section renders nothing at all when none is published.
  *
- * The page passes them in: the home page is server-rendered, so a server island
- * would only mean a second request for data the page already has.
+ * Native server island on the static home page. Supplied testimonials are
+ * used only for the build-time fallback; live requests read the database.
  */
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string; title?: string };
-  testimonials: Testimonial[];
+  testimonials?: Testimonial[];
+  loading?: boolean;
 }
 
-const { data, testimonials } = Astro.props;
+const { data, loading = false } = Astro.props;
+const testimonials =
+  Astro.props.testimonials ?? (await (await import('../../lib/server/testimonials')).fetchTestimonials());
 const anchor = data?.anchor ?? 'stimmen';
 ---
 
 {
-  testimonials.length > 0 && (
+  (
     <section class="section section--sand testimonials-section" id={anchor} aria-labelledby="testimonials-title">
       <div class="container">
         <div class="spine">
           <p class="rail-heading">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
 
           <div class="spine__body--wide">
-            <h2 class="section-title" id="testimonials-title" data-reveal="up">
+            <h2 class="section-title" id="testimonials-title">
               {data?.title ?? 'Was Teilnehmer geschrieben haben'}
             </h2>
 
-            <ul class="testimonials__list" role="list" data-reveal-group="55">
+            {testimonials.length === 0 && (
+              <p>
+                {loading
+                  ? 'Erfahrungen von Teilnehmern werden geladen.'
+                  : 'Erfahrungen veröffentlichen wir nach ihrer Freigabe.'}
+              </p>
+            )}
+            <ul class="testimonials__list" role="list">
               {testimonials.map((t) => (
-                <li class="testimonial-item" data-reveal="up">
+                <li class="testimonial-item">
                   <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
                   {(t.author || t.role) && (
                     <p class="testimonial-item__author">
@@ -62,6 +72,9 @@ const anchor = data?.anchor ?? 'stimmen';
 
 <style is:global>
   @layer sections {
+    .testimonials-section {
+      min-block-size: 30rem;
+    }
     /* A single column, not a two-up grid. Submitted quotes run from two lines
        to fifteen, so a grid left one cell half-empty beside a wall of text and
        halved the measure of both. Read down instead. */
