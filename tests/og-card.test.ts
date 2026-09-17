@@ -1,5 +1,6 @@
 import { expect, test } from 'bun:test';
-import { CARD_HEIGHT, CARD_WIDTH, cardContent, renderCard } from '../src/lib/server/og-card';
+import { readFileSync } from 'node:fs';
+import { CARD_HEIGHT, CARD_WIDTH, cardContent, cardFingerprint, renderCard } from '../src/lib/server/og-card';
 
 // Renders real PNGs. No database, no server, no network — satori embeds the
 // glyph outlines from the two woff files in src/assets/fonts, and sharp only
@@ -83,4 +84,37 @@ test('the longest German date still renders at full size', async () => {
     cardContent({ ...input, eventDate: '2026-09-30T00:00:00.000Z', place: 'Straubing-Sand' }),
   );
   expect(pngSize(png)).toEqual({ width: CARD_WIDTH, height: CARD_HEIGHT });
+});
+
+test('an identical card is drawn once and reused', async () => {
+  // The seat state is part of the key, so this is not "cache anything that
+  // looks alike" — it is "do not redraw a picture we already have".
+  const content = cardContent({ ...input, place: 'Reuse-Test' });
+
+  const first = await renderCard(content);
+  const second = await renderCard(cardContent({ ...input, place: 'Reuse-Test' }));
+  expect(second).toBe(first);
+
+  // A taken seat changes what the card says, so it must not come back cached.
+  const filled = await renderCard(cardContent({ ...input, place: 'Reuse-Test', availableSpots: 3 }));
+  expect(filled).not.toBe(first);
+  expect(cardFingerprint(content)).not.toBe(cardFingerprint(cardContent({ ...input, availableSpots: 3 })));
+});
+
+test('concurrent requests for one card share a single render', async () => {
+  const content = cardContent({ ...input, place: 'Herd-Test' });
+  const [a, b, c] = await Promise.all([renderCard(content), renderCard(content), renderCard(content)]);
+  expect(b).toBe(a);
+  expect(c).toBe(a);
+});
+
+test('the event page can state the card size without loading the renderer', () => {
+  // satori and sharp cost ~46MB of RSS. pages/event/[slug].astro needs two
+  // integers, so it must read them from the dependency-free module.
+  const page = readFileSync(new URL('../src/pages/event/[slug].astro', import.meta.url), 'utf8');
+  expect(page).toContain("from '@lib/og-card-size'");
+  expect(page).not.toContain("from '@lib/server/og-card'");
+
+  const sizes = readFileSync(new URL('../src/lib/og-card-size.ts', import.meta.url), 'utf8');
+  expect(sizes).not.toMatch(/^import /m);
 });
