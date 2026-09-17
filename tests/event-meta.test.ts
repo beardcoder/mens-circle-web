@@ -3,9 +3,7 @@ import { buildEventMeta, eventCardUrl, eventPlace, eventWhenWhere, stripHtml } f
 import { buildEventSchema } from '../src/lib/event-schema';
 import type { EventDTO } from '../src/lib/types';
 
-// Pure string/JSON-LD assertions — no database, no server, no fetch. The two
-// modules under test only reach into src/data/site.json and lib/server/format,
-// both of which are plain data and pure functions.
+// Pure string and JSON-LD assertions: no database, no server, no fetch.
 
 const SITE = new URL('https://mens-circle.de');
 
@@ -62,8 +60,8 @@ test('a full evening offers the waiting list, a past one says so', () => {
 });
 
 test('the brand is appended once, never twice', () => {
-  // An empty admin title falls back to the circle's own name — appending the
-  // site name again would say "Männerkreis Straubing … – Männerkreis Straubing".
+  // An empty admin title falls back to the circle's own name; appending the site
+  // name again would say it twice.
   const meta = buildEventMeta(event({ title: '   ' }), SITE);
   expect(meta.title).toBe('Männerkreis Straubing am 18. September 2026');
   expect(buildEventMeta(event({ title: 'Wintersonnwende' }), SITE).title).toBe(
@@ -98,9 +96,8 @@ test('the place falls back city → venue → home town', () => {
 });
 
 test('markup is stripped until stable, so nothing escapes into a JSON-LD script', () => {
-  // The point is not a pretty result but that no tag survives: a single pass
-  // leaves "</script>" behind on nested markup, and that alone would break out
-  // of the JSON-LD block these strings are embedded in.
+  // Not a pretty result, but no surviving tag: one pass leaves "</script>" on
+  // nested markup, which breaks out of the JSON-LD block.
   const residue = stripHtml('<scr<script>ipt>alert(1)</script>');
   expect(residue).not.toContain('<');
   expect(residue.toLowerCase()).not.toContain('script>');
@@ -133,8 +130,8 @@ test('availability and seat counts stay honest for full and past evenings', () =
   expect(full.offers).toMatchObject({ availability: 'https://schema.org/SoldOut' });
   expect(full).not.toHaveProperty('remainingAttendeeCapacity');
 
-  // A past evening cannot be booked either — "InStock" there is a claim that
-  // gets an Event rich result pulled.
+  // A past event cannot be booked either, and "InStock" there gets the rich
+  // result pulled.
   const past = buildEventSchema(event({ is_past: true }), SITE);
   expect(past.offers).toMatchObject({ availability: 'https://schema.org/SoldOut' });
   expect(past).not.toHaveProperty('remainingAttendeeCapacity');

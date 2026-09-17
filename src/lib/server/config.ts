@@ -5,7 +5,7 @@ const env = (key: string, fallback = ''): string => {
 
 const envInt = (key: string, fallback = 0) => Number.parseInt(env(key, String(fallback)), 10) || fallback;
 
-export const parseIntList = (raw: string): number[] =>
+const parseIntList = (raw: string): number[] =>
   raw
     ? String(raw)
         .split(',')

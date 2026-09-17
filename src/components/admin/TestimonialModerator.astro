@@ -139,7 +139,6 @@ const { testimonials } = Astro.props;
     if (!list || list.dataset.bound) return;
     list.dataset.bound = '1';
 
-    // Sort order.
     list.addEventListener('change', async (e) => {
       const input = (e.target as HTMLElement).closest('.js-order') as HTMLInputElement | null;
       if (!input) return;
@@ -148,7 +147,6 @@ const { testimonials } = Astro.props;
       window.adminToast?.(error ? 'err' : 'ok', error ? error.message : 'Reihenfolge gespeichert.');
     });
 
-    // Edit form submit.
     list.addEventListener('submit', async (e) => {
       const form = (e.target as HTMLElement).closest('.js-edit') as HTMLFormElement | null;
       if (!form) return;
@@ -169,7 +167,6 @@ const { testimonials } = Astro.props;
       btn.disabled = false;
       if (failed(error)) return;
 
-      // Reflect saved content in the display view.
       (card.querySelector('.js-quote') as HTMLElement).textContent = payload.quote;
       (card.querySelector('.js-author') as HTMLElement).textContent = payload.authorName;
       (card.querySelector('.js-role') as HTMLElement).textContent = payload.role ? ` · ${payload.role}` : '';

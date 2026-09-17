@@ -4,7 +4,7 @@ import { fullAddress } from '@lib/server/format';
 import EventMap from '../islands/EventMap.svelte';
 
 interface Props {
-  /** Event with non-null coordinates (the caller guards). */
+  /** Event with non-null coordinates; the caller guards. */
   event: EventDTO;
   lat: number;
   lng: number;

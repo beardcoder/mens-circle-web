@@ -1,10 +1,7 @@
 /**
- * SQLite → S3 backup (cron-style). Snapshots the database, gzips it, uploads it
- * to an S3-compatible bucket and prunes past the retention window.
- *
- * `VACUUM INTO`, not `cp`: copying a live SQLite file is not crash-safe under
- * WAL, while VACUUM writes a clean snapshot from one read transaction. Runs
- * in-process via bun:sqlite, so the image needs no `sqlite3` CLI.
+ * SQLite → S3 backup. Snapshots the database, gzips it, uploads it and prunes
+ * past the retention window. `VACUUM INTO`, not `cp`: copying a live SQLite file
+ * is not crash-safe under WAL.
  *
  * Run on a schedule (Coolify "Scheduled Task" or host crontab), e.g. hourly:
  *
@@ -57,26 +54,21 @@ if (!accessKeyId || !secretAccessKey) {
 // Bail rather than let bun:sqlite create an empty file at a mistyped path.
 if (!existsSync(dbPath)) fail(`database not found at ${dbPath} (check DATABASE_PATH).`);
 
-// 1) Consistent snapshot via VACUUM INTO into a temp file.
-const stamp = new Date().toISOString().replace(/[:.]/g, '-'); // 2026-06-21T16-32-24-000Z
+const stamp = new Date().toISOString().replace(/[:.]/g, '-');
 const snapshotPath = resolve('/tmp', `mens-circle-${stamp}.db`);
 const key = `${prefix}/mens-circle-${stamp}.db.gz`;
 
 console.log(`[backup] snapshotting ${dbPath} → ${snapshotPath}`);
 try {
-  // Default (read-write) open: VACUUM INTO needs a normal connection — an
-  // explicit `{ readonly: … }` option trips bun:sqlite's flag handling
-  // (SQLITE_MISUSE). The existence check above prevents creating a stray file.
+  // Read-write open: an explicit `{ readonly: … }` trips bun:sqlite's flag
+  // handling with SQLITE_MISUSE, and VACUUM INTO needs a normal connection.
   const db = new Database(dbPath);
-  // VACUUM INTO reads the source in a single transaction and writes a clean,
-  // self-contained copy (WAL contents folded in, no sidecar needed).
   db.run(`VACUUM INTO '${snapshotPath.replace(/'/g, "''")}'`);
   db.close();
 } catch (err) {
   fail(`snapshot failed: ${String(err)}`);
 }
 
-// 2) Compress.
 let gz: Buffer;
 try {
   const raw = await Bun.file(snapshotPath).arrayBuffer();
@@ -86,7 +78,6 @@ try {
   fail(`gzip failed: ${String(err)}`);
 }
 
-// 3) Upload to S3.
 const s3 = new Bun.S3Client({ accessKeyId, secretAccessKey, bucket, region, ...(endpoint ? { endpoint } : {}) });
 try {
   await s3.write(key, gz, { type: 'application/gzip' });
@@ -96,12 +87,9 @@ try {
   fail(`upload failed: ${String(err)}`);
 }
 
-// 4) Drop the local snapshot.
 rmSync(snapshotPath, { force: true });
 
-// 5) Prune backups older than the retention window (best-effort).
-
-/** Objects in the prefix that are past the cutoff — never the upload just made. */
+/** Objects past the cutoff — never the upload just made. */
 type Listed = { key?: string; lastModified?: string | Date };
 function isExpired(obj: Listed | undefined, cutoff: number): obj is Listed & { key: string } {
   if (!obj?.key || obj.key === key) return false;
@@ -135,7 +123,7 @@ if (retentionDays > 0 && typeof s3.list === 'function') {
       console.log(`[backup] pruned ${pruned} backup(s) older than ${retentionDays} day(s)`);
     }
   } catch (err) {
-    // Retention is best-effort: a failed prune must not fail the backup.
+    // Best-effort: a failed prune must not fail the backup.
     console.warn(`[backup] prune skipped: ${String(err)}`);
   }
 }

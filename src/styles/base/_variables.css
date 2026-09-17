@@ -1,16 +1,8 @@
 /**
- * Design tokens.
+ * Design tokens. Three colours and two cuts of one typeface. Every hue sits on
+ * the warm side of neutral, so the greys are ochre-cast, never blue-cast.
  *
- * Three colours and two cuts of one typeface. The site is a poster made of
- * earth pigments: a warm oat ground, a bark black that owns whole sections, and
- * a burnt orange that is a graphic element — the ring, a full-bleed field, the
- * primary button — rather than a tint on a link.
- *
- * Every hue sits on the warm side of neutral. That is the whole difference
- * between this and a tech-product palette, and it is why the greys are ochre-
- * cast rather than blue-cast.
- *
- * The contrast rules that follow from the palette, measured, not guessed:
+ * The contrast rules that follow, measured rather than guessed:
  *   ink on paper          15.2:1
  *   paper on ink          15.2:1
  *   orange on ink          4.9:1   → orange TEXT is legible on the dark
@@ -29,33 +21,25 @@
      before first paint by the inline boot script in Layout.astro. */
   color-scheme: light dark;
 
-  /* ============================================
-     Palette primitives
-     ============================================ */
+  /* Palette primitives */
 
-  /* Paper — the ground. Warm oat rather than a cool off-white: every hue on
-     this page sits on the warm side of neutral, which is what keeps the poster
-     from reading as a tech product. */
+  /* Paper — the ground. Warm oat, never a cool off-white. */
   --color-paper: #f2ede3;
   --color-paper-sunk: #e8e0d2; /* a half-step down, for set-apart passages */
   --color-paper-raised: #f8f4ec; /* a half-step up, for inputs and panels */
 
-  /* Ink — a warm bark black, not a blue-black. Owns whole sections, not just
-     glyphs. 15.2:1 on paper. */
+  /* Ink — a warm bark black, not a blue-black. 15.2:1 on paper. */
   --color-ink: #1c1714;
   --color-ink-soft: #241e19; /* one step up, for large dark fields */
   --color-ink-mid: #4a4139; /* running text on paper — 8.5:1 */
   --color-ink-muted: #645a50; /* captions, labels — 5.8:1 on paper */
 
-  /* Burnt orange — red earth pigment, not a neon signal. Still loud enough to
-     carry a full-bleed field and a 180px ring; warm enough to belong to the
-     rest of the palette. A graphic colour first: the ring, the statement field,
-     the button. Never *small* text on paper — see the contrast table above. */
+  /* Burnt orange — a graphic colour first: the ring, the statement field, the
+     button. Never small text on paper; see the contrast table above. */
   --color-orange: #dd5f33;
   --color-orange-deep: #b9491f; /* pressed / hover on light grounds */
 
-  /* Hairlines — warm, so they read as a crease in the paper rather than a
-     grey UI divider. */
+  /* Hairlines — warm, so they read as a crease in the paper. */
   --color-rule: #d8cfbe;
   --color-rule-strong: #bfb29c;
 
@@ -66,15 +50,9 @@
   --color-chalk: #f2ede3;
   --color-chalk-muted: #a39786; /* 6.2:1 on ink */
 
-  /* ------------------------------------------------------------------
-     The immersive dark surface.
-
-     The breathing exercise is a dim room by design rather than by decoration,
-     and the map skin follows it. Both were built against the old
-     earth/terracotta primitives, so those names are kept — re-pitched onto this
-     palette — instead of rewriting several hundred lines of layout CSS that has
-     nothing to do with colour. Nothing else on the site may use them.
-     ------------------------------------------------------------------ */
+  /* The immersive dark surface, used by the breathing exercise and the map
+     skin. Both were built against the old earth/terracotta primitives, so those
+     names are kept, re-pitched onto this palette. Nothing else may use them. */
   --color-bone: var(--color-paper);
   --color-parchment: var(--color-paper);
   --color-sand: var(--color-chalk-muted);
@@ -89,9 +67,7 @@
   --color-sage: #2f6b4a;
   --color-sage-light: #7fc09a;
 
-  /* ============================================
-     Semantic tokens
-     ============================================ */
+  /* Semantic tokens */
 
   /* Surfaces */
   --bg-primary: light-dark(var(--color-paper), var(--color-night));
@@ -157,9 +133,7 @@
      contrasting outline rather than a soft tint. */
   --focus-ring: 0 0 0 3px var(--color-orange);
 
-  /* ============================================
-     Typography
-     ============================================ */
+  /* Typography */
   /* --font-condensed / --font-text are defined by the Astro <Font> components
      (astro.config.mjs `fonts`) and already expand to the full stack: the
      webfont, an auto-generated metric-matched fallback face, then the
@@ -236,9 +210,7 @@
   --control-color: var(--text-primary);
   --control-placeholder: var(--text-muted);
 
-  /* ============================================
-     Spacing
-     ============================================ */
+  /* Spacing */
   --space-3xs: 0.25rem;
   --space-2xs: 0.375rem;
   --space-xs: 0.5rem;
@@ -259,9 +231,7 @@
   --rhythm-stack: var(--space-sm);
   --rhythm-cluster: var(--space-xs);
 
-  /* ============================================
-     Motion — short and functional only.
-     ============================================ */
+  /* Motion — short and functional only. */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-release: cubic-bezier(0.2, 0, 0, 1);
@@ -288,9 +258,7 @@
   --stagger-4: 160ms;
   --stagger-5: 200ms;
 
-  /* ============================================
-     Layout
-     ============================================ */
+  /* Layout */
   /* A wide poster measure. Sections place content into a 12-column grid rather
      than all sharing one centred column, so the left edge genuinely moves from
      section to section. Graphics may break out of it; reading text may not. */
@@ -312,10 +280,8 @@
   --safe-area-inset-left: env(safe-area-inset-left, 0px);
   --safe-area-inset-right: env(safe-area-inset-right, 0px);
 
-  /* ============================================
-     Shadows — only where something genuinely floats above the page
-     (the mobile nav panel, a toast, a dialog). Surfaces use rules instead.
-     ============================================ */
+  /* Shadows — only where something genuinely floats above the page
+     (the mobile nav panel, a toast, a dialog). Surfaces use rules instead. */
   --shadow-sm: 0 1px 2px light-dark(rgb(38 40 36 / 6%), rgb(0 0 0 / 30%));
   --shadow-md: 0 2px 8px light-dark(rgb(38 40 36 / 8%), rgb(0 0 0 / 36%));
   --shadow-lg: 0 6px 20px light-dark(rgb(38 40 36 / 10%), rgb(0 0 0 / 44%));
@@ -330,20 +296,16 @@
   --surface-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   --surface-noise-opacity: 0.03;
 
-  /* ============================================
-     Border radius — square. Nothing on the public site is rounded: the poster
+  /* Border radius — square. Nothing on the public site is rounded: the poster
      language is straight cuts and full-strength rules. `--radius-full` survives
-     for the breathing exercise, where the circle *is* the control.
-     ============================================ */
+     for the breathing exercise, where the circle *is* the control. */
   --radius-sm: 0;
   --radius-md: 0;
   --radius-lg: 0;
   --radius-xl: 0;
   --radius-full: 9999px;
 
-  /* ============================================
-     Z-Index Scale
-     ============================================ */
+  /* Z-Index Scale */
   --z-base: 0;
   --z-elevated: 10;
   --z-sticky: 100;
@@ -366,9 +328,7 @@
   color-scheme: dark;
 }
 
-/* ============================================
-   Smooth auto-height transitions (progressive)
-   ============================================ */
+/* Smooth auto-height transitions (progressive) */
 @supports (interpolate-size: allow-keywords) {
   :root {
     interpolate-size: allow-keywords;

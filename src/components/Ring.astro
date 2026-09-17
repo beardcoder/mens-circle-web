@@ -1,43 +1,28 @@
 ---
 interface Props {
-  /** Where on the page this instance sits — drives size and crop, see the CSS. */
+  /** Where on the page this instance sits; drives size and crop. */
   place: 'hero' | 'close';
   class?: string;
 }
 
 /**
- * The ring.
+ * The site's one graphic motif, used exactly twice: the hero and the closing
+ * block. Cropped at a viewport edge, never over text or controls.
  *
- * One graphic motif, used twice: once in the hero and once at the participation
- * close. A thick, open orange ring — the circle men sit in, drawn as a mark
- * rather than as an illustration. It is cropped by the viewport edge on purpose
- * and it overlaps the display type and the photograph.
+ * SVG rather than a bordered div because the gap has to be a clean butt-ended
+ * break — a `border-color: … transparent` gap cuts on the diagonal — and the
+ * stroke then scales with the box.
  *
- * Deliberately *not*: a cluster of floating bubbles, a gradient blob, a rotating
- * word-wreath, or a mandala. It is a single stroke with one gap in it.
- *
- * Drawn as SVG rather than a bordered div because the gap has to be a clean
- * butt-ended break (a `border-color: … transparent` gap cuts on the diagonal),
- * and because the stroke then scales with the box instead of needing its own
- * clamp.
- *
- * ── Why a wrapper element ────────────────────────────────────────────────
- * The ring carries two independent animations: a one-shot entrance (time-based)
- * and a drift on scroll (view-timeline-based). They cannot share an element:
- * both animate `transform`, so the later one in the list simply wins — and the
- * `.vt-arrival` rule that stands the entrance down after a view transition was
- * killing the whole `animation` shorthand, silently taking the scroll drift
- * with it. The wrapper owns the entrance, the inner SVG owns the drift.
- *
- * `aria-hidden` and `focusable="false"`: it carries no information, and it must
- * never take a tab stop. Nothing readable is ever placed on top of it — the
- * text sits beside or under it, never over the stroke.
+ * The wrapper exists because the ring carries two animations that both touch
+ * `transform`: a one-shot entrance and a scroll drift. On one element the later
+ * one wins, and the `.vt-arrival` rule that stands the entrance down killed the
+ * drift with it. The wrapper owns the entrance, the inner SVG the drift.
  */
 
 const { place, class: className } = Astro.props;
 
-// r=88 in a 200 box leaves room for the 23-unit stroke without clipping.
-// Circumference = 2πr ≈ 552.9. A 470/83 dash leaves one ~54° opening.
+// r=88 in a 200 box leaves room for the 23-unit stroke. Circumference ≈ 552.9,
+// so a 470/83 dash leaves one ~54° opening.
 const R = 88;
 const CIRCUMFERENCE = 2 * Math.PI * R;
 const GAP = 83;
@@ -80,7 +65,7 @@ const GAP = 83;
       transform-origin: 50% 50%;
     }
 
-    /* ─── Hero ────────────────────────────────────────────────────────
+    /* Hero.
        Sits to the upper right, cropped by the top and right edges. The display
        type runs to its left; the portrait tucks into its lower arc. Sized in vw
        so the crop stays proportional rather than being a fixed overhang that
@@ -92,7 +77,7 @@ const GAP = 83;
       aspect-ratio: 1;
     }
 
-    /* ─── Close ───────────────────────────────────────────────────────
+    /* Close.
        The reprise. Smaller, cropped by the left edge and the bottom, so the
        page ends on the same mark it opened with, seen from the other side. */
     .ring--close {
@@ -119,7 +104,7 @@ const GAP = 83;
       }
     }
 
-    /* ─── Scroll reaction ─────────────────────────────────────────────
+    /* Scroll reaction.
        The ring drifts and turns a little as its section passes. Bounded on
        purpose: ~40px of travel and ~12° of rotation — enough to notice, not
        enough to chase. Scroll-driven, so the compositor does the work and

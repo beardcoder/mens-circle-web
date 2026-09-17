@@ -10,21 +10,9 @@ import LandingVoice from './landing/LandingVoice.astro';
 import LandingMore from './landing/LandingMore.astro';
 
 /**
- * The permanent /event landing page.
- *
- * Never redirects to /event/<slug>: this is the URL that has to rank and to
- * work when nothing is scheduled. Registration stays on /event/<slug>, which
- * remains canonical for a single evening and carries its own Event markup.
- *
- * This page used to be thirteen sections and retold the whole of the home page
- * — what a Männerkreis is, the evening's rhythm, the ground rules, the
- * boundary against therapy, who Markus is. All of that now lives once, on the
- * home page, and this page does the job its URL promises: the date, the
- * practical facts, the way to take part or to be told about the next one, and
- * the questions that come up right before an evening.
- *
- * Section order: invitation, the live date, the facts, one real voice, the
- * practical questions, and finally the links into the depth.
+ * The permanent /event landing page: the date, the practical facts, the way to
+ * take part or be notified, and the questions asked right before an evening.
+ * Registration stays on /event/<slug>, which carries its own Event markup.
  *
  * Static HTML apart from the notification form inside LandingNextDate.
  */
@@ -38,8 +26,8 @@ interface Props {
 
 const { state, voice } = Astro.props;
 
-// Same call the page makes for the JSON-LD, so the rendered questions and the
-// FAQPage markup are guaranteed to be the identical strings.
+// The same call the page makes for the JSON-LD, so the rendered questions and
+// the markup are the identical strings.
 const faqItems = buildEventFaq(state.next);
 ---
 

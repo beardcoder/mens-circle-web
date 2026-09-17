@@ -11,9 +11,7 @@
  * The gap between the two is the design. Nothing sits at 80px.
  */
 
-/* ============================================
-   Headings — the reading register
-   ============================================ */
+/* Headings — the reading register */
 h1,
 h2,
 h3,
@@ -54,13 +52,11 @@ h6 {
   letter-spacing: 0;
 }
 
-/* ============================================
-   The poster register
+/* The poster register
    ------------------------------------------------------------------
    `.display` is a modifier, not an element: it is applied to whichever
    heading level is semantically right, so an h1 and an h2 can both shout
-   without either lying about the document outline.
-   ============================================ */
+   without either lying about the document outline. */
 .display {
   font-family: var(--font-display);
   font-size: var(--display-2);
@@ -116,9 +112,7 @@ h6 {
   margin-block-end: -0.06em;
 }
 
-/* ============================================
-   Body text
-   ============================================ */
+/* Body text */
 p {
   margin-block-end: 1.25em;
 }
@@ -127,12 +121,10 @@ p:last-child {
   margin-block-end: 0;
 }
 
-/* ============================================
-   Font style modifiers
+/* Font style modifiers
    ------------------------------------------------------------------
    `.text-italic` marks an emphasised phrase inside a heading. It is an
-   emphasis, not a colour swatch: the accent hue stays reserved for state.
-   ============================================ */
+   emphasis, not a colour swatch: the accent hue stays reserved for state. */
 .text-italic {
   font-style: italic;
 }
@@ -144,11 +136,9 @@ p .text-italic {
   box-shadow: none;
 }
 
-/* ============================================
-   Section header — the eyebrow + title + intro group at the top of a
+/* Section header — the eyebrow + title + intro group at the top of a
    section. Left-aligned by default: this is an editorial page, not a
-   deck of centred slides.
-   ============================================ */
+   deck of centred slides. */
 .section-header {
   max-inline-size: var(--measure-wide);
   margin-block-end: var(--rhythm-block);
@@ -164,11 +154,9 @@ p .text-italic {
   color: var(--text-on-dark);
 }
 
-/* ============================================
-   The marker — small condensed uppercase. Kickers, rail labels, meta,
+/* The marker — small condensed uppercase. Kickers, rail labels, meta,
    navigation. The counterweight to the poster register: the same
-   condensed face at the smallest size on the page.
-   ============================================ */
+   condensed face at the smallest size on the page. */
 .marker,
 .eyebrow {
   display: block;
@@ -202,9 +190,7 @@ p .text-italic {
   color: var(--color-chalk-muted);
 }
 
-/* ============================================
-   Section title — the reading register's top end.
-   ============================================ */
+/* Section title — the reading register's top end. */
 .section-title {
   max-inline-size: 18ch;
   margin-block-end: var(--rhythm-stack);
@@ -247,13 +233,11 @@ p .text-italic {
   color: var(--text-on-dark-secondary);
 }
 
-/* ============================================
-   Links
+/* Links
    ------------------------------------------------------------------
    The underline is the designed part: a 2px orange rule under ink text,
    which passes contrast (the text is ink) while the orange still reads.
-   On hover the rule thickens rather than the colour changing.
-   ============================================ */
+   On hover the rule thickens rather than the colour changing. */
 .link {
   color: var(--text-primary);
   text-decoration: underline;
@@ -292,9 +276,7 @@ p .text-italic {
   text-decoration-thickness: 4px;
 }
 
-/* ============================================
-   Prose — long-form rich text from the JSON content files
-   ============================================ */
+/* Prose — long-form rich text from the JSON content files */
 .prose {
   max-inline-size: var(--measure);
 }
@@ -379,12 +361,10 @@ p .text-italic {
   color: var(--text-primary);
 }
 
-/* ============================================
-   Shared editorial primitives
+/* Shared editorial primitives
    ------------------------------------------------------------------
    Used across sections so the page has one vocabulary rather than a new
-   invention per block.
-   ============================================ */
+   invention per block. */
 
 /* A hairline-separated definition list. The ground rules and the event meta
    use it — same rules, different content. (The home page's practical facts

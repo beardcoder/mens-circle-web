@@ -8,18 +8,14 @@ interface Props {
 }
 
 /**
- * The evening's facts, in the same hairline definition list the home page and
- * /event use — four "cards" with icons and a 16rem "TERMIN" watermark behind
- * them said nothing these four rows don't.
- *
- * Only rows with an actual value are rendered: an evening with no end time
- * should not print "bis  Uhr".
+ * The event's facts, in the same hairline definition list the home page and
+ * /event use. Only rows with a value are rendered: an event with no end time
+ * must not print "bis  Uhr".
  */
 
 const { event } = Astro.props;
 
-// The EventData shape consumed by the add-to-calendar island. The event date is
-// stored as an ISO timestamp; the calendar wants the plain calendar day.
+// The date is stored as an ISO timestamp; the calendar wants the calendar day.
 const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
 const calendarData: EventData = {
   title: event.title,
