@@ -2,7 +2,10 @@
 import Layout from '../../layouts/Layout.astro';
 import { getEventBySlug } from '@lib/server/events';
 import { buildEventMeta } from '@lib/event-meta';
-import { CARD_HEIGHT, CARD_WIDTH } from '@lib/server/og-card';
+// From lib/og-card-size.ts, NOT from the renderer: importing the two constants
+// from lib/server/og-card.ts pulled satori and sharp (~46MB of RSS) into the
+// process on every event-page render, for a page that draws no image at all.
+import { CARD_HEIGHT, CARD_WIDTH } from '@lib/og-card-size';
 import { buildEventSchema } from '@lib/event-schema';
 import EventPageContent from '../../components/event/EventPageContent.astro';
 
