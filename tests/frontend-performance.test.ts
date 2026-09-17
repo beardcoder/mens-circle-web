@@ -426,23 +426,15 @@ describe('retention scheduling (actual component functions)', () => {
   });
 });
 
-// Evaluates the checked-in sizes expressions in isolation. Commas inside
-// min/clamp must not split source-size entries.
+// Evaluates the checked-in sizes expressions in isolation. Each crop carries its
+// own hint, and the narrow one wins at the breakpoint itself — both <source>
+// media queries match there, and the browser takes the first.
 function imageSlot(component: string, viewport: number): number {
-  const sizes = read(`src/components/blocks/${component}.astro`).match(/sizes="([^"]+)"/)![1];
-  let depth = 0;
-  let separator = -1;
-  for (let index = 0; index < sizes.length; index++) {
-    if (sizes[index] === '(') depth++;
-    if (sizes[index] === ')') depth--;
-    if (sizes[index] === ',' && depth === 0) {
-      separator = index;
-      break;
-    }
-  }
-  const mobile = sizes.slice(0, separator).match(/^\(max-width: (\d+)em\) (.*)$/)!;
-  const selected = viewport <= Number(mobile[1]) * 16 ? mobile[2] : sizes.slice(separator + 1);
-  const expression = selected.replace(/([\d.]+)(vw|rem|px)/g, (_match, value, unit) =>
+  const source = read(`src/components/blocks/${component}.astro`);
+  const breakpoint = Number(source.match(/breakpoint="(\d+)em"/)![1]) * 16;
+  const crop = viewport <= breakpoint ? 'narrow' : 'wide';
+  const sizes = source.match(new RegExp(`${crop}=\\{\\{[\\s\\S]*?sizes:\\s*'([^']+)'`))![1];
+  const expression = sizes.replace(/([\d.]+)(vw|rem|px)/g, (_match, value, unit) =>
     String(Number(value) * (unit === 'vw' ? viewport / 100 : unit === 'rem' ? 16 : 1)),
   );
   return runInNewContext(expression, {
@@ -470,6 +462,27 @@ describe('responsive image size hints', () => {
   test('wide-screen hints remain capped instead of growing with viewport', () => {
     expect(imageSlot('Hero', 2560)).toBe(384);
     expect(imageSlot('PageHero', 2560)).toBe(352);
+  });
+
+  // A square variant shown in a 3:2 box travels a third of its bytes to be
+  // cropped away, which is what `<Picture>` used to do here. Each crop's ratio
+  // has to be the one its own breakpoint renders at.
+  test.each([
+    ['Hero', 'narrow', '3 / 2'],
+    ['Hero', 'wide', '3 / 4'],
+    ['PageHero', 'narrow', '3 / 2'],
+    ['PageHero', 'wide', '4 / 5'],
+  ])('%s %s crop is delivered at the ratio its CSS box uses', (component, crop, ratio) => {
+    const source = read(`src/components/blocks/${component}.astro`);
+    const declared = source.match(new RegExp(`${crop}=\\{\\{[\\s\\S]*?ratio:\\s*([\\d.]+\\s*/\\s*[\\d.]+)`))![1];
+    expect(declared.replace(/\s+/g, ' ')).toBe(ratio);
+    expect(source).toContain(`aspect-ratio: ${ratio};`);
+  });
+
+  // With the crop already correct there is no overflow left to position, and a
+  // stale `object-position` would silently shift the subject.
+  test.each(['Hero', 'PageHero'])('%s no longer positions a crop it does not make', (component) => {
+    expect(read(`src/components/blocks/${component}.astro`)).not.toContain('object-position');
   });
 });
 
