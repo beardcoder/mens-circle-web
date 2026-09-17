@@ -1,13 +1,12 @@
 <script lang="ts">
   import { isValidEmail } from '@lib/helpers';
   import { subscribeNewsletter } from '@lib/api';
-  import { showToast } from '@lib/toast';
-  import { TRACKING_EVENTS, trackEvent } from '@lib/umami';
-  import { describedBy, errorId, focusFirstInvalid, takeOverValidation } from '@lib/form-errors';
+  import { TRACKING_EVENTS, type UmamiEventData } from '@lib/umami';
+  import { describedBy, errorId, type FieldErrors, submitForm, takeOverValidation } from '@lib/form';
 
   interface Props {
     /** Optional analytics context merged into tracking events. */
-    context?: Record<string, string | number | boolean>;
+    context?: UmamiEventData;
     /** Distinguishes the error element's id when a page renders two of these. */
     formId?: string;
   }
@@ -17,59 +16,37 @@
   let email = $state('');
   let website = $state(''); // honeypot — bots fill it, humans never see it
   let submitting = $state(false);
-  let error = $state('');
+  let errors = $state<FieldErrors>({});
   let formEl: HTMLFormElement | undefined = $state();
 
   $effect(() => {
     takeOverValidation(formEl);
   });
 
+  function validate(): FieldErrors {
+    const value = email.trim();
+    if (!value) return { email: 'Bitte gib deine E-Mail-Adresse an.' };
+    if (!isValidEmail(value)) return { email: 'Diese E-Mail-Adresse sieht nicht gültig aus.' };
+    return {};
+  }
+
   async function handleSubmit(event: SubmitEvent): Promise<void> {
     event.preventDefault();
 
-    const value = email.trim();
-
-    error = !value
-      ? 'Bitte gib deine E-Mail-Adresse an.'
-      : !isValidEmail(value)
-        ? 'Diese E-Mail-Adresse sieht nicht gültig aus.'
-        : '';
-
-    if (error) {
-      // The inline message carries the detail; the toast is only the summary.
-      showToast('error', error);
-      await focusFirstInvalid(formEl);
-      return;
-    }
-
-    trackEvent(TRACKING_EVENTS.NEWSLETTER_SUBMIT, context);
-    submitting = true;
-
-    try {
-      const { success, message } = await subscribeNewsletter(value, website);
-
-      if (success) {
-        showToast('success', message);
-        trackEvent(TRACKING_EVENTS.NEWSLETTER_SUCCESS, context);
-        email = '';
-        error = '';
-      } else {
-        showToast('error', message);
-        trackEvent(TRACKING_EVENTS.NEWSLETTER_ERROR, {
-          ...context,
-          error: message,
-        });
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Network error';
-      showToast('error', 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.');
-      trackEvent(TRACKING_EVENTS.NEWSLETTER_ERROR, {
-        ...context,
-        error: message,
-      });
-    } finally {
-      submitting = false;
-    }
+    await submitForm({
+      form: formEl,
+      validate,
+      setErrors: (next) => (errors = next),
+      setSubmitting: (value) => (submitting = value),
+      events: {
+        submit: TRACKING_EVENTS.NEWSLETTER_SUBMIT,
+        success: TRACKING_EVENTS.NEWSLETTER_SUCCESS,
+        error: TRACKING_EVENTS.NEWSLETTER_ERROR,
+      },
+      context,
+      send: () => subscribeNewsletter(email.trim(), website),
+      reset: () => (email = ''),
+    });
   }
 </script>
 
@@ -99,10 +76,10 @@
       class="newsletter__input"
       autocomplete="email"
       inputmode="email"
-      aria-invalid={error ? 'true' : undefined}
-      aria-describedby={describedBy(formId, 'email', !!error)}
+      aria-invalid={errors.email ? 'true' : undefined}
+      aria-describedby={describedBy(formId, 'email', !!errors.email)}
       bind:value={email}
-      oninput={() => (error = '')}
+      oninput={() => (errors = {})}
       disabled={submitting}
     />
   </div>
@@ -111,6 +88,6 @@
     {submitting ? 'Wird gesendet …' : 'Anmelden'}
   </button>
 </form>
-{#if error}
-  <span class="form-error newsletter__error" id={errorId(formId, 'email')}>{error}</span>
+{#if errors.email}
+  <span class="form-error newsletter__error" id={errorId(formId, 'email')}>{errors.email}</span>
 {/if}

@@ -78,8 +78,7 @@
    about its viewBox centre, so `align-items: center` on the button now
    actually centres it. `currentColor` keeps it on the label's colour through
    the hover transition. */
-.btn--primary::after,
-.btn--arrow::after {
+.btn--primary::after {
   flex: none;
   inline-size: var(--btn-arrow-size);
   block-size: var(--btn-arrow-size);
@@ -93,20 +92,17 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .btn--primary:hover::after,
-  .btn--arrow:hover::after {
+  .btn--primary:hover::after {
     translate: 4px 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn--primary::after,
-  .btn--arrow::after {
+  .btn--primary::after {
     transition: none;
   }
 
-  .btn--primary:hover::after,
-  .btn--arrow:hover::after {
+  .btn--primary:hover::after {
     translate: 0;
   }
 }
@@ -219,18 +215,6 @@
   text-decoration-color: var(--color-orange);
   text-decoration-thickness: 2px;
   text-underline-offset: 0.25em;
-}
-
-/* The community CTA. Outlined on purpose — WhatsApp is the secondary route
-   into the circle, and a second solid button beside the primary one would
-   read as an equal choice. */
-.btn--whatsapp {
-  --btn-bg: transparent;
-  --btn-color: var(--text-primary);
-  --btn-border: var(--border-medium);
-  --btn-hover-bg: var(--text-primary);
-  --btn-hover-color: var(--bg-primary);
-  --btn-hover-border: var(--text-primary);
 }
 
 /* Sizes */

@@ -23,14 +23,6 @@
   margin-inline: auto;
 }
 
-.container--narrow {
-  max-inline-size: var(--container-narrow);
-}
-
-.container--prose {
-  max-inline-size: var(--container-prose);
-}
-
 /* The 12-column bay */
 .bay {
   display: grid;
@@ -46,20 +38,8 @@
    repeating grid-column arithmetic. Below 56em everything collapses to one
    column — an asymmetric 12-track grid on a phone is just a narrow column
    with extra steps. */
-.bay__full {
-  grid-column: 1 / -1;
-}
-
 .bay__left {
   grid-column: 1 / span 7;
-}
-
-.bay__mid {
-  grid-column: 3 / span 8;
-}
-
-.bay__right {
-  grid-column: 6 / span 7;
 }
 
 /* Pairs with `.bay__left` (cols 1–7) without overlapping it — two spans that
@@ -82,10 +62,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .bay__full,
   .bay__left,
-  .bay__mid,
-  .bay__right,
   .bay__far-right,
   .bay__marker,
   .bay__beside-marker {
@@ -97,10 +74,6 @@
 .section {
   position: relative;
   padding-block: var(--rhythm-section);
-}
-
-.section--large {
-  padding-block: var(--rhythm-section-lg);
 }
 
 /* A section set apart by a hairline rather than by a change of ground. */

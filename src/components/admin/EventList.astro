@@ -91,33 +91,28 @@ function fmtDate(iso: string): string {
 
 <script>
   import { actions } from 'astro:actions';
+  import { adminToast, bindOnce, ok } from '@lib/admin';
 
-  function init() {
-    const list = document.getElementById('event-list');
-    if (!list || list.dataset.bound) return;
-    list.dataset.bound = '1';
-
+  bindOnce('#event-list', (list) => {
     list.addEventListener('click', async (e) => {
       const btn = (e.target as HTMLElement).closest('.js-del') as HTMLButtonElement | null;
       if (!btn) return;
       const row = btn.closest('.event') as HTMLElement;
       const { id, title } = row.dataset;
-      if (!id || !confirm(`„${title}“ wirklich löschen?`)) return;
+      if (!id || !confirm(`„${title}" wirklich löschen?`)) return;
+
       btn.disabled = true;
-      const { error } = await actions.deleteEvent({ id });
-      if (error) {
+      if (!ok(await actions.deleteEvent({ id }))) {
         btn.disabled = false;
-        window.adminToast?.('err', error.message);
         return;
       }
-      window.adminToast?.('ok', 'Veranstaltung gelöscht.');
+
+      adminToast('ok', 'Veranstaltung gelöscht.');
       row.style.height = `${row.offsetHeight}px`;
       requestAnimationFrame(() => row.classList.add('removing'));
       setTimeout(() => row.remove(), 220);
     });
-  }
-
-  document.addEventListener('astro:page-load', init);
+  });
 </script>
 
 <style>

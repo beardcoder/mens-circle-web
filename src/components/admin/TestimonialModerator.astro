@@ -96,6 +96,7 @@ const { testimonials } = Astro.props;
 
 <script>
   import { actions } from 'astro:actions';
+  import { adminToast, bindOnce, ok } from '@lib/admin';
 
   function setEditing(card: HTMLElement, on: boolean) {
     (card.querySelector('.testi__view') as HTMLElement).hidden = on;
@@ -103,19 +104,12 @@ const { testimonials } = Astro.props;
     (card.querySelector('.js-edit') as HTMLElement).hidden = !on;
   }
 
-  /** Report an action error to the admin. True means the caller must stop. */
-  function failed(error: { message: string } | undefined): boolean {
-    if (!error) return false;
-    window.adminToast?.('err', error.message);
-    return true;
-  }
-
   async function togglePublish(card: HTMLElement, toggle: HTMLButtonElement) {
     const publish = !card.dataset.published;
     toggle.disabled = true;
-    const { error } = await actions.moderateTestimonial({ id: card.dataset.id!, publish });
+    const result = await actions.moderateTestimonial({ id: card.dataset.id!, publish });
     toggle.disabled = false;
-    if (failed(error)) return;
+    if (!ok(result)) return;
 
     card.dataset.published = publish ? '1' : '';
     toggle.textContent = publish ? 'Verbergen' : 'Veröffentlichen';
@@ -123,28 +117,23 @@ const { testimonials } = Astro.props;
     badge.textContent = publish ? 'veröffentlicht' : 'unsichtbar';
     badge.classList.toggle('badge--live', publish);
     badge.classList.toggle('badge--off', !publish);
-    window.adminToast?.('ok', publish ? 'Veröffentlicht.' : 'Verborgen.');
+    adminToast('ok', publish ? 'Veröffentlicht.' : 'Verborgen.');
   }
 
   async function removeCard(card: HTMLElement) {
     if (!confirm('Diese Stimme wirklich löschen?')) return;
-    const { error } = await actions.deleteTestimonial({ id: card.dataset.id! });
-    if (failed(error)) return;
-    window.adminToast?.('ok', 'Gelöscht.');
+    if (!ok(await actions.deleteTestimonial({ id: card.dataset.id! }))) return;
+    adminToast('ok', 'Gelöscht.');
     card.remove();
   }
 
-  function init() {
-    const list = document.getElementById('testi-list');
-    if (!list || list.dataset.bound) return;
-    list.dataset.bound = '1';
-
+  bindOnce('#testi-list', (list) => {
     list.addEventListener('change', async (e) => {
       const input = (e.target as HTMLElement).closest('.js-order') as HTMLInputElement | null;
       if (!input) return;
       const id = (input.closest('.testi') as HTMLElement).dataset.id!;
-      const { error } = await actions.moderateTestimonial({ id, sortOrder: Number(input.value) || 0 });
-      window.adminToast?.(error ? 'err' : 'ok', error ? error.message : 'Reihenfolge gespeichert.');
+      if (!ok(await actions.moderateTestimonial({ id, sortOrder: Number(input.value) || 0 }))) return;
+      adminToast('ok', 'Reihenfolge gespeichert.');
     });
 
     list.addEventListener('submit', async (e) => {
@@ -155,7 +144,6 @@ const { testimonials } = Astro.props;
       const fd = new FormData(form);
       const get = (k: string) => String(fd.get(k) ?? '');
       const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-      btn.disabled = true;
       const payload = {
         id: card.dataset.id!,
         quote: get('quote'),
@@ -163,16 +151,18 @@ const { testimonials } = Astro.props;
         role: get('role'),
         email: get('email'),
       };
-      const { error } = await actions.updateTestimonial(payload);
+
+      btn.disabled = true;
+      const result = await actions.updateTestimonial(payload);
       btn.disabled = false;
-      if (failed(error)) return;
+      if (!ok(result)) return;
 
       (card.querySelector('.js-quote') as HTMLElement).textContent = payload.quote;
       (card.querySelector('.js-author') as HTMLElement).textContent = payload.authorName;
       (card.querySelector('.js-role') as HTMLElement).textContent = payload.role ? ` · ${payload.role}` : '';
       (card.querySelector('.js-email') as HTMLElement).textContent = payload.email ? ` · ${payload.email}` : '';
       setEditing(card, false);
-      window.adminToast?.('ok', 'Stimme gespeichert.');
+      adminToast('ok', 'Stimme gespeichert.');
     });
 
     // One delegated listener that only routes; each branch owns its own work.
@@ -199,9 +189,7 @@ const { testimonials } = Astro.props;
       }
       if (target.closest('.js-del-testi')) await removeCard(card);
     });
-  }
-
-  document.addEventListener('astro:page-load', init);
+  });
 </script>
 
 <style>

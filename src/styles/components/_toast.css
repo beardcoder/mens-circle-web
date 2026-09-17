@@ -130,35 +130,6 @@
   background: var(--color-error);
 }
 
-.toast--info {
-  border-inline-start: 6px solid var(--color-info);
-}
-
-.toast--info .toast__title {
-  color: var(--color-info);
-}
-
-.toast--info .toast__icon {
-  color: light-dark(var(--color-paper), var(--color-night));
-  background: var(--color-info);
-}
-
-.toast--warning {
-  border-inline-start: 6px solid var(--color-warning);
-}
-
-.toast--warning .toast__title {
-  color: var(--color-warning);
-}
-
-/* The same light-dark pair as the others. It used to be a flat `--color-ink`,
-   which is correct on the dark mode's pale gold but measured 3.3:1 on the light
-   mode's dark ochre. */
-.toast--warning .toast__icon {
-  color: light-dark(var(--color-paper), var(--color-night));
-  background: var(--color-warning);
-}
-
 @media (width <= 768px) {
   .toast {
     inset-block-start: var(--space-sm);
