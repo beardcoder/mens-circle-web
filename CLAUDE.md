@@ -231,7 +231,7 @@ repair path, reached from the admin registrations page via the
 row at a time. It sends **only** the participant's mail, never the admin
 notification, and skips `cancelled`/`attended` seats.
 
-**Email — listmonk (external service):** The app does not render emails. It calls listmonk's transactional API (`POST /api/tx`) with a template ID + data; templates are maintained in listmonk. Source templates + setup in `listmonk/tx-templates/`. Newsletter (double-opt-in + campaigns) also via listmonk. Template IDs are wired through `LISTMONK_TX_*` env vars.
+**Email — listmonk (externally managed service):** This repo ships only the integration, not listmonk services, images, assets or templates. The app calls the external instance at runtime via `LISTMONK_URL` (base URL without `/api`), `LISTMONK_API_USER` and `LISTMONK_API_TOKEN`. Newsletter uses `LISTMONK_LIST_IDS`, campaigns optionally `LISTMONK_CAMPAIGN_TEMPLATE_ID`, and transactional mail (`POST /api/tx`) the six `LISTMONK_TX_*` IDs. See README sections **E-Mails** and **Migration einer bisherigen listmonk-Instanz** for external SMTP/opt-in/template setup and the payload contract; `lib/server/email.ts` is the payload source of truth. Preserve existing IDs, including `events.listmonk_list_id`, when moving instances; back up databases, uploads and templates before decommissioning anything. Do not reintroduce local service/template provisioning.
 
 ## Content & conventions
 

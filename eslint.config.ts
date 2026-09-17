@@ -8,10 +8,10 @@ import tseslint from 'typescript-eslint';
 import svelteConfig from './svelte.config.js';
 
 export default defineConfig([
-  // Build output, vendored assets and external services are never linted.
+  // Build output and vendored assets are never linted.
   // (node_modules and .git are ignored by ESLint out of the box.)
   {
-    ignores: ['dist/**', '.astro/**', '.claude/**', 'public/**', 'listmonk/**', '**/*.min.js'],
+    ignores: ['dist/**', '.astro/**', '.claude/**', 'public/**', '**/*.min.js'],
   },
 
   // Base rule sets.
