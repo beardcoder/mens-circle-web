@@ -10,8 +10,5 @@ bun.lock
 public/
 **/*.min.js
 
-# external services — not ours to format
-listmonk/
-
 # tooling
 .claude/

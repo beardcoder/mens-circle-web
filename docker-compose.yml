@@ -19,8 +19,8 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET}
-      # listmonk: newsletter, per-event lists + transactional email.
-      LISTMONK_URL: http://listmonk:9000
+      # External listmonk: base URL without /api, credentials + template IDs.
+      LISTMONK_URL: ${LISTMONK_URL:-}
       LISTMONK_API_USER: ${LISTMONK_API_USER}
       LISTMONK_API_TOKEN: ${LISTMONK_API_TOKEN}
       LISTMONK_LIST_IDS: ${LISTMONK_LIST_IDS}
@@ -45,8 +45,6 @@ services:
       BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
     volumes:
       - app-data:/data
-    depends_on:
-      - listmonk
     healthcheck:
       # Same dedicated endpoint the image's own HEALTHCHECK uses (see Dockerfile
       # + src/pages/health.ts): a bare 200, no page render, no DB round-trip.
@@ -59,61 +57,5 @@ services:
       - 'caddy_0.import=static_cache_headers'
       - 'caddy_1.import=web_optimizations'
 
-  listmonk:
-    build:
-      context: ./listmonk
-    image: mens-circle-listmonk:latest
-    restart: unless-stopped
-    depends_on:
-      listmonk-db:
-        condition: service_healthy
-    environment:
-      TZ: Europe/Berlin
-      LISTMONK_app__address: 0.0.0.0:9000
-      LISTMONK_app__root_url: ${SERVICE_URL_LISTMONK}
-      LISTMONK_db__host: listmonk-db
-      LISTMONK_db__port: 5432
-      LISTMONK_db__user: ${SERVICE_USER_POSTGRES}
-      LISTMONK_db__password: ${SERVICE_PASSWORD_POSTGRES}
-      LISTMONK_db__database: listmonk
-      LISTMONK_db__ssl_mode: disable
-      LISTMONK_ADMIN_USER: ${SERVICE_USER_LISTMONKADMIN}
-      LISTMONK_ADMIN_PASSWORD: ${SERVICE_PASSWORD_LISTMONKADMIN}
-    healthcheck:
-      # `wget`, not `curl` — the listmonk image ships no curl, so a curl probe
-      # exits 1 forever and the container never leaves "starting". That is not
-      # cosmetic: Traefik's Docker provider skips unhealthy or starting
-      # containers, so the router for the newsletter host is never created and
-      # the domain 404s. And the endpoint is `/health` (a bare `{"data":true}`)
-      # — `/api/ping` does not exist and `/api/health` is behind auth (403).
-      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:9000/health || exit 1']
-      start_period: 120s
-      interval: 30s
-      timeout: 5s
-      retries: 12
-    command:
-      - sh
-      - -c
-      - "./listmonk --install --idempotent --yes --config '' && ./listmonk --upgrade --yes --config '' && ./listmonk --static-dir=/listmonk/static --config ''"
-    volumes:
-      - listmonk-uploads:/listmonk/uploads:rw
-
-  listmonk-db:
-    image: postgres:18-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${SERVICE_USER_POSTGRES}
-      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES}
-      POSTGRES_DB: listmonk
-    volumes:
-      - listmonk-db:/var/lib/postgresql
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
-      interval: 30s
-      timeout: 5s
-      retries: 6
-
 volumes:
   app-data:
-  listmonk-uploads:
-  listmonk-db:
