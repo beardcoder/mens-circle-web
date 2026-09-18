@@ -31,7 +31,7 @@ export function withoutError(errors: FieldErrors, field: string): FieldErrors {
  * `aria-invalid` attributes, and picks by DOM order rather than validation
  * order — the topmost problem, not the first rule that happened to fail.
  */
-export async function focusFirstInvalid(root: HTMLElement | null | undefined): Promise<void> {
+async function focusFirstInvalid(root: HTMLElement | null | undefined): Promise<void> {
   if (!root) return;
   await Promise.resolve();
 
