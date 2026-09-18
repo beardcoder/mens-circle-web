@@ -46,5 +46,3 @@ try {
   console.error('[db] migration failed', err);
   throw err;
 }
-
-export { schema };

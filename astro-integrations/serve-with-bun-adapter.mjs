@@ -21,12 +21,7 @@ import { fileURLToPath } from 'node:url';
  *   files. Defaults to one hour, revalidated.
  * @returns {import('astro').AstroIntegration}
  */
-export function serveWithBunAdapter({
-  name,
-  match,
-  contentType,
-  cacheControl = 'public, max-age=3600, must-revalidate',
-}) {
+function serveWithBunAdapter({ name, match, contentType, cacheControl = 'public, max-age=3600, must-revalidate' }) {
   /** @type {import('astro').AstroConfig | undefined} */
   let config;
 
