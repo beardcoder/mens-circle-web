@@ -2,7 +2,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { config, listmonkApiConfigured, listmonkConfigured } from './config';
 
-export interface ListmonkSubscriber {
+interface ListmonkSubscriber {
   id: number;
   email: string;
   name: string;
@@ -40,7 +40,7 @@ const request = async (method: string, path: string, body?: unknown): Promise<Li
   }
 };
 
-export type SubscribeStatus = 'subscribed' | 'exists' | 'error';
+type SubscribeStatus = 'subscribed' | 'exists' | 'error';
 
 export interface SubscribeResult {
   ok: boolean;

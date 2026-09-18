@@ -9,7 +9,7 @@
  * while no mode is pinned.
  */
 
-export type Mode = 'light' | 'dark';
+type Mode = 'light' | 'dark';
 
 const STORAGE_MODE = 'mc-mode';
 
