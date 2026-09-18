@@ -1,41 +1,31 @@
 import { and, asc, desc, eq, isNull } from 'drizzle-orm';
-import type { Testimonial as TestimonialDTO, TestimonialPayload } from '../types';
+import type { Testimonial as TestimonialDTO } from '../types';
 import { db } from './db';
 import type { Testimonial } from './db/schema';
 import { testimonials } from './db/schema';
-import {
-  accepted,
-  consented,
-  type FormResult,
-  INVALID_EMAIL,
-  isHoneypotFilled,
-  MISSING_CONSENT,
-  rejected,
-} from './form-submission';
+import { accepted, type FormResult, isHoneypotFilled } from './form-submission';
 
 const SUCCESS_MESSAGE = 'Vielen Dank! Dein Testimonial wurde eingereicht und wird nach Prüfung veröffentlicht.';
-const QUOTE_MIN = 10;
-const QUOTE_MAX = 1000;
+
+/** The testimonial form, already validated by the `submitTestimonial` action's schema. */
+export interface TestimonialInput {
+  quote: string;
+  email: string;
+  author_name?: string | null;
+  role?: string | null;
+  /** Honeypot — real users leave it empty. */
+  website?: string | null;
+}
 
 /** Always stored unpublished, for moderation. */
-export async function submitTestimonial(payload: TestimonialPayload): Promise<FormResult> {
-  const quote = (payload.quote || '').trim();
-  const email = (payload.email || '').trim().toLowerCase();
-
+export async function submitTestimonial(payload: TestimonialInput): Promise<FormResult> {
   if (isHoneypotFilled(payload.website)) return accepted(SUCCESS_MESSAGE);
 
-  if (!consented(payload.privacy)) return rejected(422, MISSING_CONSENT);
-  if (quote.length < QUOTE_MIN || quote.length > QUOTE_MAX) {
-    return rejected(422, `Dein Testimonial muss zwischen ${QUOTE_MIN} und ${QUOTE_MAX} Zeichen lang sein.`);
-  }
-  // Optional here — only a given address has to be usable.
-  if (email && !email.includes('@')) return rejected(422, INVALID_EMAIL);
-
   await db.insert(testimonials).values({
-    quote,
+    quote: payload.quote.trim(),
     authorName: (payload.author_name || '').trim(),
     role: (payload.role || '').trim(),
-    email,
+    email: payload.email.trim().toLowerCase(),
     isPublished: false,
     sortOrder: 0,
   });

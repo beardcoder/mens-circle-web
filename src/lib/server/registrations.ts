@@ -1,19 +1,10 @@
 /* eslint-disable no-console */
 import { and, asc, eq, isNull } from 'drizzle-orm';
-import type { RegistrationPayload } from '../types';
 import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import type { Event, Participant, Registration, RegistrationStatus } from './db/schema';
 import { participants, registrations } from './db/schema';
-import {
-  accepted,
-  consented,
-  type FormResult,
-  INVALID_EMAIL,
-  isHoneypotFilled,
-  MISSING_CONSENT,
-  rejected,
-} from './form-submission';
+import { accepted, type FormResult, isHoneypotFilled, rejected } from './form-submission';
 import { sendEventMessage, sendRegistrationConfirmation, sendRegistrationEmails, sendWaitlistPromotion } from './email';
 import { countActiveRegistrations, ensureEventList, getEventById, isEventPast } from './events';
 import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
@@ -52,6 +43,17 @@ const upsertParticipant = async (
   )[0];
 };
 
+/** The registration form, already validated by the `register` action's schema. */
+export interface RegistrationInput {
+  event_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number?: string | null;
+  /** Honeypot — real users leave it empty. */
+  website?: string | null;
+}
+
 interface RegistrationFields {
   firstName: string;
   lastName: string;
@@ -60,7 +62,7 @@ interface RegistrationFields {
   eventId: string;
 }
 
-const readFields = (payload: RegistrationPayload): RegistrationFields => ({
+const readFields = (payload: RegistrationInput): RegistrationFields => ({
   firstName: (payload.first_name || '').trim(),
   lastName: (payload.last_name || '').trim(),
   email: (payload.email || '').trim().toLowerCase(),
@@ -178,15 +180,11 @@ const dispatchSideEffects = (
   );
 };
 
-export const register = async (payload: RegistrationPayload): Promise<FormResult> => {
+export const register = async (payload: RegistrationInput): Promise<FormResult> => {
   const fields = readFields(payload);
   const confirmation = confirmationMessage(fields.firstName);
 
   if (isHoneypotFilled(payload.website)) return accepted(confirmation);
-
-  if (!consented(payload.privacy)) return rejected(422, MISSING_CONSENT);
-  if (!fields.email.includes('@')) return rejected(422, INVALID_EMAIL);
-  if (!fields.eventId) return rejected(422, 'Es wurde keine Veranstaltung angegeben.');
 
   const found = await openEvent(fields.eventId);
   if ('error' in found) return found.error;

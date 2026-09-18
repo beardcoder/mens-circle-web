@@ -1,6 +1,5 @@
 ---
 import site from '../data/site.json';
-import { umamiOrigin } from '../lib/umami-config';
 import { canonicalUrl } from '../lib/canonical';
 
 // Font preloading is handled by <Font preload /> in the layout head.
@@ -26,13 +25,6 @@ interface Props {
   /** ISO dates for an `ogType="article"` page. Emitted as `article:*` meta. */
   publishedTime?: string;
   modifiedTime?: string;
-  /** Defaults to the site-wide manifest; a page can point at a focused one. */
-  manifest?: string;
-  /** Advertises the page as an installable web app, with this as the home-screen title. */
-  webAppTitle?: string;
-  /** Defaults to a zoomable viewport with `viewport-fit=cover`, so
-   *  `env(safe-area-inset-*)` resolves. App-like pages may override it. */
-  viewport?: string;
 }
 
 const {
@@ -52,9 +44,6 @@ const {
   schemas = [],
   publishedTime,
   modifiedTime,
-  manifest = '/manifest.webmanifest',
-  webAppTitle,
-  viewport = 'width=device-width, initial-scale=1.0, viewport-fit=cover',
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
@@ -62,8 +51,10 @@ const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 // One spelling per page, shared with the pages' own structured data.
 const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 
-// The only third-party origin the site loads. Everything else is same-origin.
-const analyticsOrigin = umamiOrigin();
+// Umami, self-hosted — the only third-party origin the site loads. Production
+// builds only, so local sessions never count as visits.
+const umamiOrigin = new URL(import.meta.env.PUBLIC_UMAMI_ENDPOINT || 'https://va.letsbenow.de').origin;
+const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_ID || 'f2964cb9-28e6-4658-810f-2acfb9cb9c46';
 const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
 const socialTitle = ogTitle ?? title ?? site.siteName;
 const socialDescription = ogDescription ?? description;
@@ -159,7 +150,7 @@ const website = {
 const allSchemas = [localBusiness, person, website, ...schemas];
 ---
 
-<meta name="viewport" content={viewport} />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
 <title>{fullTitle}</title>
 <meta name="title" content={fullTitle} />
@@ -174,7 +165,20 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <meta name="color-scheme" content="light dark" />
 <meta name="msapplication-TileColor" content={site.themeColor} />
 
-{analyticsOrigin && <link rel="preconnect" href={analyticsOrigin} crossorigin />}
+{
+  import.meta.env.PROD && (
+    <>
+      <link rel="preconnect" href={umamiOrigin} crossorigin />
+      <script
+        is:inline
+        defer
+        src={`${umamiOrigin}/script.js`}
+        data-website-id={umamiWebsiteId}
+        data-performance="true"
+      />
+    </>
+  )
+}
 
 <!-- Open Graph -->
 <meta property="og:type" content={ogType} />
@@ -222,19 +226,7 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png" />
-<link rel="manifest" href={manifest} />
-
-{
-  /* Installable standalone web app. */
-  webAppTitle && (
-    <>
-      <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      <meta name="apple-mobile-web-app-title" content={webAppTitle} />
-    </>
-  )
-}
+<link rel="manifest" href="/manifest.webmanifest" />
 
 <!-- Structured data -->
 {allSchemas.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}

@@ -34,7 +34,7 @@
       "data": {
         "eyebrow": "Die Hürde davor",
         "title": "Vielleicht bist du unsicher",
-        "content": "<p>Vielleicht liest du diese Seite und ein Teil von dir denkt: Das klingt gut. Ein anderer Teil fragt sich: Ist das wirklich etwas für mich?</p><p>Das ist normal.</p><p>Viele Männer sind unsicher, bevor sie zum ersten Mal in einen Männerkreis kommen. Weil sie nicht wissen, was sie erwartet. Weil sie nicht gelernt haben, vor anderen Männern ehrlich zu sprechen. Oder weil sie keine Lust auf etwas Abgehobenes haben.</p><p>Genau deshalb halte ich den Kreis klar und bodenständig.</p><p>Du musst nichts darstellen. Du musst nichts beweisen. Du musst auch nicht sofort viel reden.</p><p>Du darfst erst einmal ankommen.</p><p>Wenn du gerade merkst, dass dich das Thema anspricht, aber auch etwas unruhig macht: Atme einmal durch. Die <a class=\"link\" href=\"/atemuebung\">Atemübung</a> kann dir helfen, kurz bei dir anzukommen.</p>"
+        "content": "<p>Vielleicht liest du diese Seite und ein Teil von dir denkt: Das klingt gut. Ein anderer Teil fragt sich: Ist das wirklich etwas für mich?</p><p>Das ist normal.</p><p>Viele Männer sind unsicher, bevor sie zum ersten Mal in einen Männerkreis kommen. Weil sie nicht wissen, was sie erwartet. Weil sie nicht gelernt haben, vor anderen Männern ehrlich zu sprechen. Oder weil sie keine Lust auf etwas Abgehobenes haben.</p><p>Genau deshalb halte ich den Kreis klar und bodenständig.</p><p>Du musst nichts darstellen. Du musst nichts beweisen. Du musst auch nicht sofort viel reden.</p><p>Du darfst erst einmal ankommen.</p>"
       }
     },
     {
@@ -123,9 +123,7 @@
         "title": "Komm dazu, wenn es für dich passt",
         "text": "Du musst nichts darstellen. Du musst nicht perfekt vorbereitet sein. Es reicht, wenn du ehrlich da bist.",
         "buttonText": "Termine ansehen",
-        "buttonLink": "/event",
-        "secondaryLabel": "Erst einmal durchatmen",
-        "secondaryLink": "/atemuebung"
+        "buttonLink": "/event"
       }
     }
   ]

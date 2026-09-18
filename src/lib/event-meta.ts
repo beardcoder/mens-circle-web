@@ -4,7 +4,7 @@
  * cannot drift apart. Server-render only — it imports lib/server/format.
  */
 import site from '../data/site.json';
-import { formatDateLongDE, formatDayMonthYearDE } from './server/format';
+import { formatDateLongDE, formatDayMonthYearDE, timeRange } from './server/format';
 import type { EventDTO } from './types';
 
 /** Chat previews show more than a SERP's ~160 chars, so budget for the preview. */
@@ -37,13 +37,11 @@ function truncate(text: string, limit = DESCRIPTION_LIMIT): string {
 /** The event's own title, or the circle's name when it was left empty. */
 export const eventName = (event: EventDTO): string => stripHtml(event.title) || `Männerkreis ${site.geo.locality}`;
 
-/** City, then venue name, then home town — the ladder `summarizeNextEvent` uses. */
+/** City, then venue name, then home town. */
 export const eventPlace = (event: EventDTO): string =>
   event.city?.trim() || event.location?.trim() || site.geo.locality;
 
-/** "19:00–21:30 Uhr", or empty when no start time is set. */
-const eventTimeRange = (event: EventDTO): string =>
-  event.start_time ? `${event.start_time}${event.end_time ? `–${event.end_time}` : ''} Uhr` : '';
+const eventTimeRange = (event: EventDTO): string => timeRange(event.start_time, event.end_time);
 
 /** The single line answering "when and where" for a forwarded link. */
 export const eventWhenWhere = (event: EventDTO): string => {
@@ -86,9 +84,6 @@ function shareDetails(event: EventDTO): { label: string; value: string }[] {
   ];
 }
 
-/** One static 1200×630 poster for every event. */
-export const eventCardUrl = (_event: EventDTO, siteUrl: URL): string => new URL('/images/og-default.png', siteUrl).href;
-
 /** Optional admin-supplied image, added to the JSON-LD only. */
 function adminImage(event: EventDTO, siteUrl: URL): string | null {
   const raw = event.image_url?.trim();
@@ -120,7 +115,8 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
   const place = eventPlace(event);
   const day = formatDayMonthYearDE(event.event_date);
   const longDate = formatDateLongDE(event.event_date);
-  const image = eventCardUrl(event, siteUrl);
+  // One static 1200×630 poster for every event — SeoHead's default image.
+  const image = new URL('/images/og-default.png', siteUrl).href;
 
   // Only append the brand when the title does not already carry it — saying the
   // name twice eats the 60 chars a SERP shows.

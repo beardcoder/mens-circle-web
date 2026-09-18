@@ -1,0 +1,55 @@
+---
+/**
+ * "Bei neuen Terminen benachrichtigen" — one address into the listmonk list.
+ * Posts to the `subscribeNewsletter` action via lib/form.ts.
+ */
+interface Props {
+  /** Analytics context sent with the Umami events. */
+  context?: Record<string, string>;
+  /** Keeps ids unique when a page renders this twice. */
+  id?: string;
+}
+
+const { context = {}, id = 'newsletter' } = Astro.props;
+---
+
+<form
+  id={id}
+  class="newsletter__form"
+  data-form="newsletter"
+  data-track="newsletter"
+  data-track-context={JSON.stringify(context)}
+>
+  <div class="hp-field" aria-hidden="true">
+    <label>
+      Website
+      <input type="text" name="website" tabindex="-1" autocomplete="off" />
+    </label>
+  </div>
+
+  {/* A real, visible <label>, not an aria-label over a placeholder. */}
+  <div class="newsletter__field">
+    <label class="form-label" for={`${id}-email`}>E-Mail-Adresse</label>
+    <input
+      id={`${id}-email`}
+      type="email"
+      name="email"
+      placeholder="name@beispiel.de"
+      required
+      class="newsletter__input"
+      autocomplete="email"
+      inputmode="email"
+      aria-describedby={`${id}-email-error`}
+    />
+  </div>
+
+  <button type="submit" class="btn btn--primary">Anmelden</button>
+</form>
+<span class="form-error newsletter__error" id={`${id}-email-error`} hidden></span>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { enhanceForms } from '@lib/form';
+
+  enhanceForms('newsletter', actions.subscribeNewsletter);
+</script>

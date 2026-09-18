@@ -1,7 +1,7 @@
 ---
-import type { EventData, EventDTO } from '@lib/types';
-import { formatDayMonthYearDE, formatWeekdayDE, toDate } from '@lib/server/format';
-import CalendarModal from '../islands/CalendarModal.svelte';
+import type { EventDTO } from '@lib/types';
+import { formatDayMonthYearDE, formatWeekdayDE, timeRange } from '@lib/server/format';
+import { buildIcs, googleCalendarUrl, type CalendarEvent } from '@lib/server/ics';
 
 interface Props {
   event: EventDTO;
@@ -11,23 +11,27 @@ interface Props {
  * The event's facts, in the same hairline definition list the home page and
  * /event use. Only rows with a value are rendered: an event with no end time
  * must not print "bis  Uhr".
+ *
+ * "In Kalender speichern" is plain HTML: a native popover with a Google link and
+ * the .ics file itself, rendered here as a data URL. Like the page, the entry
+ * names the venue but not the street address — that goes out with the
+ * registration confirmation.
  */
 
 const { event } = Astro.props;
 
-// The date is stored as an ISO timestamp; the calendar wants the calendar day.
-const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
-const calendarData: EventData = {
+const calendarEvent: CalendarEvent = {
+  id: event.id,
   title: event.title,
   description: event.description,
-  location: event.location,
-  startDate: dateOnly,
+  eventDate: event.event_date,
   startTime: event.start_time,
-  endDate: dateOnly,
   endTime: event.end_time,
+  location: event.location,
 };
-
-const timeValue = event.start_time ? `${event.start_time}${event.end_time ? `–${event.end_time}` : ''} Uhr` : '';
+const ics = buildIcs(calendarEvent);
+const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
+const googleHref = googleCalendarUrl(calendarEvent);
 
 const rows = [
   {
@@ -35,7 +39,7 @@ const rows = [
     value: `${formatWeekdayDE(event.event_date)}, ${formatDayMonthYearDE(event.event_date)}`,
     sub: '',
   },
-  { label: 'Uhrzeit', value: timeValue, sub: '' },
+  { label: 'Uhrzeit', value: timeRange(event.start_time, event.end_time), sub: '' },
   { label: 'Ort', value: event.location, sub: 'Die genaue Adresse bekommst du mit der Anmeldebestätigung.' },
   {
     label: 'Plätze',
@@ -70,9 +74,80 @@ const rows = [
           }
         </dl>
 
-        <div class="event-info__calendar">
-          <CalendarModal client:visible event={calendarData} />
-        </div>
+        {
+          ics && (
+            <div class="event-info__calendar">
+              <button
+                type="button"
+                class="btn btn--secondary"
+                popovertarget="calendar-modal"
+                data-umami-event="calendar-open"
+              >
+                <svg
+                  class="icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                  <line x1="12" y1="14" x2="12" y2="18" />
+                  <line x1="10" y1="16" x2="14" y2="16" />
+                </svg>
+                In Kalender speichern
+              </button>
+
+              <div id="calendar-modal" class="calendar-modal" popover aria-labelledby="calendar-modal-title">
+                <div class="calendar-modal__content">
+                  <button
+                    type="button"
+                    class="calendar-modal__close"
+                    aria-label="Schließen"
+                    popovertarget="calendar-modal"
+                    popovertargetaction="hide"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path
+                        d="M6 6l12 12M18 6L6 18"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+
+                  <h3 id="calendar-modal-title">In Kalender speichern</h3>
+                  <p>Wähle deinen Kalender:</p>
+                  <div class="calendar-modal__buttons">
+                    <a
+                      href={googleHref}
+                      class="btn btn--secondary"
+                      target="_blank"
+                      rel="noopener"
+                      data-umami-event="calendar-download-google"
+                    >
+                      Google Calendar
+                    </a>
+                    <a
+                      href={icsHref}
+                      class="btn btn--secondary"
+                      download="maennerkreis-straubing.ics"
+                      data-umami-event="calendar-download-ics"
+                    >
+                      Apple/Outlook (.ics)
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        }
       </div>
     </div>
   </div>
@@ -82,6 +157,143 @@ const rows = [
   @layer sections {
     .event-info__calendar {
       margin-block-start: var(--space-md);
+    }
+
+    /* The popover is the card — centred in the top layer, animated in and out.
+       Square, closed by the structural rule rather than lifted by a shadow. */
+    .calendar-modal {
+      position: fixed;
+      inset: 0;
+      inline-size: min(380px, calc(100vw - 2 * var(--space-md)));
+      max-block-size: calc(100dvh - 2 * var(--space-md));
+      padding: 0;
+      margin: auto;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      border: 2px solid var(--rule-strong);
+      border-radius: 0;
+      /* Closed / pre-open resting state. A rise, no scale. */
+      opacity: 0;
+      translate: 0 12px;
+      transition:
+        opacity var(--motion-standard),
+        translate var(--motion-standard),
+        overlay var(--motion-standard) allow-discrete,
+        display var(--motion-standard) allow-discrete;
+    }
+
+    .calendar-modal:popover-open {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    @starting-style {
+      .calendar-modal:popover-open {
+        opacity: 0;
+        translate: 0 12px;
+      }
+    }
+
+    .calendar-modal::backdrop {
+      background-color: transparent;
+      backdrop-filter: blur(0);
+      transition:
+        background-color var(--motion-standard),
+        backdrop-filter var(--motion-standard),
+        overlay var(--motion-standard) allow-discrete,
+        display var(--motion-standard) allow-discrete;
+    }
+
+    .calendar-modal:popover-open::backdrop {
+      background-color: var(--bg-overlay);
+      backdrop-filter: blur(4px);
+    }
+
+    @starting-style {
+      .calendar-modal:popover-open::backdrop {
+        background-color: transparent;
+        backdrop-filter: blur(0);
+      }
+    }
+
+    .calendar-modal__content {
+      position: relative;
+      padding: var(--space-lg);
+      text-align: center;
+    }
+
+    .calendar-modal__close {
+      position: absolute;
+      inset-block-start: var(--space-xs);
+      inset-inline-end: var(--space-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: 2.25rem;
+      block-size: 2.25rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition:
+        color var(--motion-quick),
+        background-color var(--motion-quick);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .calendar-modal__close:hover {
+        color: var(--text-primary);
+        background: color-mix(in oklch, var(--text-primary) 8%, transparent);
+      }
+    }
+
+    .calendar-modal__close:focus-visible {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
+    }
+
+    .calendar-modal__close svg {
+      inline-size: 1.25rem;
+      block-size: 1.25rem;
+    }
+
+    .calendar-modal__content h3 {
+      margin-block-end: var(--space-sm);
+      font-size: 1.375rem;
+      letter-spacing: -0.02em;
+    }
+
+    .calendar-modal__content p {
+      margin-block-end: var(--space-md);
+      font-size: var(--text-body-compact);
+      color: var(--text-secondary);
+    }
+
+    .calendar-modal__buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .calendar-modal {
+        translate: 0;
+        transition:
+          opacity var(--motion-quick),
+          overlay var(--motion-quick) allow-discrete,
+          display var(--motion-quick) allow-discrete;
+      }
+
+      @starting-style {
+        .calendar-modal:popover-open {
+          translate: 0;
+        }
+      }
+
+      .calendar-modal::backdrop,
+      .calendar-modal:popover-open::backdrop {
+        backdrop-filter: none;
+      }
     }
   }
 </style>

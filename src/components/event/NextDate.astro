@@ -1,7 +1,7 @@
 ---
 import site from '@data/site.json';
 import { primaryAction, type DateStatus } from '@lib/event-status';
-import NewsletterForm from '../../islands/NewsletterForm.svelte';
+import NewsletterForm from '../forms/NewsletterForm.astro';
 
 /**
  * The one block on /event that depends on live data. Three states, each said
@@ -110,7 +110,7 @@ const whatsapp = site.whatsappCommunityLink;
           nicht verschickt.
         </p>
 
-        <NewsletterForm client:visible context={{ page: 'event-landing' }} />
+        <NewsletterForm context={{ page: 'event-landing' }} />
 
         {
           whatsapp && (

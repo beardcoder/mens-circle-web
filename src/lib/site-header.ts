@@ -1,5 +1,5 @@
 /**
- * Site header — navigation, mobile panel, in-page anchor scrolling.
+ * Site header — mobile panel and in-page anchor scrolling.
  *
  * The panel's cross-fade is owned by CSS. What lives here is what CSS cannot
  * do: open/closed state, the body scroll lock and restoring the scroll position
@@ -9,167 +9,94 @@
 
 import { prefersReducedMotion } from './helpers';
 
-const FALLBACK_HEADER_OFFSET_PX = 92;
-
 /** Offset anchored scrolling must clear below the fixed header. */
-const headerOffset = (): number => {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue('--header-clearance');
-  const parsed = Number.parseInt(raw, 10);
-
-  return Number.isFinite(parsed) ? parsed : FALLBACK_HEADER_OFFSET_PX;
-};
+const headerOffset = (): number =>
+  Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-clearance'), 10) || 92;
 
 /** A link's fragment when it targets the current page, else `null`. */
 const samePageHash = (link: HTMLAnchorElement): string | null => {
-  if (link.target && link.target !== '_self') return null;
-
-  let url: URL;
-
-  try {
-    url = new URL(link.href, window.location.href);
-  } catch {
-    return null;
-  }
-
-  if (url.origin !== window.location.origin) return null;
-  if (url.pathname !== window.location.pathname) return null;
-  if (url.hash === '' || url.hash === '#') return null;
-
-  return url.hash;
+  const url = new URL(link.href, location.href);
+  const samePage = url.origin === location.origin && url.pathname === location.pathname;
+  return samePage && url.hash.length > 1 ? url.hash : null;
 };
 
-/** Returns a cleanup; no-op when the DOM isn't there. */
-export function initSiteHeader(): () => void {
-  const root = document.querySelector<HTMLElement>('header.header#header[data-lume="site-header"]');
+const scrollToAnchor = (hash: string): boolean => {
+  const id = decodeURIComponent(hash.slice(1));
+  const target = document.getElementById(id);
+  if (!target) return false;
 
-  if (!root) return () => {};
+  window.scrollTo({
+    top: Math.max(target.getBoundingClientRect().top + window.scrollY - headerOffset(), 0),
+    behavior: prefersReducedMotion() ? 'instant' : 'smooth',
+  });
+  history.pushState(null, '', `#${id}`);
+  return true;
+};
 
-  const nav = root.querySelector<HTMLElement>('[data-lume-part="nav"]');
-  const toggle = root.querySelector<HTMLButtonElement>('[data-lume-part="toggle"]');
+export function initSiteHeader(): void {
+  const nav = document.getElementById('nav');
+  const toggle = document.getElementById('navToggle');
+  if (!nav || !toggle) return;
 
-  if (!nav || !toggle) return () => {};
-
-  const navLinks = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-lume-part="nav-link"]'));
-  const bars = Array.from(toggle.querySelectorAll<HTMLElement>('.nav-toggle__bar'));
-
-  const teardown: Array<() => void> = [];
-  const listen = <K extends keyof DocumentEventMap>(
-    target: EventTarget,
-    type: K | string,
-    handler: EventListenerOrEventListenerObject,
-    options?: AddEventListenerOptions,
-  ): void => {
-    target.addEventListener(type, handler, options);
-    teardown.push(() => target.removeEventListener(type, handler, options));
-  };
-
+  const [top, mid, bottom] = toggle.querySelectorAll<HTMLElement>('.nav-toggle__bar');
   let isOpen = false;
   let scrollPosition = 0;
 
-  const scrollToAnchor = (hash: string): boolean => {
-    const id = decodeURIComponent(hash.replace(/^#/, ''));
-    const target = id === '' ? null : document.getElementById(id);
-
-    if (target === null) return false;
-
-    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset();
-
-    window.scrollTo({
-      top: Math.max(top, 0),
-      left: 0,
-      behavior: prefersReducedMotion() ? 'instant' : 'smooth',
-    });
-
-    history.pushState(null, '', `#${id}`);
-
-    return true;
-  };
-
-  const renderToggle = (open: boolean): void => {
-    toggle.classList.toggle('is-open', open);
-    toggle.setAttribute('aria-expanded', String(open));
-    toggle.setAttribute('aria-label', open ? 'Menü schließen' : 'Menü öffnen');
-
-    const [top, mid, bottom] = bars;
-
-    if (!top || !mid || !bottom) return;
+  const render = (): void => {
+    toggle.classList.toggle('is-open', isOpen);
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    toggle.setAttribute('aria-label', isOpen ? 'Menü schließen' : 'Menü öffnen');
+    nav.classList.toggle('is-open', isOpen);
+    document.body.classList.toggle('nav-open', isOpen);
+    document.body.style.top = isOpen ? `-${scrollPosition}px` : '';
 
     const duration = prefersReducedMotion() ? '0ms' : '180ms';
-
-    for (const bar of bars) bar.style.transition = `transform ${duration} ease, opacity ${duration} ease`;
-
-    top.style.transform = open ? 'translateY(6.5px) rotate(45deg)' : '';
-    bottom.style.transform = open ? 'translateY(-6.5px) rotate(-45deg)' : '';
-    mid.style.opacity = open ? '0' : '1';
+    for (const bar of [top, mid, bottom]) bar.style.transition = `transform ${duration} ease, opacity ${duration} ease`;
+    top.style.transform = isOpen ? 'translateY(6.5px) rotate(45deg)' : '';
+    bottom.style.transform = isOpen ? 'translateY(-6.5px) rotate(-45deg)' : '';
+    mid.style.opacity = isOpen ? '0' : '1';
   };
 
-  const openMenu = (): void => {
-    if (isOpen) return;
-    isOpen = true;
-
+  const open = (): void => {
     scrollPosition = window.scrollY;
-    document.body.style.top = `-${scrollPosition}px`;
-    document.body.classList.add('nav-open');
-    nav.classList.add('is-open');
-    renderToggle(true);
+    isOpen = true;
+    render();
   };
 
   /** With a `targetHash`, scroll there once the body lock lifts instead of
    *  restoring the pre-open position. */
-  const closeMenu = (targetHash: string | null = null): void => {
+  const close = (targetHash: string | null = null): void => {
     if (!isOpen) return;
     isOpen = false;
-
-    nav.classList.remove('is-open');
-    renderToggle(false);
-    document.body.classList.remove('nav-open');
-    document.body.style.top = '';
-
-    if (targetHash !== null && scrollToAnchor(targetHash)) return;
-
-    window.scrollTo({ top: scrollPosition, left: 0, behavior: 'instant' });
+    render();
+    if (targetHash === null || !scrollToAnchor(targetHash)) {
+      window.scrollTo({ top: scrollPosition, behavior: 'instant' });
+    }
   };
 
-  listen(toggle, 'click', () => {
-    if (isOpen) closeMenu();
-    else openMenu();
-  });
+  toggle.addEventListener('click', () => (isOpen ? close() : open()));
 
-  for (const link of navLinks) {
-    listen(link, 'click', (event) => {
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('#header a[data-nav-link]')) {
+    link.addEventListener('click', (event) => {
       const hash = samePageHash(link);
-
-      if (hash === null) {
-        closeMenu();
-
-        return;
-      }
+      if (hash === null) return close();
 
       // Own the scroll so the header is cleared and closing does not snap back.
-      (event as MouseEvent).preventDefault();
-
-      if (isOpen) closeMenu(hash);
+      event.preventDefault();
+      if (isOpen) close(hash);
       else scrollToAnchor(hash);
     });
   }
 
-  listen(document, 'keydown', (event) => {
-    if ((event as KeyboardEvent).key === 'Escape' && isOpen) closeMenu();
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') close();
   });
 
   // Widening past the panel breakpoint while open would leave the body locked
   // with no visible panel.
-  if (typeof matchMedia === 'function') {
-    const mq = matchMedia('(width > 860px)');
+  matchMedia('(width > 860px)').addEventListener('change', (event) => {
+    if (event.matches) close();
+  });
 
-    listen(mq, 'change', () => {
-      if (mq.matches && isOpen) closeMenu();
-    });
-  }
-
-  renderToggle(false);
-
-  return (): void => {
-    for (const off of teardown) off();
-  };
+  render();
 }
