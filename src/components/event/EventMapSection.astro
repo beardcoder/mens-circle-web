@@ -1,7 +1,6 @@
 ---
 import type { EventDTO } from '@lib/types';
 import { fullAddress } from '@lib/server/format';
-import EventMap from '../islands/EventMap.svelte';
 
 interface Props {
   /** Event with non-null coordinates; the caller guards. */
@@ -9,6 +8,23 @@ interface Props {
   lat: number;
   lng: number;
 }
+
+/**
+ * The Anfahrt block. The map draws with Leaflet on the Humanitarian (HOT) style
+ * hosted by OpenStreetMap France — keyless on purpose: there is no account to
+ * hang a key on, and a key in a client bundle is public anyway. Its warm ground
+ * and sparse POI icons suit a palette that is ochre-cast, never blue-cast.
+ *
+ * Swapping the provider is a change to TILE_URL. The two other verified keyless
+ * rasters are tile.openstreetmap.org (standard style, behind Fastly) and
+ * tile.openstreetmap.de (same style, German labels). Stadia and Wikimedia are
+ * not options — they answer 401 and 403 for third-party use. Every one of them
+ * requires the attribution.
+ *
+ * The address sits above the map and the route links below it, so a tile
+ * outage costs nothing the reader needs: after a few failed tiles the map says
+ * so in one sentence and releases its reserved box.
+ */
 
 const { event, lat, lng } = Astro.props;
 
@@ -25,7 +41,21 @@ const address =
         <p class="event-map__address">{address}</p>
 
         <div class="event-map__frame">
-          <EventMap client:visible lat={lat} lng={lng} title={event.location} address={address} />
+          <div
+            class="event-map"
+            data-state="idle"
+            data-lat={lat}
+            data-lng={lng}
+            data-title={event.location}
+            data-address={address}
+            aria-label="Karte zum Veranstaltungsort"
+          >
+            <div class="event-map__canvas" role="application" aria-label="Interaktive Karte"></div>
+            <p class="event-map__fallback" hidden>
+              Die Karte lässt sich gerade nicht laden. Die Adresse steht über dieser Box, und die Routen-Links darunter
+              funktionieren weiterhin.
+            </p>
+          </div>
         </div>
 
         <div class="event-map__actions">
@@ -61,6 +91,91 @@ const address =
     </div>
   </div>
 </section>
+
+<script>
+  // Static import so Astro bundles Leaflet's CSS into the page styles; a
+  // runtime CSS import 404s under `inlineStylesheets: 'always'`.
+  import 'leaflet/dist/leaflet.css';
+
+  const TILE_URL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+  const TILE_ATTRIBUTION =
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
+    ' &middot; Kacheln: <a href="https://www.hotosm.org/">HOT</a>' +
+    ' / <a href="https://openstreetmap.fr/">OSM France</a>';
+  /** How many tiles may fail before the map admits it cannot draw itself. */
+  const TILE_ERROR_LIMIT = 4;
+
+  async function draw(root: HTMLElement): Promise<void> {
+    const canvas = root.querySelector<HTMLElement>('.event-map__canvas');
+    if (!canvas) return;
+    const { lat, lng, title = '', address = '' } = root.dataset;
+    const position: [number, number] = [Number(lat), Number(lng)];
+    root.dataset.state = 'loading';
+
+    const { default: L } = await import('leaflet');
+    const map = L.map(canvas, { scrollWheelZoom: false }).setView(position, 16);
+
+    let tileErrors = 0;
+    L.tileLayer(TILE_URL, { maxZoom: 20, subdomains: 'abc', attribution: TILE_ATTRIBUTION })
+      .on('tileerror', () => {
+        if (++tileErrors < TILE_ERROR_LIMIT) return;
+        root.dataset.state = 'failed';
+        root.querySelector<HTMLElement>('.event-map__fallback')!.hidden = false;
+      })
+      .on('tileload', () => (tileErrors = 0))
+      .addTo(map);
+
+    // Phones hand the route to the native maps app.
+    const directions = matchMedia('(pointer: coarse)').matches
+      ? `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(address || title)})`
+      : `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`;
+    const popup = document.createElement('div');
+    popup.append(Object.assign(document.createElement('strong'), { textContent: title }));
+    if (address) popup.append(document.createElement('br'), address);
+    popup.append(
+      document.createElement('br'),
+      Object.assign(document.createElement('a'), {
+        className: 'event-map__directions',
+        href: directions,
+        target: '_blank',
+        rel: 'noopener',
+        textContent: 'Route planen',
+      }),
+    );
+
+    const icon = L.divIcon({
+      className: 'event-map__marker',
+      html:
+        '<svg viewBox="0 0 32 44" aria-hidden="true" focusable="false">' +
+        '<path d="M16 0C7.2 0 0 7 0 15.5 0 27 16 44 16 44s16-17 16-28.5C32 7 24.8 0 16 0z"/>' +
+        '<circle cx="16" cy="15.5" r="6" fill="#fff"/>' +
+        '</svg>',
+      iconSize: [32, 44],
+      iconAnchor: [16, 44],
+      popupAnchor: [0, -40],
+    });
+    L.marker(position, { icon }).addTo(map).bindPopup(popup);
+
+    // Scroll-zoom only once the reader has clicked into the map.
+    canvas.addEventListener('click', () => map.scrollWheelZoom.enable());
+    canvas.addEventListener('mouseleave', () => map.scrollWheelZoom.disable());
+
+    if (root.dataset.state !== 'failed') root.dataset.state = 'ready';
+  }
+
+  // Leaflet loads only when the map is about to scroll into view.
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        void draw(entry.target as HTMLElement);
+      }
+    },
+    { rootMargin: '200px' },
+  );
+  for (const root of document.querySelectorAll('.event-map')) observer.observe(root);
+</script>
 
 <style is:global>
   @layer sections {
@@ -105,6 +220,167 @@ const address =
     .event-map__attribution a {
       text-decoration: underline;
       text-underline-offset: 0.2em;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Unlayered like Leaflet's own stylesheet, so these overrides win over it. */
+  @keyframes event-map-skeleton {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+
+    50% {
+      opacity: 0.25;
+    }
+  }
+
+  .event-map {
+    position: relative;
+    display: block;
+    block-size: 100%;
+    overflow: hidden;
+    background: var(--bg-secondary);
+    contain: paint;
+    isolation: isolate;
+  }
+
+  .event-map[hidden] {
+    display: none;
+  }
+
+  .event-map__canvas {
+    inline-size: 100%;
+    /* The frame in EventMapSection.astro owns the aspect ratio; fill it. */
+    block-size: 100%;
+    min-block-size: 280px;
+    background: var(--bg-secondary);
+  }
+
+  .event-map[data-state='idle'] .event-map__canvas::before,
+  .event-map[data-state='loading'] .event-map__canvas::before {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: '';
+    background: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--border-light) 60%, transparent) 0 12px,
+      transparent 12px 24px
+    );
+    animation: event-map-skeleton 2s var(--ease-ambient) infinite;
+  }
+
+  .event-map__canvas:has(.leaflet-container::before) {
+    display: none;
+  }
+
+  .event-map[data-state='failed'] .event-map__canvas {
+    display: none;
+  }
+
+  /* The frame reserves a 16/9 box so a loading map
+     cannot shift the page. Once there is no map to load, that box is just a
+     large empty rectangle around one sentence — release it. */
+  .event-map__frame:has(.event-map[data-state='failed']) {
+    aspect-ratio: auto;
+  }
+
+  .event-map__fallback {
+    padding: var(--space-sm);
+    margin: 0;
+    font-size: var(--text-caption);
+    line-height: var(--leading-normal);
+    color: var(--text-muted);
+    text-wrap: balance;
+  }
+
+  .event-map__marker {
+    border: 0;
+    background: none;
+  }
+
+  .event-map__marker svg {
+    inline-size: 100%;
+    block-size: 100%;
+    color: var(--accent-primary);
+    fill: currentcolor;
+  }
+
+  /* Leaflet ships its own attribution chrome: a translucent white box with
+     #0078a8 links, which measures 3.3:1 on that box and is the only text on the
+     site that fails. It is a required credit, so it has to be legible — put it
+     on our own ground with our own colours. */
+  .event-map .leaflet-control-attribution {
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+    border-radius: 0;
+  }
+
+  .event-map .leaflet-control-attribution a {
+    color: var(--text-primary);
+    text-decoration: underline;
+  }
+
+  .event-map .leaflet-popup-content-wrapper {
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    background: var(--bg-elevated);
+    border: 2px solid var(--rule-strong);
+    border-radius: 0;
+  }
+
+  .event-map .leaflet-popup-content {
+    margin: var(--space-xs) var(--space-sm);
+    font-size: var(--text-caption);
+    line-height: var(--leading-normal);
+  }
+
+  .event-map .leaflet-popup-content strong {
+    display: inline-block;
+    margin-block-end: var(--space-3xs);
+    font-family: var(--font-display);
+    font-size: var(--text-section-body);
+    font-weight: 400;
+  }
+
+  .event-map .leaflet-popup-tip {
+    background: var(--bg-elevated);
+  }
+
+  .event-map__directions {
+    display: inline-block;
+    margin-block-start: var(--space-xs);
+    font-weight: 600;
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .event-map__directions:hover,
+  .event-map__directions:focus-visible {
+    color: var(--accent-rare);
+  }
+
+  .event-map .leaflet-control-zoom a {
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+  }
+
+  .event-map .leaflet-control-zoom a:hover,
+  .event-map .leaflet-control-zoom a:focus-visible {
+    background: var(--bg-secondary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .event-map[data-state='idle'] .event-map__canvas::before,
+    .event-map[data-state='loading'] .event-map__canvas::before {
+      animation: none;
     }
   }
 </style>

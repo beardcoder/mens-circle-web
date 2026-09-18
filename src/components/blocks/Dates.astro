@@ -1,7 +1,7 @@
 ---
 import site from '../../data/site.json';
 import HomeEventStatus from '../HomeEventStatus.astro';
-import NewsletterForm from '../islands/NewsletterForm.svelte';
+import NewsletterForm from '../forms/NewsletterForm.astro';
 import Ring from '../Ring.astro';
 
 interface Props {
@@ -48,7 +48,7 @@ const lines = data.displayLines ?? ['DABEI SEIN.'];
       <div class="bay__far-right home-dates__notify" id="newsletter">
         <h3 class="home-dates__sub">Bei neuen Terminen benachrichtigen</h3>
         {data.newsletterText && <p class="home-dates__text">{data.newsletterText}</p>}
-        <NewsletterForm client:visible context={{ location: 'home-dates' }} />
+        <NewsletterForm context={{ location: 'home-dates' }} />
 
         {
           whatsapp && (

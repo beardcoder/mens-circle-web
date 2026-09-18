@@ -1,7 +1,7 @@
 ---
 import type { EventDTO } from '@lib/types';
-import { formatDateShortDE, toDate } from '@lib/server/format';
-import RegistrationForm from '../islands/RegistrationForm.svelte';
+import { formatDateShortDE, isoDay } from '@lib/server/format';
+import RegistrationForm from '../forms/RegistrationForm.astro';
 
 interface Props {
   event: EventDTO;
@@ -14,7 +14,7 @@ interface Props {
  */
 
 const { event } = Astro.props;
-const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
+const dateOnly = isoDay(event.event_date);
 
 const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full ? 'Warteliste' : 'Anmeldung';
 ---
@@ -56,7 +56,7 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
                 Bei neuen Terminen benachrichtigen
               </a>
             ) : (
-              <RegistrationForm client:visible event={{ id: event.id, is_full: event.is_full }} />
+              <RegistrationForm eventId={event.id} isFull={event.is_full} />
             )
           }
         </div>

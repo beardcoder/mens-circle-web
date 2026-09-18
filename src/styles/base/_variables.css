@@ -30,14 +30,12 @@
 
   /* Ink — a warm bark black, not a blue-black. 15.2:1 on paper. */
   --color-ink: #1c1714;
-  --color-ink-soft: #241e19; /* one step up, for large dark fields */
   --color-ink-mid: #4a4139; /* running text on paper — 8.5:1 */
   --color-ink-muted: #645a50; /* captions, labels — 5.8:1 on paper */
 
   /* Burnt orange — a graphic colour first: the ring, the statement field, the
      button. Never small text on paper; see the contrast table above. */
   --color-orange: #dd5f33;
-  --color-orange-deep: #b9491f; /* pressed / hover on light grounds */
 
   /* Hairlines — warm, so they read as a crease in the paper. */
   --color-rule: #d8cfbe;
@@ -49,18 +47,6 @@
   --color-night-rule: #3d342c;
   --color-chalk: #f2ede3;
   --color-chalk-muted: #a39786; /* 6.2:1 on ink */
-
-  /* The immersive dark surface, used by the breathing exercise and the map
-     skin. Both were built against the old earth/terracotta primitives, so those
-     names are kept, re-pitched onto this palette. Nothing else may use them. */
-  --color-bone: var(--color-paper);
-  --color-sand: var(--color-chalk-muted);
-  --color-sand-light: var(--color-chalk);
-  --color-earth-deep: var(--color-night);
-  --color-terracotta: var(--color-orange);
-  --color-terracotta-light: var(--color-orange);
-  --color-sage: #2f6b4a;
-  --color-sage-light: #7fc09a;
 
   /* Semantic tokens */
 
@@ -94,7 +80,6 @@
   /* Status */
   --color-success: light-dark(#2f6b4a, #7fc09a);
   --color-error: light-dark(#9c3a2c, #e0907f);
-  --color-warning: light-dark(#8a6218, #d9b45f);
 
   /* Borders.
      `--rule-strong` is the 2-3px structural rule the poster layout is built
@@ -105,7 +90,7 @@
 
      The literal `--color-ink` / `--color-paper` stay correct only where the
      ground itself does not flip: the orange statement field, the ink bands,
-     the footer and the breathing exercise. */
+     and the footer. */
   --rule-strong: light-dark(var(--color-ink), var(--color-chalk));
   --border-light: light-dark(var(--color-rule), var(--color-night-rule));
   --border-medium: light-dark(var(--color-rule-strong), #453a31);
@@ -210,8 +195,6 @@
   --duration-fast: 140ms;
   --duration-normal: 220ms;
   --duration-slow: 340ms;
-  --duration-slower: 460ms;
-  --duration-cinematic: 600ms;
 
   --motion-quick: var(--duration-fast) var(--ease-precise);
   --motion-standard: var(--duration-normal) var(--ease-precise);
@@ -232,30 +215,6 @@
      Used for `scroll-padding-top`, anchored scrolling and the top of the mobile
      nav panel — if it drifts from the real height, anchors land under the bar. */
   --header-clearance: 84px;
-
-  /* Safe area insets for mobile */
-  --safe-area-inset-top: env(safe-area-inset-top, 0px);
-  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-inset-left: env(safe-area-inset-left, 0px);
-  --safe-area-inset-right: env(safe-area-inset-right, 0px);
-
-  /* Shadows — only where something genuinely floats above the page
-     (the mobile nav panel, a toast, a dialog). Surfaces use rules instead. */
-  --shadow-2xl: 0 20px 48px light-dark(rgb(38 40 36 / 16%), rgb(0 0 0 / 58%));
-
-  /* The breathing surface still uses a faint texture — it is the one place a
-     flat ground reads as a dead screen rather than a quiet room. Everywhere
-     else the global noise overlay is gone. */
-  --surface-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  --surface-noise-opacity: 0.03;
-
-  /* Border radius — square. Nothing on the public site is rounded: the poster
-     language is straight cuts and full-strength rules. `--radius-full` survives
-     for the breathing exercise, where the circle *is* the control. */
-  --radius-sm: 0;
-  --radius-md: 0;
-  --radius-lg: 0;
-  --radius-full: 9999px;
 
   /* Z-Index Scale */
   --z-sticky: 100;
