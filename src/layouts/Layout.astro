@@ -5,7 +5,6 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import ScrollToTop from '../components/ScrollToTop.astro';
 import SeoHead from '../components/SeoHead.astro';
-import { UMAMI_ENDPOINT, UMAMI_WEBSITE_ID } from '../lib/umami-config';
 
 interface Props {
   title?: string;
@@ -30,10 +29,6 @@ interface Props {
 }
 
 const { bare = false, ...props } = Astro.props;
-
-// Heatmap recorder, alongside the tracker the astro-umami integration injects.
-// Production only; sample rate and the heatmaps toggle live in the Umami admin.
-const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` : null;
 ---
 
 <!doctype html>
@@ -73,12 +68,6 @@ const umamiRecorderSrc = import.meta.env.PROD ? `${UMAMI_ENDPOINT}/recorder.js` 
     <Font cssVariable="--font-condensed" preload />
     <Font cssVariable="--font-text" />
     <SeoHead {...props} />
-    {
-      /* `async`, NOT `defer`: deferred scripts run in document order, so a stalled
-        analytics CDN would hold back our own module behind it — 3069ms to
-        interactive vs 194ms in a 3s-stall test. Nothing orders against this. */
-    }
-    {umamiRecorderSrc && <script is:inline async src={umamiRecorderSrc} data-website-id={UMAMI_WEBSITE_ID} />}
   </head>
   <body class:list={[{ 'is-bare': bare }]}>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
