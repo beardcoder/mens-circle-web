@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { buildEventMeta, eventCardUrl, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/event-meta';
+import { buildEventMeta, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/event-meta';
 import { buildEventSchema } from '../src/lib/event-schema';
 import type { EventDTO } from '../src/lib/types';
 
@@ -71,7 +71,7 @@ test('the brand is appended once, never twice', () => {
 
 test('unknown/new events use a real static poster without transformation URLs', () => {
   expect(buildEventMeta(event(), SITE).image).toBe('https://mens-circle.de/images/og-default.png');
-  expect(eventCardUrl(event({ available_spots: 3 }), SITE)).toBe(eventCardUrl(event(), SITE));
+  expect(buildEventMeta(event({ available_spots: 3 }), SITE).image).toBe(buildEventMeta(event(), SITE).image);
   expect(buildEventMeta(event(), SITE).extraImage).toBeNull();
 });
 

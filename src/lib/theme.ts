@@ -5,111 +5,63 @@
  *   • `data-mode-resolved` the mode actually in effect, mirrored for the icons
  *
  * The layout's inline boot script sets both attributes before first paint so
- * nothing flashes; this re-syncs on load, wires the button, and follows the OS
- * while no mode is pinned.
+ * nothing flashes; this wires the buttons and follows the OS while no mode is
+ * pinned.
  */
 
 type Mode = 'light' | 'dark';
 
-const STORAGE_MODE = 'mc-mode';
+const STORAGE_KEY = 'mc-mode';
 
 /** Mobile browser chrome colour per resolved mode (matches --bg-primary). */
-const THEME_COLOR: Record<Mode, string> = {
-  light: '#f3f0e9',
-  dark: '#1c1e1b',
-};
+const THEME_COLOR: Record<Mode, string> = { light: '#f3f0e9', dark: '#1c1e1b' };
 
-const prefersDark = (): boolean =>
-  typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches;
+const darkQuery = matchMedia('(prefers-color-scheme: dark)');
 
-const readStored = (key: string): string | null => {
+/** The explicit mode the user pinned, or `null` when following the OS. */
+const storedMode = (): Mode | null => {
   try {
-    return localStorage.getItem(key);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw === 'light' || raw === 'dark' ? raw : null;
   } catch {
     return null;
   }
 };
 
-const writeStored = (key: string, value: string): void => {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Storage unavailable (private mode) — the choice just will not persist.
-  }
-};
+const resolvedMode = (): Mode => storedMode() ?? (darkQuery.matches ? 'dark' : 'light');
 
-/** The explicit mode the user pinned, or `null` when following the OS. */
-const getStoredMode = (): Mode | null => {
-  const raw = readStored(STORAGE_MODE);
+/** Rendered twice (bar + nav panel) with CSS picking one; both stay in sync. */
+const buttons = (): NodeListOf<HTMLButtonElement> => document.querySelectorAll('[data-mode-toggle]');
 
-  return raw === 'light' || raw === 'dark' ? raw : null;
-};
-
-/** The mode actually in effect: explicit choice, else OS preference. */
-const resolveMode = (): Mode => getStoredMode() ?? (prefersDark() ? 'dark' : 'light');
-
-/** Point the mobile `theme-color` meta at the resolved mode. */
-const syncThemeColor = (resolved: Mode): void => {
-  const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-
-  if (meta) meta.content = THEME_COLOR[resolved];
-};
-
-/** Push the current mode onto <html> and the meta tag. */
-const apply = (): void => {
+/** Push the current mode onto <html>, the meta tag and the buttons. */
+function apply(): void {
   const root = document.documentElement;
-  const stored = getStoredMode();
-  const resolved = resolveMode();
+  const stored = storedMode();
+  const resolved = resolvedMode();
 
   root.setAttribute('data-mode-resolved', resolved);
-
   if (stored) root.setAttribute('data-mode', stored);
   else root.removeAttribute('data-mode');
 
-  syncThemeColor(resolved);
-};
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[resolved]);
+  for (const btn of buttons()) btn.setAttribute('aria-pressed', String(resolved === 'dark'));
+}
 
-/** Returns a cleanup; no-op when the switch isn't on the page. */
-export function initTheme(): () => void {
-  const teardown: Array<() => void> = [];
-  const listen = (target: EventTarget, type: string, handler: EventListener): void => {
-    target.addEventListener(type, handler);
-    teardown.push(() => target.removeEventListener(type, handler));
-  };
-
+export function initTheme(): void {
   apply();
 
-  // Rendered twice (bar + nav panel) with CSS picking one. Wire both so the
-  // hidden copy is never stale when it takes over.
-  const modeBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-mode-toggle]'));
-
-  const syncButtons = (): void => {
-    const pressed = String(resolveMode() === 'dark');
-
-    for (const btn of modeBtns) btn.setAttribute('aria-pressed', pressed);
-  };
-
-  syncButtons();
-
-  for (const btn of modeBtns) {
-    listen(btn, 'click', () => {
-      writeStored(STORAGE_MODE, resolveMode() === 'dark' ? 'light' : 'dark');
+  for (const btn of buttons()) {
+    btn.addEventListener('click', () => {
+      try {
+        localStorage.setItem(STORAGE_KEY, resolvedMode() === 'dark' ? 'light' : 'dark');
+      } catch {
+        // Storage unavailable (private mode) — the choice just will not persist.
+      }
       apply();
-      syncButtons();
     });
   }
 
-  if (typeof matchMedia === 'function') {
-    const mq = matchMedia('(prefers-color-scheme: dark)');
-
-    listen(mq, 'change', () => {
-      if (getStoredMode() !== null) return;
-      apply();
-      syncButtons();
-    });
-  }
-
-  return (): void => {
-    for (const off of teardown) off();
-  };
+  darkQuery.addEventListener('change', () => {
+    if (storedMode() === null) apply();
+  });
 }

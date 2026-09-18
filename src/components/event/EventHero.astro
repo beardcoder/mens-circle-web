@@ -1,6 +1,6 @@
 ---
 import type { EventDTO } from '@lib/types';
-import { formatDayMonthYearDE, formatWeekdayDE, toDate } from '@lib/server/format';
+import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from '@lib/server/format';
 
 interface Props {
   event: EventDTO;
@@ -13,10 +13,9 @@ interface Props {
  */
 
 const { event } = Astro.props;
-const dateOnly = toDate(event.event_date)?.toISOString().slice(0, 10) ?? '';
+const dateOnly = isoDay(event.event_date);
 const weekday = formatWeekdayDE(event.event_date);
 const dayMonthYear = formatDayMonthYearDE(event.event_date);
-const timeRange = event.start_time ? `${event.start_time}${event.end_time ? `–${event.end_time}` : ''} Uhr` : '';
 ---
 
 <section class="hero event-hero">
@@ -34,7 +33,9 @@ const timeRange = event.start_time ? `${event.start_time}${event.end_time ? `–
             between elements in the template becomes real text nodes, which put
             gaps around the en dash of the time range. */
         }
-        <p class="hero__meta">{[timeRange, event.location].filter(Boolean).join(' · ')}</p>
+        <p class="hero__meta">
+          {[timeRange(event.start_time, event.end_time), event.location].filter(Boolean).join(' · ')}
+        </p>
 
         {
           !event.is_past && (

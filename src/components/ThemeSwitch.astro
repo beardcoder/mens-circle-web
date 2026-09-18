@@ -9,16 +9,6 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-{
-  /* One control, one axis: light or dark. The warm/cool palette toggle that
-     used to sit beside it is gone — the site has one palette now, so a second
-     one was a setting with nothing behind it.
-
-     Rendered twice by the header (top bar on wide screens, inside the mobile
-     nav panel on narrow ones) with CSS showing exactly one. `display: none`
-     keeps the inactive copy out of the a11y tree and the tab order, so there is
-     never a duplicate control. initTheme() wires every instance (lib/theme.ts). */
-}
 <div class:list={['theme-switch', className]}>
   <button
     class="theme-switch__btn"

@@ -15,7 +15,6 @@
  *   <a class="btn btn--whatsapp"   — the community CTA, deliberately secondary
  *   <a class="btn btn--arrow"      — adds the arrow to a non-primary button
  *   <a class="btn btn--large"      — a touch more presence
- *   <a class="btn btn--icon"       — round, icon-only
  */
 
 /* Base */
@@ -229,67 +228,10 @@
   inline-size: 100%;
 }
 
-/* Round, icon-only — used by the breathing start button, where the circle is
-   the control rather than decoration. */
-.btn--icon {
-  --btn-padding-block: 0;
-  --btn-padding-inline: 0;
-  --btn-radius: var(--radius-full);
-  --btn-gap: 0;
-
-  inline-size: var(--btn-size, 72px);
-  min-inline-size: var(--btn-size, 72px);
-  block-size: var(--btn-size, 72px);
-  min-block-size: var(--btn-size, 72px);
-  aspect-ratio: 1;
-}
-
-.btn--icon::after {
-  content: none;
-}
-
-.btn--icon svg {
-  inline-size: var(--btn-icon-size, 28px);
-  block-size: var(--btn-icon-size, 28px);
-}
-
 /* Action row — a primary button with at most one quiet text link beside it. */
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs) var(--space-md);
   align-items: center;
-}
-
-/* Social / icon buttons (footer) */
-.social-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  inline-size: 44px;
-  block-size: 44px;
-  color: var(--color-chalk-muted);
-  border: 1px solid var(--border-on-dark);
-  border-radius: 0;
-  transition:
-    color var(--motion-quick),
-    border-color var(--motion-quick);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .social-icon:hover {
-    color: var(--color-ink);
-    background: var(--color-orange);
-    border-color: var(--color-orange);
-  }
-}
-
-.social-icon:focus-visible {
-  outline: 3px solid var(--color-paper);
-  outline-offset: 2px;
-}
-
-.social-icon svg {
-  inline-size: 20px;
-  block-size: 20px;
 }

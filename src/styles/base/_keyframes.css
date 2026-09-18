@@ -2,7 +2,7 @@
  * Global keyframes, unlayered — @keyframes inside @layer has shipped subtle
  * regressions in Vite/lightningcss builds.
  *
- * Three designed motion situations plus the breathing exercise. Everything here
+ * The three designed motion situations and their helpers. Everything here
  * is opacity/transform only, so it composites, and every call site is gated
  * behind `prefers-reduced-motion: no-preference`.
  */
@@ -97,62 +97,6 @@
 
   to {
     transform: translate3d(0, 0, 0);
-  }
-}
-
-/* Breathing exercise — phase-based rings. These are the content.. */
-@keyframes breathing-idle {
-  0%,
-  100% {
-    transform: scale(0.98);
-  }
-
-  50% {
-    transform: scale(1.04);
-  }
-}
-
-@keyframes breathing-idle-inner {
-  0%,
-  100% {
-    transform: scale(0.95);
-  }
-
-  50% {
-    transform: scale(1.25);
-  }
-}
-
-@keyframes breathing-wave-outer {
-  0%,
-  100% {
-    transform: scale(0.98);
-  }
-
-  50% {
-    transform: scale(1.06);
-  }
-}
-
-@keyframes breathing-wave-mid {
-  0%,
-  100% {
-    transform: scale(0.92);
-  }
-
-  50% {
-    transform: scale(1.5);
-  }
-}
-
-@keyframes breathing-wave-inner {
-  0%,
-  100% {
-    transform: scale(0.88);
-  }
-
-  50% {
-    transform: scale(2.5);
   }
 }
 

@@ -1,6 +1,5 @@
 ---
 import { primaryAction, dateStatus } from '../lib/event-status';
-import { summarizeNextEvent } from '../lib/event-landing';
 
 interface Props {
   placement: 'hero' | 'dates';
@@ -11,7 +10,7 @@ interface Props {
 const { placement, secondaryLabel, secondaryLink, fallback = false } = Astro.props;
 // The static fallback never opens SQLite. Only the server-island request reads live data.
 const result = fallback ? null : await (await import('../lib/server/events')).fetchNextEventState();
-const state = dateStatus(result?.status ?? 'unavailable', summarizeNextEvent(result?.event ?? null));
+const state = dateStatus(result?.status ?? 'unavailable', result?.event ?? null);
 const status = fallback ? 'loading' : state.status;
 const action = fallback
   ? {

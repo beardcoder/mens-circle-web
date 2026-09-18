@@ -2,10 +2,8 @@ import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import astro from 'eslint-plugin-astro';
-import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import svelteConfig from './svelte.config.js';
 
 export default defineConfig([
   // Build output and vendored assets are never linted.
@@ -18,26 +16,12 @@ export default defineConfig([
   js.configs.recommended,
   tseslint.configs.recommended,
   ...astro.configs.recommended,
-  ...svelte.configs.recommended,
 
   // Browser + Node globals for plain script files.
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
-    },
-  },
-
-  // Svelte needs the TS parser for <script lang="ts"> and the project's svelte.config.
-  {
-    files: ['**/*.svelte', '**/*.svelte.{js,ts}'],
-    languageOptions: {
-      globals: { ...globals.browser },
-      parserOptions: {
-        parser: tseslint.parser,
-        extraFileExtensions: ['.svelte'],
-        svelteConfig,
-      },
     },
   },
 

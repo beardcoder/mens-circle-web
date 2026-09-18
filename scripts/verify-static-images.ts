@@ -18,7 +18,6 @@ for (const path of [
   '/',
   '/warum-ich-den-maennerkreis-leite',
   '/event',
-  '/atemuebung',
   '/admin/login',
   ...(eventSlug ? [`/event/${eventSlug}`] : []),
 ]) {
