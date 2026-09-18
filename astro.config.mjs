@@ -8,11 +8,29 @@ import { defineConfig, fontProviders } from 'astro/config';
 import { publishGeneratedFiles } from './astro-integrations/publish-generated-files.mjs';
 import site from './src/data/site.json' with { type: 'json' };
 
+const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
+// Protocol without the trailing colon — the shape `allowedDomains` matches on.
+const { hostname: siteHostname, protocol: siteProtocol } = new URL(siteUrl);
+
 // SSR on Bun: the adapter builds dist/server/entry.mjs, and that single process
 // is the public edge — static assets, prerendered HTML and on-demand routes.
 // Event pages and home server islands render per request; photos are prerendered.
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://mens-circle.de',
+  site: siteUrl,
+  // TLS terminates at the Coolify/Traefik proxy, so the Bun process receives
+  // plain HTTP and `Astro.url` reads `http://<host>`. The browser's `Origin` on
+  // a form POST says `https://<host>`, so Astro's CSRF check (`checkOrigin`,
+  // on by default) saw two different origins and answered every Anmeldung with
+  // 403 "Cross-site POST form submissions are forbidden".
+  //
+  // `allowedDomains` is the supported fix: it is the ONLY thing that makes
+  // Astro trust `X-Forwarded-Proto`/`X-Forwarded-Host` at all, and it must name
+  // the domain explicitly — an unlisted host header is ignored, which is what
+  // keeps host-header injection out. Do not "fix" a future 403 by turning
+  // `checkOrigin` off; that removes the CSRF protection from every action.
+  security: {
+    allowedDomains: [{ hostname: siteHostname, protocol: siteProtocol.replace(':', '') }],
+  },
   output: 'server',
   adapter: bun({ isr: false }),
   image: {
