@@ -1,7 +1,7 @@
 ---
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
-import Logo from './Logo.astro';
+import { Icon } from 'astro-icon/components';
 import ThemeSwitch from './ThemeSwitch.astro';
 
 /**
@@ -15,18 +15,18 @@ const links = nav.header.links;
 const ctaLinks = nav.header.cta;
 const secondary = nav.header.secondary;
 // Explicit allowlist, so new entries do not silently become speculative.
-const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung']);
+const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
 ---
 
-<header class="header" id="header" data-lume="site-header">
+<header class="header" id="header">
   <div class="container">
     <div class="header__inner">
       <a href="/" class="header__logo logo" aria-label={`${site.siteName} – Startseite`}>
-        <Logo class="logo__icon" />
+        <Icon name="logo" class="logo__icon" aria-hidden="true" />
         <span class="logo__text">Männerkreis<span class="logo__place">Straubing</span></span>
       </a>
 
-      <nav class="nav" id="nav" data-lume-part="nav" aria-label="Hauptnavigation">
+      <nav class="nav" id="nav" aria-label="Hauptnavigation">
         <ul class="nav__list">
           {
             links.map((link) => (
@@ -34,7 +34,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
                 <a
                   href={link.url}
                   class="nav__link"
-                  data-lume-part="nav-link"
+                  data-nav-link
                   data-umami-event="nav-click"
                   data-umami-event-target={link.umamiTarget}
                 >
@@ -53,7 +53,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
                 <a
                   href={link.url}
                   class="nav__secondary-link"
-                  data-lume-part="nav-link"
+                  data-nav-link
                   data-astro-prefetch={prefetchPaths.has(link.url) ? 'hover' : undefined}
                 >
                   {link.label}
@@ -76,7 +76,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
             <a
               href={link.url}
               class="btn btn--primary nav__cta"
-              data-lume-part="nav-link"
+              data-nav-link
               data-umami-event="cta-click"
               data-umami-event-location="header"
               data-umami-event-target={link.umamiTarget}
@@ -90,7 +90,6 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
           class="nav-toggle"
           id="navToggle"
           type="button"
-          data-lume-part="toggle"
           aria-controls="nav"
           aria-expanded="false"
           aria-label="Menü öffnen"

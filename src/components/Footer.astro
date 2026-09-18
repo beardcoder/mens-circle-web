@@ -1,14 +1,18 @@
 ---
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
-import type { SocialLink } from '../lib/social';
-import Logo from './Logo.astro';
-import SocialIcon from './SocialIcon.astro';
+import { Icon } from 'astro-icon/components';
 
-const socialLinks = site.socialLinks as SocialLink[];
+// `mailto:` and `tel:` stay in place; external profiles open in a new tab,
+// announced as part of the accessible name. Icons: src/icons/social-<type>.svg.
+const socialLinks = site.socialLinks.map((link) => {
+  const internal = link.type === 'email' || link.type === 'phone';
+  const scheme = link.type === 'email' ? 'mailto:' : link.type === 'phone' ? 'tel:' : '';
+  return { ...link, href: `${scheme}${link.value}`, internal };
+});
 const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]/g, '')}` : null;
 // Only these prerendered pages are safe to fetch before a click.
-const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung', '/impressum', '/datenschutz']);
+const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum', '/datenschutz']);
 ---
 
 <footer class="footer">
@@ -16,7 +20,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
     <div class="footer__top">
       <div class="footer__brand">
         <a href="/" class="footer__logo">
-          <Logo class="footer__logo-icon" />
+          <Icon name="logo" class="footer__logo-icon" aria-hidden="true" />
           <span>{site.siteName}</span>
         </a>
         <p class="footer__text">{site.footerDescription}</p>
@@ -25,7 +29,21 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/atemuebung
             <ul class="footer__social-links">
               {socialLinks.map((link) => (
                 <li>
-                  <SocialIcon link={link} variant="link" />
+                  <a
+                    href={link.href}
+                    title={link.label}
+                    target={link.internal ? undefined : '_blank'}
+                    rel={link.internal ? undefined : 'noopener noreferrer'}
+                    data-umami-event="social-click"
+                    data-umami-event-platform={link.type}
+                    class="social-link"
+                  >
+                    <Icon name={`social-${link.type}`} class="social-link__icon" aria-hidden="true" />
+                    <span class="social-link__label">
+                      {link.label}
+                      {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
+                    </span>
+                  </a>
                 </li>
               ))}
             </ul>

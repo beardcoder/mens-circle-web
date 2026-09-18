@@ -1,20 +1,3 @@
-/** Response contract for every form-handling API route. */
-export interface ApiResponse {
-  success: boolean;
-  message: string;
-}
-
-/** Calendar event payload used by the add-to-calendar util. */
-export interface EventData {
-  title: string;
-  description: string;
-  location: string;
-  startDate: string; // YYYY-MM-DD
-  startTime: string; // HH:MM
-  endDate: string; // YYYY-MM-DD
-  endTime: string; // HH:MM
-}
-
 /**
  * Public event shape. Capacity values are computed server-side, so the client
  * never sees raw registration data.
@@ -46,29 +29,6 @@ export interface Testimonial {
   quote: string;
   author: string | null;
   role: string | null;
-}
-
-/** Payload for the event registration form → POST /api/event/register */
-export interface RegistrationPayload {
-  event_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string | null;
-  privacy: boolean;
-  /** Honeypot — real users leave it empty. */
-  website?: string;
-}
-
-/** Payload for the testimonial form → POST /api/testimonial/submit */
-export interface TestimonialPayload {
-  quote: string;
-  author_name: string | null;
-  role: string | null;
-  email: string;
-  privacy: boolean;
-  /** Honeypot — real users leave it empty. */
-  website?: string;
 }
 
 declare global {

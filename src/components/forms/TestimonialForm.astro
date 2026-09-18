@@ -1,0 +1,135 @@
+---
+/**
+ * "Teile deine Erfahrung" — stored unpublished for moderation. Posts to the
+ * `submitTestimonial` action via lib/form.ts.
+ */
+---
+
+<form
+  id="testimonial"
+  class="testimonial-form"
+  data-form="testimonial"
+  data-track="testimonial"
+  data-track-context="{}"
+>
+  <div class="hp-field" aria-hidden="true">
+    <label>
+      Website
+      <input type="text" name="website" tabindex="-1" autocomplete="off" />
+    </label>
+  </div>
+
+  <div class="form-field form-field--spaced">
+    <label for="quote" class="form-label form-label--plain">
+      Deine Erfahrung <span class="form-required">*</span>
+    </label>
+    <textarea
+      id="quote"
+      name="quote"
+      class="form-control form-control--light"
+      rows="6"
+      placeholder='z.B. "Hier kann ich endlich ich selbst sein, ohne Maske und ohne Leistungsdruck..."'
+      required
+      minlength="10"
+      maxlength="1000"
+      aria-describedby="testimonial-quote-error testimonial-quote-hint"></textarea>
+    <span class="form-hint" id="testimonial-quote-hint">Mindestens 10 Zeichen, maximal 1000 Zeichen</span>
+    <span class="form-error" id="testimonial-quote-error" hidden></span>
+    <span class="testimonial-form__counter"><span class="char-count">0</span>/1000</span>
+  </div>
+
+  <div class="form-field form-field--spaced">
+    <label for="author_name" class="form-label form-label--plain">
+      Dein Name <span class="form-optional">(optional)</span>
+    </label>
+    <input
+      type="text"
+      id="author_name"
+      name="author_name"
+      class="form-control form-control--light"
+      placeholder="z.B. Michael oder anonym lassen"
+      maxlength="255"
+    />
+    <span class="form-hint">Leer lassen für ein anonymes Testimonial</span>
+  </div>
+
+  <div class="form-field form-field--spaced">
+    <label for="role" class="form-label form-label--plain">
+      Rolle/Beschreibung <span class="form-optional">(optional)</span>
+    </label>
+    <input
+      type="text"
+      id="role"
+      name="role"
+      class="form-control form-control--light"
+      placeholder="z.B. Teilnehmer seit 2023"
+      maxlength="255"
+    />
+  </div>
+
+  <div class="form-field form-field--spaced">
+    <label for="testimonial_email" class="form-label form-label--plain">
+      E-Mail-Adresse <span class="form-required">*</span>
+    </label>
+    <input
+      type="email"
+      id="testimonial_email"
+      name="email"
+      class="form-control form-control--light"
+      placeholder="deine@email.de"
+      required
+      maxlength="255"
+      aria-describedby="testimonial-email-error testimonial-email-hint"
+    />
+    <span class="form-hint" id="testimonial-email-hint">Wird nicht veröffentlicht. Nur für Rückfragen.</span>
+    <span class="form-error" id="testimonial-email-error" hidden></span>
+  </div>
+
+  <div class="form-field form-field--checkbox">
+    <label class="form-checkbox-label">
+      <input
+        type="checkbox"
+        name="privacy"
+        class="form-checkbox-control"
+        required
+        aria-describedby="testimonial-privacy-error"
+      />
+      <span class="form-checkbox-text">
+        Ich habe die
+        <a href="/datenschutz" target="_blank" rel="noopener" class="link"
+          >Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span></a
+        >
+        zur Kenntnis genommen und bin damit einverstanden, dass meine Daten zum Zwecke der Veröffentlichung gespeichert werden.
+        <span class="form-required">*</span>
+      </span>
+    </label>
+    <span class="form-error" id="testimonial-privacy-error" hidden></span>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn--primary">Erfahrung teilen</button>
+  </div>
+
+  <p class="testimonial-form__note">
+    <small>
+      Alle Felder mit <span class="form-required">*</span> sind Pflichtfelder.<br />
+      Dein Testimonial wird nach Prüfung durch uns veröffentlicht.
+    </small>
+  </p>
+</form>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { enhanceForms } from '@lib/form';
+
+  enhanceForms('testimonial', actions.submitTestimonial);
+
+  // Live character count under the textarea; reset with the form.
+  const quote = document.querySelector<HTMLTextAreaElement>('#quote');
+  const count = document.querySelector('.testimonial-form .char-count');
+  const update = (): void => {
+    if (quote && count) count.textContent = String(quote.value.length);
+  };
+  quote?.addEventListener('input', update);
+  quote?.form?.addEventListener('reset', () => setTimeout(update));
+</script>

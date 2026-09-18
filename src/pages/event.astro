@@ -2,22 +2,25 @@
 import Layout from '../layouts/Layout.astro';
 import { fetchNextEventState } from '@lib/server/events';
 import { fetchTestimonials } from '@lib/server/testimonials';
-import { buildEventFaq, summarizeNextEvent } from '@lib/event-landing';
 import { dateStatus } from '@lib/event-status';
-import EventLanding from '../components/event/EventLanding.astro';
+import Faq from '../components/blocks/Faq.astro';
+import Facts from '../components/blocks/Facts.astro';
+import NextDate from '../components/event/NextDate.astro';
 import { eventSeriesSchema } from '@lib/series-schema';
 import site from '@data/site.json';
 
 /**
- * The permanent landing page for the dates. It never redirects to
- * /event/<slug>, so this URL holds evergreen content and can rank. SSR, not
- * prerendered: the upcoming date belongs in the initial HTML.
+ * The permanent landing page for the dates: the date, the practical facts, the
+ * way to take part or be notified, and the questions asked right before an
+ * evening. It never redirects to /event/<slug>, so this URL holds evergreen
+ * content and can rank. SSR, not prerendered: the upcoming date belongs in the
+ * initial HTML. Registration stays on /event/<slug>.
  */
 const { status, event } = await fetchNextEventState();
-const next = summarizeNextEvent(event);
 // One object for the whole page, so the date block, the FAQ and the metadata
 // cannot disagree. A failed read is its own state, never "kein Termin geplant".
-const state = dateStatus(status, next);
+const state = dateStatus(status, event);
+const { next } = state;
 
 // One published voice for the pull quote — the top of the curated order, not a
 // second copy of the home page's grid. `null` renders no section.
@@ -26,9 +29,63 @@ const [voice = null] = await fetchTestimonials(1);
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = new URL('/event', siteUrl).href;
 
-// The same builder the component renders from, so the FAQPage markup cannot
-// drift from the visible questions.
-const faqItems = buildEventFaq(state.next);
+// Rendered below and emitted as FAQPage JSON-LD from this one list — Google
+// flags FAQ markup that does not match the visible text. Deliberately disjoint
+// from the home page's FAQ set (src/content/home.json): two FAQPage blocks
+// asking the same questions on two URLs only compete.
+const faqItems = [
+  {
+    question: 'Wann findet der nächste Männerkreis statt?',
+    answer: next
+      ? `Der nächste Termin ist ${next.dateLabel}${next.timeRange ? ` um ${next.timeRange}` : ''} in ${next.place}. Alle Details und die Anmeldung findest du auf der Seite zu diesem Termin.`
+      : 'Der nächste Termin steht noch nicht fest. Sobald er geplant ist, erfährst du es über die Benachrichtigung auf dieser Seite oder über die WhatsApp-Gruppe.',
+  },
+  {
+    question: 'Wie melde ich mich an?',
+    answer:
+      'Über das Anmeldeformular auf der Seite des jeweiligen Termins. Du brauchst nur Vor- und Nachnamen und eine E-Mail-Adresse. Danach bekommst du eine Bestätigung per E-Mail mit dem genauen Treffpunkt. Ist ein Abend ausgebucht, kommst du auf die Warteliste und rückst nach, sobald ein Platz frei wird.',
+  },
+  {
+    question: 'Was kostet die Teilnahme?',
+    answer: next?.costBasis
+      ? `Für den nächsten Termin gilt: ${next.costBasis}. Du gibst, was dir der Abend wert ist und was für dich machbar ist – einen festen Preis oder eine Mitgliedschaft gibt es nicht.`
+      : 'Der Kreis läuft auf Spendenbasis. Du gibst, was dir der Abend wert ist und was für dich machbar ist. Es gibt keinen festen Preis und keine Mitgliedschaft.',
+  },
+  {
+    question: 'Wo genau findet der Männerkreis statt?',
+    answer: `Der Männerkreis findet in ${next?.place || site.geo.locality} in Niederbayern statt. Die genaue Adresse bekommst du mit der Anmeldebestätigung – so bleibt der Ort der Gruppe vorbehalten, die tatsächlich zusammenkommt.`,
+  },
+  {
+    question: 'Kann ich alleine kommen?',
+    answer:
+      'Ja. Du musst vorher niemanden kennen. Es reicht, wenn du dich für einen Termin anmeldest und an dem Abend da bist.',
+  },
+  {
+    question: 'Gibt es Atemübungen oder Meditation?',
+    answer:
+      'Je nach Abend kann eine einfache Übung mit Atem, Körperwahrnehmung oder Stille dazugehören. Sie wird vorher erklärt, bleibt bodenständig, und du entscheidest selbst, woran du teilnimmst.',
+  },
+];
+
+// The page's exit, ordered by what someone who has just read the date wants
+// next: what an evening is, who holds it, what others said.
+const moreLinks = [
+  {
+    href: '/#ueber',
+    title: 'Worum es an so einem Abend geht',
+    text: 'Der Ablauf, der Rahmen und was der Kreis ausdrücklich nicht ist.',
+  },
+  {
+    href: '/warum-ich-den-maennerkreis-leite',
+    title: 'Warum ich den Männerkreis leite',
+    text: 'Ein persönlicher Text von Markus: was ihm wichtig ist und was du von ihm erwarten kannst.',
+  },
+  {
+    href: '/#stimmen',
+    title: 'Stimmen aus dem Kreis',
+    text: 'Was Männer nach einem Abend geschrieben haben.',
+  },
+];
 
 /**
  * The series is built once in lib/series-schema.ts and shared with the home
@@ -37,12 +94,12 @@ const faqItems = buildEventFaq(state.next);
  */
 const eventSeries: Record<string, unknown> = {
   ...eventSeriesSchema(siteUrl),
-  ...(state.next
+  ...(next
     ? {
         subEvent: {
           '@type': 'Event',
-          '@id': new URL(`/event/${state.next.slug}`, siteUrl).href,
-          url: new URL(`/event/${state.next.slug}`, siteUrl).href,
+          '@id': new URL(`/event/${next.slug}`, siteUrl).href,
+          url: new URL(`/event/${next.slug}`, siteUrl).href,
         },
       }
     : {}),
@@ -70,21 +127,19 @@ const breadcrumbs = {
 
 // Changes with the state so the SERP snippet is never stale, but both variants
 // lead with the same evergreen keywords.
-const description = state.next
-  ? `Nächster Männerkreis in ${state.next.place}: ${state.next.dateLabel}${state.next.timeRange ? `, ${state.next.timeRange}` : ''}. Anmeldung, Ort, Dauer und Beitrag auf einen Blick – ohne Vorerfahrung, auf Spendenbasis.`
+const description = next
+  ? `Nächster Männerkreis in ${next.place}: ${next.dateLabel}${next.timeRange ? `, ${next.timeRange}` : ''}. Anmeldung, Ort, Dauer und Beitrag auf einen Blick – ohne Vorerfahrung, auf Spendenbasis.`
   : 'Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis.';
 
 // The <title> stays evergreen because that is what ranks; the social title
 // leads with the date when there is one. `unavailable` gets the evergreen
 // wording rather than a claim about an empty calendar.
-const socialTitle = state.next
-  ? `Nächster Männerkreis: ${state.next.dateLabel} in ${state.next.place}`
-  : `Termine – ${site.siteName}`;
+const socialTitle = next ? `Nächster Männerkreis: ${next.dateLabel} in ${next.place}` : `Termine – ${site.siteName}`;
 
-const socialDetails = state.next
+const socialDetails = next
   ? [
-      { label: 'Nächster Termin', value: [state.next.dateLabel, state.next.timeRange].filter(Boolean).join(', ') },
-      { label: 'Ort', value: state.next.place },
+      { label: 'Nächster Termin', value: [next.dateLabel, next.timeRange].filter(Boolean).join(', ') },
+      { label: 'Ort', value: next.place },
     ]
   : [];
 ---
@@ -96,5 +151,193 @@ const socialDetails = state.next
   socialDetails={socialDetails}
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  <EventLanding state={state} voice={voice} />
+  <section class="page-opening">
+    <div class="container">
+      <div class="page-opening__inner">
+        <p class="marker marker--ruled page-opening__eyebrow">Männerkreis · Straubing / Niederbayern</p>
+
+        <h1 class="page-opening__title">Termine und Anmeldung</h1>
+
+        <p class="page-opening__lead">
+          Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend dauert
+          zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was
+          dich erwartet, lies zuerst, <a class="link" href="/#ueber">worum es an so einem Abend geht</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <NextDate state={state} />
+  <Facts variant="list" next={next} />
+
+  {
+    /* The top curated entry as a pull quote, quoted as submitted. Not a second
+      testimonials grid — that would put the same quotes on two indexed URLs. */
+  }
+  {
+    voice && (
+      <section class="section section--ruled event-landing-voice" aria-label="Stimme aus dem Kreis">
+        <div class="container">
+          <div class="spine">
+            <p class="rail-heading">Aus dem Kreis</p>
+
+            <figure class="event-landing-voice__figure spine__body" data-reveal="fade">
+              <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
+              {(voice.author || voice.role) && (
+                <figcaption class="event-landing-voice__author">
+                  {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
+                  {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
+                </figcaption>
+              )}
+            </figure>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <Faq
+    data={{
+      anchor: 'fragen-zum-termin',
+      eyebrow: 'Vor dem Termin',
+      title: 'Fragen zu Termin und Anmeldung',
+      items: faqItems,
+    }}
+  />
+
+  <section class="section section--ruled event-landing-more" aria-labelledby="mehr-title">
+    <div class="container">
+      <div class="spine">
+        <h2 class="rail-heading" id="mehr-title">Weiterlesen</h2>
+
+        <ul class="event-landing-more__list spine__body--wide" role="list" data-reveal-group="55">
+          {
+            moreLinks.map((link) => (
+              <li class="event-landing-more__item" data-reveal="up">
+                <a href={link.href}>
+                  <span class="event-landing-more__title">{link.title}</span>
+                  <span class="event-landing-more__text">{link.text}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
 </Layout>
+
+<style is:global>
+  @layer sections {
+    .page-opening {
+      padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
+    }
+
+    .page-opening__inner {
+      max-inline-size: var(--measure-wide);
+    }
+
+    .page-opening__eyebrow {
+      margin-block-end: var(--space-sm);
+      color: var(--text-primary);
+    }
+
+    .page-opening__title {
+      margin-block-end: var(--space-sm);
+      font-size: var(--display-3);
+      line-height: 0.98;
+      letter-spacing: -0.015em;
+      text-wrap: balance;
+    }
+
+    .page-opening__lead {
+      max-inline-size: var(--measure);
+      margin: 0;
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+
+    .event-landing-voice__figure {
+      max-inline-size: var(--measure);
+      margin: 0;
+    }
+
+    /* Sized to be read, not to be admired: submitted quotes run to a dozen
+       lines, and a dozen lines of 2rem display serif is a wall. */
+    .event-landing-voice__quote {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      line-height: var(--leading-normal);
+      color: var(--text-primary);
+      text-wrap: pretty;
+    }
+
+    .event-landing-voice__author {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3xs) var(--space-xs);
+      align-items: baseline;
+      margin-block-start: var(--space-sm);
+    }
+
+    .event-landing-voice__name {
+      font-size: var(--text-caption);
+      font-style: normal;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .event-landing-voice__role {
+      font-size: var(--text-caption);
+      color: var(--text-muted);
+    }
+
+    .event-landing-more__list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      border-block-start: 1px solid var(--border-light);
+    }
+
+    .event-landing-more__item {
+      border-block-end: 1px solid var(--border-light);
+    }
+
+    .event-landing-more__item a {
+      display: grid;
+      gap: var(--space-3xs);
+      padding-block: var(--space-sm);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .event-landing-more__item a:hover .event-landing-more__title,
+    .event-landing-more__item a:focus-visible .event-landing-more__title {
+      color: var(--accent-text);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+
+    .event-landing-more__item a:focus-visible {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
+    }
+
+    .event-landing-more__title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      line-height: 1.25;
+      color: var(--text-primary);
+      transition: color var(--motion-quick);
+    }
+
+    .event-landing-more__text {
+      max-inline-size: var(--measure);
+      font-size: var(--text-section-body);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+  }
+</style>

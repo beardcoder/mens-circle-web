@@ -1,6 +1,6 @@
 # Männerkreis Niederbayern / Straubing
 
-Schnelle, leichtgewichtige Website für den Männerkreis — **Astro 7 + Svelte 5**,
+Schnelle, leichtgewichtige Website für den Männerkreis — **Astro 7** (ohne UI-Framework),
 **SSR in der Bun-Runtime**, **Drizzle ORM auf `bun:sqlite`** als Backend. Der
 Bun-Server ist selbst der öffentliche Edge (kein nginx) **und** das Backend in
 einem Prozess. Alles zusammen in **einem** Docker-Image, deploybar mit Coolify.
@@ -15,7 +15,7 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 │   ├─ liefert statische Assets + vorgerenderte HTML direkt → /app/dist/client│
 │   │    (gehashte Assets immutable, Security-Header)                         │
 │   ├─ On-Demand-SSR: Server Islands + Event-Seiten                │
-│   ├─ Public API  → /api/* (Anmeldung, Newsletter, Testimonial, Events, ICS) │
+│   ├─ Actions     → /_actions/* (Formulare + Admin), ICS für Bestätigungsmails│
 │   ├─ Admin-UI    → /admin/* (Events anlegen, Anmeldungen verwalten)         │
 │   ├─ Datenhaltung → Drizzle ORM auf bun:sqlite (Datei im /data-Volume)      │
 │   │    Migrationen werden beim Boot automatisch angewendet (drizzle/)       │
@@ -32,7 +32,7 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 - **Bun-Server als Edge + Backend.** Ein einziger Bun-Prozess ist der
   öffentliche Einstieg: er liefert die gehashten Assets **und die vorgerenderten
   HTML-Seiten** direkt von Platte, rendert die SSR-Routen on demand und bedient
-  die API- und Admin-Routen direkt als Astro-Endpunkte. Es gibt **keinen
+  Formulare und Admin-Aktionen als Astro Actions. Es gibt **keinen
   separaten Backend-Prozess** mehr — die Daten liegen in einer SQLite-Datei, auf
   die Drizzle in-process zugreift. Den Server-Entrypoint
   (`dist/server/entry.mjs`) erzeugt `@wyattjoh/astro-bun-adapter` beim Build; es
@@ -47,8 +47,8 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
 - **Native Admin-UI.** Unter `/admin` (Login per `ADMIN_EMAIL`/`ADMIN_PASSWORD`,
   signiertes Session-Cookie) lassen sich Veranstaltungen anlegen/bearbeiten,
   Anmeldungen verwalten (Status ändern, stornieren → automatisches Nachrücken
-  von der Warteliste) und Teilnehmer:innen anschreiben. Svelte-5-Islands,
-  abgesichert per Middleware ([`src/middleware.ts`](src/middleware.ts)).
+  von der Warteliste) und Teilnehmer:innen anschreiben. Astro-Seiten mit
+  kleinen Skripten, abgesichert per Middleware ([`src/middleware.ts`](src/middleware.ts)).
 - **E-Mail über listmonk.** Sowohl der Newsletter (Double-Opt-In, Kampagnen) als
   auch die **transaktionalen** Event-Mails laufen über listmonk. Die App rendert
   die Mails nicht selbst, sondern ruft listmonks **Transactional API**
@@ -63,8 +63,12 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
   die Startseite auf die weiterhin serverseitig gerenderte Terminseite.
 - **Statischer Content** (Texte, FAQ, Hero, Moderator …) liegt als **JSON** im
   Repo (`src/content/`, `src/data/`).
-- **Dynamische Teile** (Anmeldung, Warteliste, Newsletter, Testimonial,
-  Atemübung) sind **Svelte-5-Islands**, die per `fetch` mit der API sprechen.
+- **Formulare** (Anmeldung, Newsletter, Testimonial) sind normale HTML-Formulare
+  ([`src/components/forms/`](src/components/forms/)), die ihr `FormData` an
+  **Astro Actions** ([`src/actions/`](src/actions/)) schicken. Die
+  Feldvalidierung steht nur im Zod-Schema der Action; Fehler landen über
+  `isInputError(error).fields` direkt neben dem Feld
+  ([`src/lib/form.ts`](src/lib/form.ts)).
 
 ## Gestaltung
 
@@ -91,8 +95,8 @@ Schriftfamilie in zwei Schnitten, ein grafisches Motiv.
 - **Alles auf dem Seitengrund muss mit dem Modus umschalten** —
   `--text-primary`, `--text-muted`, `--rule-strong`, `--bg-*`. Die literalen
   `--color-ink` / `--color-paper` sind nur dort richtig, wo der Grund selbst
-  nicht umschaltet: oranges Statement, dunkle Bänder (`.section--ink`), Footer,
-  Atemübung. Ein Fehler hier fällt im Hellmodus nicht auf und lässt im
+  nicht umschaltet: oranges Statement, dunkle Bänder (`.section--ink`), Footer.
+  Ein Fehler hier fällt im Hellmodus nicht auf und lässt im
   Dunkelmodus Text verschwinden.
 - **Zwei Rastersysteme.** `.bay` ist ein 12-Spalten-Raster (1320px); die
   Abschnitte liegen in _verschiedenen_ Spalten, damit die linke Kante wandert.
@@ -103,8 +107,7 @@ Schriftfamilie in zwei Schnitten, ein grafisches Motiv.
   das einzige grafische Motiv: ein dicker, offener oranger SVG-Ring, genau
   zweimal eingesetzt (Hero, Abschluss), am Bildschirmrand angeschnitten, nie
   über Text oder Bedienelementen.
-- **Radius ist überall 0.** `--radius-full` überlebt nur für die Atemübung, wo
-  der Kreis das Bedienelement _ist_.
+- **Radius ist überall 0.**
 
 ## Motion & Seitenübergänge
 
@@ -125,13 +128,9 @@ zeigt.
   **Keyframes** ungelayert in
   [`src/styles/base/_keyframes.css`](src/styles/base/_keyframes.css).
 - **Scroll-Reveals** (nur noch an wenigen Stellen) treibt
-  [`src/lib/motion.ts`](src/lib/motion.ts) über Motions `inView` + die Web
-  Animations API. Der versteckte Startzustand steht hinter `.motion-ready`, das
+  [`src/lib/motion.ts`](src/lib/motion.ts) über einen IntersectionObserver +
+  die Web Animations API (keine Bibliothek). Der versteckte Startzustand steht hinter `.motion-ready`, das
   eine Totmannschaltung im Layout wieder abräumt — ohne JS bleibt alles sichtbar.
-- **Ambient-Loops** gibt es nur noch in der Atemübung, wo die atmenden Kreise der
-  Inhalt sind. [`src/lib/ambient.ts`](src/lib/ambient.ts) pausiert sie, solange
-  ihre `<section>` nicht sichtbar ist; `[data-motion-essential]` nimmt sie von
-  der Iterationsbremse aus.
 - **Seitenübergänge** sind native Cross-Document View Transitions
   ([`src/styles/utilities/_view-transitions.css`](src/styles/utilities/_view-transitions.css)),
   kein Router. Ein `pagereveal`-Listener im Layout setzt `.vt-arrival` vor dem
@@ -169,26 +168,29 @@ src/
   data/           site.json, navigation.json
   components/      Astro-Blöcke (Hero, Facts, Intro, Statement, FAQ …),
                   Ring.astro (das Kreismotiv), Header, Footer, SEO
-  components/event/    Server-gerenderte Event-Seite (Hero, Anmeldung, Infos, Karte …)
-  components/islands/  Svelte-5-Islands (Formulare, Breathing, Kalender-Modal, Map)
-  components/admin/    Svelte-5-Islands der Admin-UI (Events, Anmeldungen, Stimmen)
+  components/event/    Server-gerenderte Event-Seite (Hero, Anmeldung, Infos,
+                       Kalender-Popover mit eingebettetem .ics, Karte …)
+  components/forms/    Anmeldung, Newsletter, Testimonial (HTML + Action)
+  components/admin/    Admin-UI (Events, Anmeldungen, Stimmen)
   layouts/        Layout.astro (Seite), AdminLayout.astro (Back-Office)
-  actions/        Astro Actions (`/_actions/*`) — die Admin-RPC-Schicht
-  lib/            api.ts (Client-Formulare), motion.ts (Scroll-Reveals),
+  actions/        Astro Actions (`/_actions/*`), nach Bereich aufgeteilt:
+                  forms, auth, events, registrations, testimonials
+  lib/            form.ts (Formulare → Actions), motion.ts (Scroll-Reveals),
                   event-status.ts (Terminstatus → Text + Hauptaktion),
-                  ambient.ts (Loops der Atemübung parken), site-header.ts,
-                  theme.ts, types, umami-config, Utils
+                  event-meta.ts / event-schema.ts (Share-Metadaten, JSON-LD),
+                  site-header.ts, theme.ts, toast.ts, types
   lib/server/     Datenschicht (db/, events, registrations, testimonials,
                   listmonk, email, auth, reminders, ics, format) — NUR serverseitig
   middleware.ts   Admin-Guard + Trailing-Slash-Kanonisierung
-  pages/          index, event, atemuebung, teile-deine-erfahrung, [slug], health
-  pages/api/      Public-API (Formular-Endpunkte + /api/public/*)
+  pages/          index, event, event/[slug], teile-deine-erfahrung, [slug], health
+  pages/api/      nur noch /api/public/events/<slug>/ics (Link in Bestätigungsmails)
   pages/admin/    Admin-UI-Seiten
   styles/         vollständiges CSS-Designsystem (@layer, light-dark(), kein
                   Tailwind); utilities/_layout.css = .bay + .spine,
                   utilities/_motion.css + base/_keyframes.css = Animation
-astro-integrations/  Build-Integrationen (Sitemap/llms.txt in das Static-Manifest
-                  des Bun-Adapters nachtragen — s. serve-with-bun-adapter.mjs)
+astro-integrations/  publish-generated-files.mjs: Sitemap-Index und llms.txt um
+                  SSR-Seiten ergänzen und ins Static-Manifest des Bun-Adapters
+                  eintragen
 scripts/          reminder-cron.ts (Timer-Scheduler via --preload), send-reminders.ts,
                   backup-db.ts (SQLite → S3)
 drizzle/          generierte SQL-Migrationen (beim Boot angewendet)

@@ -9,7 +9,7 @@
  *   base       — element defaults (typography, fonts)
  *   layout     — page-level layout utilities
  *   components — reusable UI (buttons, cards, forms, toast)
- *   sections   — page sections (hero, surfaces, ornaments)
+ *   sections   — page sections (hero)
  *   utilities  — helpers, motion, view transitions, print
  */
 
@@ -28,8 +28,6 @@
 @import url('components/_cards.css') layer(components);
 @import url('components/_forms.css') layer(components);
 @import url('components/_toast.css') layer(components);
-@import url('sections/_surfaces.css') layer(sections);
-@import url('sections/_ornaments.css') layer(sections);
 @import url('sections/_hero.css') layer(sections);
 /* Event- and error-page section styles are NOT here — they live in the
    components that own them, each in a `<style is:global>` + `@layer sections`

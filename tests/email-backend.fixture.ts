@@ -328,7 +328,6 @@ const scenarios: Record<string, () => Promise<void>> = {
       first_name: 'Person',
       last_name: '',
       phone_number: '',
-      privacy: true,
     });
     assert.equal(result.status, 200, 'registration must resolve while all HTTP is still blocked');
     assert.equal(completed, 0);

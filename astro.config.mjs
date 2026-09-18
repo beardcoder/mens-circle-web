@@ -1,24 +1,12 @@
 // @ts-check
 
 import sitemap from '@astrojs/sitemap';
-import svelte from '@astrojs/svelte';
 import bun from '@wyattjoh/astro-bun-adapter';
-import umami from '@yeskunall/astro-umami';
 import icon from 'astro-icon';
 import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
-import { addPagesToLlmsTxt } from './astro-integrations/llms-extra.mjs';
 import { defineConfig, fontProviders } from 'astro/config';
-import { addSitemapsToIndex } from './astro-integrations/sitemap-index-extra.mjs';
-import { serveLlmsWithBunAdapter, serveSitemapWithBunAdapter } from './astro-integrations/serve-with-bun-adapter.mjs';
-import { UMAMI_ENDPOINT, UMAMI_WEBSITE_ID } from './src/lib/umami-config.ts';
+import { publishGeneratedFiles } from './astro-integrations/publish-generated-files.mjs';
 import site from './src/data/site.json' with { type: 'json' };
-
-// One source of truth for the brand, shared with SeoHead and the manifests.
-// These used to be typed out again inside the llms() options, where they went
-// stale: llms.txt still announced the site under a name and a marketing voice
-// the rest of the site had already dropped.
-const SITE_NAME = site.siteName;
-const SITE_DESCRIPTION = site.description;
 
 // SSR on Bun: the adapter builds dist/server/entry.mjs, and that single process
 // is the public edge — static assets, prerendered HTML and on-demand routes.
@@ -36,9 +24,12 @@ export default defineConfig({
   // fs-lite driver, so the opt-out is a no-op. Set it once the adapter honours it.
   // `bun:sqlite` is a Bun builtin — external, or Rollup tries to bundle it.
   vite: {
-    // Sharp is used by Astro's prerender build, but never bundled into the
-    // production server (and is not installed in the runtime image).
-    ssr: { noExternal: true, external: ['bun:sqlite', 'sharp'] },
+    // The production server is one self-contained bundle (the runtime image
+    // ships no node_modules). Only for the build, though: in dev, bundling every
+    // dependency sends CommonJS packages (picomatch) through Vite's module
+    // runner, which dies on `require`. Sharp is used by the prerender build but
+    // never bundled into the server (and is not installed in the runtime image).
+    ssr: { noExternal: process.argv.includes('build') || undefined, external: ['bun:sqlite', 'sharp'] },
     optimizeDeps: { exclude: ['bun:sqlite'] },
     // Lightning CSS autoprefixes from real compat data (so `-webkit-backdrop-filter`
     // is handled for us). `cssTarget` stays modern so the tokens' `oklch()` and
@@ -53,8 +44,9 @@ export default defineConfig({
   },
   trailingSlash: 'ignore',
   redirects: {
-    '/home': '/',
     '/events': '/event',
+    // Redirects to `/` itself live in src/middleware.ts: Astro emits nothing
+    // for them here, so they answered 404.
     // Legacy plural deep-links → the per-event page (was a PocketBase route).
     '/events/[slug]': '/event/[slug]',
     // Old PocketBase page, still indexed.
@@ -62,8 +54,8 @@ export default defineConfig({
     // Interim URL from before @astrojs/sitemap.
     '/sitemap.xml': '/sitemap-index.xml',
   },
-  // Only explicitly marked static links prefetch on intent. Live scheduling,
-  // admin and the breathing app must not render/execute speculatively.
+  // Only explicitly marked static links prefetch on intent. Live scheduling
+  // and admin must not render/execute speculatively.
   // Native cross-document view transitions do not require prerendering.
   prefetch: {
     prefetchAll: false,
@@ -113,17 +105,12 @@ export default defineConfig({
     },
   ],
   integrations: [
-    svelte(),
     // Local SVGs from src/icons/, inlined via <Icon name="…" />.
     icon(),
     sitemap({
       // Drop noindex / non-public routes. Event pages are SSR and unknown at build
-      // time; /sitemap-events.xml lists those, wired in by addSitemapsToIndex below.
-      filter: (page) =>
-        !page.includes('/admin') &&
-        !page.includes('/impressum') &&
-        !page.includes('/datenschutz') &&
-        !page.includes('/atemuebung/app'),
+      // time; /sitemap-events.xml lists those, wired in by publishGeneratedFiles.
+      filter: (page) => !page.includes('/admin') && !page.includes('/impressum') && !page.includes('/datenschutz'),
       // Slash-less URLs, matching the canonicals — every entry resolves 200
       // instead of 301-redirecting.
       serialize(item) {
@@ -132,35 +119,28 @@ export default defineConfig({
         return { ...item, url: url.href };
       },
     }),
-    // Must sit BETWEEN sitemap() and serveSitemapWithBunAdapter(): it needs the
-    // index to exist, and must patch it before the manifest records its length.
-    addSitemapsToIndex({ paths: ['/sitemap-events.xml'] }),
-    // Must run AFTER sitemap(): registers its output in the adapter's manifest.
-    serveSitemapWithBunAdapter(),
     // llms.txt for AI crawlers, derived from the built HTML so it cannot drift.
     // Pinned to 2.x on purpose: v3 dropped both `DEFAULT_NOISE_SELECTORS` and the
     // `excludeSelectors` option (the config no longer loads), and its new SSR pass
     // ignores `exclude` — it scrapes /admin/* from the *live* site at build time and
     // publishes it as .md. Revisit once `exclude` covers SSR routes again.
     llms({
-      name: SITE_NAME,
-      description: SITE_DESCRIPTION,
+      name: site.siteName,
+      description: site.description,
       contentSelector: 'main',
       // Strip chrome (nav/footer/forms/aria-hidden) so the markdown is prose.
       excludeSelectors: [...DEFAULT_NOISE_SELECTORS, '.home-live-event', '.testimonials-section'],
-      // Back-office and the noindex breathing app stay out of the AI index — and
-      // so do the legal pages. They are noindex for search for the same reason
+      // Back-office stays out of the AI index — and so do the legal pages. They are noindex for search for the same reason
       // they are noise here: llms-full.txt was 19KB of which the privacy policy
       // was the larger half, so a model reading it learned our data-retention
       // periods and not what the Männerkreis is. Same exclusion list as the
       // sitemap, for the same reason.
-      exclude: ['admin/**', 'atemuebung/app/**', 'impressum/**', 'datenschutz/**'],
+      exclude: ['admin/**', 'impressum/**', 'datenschutz/**'],
     }),
-    // Must sit BETWEEN llms() and serveLlmsWithBunAdapter(), same ordering
-    // reason as the sitemap: the file must exist, and the manifest records its
-    // length afterwards.
-    addPagesToLlmsTxt({
-      entries: [
+    // Must run AFTER sitemap() and llms(): patches and publishes their output.
+    publishGeneratedFiles({
+      sitemaps: ['/sitemap-events.xml'],
+      llmsPages: [
         {
           path: '/event',
           title: 'Termine & Anmeldung',
@@ -168,16 +148,6 @@ export default defineConfig({
             'Wann der nächste Männerkreis stattfindet, wo er stattfindet, wie lange er dauert, was er kostet und wie du dich anmeldest.',
         },
       ],
-    }),
-    // Must run AFTER llms(), same manifest reason as serveSitemapWithBunAdapter.
-    serveLlmsWithBunAdapter(),
-    // Umami tracker. Id + endpoint from src/lib/umami-config.ts, shared with
-    // SeoHead's preconnect. `performance` turns on Umami's own Core Web Vitals
-    // collection.
-    umami({
-      id: UMAMI_WEBSITE_ID,
-      performance: true,
-      endpointUrl: UMAMI_ENDPOINT,
     }),
   ],
 });

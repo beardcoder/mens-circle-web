@@ -1,0 +1,115 @@
+---
+/**
+ * Registration for one event. Posts to the `register` action via lib/form.ts;
+ * seats and the waiting list are decided on the server.
+ */
+interface Props {
+  eventId: string;
+  isFull: boolean;
+}
+
+const { eventId, isFull } = Astro.props;
+---
+
+<form
+  id="register"
+  class="event-register__form"
+  autocomplete="on"
+  data-form="register"
+  data-track="event-registration"
+  data-track-context={JSON.stringify({ event_id: eventId })}
+>
+  <input type="hidden" name="event_id" value={eventId} />
+  <div class="hp-field" aria-hidden="true">
+    <label>
+      Website
+      <input type="text" name="website" tabindex="-1" autocomplete="off" />
+    </label>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="firstName">Vorname</label>
+      <input
+        type="text"
+        id="firstName"
+        name="first_name"
+        placeholder="Dein Vorname"
+        required
+        autocomplete="given-name"
+        aria-describedby="register-first_name-error"
+      />
+      <span class="form-error" id="register-first_name-error" hidden></span>
+    </div>
+
+    <div class="form-group">
+      <label for="lastName">Nachname</label>
+      <input
+        type="text"
+        id="lastName"
+        name="last_name"
+        placeholder="Dein Nachname"
+        required
+        autocomplete="family-name"
+        aria-describedby="register-last_name-error"
+      />
+      <span class="form-error" id="register-last_name-error" hidden></span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="email">E-Mail</label>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      placeholder="deine@email.de"
+      required
+      autocomplete="email"
+      inputmode="email"
+      aria-describedby="register-email-error"
+    />
+    <span class="form-error" id="register-email-error" hidden></span>
+  </div>
+
+  <div class="form-group">
+    <label for="phone">Handynummer <span class="form-label-optional">(optional)</span></label>
+    <input
+      type="tel"
+      id="phone"
+      name="phone_number"
+      placeholder="+49 170 1234567"
+      autocomplete="tel"
+      inputmode="tel"
+      aria-describedby="register-phone-hint"
+    />
+    <span class="form-helper" id="register-phone-hint">
+      Falls wir dich am Veranstaltungstag kurzfristig erreichen müssen
+    </span>
+  </div>
+
+  <div class="form-group">
+    <label class="form-checkbox">
+      <input type="checkbox" name="privacy" required aria-describedby="register-privacy-error" />
+      <span>
+        Ich habe die
+        <a href="/datenschutz" target="_blank" rel="noopener"
+          >Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span></a
+        >
+        gelesen und stimme der Verarbeitung meiner Daten zu.
+      </span>
+    </label>
+    <span class="form-error" id="register-privacy-error" hidden></span>
+  </div>
+
+  <button type="submit" class="btn btn--primary btn--large event-register__submit">
+    {isFull ? 'Auf Warteliste eintragen' : 'Verbindlich anmelden'}
+  </button>
+</form>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { enhanceForms } from '@lib/form';
+
+  enhanceForms('register', actions.register);
+</script>

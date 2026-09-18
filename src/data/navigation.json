@@ -14,8 +14,7 @@
     ],
     "secondary": [
       { "label": "Häufige Fragen", "url": "/#faq" },
-      { "label": "Meine Haltung", "url": "/warum-ich-den-maennerkreis-leite" },
-      { "label": "Atemübung", "url": "/atemuebung" }
+      { "label": "Meine Haltung", "url": "/warum-ich-den-maennerkreis-leite" }
     ]
   },
   "footerPrimary": [
@@ -24,8 +23,7 @@
     { "label": "Markus", "url": "/#moderator" },
     { "label": "Häufige Fragen", "url": "/#faq" },
     { "label": "Meine Haltung", "url": "/warum-ich-den-maennerkreis-leite" },
-    { "label": "Termine & Anmeldung", "url": "/event" },
-    { "label": "Atemübung", "url": "/atemuebung" }
+    { "label": "Termine & Anmeldung", "url": "/event" }
   ],
   "footerContact": [{ "label": "Bei neuen Terminen benachrichtigen", "url": "/#termine" }],
   "footerLegal": [

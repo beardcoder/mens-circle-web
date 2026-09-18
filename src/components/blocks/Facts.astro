@@ -1,46 +1,88 @@
 ---
-import { buildEventFacts, type NextEventSummary } from '@lib/event-landing';
+import site from '@data/site.json';
+import { type NextEventSummary, summarizeNextEvent } from '@lib/event-status';
 
 /**
- * The practical facts as a full-bleed ink band under the hero. The same builder
- * feeds /event, so the two pages cannot state different facts. The street
- * address is never here: it goes out with the registration confirmation.
+ * The quick-scan facts: a full-bleed ink band under the home hero, or a hairline
+ * list on /event — one list, so the two pages cannot state different facts. A
+ * scheduled event overrides what it knows: city, time window, fee. Never more
+ * precise than the city: the exact address goes out with the registration
+ * confirmation only.
  */
 
 interface Props {
-  data: { anchor?: string; eyebrow?: string };
-  /** The next scheduled event, when there is one. */
+  data?: { anchor?: string; eyebrow?: string };
+  variant?: 'band' | 'list';
+  /** The next scheduled event, when there is one. Read live when omitted. */
   next?: NextEventSummary | null;
 }
 
-const { data } = Astro.props;
+const { data = {}, variant = 'band' } = Astro.props;
 const next =
   Astro.props.next !== undefined
     ? Astro.props.next
-    : (await import('../../lib/event-landing')).summarizeNextEvent(
-        (await (await import('../../lib/server/events')).fetchNextEventState()).event,
-      );
-const facts = buildEventFacts(next);
+    : // Dynamic, so the static fallback never opens SQLite.
+      summarizeNextEvent((await (await import('../../lib/server/events')).fetchNextEventState()).event);
+
+const facts = [
+  { label: 'Wo', value: next?.place || site.geo.locality, sub: 'Die genaue Adresse bekommst du mit der Anmeldung' },
+  // Non-breaking space: the only acceptable break is before "Wochen" — between
+  // the 2 and the 4 it reads as a stray hyphen.
+  { label: 'Wie oft', value: 'Alle\u00A02–4 Wochen', sub: 'Ein fester Rhythmus, keine Mitgliedschaft' },
+  {
+    label: 'Dauer',
+    value: '2–3 Stunden',
+    sub: next?.timeRange ? `Nächster Termin: ${next.timeRange}` : 'Ein Abend, kein Wochenendseminar',
+  },
+  // The event's own fee text wins: it may name an amount "Spendenbasis" swallows.
+  { label: 'Beitrag', value: next?.costBasis || 'Spendenbasis', sub: 'Jeder gibt, was für ihn machbar ist' },
+];
 const anchor = data.anchor ?? 'praktisches';
 ---
 
-<section class="section section--ink home-facts" id={anchor} aria-labelledby="praktisches-title">
-  <div class="container">
-    <h2 class="marker home-facts__title" id="praktisches-title">{data.eyebrow ?? 'Praktisches'}</h2>
+{
+  variant === 'list' ? (
+    <section class="section section--ruled event-landing-facts" aria-labelledby="fakten-title">
+      <div class="container">
+        <div class="spine">
+          <h2 class="rail-heading" id="fakten-title">
+            Gut zu wissen
+          </h2>
 
-    <dl class="home-facts__row">
-      {
-        facts.map((fact) => (
-          <div class="home-facts__item">
-            <dt class="home-facts__label">{fact.label}</dt>
-            <dd class="home-facts__value">{fact.value}</dd>
-            <dd class="home-facts__note">{fact.sub}</dd>
-          </div>
-        ))
-      }
-    </dl>
-  </div>
-</section>
+          <dl class="deflist spine__body--wide" data-reveal-group="55">
+            {facts.map((fact) => (
+              <div class="deflist__row" data-reveal="up">
+                <dt class="deflist__term">{fact.label}</dt>
+                <dd class="deflist__desc">
+                  {fact.value}
+                  <span class="deflist__note">{fact.sub}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class="section section--ink home-facts" id={anchor} aria-labelledby="praktisches-title">
+      <div class="container">
+        <h2 class="marker home-facts__title" id="praktisches-title">
+          {data.eyebrow ?? 'Praktisches'}
+        </h2>
+
+        <dl class="home-facts__row">
+          {facts.map((fact) => (
+            <div class="home-facts__item">
+              <dt class="home-facts__label">{fact.label}</dt>
+              <dd class="home-facts__value">{fact.value}</dd>
+              <dd class="home-facts__note">{fact.sub}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  )
+}
 
 <style is:global>
   @layer sections {

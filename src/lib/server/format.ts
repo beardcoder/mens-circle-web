@@ -36,6 +36,12 @@ export const toDate = (value: unknown): Date | null => {
   return Number.isNaN(d.getTime()) ? null : d;
 };
 
+/** The calendar day, "2026-09-18" — for `<time datetime>` and calendar links. */
+export const isoDay = (value: unknown): string => toDate(value)?.toISOString().slice(0, 10) ?? '';
+
+/** "19:00–21:30 Uhr" as the pages print it, or empty when no start time is set. */
+export const timeRange = (start: string, end: string): string => (start ? `${start}${end ? `–${end}` : ''} Uhr` : '');
+
 export const formatWeekdayDE = (value: unknown): string => {
   const d = toDate(value);
   return d ? WEEKDAYS_DE[d.getUTCDay()] : '';

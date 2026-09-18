@@ -146,32 +146,6 @@
   }
 }
 
-/* Ambient loop parking. The only endless loops left are the breathing
-   exercise's, which opt out via `data-motion-essential`; the mechanism stays
-   because that page can be scrolled away from. */
-
-@media (prefers-reduced-motion: no-preference) {
-  .is-ambient-paused,
-  .is-ambient-paused::before,
-  .is-ambient-paused::after,
-  .is-ambient-paused *,
-  .is-ambient-paused *::before,
-  .is-ambient-paused *::after {
-    animation-play-state: paused;
-  }
-
-  /* The breathing rings *are* the content. Same specificity as above, so source
-     order decides — keep this last. */
-  [data-motion-essential],
-  [data-motion-essential]::before,
-  [data-motion-essential]::after,
-  [data-motion-essential] *,
-  [data-motion-essential] *::before,
-  [data-motion-essential] *::after {
-    animation-play-state: running;
-  }
-}
-
 /* Surface primitives. */
 
 [data-motion='image'] {

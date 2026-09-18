@@ -1,17 +1,49 @@
 /**
  * Maps "is a date on the books?" to what every surface says and offers — the
- * header, the home hero, the closing Termine block, /event and /event/<slug>
+ * header, the home hero, the facts band, the closing Termine block and /event
  * all read this one object.
  *
  * Three states, deliberately, not two:
  *   scheduled    — a published, upcoming event exists
  *   none         — nothing is scheduled (a true, sayable fact)
  *   unavailable  — the read failed; we do not know, and must not claim we do
+ *
+ * Server-render only — it imports lib/server/format.
  */
 
-import type { NextEventSummary } from './event-landing';
+import { eventPlace } from './event-meta';
+import { formatDayMonthYearDE, formatWeekdayDE, timeRange } from './server/format';
+import type { EventDTO } from './types';
 
 export type NextEventStatus = 'scheduled' | 'none' | 'unavailable';
+
+/** The upcoming event reduced to the strings the pages show. */
+export interface NextEventSummary {
+  slug: string;
+  /** "Donnerstag, 18. September 2026" */
+  dateLabel: string;
+  /** "19:00–21:30 Uhr", or empty when no time is set. */
+  timeRange: string;
+  /** City, then venue name, then the site's own locality. */
+  place: string;
+  /** Free-text participation fee, empty when not set. */
+  costBasis: string;
+  isFull: boolean;
+  availableSpots: number;
+  maxParticipants: number;
+}
+
+export const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
+  event && {
+    slug: event.slug,
+    dateLabel: [formatWeekdayDE(event.event_date), formatDayMonthYearDE(event.event_date)].filter(Boolean).join(', '),
+    timeRange: timeRange(event.start_time, event.end_time),
+    place: eventPlace(event),
+    costBasis: event.cost_basis?.trim() ?? '',
+    isFull: event.is_full,
+    availableSpots: event.available_spots,
+    maxParticipants: event.max_participants,
+  };
 
 export interface DateStatus {
   status: NextEventStatus;
@@ -19,11 +51,10 @@ export interface DateStatus {
   isFull: boolean;
 }
 
-export const dateStatus = (status: NextEventStatus, next: NextEventSummary | null): DateStatus => ({
-  status,
-  next: status === 'scheduled' ? next : null,
-  isFull: status === 'scheduled' ? Boolean(next?.isFull) : false,
-});
+export const dateStatus = (status: NextEventStatus, event: EventDTO | null): DateStatus => {
+  const next = status === 'scheduled' ? summarizeNextEvent(event) : null;
+  return { status, next, isFull: Boolean(next?.isFull) };
+};
 
 export interface PrimaryAction {
   label: string;
