@@ -1,9 +1,9 @@
 ---
 import '../styles/app.css';
 import { Font } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import ScrollToTop from '../components/ScrollToTop.astro';
 import SeoHead from '../components/SeoHead.astro';
 
 interface Props {
@@ -21,14 +21,9 @@ interface Props {
   schemas?: Record<string, unknown>[];
   publishedTime?: string;
   modifiedTime?: string;
-  manifest?: string;
-  webAppTitle?: string;
-  viewport?: string;
-  /** No header, footer or scroll-to-top, so a page can present as a full-screen app. */
-  bare?: boolean;
 }
 
-const { bare = false, ...props } = Astro.props;
+const props = Astro.props;
 ---
 
 <!doctype html>
@@ -69,21 +64,23 @@ const { bare = false, ...props } = Astro.props;
     <Font cssVariable="--font-text" />
     <SeoHead {...props} />
   </head>
-  <body class:list={[{ 'is-bare': bare }]}>
+  <body>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
-    {!bare && <span id="top" aria-hidden="true" />}
+    <span id="top" aria-hidden="true"></span>
 
     <a href="#main" class="skip-link">Zum Inhalt springen</a>
 
-    {!bare && <Header />}
+    <Header />
 
     <main id="main">
       <slot />
     </main>
 
-    {!bare && <Footer />}
+    <Footer />
 
-    {!bare && <ScrollToTop />}
+    <a href="#top" class="scroll-to-top" aria-label="Nach oben scrollen" title="Nach oben">
+      <Icon name="chevron-up" aria-hidden="true" />
+    </a>
 
     <script>
       import '../lib/client';
