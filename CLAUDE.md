@@ -37,7 +37,7 @@ compiler API that both `bun run lint` (typescript-eslint, peer `<6.1.0`) and
 breaks both at config-load time. Dependabot is configured to skip the major.
 
 `tests/` holds the suite: concurrency, the email/listmonk backend, database
-performance and the event share metadata. Each `*.fixture.ts` case is spawned as **its own Bun
+performance, the event share metadata and the proxied-origin CSRF guard. Each `*.fixture.ts` case is spawned as **its own Bun
 process** with its own SQLite file and its own `fetch` fake, so no case can leak
 module state into another and the suite needs neither a listmonk nor a build.
 CI runs `bun test` between the type check and the build. Verify changes with
@@ -110,6 +110,8 @@ split by area and merged flat in `index.ts`, so callers use `actions.<name>()`:
 The only remaining endpoints are `/health`, `/sitemap-events.xml` and
 `/api/public/events/<slug>/ics` — the latter is linked from the confirmation
 mails (`icsUrl`). The event page embeds its own .ics as a data URL.
+
+**CSRF behind the proxy — `security.allowedDomains`.** Astro's `checkOrigin` compares the browser's `Origin` against `Astro.url`. TLS terminates at Coolify/Traefik, so the Bun process sees plain HTTP and built `http://<host>`, while the form POST's `Origin` said `https://<host>` — every Anmeldung answered 403 "Cross-site POST form submissions are forbidden". `security.allowedDomains` in `astro.config.mjs` (derived from `PUBLIC_SITE_URL`) is the only thing that makes Astro trust `X-Forwarded-Proto`/`X-Forwarded-Host`; an unlisted host header is still ignored, which is what keeps host-header injection out. The check runs as an internal middleware _before_ `src/middleware.ts`, so it cannot be repaired there. Never answer a future 403 by setting `checkOrigin: false` — that drops CSRF protection from every action. `tests/forwarded-origin.test.ts` pins this against Astro's own validator.
 
 **Auth & guards:** `src/middleware.ts` guards admin **pages** (`/admin/*`) behind a signed session cookie (`ADMIN_EMAIL`/`ADMIN_PASSWORD`/`ADMIN_SESSION_SECRET`); unauth pages redirect to login, API hits get 401. Actions live outside the `/admin` path match, so each mutating action **self-guards** via `requireAdmin`.
 
