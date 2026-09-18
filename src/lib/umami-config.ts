@@ -1,7 +1,7 @@
 /**
  * One source of truth for the Umami website id and endpoint, shared by
- * astro.config.mjs (tracker), Layout.astro (recorder) and SeoHead.astro
- * (preconnect). Env first, built-in default second.
+ * astro.config.mjs (tracker) and SeoHead.astro (preconnect). Env first,
+ * built-in default second.
  */
 
 /** The production property. */

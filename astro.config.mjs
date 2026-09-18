@@ -171,9 +171,9 @@ export default defineConfig({
     }),
     // Must run AFTER llms(), same manifest reason as serveSitemapWithBunAdapter.
     serveLlmsWithBunAdapter(),
-    // Umami tracker. Id + endpoint from src/lib/umami-config.ts, shared with the
-    // layout's heatmap recorder and SeoHead's preconnect. `performance` turns on
-    // Umami's own Core Web Vitals collection.
+    // Umami tracker. Id + endpoint from src/lib/umami-config.ts, shared with
+    // SeoHead's preconnect. `performance` turns on Umami's own Core Web Vitals
+    // collection.
     umami({
       id: UMAMI_WEBSITE_ID,
       performance: true,
