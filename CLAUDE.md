@@ -38,10 +38,23 @@ breaks both at config-load time. Dependabot is configured to skip the major.
 
 `tests/` holds the suite: concurrency, the email/listmonk backend, database
 performance, the event share metadata and the proxied-origin CSRF guard. Each `*.fixture.ts` case is spawned as **its own Bun
-process** with its own SQLite file and its own `fetch` fake, so no case can leak
-module state into another and the suite needs neither a listmonk nor a build.
+process** — `--no-env-file`, an explicit `env` map, its own SQLite file and its
+own `fetch` fake — so no case can leak module state into another and the suite
+needs neither a listmonk nor a build.
 CI runs `bun test` between the type check and the build. Verify changes with
 `bun run check` + `bun run lint` + `bun test`, and by exercising the app.
+
+**A test that reads config must spawn a fixture, not read it in-process.**
+`astro.config.mjs` derives `security.allowedDomains` from `PUBLIC_SITE_URL` at
+module load, so a test importing it measures the developer's `.env` rather than
+the shipped config — and exercising the app locally means pointing that at
+localhost, which is this same file's other instruction. The two used to
+contradict each other: the CSRF guard went red for anyone actually running the
+site, with nothing wrong in the code. `forwarded-origin.fixture.ts` now names
+the site URL per scenario, which also pins the derivation itself rather than one
+literal domain. Env-dependent green is worse than red: it cost a full
+misdiagnosis here, including a `git stash -u` that does not touch a gitignored
+`.env` and so "reproduced" the failure without the change.
 
 **The complexity budget is enforced, not advisory.** `eslint.config.ts` sets
 `complexity: ['error', 12]` and `max-depth: ['error', 4]` at the measured
