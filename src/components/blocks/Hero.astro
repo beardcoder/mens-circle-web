@@ -255,7 +255,7 @@ const lines = data.displayLines ?? [];
 
       .home-hero__grid {
         grid-template-columns: minmax(0, 1fr);
-        row-gap: var(--space-md);
+        row-gap: var(--rhythm-group);
       }
 
       .home-hero__type,
@@ -281,8 +281,9 @@ const lines = data.displayLines ?? [];
         margin-block-start: 0;
       }
 
+      /* The row gap now carries the separation on its own. */
       .home-hero__figure {
-        margin-block-start: var(--space-xs);
+        margin-block-start: 0;
       }
 
       .home-hero__image {

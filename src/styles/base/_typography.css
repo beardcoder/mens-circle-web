@@ -226,6 +226,14 @@ p:last-child {
   color: var(--text-secondary);
 }
 
+/* `.prose p` outranks the global `p:last-child` trim on specificity, so a
+   rich-text block used to hand whatever followed it an extra 16px that its
+   hand-written neighbours did not — which is why several sections measured
+   more padding at the bottom than at the top. Trim it here too. */
+.prose > :last-child {
+  margin-block-end: 0;
+}
+
 .prose ul,
 .prose ol {
   padding-inline-start: 1.25rem;
