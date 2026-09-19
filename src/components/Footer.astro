@@ -147,7 +147,13 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
     @media (width <= 800px) {
       .footer__top {
         grid-template-columns: 1fr;
-        gap: var(--space-md);
+        gap: var(--rhythm-group);
+      }
+
+      .footer__links a,
+      .footer__legal a,
+      .social-link {
+        min-block-size: 44px;
       }
     }
 

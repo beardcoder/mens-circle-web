@@ -23,7 +23,11 @@ const anchor = data?.anchor ?? 'stimmen';
 
 {
   (
-    <section class="section section--sand testimonials-section" id={anchor} aria-labelledby="testimonials-title">
+    <section
+      class:list={['section', 'section--sand', 'testimonials-section', loading && 'testimonials-section--pending']}
+      id={anchor}
+      aria-labelledby="testimonials-title"
+    >
       <div class="container">
         <div class="spine">
           <p class="rail-heading">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
@@ -69,22 +73,25 @@ const anchor = data?.anchor ?? 'stimmen';
 
 <style is:global>
   @layer sections {
-    .testimonials-section {
+    /* The island's loading floor, and only that: on the loaded section the same
+       rule held a 480px minimum open under a short list of quotes. */
+    .testimonials-section--pending {
       min-block-size: 30rem;
     }
+
     /* A single column, not a two-up grid. Submitted quotes run from two lines
        to fifteen, so a grid left one cell half-empty beside a wall of text and
        halved the measure of both. Read down instead. */
     .testimonials__list {
       max-inline-size: var(--measure);
-      margin-block-start: var(--space-md);
+      margin-block-start: var(--rhythm-group);
       padding: 0;
       list-style: none;
       border-block-start: 1px solid var(--border-light);
     }
 
     .testimonial-item {
-      padding-block: var(--space-md);
+      padding-block: var(--rhythm-item);
       border-block-end: 1px solid var(--border-light);
     }
 
@@ -120,7 +127,7 @@ const anchor = data?.anchor ?? 'stimmen';
 
     .testimonials__note {
       max-inline-size: var(--measure);
-      margin-block-start: var(--space-md);
+      margin-block-start: var(--rhythm-group);
       font-size: var(--text-caption);
       line-height: var(--leading-relaxed);
       color: var(--text-muted);
