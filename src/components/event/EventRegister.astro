@@ -67,15 +67,18 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
 
 <style is:global>
   @layer sections {
+    /* The rail heading sits 8px above the title everywhere on the site, so the
+       title needs more than that below it or the three lines read as one
+       undifferentiated stack. Same rung as `.section-title`. */
     .event-register__title {
-      margin-block-end: var(--space-xs);
+      margin-block-end: var(--rhythm-stack);
       font-size: var(--text-3xl);
       line-height: 1.15;
     }
 
     .event-register__text {
       max-inline-size: var(--measure);
-      margin-block-end: var(--space-md);
+      margin-block-end: var(--rhythm-group);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
