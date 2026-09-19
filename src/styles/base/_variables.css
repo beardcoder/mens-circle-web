@@ -179,12 +179,36 @@
   --space-xl: clamp(3rem, 2.2rem + 3vw, 5rem);
   --space-2xl: clamp(4rem, 3rem + 4vw, 6.5rem);
 
-  /* Vertical rhythm — one source of truth for section spacing. Sections are
-     separated by a hairline as well as by space, so the space itself does not
-     have to do all the work: this is deliberately tighter than the old scale,
-     which left half a screen of nothing between passages. */
-  --rhythm-section: clamp(2.5rem, 1.9rem + 2.2vw, 4rem);
-  --rhythm-stack: var(--space-sm);
+  /* Vertical rhythm — the page's one ladder, four rungs that never cross:
+
+       section  between two sections (the section's own padding-block)
+       group    between the distinct groups inside one section
+       item     between the repeated items of one list
+       tight    inside a single item — label to value to note
+
+     The rungs are what carry the hierarchy, so the ratios matter more than the
+     absolute numbers: each rung is roughly 1.5× the one below it, at every
+     width. Keeping that order is the whole point. It had drifted badly on a
+     phone, where `--space-xl`/`--space-2xl` gaps inside a section (up to 92px)
+     grew larger than the 80px between two sections, so the eye could no longer
+     tell where one passage ended and the next began. Reach for these four
+     before reaching for a `--space-*` token in a vertical margin.
+
+                     390px     1320px
+       section        48px       64px
+       group          28px       37px
+       item           20px       26px
+       tight           8px        8px */
+  --rhythm-section: clamp(3rem, 2.55rem + 1.8vw, 4rem);
+  --rhythm-group: clamp(1.75rem, 1.5rem + 1vw, 2.5rem);
+  --rhythm-item: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
+  --rhythm-tight: var(--space-xs);
+
+  /* A section title to its own body. It is the item rung rather than a rung of
+     its own: a title and the prose under it are one group, but at `--space-sm`
+     it measured exactly the paragraph-to-paragraph gap, so the heading had no
+     more separation from its text than the paragraphs had from each other. */
+  --rhythm-stack: var(--rhythm-item);
 
   /* Motion — short and functional only. */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);

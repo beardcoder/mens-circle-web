@@ -142,6 +142,17 @@ mails (`icsUrl`). The event page embeds its own .ics as a data URL.
   content into _different_ spans so the left edge moves down the page. `.spine`
   (marker column + text column) is for quiet passages and sub-pages only —
   using it everywhere is what made an earlier iteration read as a stock theme.
+- **Vertical space is a four-rung ladder, and the rungs never cross.**
+  `--rhythm-section` > `--rhythm-group` > `--rhythm-item` > `--rhythm-tight`
+  (48/28/20/8 on a phone, 64/37/26/8 at 1320px), plus `--rhythm-stack` for a
+  title to its own body. Reach for these in a vertical margin before reaching
+  for a `--space-*` token. The order is the hierarchy: it had inverted on a
+  phone, where gaps _inside_ a section ran to 92px against 80px _between_ two
+  sections, and the page lost the ability to say where one passage ended.
+  Beware the other half of that failure — a `min-block-size` that levels grid
+  columns or reserves a server island's slot is not spacing, and it must be
+  lifted once the columns stack or the island has swapped in, or it becomes a
+  void nothing can close (`.home-live-event--pending`, `.home-facts__item`).
 - **The ring** (`components/Ring.astro`) is the one graphic motif: a thick, open
   orange SVG ring, used exactly twice (hero, close), cropped at a viewport edge,
   never over text or controls.
