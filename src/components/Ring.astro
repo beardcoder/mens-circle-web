@@ -104,6 +104,20 @@ const GAP = 83;
       }
     }
 
+    /* Phone, where the closing block's text runs the full width: the same crop
+       put the arc straight behind the last paragraph and its link, and muted
+       chalk over the orange measures about 1.2:1 — the sentence was effectively
+       gone. Cropped harder, the ring keeps its corner and stays clear of the
+       type; `.home-dates` reserves the band it needs (see blocks/Dates.astro).
+       The motif is "cropped at a viewport edge, never over text or controls". */
+    @media (width <= 48em) {
+      .ring--close {
+        inset-block-end: -6.5rem;
+        inset-inline-start: -5rem;
+        inline-size: 10rem;
+      }
+    }
+
     /* Scroll reaction.
        The ring drifts and turns a little as its section passes. Bounded on
        purpose: ~40px of travel and ~12° of rotation — enough to notice, not
