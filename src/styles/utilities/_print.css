@@ -18,11 +18,9 @@
   .header,
   .footer,
   .nav,
-  .newsletter-section,
   .cta-section,
   .skip-link,
   .scroll-to-top,
-  .modal,
   .calendar-modal,
   .btn,
   button:not([type='submit']) {

@@ -16,12 +16,18 @@
 
 export const CACHE_CONTROL = 'Cache-Control';
 
+// The policy values below are private: cacheControlForRoute() and
+// cacheControlForFile() are the only two things anything outside this file
+// ever needs — see tests/cache-policy.test.ts, which asserts on the strings
+// those functions return rather than importing a parallel set of expected
+// constants just to compare them to themselves.
+
 /**
  * Back-office pages, the live server islands and action responses. A seat
  * count, a participant list or a signed-in view must never be stored — not by
  * the browser, not by an intermediary, not by a future edge cache rule.
  */
-export const NO_STORE = 'private, no-store';
+const NO_STORE = 'private, no-store';
 
 /**
  * HTML. May be stored, must be revalidated before every reuse.
@@ -32,7 +38,7 @@ export const NO_STORE = 'private, no-store';
  * served stale. The uniform rule replaces a 24h `max-age` that left Impressum
  * and Datenschutz a day behind the repository.
  */
-export const REVALIDATE = 'public, max-age=0, must-revalidate';
+const REVALIDATE = 'public, max-age=0, must-revalidate';
 
 /**
  * Unhashed files from `public/` — favicons, logos, the OG poster. Their names
@@ -40,17 +46,17 @@ export const REVALIDATE = 'public, max-age=0, must-revalidate';
  * forever; a week of freshness plus a month of background refresh keeps them
  * out of the request path without that risk.
  */
-export const PUBLIC_ASSET = 'public, max-age=604800, stale-while-revalidate=2592000';
+const PUBLIC_ASSET = 'public, max-age=604800, stale-while-revalidate=2592000';
 
 /** Crawler- and installer-facing files, which have to be able to change today. */
-export const SHORT = 'public, max-age=3600, must-revalidate';
+const SHORT = 'public, max-age=3600, must-revalidate';
 
 /**
  * `public/sw.js` only. It exists to unregister the retired breathing app's
  * service worker, so it must never be pinned in a cache — a stale copy is a
  * worker that cannot retire itself.
  */
-export const NO_CACHE = 'no-cache';
+const NO_CACHE = 'no-cache';
 
 /** Nothing here may be stored; see `NO_STORE`. */
 const isPrivatePath = (pathname: string): boolean =>
