@@ -35,6 +35,15 @@ updates:
       # both tools ship TS 7 support.
       - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
+      # astro-llms-md 3.x must be adopted by hand, not auto-merged: it dropped
+      # both DEFAULT_NOISE_SELECTORS and the excludeSelectors option (the
+      # config astro.config.mjs passes it no longer loads), and its new SSR
+      # pass ignores `exclude` — it scrapes /admin/* from the *live* site at
+      # build time and publishes it as .md. See the `llms()` comment in
+      # astro.config.mjs. This is exactly what turned #85's CI red. Drop this
+      # entry once `exclude` covers SSR routes again.
+      - dependency-name: 'astro-llms-md'
+        update-types: ['version-update:semver-major']
 
   # The GitHub Actions used by the workflows in .github/workflows.
   - package-ecosystem: 'github-actions'
