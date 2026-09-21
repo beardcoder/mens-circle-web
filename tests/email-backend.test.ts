@@ -18,6 +18,7 @@ const cases = [
   'reminder-stamp-failure',
   'broadcast',
   'registration-async',
+  'waitlist-promotion',
 ];
 
 for (const scenario of cases) {
