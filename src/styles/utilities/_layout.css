@@ -166,13 +166,13 @@
    layout for the timeline to read. */
 @supports (content-visibility: auto) {
   :where(
+    .home-circle,
     .home-person,
     .home-evening,
     .home-frame,
     .faq-section,
     .values-section,
     .testimonials-section,
-    .newsletter-section,
     .cta-section,
     .event-info-section,
     .event-map-section,
