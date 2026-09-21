@@ -35,7 +35,11 @@ export const config = {
   DATABASE_PATH: env('DATABASE_PATH', './data/mens-circle.db'),
   ADMIN_EMAIL: env('ADMIN_EMAIL', ''),
   ADMIN_PASSWORD: env('ADMIN_PASSWORD', ''),
-  ADMIN_SESSION_SECRET: env('ADMIN_SESSION_SECRET', env('ADMIN_PASSWORD', 'change-me')),
+  // No fallback — not to ADMIN_PASSWORD (a login password reused as an HMAC
+  // key), and never to a literal default (this repo is public, so a literal
+  // here is a published secret). lib/server/auth.ts refuses to sign or trust
+  // any session while this is empty; see sessionSecretConfigured() there.
+  ADMIN_SESSION_SECRET: env('ADMIN_SESSION_SECRET', ''),
   LISTMONK_URL: env('LISTMONK_URL', '').replace(/\/+$/, ''),
   LISTMONK_API_USER: env('LISTMONK_API_USER', ''),
   LISTMONK_API_TOKEN: env('LISTMONK_API_TOKEN', ''),
