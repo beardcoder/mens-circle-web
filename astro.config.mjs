@@ -6,6 +6,7 @@ import icon from 'astro-icon';
 import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
 import { defineConfig, fontProviders } from 'astro/config';
 import { publishGeneratedFiles } from './astro-integrations/publish-generated-files.mjs';
+import { staticCacheHeaders } from './astro-integrations/static-cache-headers.mjs';
 import site from './src/data/site.json' with { type: 'json' };
 
 const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
@@ -167,5 +168,8 @@ export default defineConfig({
         },
       ],
     }),
+    // Must run LAST: it rewrites the same static manifest, and the entries
+    // publishGeneratedFiles() adds have to exist before the policy is applied.
+    staticCacheHeaders(),
   ],
 });
