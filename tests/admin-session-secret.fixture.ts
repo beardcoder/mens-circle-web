@@ -1,0 +1,104 @@
+/* eslint-disable no-console */
+/**
+ * Executed only by admin-session-secret.test.ts, in a child process started
+ * with `--no-env-file` and an explicit environment — config.ts reads
+ * ADMIN_SESSION_SECRET (and its siblings) from process.env at module load,
+ * exactly the reason forwarded-origin.fixture.ts is isolated the same way.
+ *
+ * The regression this guards: ADMIN_SESSION_SECRET used to fall back to
+ * ADMIN_PASSWORD, then to the literal string 'change-me' — a value visible in
+ * this public repository. With neither var set, that literal became the HMAC
+ * key signing every admin session cookie, so anyone could forge a valid
+ * `mc_admin` cookie for any deployment that forgot to set it, without ever
+ * needing to guess a real password. Each scenario proves the closed state
+ * from the actual functions callers use, not from re-reading config values.
+ */
+import assert from 'node:assert/strict';
+
+const encoder = new TextEncoder();
+const base64url = (bytes: Uint8Array): string => {
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
+/**
+ * Builds a token exactly like auth.ts's own createSession() would, but signed
+ * with a caller-chosen key rather than whatever config.ADMIN_SESSION_SECRET
+ * holds — the only way to test "a token forged against key X is rejected"
+ * without reaching into auth.ts's private helpers.
+ */
+async function forgeToken(email: string, key: string, exp = Date.now() + 60_000): Promise<string> {
+  const payload = base64url(encoder.encode(JSON.stringify({ email, exp })));
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(key),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sig = base64url(new Uint8Array(await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode(payload))));
+  return `${payload}.${sig}`;
+}
+
+const { config } = await import('../src/lib/server/config');
+const auth = await import('../src/lib/server/auth');
+
+switch (process.argv[2]) {
+  // Nothing set at all — the totally unconfigured deployment.
+  case 'unset': {
+    assert.equal(config.ADMIN_SESSION_SECRET, '');
+    assert.equal(auth.sessionSecretConfigured(), false);
+    assert.equal(auth.verifyCredentials('a@b.c', 'x'), false);
+
+    // The exact historical exploit: a cookie forged with the old literal
+    // default must be rejected — not merely "some token is rejected", but
+    // specifically this one, which used to verify successfully.
+    const forgedWithOldDefault = await forgeToken('attacker@evil.example', 'change-me');
+    assert.equal(await auth.readSession(forgedWithOldDefault), null);
+    assert.equal(await auth.readSession('anything.at.all'), null);
+    break;
+  }
+
+  // ADMIN_EMAIL/PASSWORD set, ADMIN_SESSION_SECRET still not — the case that
+  // used to silently fall back to signing with the real password instead.
+  case 'password-only': {
+    assert.equal(config.ADMIN_EMAIL, 'admin@example.invalid');
+    assert.equal(config.ADMIN_PASSWORD, 'correct-horse-battery-staple');
+    assert.equal(config.ADMIN_SESSION_SECRET, '');
+    assert.equal(auth.sessionSecretConfigured(), false);
+
+    // Correct credentials must still be refused: verifyCredentials must not
+    // let a real login succeed while nothing can safely sign the result.
+    assert.equal(auth.verifyCredentials('admin@example.invalid', 'correct-horse-battery-staple'), false);
+
+    // A token forged with the password as the key (the old fallback) must no
+    // longer verify — the fallback itself is gone, not just gated later.
+    const forgedWithPassword = await forgeToken('admin@example.invalid', 'correct-horse-battery-staple');
+    assert.equal(await auth.readSession(forgedWithPassword), null);
+    break;
+  }
+
+  // Everything configured, with its own distinct secret — the healthy path
+  // must work exactly as before.
+  case 'configured': {
+    assert.equal(config.ADMIN_SESSION_SECRET, 'a-long-random-session-secret');
+    assert.equal(auth.sessionSecretConfigured(), true);
+    assert.equal(auth.verifyCredentials('admin@example.invalid', 'correct-horse-battery-staple'), true);
+    assert.equal(auth.verifyCredentials('admin@example.invalid', 'wrong-password'), false);
+
+    const token = await auth.createSession('admin@example.invalid');
+    assert.equal(await auth.readSession(token), 'admin@example.invalid');
+
+    // A token signed with a guessed secret still fails on its own merits —
+    // the fix must not have weakened the existing signature check.
+    const forgedWithWrongSecret = await forgeToken('admin@example.invalid', 'a-guessed-secret');
+    assert.equal(await auth.readSession(forgedWithWrongSecret), null);
+    break;
+  }
+
+  default:
+    throw new Error('Unknown admin-session-secret scenario');
+}
+
+console.log(`PASS ${process.argv[2]}`);
