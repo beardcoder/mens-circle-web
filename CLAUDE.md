@@ -22,6 +22,7 @@ bun test                         # test suite (isolated Bun processes, no servic
 
 bun run db:generate              # generate drizzle/<n>_*.sql after editing schema.ts
 bun run db:studio                # Drizzle Studio DB browser
+bun run db:backup                # snapshot DATABASE_PATH -> S3/R2 (scripts/backup-db.ts, needs BACKUP_S3_*)
 ```
 
 The `--bun` flag is the classic footgun here: dev needs the Bun runtime or the DB
@@ -36,8 +37,11 @@ compiler API that both `bun run lint` (typescript-eslint, peer `<6.1.0`) and
 `bun run check` (@astrojs/check, peer `^5 || ^6`) still consume, so a TS 7 bump
 breaks both at config-load time. Dependabot is configured to skip the major.
 
-`tests/` holds the suite: concurrency, the email/listmonk backend, database
-performance, the event share metadata and the proxied-origin CSRF guard. Each `*.fixture.ts` case is spawned as **its own Bun
+`tests/` holds the suite: concurrency, the email/listmonk backend (including
+the registration race and the waitlist-promotion-must-not-fire-on-a-waitlist-
+cancellation guards), database performance, the event share metadata, the
+proxied-origin CSRF guard, the cache policy and the admin-session-secret
+fallback closure. Each `*.fixture.ts` case is spawned as **its own Bun
 process** — `--no-env-file`, an explicit `env` map, its own SQLite file and its
 own `fetch` fake — so no case can leak module state into another and the suite
 needs neither a listmonk nor a build.
@@ -76,6 +80,31 @@ live scheduling and testimonials. The event pages stay fully SSR. The static
 home fallback links to `/event`, so scheduling stays usable without JavaScript.
 `astro-llms-md` includes the home page; only `/event` needs the extra entry.
 
+**Server islands: exactly four, home page only.** `HomeEventStatus` (hero
+placement), `HomeEventStatus` (dates placement), `Facts` and `Testimonials`,
+each rendered with an explicit `<Fragment slot="fallback">` that **never**
+imports `lib/server/*` — the fallback prop (`fallback`/`next={null}`/
+`testimonials={[]}`) is what keeps the prerendered shell free of a DB read.
+`scripts/verify-static-images.ts` asserts the count is exactly 4 and that no
+island's resolved fragment still says `data-status="loading"`; a fifth island
+or a fallback that starts reading the DB breaks that check for a reason worth
+understanding, not silencing.
+
+**Cache policy — `src/lib/cache-policy.ts`.** One table, two consumers:
+`src/middleware.ts` sets `Cache-Control` on everything server-rendered
+(including at prerender time, since Astro folds a route's response headers
+into the static manifest), and `astro-integrations/static-cache-headers.mjs`
+sets it on everything served from disk. `/admin/*`, the server islands and
+`/_actions/*` are `private, no-store`; HTML is `public, max-age=0,
+must-revalidate` (never longer — a stale seat count is a wrong seat count);
+unhashed `public/` files get a week with `stale-while-revalidate` since their
+names carry no hash. Hashed `/assets/*` and self-hosted fonts are untouched —
+they stay the adapter's own `immutable`. A route that sets its own
+`Cache-Control` (`/health`, `/sitemap-events.xml`, the home page's
+island-parameter `no-cache`) is left alone by both consumers. Adding a new
+static file type or a route with different freshness needs? Extend the table
+in `cache-policy.ts`, not a one-off header at the call site — `tests/cache-policy.test.ts` pins the table itself.
+
 **SEO / sitemap:** `/event` is a permanent landing page (`src/pages/event.astro`) that reads correctly with or without a scheduled date — it never redirects, and `/event/<slug>` stays the canonical URL for one meeting. The sitemap is in **two parts**: `@astrojs/sitemap` emits `sitemap-0.xml` for the build-time routes, and `src/pages/sitemap-events.xml.ts` lists the event pages per request (their slugs live in SQLite and are unknown at build time). `astro-integrations/publish-generated-files.mjs` adds that route to `sitemap-index.xml`, adds `/event` to `llms.txt` (`astro-llms-md` reads built HTML, so SSR pages are invisible to it) and only then registers every generated file in the adapter's static manifest — patching a file after its byte length is recorded would serve a truncated document. It **must** be registered after `sitemap()` and `llms()`.
 
 **Images use native Astro features.** The home page is prerendered, so its
@@ -105,6 +134,20 @@ says so in one sentence and releases its reserved 16/9 box.
 
 **Data layer — `src/lib/server/db/`:** Drizzle on `bun:sqlite`. Schema in `schema.ts`; migrations in `drizzle/` are **applied automatically on boot** (`index.ts`). `bun:sqlite` is a Bun builtin kept `external` in `astro.config.mjs` (Rollup must not bundle it). After changing the schema, run `bun run db:generate`.
 
+**A read-then-write that must stay correct under concurrent requests belongs
+in a `db.transaction()`, not two awaited calls.** `bun:sqlite`'s driver
+(`drizzle-orm/bun-sqlite`) is synchronous end to end — `Database#transaction()`
+wraps a plain function, not a Promise — so the callback must stay fully
+synchronous (`tx.select()...get()`/`.all()`/`.run()`, never `await
+tx.select()...`); an `await` inside would let the native transaction commit
+before the awaited work even ran. `registrations.ts`'s `claimSeat()` is the
+reference: it recounts active seats and claims the row inside one
+`db.transaction(fn, { behavior: 'immediate' })`, which is what closes the race
+two concurrent registrations for the last seat used to fall into (both reading
+"not full" before either had written). `events.ts` exports `holdsASeat()` for
+exactly this reuse — recompute capacity from that one predicate, never a
+second copy of it.
+
 **`src/lib/server/*` is server-only** (db, events, registrations, testimonials, listmonk, email, auth, reminders, ics, format, ratelimit, config). Never import it into client `<script>` code — it pulls in `bun:sqlite`. This is the business-logic layer; the actions below are thin wrappers over it.
 
 **Everything is an Astro Action** (`src/actions/*`, served at `/_actions/*`),
@@ -116,9 +159,22 @@ split by area and merged flat in `index.ts`, so callers use `actions.<name>()`:
   `components/forms/` are plain HTML forms, and `lib/form.ts` posts their
   `FormData` and writes `isInputError(error).fields` beside each field. What
   only the data can decide (capacity, waitlist, duplicates, honeypot) lives in
-  `lib/server` and answers with a `FormResult`.
+  `lib/server` and answers with a `FormResult`. **These forms require
+  JavaScript** — the `<form>` has no `method`/`action`, `lib/form.ts` owns the
+  submit entirely, and there is no server-rendered no-JS fallback path.
+  `lib/form.ts`'s markup contract, for a new form: `data-form="<name>"` on the
+  `<form>` with a matching `id`, `<span class="form-error"
+id="{formId}-{fieldname}-error" hidden>` beside each validated field with
+  `aria-describedby` pointing at it, the `.hp-field` honeypot block copied
+  verbatim, and `enhanceForms('<name>', actions.<name>)` in a trailing
+  `<script>`. Nothing else is wired up automatically.
 - **Admin back-office** (`auth.ts`, `events.ts`, `registrations.ts`,
-  `testimonials.ts`), called from the admin components' scripts.
+  `testimonials.ts`), called from the admin components' scripts. Every
+  mutating admin script uses `bindOnce(selector, setup)` and `ok(result)` from
+  `lib/admin.ts` — `bindOnce` is required, not a convenience, because the admin
+  runs `<ClientRouter />`: a plain `DOMContentLoaded` listener only fires once
+  and goes stale after the first view-transition swap. Report outcomes with
+  `adminToast('ok' | 'err', text)`.
 
 The only remaining endpoints are `/health`, `/sitemap-events.xml` and
 `/api/public/events/<slug>/ics` — the latter is linked from the confirmation
@@ -126,7 +182,15 @@ mails (`icsUrl`). The event page embeds its own .ics as a data URL.
 
 **CSRF behind the proxy — `security.allowedDomains`.** Astro's `checkOrigin` compares the browser's `Origin` against `Astro.url`. TLS terminates at Coolify/Traefik, so the Bun process sees plain HTTP and built `http://<host>`, while the form POST's `Origin` said `https://<host>` — every Anmeldung answered 403 "Cross-site POST form submissions are forbidden". `security.allowedDomains` in `astro.config.mjs` (derived from `PUBLIC_SITE_URL`) is the only thing that makes Astro trust `X-Forwarded-Proto`/`X-Forwarded-Host`; an unlisted host header is still ignored, which is what keeps host-header injection out. The check runs as an internal middleware _before_ `src/middleware.ts`, so it cannot be repaired there. Never answer a future 403 by setting `checkOrigin: false` — that drops CSRF protection from every action. `tests/forwarded-origin.test.ts` pins this against Astro's own validator.
 
-**Auth & guards:** `src/middleware.ts` guards admin **pages** (`/admin/*`) behind a signed session cookie (`ADMIN_EMAIL`/`ADMIN_PASSWORD`/`ADMIN_SESSION_SECRET`); unauth pages redirect to login, API hits get 401. Actions live outside the `/admin` path match, so each mutating action **self-guards** via `requireAdmin`.
+**Auth & guards:** `src/middleware.ts` guards admin **pages** (`/admin/*`) behind a signed session cookie (`ADMIN_EMAIL`/`ADMIN_PASSWORD`/`ADMIN_SESSION_SECRET`); every unauthenticated page request — there is no separate API path here — redirects to `/admin/login`. Actions live outside the `/admin` path match, so each mutating action **self-guards** via `requireAdmin`, which is what actually answers 401 for an unauthenticated action call.
+
+**`ADMIN_SESSION_SECRET` has no fallback, on purpose.** It used to fall back to
+`ADMIN_PASSWORD`, then to a literal string — a real vulnerability, since the
+literal sat in this public repository and let anyone forge a valid admin
+session cookie for a deployment that forgot to set it. `sessionSecretConfigured()`
+(`lib/server/auth.ts`) now gates both `verifyCredentials()` and
+`readSession()`: with the var unset, a login can never succeed and no cookie —
+forged or genuine-looking — is ever trusted. Never reintroduce a default here.
 
 **Design system — the page is a poster.** Three colours and one superfamily.
 
@@ -204,6 +268,17 @@ sets `.vt-arrival` before first paint so the arriving page skips its own entranc
 
 **Cron (reminders):** In-process, on a plain self-rescheduling timer. `scripts/reminder-cron.ts` fires every 15 minutes on the UTC quarter hour and calls `runReminders()` from `src/lib/server/reminders.ts` — a single idempotent pass that stamps `reminder_sent_at`. It's loaded as a **`bun --preload`** module in `docker-entrypoint.sh`, so it registers once at process startup, before the Astro entry boots, in the same long-lived web process. (`--preload` must precede the entry file; the `bun run` subcommand is dropped — preload is a runtime flag.) This replaces the old "start lazily from middleware" trick, which relied on a `__MC_RUNTIME` flag the new Bun adapter never sets. The runtime image ships `src/lib/server` so the preload can reuse the data/email layer. **Do not reach for `Bun.cron` here:** the runtime only implements the OS-level `(path, schedule, title)` form, which writes to a crontab the image has no daemon for — the in-process callback overload exists only in `@types/bun`, so it type-checks and then throws at boot, killing the preload and the whole server with it. To trigger a pass manually: `bun run scripts/send-reminders.ts`.
 
+**This deploys as exactly one replica, and that is load-bearing.** The
+reminder cron has no distributed lock — its only guarantee against a duplicate
+send is the in-process 15-minute schedule plus the `reminder_sent_at` stamp,
+which two replicas racing the same quarter-hour boundary would both pass
+before either stamps. `bun:sqlite` is a single-writer connection opened once
+per process (`db/index.ts`), and the capacity-safe registration write
+(`claimSeat()`, above) is only atomic **within** one process's connection. A
+second replica would reintroduce the exact races that transaction closes,
+from a different angle. Scaling this out is a real redesign (a lock or a
+different DB), not a Coolify replica-count knob.
+
 **Anmeldebestätigungen are re-sendable.** `registrations.confirmation_sent_at`
 is stamped **only** when listmonk accepted the participant's copy, so a null is
 real evidence that no confirmation arrived (a cancelled seat that is later
@@ -221,10 +296,10 @@ notification, and skips `cancelled`/`attended` seats.
 - **Static content is JSON in the repo:** `src/content/home.json` (home block order + copy), `src/content/legal/*.json`, `src/data/site.json` (name, social, footer), `src/data/navigation.json`.
 - **Dynamic content (events, registrations, testimonials)** is managed in the admin UI at `/admin`; newsletter in the listmonk admin.
 - **Path aliases:** `@lib/*`, `@components/*`, `@data/*` (see `tsconfig.json`, extends `astro/tsconfigs/strict`).
-- **Styling:** hand-organized CSS under `src/styles/` (base/components/sections/utilities, entry `app.css`). LightningCSS transforms/minifies; `light-dark()` resolves the mode off `color-scheme`. CSS is inlined into each page's `<head>`. Animation belongs in `utilities/_motion.css` and `base/_keyframes.css` — see **Motion** above.
+- **Styling:** hand-organized CSS under `src/styles/` (base/components/sections/utilities, entry `app.css`). LightningCSS transforms/minifies; `light-dark()` resolves the mode off `color-scheme`. CSS is inlined into each page's `<head>` (`inlineStylesheets: 'always'`) — that is why block/event-specific styles live **in the component** (`<style is:global> @layer sections` inside `components/blocks/*.astro` and `components/event/*.astro`), not in `app.css`'s global import chain: a global copy would repeat every page's inline `<head>` with rules only some pages use. `sections/_hero.css` is the one deliberate exception (`PageHero.astro` and `teile-deine-erfahrung.astro` reuse its unscoped classes on nearly every page). Animation belongs in `utilities/_motion.css` and `base/_keyframes.css` — see **Motion** above.
 - **Radius is 0 everywhere on the public site.**
 - Fonts are self-hosted via the native Astro Fonts API (configured in `astro.config.mjs`, wired in `src/layouts/Layout.astro`). Barlow Condensed 600/800 + Barlow 400/600 — **the admin shares them.** It used to carry Bricolage Grotesque + IBM Plex Mono for a separate back-office voice; that identity is gone and so are the two extra webfonts (6 woff2 files, not 10).
-- **Home blocks** are dispatched by `components/PageContent.astro` from `home.json`'s `blocks` array: `hero`, `facts`, `intro`, `moderator`, `statement`, `frame`, `journey-steps`, `testimonials`, `faq`, `dates`. Adding a block means adding a component _and_ a case there.
+- **Home blocks** are dispatched by `components/PageContent.astro` from `home.json`'s `blocks` array. `home.json` currently uses ten of them — `hero`, `facts`, `intro`, `moderator`, `statement`, `frame`, `journey-steps`, `testimonials`, `faq`, `dates` — but `PageContent.astro` itself also switches on `cta`, `value-items`, `page-hero` and `text-section` for the sub-pages that reuse the same dispatcher. Adding a block means adding a component _and_ a case there.
 - **One brand name: `site.siteName`.** Titles, manifests, robots.txt and every
   schema `name` read it. Four spellings had drifted in before, including one
   with a stray space (`Niederbayern/ Straubing`). Never type the name out again.
@@ -241,4 +316,4 @@ notification, and skips `cancelled`/`attended` seats.
 
 ## Environment
 
-Copy `.env.example`. Without `ADMIN_*` the `/admin` area is unusable; without `LISTMONK_*` email/newsletter is inert. `PUBLIC_SITE_URL` is build-time (sitemap/OG); `APP_URL` is runtime (email links, .ics, image URLs); `DATABASE_PATH` defaults to `./data/mens-circle.db` locally and the `/data` volume in Docker.
+Copy `.env.example`. Without `ADMIN_*` the `/admin` area is unusable; without `LISTMONK_*` email/newsletter is inert. `PUBLIC_SITE_URL` is build-time (sitemap/OG); `APP_URL` is runtime (email links, .ics, image URLs); `DATABASE_PATH` defaults to `./data/mens-circle.db` locally and the `/data` volume in Docker. `ADMIN_SESSION_SECRET` specifically has **no fallback** — not to `ADMIN_PASSWORD`, not to a default — leaving it unset locks the admin area out entirely rather than degrading; see **Auth & guards** above for why.
