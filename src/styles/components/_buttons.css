@@ -190,16 +190,6 @@
   --btn-hover-border: var(--text-primary);
 }
 
-/* Outlined for dark surfaces */
-.btn--outline {
-  --btn-bg: transparent;
-  --btn-color: var(--color-chalk);
-  --btn-border: var(--border-on-dark);
-  --btn-hover-bg: var(--color-paper);
-  --btn-hover-color: var(--color-ink);
-  --btn-hover-border: var(--color-paper);
-}
-
 /* Low-emphasis text button */
 .btn--ghost {
   --btn-bg: transparent;

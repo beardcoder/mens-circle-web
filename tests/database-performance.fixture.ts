@@ -4,7 +4,7 @@ import { copyFileSync, mkdirSync, readFileSync, realpathSync, writeFileSync } fr
 import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { Database, type SQLQueryBindings } from 'bun:sqlite';
-import { and, asc, desc, eq, isNull } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, isNull } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
 import { NoopLogger, type Logger } from 'drizzle-orm/logger';
@@ -28,12 +28,10 @@ const { db } = await import('../src/lib/server/db');
 const { events, participants, registrations, testimonials } = await import('../src/lib/server/db/schema');
 const {
   countActiveRegistrations,
-  eventDto,
-  fetchNextEvent,
   fetchNextEventState,
   getEventBySlug,
-  getNextEvent,
   getPublishedEventBySlug,
+  isEventPast,
   listEventsForAdmin,
 } = await import('../src/lib/server/events');
 const { fetchTestimonials } = await import('../src/lib/server/testimonials');
@@ -64,6 +62,61 @@ function explain(query: Query): string {
     statement.finalize();
   }
 }
+
+/**
+ * The old two-query lookup-then-DTO path, kept here rather than as an export
+ * of events.ts: this file's own reference baseline for "the combined-query
+ * path returns the identical value using fewer statements" — the only thing
+ * that ever needed it. Keeping a from-scratch reimplementation, rather than
+ * reaching into events.ts's private eventDtoWithCount/startOfTodayIso, is the
+ * point of a baseline comparison: it has to arrive at the same answer
+ * independently, not share the code path it is checking.
+ */
+function legacyStartOfTodayIso(): string {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
+}
+
+async function legacyGetNextEvent(): Promise<typeof events.$inferSelect | null> {
+  const rows = await db
+    .select()
+    .from(events)
+    .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, legacyStartOfTodayIso())))
+    .orderBy(asc(events.eventDate))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+async function legacyEventDto(ev: typeof events.$inferSelect) {
+  const activeCount = await countActiveRegistrations(ev.id);
+  const available = Math.max(0, ev.maxParticipants - activeCount);
+  return {
+    id: ev.id,
+    title: ev.title,
+    slug: ev.slug,
+    description: ev.description,
+    event_date: ev.eventDate,
+    start_time: ev.startTime,
+    end_time: ev.endTime,
+    location: ev.location,
+    location_details: ev.locationDetails,
+    street: ev.street,
+    postal_code: ev.postalCode,
+    city: ev.city,
+    latitude: ev.latitude,
+    longitude: ev.longitude,
+    max_participants: ev.maxParticipants,
+    cost_basis: ev.costBasis,
+    image_url: ev.imageUrl ?? null,
+    available_spots: available,
+    is_full: available <= 0,
+    is_past: isEventPast(ev),
+  };
+}
+
+/** What the removed fetchNextEvent() export used to return directly — now
+ *  derived from the real production entrypoint instead of a parallel one. */
+const nextEventOrNull = async () => (await fetchNextEventState()).event;
 
 const today = new Date();
 const date = (offset: number) =>
@@ -124,8 +177,8 @@ function seedEvents() {
 
 async function checkEvents() {
   seedEvents();
-  // The former lookup + DTO API remains a two-query reference path.
-  const baseline = await capture(async () => eventDto((await getNextEvent())!), 2);
+  // The two-query baseline (see legacyGetNextEvent/legacyEventDto above).
+  const baseline = await capture(async () => legacyEventDto((await legacyGetNextEvent())!), 2);
   assert.deepEqual(baseline.value, {
     id: 'today',
     title: 'Today',
@@ -148,7 +201,7 @@ async function checkEvents() {
     is_full: false,
     is_past: false,
   });
-  const next = await capture(fetchNextEvent, 1);
+  const next = await capture(nextEventOrNull, 1);
   assert.deepEqual(next.value, baseline.value);
   const state = await capture(fetchNextEventState, 1);
   assert.deepEqual(state.value, { status: 'scheduled', event: baseline.value });
@@ -166,7 +219,7 @@ async function checkEvents() {
     ['overflow', 0],
     ['past', 6],
   ] as const) {
-    const legacy = await capture(async () => eventDto((await getPublishedEventBySlug(slug))!), 2);
+    const legacy = await capture(async () => legacyEventDto((await getPublishedEventBySlug(slug))!), 2);
     const current = await capture(() => getEventBySlug(slug), 1);
     assert.deepEqual(current.value, legacy.value);
     assert.equal(current.value?.available_spots, available);
@@ -189,21 +242,21 @@ async function checkEvents() {
   for (const limit of [undefined, 1]) {
     await capture(async () => Promise.all([fetchNextEventState(), fetchTestimonials(limit)]), 2);
     await capture(
-      async () => Promise.all([getNextEvent().then((event) => eventDto(event!)), fetchTestimonials(limit)]),
+      async () => Promise.all([legacyGetNextEvent().then((event) => legacyEventDto(event!)), fetchTestimonials(limit)]),
       3,
     );
   }
   // No cross-request cache: a new seat must affect the very next read.
   db.update(registrations).set({ status: 'registered' }).where(eq(registrations.id, 'today-2')).run();
-  assert.equal((await capture(fetchNextEvent, 1)).value?.available_spots, 1);
+  assert.equal((await capture(nextEventOrNull, 1)).value?.available_spots, 1);
 }
 
 async function checkStates() {
   assert.deepEqual((await capture(fetchNextEventState, 1)).value, { status: 'none', event: null });
-  assert.equal((await capture(fetchNextEvent, 1)).value, null);
+  assert.equal((await capture(nextEventOrNull, 1)).value, null);
   seedEvents();
   db.update(events).set({ isPublished: false }).where(eq(events.id, 'today')).run();
-  assert.equal((await fetchNextEvent())?.id, 'empty');
+  assert.equal((await nextEventOrNull())?.id, 'empty');
   db.update(events)
     .set({ isPublished: false })
     .where(and(eq(events.isPublished, true), isNull(events.deleted)))
@@ -214,13 +267,13 @@ async function checkStates() {
   // A capacity-query failure is unavailable, not an empty scheduling state.
   db.$client.run('DROP TABLE registrations');
   assert.deepEqual(await fetchNextEventState(), { status: 'unavailable', event: null });
-  assert.equal(await fetchNextEvent(), null);
+  assert.equal(await nextEventOrNull(), null);
   assert.equal(await getEventBySlug('today'), null);
   // ICS still has no dependency on registrations/capacity.
   assert.equal((await getPublishedEventBySlug('today'))?.id, 'today');
   db.$client.run('DROP TABLE events');
   assert.deepEqual(await fetchNextEventState(), { status: 'unavailable', event: null });
-  assert.equal(await fetchNextEvent(), null);
+  assert.equal(await nextEventOrNull(), null);
   assert.equal(await getEventBySlug('today'), null);
 }
 

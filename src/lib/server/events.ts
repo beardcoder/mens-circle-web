@@ -57,9 +57,6 @@ const eventDtoWithCount = (ev: Event, activeCount: number): EventDTO => {
   };
 };
 
-export const eventDto = async (ev: Event): Promise<EventDTO> =>
-  eventDtoWithCount(ev, await countActiveRegistrations(ev.id));
-
 interface EventWithCapacity {
   event: Event;
   activeCount: number;
@@ -79,16 +76,6 @@ const eventWithCapacityQuery = () =>
 const startOfTodayIso = (): string => {
   const now = new Date();
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0)).toISOString();
-};
-
-export const getNextEvent = async (): Promise<Event | null> => {
-  const rows = await db
-    .select()
-    .from(events)
-    .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, startOfTodayIso())))
-    .orderBy(asc(events.eventDate))
-    .limit(1);
-  return rows[0] ?? null;
 };
 
 const getNextEventWithCapacity = async (): Promise<EventWithCapacity | null> => {
@@ -144,12 +131,13 @@ const tryEventDto = async (fetch: () => Promise<EventWithCapacity | null>, label
   }
 };
 
-export const fetchNextEvent = (): Promise<EventDTO | null> => tryEventDto(getNextEventWithCapacity, 'fetchNextEvent');
-
 /**
- * The scheduling state as three cases. `fetchNextEvent` collapses "nothing
- * scheduled" and "the read failed" into one `null`; anything that puts the
- * answer in front of a reader must tell them apart and uses this instead.
+ * The scheduling state as three cases: `scheduled`, `none` (nothing on the
+ * books — a true, sayable fact) and `unavailable` (the read itself failed).
+ * Anything that puts the answer in front of a reader must tell those apart —
+ * a failed read must never render as "kein Termin geplant", which would be a
+ * false claim — so this is the one entry point for "what's the next event"
+ * everywhere in the app.
  */
 export type NextEventState =
   { status: 'scheduled'; event: EventDTO } | { status: 'none'; event: null } | { status: 'unavailable'; event: null };
