@@ -15,6 +15,11 @@ const calls: Call[] = [];
 let active = 0;
 let peak = 0;
 const pause = () => new Promise((resolve) => setTimeout(resolve, 2));
+/** Polls the fetch stub's own in-flight counter rather than guessing how many
+ *  background calls a batch of fire-and-forget work will make. */
+const waitForIdle = async (): Promise<void> => {
+  while (active > 0) await pause();
+};
 const json = (data: unknown, status = 200) => Response.json(data, { status });
 const deferred = () => {
   let resolve!: () => void;
@@ -426,6 +431,60 @@ const scenarios: Record<string, () => Promise<void>> = {
       0,
       'cancelling a waitlist entry must never promote anyone — it held no seat',
     );
+  },
+  async 'registration-race'() {
+    const { db } = await import('../src/lib/server/db');
+    const today = new Date().toISOString().slice(0, 10);
+    const [event] = await db
+      .insert(events)
+      .values({
+        title: 'Race',
+        slug: 'race',
+        eventDate: `${today}T12:00:00.000Z`,
+        isPublished: true,
+        maxParticipants: 3,
+      })
+      .returning();
+
+    // Every listmonk call any of these registrations triggers in the
+    // background just needs to succeed — this scenario is about the DB row
+    // states, not the side effects.
+    handler = () => json({ data: { id: 1 } });
+
+    const { register } = await import('../src/lib/server/registrations');
+    const RACERS = 12;
+    // Genuinely concurrent: every call starts before any of them can have
+    // finished its own claim, which is exactly what production sees when a
+    // popular event's last few seats get hit at once.
+    const results = await Promise.all(
+      Array.from({ length: RACERS }, (_, i) =>
+        register({
+          event_id: event.id,
+          email: `racer${i}@example.invalid`,
+          first_name: `Racer${i}`,
+          last_name: '',
+          phone_number: '',
+        }),
+      ),
+    );
+
+    assert.ok(
+      results.every((result) => result.status === 200),
+      'every racer is accepted, whether seated or waitlisted — nobody is turned away as an error',
+    );
+
+    const rows = await db.select().from(registrations).where(eq(registrations.eventId, event.id));
+    assert.equal(rows.length, RACERS, 'every racer gets exactly one row');
+    assert.equal(
+      rows.filter((row) => row.status === 'registered').length,
+      3,
+      'never more than maxParticipants end up registered, no matter how many raced for the last seats',
+    );
+    assert.equal(rows.filter((row) => row.status === 'waitlist').length, RACERS - 3);
+
+    // Let every racer's fire-and-forget mail/listmonk work actually finish —
+    // register() never awaits it, so it can still be in flight here.
+    await waitForIdle();
   },
 };
 

@@ -19,6 +19,7 @@ const cases = [
   'broadcast',
   'registration-async',
   'waitlist-promotion',
+  'registration-race',
 ];
 
 for (const scenario of cases) {
