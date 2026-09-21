@@ -354,6 +354,79 @@ const scenarios: Record<string, () => Promise<void>> = {
     await lm.ensureSubscriber(subscriber.email, 'Person');
     assert.equal(calls.length, 6, 'registration identity must not become a global ID cache');
   },
+  async 'waitlist-promotion'() {
+    const { db, event } = await seed(5);
+    // r0-r3 hold seats; r4 waits. (p4's derived subscriber id is 5 — clear of
+    // the ids txHandler special-cases to fail, which would otherwise muddy
+    // what this scenario is actually testing.)
+    await db.update(registrations).set({ status: 'waitlist' }).where(eq(registrations.id, 'r4'));
+
+    const { changeRegistrationStatus } = await import('../src/lib/server/registrations');
+
+    // Cancelling a SEAT (r0, 'registered') frees one — the sole waitlisted
+    // entry must be promoted and mailed. The mail is fire-and-forget from
+    // changeRegistrationStatus's own return, so gate on the actual /api/tx
+    // call rather than racing a fixed delay.
+    const promoted = deferred();
+    handler = (call) => {
+      if (call.path === '/api/tx') promoted.resolve();
+      return txHandler(call);
+    };
+    await changeRegistrationStatus('r0', 'cancelled');
+    await promoted.promise;
+    let rows = await db.select().from(registrations);
+    assert.equal(rows.find((row) => row.id === 'r4')?.status, 'registered', 'the waitlisted entry is promoted');
+    assert.equal(
+      calls.filter((call) => call.path === '/api/tx' && call.body.template_id === config.TX_WAITLIST_PROMOTION).length,
+      1,
+      'the promoted participant is mailed exactly once',
+    );
+
+    // Cancelling a fresh WAITLIST entry that never held a seat must never
+    // promote anyone — even though a second person is genuinely still
+    // waiting and available to be (wrongly) promoted. This is the exact bug
+    // this scenario guards against: promotion used to run for ANY cancelled
+    // entry regardless of what its own status had been, so this second
+    // waiter would have been promoted purely because someone else on the
+    // waitlist cancelled.
+    calls.length = 0;
+    handler = txHandler;
+    const waiters = await db
+      .insert(participants)
+      .values([
+        { email: 'late@example.invalid', firstName: 'Late' },
+        { email: 'still-waiting@example.invalid', firstName: 'Waiting' },
+      ])
+      .returning();
+    await db.insert(registrations).values([
+      { id: 'r-late', eventId: event.id, participantId: waiters[0].id, status: 'waitlist', registeredAt: '998' },
+      {
+        id: 'r-still-waiting',
+        eventId: event.id,
+        participantId: waiters[1].id,
+        status: 'waitlist',
+        registeredAt: '999',
+      },
+    ]);
+    await changeRegistrationStatus('r-late', 'cancelled');
+    // Nothing async to await: with the fix, this path never calls
+    // promoteNextWaitlisted, so no fetch is even scheduled. A short pause is
+    // defensive margin only, in case a future change makes that path async
+    // without immediately reaching the network.
+    await pause();
+    rows = await db.select().from(registrations);
+    assert.equal(rows.find((row) => row.id === 'r-late')?.status, 'cancelled');
+    assert.equal(
+      rows.find((row) => row.id === 'r-still-waiting')?.status,
+      'waitlist',
+      'the other waiter is untouched, not promoted',
+    );
+    assert.equal(
+      calls.filter((call) => call.path === '/api/tx' && call.body.template_id === config.TX_WAITLIST_PROMOTION).length,
+      0,
+      'cancelling a waitlist entry must never promote anyone — it held no seat',
+    );
+  },
 };
 
 const scenario = process.argv[2];

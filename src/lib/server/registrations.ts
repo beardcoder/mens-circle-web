@@ -289,7 +289,14 @@ export const changeRegistrationStatus = async (regId: string, newStatus: RegStat
         )[0];
         if (participant) void removeFromList(participant.email, event.listmonkListId).catch(() => {});
       }
-      await promoteNextWaitlisted(event);
+      // Only a status that actually held a seat frees one. A cancelled
+      // `waitlist` entry never held one, so it must never promote the next
+      // person — that used to run regardless of `oldStatus`, which could push
+      // an event over capacity and mailed the promoted person a seat that
+      // nobody had vacated.
+      if (oldStatus === 'registered' || oldStatus === 'attended') {
+        await promoteNextWaitlisted(event);
+      }
     }
   }
   return updated;
