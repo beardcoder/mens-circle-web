@@ -8,8 +8,12 @@ import { config, listmonkApiConfigured } from './config';
 import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
 import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
 
-/** The single predicate behind every capacity number: live and seat-holding. */
-const holdsASeat = () =>
+/**
+ * The single predicate behind every capacity number: live and seat-holding.
+ * Exported so registrations.ts's transactional seat claim recounts against
+ * this exact definition rather than a second copy that could drift from it.
+ */
+export const holdsASeat = () =>
   and(isNull(registrations.deleted), inArray(registrations.status, ACTIVE_REGISTRATION_STATUSES));
 
 export const countActiveRegistrations = async (eventId: string): Promise<number> => {
