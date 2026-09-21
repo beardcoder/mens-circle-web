@@ -1,5 +1,8 @@
 /**
- * schema.org/Event JSON-LD, embedded by /event and /event/[slug] via SeoHead.
+ * schema.org/Event JSON-LD for one scheduled meeting, embedded by
+ * /event/[slug] via SeoHead. /event itself carries no Event node — it emits
+ * `eventSeriesSchema()` (series-schema.ts) and points at the next meeting with
+ * `subEvent: { '@id': <its canonical URL> }` instead of restating it.
  *
  * It joins the site's single entity graph: the canonical URL doubles as `@id`
  * (the node /event points at with `subEvent`), `organizer` references

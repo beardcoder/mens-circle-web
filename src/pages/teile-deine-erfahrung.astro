@@ -2,8 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import TestimonialForm from '../components/forms/TestimonialForm.astro';
 
-// Prerendered: the island POSTs to /api/testimonial/submit, so nothing here
-// needs server rendering.
+// Prerendered: the form posts to the submitTestimonial action client-side
+// (see src/lib/form.ts), so nothing here needs server rendering.
 export const prerender = true;
 
 const schemas = [
