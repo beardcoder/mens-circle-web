@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
-import { and, asc, eq, isNull } from 'drizzle-orm';
+import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import type { Event, Participant, Registration, RegistrationStatus } from './db/schema';
 import { participants, registrations } from './db/schema';
 import { accepted, type FormResult, isHoneypotFilled, rejected } from './form-submission';
 import { sendEventMessage, sendRegistrationConfirmation, sendRegistrationEmails, sendWaitlistPromotion } from './email';
-import { countActiveRegistrations, ensureEventList, getEventById, isEventPast } from './events';
+import { countActiveRegistrations, ensureEventList, getEventById, holdsASeat, isEventPast } from './events';
 import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
 
 /** Alias for the existing call sites; the union lives with the column. */
@@ -88,47 +88,79 @@ const openEvent = async (eventId: string): Promise<{ event: Event } | { error: F
 };
 
 /**
- * Take the seat: revive a cancelled registration or write a new one. Returns the
- * booked row's id, or the conflict to answer with when a live one exists.
+ * Take the seat: revive a cancelled registration or write a new one, deciding
+ * `registered` vs. `waitlist` from a recount taken inside the same write
+ * transaction as the claim. Returns the booked row, or the conflict to answer
+ * with when a live one exists.
+ *
+ * bun:sqlite's driver is synchronous end to end (see drizzle-orm/bun-sqlite's
+ * session.ts): `Database#transaction()` wraps a plain function call, not a
+ * Promise, so this callback must stay fully synchronous — an `await` inside
+ * would let the native transaction commit before the awaited work even runs.
+ * `tx.select()...get()` (rather than `await tx.select()...`) is what stays
+ * synchronous. That, not the `behavior` below, is what actually closes the
+ * race: JS is single-threaded and runs a synchronous call to completion
+ * before anything else gets the thread, so once this recount starts, no
+ * other concurrent `register()` call's claim can interleave with it — the
+ * old code awaited between the count and the write, and that await was
+ * exactly the gap two requests for the last seat could both fall into.
+ *
+ * `behavior: 'immediate'` is the belt to that braces: it takes SQLite's own
+ * write lock at BEGIN rather than at the driver's default `deferred`
+ * behaviour's first write, so the guarantee holds even if a future change
+ * ever calls this from more than one process, and it fails loud (via the 5s
+ * `busy_timeout` in db/index.ts) rather than silently on any lock contention
+ * this function itself doesn't explain.
  */
-const claimSeat = async (
+const claimSeat = (
   participantId: string,
-  eventId: string,
-  status: IntakeStatus,
-): Promise<{ registrationId: string } | { error: FormResult }> => {
-  const existing = (
-    await db
-      .select()
-      .from(registrations)
-      .where(and(eq(registrations.participantId, participantId), eq(registrations.eventId, eventId)))
-      .limit(1)
-  )[0];
+  event: Event,
+): { registrationId: string; status: IntakeStatus } | { error: FormResult } =>
+  db.transaction(
+    (tx) => {
+      const existing = tx
+        .select()
+        .from(registrations)
+        .where(and(eq(registrations.participantId, participantId), eq(registrations.eventId, event.id)))
+        .get();
 
-  if (existing && !existing.deleted) {
-    return {
-      error: rejected(
-        409,
-        existing.status === 'waitlist'
-          ? 'Du bist bereits auf der Warteliste für diese Veranstaltung.'
-          : 'Du bist bereits für diese Veranstaltung angemeldet.',
-      ),
-    };
-  }
+      if (existing && !existing.deleted) {
+        return {
+          error: rejected(
+            409,
+            existing.status === 'waitlist'
+              ? 'Du bist bereits auf der Warteliste für diese Veranstaltung.'
+              : 'Du bist bereits für diese Veranstaltung angemeldet.',
+          ),
+        };
+      }
 
-  const registeredAt = new Date().toISOString();
-  if (existing) {
-    // A revived seat starts over: the old confirmation no longer describes it.
-    await db
-      .update(registrations)
-      .set({ status, registeredAt, cancelledAt: null, deleted: null, confirmationSentAt: null })
-      .where(eq(registrations.id, existing.id));
-    return { registrationId: existing.id };
-  }
-  const inserted = (
-    await db.insert(registrations).values({ participantId, eventId, status, registeredAt }).returning()
-  )[0];
-  return { registrationId: inserted.id };
-};
+      const activeCount =
+        tx
+          .select({ c: sql<number>`count(*)` })
+          .from(registrations)
+          .where(and(eq(registrations.eventId, event.id), holdsASeat()))
+          .get()?.c ?? 0;
+      const status: IntakeStatus = activeCount >= event.maxParticipants ? 'waitlist' : 'registered';
+      const registeredAt = new Date().toISOString();
+
+      if (existing) {
+        // A revived seat starts over: the old confirmation no longer describes it.
+        tx.update(registrations)
+          .set({ status, registeredAt, cancelledAt: null, deleted: null, confirmationSentAt: null })
+          .where(eq(registrations.id, existing.id))
+          .run();
+        return { registrationId: existing.id, status };
+      }
+      const inserted = tx
+        .insert(registrations)
+        .values({ participantId, eventId: event.id, status, registeredAt })
+        .returning()
+        .get();
+      return { registrationId: inserted.id, status };
+    },
+    { behavior: 'immediate' },
+  );
 
 /** Record that the participant's copy of the confirmation actually left listmonk. */
 const markConfirmationSent = async (registrationId: string): Promise<void> => {
@@ -190,24 +222,18 @@ export const register = async (payload: RegistrationInput): Promise<FormResult> 
   if ('error' in found) return found.error;
   const { event } = found;
 
-  const isWaitlist = (await countActiveRegistrations(event.id)) >= event.maxParticipants;
-  const status: IntakeStatus = isWaitlist ? 'waitlist' : 'registered';
-
   const participant = await upsertParticipant(fields.email, fields);
-  const seat = await claimSeat(participant.id, event.id, status);
+  // Decides registered-vs-waitlist itself, from a recount inside its own
+  // write transaction — see claimSeat's own comment for why that recount
+  // can't happen out here beforehand.
+  const seat = claimSeat(participant.id, event);
   if ('error' in seat) return seat.error;
+  const { status, registrationId } = seat;
 
-  dispatchSideEffects(
-    event,
-    participant,
-    fields,
-    status,
-    await countActiveRegistrations(event.id),
-    seat.registrationId,
-  );
+  dispatchSideEffects(event, participant, fields, status, await countActiveRegistrations(event.id), registrationId);
 
   return accepted(
-    isWaitlist
+    status === 'waitlist'
       ? `Du wurdest auf die Warteliste eingetragen, ${fields.firstName}. Wir benachrichtigen dich per E-Mail, sobald ein Platz frei wird.`
       : confirmation,
   );
