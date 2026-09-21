@@ -14,9 +14,10 @@ export DATABASE_PATH="${DATABASE_PATH:-/data/mens-circle.db}"
 
 echo "→ Starting Astro server on $ASTRO_HOST:$ASTRO_PORT (db: $DATABASE_PATH)"
 # --smol keeps the Bun heap small (lower RAM) — fine for this traffic level.
-# --preload registers the event-reminder cron (Bun.cron) once at startup, in
-# this same process, before the Astro entry boots. NB: --preload must precede
-# the entry file and the `run` subcommand is dropped (`bun run --preload …`
-# is rejected — preload is a runtime flag, not a run-script flag).
+# --preload registers the event-reminder scheduler (scripts/reminder-cron.ts,
+# a plain self-rescheduling setTimeout — NOT Bun.cron, see that file) once at
+# startup, in this same process, before the Astro entry boots. NB: --preload
+# must precede the entry file and the `run` subcommand is dropped (`bun run
+# --preload …` is rejected — preload is a runtime flag, not a run-script flag).
 HOST="$ASTRO_HOST" PORT="$ASTRO_PORT" \
   exec bun --smol --preload /app/scripts/reminder-cron.ts /app/dist/server/entry.mjs

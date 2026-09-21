@@ -1,0 +1,1 @@
+ALTER TABLE `registrations` DROP COLUMN `sms_reminder_sent_at`;

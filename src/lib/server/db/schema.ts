@@ -80,7 +80,6 @@ export const registrations = sqliteTable(
     /** Last successful delivery of the confirmation mail; null means it never arrived. */
     confirmationSentAt: text('confirmation_sent_at'),
     reminderSentAt: text('reminder_sent_at'),
-    smsReminderSentAt: text('sms_reminder_sent_at'),
     deleted: text('deleted'),
     createdAt: text('created_at').notNull().$defaultFn(nowIso),
     updatedAt: text('updated_at').notNull().$defaultFn(nowIso).$onUpdateFn(nowIso),
