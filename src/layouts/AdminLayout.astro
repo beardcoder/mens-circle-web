@@ -36,32 +36,30 @@ const onTestimonials = path.startsWith('/admin/testimonials');
     <ClientRouter />
   </head>
   <body>
-    {
-      !bare && (
-        <header class="topbar">
-          <nav class="nav">
-            <a href="/admin" class="brand">
-              <span class="brand-ring" aria-hidden="true" />
-              männerkreis
+    {!bare && (
+      <header class="topbar">
+        <nav class="nav">
+          <a href="/admin" class="brand">
+            <span class="brand-ring" aria-hidden="true" />
+            männerkreis
+          </a>
+          <div class="nav-links">
+            <a href="/admin" class:list={['nav-link', { active: onEvents }]}>
+              Veranstaltungen
             </a>
-            <div class="nav-links">
-              <a href="/admin" class:list={['nav-link', { active: onEvents }]}>
-                Veranstaltungen
-              </a>
-              <a href="/admin/testimonials" class:list={['nav-link', { active: onTestimonials }]}>
-                Stimmen
-              </a>
-            </div>
-          </nav>
-          <div class="user">
-            {admin && <span class="user-name">{admin}</span>}
-            <button type="button" id="admin-logout" class="btn btn--ghost btn--sm">
-              Abmelden
-            </button>
+            <a href="/admin/testimonials" class:list={['nav-link', { active: onTestimonials }]}>
+              Stimmen
+            </a>
           </div>
-        </header>
-      )
-    }
+        </nav>
+        <div class="user">
+          {admin && <span class="user-name">{admin}</span>}
+          <button type="button" id="admin-logout" class="btn btn--ghost btn--sm">
+            Abmelden
+          </button>
+        </div>
+      </header>
+    )}
     <main class="main" class:list={{ 'main--bare': bare }}>
       <slot />
     </main>
@@ -100,7 +98,6 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         });
       });
     </script>
-
     <style is:global>
       :root {
         /* The public site's palette, dark side. The names are the ones the admin

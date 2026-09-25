@@ -81,11 +81,9 @@ const fallback = await crop(src, wide, 'jpeg', width);
 ---
 
 <picture>
-  {
-    sources.map((source) => (
-      <source media={source.media} type={source.type} srcset={source.srcset} sizes={source.sizes} />
-    ))
-  }
+  {sources.map((source) => (
+    <source media={source.media} type={source.type} srcset={source.srcset} sizes={source.sizes} />
+  ))}
   <img
     src={fallback.src}
     srcset={fallbackSrcset}

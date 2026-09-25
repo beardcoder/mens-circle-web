@@ -50,7 +50,9 @@ function badgeClass(s: Status): string {
     <p class="eyebrow">Anmeldungen</p>
     <h1>{eventTitle}</h1>
   </div>
-  <a class="btn btn--ghost" href="/admin">Zurück</a>
+  <a class="btn btn--ghost" href="/admin">
+    Zurück
+  </a>
 </div>
 
 <div class="stats card">
@@ -69,85 +71,83 @@ function badgeClass(s: Status): string {
   <div class="confirm__text">
     <h2 class="confirm__title">Anmeldebestätigungen</h2>
     <p class="muted confirm__hint">
-      {
-        missingConfirmation > 0 ? (
-          <Fragment>
-            Bei <strong>{missingConfirmation}</strong> Anmeldung{missingConfirmation === 1 ? '' : 'en'} ist keine
-            Bestätigung nachgewiesen.
-          </Fragment>
-        ) : (
-          'Für alle aktiven Anmeldungen ist eine Bestätigung nachgewiesen.'
-        )
-      }
-      {' '}Der Versand geht nur an die Teilnehmer:innen, nicht an die Admin-Adresse.
+      {missingConfirmation > 0 ? (
+        <Fragment>
+          Bei <strong>{missingConfirmation}</strong> Anmeldung{missingConfirmation === 1 ? '' : 'en'} ist keine
+          Bestätigung nachgewiesen.
+        </Fragment>
+      ) : (
+        'Für alle aktiven Anmeldungen ist eine Bestätigung nachgewiesen.'
+      )}{' '}
+      Der Versand geht nur an die Teilnehmer:innen, nicht an die Admin-Adresse.
     </p>
   </div>
   <div class="confirm__actions">
-    <button class="btn js-resend-missing" type="button" disabled={missingConfirmation === 0}> Fehlende senden </button>
+    <button class="btn js-resend-missing" type="button" disabled={missingConfirmation === 0}>
+      Fehlende senden
+    </button>
     <button class="btn btn--ghost js-resend-all" type="button" disabled={registrations.length === 0}>
       Alle erneut senden
     </button>
   </div>
 </section>
 
-{
-  registrations.length === 0 ? (
-    <div class="empty">Noch keine Anmeldungen.</div>
-  ) : (
-    <ul id="reg-list" class="regs" data-event={eventId}>
-      {registrations.map((reg) => (
-        <li class="reg card" data-id={reg.id} data-name={`${reg.firstName} ${reg.lastName}`}>
-          <div class="reg__head">
-            <span class="reg__name">
-              {reg.firstName} {reg.lastName}
-            </span>
-            <span class={`badge ${badgeClass(reg.status)}`}>{STATUS_LABEL[reg.status]}</span>
-          </div>
-          <div class="reg__contact mono">
-            <a href={`mailto:${reg.email}`}>{reg.email}</a>
-            {reg.phone && <span class="faint"> · {reg.phone}</span>}
-          </div>
-          <div class="reg__foot">
-            <span class="reg__when mono faint">
-              angemeldet {fmt(reg.registeredAt)}
-              {reg.confirmationSentAt ? (
-                <span> · Bestätigung {fmt(reg.confirmationSentAt)}</span>
-              ) : (
-                (reg.status === 'registered' || reg.status === 'waitlist') && (
-                  <span class="reg__warn"> · keine Bestätigung gesendet</span>
-                )
-              )}
-            </span>
-            <div class="reg__actions">
-              {(reg.status === 'registered' || reg.status === 'waitlist') && (
-                <button class="btn btn--ghost btn--sm js-resend-one" type="button">
-                  Bestätigung senden
-                </button>
-              )}
-              <select class="js-status" aria-label="Status ändern">
-                <option value="registered" selected={reg.status === 'registered'}>
-                  Angemeldet
-                </option>
-                <option value="waitlist" selected={reg.status === 'waitlist'}>
-                  Warteliste
-                </option>
-                <option value="attended" selected={reg.status === 'attended'}>
-                  Teilgenommen
-                </option>
-                <option value="cancelled" selected={reg.status === 'cancelled'}>
-                  Storniert
-                </option>
-              </select>
-              <button class="btn btn--danger btn--sm js-del-reg" type="button">
-                Entfernen
+{registrations.length === 0 ? (
+  <div class="empty">Noch keine Anmeldungen.</div>
+) : (
+  <ul id="reg-list" class="regs" data-event={eventId}>
+    {registrations.map((reg) => (
+      <li class="reg card" data-id={reg.id} data-name={`${reg.firstName} ${reg.lastName}`}>
+        <div class="reg__head">
+          <span class="reg__name">
+            {reg.firstName} {reg.lastName}
+          </span>
+          <span class={`badge ${badgeClass(reg.status)}`}>{STATUS_LABEL[reg.status]}</span>
+        </div>
+        <div class="reg__contact mono">
+          <a href={`mailto:${reg.email}`}>{reg.email}</a>
+          {reg.phone && <span class="faint"> · {reg.phone}</span>}
+        </div>
+        <div class="reg__foot">
+          <span class="reg__when mono faint">
+            angemeldet {fmt(reg.registeredAt)}
+            {reg.confirmationSentAt ? (
+              <span> · Bestätigung {fmt(reg.confirmationSentAt)}</span>
+            ) : (
+              (reg.status === 'registered' || reg.status === 'waitlist') && (
+                <span class="reg__warn"> · keine Bestätigung gesendet</span>
+              )
+            )}
+          </span>
+          <div class="reg__actions">
+            {(reg.status === 'registered' || reg.status === 'waitlist') && (
+              <button class="btn btn--ghost btn--sm js-resend-one" type="button">
+                Bestätigung senden
               </button>
-            </div>
+            )}
+            <select class="js-status" aria-label="Status ändern">
+              <option value="registered" selected={reg.status === 'registered'}>
+                Angemeldet
+              </option>
+              <option value="waitlist" selected={reg.status === 'waitlist'}>
+                Warteliste
+              </option>
+              <option value="attended" selected={reg.status === 'attended'}>
+                Teilgenommen
+              </option>
+              <option value="cancelled" selected={reg.status === 'cancelled'}>
+                Storniert
+              </option>
+            </select>
+            <button class="btn btn--danger btn--sm js-del-reg" type="button">
+              Entfernen
+            </button>
           </div>
-        </li>
-      ))}
-    </ul>
-  )
-}
+        </div>
+      </li>
+    ))}
+  </ul>
+)}
 
 <section class="broadcast">
   <h2>Nachricht an Teilnehmer:innen</h2>
@@ -164,7 +164,9 @@ function badgeClass(s: Status): string {
       <label for="msg-content">Nachricht</label>
       <textarea id="msg-content" name="content" rows="6"></textarea>
     </div>
-    <button class="btn" type="submit">Nachricht senden</button>
+    <button class="btn" type="submit">
+      Nachricht senden
+    </button>
   </form>
 </section>
 

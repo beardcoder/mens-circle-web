@@ -34,27 +34,25 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
         {data.title && <h2 class="section-title" id="faq-title" data-reveal="up" set:html={data.title} />}
         {data.intro && <p class="section-intro faq__intro" data-reveal="up" set:html={data.intro} />}
 
-        {
-          items.length > 0 && (
-            <div class="faq__list" data-reveal-group="45">
-              {items.map((item) => (
-                <details class="accordion-item" data-reveal="up">
-                  <summary
-                    class="accordion-item__trigger"
-                    data-umami-event="faq-expand"
-                    data-umami-event-question={item.question!.slice(0, 50)}
-                  >
-                    <span class="accordion-item__question">{item.question}</span>
-                    <span class="accordion-item__icon" aria-hidden="true" />
-                  </summary>
-                  <div class="accordion-item__body">
-                    <div class="accordion-item__content" set:html={item.answer} />
-                  </div>
-                </details>
-              ))}
-            </div>
-          )
-        }
+        {items.length > 0 && (
+          <div class="faq__list" data-reveal-group="45">
+            {items.map((item) => (
+              <details class="accordion-item" data-reveal="up">
+                <summary
+                  class="accordion-item__trigger"
+                  data-umami-event="faq-expand"
+                  data-umami-event-question={item.question!.slice(0, 50)}
+                >
+                  <span class="accordion-item__question">{item.question}</span>
+                  <span class="accordion-item__icon" aria-hidden="true" />
+                </summary>
+                <div class="accordion-item__body">
+                  <div class="accordion-item__content" set:html={item.answer} />
+                </div>
+              </details>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   </div>

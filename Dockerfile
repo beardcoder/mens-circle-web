@@ -23,11 +23,24 @@
 FROM oven/bun:1 AS build
 WORKDIR /app
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# BuildKit cache for Bun's global package store: a rebuild after a lockfile
+# change downloads only what changed. Not part of any image layer.
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 COPY . .
 # Canonical URL for sitemap / OG tags (build-time).
 ARG PUBLIC_SITE_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
+# Server-island encryption key — build-time only, and only here. The prerendered
+# home page carries its islands' props encrypted in the HTML; Astro encodes the
+# key it used into the server manifest, so the runtime never reads ASTRO_KEY from
+# its environment (setting it on the container does nothing). Unset at build,
+# Astro mints a fresh key each time, and every cached document from an older
+# build then gets a 400 from /_server-islands/<name> — which is what
+# src/lib/cache.ts depends on not happening. Keep the value stable across builds.
+# This stage is not shipped, but the value does land in its build metadata;
+# rotate it like any other secret.
+ARG ASTRO_KEY
+ENV ASTRO_KEY=$ASTRO_KEY
 # Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks
 # Astro's Rollup build, while `bun run` still uses Bun for everything else.
 RUN bun run build
@@ -37,7 +50,7 @@ RUN bun run build
 FROM oven/bun:1 AS production-deps
 WORKDIR /app
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --production
 
 # 3) Final runtime image — Bun runtime only.
 FROM oven/bun:1

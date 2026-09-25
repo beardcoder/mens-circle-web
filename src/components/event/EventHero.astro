@@ -24,28 +24,26 @@ const dayMonthYear = formatDayMonthYearDE(event.event_date);
       <p class="hero__label">{event.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}</p>
 
       <h1 class="hero__title">
-        <time datetime={dateOnly}>{weekday}, {dayMonthYear}</time>
+        <time datetime={dateOnly}>
+          {weekday}, {dayMonthYear}
+        </time>
       </h1>
 
       <div class="hero__bottom">
-        {
-          /* Built as a string rather than as JSX fragments: the whitespace
+        {/* Built as a string rather than as JSX fragments: the whitespace
             between elements in the template becomes real text nodes, which put
-            gaps around the en dash of the time range. */
-        }
+            gaps around the en dash of the time range. */}
         <p class="hero__meta">
           {[timeRange(event.start_time, event.end_time), event.location].filter(Boolean).join(' · ')}
         </p>
 
-        {
-          !event.is_past && (
-            <span class="hero__cta">
-              <a href="#anmeldung" class="btn btn--primary">
-                {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
-              </a>
-            </span>
-          )
-        }
+        {!event.is_past && (
+          <span class="hero__cta">
+            <a href="#anmeldung" class="btn btn--primary">
+              {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
+            </a>
+          </span>
+        )}
       </div>
     </div>
   </div>

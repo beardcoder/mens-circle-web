@@ -22,53 +22,51 @@ const anchor = data?.anchor ?? 'stimmen';
 ---
 
 {
-  (
-    <section
-      class:list={['section', 'section--sand', 'testimonials-section', loading && 'testimonials-section--pending']}
-      id={anchor}
-      aria-labelledby="testimonials-title"
-    >
-      <div class="container">
-        <div class="spine">
-          <p class="rail-heading">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
+  <section
+    class:list={['section', 'section--sand', 'testimonials-section', loading && 'testimonials-section--pending']}
+    id={anchor}
+    aria-labelledby="testimonials-title"
+  >
+    <div class="container">
+      <div class="spine">
+        <p class="rail-heading">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
 
-          <div class="spine__body--wide">
-            <h2 class="section-title" id="testimonials-title">
-              {data?.title ?? 'Was Teilnehmer geschrieben haben'}
-            </h2>
+        <div class="spine__body--wide">
+          <h2 class="section-title" id="testimonials-title">
+            {data?.title ?? 'Was Teilnehmer geschrieben haben'}
+          </h2>
 
-            {testimonials.length === 0 && (
-              <p>
-                {loading
-                  ? 'Erfahrungen von Teilnehmern werden geladen.'
-                  : 'Erfahrungen veröffentlichen wir nach ihrer Freigabe.'}
-              </p>
-            )}
-            <ul class="testimonials__list" role="list">
-              {testimonials.map((t) => (
-                <li class="testimonial-item">
-                  <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
-                  {(t.author || t.role) && (
-                    <p class="testimonial-item__author">
-                      {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
-                      {t.role && <span class="testimonial-item__role">{t.role}</span>}
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ul>
-
-            <p class="testimonials__note">
-              Die Zitate stammen von Männern, die beim Kreis waren.{' '}
-              <a class="link" href="/teile-deine-erfahrung">
-                Du warst dabei und möchtest etwas beitragen?
-              </a>
+          {testimonials.length === 0 && (
+            <p>
+              {loading
+                ? 'Erfahrungen von Teilnehmern werden geladen.'
+                : 'Erfahrungen veröffentlichen wir nach ihrer Freigabe.'}
             </p>
-          </div>
+          )}
+          <ul class="testimonials__list" role="list">
+            {testimonials.map((t) => (
+              <li class="testimonial-item">
+                <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
+                {(t.author || t.role) && (
+                  <p class="testimonial-item__author">
+                    {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
+                    {t.role && <span class="testimonial-item__role">{t.role}</span>}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          <p class="testimonials__note">
+            Die Zitate stammen von Männern, die beim Kreis waren.{' '}
+            <a class="link" href="/teile-deine-erfahrung">
+              Du warst dabei und möchtest etwas beitragen?
+            </a>
+          </p>
         </div>
       </div>
-    </section>
-  )
+    </div>
+  </section>
 }
 
 <style is:global>

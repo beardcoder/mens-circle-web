@@ -46,3 +46,9 @@ try {
   console.error('[db] migration failed', err);
   throw err;
 }
+
+// Query-planner statistics, refreshed on every open (0x10002 = consider every
+// table, with the analysis capped so a large one cannot stall startup). A
+// no-op while the statistics are current. The server opens once per boot and
+// scripts/schedule.ts once a minute, so they never go stale for long.
+sqlite.run('PRAGMA optimize = 0x10002;');

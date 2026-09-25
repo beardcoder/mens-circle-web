@@ -26,25 +26,21 @@ const anchor = data.anchor ?? 'moderator';
       <p class="marker bay__marker">{data.eyebrow}</p>
 
       <div class="bay__beside-marker home-person__body">
-        {
-          data.name && (
-            <h2 class="home-person__name" id="person-title">
-              {data.name}
-            </h2>
-          )
-        }
+        {data.name && (
+          <h2 class="home-person__name" id="person-title">
+            {data.name}
+          </h2>
+        )}
 
         {data.bio && <div class="home-person__bio prose" set:html={data.bio} />}
 
-        {
-          data.linkLabel && data.linkUrl && (
-            <p class="home-person__link">
-              <a href={data.linkUrl} class="link">
-                {data.linkLabel}
-              </a>
-            </p>
-          )
-        }
+        {data.linkLabel && data.linkUrl && (
+          <p class="home-person__link">
+            <a href={data.linkUrl} class="link">
+              {data.linkLabel}
+            </a>
+          </p>
+        )}
       </div>
     </div>
   </div>

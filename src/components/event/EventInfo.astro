@@ -57,97 +57,95 @@ const rows = [
 <section class="section section--ruled event-info-section" aria-labelledby="termin-fakten">
   <div class="container">
     <div class="spine">
-      <h2 class="rail-heading" id="termin-fakten">Der Termin</h2>
+      <h2 class="rail-heading" id="termin-fakten">
+        Der Termin
+      </h2>
 
       <div class="spine__body--wide">
         <dl class="deflist" data-reveal-group="55">
-          {
-            rows.map((row) => (
-              <div class="deflist__row" data-reveal="up">
-                <dt class="deflist__term">{row.label}</dt>
-                <dd class="deflist__desc">
-                  {row.value}
-                  {row.sub && <span class="deflist__note">{row.sub}</span>}
-                </dd>
-              </div>
-            ))
-          }
+          {rows.map((row) => (
+            <div class="deflist__row" data-reveal="up">
+              <dt class="deflist__term">{row.label}</dt>
+              <dd class="deflist__desc">
+                {row.value}
+                {row.sub && <span class="deflist__note">{row.sub}</span>}
+              </dd>
+            </div>
+          ))}
         </dl>
 
-        {
-          ics && (
-            <div class="event-info__calendar">
-              <button
-                type="button"
-                class="btn btn--secondary"
-                popovertarget="calendar-modal"
-                data-umami-event="calendar-open"
+        {ics && (
+          <div class="event-info__calendar">
+            <button
+              type="button"
+              class="btn btn--secondary"
+              popovertarget="calendar-modal"
+              data-umami-event="calendar-open"
+            >
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+                focusable="false"
               >
-                <svg
-                  class="icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  aria-hidden="true"
-                  focusable="false"
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <line x1="12" y1="14" x2="12" y2="18" />
+                <line x1="10" y1="16" x2="14" y2="16" />
+              </svg>
+              In Kalender speichern
+            </button>
+
+            <div id="calendar-modal" class="calendar-modal" popover aria-labelledby="calendar-modal-title">
+              <div class="calendar-modal__content">
+                <button
+                  type="button"
+                  class="calendar-modal__close"
+                  aria-label="Schließen"
+                  popovertarget="calendar-modal"
+                  popovertargetaction="hide"
                 >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                  <line x1="12" y1="14" x2="12" y2="18" />
-                  <line x1="10" y1="16" x2="14" y2="16" />
-                </svg>
-                In Kalender speichern
-              </button>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path
+                      d="M6 6l12 12M18 6L6 18"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </button>
 
-              <div id="calendar-modal" class="calendar-modal" popover aria-labelledby="calendar-modal-title">
-                <div class="calendar-modal__content">
-                  <button
-                    type="button"
-                    class="calendar-modal__close"
-                    aria-label="Schließen"
-                    popovertarget="calendar-modal"
-                    popovertargetaction="hide"
+                <h3 id="calendar-modal-title">In Kalender speichern</h3>
+                <p>Wähle deinen Kalender:</p>
+                <div class="calendar-modal__buttons">
+                  <a
+                    href={googleHref}
+                    class="btn btn--secondary"
+                    target="_blank"
+                    rel="noopener"
+                    data-umami-event="calendar-download-google"
                   >
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                      <path
-                        d="M6 6l12 12M18 6L6 18"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </button>
-
-                  <h3 id="calendar-modal-title">In Kalender speichern</h3>
-                  <p>Wähle deinen Kalender:</p>
-                  <div class="calendar-modal__buttons">
-                    <a
-                      href={googleHref}
-                      class="btn btn--secondary"
-                      target="_blank"
-                      rel="noopener"
-                      data-umami-event="calendar-download-google"
-                    >
-                      Google Calendar
-                    </a>
-                    <a
-                      href={icsHref}
-                      class="btn btn--secondary"
-                      download="maennerkreis-straubing.ics"
-                      data-umami-event="calendar-download-ics"
-                    >
-                      Apple/Outlook (.ics)
-                    </a>
-                  </div>
+                    Google Calendar
+                  </a>
+                  <a
+                    href={icsHref}
+                    class="btn btn--secondary"
+                    download="maennerkreis-straubing.ics"
+                    data-umami-event="calendar-download-ics"
+                  >
+                    Apple/Outlook (.ics)
+                  </a>
                 </div>
               </div>
             </div>
-          )
-        }
+          </div>
+        )}
       </div>
     </div>
   </div>

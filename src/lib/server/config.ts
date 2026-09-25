@@ -33,13 +33,20 @@ export const config = {
   MAIL_ADMIN_NAME: env('MAIL_ADMIN_NAME', 'Männerkreis Admin'),
   CONTACT_EMAIL: env('MAIL_CONTACT_ADDRESS', 'hallo@mens-circle.de'),
   DATABASE_PATH: env('DATABASE_PATH', './data/mens-circle.db'),
-  ADMIN_EMAIL: env('ADMIN_EMAIL', ''),
-  ADMIN_PASSWORD: env('ADMIN_PASSWORD', ''),
-  // No fallback — not to ADMIN_PASSWORD (a login password reused as an HMAC
-  // key), and never to a literal default (this repo is public, so a literal
-  // here is a published secret). lib/server/auth.ts refuses to sign or trust
-  // any session while this is empty; see sessionSecretConfigured() there.
+  // Who may enter /admin: comma-separated emails and/or one Pocket ID group.
+  ADMIN_EMAILS: env('ADMIN_EMAIL', '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
+  ADMIN_GROUP: env('OIDC_ADMIN_GROUP', ''),
+  // No fallback — never to a literal default (this repo is public, so a
+  // literal here is a published secret). lib/server/auth.ts refuses to sign or
+  // trust any session while this is shorter than 32 characters.
   ADMIN_SESSION_SECRET: env('ADMIN_SESSION_SECRET', ''),
+  // Pocket ID (any OIDC provider): the issuer URL, e.g. https://id.example.org.
+  OIDC_ISSUER: env('OIDC_ISSUER', '').replace(/\/+$/, ''),
+  OIDC_CLIENT_ID: env('OIDC_CLIENT_ID', ''),
+  OIDC_CLIENT_SECRET: env('OIDC_CLIENT_SECRET', ''),
   LISTMONK_URL: env('LISTMONK_URL', '').replace(/\/+$/, ''),
   LISTMONK_API_USER: env('LISTMONK_API_USER', ''),
   LISTMONK_API_TOKEN: env('LISTMONK_API_TOKEN', ''),

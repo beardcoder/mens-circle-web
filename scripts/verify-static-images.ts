@@ -1,5 +1,6 @@
 /** Verifies the built server over HTTP. Sharp runs only in this separate test process. */
 import assert from 'node:assert/strict';
+import { PRERENDERED_CACHE_CONTROL } from '../src/lib/cache';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 
@@ -22,7 +23,7 @@ for (const path of [
   ...(eventSlug ? [`/event/${eventSlug}`] : []),
 ]) {
   const response = await get(path);
-  if (path === '/') assert.equal(response.headers.get('cache-control'), 'no-cache');
+  if (path === '/') assert.equal(response.headers.get('cache-control'), PRERENDERED_CACHE_CONTROL);
   const html = await response.text();
   assert.ok(!html.includes('/_image?'), path);
   for (const [tag] of html.matchAll(/<(?:img|source)\b[^>]*>/g)) {

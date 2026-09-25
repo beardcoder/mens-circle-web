@@ -22,77 +22,75 @@ const { testimonials } = Astro.props;
   </div>
 </div>
 
-{
-  testimonials.length === 0 ? (
-    <div class="empty">Noch keine Einreichungen.</div>
-  ) : (
-    <ul id="testi-list" class="testis">
-      {testimonials.map((t) => (
-        <li class="testi card" data-id={t.id} data-published={t.isPublished ? '1' : ''}>
-          <div class="testi__view">
-            <blockquote class="testi__quote js-quote">{t.quote}</blockquote>
-            <div class="testi__meta mono muted">
-              <strong class="testi__author js-author">{t.authorName}</strong>
-              <span class="js-role">{t.role ? ` · ${t.role}` : ''}</span>
-              <span class="faint js-email">{t.email ? ` · ${t.email}` : ''}</span>
-            </div>
+{testimonials.length === 0 ? (
+  <div class="empty">Noch keine Einreichungen.</div>
+) : (
+  <ul id="testi-list" class="testis">
+    {testimonials.map((t) => (
+      <li class="testi card" data-id={t.id} data-published={t.isPublished ? '1' : ''}>
+        <div class="testi__view">
+          <blockquote class="testi__quote js-quote">{t.quote}</blockquote>
+          <div class="testi__meta mono muted">
+            <strong class="testi__author js-author">{t.authorName}</strong>
+            <span class="js-role">{t.role ? ` · ${t.role}` : ''}</span>
+            <span class="faint js-email">{t.email ? ` · ${t.email}` : ''}</span>
           </div>
+        </div>
 
-          <form class="testi__edit js-edit" hidden>
+        <form class="testi__edit js-edit" hidden>
+          <div class="field">
+            <label>Zitat</label>
+            {/* prettier-ignore */}
+            <textarea name="quote" rows="4">{t.quote}</textarea>
+          </div>
+          <div class="field-row">
             <div class="field">
-              <label>Zitat</label>
-              {/* prettier-ignore */}
-              <textarea name="quote" rows="4">{t.quote}</textarea>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label>Name</label>
-                <input name="authorName" type="text" value={t.authorName} />
-              </div>
-              <div class="field">
-                <label>Rolle</label>
-                <input name="role" type="text" value={t.role} />
-              </div>
+              <label>Name</label>
+              <input name="authorName" type="text" value={t.authorName} />
             </div>
             <div class="field">
-              <label>E-Mail</label>
-              <input name="email" type="email" value={t.email} />
-            </div>
-            <div class="testi__editbtns">
-              <button class="btn btn--sm" type="submit">
-                Speichern
-              </button>
-              <button class="btn btn--ghost btn--sm js-cancel" type="button">
-                Abbrechen
-              </button>
-            </div>
-          </form>
-
-          <div class="testi__controls">
-            <span class={`badge js-badge ${t.isPublished ? 'badge--live' : 'badge--off'}`}>
-              {t.isPublished ? 'veröffentlicht' : 'unsichtbar'}
-            </span>
-            <label class="order">
-              <span class="muted">Reihenfolge</span>
-              <input class="js-order mono" type="number" value={t.sortOrder} />
-            </label>
-            <div class="testi__btns">
-              <button class="btn btn--ghost btn--sm js-edit-btn" type="button">
-                Bearbeiten
-              </button>
-              <button class="btn btn--ghost btn--sm js-toggle" type="button">
-                {t.isPublished ? 'Verbergen' : 'Veröffentlichen'}
-              </button>
-              <button class="btn btn--danger btn--sm js-del-testi" type="button">
-                Löschen
-              </button>
+              <label>Rolle</label>
+              <input name="role" type="text" value={t.role} />
             </div>
           </div>
-        </li>
-      ))}
-    </ul>
-  )
-}
+          <div class="field">
+            <label>E-Mail</label>
+            <input name="email" type="email" value={t.email} />
+          </div>
+          <div class="testi__editbtns">
+            <button class="btn btn--sm" type="submit">
+              Speichern
+            </button>
+            <button class="btn btn--ghost btn--sm js-cancel" type="button">
+              Abbrechen
+            </button>
+          </div>
+        </form>
+
+        <div class="testi__controls">
+          <span class={`badge js-badge ${t.isPublished ? 'badge--live' : 'badge--off'}`}>
+            {t.isPublished ? 'veröffentlicht' : 'unsichtbar'}
+          </span>
+          <label class="order">
+            <span class="muted">Reihenfolge</span>
+            <input class="js-order mono" type="number" value={t.sortOrder} />
+          </label>
+          <div class="testi__btns">
+            <button class="btn btn--ghost btn--sm js-edit-btn" type="button">
+              Bearbeiten
+            </button>
+            <button class="btn btn--ghost btn--sm js-toggle" type="button">
+              {t.isPublished ? 'Verbergen' : 'Veröffentlichen'}
+            </button>
+            <button class="btn btn--danger btn--sm js-del-testi" type="button">
+              Löschen
+            </button>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ul>
+)}
 
 <script>
   import { actions } from 'astro:actions';

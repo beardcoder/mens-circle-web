@@ -27,13 +27,11 @@ const anchor = data.anchor ?? slug;
       {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
 
       <div class="spine__body">
-        {
-          data.title && (
-            <h2 class="text-section__title" data-reveal="up">
-              {data.title}
-            </h2>
-          )
-        }
+        {data.title && (
+          <h2 class="text-section__title" data-reveal="up">
+            {data.title}
+          </h2>
+        )}
 
         {data.content && <div class="prose" data-reveal="up" set:html={data.content} />}
       </div>
