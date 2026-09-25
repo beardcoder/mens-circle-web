@@ -63,15 +63,7 @@ function explain(query: Query): string {
   }
 }
 
-/**
- * The old two-query lookup-then-DTO path, kept here rather than as an export
- * of events.ts: this file's own reference baseline for "the combined-query
- * path returns the identical value using fewer statements" — the only thing
- * that ever needed it. Keeping a from-scratch reimplementation, rather than
- * reaching into events.ts's private eventDtoWithCount/startOfTodayIso, is the
- * point of a baseline comparison: it has to arrive at the same answer
- * independently, not share the code path it is checking.
- */
+/** Independent two-query baseline the combined query must match. */
 function legacyStartOfTodayIso(): string {
   const now = new Date();
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();

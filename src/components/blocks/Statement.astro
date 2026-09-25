@@ -12,14 +12,7 @@ interface Props {
   };
 }
 
-/**
- * A full-bleed orange field carrying one sentence at poster size. Ink on orange,
- * never white: white measures 2.9:1 here and fails, ink measures 5.9:1.
- *
- * The lines settle flush-left as the field enters view (utilities/_motion.css).
- * The settled state is the readable one, so no word exists only mid-animation,
- * and the section clips so the travel cannot raise a horizontal scrollbar.
- */
+/** A full-bleed orange field carrying one sentence at poster size. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'haltung';
@@ -55,10 +48,7 @@ const lines = data.lines ?? [];
       padding-block: var(--space-2xl);
     }
 
-    /* Full-strength ink. At 70% it composited to #562d1d on the orange and
-       measured 3.2:1 at 13px — Lighthouse caught it where a contrast audit that
-       reads `color` but ignores element `opacity` does not. The marker is
-       subordinate by size and tracking; it does not need to be faded too. */
+    /* Full-strength ink. */
     .statement__marker {
       margin-block-end: var(--space-md);
       color: var(--color-ink);

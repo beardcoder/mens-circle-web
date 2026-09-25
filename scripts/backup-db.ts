@@ -1,26 +1,4 @@
-/**
- * SQLite → S3 backup. Snapshots the database, gzips it, uploads it and prunes
- * past the retention window. `VACUUM INTO`, not `cp`: copying a live SQLite file
- * is not crash-safe under WAL.
- *
- * Runs as one of scripts/schedule.ts's tasks (see that file for the cron
- * cadence and how Coolify's "Scheduled Task" invokes it), and remains
- * directly runnable on its own:
- *
- *   docker exec <web-container> bun run scripts/backup-db.ts
- *
- * Required env:
- *   BACKUP_S3_BUCKET           target bucket
- *   BACKUP_S3_ACCESS_KEY_ID    (or AWS_ACCESS_KEY_ID)
- *   BACKUP_S3_SECRET_ACCESS_KEY(or AWS_SECRET_ACCESS_KEY)
- *
- * Optional env:
- *   DATABASE_PATH              source db (default ./data/mens-circle.db)
- *   BACKUP_S3_PREFIX           key prefix (default "mens-circle-db")
- *   BACKUP_S3_REGION           region (default "auto")
- *   BACKUP_S3_ENDPOINT         custom endpoint for R2/MinIO (else AWS)
- *   BACKUP_RETENTION_DAYS      prune older than N days (default 30; 0 = keep all)
- */
+/** SQLite → S3 backup. */
 import { Database } from 'bun:sqlite';
 import { existsSync, rmSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';

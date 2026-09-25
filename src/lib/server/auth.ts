@@ -8,14 +8,7 @@ const encoder = new TextEncoder();
 const base64url = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64url');
 const fromBase64url = (s: string): Uint8Array<ArrayBuffer> => Uint8Array.from(Buffer.from(s, 'base64url'));
 
-/**
- * Whether the site can sign or verify a session at all. Checked where it
- * matters — signing and verifying — rather than once at startup: config.ts is
- * imported by every server-side caller (the reminder job included), and those
- * have nothing to do with admin auth, so failing there would take down
- * unrelated functionality over a var only /admin needs. 32 characters is the
- * floor: an HMAC key shorter than that is a password, not a secret.
- */
+/** Sessions need a secret of ≥ 32 characters; without one nothing is signed or trusted. */
 export const sessionSecretConfigured = (): boolean => config.ADMIN_SESSION_SECRET.length >= 32;
 
 const getHmacKey = (() => {
@@ -41,9 +34,6 @@ export const signToken = async (data: Record<string, unknown>, ttlS: number): Pr
 /** The token's data if the signature holds and it has not expired, else null.
  *  `subtle.verify` compares in constant time, so no hand-rolled comparison. */
 export const verifyToken = async <T extends Record<string, unknown>>(token: string | undefined): Promise<T | null> => {
-  // A token signed before the secret was unset (or forged against a guessed
-  // one) must never be trusted just because it verifies against whatever key
-  // an empty string would produce.
   if (!sessionSecretConfigured()) return null;
   const [payload, sig] = token?.split('.') ?? [];
   if (!payload || !sig) return null;

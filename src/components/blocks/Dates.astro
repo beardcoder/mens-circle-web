@@ -14,13 +14,7 @@ interface Props {
   };
 }
 
-/**
- * The close: the date, the action that fits it, and the way to hear about the
- * next one. An ink field with the ring reprised at the lower left.
- *
- * The `#newsletter` and `#whatsapp-community` anchors are load-bearing — the
- * footer, older mails and /event all link to them.
- */
+/** The close: the date, the action that fits it, and the way to hear about the next one. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'termine';
@@ -157,10 +151,7 @@ const lines = data.displayLines ?? ['DABEI SEIN.'];
 
     @media (width <= 56em) {
       .home-dates {
-        /* The extra bottom padding is the band the cropped closing ring sits
-           in, so the arc never reaches the last line of text — including at the
-           far end of its scroll drift, which lifts it another 22px. Keep it in
-           step with `.ring--close` in components/Ring.astro. */
+        /* Room for the cropped ring, including its scroll drift. */
         padding-block: var(--space-xl) calc(var(--space-xl) + 2.5rem);
       }
 

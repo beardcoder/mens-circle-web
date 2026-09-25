@@ -5,9 +5,7 @@ import { buildIcs } from '@lib/server/ics';
 
 export const prerender = false;
 
-// GET /api/public/events/{slug}/ics — hosted iCalendar download, linked from the
-// confirmation mails (`icsUrl`), so it carries the full address. The event page
-// embeds its own copy without one.
+// GET /api/public/events/{slug}/ics — hosted iCalendar download, linked from the confirmation mails (`icsUrl`), so it carries the full address.
 export const GET: APIRoute = async ({ params }) => {
   const slug = params.slug;
   if (!slug) return new Response('Not found', { status: 404 });

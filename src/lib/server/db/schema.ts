@@ -1,10 +1,4 @@
-/**
- * Conventions across all four tables:
- *   • Text UUID primary keys.
- *   • `deleted` is a soft-delete timestamp; null means live.
- *   • Timestamps are ISO-8601 UTC strings, so they sort lexicographically.
- *   • Booleans are stored as integers.
- */
+/** UUID text keys, `deleted` as soft-delete timestamp, ISO-8601 UTC strings, booleans as integers. */
 import { desc, isNull } from 'drizzle-orm';
 import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
@@ -14,11 +8,7 @@ const nowIso = () => new Date().toISOString();
 /** Lifecycle of a seat in an event. */
 export type RegistrationStatus = 'registered' | 'waitlist' | 'cancelled' | 'attended';
 
-/**
- * What "how full is this event" counts. `waitlist` holds no seat and `cancelled`
- * released theirs; `attended` is a past-tense `registered`, so it still counts.
- * Shared by the capacity queries and the reminder pass.
- */
+/** Seat-holding statuses; `attended` still counts. */
 export const ACTIVE_REGISTRATION_STATUSES = ['registered', 'attended'] as const satisfies RegistrationStatus[];
 
 export const participants = sqliteTable(

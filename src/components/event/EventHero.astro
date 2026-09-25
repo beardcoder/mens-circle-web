@@ -6,11 +6,7 @@ interface Props {
   event: EventDTO;
 }
 
-/**
- * The opening of a single event's page. The date is the heading, because the
- * date is what this page is. The event's own image is never painted behind it:
- * the text has to stay readable over whatever an admin uploaded.
- */
+/** The opening of a single event's page. */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);

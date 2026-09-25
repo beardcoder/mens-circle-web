@@ -1,11 +1,4 @@
-/**
- * Site header — mobile panel and in-page anchor scrolling.
- *
- * The panel's cross-fade is owned by CSS. What lives here is what CSS cannot
- * do: open/closed state, the body scroll lock and restoring the scroll position
- * afterwards, the hamburger⇄X morph, Escape-to-close, and anchor scrolling that
- * clears the fixed header.
- */
+/** Site header — mobile panel and in-page anchor scrolling. */
 
 import { prefersReducedMotion } from './helpers';
 

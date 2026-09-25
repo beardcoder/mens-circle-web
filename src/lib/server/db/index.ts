@@ -1,8 +1,4 @@
-/**
- * Opens the SQLite file from `DATABASE_PATH` and applies the migrations under
- * `./drizzle` on first import. The Bun server is long-lived, so this runs once
- * per process and a fresh deploy provisions its schema with no manual step.
- */
+/** Opens the SQLite file from `DATABASE_PATH` and applies the migrations under `./drizzle` on first import. */
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { Database } from 'bun:sqlite';
@@ -24,12 +20,7 @@ if (dbPath !== ':memory:') {
 }
 
 const sqlite = new Database(dbPath, { create: true });
-// Tuned for a long-lived, low-RAM single-writer server:
-//   • WAL                 readers never block the writer.
-//   • synchronous=NORMAL  drops a full fsync per transaction, still durable
-//                         across an app crash; only power loss costs the last commit.
-//   • foreign_keys        enforce the registration↔event/participant relations.
-//   • busy_timeout        wait out a brief writer lock instead of erroring.
+// WAL, NORMAL sync (durable across app crashes), FKs on, wait out brief write locks.
 sqlite.run('PRAGMA journal_mode = WAL;');
 sqlite.run('PRAGMA synchronous = NORMAL;');
 sqlite.run('PRAGMA foreign_keys = ON;');
@@ -47,8 +38,5 @@ try {
   throw err;
 }
 
-// Query-planner statistics, refreshed on every open (0x10002 = consider every
-// table, with the analysis capped so a large one cannot stall startup). A
-// no-op while the statistics are current. The server opens once per boot and
-// scripts/schedule.ts once a minute, so they never go stale for long.
+// Refresh planner statistics on open; a no-op when current.
 sqlite.run('PRAGMA optimize = 0x10002;');

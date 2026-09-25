@@ -46,9 +46,7 @@ schemas.push({
   ],
 });
 
-// `Article`, not a bare `WebPage`: a signed piece of writing, attributed to the
-// `Person` entity in SeoHead. The dates are set by hand in the content file —
-// a file mtime would claim every page was modified at build time.
+// `Article`, not a bare `WebPage`: a signed piece of writing, attributed to the `Person` entity in SeoHead.
 const articleImage = new URL('/images/og-markus.jpg', siteUrl).href;
 
 schemas.push({
