@@ -36,34 +36,30 @@ const steps = data.steps ?? [];
       <p class="marker marker--ruled bay__marker">{data.eyebrow}</p>
 
       <div class="bay__beside-marker">
-        {
-          data.title && (
-            <h2 class="section-title" id="ablauf-title">
-              {data.title}
-            </h2>
-          )
-        }
+        {data.title && (
+          <h2 class="section-title" id="ablauf-title">
+            {data.title}
+          </h2>
+        )}
         {data.subtitle && <p class="section-intro">{data.subtitle}</p>}
       </div>
     </div>
 
-    {
-      steps.length > 0 && (
-        <ol class="home-evening__list" role="list">
-          {steps.map((step) => (
-            <li class="home-evening__step">
-              <p class="home-evening__number" aria-hidden="true">
-                {step.number}
-              </p>
-              <div class="home-evening__text-col">
-                {step.title && <h3 class="home-evening__title">{step.title}</h3>}
-                {step.description && <p class="home-evening__text">{step.description}</p>}
-              </div>
-            </li>
-          ))}
-        </ol>
-      )
-    }
+    {steps.length > 0 && (
+      <ol class="home-evening__list" role="list">
+        {steps.map((step) => (
+          <li class="home-evening__step">
+            <p class="home-evening__number" aria-hidden="true">
+              {step.number}
+            </p>
+            <div class="home-evening__text-col">
+              {step.title && <h3 class="home-evening__title">{step.title}</h3>}
+              {step.description && <p class="home-evening__text">{step.description}</p>}
+            </div>
+          </li>
+        ))}
+      </ol>
+    )}
 
     {data.close && <div class="home-evening__close prose" set:html={data.close} />}
   </div>

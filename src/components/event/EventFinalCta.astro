@@ -16,16 +16,16 @@ const { event } = Astro.props;
 <section class="section section--ruled event-cta-section" aria-labelledby="weiter-title">
   <div class="container">
     <div class="spine">
-      <h2 class="rail-heading" id="weiter-title">Weiter</h2>
+      <h2 class="rail-heading" id="weiter-title">
+        Weiter
+      </h2>
 
       <ul class="event-cta__list spine__body--wide" role="list">
-        {
-          event.is_past && (
-            <li>
-              <a href="/#termine">Bei neuen Terminen benachrichtigen</a>
-            </li>
-          )
-        }
+        {event.is_past && (
+          <li>
+            <a href="/#termine">Bei neuen Terminen benachrichtigen</a>
+          </li>
+        )}
         <li>
           <a href="/event">Alle Termine</a>
         </li>

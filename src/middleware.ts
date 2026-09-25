@@ -20,8 +20,8 @@ const hasTrailingSlash = ({ isPrerendered, request, url }: APIContext): boolean 
 
 /**
  * Attach the cache policy, unless the route already stated one of its own —
- * `/health`, `/sitemap-events.xml` and the home page's island-parameter
- * `no-cache` all know better than the table does.
+ * `/health`, `/sitemap-events.xml` and the prerendered documents'
+ * `PRERENDERED_CACHE_CONTROL` (lib/cache.ts) all know better than the table does.
  *
  * The copy is for a response whose headers are immutable, which is what
  * `Response.redirect()` returns. Nothing reaching this function builds one

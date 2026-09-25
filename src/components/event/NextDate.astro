@@ -29,74 +29,72 @@ const whatsapp = site.whatsappCommunityLink;
       <p class="rail-heading event-next__rail">Nächster Termin</p>
 
       <div class="spine__body">
-        {
-          next ? (
-            <>
-              <h2 class="display display--sm event-next__title" id="naechster-termin-title">
-                <time datetime={next.slug}>{next.dateLabel}</time>
-              </h2>
+        {next ? (
+          <>
+            <h2 class="display display--sm event-next__title" id="naechster-termin-title">
+              <time datetime={next.slug}>{next.dateLabel}</time>
+            </h2>
 
-              <dl class="deflist event-next__meta">
-                {next.timeRange && (
-                  <div class="deflist__row">
-                    <dt class="deflist__term">Uhrzeit</dt>
-                    <dd class="deflist__desc">{next.timeRange}</dd>
-                  </div>
-                )}
+            <dl class="deflist event-next__meta">
+              {next.timeRange && (
                 <div class="deflist__row">
-                  <dt class="deflist__term">Ort</dt>
-                  <dd class="deflist__desc">
-                    {next.place}
-                    <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
-                  </dd>
+                  <dt class="deflist__term">Uhrzeit</dt>
+                  <dd class="deflist__desc">{next.timeRange}</dd>
                 </div>
-                <div class="deflist__row">
-                  <dt class="deflist__term">Plätze</dt>
-                  <dd class="deflist__desc">
+              )}
+              <div class="deflist__row">
+                <dt class="deflist__term">Ort</dt>
+                <dd class="deflist__desc">
+                  {next.place}
+                  <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
+                </dd>
+              </div>
+              <div class="deflist__row">
+                <dt class="deflist__term">Plätze</dt>
+                <dd class="deflist__desc">
+                  {state.isFull
+                    ? 'Ausgebucht – du kannst auf die Warteliste'
+                    : `${next.availableSpots} von ${next.maxParticipants} frei`}
+                  <span class="deflist__note">
                     {state.isFull
-                      ? 'Ausgebucht – du kannst auf die Warteliste'
-                      : `${next.availableSpots} von ${next.maxParticipants} frei`}
-                    <span class="deflist__note">
-                      {state.isFull
-                        ? 'Wird ein Platz frei, rückst du automatisch nach.'
-                        : 'Für die Anmeldung genügen Vor- und Nachname und eine E-Mail-Adresse.'}
-                    </span>
-                  </dd>
+                      ? 'Wird ein Platz frei, rückst du automatisch nach.'
+                      : 'Für die Anmeldung genügen Vor- und Nachname und eine E-Mail-Adresse.'}
+                  </span>
+                </dd>
+              </div>
+              {next.costBasis && (
+                <div class="deflist__row">
+                  <dt class="deflist__term">Beitrag</dt>
+                  <dd class="deflist__desc">{next.costBasis}</dd>
                 </div>
-                {next.costBasis && (
-                  <div class="deflist__row">
-                    <dt class="deflist__term">Beitrag</dt>
-                    <dd class="deflist__desc">{next.costBasis}</dd>
-                  </div>
-                )}
-              </dl>
+              )}
+            </dl>
 
-              <p class="event-next__action">
-                <a
-                  href={action.href}
-                  class="btn btn--primary btn--large"
-                  data-umami-event="cta-click"
-                  data-umami-event-location="event-landing"
-                  data-umami-event-state={state.status}
-                >
-                  {action.label}
-                </a>
-              </p>
-            </>
-          ) : (
-            <>
-              <h2 class="display display--sm event-next__title" id="naechster-termin-title">
-                {state.status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
-              </h2>
+            <p class="event-next__action">
+              <a
+                href={action.href}
+                class="btn btn--primary btn--large"
+                data-umami-event="cta-click"
+                data-umami-event-location="event-landing"
+                data-umami-event-state={state.status}
+              >
+                {action.label}
+              </a>
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 class="display display--sm event-next__title" id="naechster-termin-title">
+              {state.status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
+            </h2>
 
-              <p class="event-next__text" data-status={state.status}>
-                {state.status === 'unavailable'
-                  ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
-                  : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich unten ein, dann bekommst du eine kurze Nachricht.'}
-              </p>
-            </>
-          )
-        }
+            <p class="event-next__text" data-status={state.status}>
+              {state.status === 'unavailable'
+                ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
+                : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich unten ein, dann bekommst du eine kurze Nachricht.'}
+            </p>
+          </>
+        )}
       </div>
     </div>
 
@@ -112,25 +110,23 @@ const whatsapp = site.whatsappCommunityLink;
 
         <NewsletterForm context={{ page: 'event-landing' }} />
 
-        {
-          whatsapp && (
-            <p class="event-next__alt" id="whatsapp-community">
-              Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine{' '}
-              <a
-                class="link"
-                href={whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-umami-event="whatsapp-click"
-                data-umami-event-type="community-join"
-              >
-                WhatsApp-Gruppe
-                <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
-              </a>
-              .
-            </p>
-          )
-        }
+        {whatsapp && (
+          <p class="event-next__alt" id="whatsapp-community">
+            Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine{' '}
+            <a
+              class="link"
+              href={whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-umami-event="whatsapp-click"
+              data-umami-event-type="community-join"
+            >
+              WhatsApp-Gruppe
+              <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+            </a>
+            .
+          </p>
+        )}
       </div>
     </div>
   </div>

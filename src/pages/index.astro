@@ -3,13 +3,16 @@ import Layout from '../layouts/Layout.astro';
 import type { Block } from '../components/PageContent.astro';
 import PageContent from '../components/PageContent.astro';
 import home from '../content/home.json';
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import { eventSeriesSchema } from '@lib/series-schema';
 
 // Static shell and native <Picture> assets; live content uses server:defer.
 export const prerender = true;
-// Island parameters are encrypted per build, so revalidate on navigation or a
-// new deployment receives parameters from an old build.
-Astro.response.headers.set('Cache-Control', 'no-cache');
+// Everything live on this page arrives through a server island, so the document
+// itself may be cached. It was a flat `no-cache` because the islands' encrypted
+// props are build-scoped — read PRERENDERED_CACHE_CONTROL before widening this,
+// it depends on ASTRO_KEY being set.
+Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 const blocks = home.blocks as Block[];
 

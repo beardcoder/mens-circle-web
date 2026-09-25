@@ -37,7 +37,9 @@ const lines = data.displayLines ?? ['DABEI SEIN.'];
         <p class="marker marker--ruled home-dates__marker">{data.eyebrow}</p>
 
         <h2 class="display home-dates__display" id="termine-title">
-          {lines.map((line) => <span class="display__line">{line}</span>)}
+          {lines.map((line) => (
+            <span class="display__line">{line}</span>
+          ))}
         </h2>
 
         <HomeEventStatus placement="dates" server:defer>
@@ -50,25 +52,23 @@ const lines = data.displayLines ?? ['DABEI SEIN.'];
         {data.newsletterText && <p class="home-dates__text">{data.newsletterText}</p>}
         <NewsletterForm context={{ location: 'home-dates' }} />
 
-        {
-          whatsapp && (
-            <p class="home-dates__alt" id="whatsapp-community">
-              {data.whatsappText}{' '}
-              <a
-                class="link home-dates__alt-link"
-                href={whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-umami-event="whatsapp-click"
-                data-umami-event-type="community-join"
-              >
-                Zur WhatsApp-Gruppe
-                <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
-              </a>
-              .
-            </p>
-          )
-        }
+        {whatsapp && (
+          <p class="home-dates__alt" id="whatsapp-community">
+            {data.whatsappText}{' '}
+            <a
+              class="link home-dates__alt-link"
+              href={whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-umami-event="whatsapp-click"
+              data-umami-event-type="community-join"
+            >
+              Zur WhatsApp-Gruppe
+              <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+            </a>
+            .
+          </p>
+        )}
       </div>
     </div>
   </div>

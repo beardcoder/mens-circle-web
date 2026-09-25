@@ -44,7 +44,9 @@ const lines = data.displayLines ?? [];
 
         <h1 class="home-hero__heading">
           <span class="display display--xl home-hero__display">
-            {lines.map((line) => <span class="display__line">{line}</span>)}
+            {lines.map((line) => (
+              <span class="display__line">{line}</span>
+            ))}
           </span>
           {data.lede && <span class="home-hero__lede">{data.lede}</span>}
         </h1>
@@ -69,34 +71,32 @@ const lines = data.displayLines ?? [];
         </HomeEventStatus>
       </div>
 
-      {
-        photo && (
-          <figure class="home-hero__figure">
-            <CropPicture
-              src={photo}
-              class="home-hero__image"
-              breakpoint="56em"
-              narrow={{
-                ratio: 3 / 2,
-                widths: [420, 700, 900],
-                sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
-                // The subject sits high in the frame; a centred band takes the torso.
-                position: 'top',
-              }}
-              wide={{
-                ratio: 3 / 4,
-                widths: [400, 560, 768],
-                sizes:
-                  'calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem) - 2 * clamp(1rem, 0.6rem + 1.6vw, 2rem)) / 3)',
-              }}
-              loading="eager"
-              fetchpriority="high"
-              alt={data.imageAlt ?? ''}
-            />
-            {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
-          </figure>
-        )
-      }
+      {photo && (
+        <figure class="home-hero__figure">
+          <CropPicture
+            src={photo}
+            class="home-hero__image"
+            breakpoint="56em"
+            narrow={{
+              ratio: 3 / 2,
+              widths: [420, 700, 900],
+              sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
+              // The subject sits high in the frame; a centred band takes the torso.
+              position: 'top',
+            }}
+            wide={{
+              ratio: 3 / 4,
+              widths: [400, 560, 768],
+              sizes:
+                'calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem) - 2 * clamp(1rem, 0.6rem + 1.6vw, 2rem)) / 3)',
+            }}
+            loading="eager"
+            fetchpriority="high"
+            alt={data.imageAlt ?? ''}
+          />
+          {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
+        </figure>
+      )}
     </div>
   </div>
 </section>

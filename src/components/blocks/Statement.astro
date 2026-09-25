@@ -31,21 +31,21 @@ const lines = data.lines ?? [];
     {data.eyebrow && <p class="marker statement__marker">{data.eyebrow}</p>}
 
     <h2 class="display statement__display" id="statement-title">
-      {lines.map((line) => <span class="display__line statement__line">{line}</span>)}
+      {lines.map((line) => (
+        <span class="display__line statement__line">{line}</span>
+      ))}
     </h2>
 
-    {
-      (data.text || data.linkLabel) && (
-        <div class="statement__foot">
-          {data.text && <p class="statement__text">{data.text}</p>}
-          {data.linkLabel && data.linkUrl && (
-            <a href={data.linkUrl} class="text-link statement__link">
-              {data.linkLabel}
-            </a>
-          )}
-        </div>
-      )
-    }
+    {(data.text || data.linkLabel) && (
+      <div class="statement__foot">
+        {data.text && <p class="statement__text">{data.text}</p>}
+        {data.linkLabel && data.linkUrl && (
+          <a href={data.linkUrl} class="text-link statement__link">
+            {data.linkLabel}
+          </a>
+        )}
+      </div>
+    )}
   </div>
 </section>
 

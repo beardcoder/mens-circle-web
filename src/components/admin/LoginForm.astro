@@ -1,8 +1,22 @@
 ---
 interface Props {
-  redirect?: string;
+  redirect: string;
+  /** `?error=` code from /auth/*, if the last attempt failed. */
+  error?: string | null;
+  /** False when the OIDC_* variables are missing — sign-in cannot work. */
+  configured: boolean;
 }
-const { redirect = '/admin' } = Astro.props;
+const { redirect, error, configured } = Astro.props;
+
+const MESSAGES: Record<string, string> = {
+  denied: 'Dieses Konto hat keinen Zugang zum Back-office.',
+  cancelled: 'Die Anmeldung wurde abgebrochen.',
+  rate: 'Zu viele Versuche. Bitte später erneut.',
+  provider: 'Pocket ID ist gerade nicht erreichbar.',
+  failed: 'Die Anmeldung ist fehlgeschlagen. Bitte erneut versuchen.',
+  config: 'Die Anmeldung ist auf dem Server nicht eingerichtet.',
+};
+const message = configured ? error && (MESSAGES[error] ?? MESSAGES.failed) : MESSAGES.config;
 ---
 
 <div class="login">
@@ -10,46 +24,21 @@ const { redirect = '/admin' } = Astro.props;
     <span class="login__ring" aria-hidden="true"></span>
     männerkreis
   </div>
-  <form id="login-form" class="card login__card" data-redirect={redirect}>
+  <div class="card login__card">
     <p class="eyebrow">Back-office</p>
     <h1>Anmeldung</h1>
-    <div class="field">
-      <label for="email">E-Mail</label>
-      <input id="email" name="email" type="email" autocomplete="username" required />
-    </div>
-    <div class="field">
-      <label for="password">Passwort</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required />
-    </div>
-    <button class="btn btn--block" type="submit">Anmelden</button>
-  </form>
+    {message && (
+      <p class="login__error" role="alert">
+        {message}
+      </p>
+    )}
+    {configured && (
+      <a class="btn btn--block" href={`/auth/login?redirect=${encodeURIComponent(redirect)}`}>
+        Mit Pocket ID anmelden
+      </a>
+    )}
+  </div>
 </div>
-
-<script>
-  import { actions } from 'astro:actions';
-  import { bindOnce, ok } from '@lib/admin';
-
-  bindOnce<HTMLFormElement>('#login-form', (form) => {
-    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fd = new FormData(form);
-
-      btn.disabled = true;
-      btn.textContent = 'Anmelden…';
-      const result = await actions.login({
-        email: String(fd.get('email') ?? '').trim(),
-        password: String(fd.get('password') ?? ''),
-      });
-      btn.disabled = false;
-      btn.textContent = 'Anmelden';
-
-      if (!ok(result)) return;
-      window.location.href = form.dataset.redirect || '/admin';
-    });
-  });
-</script>
 
 <style>
   .login {
@@ -79,5 +68,9 @@ const { redirect = '/admin' } = Astro.props;
   }
   .login__card h1 {
     margin: 0.25rem 0 1.25rem;
+  }
+  .login__error {
+    margin: 0 0 1.25rem;
+    color: var(--danger);
   }
 </style>

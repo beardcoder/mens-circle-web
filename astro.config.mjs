@@ -3,7 +3,7 @@
 import sitemap from '@astrojs/sitemap';
 import bun from '@wyattjoh/astro-bun-adapter';
 import icon from 'astro-icon';
-import llms, { DEFAULT_NOISE_SELECTORS } from 'astro-llms-md';
+import llms from 'astro-llms-md';
 import { defineConfig, fontProviders } from 'astro/config';
 import { publishGeneratedFiles } from './astro-integrations/publish-generated-files.mjs';
 import { staticCacheHeaders } from './astro-integrations/static-cache-headers.mjs';
@@ -139,22 +139,35 @@ export default defineConfig({
       },
     }),
     // llms.txt for AI crawlers, derived from the built HTML so it cannot drift.
-    // Pinned to 2.x on purpose: v3 dropped both `DEFAULT_NOISE_SELECTORS` and the
-    // `excludeSelectors` option (the config no longer loads), and its new SSR pass
-    // ignores `exclude` — it scrapes /admin/* from the *live* site at build time and
-    // publishes it as .md. Revisit once `exclude` covers SSR routes again.
     llms({
       name: site.siteName,
       description: site.description,
       contentSelector: 'main',
       // Strip chrome (nav/footer/forms/aria-hidden) so the markdown is prose.
-      excludeSelectors: [...DEFAULT_NOISE_SELECTORS, '.home-live-event', '.testimonials-section'],
+      // v3's README documents a `DEFAULT_NOISE_SELECTORS` export, but 3.0.2 does
+      // not ship it (the config fails to load) — so its six selectors are spelled
+      // out here.
+      excludeSelectors: [
+        'nav',
+        'aside',
+        'footer',
+        'form',
+        "[aria-hidden='true']",
+        '[hidden]',
+        '.home-live-event',
+        '.testimonials-section',
+      ],
       // Back-office stays out of the AI index — and so do the legal pages. They are noindex for search for the same reason
       // they are noise here: llms-full.txt was 19KB of which the privacy policy
       // was the larger half, so a model reading it learned our data-retention
       // periods and not what the Männerkreis is. Same exclusion list as the
       // sitemap, for the same reason.
-      exclude: ['admin/**', 'impressum/**', 'datenschutz/**'],
+      //
+      // `event` and `health` are the SSR routes v3 would otherwise fetch at build
+      // time — from the *live* site when it answers, else from a temporary server
+      // that needs the DB. /event goes in through publishGeneratedFiles instead,
+      // so a build never depends on or snapshots production.
+      exclude: ['admin/**', 'impressum/**', 'datenschutz/**', 'event', 'health'],
     }),
     // Must run AFTER sitemap() and llms(): patches and publishes their output.
     publishGeneratedFiles({

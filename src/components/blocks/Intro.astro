@@ -27,39 +27,33 @@ const questions = data.questions ?? [];
     <div class="bay">
       <div class="home-circle__head">
         <p class="marker marker--ruled">{data.eyebrow}</p>
-        {
-          data.title && (
-            <h2 class="section-title" id="ueber-title">
-              {data.title}
-            </h2>
-          )
-        }
+        {data.title && (
+          <h2 class="section-title" id="ueber-title">
+            {data.title}
+          </h2>
+        )}
       </div>
 
       {data.text && <div class="home-circle__text prose" set:html={data.text} />}
     </div>
 
-    {
-      questions.length > 0 && (
-        <div class="home-circle__questions">
-          <p class="marker home-circle__questions-label">{data.questionsLabel}</p>
+    {questions.length > 0 && (
+      <div class="home-circle__questions">
+        <p class="marker home-circle__questions-label">{data.questionsLabel}</p>
 
-          <ul class="home-circle__list" role="list">
-            {questions.map((question) => (
-              <li class="home-circle__question">{question}</li>
-            ))}
-          </ul>
-        </div>
-      )
-    }
+        <ul class="home-circle__list" role="list">
+          {questions.map((question) => (
+            <li class="home-circle__question">{question}</li>
+          ))}
+        </ul>
+      </div>
+    )}
 
-    {
-      data.close && (
-        <div class="bay">
-          <p class="home-circle__close">{data.close}</p>
-        </div>
-      )
-    }
+    {data.close && (
+      <div class="bay">
+        <p class="home-circle__close">{data.close}</p>
+      </div>
+    )}
   </div>
 </section>
 

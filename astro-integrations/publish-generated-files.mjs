@@ -9,8 +9,8 @@ import { fileURLToPath } from 'node:url';
  *
  * 1. `sitemap-index.xml` gains the sitemaps that are routes, not files — the
  *    event slugs live in SQLite (src/pages/sitemap-events.xml.ts).
- * 2. `llms.txt` gains the SSR pages, which `astro-llms-md` cannot see because it
- *    reads the built HTML.
+ * 2. `llms.txt` gains the SSR pages. `astro-llms-md` excludes them on purpose:
+ *    its SSR pass would fetch them from the live site at build time.
  * 3. Every generated file is registered in the adapter's `static-manifest.json`.
  *    The adapter writes that manifest in its own `astro:build:done`, which Astro
  *    runs first, so anything generated later would 404 in production.

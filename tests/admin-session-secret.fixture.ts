@@ -12,6 +12,8 @@
  * `mc_admin` cookie for any deployment that forgot to set it, without ever
  * needing to guess a real password. Each scenario proves the closed state
  * from the actual functions callers use, not from re-reading config values.
+ * Sign-in is Pocket ID now (see admin-oidc.test.ts); what is left to guard here
+ * is the session cookie itself.
  */
 import assert from 'node:assert/strict';
 
@@ -49,7 +51,7 @@ switch (process.argv[2]) {
   case 'unset': {
     assert.equal(config.ADMIN_SESSION_SECRET, '');
     assert.equal(auth.sessionSecretConfigured(), false);
-    assert.equal(auth.verifyCredentials('a@b.c', 'x'), false);
+    await assert.rejects(auth.createSession('a@b.c'), 'nothing may be signed without a secret');
 
     // The exact historical exploit: a cookie forged with the old literal
     // default must be rejected — not merely "some token is rejected", but
@@ -60,17 +62,11 @@ switch (process.argv[2]) {
     break;
   }
 
-  // ADMIN_EMAIL/PASSWORD set, ADMIN_SESSION_SECRET still not — the case that
-  // used to silently fall back to signing with the real password instead.
+  // A stale ADMIN_PASSWORD left in the environment, no session secret — the
+  // case that used to silently fall back to signing with the password.
   case 'password-only': {
-    assert.equal(config.ADMIN_EMAIL, 'admin@example.invalid');
-    assert.equal(config.ADMIN_PASSWORD, 'correct-horse-battery-staple');
     assert.equal(config.ADMIN_SESSION_SECRET, '');
     assert.equal(auth.sessionSecretConfigured(), false);
-
-    // Correct credentials must still be refused: verifyCredentials must not
-    // let a real login succeed while nothing can safely sign the result.
-    assert.equal(auth.verifyCredentials('admin@example.invalid', 'correct-horse-battery-staple'), false);
 
     // A token forged with the password as the key (the old fallback) must no
     // longer verify — the fallback itself is gone, not just gated later.
@@ -79,13 +75,19 @@ switch (process.argv[2]) {
     break;
   }
 
+  // A secret that is set but too short to be one — treated as unset, even for
+  // a token that really was signed with it.
+  case 'short': {
+    assert.equal(auth.sessionSecretConfigured(), false);
+    assert.equal(await auth.readSession(await forgeToken('admin@example.invalid', 'short-secret')), null);
+    break;
+  }
+
   // Everything configured, with its own distinct secret — the healthy path
   // must work exactly as before.
   case 'configured': {
-    assert.equal(config.ADMIN_SESSION_SECRET, 'a-long-random-session-secret');
+    assert.equal(config.ADMIN_SESSION_SECRET, 'a-long-random-session-secret-for-the-test-suite');
     assert.equal(auth.sessionSecretConfigured(), true);
-    assert.equal(auth.verifyCredentials('admin@example.invalid', 'correct-horse-battery-staple'), true);
-    assert.equal(auth.verifyCredentials('admin@example.invalid', 'wrong-password'), false);
 
     const token = await auth.createSession('admin@example.invalid');
     assert.equal(await auth.readSession(token), 'admin@example.invalid');

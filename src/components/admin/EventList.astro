@@ -30,64 +30,62 @@ function fmtDate(iso: string): string {
     <p class="eyebrow">Übersicht</p>
     <h1>Veranstaltungen</h1>
   </div>
-  <a class="btn" href="/admin/events/new">Neue Veranstaltung</a>
+  <a class="btn" href="/admin/events/new">
+    Neue Veranstaltung
+  </a>
 </div>
 
-{
-  events.length > 0 && (
-    <p class="summary mono muted">
-      <span class="summary__n">{events.length}</span> Veranstaltungen · <span class="summary__n">{publishedCount}</span>{' '}
-      veröffentlicht
-    </p>
-  )
-}
+{events.length > 0 && (
+  <p class="summary mono muted">
+    <span class="summary__n">{events.length}</span> Veranstaltungen · <span class="summary__n">{publishedCount}</span>{' '}
+    veröffentlicht
+  </p>
+)}
 
-{
-  events.length === 0 ? (
-    <div class="empty">
-      <p>Noch keine Veranstaltungen.</p>
-      <a class="btn btn--ghost btn--sm" href="/admin/events/new">
-        Die erste anlegen
-      </a>
-    </div>
-  ) : (
-    <ul id="event-list" class="events">
-      {events.map((ev) => (
-        <li class="event card" data-id={ev.id} data-title={ev.title}>
-          <a class="event__main" href={`/admin/events/${ev.id}`}>
-            <CapacityRing value={ev.activeCount} max={ev.maxParticipants} />
-            <span class="event__text">
-              <span class="event__title">{ev.title}</span>
-              <span class="event__meta mono">
-                {fmtDate(ev.eventDate)}
-                {ev.startTime ? ` · ${ev.startTime}` : ''}
-                <span class="faint"> · /event/{ev.slug}</span>
-              </span>
+{events.length === 0 ? (
+  <div class="empty">
+    <p>Noch keine Veranstaltungen.</p>
+    <a class="btn btn--ghost btn--sm" href="/admin/events/new">
+      Die erste anlegen
+    </a>
+  </div>
+) : (
+  <ul id="event-list" class="events">
+    {events.map((ev) => (
+      <li class="event card" data-id={ev.id} data-title={ev.title}>
+        <a class="event__main" href={`/admin/events/${ev.id}`}>
+          <CapacityRing value={ev.activeCount} max={ev.maxParticipants} />
+          <span class="event__text">
+            <span class="event__title">{ev.title}</span>
+            <span class="event__meta mono">
+              {fmtDate(ev.eventDate)}
+              {ev.startTime ? ` · ${ev.startTime}` : ''}
+              <span class="faint"> · /event/{ev.slug}</span>
             </span>
-          </a>
-          <div class="event__side">
-            {ev.isPublished ? (
-              <span class="badge badge--live">veröffentlicht</span>
-            ) : (
-              <span class="badge badge--draft">entwurf</span>
-            )}
-            <div class="event__actions">
-              <a class="btn btn--ghost btn--sm" href={`/admin/events/${ev.id}/registrations`}>
-                Anmeldungen
-              </a>
-              <a class="btn btn--ghost btn--sm" href={`/admin/events/new?from=${ev.id}`} title="Duplizieren">
-                Duplizieren
-              </a>
-              <button class="btn btn--danger btn--sm js-del" type="button">
-                Löschen
-              </button>
-            </div>
+          </span>
+        </a>
+        <div class="event__side">
+          {ev.isPublished ? (
+            <span class="badge badge--live">veröffentlicht</span>
+          ) : (
+            <span class="badge badge--draft">entwurf</span>
+          )}
+          <div class="event__actions">
+            <a class="btn btn--ghost btn--sm" href={`/admin/events/${ev.id}/registrations`}>
+              Anmeldungen
+            </a>
+            <a class="btn btn--ghost btn--sm" href={`/admin/events/new?from=${ev.id}`} title="Duplizieren">
+              Duplizieren
+            </a>
+            <button class="btn btn--danger btn--sm js-del" type="button">
+              Löschen
+            </button>
           </div>
-        </li>
-      ))}
-    </ul>
-  )
-}
+        </div>
+      </li>
+    ))}
+  </ul>
+)}
 
 <script>
   import { actions } from 'astro:actions';
