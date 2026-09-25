@@ -1,12 +1,12 @@
 // @ts-check
 
 import sitemap from '@astrojs/sitemap';
-import bun from '@wyattjoh/astro-bun-adapter';
+import bun from '@mens-circle/astro-bun';
 import icon from 'astro-icon';
 import llms from 'astro-llms-md';
 import { defineConfig, fontProviders } from 'astro/config';
 import { publishGeneratedFiles } from './astro-integrations/publish-generated-files.mjs';
-import { staticCacheHeaders } from './astro-integrations/static-cache-headers.mjs';
+import { cacheControlForFile } from './src/lib/cache-policy.ts';
 import site from './src/data/site.json' with { type: 'json' };
 
 const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
@@ -20,7 +20,13 @@ export default defineConfig({
     allowedDomains: [{ hostname: siteHostname, protocol: siteProtocol.replace(':', '') }],
   },
   output: 'server',
-  adapter: bun({ isr: false }),
+  adapter: bun({
+    // The cache policy for files on disk; HTML keeps what the page set at prerender time.
+    staticHeaders: (pathname, { assets }) => {
+      const cacheControl = cacheControlForFile(pathname, assets);
+      return cacheControl ? { 'cache-control': cacheControl } : null;
+    },
+  }),
   image: {
     // Replaces Astro's runtime transformer with a 404.
     endpoint: { entrypoint: './src/lib/disabled-image-endpoint.ts', route: '/_image' },
@@ -102,7 +108,7 @@ export default defineConfig({
       // event/health: v3 would fetch these SSR routes from the live site at build time.
       exclude: ['admin/**', 'impressum/**', 'datenschutz/**', 'event', 'health'],
     }),
-    // Order matters: after sitemap() and llms(), before staticCacheHeaders().
+    // After sitemap() and llms(), whose output it patches.
     publishGeneratedFiles({
       sitemaps: ['/sitemap-events.xml'],
       llmsPages: [
@@ -114,6 +120,5 @@ export default defineConfig({
         },
       ],
     }),
-    staticCacheHeaders(),
   ],
 });

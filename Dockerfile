@@ -1,9 +1,10 @@
 # syntax=docker/dockerfile:1
 
-# The adapter bakes the absolute client path into the bundle, so every stage uses /app.
 FROM oven/bun:1 AS build
 WORKDIR /app
+# The workspace manifests must be present before install.
 COPY package.json bun.lock ./
+COPY packages/astro-bun/package.json ./packages/astro-bun/
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 COPY . .
 ARG PUBLIC_SITE_URL
@@ -17,6 +18,7 @@ RUN bun run build
 FROM oven/bun:1 AS production-deps
 WORKDIR /app
 COPY package.json bun.lock ./
+COPY packages/astro-bun/package.json ./packages/astro-bun/
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --production
 
 FROM oven/bun:1

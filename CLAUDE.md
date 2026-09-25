@@ -21,8 +21,11 @@ typescript-eslint refuse TS 7.
 
 ## Rules
 
-**Runtime.** One Bun process (`dist/server/entry.mjs` from `@wyattjoh/astro-bun-adapter`)
-serves static files, SSR, actions and admin. Migrations run on boot. `src/lib/server/*`
+**Runtime.** One Bun process (`dist/server/entry.mjs` from the workspace adapter
+`packages/astro-bun`) serves static files, SSR, actions and admin. Static files are
+`Bun.serve` routes (native ETag/304; text precompressed with zstd/gzip at startup); POST
+and unknown paths fall through to Astro. The adapter stays generic: site policy goes in
+through its options in `astro.config.mjs`. Migrations run on boot. `src/lib/server/*`
 is server-only; never import it into client scripts.
 
 **Tests.** A test that reads config must spawn a fixture with `--no-env-file` and an
@@ -53,13 +56,13 @@ replica on the same SQLite file is not supported.
 get no images. Event pages are SSR. `lib/event-status.ts` has three states; a failed
 read (`unavailable`) must never render as "no date planned".
 
-**Caching.** `lib/cache-policy.ts` is the one table (middleware + `static-cache-headers.mjs`);
+**Caching.** `lib/cache-policy.ts` is the one table (middleware + the adapter's `staticHeaders`);
 routes with their own header are left alone. The four prerendered documents use
 `PRERENDERED_CACHE_CONTROL` (`lib/cache.ts`, `s-maxage=300`), which is only safe with a
 stable build-time `ASTRO_KEY`; without it, revert to `no-cache`.
 
 **Generated files.** `publish-generated-files.mjs` must run after `sitemap()` and `llms()`:
-it adds `/sitemap-events.xml` and `/event` and registers files in the adapter manifest.
+it adds `/sitemap-events.xml` and `/event`. The adapter serves whatever is on disk at startup.
 `astro-llms-md` excludes `event` and `health` so it never fetches the live site at build.
 
 **Images.** Native `<Picture>` at build time only. Keep the `/_image` 404 override;
