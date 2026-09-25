@@ -266,18 +266,37 @@ eased pair sums past 1 and flashes bright. The header deliberately carries no
 the old page's bar on the new page. A `pagereveal` listener in `Layout.astro`
 sets `.vt-arrival` before first paint so the arriving page skips its own entrance.
 
-**Cron (reminders):** In-process, on a plain self-rescheduling timer. `scripts/reminder-cron.ts` fires every 15 minutes on the UTC quarter hour and calls `runReminders()` from `src/lib/server/reminders.ts` — a single idempotent pass that stamps `reminder_sent_at`. It's loaded as a **`bun --preload`** module in `docker-entrypoint.sh`, so it registers once at process startup, before the Astro entry boots, in the same long-lived web process. (`--preload` must precede the entry file; the `bun run` subcommand is dropped — preload is a runtime flag.) This replaces the old "start lazily from middleware" trick, which relied on a `__MC_RUNTIME` flag the new Bun adapter never sets. The runtime image ships `src/lib/server` so the preload can reuse the data/email layer. **Do not reach for `Bun.cron` here:** the runtime only implements the OS-level `(path, schedule, title)` form, which writes to a crontab the image has no daemon for — the in-process callback overload exists only in `@types/bun`, so it type-checks and then throws at boot, killing the preload and the whole server with it. To trigger a pass manually: `bun run scripts/send-reminders.ts`.
+**Cron — `scripts/schedule.ts`, host-driven, Laravel-`schedule:run`-style.**
+There is no timer inside the server process anymore. The HOST's own cron
+(Coolify's "Scheduled Task") calls one entrypoint once a minute —
+`docker exec <web-container> bun run scripts/schedule.ts` — and that file
+holds every recurring task with its own 5-field cron expression
+(`scripts/lib/cron.ts`'s `isDue()`, evaluated on the UTC clock), running only
+the ones due on that minute: reminders every 15 minutes
+(`runReminders()` from `src/lib/server/reminders.ts`, stamping
+`reminder_sent_at`) and, when `BACKUP_S3_*` is configured
+(`backupConfigured()`), the S3 backup (`runBackup()` from
+`scripts/backup-db.ts`, default `0 3 * * *`). Tasks run sequentially — one
+failure is logged and does not stop the rest. Both `runBackup()` and
+`runReminders()` stay directly runnable on their own
+(`bun run scripts/backup-db.ts`, `bun run scripts/send-reminders.ts`) for a
+manual one-off pass; `schedule.ts` is only what decides _when_ they run
+automatically. **Do not reach for `Bun.cron` or an in-process timer here:**
+the runtime's OS-level `(path, schedule, title)` form writes to a crontab
+this image has no daemon for, and the in-process callback overload exists
+only in `@types/bun` — it type-checks and then throws at boot. Host-driven
+cron sidesteps that entirely: nothing inside the container schedules itself.
 
-**This deploys as exactly one replica, and that is load-bearing.** The
-reminder cron has no distributed lock — its only guarantee against a duplicate
-send is the in-process 15-minute schedule plus the `reminder_sent_at` stamp,
-which two replicas racing the same quarter-hour boundary would both pass
-before either stamps. `bun:sqlite` is a single-writer connection opened once
-per process (`db/index.ts`), and the capacity-safe registration write
-(`claimSeat()`, above) is only atomic **within** one process's connection. A
-second replica would reintroduce the exact races that transaction closes,
-from a different angle. Scaling this out is a real redesign (a lock or a
-different DB), not a Coolify replica-count knob.
+**Coolify replica count no longer has to stay at one for the reminder cron**
+— host-driven cron calls `schedule.ts` once, from outside the container,
+regardless of how many web replicas are running, so there's no in-process
+timer left to double-fire across replicas. `bun:sqlite` remains a
+single-writer connection opened once per process (`db/index.ts`), and the
+capacity-safe registration write (`claimSeat()`, above) is only atomic
+**within** one process's connection — that constraint is independent of the
+cron design and still means running more than one web replica against the
+same SQLite file is a real redesign (a lock or a different DB), not a
+Coolify replica-count knob.
 
 **Anmeldebestätigungen are re-sendable.** `registrations.confirmation_sent_at`
 is stamped **only** when listmonk accepted the participant's copy, so a null is

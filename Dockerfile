@@ -55,13 +55,16 @@ COPY --from=production-deps /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 # Drizzle migrations — applied at runtime on boot (resolved against the WORKDIR).
 COPY --from=build /app/drizzle ./drizzle
-# Operational scripts: the SQLite → S3 backup (scheduled `docker exec <web> bun
-# run scripts/backup-db.ts`), the reminder cron loaded via `bun --preload`
-# (scripts/reminder-cron.ts), and its one-shot manual variant (send-reminders.ts).
-COPY --from=build /app/scripts/backup-db.ts /app/scripts/reminder-cron.ts /app/scripts/send-reminders.ts ./scripts/
-# Server-only business logic the reminder cron reuses at runtime (db, email,
-# listmonk…). Imported directly by the preload module — no astro: deps, no path
-# aliases, so it runs under plain Bun without the build toolchain.
+# Operational scripts: scripts/schedule.ts is the one entrypoint Coolify's
+# Scheduled Task calls (`docker exec <web> bun run scripts/schedule.ts`, see
+# CLAUDE.md's "Cron" section) — it dispatches backup-db.ts's runBackup() and
+# reminders.ts's runReminders() by their own cron cadence. scripts/lib/cron.ts
+# is its pure due-task matcher; send-reminders.ts stays as the manual one-shot.
+COPY --from=build /app/scripts/schedule.ts /app/scripts/backup-db.ts /app/scripts/send-reminders.ts ./scripts/
+COPY --from=build /app/scripts/lib ./scripts/lib
+# Server-only business logic scripts/schedule.ts reuses at runtime (db, email,
+# listmonk…) — no astro: deps, no path aliases, so it runs under plain Bun
+# without the build toolchain.
 COPY --from=build /app/src/lib/server ./src/lib/server
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
