@@ -191,8 +191,10 @@ src/
 astro-integrations/  publish-generated-files.mjs: Sitemap-Index und llms.txt um
                   SSR-Seiten ergänzen und ins Static-Manifest des Bun-Adapters
                   eintragen
-scripts/          reminder-cron.ts (Timer-Scheduler via --preload), send-reminders.ts,
-                  backup-db.ts (SQLite → S3)
+scripts/          schedule.ts (ein Cron-Entrypoint für alle wiederkehrenden
+                  Aufgaben, von Coolifys "Scheduled Task" per Host-Cron
+                  aufgerufen — siehe Deployment-Abschnitt), lib/cron.ts
+                  (Cron-Matcher), send-reminders.ts, backup-db.ts (SQLite → S3)
 drizzle/          generierte SQL-Migrationen (beim Boot angewendet)
 drizzle.config.ts drizzle-kit-Konfiguration
 Dockerfile        Multi-Stage: Bun-Build → Bun-Runtime (ein Prozess)
@@ -268,6 +270,17 @@ API-Pfade selbst und entfernt abschließende Slashes. Zugangsdaten nur als
 Runtime-Secrets hinterlegen. Nach Änderungen an URL, Zugangsdaten oder IDs die
 Web-App neu starten. Die App richtet den externen Dienst nicht ein; siehe
 [Externe Instanz einrichten](#externe-instanz-einrichten).
+
+5. **Scheduled Task** anlegen für die Erinnerungsmails (und, wenn `BACKUP_S3_*`
+   gesetzt ist, das SQLite-Backup): Command `bun run scripts/schedule.ts`,
+   Cron-Ausdruck `* * * * *` (jede Minute; ist die Granularität in der Coolify-UI
+   feiner als `*/5 * * * *` nicht verfügbar, reicht `*/5 * * * *` ebenfalls — die
+   eigentliche Kadenz jeder Aufgabe steht in `scripts/schedule.ts` selbst, siehe
+   CLAUDE.md-Abschnitt "Cron"). Der Host-Cron entscheidet nur, wie oft
+   nachgeschaut wird; `schedule.ts` führt pro Aufruf nur die gerade fälligen
+   Aufgaben aus. War hier zuvor bereits ein separater Scheduled Task allein für
+   `bun run scripts/backup-db.ts` eingerichtet, diesen entfernen — sonst läuft
+   das Backup doppelt, einmal direkt und einmal über `schedule.ts`.
 
 Alternativ als **Docker-Compose**-Ressource mit `docker-compose.yml` deployen:
 Die Datei enthält nur `web` und das SQLite-Volume `app-data`. Coolify setzt

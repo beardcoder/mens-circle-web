@@ -1,6 +1,6 @@
 /**
  * One idempotent reminder pass, then exit — the manual escape hatch beside the
- * scheduled pass in scripts/reminder-cron.ts.
+ * scheduled pass in scripts/schedule.ts.
  *
  *   bun run scripts/send-reminders.ts
  *   docker exec <web> bun run scripts/send-reminders.ts
