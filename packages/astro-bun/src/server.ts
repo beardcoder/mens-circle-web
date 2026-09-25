@@ -20,22 +20,19 @@ const serverDir = fileURLToPath(new URL('.', import.meta.url));
 const clientDir = join(serverDir, config.clientDir);
 const manifest = Bun.file(join(serverDir, MANIFEST_FILE));
 
-const routes = await createStaticRoutes({
+const { routes, errorPages } = await createStaticRoutes({
   clientDir,
   assets: config.assets,
   staticCacheControl: config.staticCacheControl,
-  compress: config.compress,
   headers: (await manifest.exists()) ? ((await manifest.json()) as StaticHeaders) : {},
 });
 
-/** Prerendered 404/500 pages, read from disk instead of fetched over HTTP from ourselves. */
+/** Prerendered 404/500 pages from memory, with the headers their file would get; Astro sets the status. */
 async function errorPage(url: string): Promise<Response> {
   const base = new URL(url, 'http://localhost').pathname.replace(/(?:\/index)?\.html$|\/$/, '');
-  for (const candidate of [`${base}.html`, `${base}/index.html`]) {
-    const file = Bun.file(join(clientDir, candidate));
-    if (await file.exists()) return new Response(file, { headers: { 'content-type': 'text/html; charset=utf-8' } });
-  }
-  return new Response(null, { status: 404 });
+  const page = errorPages[`${base}.html`] ?? errorPages[`${base}/index.html`];
+  if (!page) return new Response(null, { status: 404 });
+  return page.clone();
 }
 
 const server = Bun.serve({
