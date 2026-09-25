@@ -1,12 +1,10 @@
 // @ts-check
-import { createHash } from 'node:crypto';
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Adds the SSR sitemap to sitemap-index.xml and the SSR pages to llms.txt, then
- * registers every generated file in the adapter's static manifest (written before
- * this hook runs, so unregistered files would 404). Register after sitemap() and llms().
+ * Adds the SSR sitemap to sitemap-index.xml and the SSR pages to llms.txt.
+ * Register after sitemap() and llms(). The adapter serves whatever ends up on disk.
  *
  * @param {object} options
  * @param {string[]} options.sitemaps Root-relative sitemap routes for the index.
@@ -53,37 +51,6 @@ export function publishGeneratedFiles({ sitemaps, llmsPages }) {
             ? `${text.trimEnd()}\n\n${block}`
             : `${text.slice(0, firstSection + 1)}${block}\n${text.slice(firstSection + 1)}`;
         });
-
-        const manifestPath = fileURLToPath(new URL('.astro-bun-adapter/static-manifest.json', config.build.server));
-        /** @type {Record<string, { headers: Record<string, string>; filePath: string }>} */
-        let manifest;
-        try {
-          manifest = JSON.parse(await readFile(manifestPath, 'utf-8'));
-        } catch {
-          return;
-        }
-
-        const generated = (await readdir(fileURLToPath(dir))).filter(
-          (file) => /^sitemap.*\.xml$/.test(file) || /^llms(-full)?\.txt$/.test(file) || file.endsWith('.md'),
-        );
-        for (const file of generated) {
-          const content = await readFile(new URL(file, dir));
-          manifest[`/${file}`] = {
-            headers: {
-              'content-type': file.endsWith('.xml')
-                ? 'application/xml'
-                : file.endsWith('.md')
-                  ? 'text/markdown; charset=utf-8'
-                  : 'text/plain; charset=utf-8',
-              'content-length': String(content.byteLength),
-              'cache-control': 'public, max-age=3600, must-revalidate',
-              etag: `"${createHash('sha256').update(content).digest('hex').slice(0, 16)}"`,
-            },
-            filePath: file,
-          };
-        }
-        await writeFile(manifestPath, JSON.stringify(manifest));
-        logger.info(`Registered ${generated.length} generated file(s) with the Bun adapter`);
       },
     },
   };
