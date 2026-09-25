@@ -1,10 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import TestimonialForm from '../components/forms/TestimonialForm.astro';
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 
 // Prerendered: the form posts to the submitTestimonial action client-side
 // (see src/lib/form.ts), so nothing here needs server rendering.
 export const prerender = true;
+Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 const schemas = [
   {

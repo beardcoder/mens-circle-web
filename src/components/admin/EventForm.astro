@@ -41,7 +41,9 @@ const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
     <p class="eyebrow">{isEdit ? 'Bearbeiten' : 'Anlegen'}</p>
     <h1>{isEdit ? 'Veranstaltung bearbeiten' : 'Neue Veranstaltung'}</h1>
   </div>
-  <a class="btn btn--ghost" href="/admin">Zurück</a>
+  <a class="btn btn--ghost" href="/admin">
+    Zurück
+  </a>
 </div>
 
 {isDuplicate && <p class="dup-note mono">Aus Vorlage übernommen — Datum &amp; Sichtbarkeit bitte neu setzen.</p>}
@@ -143,35 +145,35 @@ const nlIntro = DEFAULT_EVENT_NEWSLETTER_INTRO;
     <span>Veröffentlicht (öffentlich sichtbar)</span>
   </label>
 
-  <button class="btn" type="submit">Speichern</button>
+  <button class="btn" type="submit">
+    Speichern
+  </button>
 </form>
 
-{
-  isEdit && (
-    <section class="newsletter-send">
-      <h2>Newsletter zu dieser Veranstaltung senden</h2>
-      <p class="muted newsletter-send__hint">
-        Geht als Kampagne an die <strong>öffentliche Newsletter-Liste</strong> — dieselbe Liste, in die sich Besucher
-        über das Anmeldeformular eintragen. Unten steht ein fertiger Vorschlag, den du anpassen kannst. Titel, Datum,
-        Ort und der Link zur Veranstaltung werden automatisch ergänzt; Anrede, Grußformel, Fußzeile und Abmeldelink
-        kommen aus der listmonk-Vorlage.
-      </p>
-      <form id="newsletter-form" class="card" data-id={event?.id ?? ''}>
-        <div class="field">
-          <label for="nl-subject">Betreff *</label>
-          <input id="nl-subject" name="subject" type="text" value={`Einladung zum nächsten Männerkreis`} required />
-        </div>
-        <div class="field">
-          <label for="nl-intro">Einleitungstext</label>
-          <textarea id="nl-intro" name="intro" rows="8" set:text={nlIntro} />
-        </div>
-        <button class="btn btn--ghost" type="submit">
-          Newsletter senden
-        </button>
-      </form>
-    </section>
-  )
-}
+{isEdit && (
+  <section class="newsletter-send">
+    <h2>Newsletter zu dieser Veranstaltung senden</h2>
+    <p class="muted newsletter-send__hint">
+      Geht als Kampagne an die <strong>öffentliche Newsletter-Liste</strong> — dieselbe Liste, in die sich Besucher über
+      das Anmeldeformular eintragen. Unten steht ein fertiger Vorschlag, den du anpassen kannst. Titel, Datum, Ort und
+      der Link zur Veranstaltung werden automatisch ergänzt; Anrede, Grußformel, Fußzeile und Abmeldelink kommen aus der
+      listmonk-Vorlage.
+    </p>
+    <form id="newsletter-form" class="card" data-id={event?.id ?? ''}>
+      <div class="field">
+        <label for="nl-subject">Betreff *</label>
+        <input id="nl-subject" name="subject" type="text" value={`Einladung zum nächsten Männerkreis`} required />
+      </div>
+      <div class="field">
+        <label for="nl-intro">Einleitungstext</label>
+        <textarea id="nl-intro" name="intro" rows="8" set:text={nlIntro} />
+      </div>
+      <button class="btn btn--ghost" type="submit">
+        Newsletter senden
+      </button>
+    </form>
+  </section>
+)}
 
 <script>
   import { actions } from 'astro:actions';

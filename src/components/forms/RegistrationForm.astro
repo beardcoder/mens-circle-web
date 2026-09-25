@@ -73,7 +73,9 @@ const { eventId, isFull } = Astro.props;
   </div>
 
   <div class="form-group">
-    <label for="phone">Handynummer <span class="form-label-optional">(optional)</span></label>
+    <label for="phone">
+      Handynummer <span class="form-label-optional">(optional)</span>
+    </label>
     <input
       type="tel"
       id="phone"
@@ -93,9 +95,9 @@ const { eventId, isFull } = Astro.props;
       <input type="checkbox" name="privacy" required aria-describedby="register-privacy-error" />
       <span>
         Ich habe die
-        <a href="/datenschutz" target="_blank" rel="noopener"
-          >Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span></a
-        >
+        <a href="/datenschutz" target="_blank" rel="noopener">
+          Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span>
+        </a>
         gelesen und stimme der Verarbeitung meiner Daten zu.
       </span>
     </label>

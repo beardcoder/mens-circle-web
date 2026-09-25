@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "description": "Männerkreis Niederbayern/ Straubing — Astro 7, SSR on the Bun runtime, with Drizzle (bun:sqlite) as the backend and listmonk for email.",
+  "description": "Website of the Männerkreis — Astro 7 SSR on the Bun runtime, Drizzle on bun:sqlite, listmonk for email, Pocket ID for the admin sign-in.",
   "scripts": {
     "dev": "bun --bun astro dev",
     "build": "astro build",
@@ -21,7 +21,8 @@
     "images:verify": "bun scripts/verify-static-images.ts"
   },
   "dependencies": {
-    "drizzle-orm": "^0.45.2"
+    "drizzle-orm": "^0.45.3",
+    "openid-client": "^6.8.8"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
@@ -30,20 +31,20 @@
     "@types/bun": "^1.4.2",
     "@types/leaflet": "^1.9.22",
     "@wyattjoh/astro-bun-adapter": "^2.1.1",
-    "astro": "7.3.3",
+    "astro": "7.3.5",
     "astro-icon": "^1.2.0",
-    "astro-llms-md": "^2.2.2",
-    "drizzle-kit": "^0.31.10",
-    "eslint": "^10.10.0",
+    "astro-llms-md": "^3.0.2",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-astro": "^3.2.1",
     "globals": "^17.12.0",
     "jiti": "^2.7.0",
     "leaflet": "^1.9.4",
-    "prettier": "^3.9.8",
-    "prettier-plugin-astro": "^0.14.1",
+    "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0",
     "sharp": "^0.35.4",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.70.0"
+    "typescript-eslint": "^8.70.1"
   }
 }

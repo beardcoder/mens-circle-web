@@ -26,48 +26,46 @@ interface Props {
 const { blocks } = Astro.props;
 ---
 
-{
-  blocks.map((block) => {
-    const data = block.data ?? {};
-    switch (block.type) {
-      case 'hero':
-        return <Hero data={data} />;
-      case 'facts':
-        return (
-          <Facts data={data} server:defer>
-            <Facts data={data} next={null} slot="fallback" />
-          </Facts>
-        );
-      case 'intro':
-        return <Intro data={data} />;
-      case 'moderator':
-        return <Moderator data={data} />;
-      case 'journey-steps':
-        return <JourneySteps data={data} />;
-      case 'statement':
-        return <Statement data={data} />;
-      case 'frame':
-        return <Frame data={data} />;
-      case 'faq':
-        return <Faq data={data} />;
-      case 'dates':
-        return <Dates data={data} />;
-      case 'cta':
-        return <Cta data={data} />;
-      case 'value-items':
-        return <ValueItems data={data} />;
-      case 'testimonials':
-        return (
-          <Testimonials data={data} server:defer>
-            <Testimonials data={data} testimonials={[]} loading slot="fallback" />
-          </Testimonials>
-        );
-      case 'page-hero':
-        return <PageHero data={data} />;
-      case 'text-section':
-        return <TextSection data={data} />;
-      default:
-        return null;
-    }
-  })
-}
+{blocks.map((block) => {
+  const data = block.data ?? {};
+  switch (block.type) {
+    case 'hero':
+      return <Hero data={data} />;
+    case 'facts':
+      return (
+        <Facts data={data} server:defer>
+          <Facts data={data} next={null} slot="fallback" />
+        </Facts>
+      );
+    case 'intro':
+      return <Intro data={data} />;
+    case 'moderator':
+      return <Moderator data={data} />;
+    case 'journey-steps':
+      return <JourneySteps data={data} />;
+    case 'statement':
+      return <Statement data={data} />;
+    case 'frame':
+      return <Frame data={data} />;
+    case 'faq':
+      return <Faq data={data} />;
+    case 'dates':
+      return <Dates data={data} />;
+    case 'cta':
+      return <Cta data={data} />;
+    case 'value-items':
+      return <ValueItems data={data} />;
+    case 'testimonials':
+      return (
+        <Testimonials data={data} server:defer>
+          <Testimonials data={data} testimonials={[]} loading slot="fallback" />
+        </Testimonials>
+      );
+    case 'page-hero':
+      return <PageHero data={data} />;
+    case 'text-section':
+      return <TextSection data={data} />;
+    default:
+      return null;
+  }
+})}

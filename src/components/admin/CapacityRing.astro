@@ -32,14 +32,13 @@ const labelSize = Math.round(size * 0.24);
       fill="none"
       stroke-width={stroke}
       stroke-dasharray={circ}
-      stroke-dashoffset={offset}></circle>
+      stroke-dashoffset={offset}
+    ></circle>
   </svg>
-  {
-    showLabel && (
-      <span class="ring__label" style={`font-size:${labelSize}px`}>
-        {value}
-        <span class="faint">/{max}</span>
-      </span>
-    )
-  }
+  {showLabel && (
+    <span class="ring__label" style={`font-size:${labelSize}px`}>
+      {value}
+      <span class="faint">/{max}</span>
+    </span>
+  )}
 </span>

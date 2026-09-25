@@ -39,58 +39,54 @@ const imageAsset = resolveAssetImage(data.image);
         {data.title && <h1 class="page-hero__title" set:html={data.title} />}
         {data.lead && <p class="page-hero__lead">{data.lead}</p>}
 
-        {
-          hasButton && (
-            <p class="page-hero__cta">
-              <a
-                href={data.buttonLink}
-                class="btn btn--primary btn--large"
-                target={buttonExternal ? '_blank' : undefined}
-                rel={buttonExternal ? 'noopener noreferrer' : undefined}
-              >
-                {data.buttonText}
-              </a>
-            </p>
-          )
-        }
+        {hasButton && (
+          <p class="page-hero__cta">
+            <a
+              href={data.buttonLink}
+              class="btn btn--primary btn--large"
+              target={buttonExternal ? '_blank' : undefined}
+              rel={buttonExternal ? 'noopener noreferrer' : undefined}
+            >
+              {data.buttonText}
+            </a>
+          </p>
+        )}
       </div>
 
-      {
-        hasImage && (
-          <figure class="page-hero__media">
-            {imageAsset ? (
-              <CropPicture
-                src={imageAsset}
-                class="page-hero__image"
-                breakpoint="54em"
-                narrow={{
-                  ratio: 3 / 2,
-                  widths: [420, 700, 900],
-                  sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
-                  position: 'top',
-                }}
-                wide={{
-                  ratio: 4 / 5,
-                  widths: [352, 512, 704],
-                  sizes: 'min(22rem, calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)) * 0.32))',
-                }}
-                loading="eager"
-                fetchpriority="high"
-                alt={data.imageAlt ?? ''}
-              />
-            ) : (
-              <img
-                src={data.image}
-                class="page-hero__image"
-                loading="eager"
-                fetchpriority="high"
-                alt={data.imageAlt ?? ''}
-              />
-            )}
-            {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
-          </figure>
-        )
-      }
+      {hasImage && (
+        <figure class="page-hero__media">
+          {imageAsset ? (
+            <CropPicture
+              src={imageAsset}
+              class="page-hero__image"
+              breakpoint="54em"
+              narrow={{
+                ratio: 3 / 2,
+                widths: [420, 700, 900],
+                sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
+                position: 'top',
+              }}
+              wide={{
+                ratio: 4 / 5,
+                widths: [352, 512, 704],
+                sizes: 'min(22rem, calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)) * 0.32))',
+              }}
+              loading="eager"
+              fetchpriority="high"
+              alt={data.imageAlt ?? ''}
+            />
+          ) : (
+            <img
+              src={data.image}
+              class="page-hero__image"
+              loading="eager"
+              fetchpriority="high"
+              alt={data.imageAlt ?? ''}
+            />
+          )}
+          {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
+        </figure>
+      )}
     </div>
   </div>
 </section>

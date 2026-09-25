@@ -16,21 +16,19 @@ const description = event.description?.trim() ?? '';
 const descriptionHtml = escapeHtml(description).replace(/\r\n|\r|\n/g, '<br />');
 ---
 
-{
-  description && (
-    <section class="section section--ruled event-about-section" aria-labelledby="ueber-den-abend">
-      <div class="container">
-        <div class="spine">
-          <h2 class="rail-heading" id="ueber-den-abend">
-            Zu diesem Abend
-          </h2>
+{description && (
+  <section class="section section--ruled event-about-section" aria-labelledby="ueber-den-abend">
+    <div class="container">
+      <div class="spine">
+        <h2 class="rail-heading" id="ueber-den-abend">
+          Zu diesem Abend
+        </h2>
 
-          <div class="event-about__text spine__body" data-reveal="up" set:html={descriptionHtml} />
-        </div>
+        <div class="event-about__text spine__body" data-reveal="up" set:html={descriptionHtml} />
       </div>
-    </section>
-  )
-}
+    </div>
+  </section>
+)}
 
 <style is:global>
   @layer sections {

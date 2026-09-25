@@ -47,11 +47,15 @@ const timeStr = event.startTime ? `${event.startTime}${event.endTime ? `–${eve
 <section class="next">
   <div class="next__bar">
     <p class="eyebrow">Nächstes Event · Planung</p>
-    <a class="btn btn--sm" href={`/admin/events/${event.id}/registrations`}>Anmeldungen verwalten</a>
+    <a class="btn btn--sm" href={`/admin/events/${event.id}/registrations`}>
+      Anmeldungen verwalten
+    </a>
   </div>
 
   <div class="next__titles">
-    <a class="next__title" href={`/admin/events/${event.id}`}>{event.title}</a>
+    <a class="next__title" href={`/admin/events/${event.id}`}>
+      {event.title}
+    </a>
     <p class="next__meta mono">
       {dateLong}
       {timeStr && <span> · {timeStr}</span>}
@@ -65,42 +69,41 @@ const timeStr = event.startTime ? `${event.startTime}${event.endTime ? `–${eve
     <div class="roster__lists">
       <div class="roster__col">
         <p class="roster__label">
-          Angemeldet <span class="mono roster__n">{registered.length}/{event.maxParticipants}</span>
+          Angemeldet{' '}
+          <span class="mono roster__n">
+            {registered.length}/{event.maxParticipants}
+          </span>
         </p>
-        {
-          registered.length === 0 ? (
-            <p class="muted roster__empty">Noch niemand angemeldet.</p>
-          ) : (
-            <ol class="roster">
-              {registered.map((p, i) => (
-                <li class="roster__person">
-                  <span class="roster__idx mono faint">{String(i + 1).padStart(2, '0')}</span>
-                  <span class="roster__name">{name(p)}</span>
-                  {p.status === 'attended' && <span class="badge badge--live">da</span>}
-                </li>
-              ))}
-            </ol>
-          )
-        }
+        {registered.length === 0 ? (
+          <p class="muted roster__empty">Noch niemand angemeldet.</p>
+        ) : (
+          <ol class="roster">
+            {registered.map((p, i) => (
+              <li class="roster__person">
+                <span class="roster__idx mono faint">{String(i + 1).padStart(2, '0')}</span>
+                <span class="roster__name">{name(p)}</span>
+                {p.status === 'attended' && <span class="badge badge--live">da</span>}
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
 
-      {
-        waitlist.length > 0 && (
-          <div class="roster__col">
-            <p class="roster__label">
-              Warteliste <span class="mono roster__n">{waitlist.length}</span>
-            </p>
-            <ol class="roster">
-              {waitlist.map((p, i) => (
-                <li class="roster__person">
-                  <span class="roster__idx mono faint">{String(i + 1).padStart(2, '0')}</span>
-                  <span class="roster__name muted">{name(p)}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        )
-      }
+      {waitlist.length > 0 && (
+        <div class="roster__col">
+          <p class="roster__label">
+            Warteliste <span class="mono roster__n">{waitlist.length}</span>
+          </p>
+          <ol class="roster">
+            {waitlist.map((p, i) => (
+              <li class="roster__person">
+                <span class="roster__idx mono faint">{String(i + 1).padStart(2, '0')}</span>
+                <span class="roster__name muted">{name(p)}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
     </div>
   </div>
 </section>

@@ -29,36 +29,32 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
           {heading}
         </h2>
 
-        {
-          event.is_past ? (
-            <p class="event-register__text">
-              Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine
-              Anmeldung ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich
-              benachrichtigen, sobald der nächste Termin feststeht.
-            </p>
-          ) : event.is_full ? (
-            <p class="event-register__text">
-              Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch
-              nach und bekommst sofort eine E-Mail.
-            </p>
-          ) : (
-            <p class="event-register__text">
-              Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen
-              Vor- und Nachname und eine E-Mail-Adresse; den genauen Treffpunkt bekommst du mit der Bestätigung.
-            </p>
-          )
-        }
+        {event.is_past ? (
+          <p class="event-register__text">
+            Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine
+            Anmeldung ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich benachrichtigen,
+            sobald der nächste Termin feststeht.
+          </p>
+        ) : event.is_full ? (
+          <p class="event-register__text">
+            Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch
+            nach und bekommst sofort eine E-Mail.
+          </p>
+        ) : (
+          <p class="event-register__text">
+            Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen Vor-
+            und Nachname und eine E-Mail-Adresse; den genauen Treffpunkt bekommst du mit der Bestätigung.
+          </p>
+        )}
 
         <div class="event-register__form-wrap">
-          {
-            event.is_past ? (
-              <a href="/#termine" class="btn btn--primary">
-                Bei neuen Terminen benachrichtigen
-              </a>
-            ) : (
-              <RegistrationForm eventId={event.id} isFull={event.is_full} />
-            )
-          }
+          {event.is_past ? (
+            <a href="/#termine" class="btn btn--primary">
+              Bei neuen Terminen benachrichtigen
+            </a>
+          ) : (
+            <RegistrationForm eventId={event.id} isFull={event.is_full} />
+          )}
         </div>
       </div>
     </div>

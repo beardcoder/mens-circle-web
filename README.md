@@ -44,8 +44,8 @@ Paketmanager, Build-Tool **und** Laufzeit ist **Bun**.
   [`drizzle/`](drizzle/) (mit `bun run db:generate` aus dem Schema erzeugt) werden
   beim Server-Boot automatisch angewendet
   ([`src/lib/server/db/index.ts`](src/lib/server/db/index.ts)).
-- **Native Admin-UI.** Unter `/admin` (Login per `ADMIN_EMAIL`/`ADMIN_PASSWORD`,
-  signiertes Session-Cookie) lassen sich Veranstaltungen anlegen/bearbeiten,
+- **Native Admin-UI.** Unter `/admin` (Anmeldung über Pocket ID per OpenID
+  Connect, danach signiertes Session-Cookie) lassen sich Veranstaltungen anlegen/bearbeiten,
   Anmeldungen verwalten (Status ändern, stornieren → automatisches Nachrücken
   von der Warteliste) und Teilnehmer:innen anschreiben. Astro-Seiten mit
   kleinen Skripten, abgesichert per Middleware ([`src/middleware.ts`](src/middleware.ts)).
@@ -206,7 +206,7 @@ Voraussetzungen: [Bun](https://bun.sh) ≥ 1.3.
 
 ```bash
 bun install
-cp .env.example .env   # ADMIN_EMAIL / ADMIN_PASSWORD setzen für /admin
+cp .env.example .env   # OIDC_* + ADMIN_EMAIL setzen für /admin
 
 bun run dev            # Astro-Dev-Server (Port 4321), API + Admin inklusive
 ```
@@ -231,8 +231,7 @@ bun run build          # → dist/   (NICHT `bun --bun run build`, das bricht Ro
 
 # Den gebauten Server in der Bun-Runtime starten (wie in Produktion):
 PORT=3000 DATABASE_PATH=./data/mens-circle.db \
-  ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=secret \
-  bun run start
+  APP_URL=http://localhost:3000 bun run start   # OIDC_* aus .env
 ```
 
 ## Deployment mit Coolify
@@ -255,8 +254,10 @@ SMTP und Vorlagen wird unabhängig davon extern betrieben und gesichert.
 | `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`      | Absender transaktionaler Mails                                  |
 | `MAIL_ADMIN_ADDRESS`, `MAIL_ADMIN_NAME`    | Empfänger der Admin-Benachrichtigungen                          |
 | `MAIL_CONTACT_ADDRESS`, `SITE_NAME`        | Kontaktadresse und Name im Transaktions-Payload                 |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD`            | Login der Admin-UI (`/admin`)                                   |
-| `ADMIN_SESSION_SECRET`                     | langer Zufallswert, signiert das Session-Cookie                 |
+| `OIDC_ISSUER`                              | URL der Pocket-ID-Instanz (Admin-Anmeldung)                     |
+| `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`     | OIDC-Client in Pocket ID, Callback `${APP_URL}/auth/callback`   |
+| `ADMIN_EMAIL`, `OIDC_ADMIN_GROUP`          | wer ins `/admin` darf: E-Mails (kommasepariert) und/oder Gruppe |
+| `ADMIN_SESSION_SECRET`                     | ≥ 32 Zufallszeichen, signiert das Session-Cookie                |
 | `LISTMONK_URL`                             | externe Basisadresse ohne `/api`-Suffix, HTTPS empfohlen        |
 | `LISTMONK_API_USER`, `LISTMONK_API_TOKEN`  | API-Benutzer und Token der externen Instanz                     |
 | `LISTMONK_LIST_IDS`                        | numerische Newsletter-Listen-IDs, kommasepariert, keine UUIDs   |

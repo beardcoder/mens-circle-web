@@ -4,9 +4,11 @@ import PageHero from '../components/blocks/PageHero.astro';
 import TextSection from '../components/blocks/TextSection.astro';
 import datenschutz from '../content/legal/datenschutz.json';
 import impressum from '../content/legal/impressum.json';
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 
 // Static legal pages — no live data, prerendered to plain HTML at build time.
 export const prerender = true;
+Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 export function getStaticPaths() {
   const pages = { impressum, datenschutz };
