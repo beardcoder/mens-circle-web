@@ -7,6 +7,7 @@ import { setGetEnv } from 'astro/env/setup';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import config from 'virtual:@mens-circle/astro-bun/config';
+import { compressResponse } from './compress';
 import { MANIFEST_FILE, type StaticHeaders } from './shared';
 import { createStaticRoutes } from './static';
 
@@ -20,7 +21,7 @@ const serverDir = fileURLToPath(new URL('.', import.meta.url));
 const clientDir = join(serverDir, config.clientDir);
 const manifest = Bun.file(join(serverDir, MANIFEST_FILE));
 
-const routes = await createStaticRoutes({
+const { routes, errorPages } = await createStaticRoutes({
   clientDir,
   assets: config.assets,
   staticCacheControl: config.staticCacheControl,
@@ -28,14 +29,13 @@ const routes = await createStaticRoutes({
   headers: (await manifest.exists()) ? ((await manifest.json()) as StaticHeaders) : {},
 });
 
-/** Prerendered 404/500 pages, read from disk instead of fetched over HTTP from ourselves. */
+/** Prerendered 404/500 pages from memory, with the headers their file would get; Astro sets the status. */
 async function errorPage(url: string): Promise<Response> {
   const base = new URL(url, 'http://localhost').pathname.replace(/(?:\/index)?\.html$|\/$/, '');
-  for (const candidate of [`${base}.html`, `${base}/index.html`]) {
-    const file = Bun.file(join(clientDir, candidate));
-    if (await file.exists()) return new Response(file, { headers: { 'content-type': 'text/html; charset=utf-8' } });
-  }
-  return new Response(null, { status: 404 });
+  const page = errorPages[`${base}.html`] ?? errorPages[`${base}/index.html`];
+  if (!page) return new Response(null, { status: 404 });
+  // Identity bytes; compressResponse encodes the final response for the client.
+  return typeof page === 'function' ? page(new Request(url)) : page.clone();
 }
 
 const server = Bun.serve({
@@ -43,13 +43,15 @@ const server = Bun.serve({
   port: Number(process.env.PORT || config.port),
   development: false,
   routes,
-  fetch: (request, server) =>
-    app.render(request, {
+  async fetch(request, server) {
+    const response = await app.render(request, {
       addCookieHeader: true,
       routeData: app.match(request),
       clientAddress: server.requestIP(request)?.address,
       prerenderedErrorPageFetch: errorPage,
-    }),
+    });
+    return config.compress ? compressResponse(request, response) : response;
+  },
   error(error) {
     logger.error(error.stack ?? String(error));
     return new Response('Internal Server Error', { status: 500 });

@@ -8,6 +8,7 @@
  * - Large files become file routes: streamed with sendfile, Last-Modified and Range natively.
  */
 import { join } from 'node:path';
+import { acceptedEncodings, COMPRESSIBLE, MIN_COMPRESS_SIZE } from './compress';
 import type { StaticHeaders } from './shared';
 
 export interface StaticRouteOptions {
@@ -26,8 +27,6 @@ type Handler = (request: Request) => Response;
 export type StaticRoutes = Record<string, { GET: Response | Handler; HEAD?: Handler }>;
 
 const IMMUTABLE = 'public, max-age=31536000, immutable';
-const COMPRESSIBLE = /^(?:text\/|application\/(?:javascript|json|xml|manifest\+json)|image\/svg\+xml)/;
-const MIN_COMPRESS_SIZE = 1024;
 const MAX_BUFFERED_SIZE = 1024 * 1024;
 
 /** The URL paths a file answers to: `/a/index.html` and `/a.html` also as `/a`. */
@@ -35,17 +34,6 @@ export function urlPathsFor(file: string): string[] {
   if (file.endsWith('/index.html')) return [file, file.slice(0, -'/index.html'.length) || '/'];
   if (file.endsWith('.html')) return [file, file.slice(0, -'.html'.length)];
   return [file];
-}
-
-/** Encodings the client accepts, without the ones it refuses with `q=0`. */
-export function acceptedEncodings(header: string | null): Set<string> {
-  const accepted = new Set<string>();
-  for (const part of (header ?? '').split(',')) {
-    const [name, ...params] = part.split(';').map((token) => token.trim().toLowerCase());
-    const q = params.find((param) => param.startsWith('q='));
-    if (name && (!q || Number(q.slice(2)) > 0)) accepted.add(name);
-  }
-  return accepted;
 }
 
 const matchesETag = (header: string | null, etag: string): boolean =>
@@ -103,23 +91,37 @@ async function routeFor(file: string, options: StaticRouteOptions): Promise<Resp
   return (compressible && negotiated(bytes, headers)) || new Response(bytes, { headers });
 }
 
-/** Every file below `clientDir` as a GET and HEAD route. */
-export async function createStaticRoutes(options: StaticRouteOptions): Promise<StaticRoutes> {
+/** Every file below `clientDir` as a GET and HEAD route, except the error pages. */
+/** Prerendered error pages. They are served through Astro with their status, never as a 200 page. */
+const ERROR_PAGE = /^\/(?:404|500)(?:\.html|\/index\.html)$/;
+
+export interface StaticFiles {
+  routes: StaticRoutes;
+  /** The error pages by file path (`/404.html`), for Astro's `prerenderedErrorPageFetch`. */
+  errorPages: Record<string, Response | Handler>;
+}
+
+export async function createStaticRoutes(options: StaticRouteOptions): Promise<StaticFiles> {
   const files = await Array.fromAsync(
     new Bun.Glob('**/*').scan({ cwd: options.clientDir, onlyFiles: true, dot: true }),
     (file) => `/${file.replaceAll('\\', '/')}`,
   );
   const routes: StaticRoutes = {};
+  const errorPages: StaticFiles['errorPages'] = {};
   await Promise.all(
     files
       // `:` and `*` would turn a file name into a route pattern.
       .filter((file) => !/[:*]/.test(file))
       .map(async (file) => {
         const GET = await routeFor(file, options);
+        if (ERROR_PAGE.test(file)) {
+          errorPages[file] = GET;
+          return;
+        }
         // Bun answers HEAD for static responses itself, not for handlers.
         const route = typeof GET === 'function' ? { GET, HEAD: GET } : { GET };
         for (const path of urlPathsFor(file)) routes[path] = route;
       }),
   );
-  return routes;
+  return { routes, errorPages };
 }

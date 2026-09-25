@@ -25,12 +25,18 @@ export default defineConfig({
   itself. Files above 1 MB are file routes (sendfile, `Last-Modified`).
 - **Compression**: text files (HTML, CSS, JS, SVG, XML, JSON, Markdown) are compressed
   once at startup with `Bun.zstdCompressSync` and `Bun.gzipSync` and negotiated per
-  request (`Vary: Accept-Encoding`, one ETag per encoding).
+  request (`Vary: Accept-Encoding`, one ETag per encoding). Rendered responses are
+  compressed on the fly with Bun's native `node:zlib` (zstd, then gzip), flushed after
+  every chunk: `CompressionStream` would buffer the whole page and break streaming.
+  Skipped for HEAD, 204/206/304, `no-transform`, event streams, bodies that are already
+  encoded or declare fewer than 1 KB; a strong ETag turns weak.
 - **Methods**: routes are registered for GET and HEAD only; a POST to a page and every
   unknown path fall through to the `fetch` handler, i.e. to Astro (middleware, CSRF, 404).
 - **Shutdown**: SIGTERM/SIGINT call `server.stop()`, which lets in-flight requests finish.
-- `server.requestIP()` becomes `Astro.clientAddress`; prerendered 404/500 pages are read
-  from disk instead of fetched over HTTP.
+- `server.requestIP()` becomes `Astro.clientAddress`.
+- **Error pages**: a prerendered `404.html`/`500.html` is not a static route (it would
+  answer `/404` with 200). It is held in memory and handed to Astro through
+  `prerenderedErrorPageFetch`, so every 404 keeps its status and its file's headers.
 
 ## Image service
 

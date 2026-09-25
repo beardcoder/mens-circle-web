@@ -2,7 +2,8 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { acceptedEncodings, createStaticRoutes, urlPathsFor } from '../src/static';
+import { acceptedEncodings } from '../src/compress';
+import { createStaticRoutes, urlPathsFor } from '../src/static';
 
 test('pages answer to their clean URL too', () => {
   expect(urlPathsFor('/index.html')).toEqual(['/index.html', '/']);
@@ -23,6 +24,7 @@ describe('served over HTTP', () => {
   let server: ReturnType<typeof Bun.serve>;
   const html = `<!doctype html><title>x</title>${'<p>Männerkreis</p>'.repeat(200)}`;
   const url = (path: string) => new URL(path, server.url);
+  let errorPages: Awaited<ReturnType<typeof createStaticRoutes>>['errorPages'];
 
   beforeAll(async () => {
     dir = await mkdtemp(join(tmpdir(), 'astro-bun-'));
@@ -32,8 +34,9 @@ describe('served over HTTP', () => {
     await writeFile(join(dir, 'assets/app.abc123.js'), 'console.log(1)');
     await writeFile(join(dir, 'robots.txt'), 'User-agent: *');
     await writeFile(join(dir, 'big.bin'), new Uint8Array(64 * 1024));
+    await writeFile(join(dir, '404.html'), '<h1>404</h1>');
 
-    const routes = await createStaticRoutes({
+    const files = await createStaticRoutes({
       clientDir: dir,
       assets: 'assets',
       staticCacheControl: 'public, max-age=60',
@@ -41,7 +44,8 @@ describe('served over HTTP', () => {
       headers: { '/robots.txt': { 'Cache-Control': 'no-cache' } },
       maxBufferedSize: 16 * 1024,
     });
-    server = Bun.serve({ port: 0, routes, fetch: () => new Response('astro', { status: 418 }) });
+    errorPages = files.errorPages;
+    server = Bun.serve({ port: 0, routes: files.routes, fetch: () => new Response('astro', { status: 418 }) });
   });
 
   afterAll(async () => {
@@ -110,5 +114,13 @@ describe('served over HTTP', () => {
     expect((await fetch(url('/robots.txt'), { method: 'POST' })).status).toBe(418);
     expect((await fetch(url('/impressum/'))).status).toBe(418);
     expect((await fetch(url('/missing'))).status).toBe(418);
+  });
+
+  test('error pages are kept for Astro, never served as a 200 page', async () => {
+    expect((await fetch(url('/404'))).status).toBe(418);
+    expect((await fetch(url('/404.html'))).status).toBe(418);
+    const page = errorPages['/404.html'];
+    expect(page).toBeInstanceOf(Response);
+    expect(await (page as Response).clone().text()).toBe('<h1>404</h1>');
   });
 });
