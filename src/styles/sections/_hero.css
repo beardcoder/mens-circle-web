@@ -1,14 +1,4 @@
-/**
- * Page opening — the block at the top of a sub-page.
- *
- * Shared by the single-event page (components/event/EventHero.astro) and the
- * testimonial form page. It is a heading and a line of facts on the page's own
- * ground: no full-bleed dark panel, no 100vh, no ring ornaments, no background
- * image behind the text.
- *
- * The home page does not use this — its opening is an asymmetric two-column
- * block of its own (components/blocks/Hero.astro).
- */
+/** Page opening — the block at the top of a sub-page. */
 
 .hero {
   position: relative;

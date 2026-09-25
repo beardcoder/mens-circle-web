@@ -88,29 +88,9 @@ const openEvent = async (eventId: string): Promise<{ event: Event } | { error: F
 };
 
 /**
- * Take the seat: revive a cancelled registration or write a new one, deciding
- * `registered` vs. `waitlist` from a recount taken inside the same write
- * transaction as the claim. Returns the booked row, or the conflict to answer
- * with when a live one exists.
- *
- * bun:sqlite's driver is synchronous end to end (see drizzle-orm/bun-sqlite's
- * session.ts): `Database#transaction()` wraps a plain function call, not a
- * Promise, so this callback must stay fully synchronous — an `await` inside
- * would let the native transaction commit before the awaited work even runs.
- * `tx.select()...get()` (rather than `await tx.select()...`) is what stays
- * synchronous. That, not the `behavior` below, is what actually closes the
- * race: JS is single-threaded and runs a synchronous call to completion
- * before anything else gets the thread, so once this recount starts, no
- * other concurrent `register()` call's claim can interleave with it — the
- * old code awaited between the count and the write, and that await was
- * exactly the gap two requests for the last seat could both fall into.
- *
- * `behavior: 'immediate'` is the belt to that braces: it takes SQLite's own
- * write lock at BEGIN rather than at the driver's default `deferred`
- * behaviour's first write, so the guarantee holds even if a future change
- * ever calls this from more than one process, and it fails loud (via the 5s
- * `busy_timeout` in db/index.ts) rather than silently on any lock contention
- * this function itself doesn't explain.
+ * Claims a seat (registered or waitlist) from a recount in the same transaction.
+ * The callback must stay synchronous: bun:sqlite transactions wrap a plain function,
+ * so an `await` would commit before the awaited work runs.
  */
 const claimSeat = (
   participantId: string,
@@ -177,12 +157,7 @@ const assignToEventList = async (event: Event, fields: RegistrationFields): Prom
   if (!result.ok) throw new Error('listmonk assignment rejected');
 };
 
-/**
- * Confirmation mail and list membership, after the seat is booked. Not awaited:
- * neither a slow mailer nor a listmonk outage may turn a booked seat into an
- * error page. Both halves share one subscriber scope so they provision the same
- * listmonk identity instead of racing to create it twice.
- */
+/** Mail and list membership after booking; not awaited, so listmonk can't fail a booked seat. */
 const dispatchSideEffects = (
   event: Event,
   participant: Participant,
@@ -223,9 +198,6 @@ export const register = async (payload: RegistrationInput): Promise<FormResult> 
   const { event } = found;
 
   const participant = await upsertParticipant(fields.email, fields);
-  // Decides registered-vs-waitlist itself, from a recount inside its own
-  // write transaction — see claimSeat's own comment for why that recount
-  // can't happen out here beforehand.
   const seat = claimSeat(participant.id, event);
   if ('error' in seat) return seat.error;
   const { status, registrationId } = seat;
@@ -315,11 +287,7 @@ export const changeRegistrationStatus = async (regId: string, newStatus: RegStat
         )[0];
         if (participant) void removeFromList(participant.email, event.listmonkListId).catch(() => {});
       }
-      // Only a status that actually held a seat frees one. A cancelled
-      // `waitlist` entry never held one, so it must never promote the next
-      // person — that used to run regardless of `oldStatus`, which could push
-      // an event over capacity and mailed the promoted person a seat that
-      // nobody had vacated.
+      // Only a seat-holding status frees a seat; a cancelled waitlist entry promotes no one.
       if (oldStatus === 'registered' || oldStatus === 'attended') {
         await promoteNextWaitlisted(event);
       }
@@ -361,11 +329,7 @@ export interface ResendResult {
   skipped: number;
 }
 
-/**
- * Re-send confirmations listmonk never delivered. Only live `registered` and
- * `waitlist` seats are eligible — a cancelled or attended one would confirm
- * something no longer true — and each success re-stamps `confirmation_sent_at`.
- */
+/** Re-sends missing confirmations for live registered/waitlist seats only. */
 export const resendRegistrationConfirmations = async (
   eventId: string,
   opts: { ids?: string[]; onlyMissing?: boolean } = {},

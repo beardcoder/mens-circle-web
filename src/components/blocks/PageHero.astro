@@ -17,11 +17,7 @@ interface Props {
   };
 }
 
-/**
- * The opening block of a sub-page: text beside an optional photograph, on the
- * page's own ground. `align: 'center'` exists for the legal pages, which have a
- * title and nothing else and would look stranded in a wide left-aligned column.
- */
+/** The opening block of a sub-page: text beside an optional photograph, on the page's own ground. */
 
 const { data } = Astro.props;
 const align = data.align === 'center' ? 'center' : 'left';

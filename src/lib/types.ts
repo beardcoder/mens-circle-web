@@ -1,7 +1,4 @@
-/**
- * Public event shape. Capacity values are computed server-side, so the client
- * never sees raw registration data.
- */
+/** Public event shape. */
 export interface EventDTO {
   id: string;
   title: string;

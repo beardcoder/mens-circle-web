@@ -98,14 +98,7 @@ const action = fallback
 </div>
 <style is:global>
   @layer sections {
-    /* Reserve space while the native island loads — and ONLY while it loads.
-       These reservations used to sit on `.home-live-event--<placement>`, which
-       the island's own markup also carries, so the floor never lifted: on a
-       phone the hero kept 368px for ~180px of content and the closing block
-       kept 608px for ~530px, which is where the two large voids on the page
-       came from (161px under the hero's link, 130px under the closing button).
-       Scoped to the fallback, the reservation does its job during the swap and
-       then gets out of the way. The image stays outside it either way. */
+    /* Reserve space while the native island loads — and ONLY while it loads. */
     .home-live-event--pending.home-live-event--hero {
       min-block-size: 11rem;
     }
@@ -114,9 +107,7 @@ const action = fallback
       min-block-size: 30rem;
     }
 
-    /* Same reasoning one level down: the status sentence runs to two, three or
-       four lines depending on the state, and padding every state out to four
-       left a visible hole above the button. */
+    /* No min height here: the sentence length varies by state. */
     .home-live-event--pending .home-hero__status {
       min-block-size: 4lh;
     }

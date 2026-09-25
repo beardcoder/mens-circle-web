@@ -2,13 +2,7 @@
 import site from '@data/site.json';
 import { type NextEventSummary, summarizeNextEvent } from '@lib/event-status';
 
-/**
- * The quick-scan facts: a full-bleed ink band under the home hero, or a hairline
- * list on /event — one list, so the two pages cannot state different facts. A
- * scheduled event overrides what it knows: city, time window, fee. Never more
- * precise than the city: the exact address goes out with the registration
- * confirmation only.
- */
+/** Quick facts, shared by home and /event. Never more precise than the city. */
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string };
@@ -101,10 +95,7 @@ const anchor = data.anchor ?? 'praktisches';
       border-block-start: 1px solid var(--border-on-dark);
     }
 
-    /* The 11rem floor levels the four cells against each other while they sit
-       side by side — it is a column height, not a spacing choice, so it is
-       lifted again as soon as they stop being columns (see the stacked
-       breakpoint below). */
+    /* Levels the columns; lifted once they stack. */
     .home-facts__item {
       min-block-size: 11rem;
       padding-block: var(--space-md) var(--space-sm);
@@ -146,14 +137,7 @@ const anchor = data.anchor ?? 'praktisches';
       text-wrap: pretty;
     }
 
-    /* Two-up, then stacked. The rules follow the columns.
-
-       The 11rem floor goes with the four-up layout it was drawn for. Grid rows
-       already stretch their items to a common height, so below this width the
-       floor equalises nothing — it just reserved a fixed 176px band for facts
-       that read in about 120px, which is ~56px of dead air under every one of
-       them at tablet width and ~90px on a phone. Each fact is now as tall as
-       it reads, separated by the hairline and one rung of the ladder. */
+    /* Two-up, then stacked. */
     @media (width <= 62em) {
       .home-facts__row {
         grid-template-columns: repeat(2, minmax(0, 1fr));

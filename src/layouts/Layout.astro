@@ -31,17 +31,12 @@ const props = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <script is:inline>
-      // `.motion-ready` lets CSS hide every [data-reveal] until lib/motion.ts
-      // animates it in. Set here so nothing flashes, with a dead-man's switch:
-      // initMotion() clears the timer, otherwise the hidden state lifts itself.
+      // `.motion-ready` lets CSS hide every [data-reveal] until lib/motion.ts animates it in.
       document.documentElement.classList.add('motion-ready');
       window.__mcMotionFallback = setTimeout(() => {
         document.documentElement.classList.remove('motion-ready');
       }, 4000);
-      // `pagereveal` fires in the incoming document before its first rendering
-      // opportunity — the only point early enough to stand the page's own
-      // entrance down, so the cross-fade is the only thing moving. Inline
-      // because the deferred module would miss the event.
+      // Before first paint: skip the entrance so only the cross-fade moves.
       addEventListener('pagereveal', (event) => {
         if (event.viewTransition) document.documentElement.classList.add('vt-arrival');
       });

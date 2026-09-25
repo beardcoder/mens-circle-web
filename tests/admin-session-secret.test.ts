@@ -1,10 +1,4 @@
-/**
- * Regression guard: ADMIN_SESSION_SECRET must never fall back to
- * ADMIN_PASSWORD or to a literal default. Each scenario runs in its own Bun
- * process — config.ts reads its env at module load, same reason
- * forwarded-origin.test.ts and the database/email suites are isolated this
- * way. See admin-session-secret.fixture.ts for what each one proves.
- */
+/** Regression guard: ADMIN_SESSION_SECRET must never fall back to ADMIN_PASSWORD or to a literal default. */
 import { expect, test } from 'bun:test';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';

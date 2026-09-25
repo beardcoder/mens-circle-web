@@ -4,12 +4,7 @@ import site from '../data/site.json';
 import { Icon } from 'astro-icon/components';
 import ThemeSwitch from './ThemeSwitch.astro';
 
-/**
- * A wordmark, three destinations and one action. The bar is opaque, sits on a
- * hairline and does not change on scroll. The anchors are load-bearing —
- * "Ablauf" points at `#reise`, "Markus" at `#moderator` — so every link ever
- * shared still lands where it did.
- */
+/** A wordmark, three destinations and one action. */
 
 const links = nav.header.links;
 const ctaLinks = nav.header.cta;
@@ -182,9 +177,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
       font-family: var(--font-display);
       font-size: 0.6875rem;
       font-weight: 600;
-      /* Not orange: at 11px the orange measures 3.52:1 on paper, under the
-         4.5:1 small text requires. `--text-muted`, not the literal ink-muted —
-         a literal would stay dark grey on the dark ground (2.8:1). */
+      /* Not orange: at 11px the orange measures 3.52:1 on paper, under the 4.5:1 small text requires. */
       color: var(--text-muted);
       letter-spacing: 0.2em;
     }
@@ -355,15 +348,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
         display: flex;
       }
 
-      /* The panel hangs off the bottom edge of the bar.
-
-         It cannot be `position: fixed; inset: 0` with a lower z-index: the nav
-         is a *child* of the header, and a positioned descendant paints above
-         its ancestor's own content whatever the z-index says — which hid the
-         wordmark, the CTA and the close button behind the panel. Positioning it
-         absolutely against the header instead puts its top edge exactly on the
-         bar's bottom edge, with no measured clearance to drift out of sync and
-         no sliver of page between the two. */
+      /* The panel hangs off the bottom edge of the bar. */
       .nav {
         position: absolute;
         inset-block-start: 100%;
@@ -461,11 +446,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
       }
     }
 
-    /* The smallest phones. Everything gives a little rather than one element
-       giving everything: the wordmark drops its locality line and a type step,
-       the CTA tightens, and the gaps close. Measured at 320px the row then
-       comes to ~280px of content in a 280px track, with the CTA keeping a
-       readable label and the toggle keeping its 44px box. */
+    /* The smallest phones. */
     @media (width <= 420px) {
       .header__inner,
       .header__actions {

@@ -1,13 +1,4 @@
-/**
- * View Transitions — native cross-document fade.
- *
- * No router, no JS animating anything: `@view-transition` opts in and the UA
- * drives the snapshots. The only script involved is the `pagereveal` listener
- * in Layout.astro, which sets `.vt-arrival` so the arriving page's own entrance
- * stands down (see utilities/_motion.css).
- *
- * Chrome/Edge 126+, Safari 18.2+; elsewhere navigation is simply instant.
- */
+/** View Transitions — native cross-document fade. */
 
 @view-transition {
   navigation: auto;
@@ -25,11 +16,7 @@
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  /* `plus-lighter` adds the two snapshots, which avoids the grey sag of a plain
-     cross-fade — but only while their opacities sum to 1. Both sides used to
-     ease with `--ease-settle`, a front-loaded curve, so mid-transition they sat
-     near 0.9 each and summed to ~1.8: that was the bright flash. Linear on both,
-     same duration, is the pairing the blend mode expects. */
+  /* `plus-lighter` adds the two snapshots, which avoids the grey sag of a plain cross-fade — but only while their opacities sum to 1. */
   mix-blend-mode: plus-lighter;
   animation-duration: var(--vt-duration);
   animation-timing-function: linear;
@@ -43,10 +30,7 @@
   animation-name: vt-fade-in;
 }
 
-/* The header deliberately has no `view-transition-name`: a separate snapshot
-   would park the old page's bar over the new page for the length of the
-   transition. In the root snapshot it cross-fades in lock-step with the ground
-   behind it. */
+/* No view-transition-name on the header: its snapshot would linger over the new page. */
 
 /* The light/dark toggle repaints instantly (lib/theme.ts) — no transition to
    tune here any more. */

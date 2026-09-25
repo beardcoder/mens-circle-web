@@ -1,7 +1,4 @@
-/**
- * Thin DOM helper. All entry/exit motion lives in CSS via `@starting-style` and
- * `.toast--hiding`; this only appends the element and removes it on expiry.
- */
+/** Thin DOM helper. */
 
 type ToastType = 'success' | 'error';
 

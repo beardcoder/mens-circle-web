@@ -1,20 +1,4 @@
-/**
- * Motion system.
- *
- * Three designed situations, and nothing else that moves:
- *
- *   1. THE ENTRANCE   one staggered introduction of the hero, ~820ms end to end.
- *   2. THE RING       drifts and turns on scroll (see components/Ring.astro).
- *   3. THE STATEMENT  three lines settle flush-left as the orange field enters.
- *
- * Everything is opacity/transform, everything is gated behind
- * `prefers-reduced-motion: no-preference`, and no content depends on any of it:
- * every animation ends in the state a static render already shows, and the
- * hidden start states are pure CSS with no JS to fail.
- *
- * What is deliberately absent: per-paragraph scroll reveals, hover lifts,
- * custom cursors, magnetic buttons, endless marquees.
- */
+/** Motion: hero entrance, ring drift, statement settle. Nothing else moves. */
 
 /* 1. The entrance. */
 
@@ -72,10 +56,7 @@
     animation-delay: var(--stagger-2);
   }
 
-  /* Arriving through a view transition, the cross-fade already *is* the
-     entrance. `.vt-arrival` is set from the `pagereveal` listener in
-     Layout.astro before first paint, and never removed: taking it off later
-     would restart these from `opacity: 0` and flash the headline. */
+  /* Set before first paint on view-transition arrival; never removed, or the headline flashes. */
   .vt-arrival .home-hero__display .display__line,
   .vt-arrival .home-hero__kicker,
   .vt-arrival .home-hero__lede,
@@ -93,13 +74,7 @@
   }
 }
 
-/* 3. The statement.
-   Scroll-driven, so it tracks the section's position rather than firing once
-   on a timer. Each line starts from a different offset and they converge on a
-   flush-left edge — the movement is the composition arriving, not a reveal.
-
-   `animation-range: entry` so it completes while the section is still coming
-   up; by the time the field fills the screen the lines are already set. */
+/* 3. The statement, scroll-driven. */
 
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: view()) {
@@ -134,11 +109,7 @@
   }
 }
 
-/* Reveal-on-scroll.
-   Still available for the few places that use it (the step list, the facts
-   band), driven by lib/motion.ts. The hidden start state lives here behind
-   `.motion-ready`, which carries a dead-man's switch in Layout.astro — without
-   JS, or under reduced motion, nothing is ever hidden. */
+/* Reveal-on-scroll. */
 
 @media (prefers-reduced-motion: no-preference) {
   .motion-ready [data-reveal] {
@@ -209,12 +180,7 @@
   }
 }
 
-/* Reduced motion.
-   Everything spatial and everything scroll-bound is off. Colour feedback
-   stays. `data-motion-essential` is the escape hatch for a future looping
-   animation that IS its content rather than its decoration — it opts an
-   element (and its descendants) out of the iteration cap below. Nothing
-   currently sets it; the breathing exercise that once needed it is gone. */
+/* Reduced motion. */
 
 @media (prefers-reduced-motion: reduce) {
   .home-hero__display .display__line,

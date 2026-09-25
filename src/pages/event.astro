@@ -9,13 +9,7 @@ import NextDate from '../components/event/NextDate.astro';
 import { eventSeriesSchema } from '@lib/series-schema';
 import site from '@data/site.json';
 
-/**
- * The permanent landing page for the dates: the date, the practical facts, the
- * way to take part or be notified, and the questions asked right before an
- * evening. It never redirects to /event/<slug>, so this URL holds evergreen
- * content and can rank. SSR, not prerendered: the upcoming date belongs in the
- * initial HTML. Registration stays on /event/<slug>.
- */
+/** Evergreen landing page for the dates; never redirects. SSR so the date is in the HTML. */
 const { status, event } = await fetchNextEventState();
 // One object for the whole page, so the date block, the FAQ and the metadata
 // cannot disagree. A failed read is its own state, never "kein Termin geplant".
@@ -29,10 +23,7 @@ const [voice = null] = await fetchTestimonials(1);
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = new URL('/event', siteUrl).href;
 
-// Rendered below and emitted as FAQPage JSON-LD from this one list — Google
-// flags FAQ markup that does not match the visible text. Deliberately disjoint
-// from the home page's FAQ set (src/content/home.json): two FAQPage blocks
-// asking the same questions on two URLs only compete.
+// Rendered below and emitted as FAQPage JSON-LD from this one list — Google flags FAQ markup that does not match the visible text.
 const faqItems = [
   {
     question: 'Wann findet der nächste Männerkreis statt?',
@@ -87,11 +78,7 @@ const moreLinks = [
   },
 ];
 
-/**
- * The series is built once in lib/series-schema.ts and shared with the home
- * page, so both describe one entity under one `@id`. A scheduled meeting is
- * referenced as a `subEvent` pointing at its canonical URL, never restated.
- */
+/** The series is built once in lib/series-schema.ts and shared with the home page, so both describe one entity under one `@id`. */
 const eventSeries: Record<string, unknown> = {
   ...eventSeriesSchema(siteUrl),
   ...(next
@@ -131,9 +118,7 @@ const description = next
   ? `Nächster Männerkreis in ${next.place}: ${next.dateLabel}${next.timeRange ? `, ${next.timeRange}` : ''}. Anmeldung, Ort, Dauer und Beitrag auf einen Blick – ohne Vorerfahrung, auf Spendenbasis.`
   : 'Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis.';
 
-// The <title> stays evergreen because that is what ranks; the social title
-// leads with the date when there is one. `unavailable` gets the evergreen
-// wording rather than a claim about an empty calendar.
+// The <title> stays evergreen because that is what ranks; the social title leads with the date when there is one.
 const socialTitle = next ? `Nächster Männerkreis: ${next.dateLabel} in ${next.place}` : `Termine – ${site.siteName}`;
 
 const socialDetails = next

@@ -1,8 +1,4 @@
-/**
- * Map a content image path to the bundled asset in `src/assets/images/`, so
- * components can hand it to `<Image>`/`<Picture>`. `null` for external URLs and
- * unmatched paths — callers fall back to `<img>`.
- */
+/** Map a content image path to the bundled asset in `src/assets/images/`, so components can hand it to `<Image>`/`<Picture>`. */
 import type { ImageMetadata } from 'astro';
 
 const assetImages = import.meta.glob<{ default: ImageMetadata }>('/src/assets/images/*.{jpg,jpeg,png,webp,avif}', {

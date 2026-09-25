@@ -1,12 +1,4 @@
-/**
- * Scroll-triggered reveals. The hidden start state lives in CSS behind
- * `.motion-ready`, so without JS or under reduced motion everything stays
- * visible.
- *
- * Markup:
- *   data-reveal[="up"|"fade"]      a rise (default) or a plain cross-fade
- *   data-reveal-group[="55"]       stagger direct children, ms between them
- */
+/** Scroll-triggered reveals. */
 
 declare global {
   interface Window {

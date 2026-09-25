@@ -164,11 +164,7 @@ export const renameList = async (listId: number, name: string): Promise<boolean>
   return !!res?.ok;
 };
 
-/**
- * Fill in a name listmonk does not have; an existing one is never overwritten,
- * and a stored address counts as no name. The PUT replaces the whole record, so
- * the current lists have to ride along or saving a name unsubscribes the person.
- */
+/** Fills a missing name only. The PUT replaces the record, so the lists must be resent. */
 const backfillName = async (sub: ListmonkSubscriber, email: string, name: string, listIds: number[]): Promise<void> => {
   const held = (sub.name || '').trim();
   if (!name || (held !== '' && held.toLowerCase() !== String(email).toLowerCase())) return;
@@ -209,11 +205,7 @@ const applyMembership = async (
   return { ok: true, status: identity?.created ? 'subscribed' : 'exists' };
 };
 
-/**
- * Inside a workflow scope the subscriber is already provisioned, so reuse that
- * identity rather than racing it. Outside one, a single POST creates the
- * subscriber with its lists, and only a 409 needs the membership call.
- */
+/** Reuses the workflow's subscriber if any; otherwise POST, and only a 409 needs the membership call. */
 export const addToLists = async (
   email: string,
   name: string,
@@ -300,11 +292,7 @@ const startCampaign = async (campaignId: number): Promise<boolean> => {
   return false;
 };
 
-/**
- * Create a campaign and start it. The two steps report separately: a created but
- * unstarted campaign still exists as a draft, and the admin has to be told that
- * rather than invited to send the same thing twice.
- */
+/** Create and start a campaign; a created but unstarted one is reported as a draft. */
 export const sendNewsletterCampaign = async (opts: CampaignOptions): Promise<CampaignResult> => {
   if (!listmonkApiConfigured()) {
     return { ok: false, campaignId: 0, error: 'listmonk ist nicht konfiguriert.' };

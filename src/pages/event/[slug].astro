@@ -10,9 +10,7 @@ import EventInfo from '../../components/event/EventInfo.astro';
 import EventMapSection from '../../components/event/EventMapSection.astro';
 import EventRegister from '../../components/event/EventRegister.astro';
 
-// One SSR page per event, read per request, so a new or edited event is live
-// with no rebuild. An unknown slug falls back to /event. Only the interactive
-// pieces run client code — registration form and map.
+// One SSR page per event, read per request, so a new or edited event is live with no rebuild.
 const { slug } = Astro.params;
 const event = slug ? await getEventBySlug(slug) : null;
 if (!event) return Astro.redirect('/event', 302);

@@ -1,8 +1,4 @@
-/**
- * Scroll-to-top button — revealed by scroll position via
- * `animation-timeline: scroll(root block)`, no JS. Browsers without
- * scroll-driven animations get the always-visible fallback.
- */
+/** Scroll-to-top button — revealed by scroll position via `animation-timeline: scroll(root block)`, no JS. */
 
 @keyframes scroll-to-top-reveal {
   0%,

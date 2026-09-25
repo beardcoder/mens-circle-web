@@ -23,10 +23,7 @@ const eventDetail = (ev: Event, opts: { includeAddress?: boolean } = {}) => ({
   locationDetails: ev.locationDetails,
 });
 
-/**
- * The participant's own confirmation. Kept apart from the admin notification so
- * a missing confirmation can be re-sent without announcing the seat twice.
- */
+/** The participant's own confirmation. */
 export const sendRegistrationConfirmation = async (
   ev: Event,
   participant: Participant,

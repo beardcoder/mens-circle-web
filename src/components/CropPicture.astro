@@ -2,20 +2,7 @@
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-/**
- * A `<picture>` whose variants already carry the aspect ratio they are shown at.
- *
- * `<Picture>` can only emit one crop, so a square source shown in a portrait box
- * on desktop and a landscape band on phones was delivered square to both and cut
- * to shape by `object-fit: cover` — the cropped-away pixels still travelled. On
- * the home hero that was a third of the phone's download.
- *
- * Each width is requested on its own because `aspectRatio` is ignored once
- * `widths` is set: Astro's srcset path passes only a width to the image service,
- * which then keeps the source's ratio. Passing `width` *and* `height` is what
- * reaches sharp's cover-crop. `position` is sharp's, not CSS's — it takes
- * keywords ('center', 'top', …), never percentages.
- */
+/** A `<picture>` whose variants already carry the aspect ratio they are shown at. */
 
 interface Crop {
   /** Width ÷ height of the box this crop has to fill. */

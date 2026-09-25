@@ -1,15 +1,4 @@
-/**
- * Minimal 5-field cron matcher (`minute hour day-of-month month
- * day-of-week`), evaluated against the UTC clock. Supports the star, star-
- * slash-N step expressions and comma lists of exact numbers — no ranges
- * (`1-5`), which none of this repo's own schedules need.
- *
- * Pure and side-effect-free on purpose: scripts/schedule.ts is the only
- * caller, and keeping this free of imports (no `bun:sqlite`, no server code)
- * is what lets tests import it directly instead of spawning a fixture — see
- * CLAUDE.md's "A test that reads config must spawn a fixture" note, which
- * this module has nothing to do with precisely because it reads no config.
- */
+/** Minimal 5-field cron matcher (`minute hour day-of-month month day-of-week`), evaluated against the UTC clock. */
 
 /** A single cron field, e.g. a star, a step expression or a comma list. */
 function fieldMatches(field: string, value: number): boolean {
