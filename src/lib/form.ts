@@ -1,16 +1,4 @@
-/**
- * Client side of the three public forms (registration, newsletter, testimonial).
- * Each posts its FormData to an Astro Action; the action's schema is the only
- * validation. Its input errors come back per field and are written beside the
- * field — `aria-invalid`, the message, focus on the first offender — because a
- * toast alone never says which field is wrong.
- *
- * Markup contract:
- *   <form data-form="…" id="…">            wired by `enhanceForms`
- *   <… id="{form.id}-{name}-error" hidden>  where a field's message goes
- *   data-track="…"                          Umami events `<track>-submit|success|error`
- *   data-track-context='{"…": "…"}'         extra analytics data for them
- */
+/** Client side of the three public forms (registration, newsletter, testimonial). */
 import { isInputError } from 'astro:actions';
 import { prefersReducedMotion } from './helpers';
 import { showToast } from './toast';

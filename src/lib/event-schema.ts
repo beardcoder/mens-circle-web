@@ -1,14 +1,4 @@
-/**
- * schema.org/Event JSON-LD for one scheduled meeting, embedded by
- * /event/[slug] via SeoHead. /event itself carries no Event node — it emits
- * `eventSeriesSchema()` (series-schema.ts) and points at the next meeting with
- * `subEvent: { '@id': <its canonical URL> }` instead of restating it.
- *
- * It joins the site's single entity graph: the canonical URL doubles as `@id`
- * (the node /event points at with `subEvent`), `organizer` references
- * `#organization` and `superEvent` references `#series`. Human-readable strings
- * come from lib/event-meta.ts, so markup and share card cannot disagree.
- */
+/** schema.org/Event JSON-LD for one scheduled meeting, embedded by /event/[slug] via SeoHead. */
 import site from '../data/site.json';
 import { buildEventMeta, eventName, stripHtml } from './event-meta';
 import type { EventDTO } from './types';
@@ -33,10 +23,7 @@ function localDateTime(isoDate: string, time: string): string {
   return `${datePart}T${time}:00${berlinOffset(d)}`;
 }
 
-/**
- * Locality, region and country fall back to the circle's home town so the
- * address is never half-stated; street and postal code are left out instead.
- */
+/** Locality, region and country fall back to the circle's home town so the address is never half-stated; street and postal code are left out instead. */
 function buildPlace(event: EventDTO): Record<string, unknown> {
   const hasCoordinates = event.latitude != null && event.longitude != null;
   return {
@@ -56,10 +43,7 @@ function buildPlace(event: EventDTO): Record<string, unknown> {
   };
 }
 
-/**
- * Seat numbers, but only where the page states them: a past or full event shows
- * no count, and sold-out is already carried by `offers.availability`.
- */
+/** Seat numbers, but only where the page states them: a past or full event shows no count, and sold-out is already carried by `offers.availability`. */
 function capacity(event: EventDTO): Record<string, number> {
   if (event.max_participants <= 0) return {};
   const max = { maximumAttendeeCapacity: event.max_participants };

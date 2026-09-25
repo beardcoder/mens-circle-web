@@ -4,20 +4,9 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Finishes what `@astrojs/sitemap` and `astro-llms-md` write at build time, and
- * publishes it under `@wyattjoh/astro-bun-adapter`.
- *
- * 1. `sitemap-index.xml` gains the sitemaps that are routes, not files — the
- *    event slugs live in SQLite (src/pages/sitemap-events.xml.ts).
- * 2. `llms.txt` gains the SSR pages. `astro-llms-md` excludes them on purpose:
- *    its SSR pass would fetch them from the live site at build time.
- * 3. Every generated file is registered in the adapter's `static-manifest.json`.
- *    The adapter writes that manifest in its own `astro:build:done`, which Astro
- *    runs first, so anything generated later would 404 in production.
- *
- * Register it AFTER `sitemap()` and `llms()`. The patches must land before the
- * manifest records each file's byte length, which is why all three steps live
- * in this one hook.
+ * Adds the SSR sitemap to sitemap-index.xml and the SSR pages to llms.txt, then
+ * registers every generated file in the adapter's static manifest (written before
+ * this hook runs, so unregistered files would 404). Register after sitemap() and llms().
  *
  * @param {object} options
  * @param {string[]} options.sitemaps Root-relative sitemap routes for the index.

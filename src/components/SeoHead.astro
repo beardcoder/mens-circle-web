@@ -58,9 +58,7 @@ const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_ID || 'f2964cb9-28e6-4658-81
 const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
 const socialTitle = ogTitle ?? title ?? site.siteName;
 const socialDescription = ogDescription ?? description;
-// Declared dimensions must match the file, or a summary_large_image card gets
-// downgraded to a small one. So width/height go out only when the caller knows
-// them; otherwise the scraper measures the file itself.
+// Declared dimensions must match the file, or a summary_large_image card gets downgraded to a small one.
 const usesDefaultImage = !ogImage;
 const ogImageUrl = new URL(ogImage ?? '/images/og-default.png', siteUrl).href;
 const imageWidth = usesDefaultImage ? 1200 : ogImageWidth;

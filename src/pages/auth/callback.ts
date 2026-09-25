@@ -1,7 +1,4 @@
-/**
- * `GET /auth/callback` — Pocket ID sends the browser back here. Register
- * exactly `${APP_URL}/auth/callback` as the client's callback URL.
- */
+/** `GET /auth/callback` — Pocket ID sends the browser back here. */
 import type { APIRoute } from 'astro';
 import { createSession, SESSION_COOKIE, SESSION_TTL_S } from '@lib/server/auth';
 import { AccessDenied, completeLogin, FLOW_COOKIE } from '@lib/server/oidc';

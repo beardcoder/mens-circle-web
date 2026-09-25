@@ -1,9 +1,4 @@
-/**
- * In-process fixed-window rate limiting. One long-lived Bun process, so a plain
- * Map is the whole store — but every `key:ip` pair mints an entry, so expired
- * buckets are swept opportunistically to keep the map proportional to active
- * clients rather than to every client since the deploy.
- */
+/** In-process fixed-window rate limiting. */
 type Bucket = { count: number; resetAt: number };
 
 const buckets = new Map<string, Bucket>();

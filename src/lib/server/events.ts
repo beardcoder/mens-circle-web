@@ -8,11 +8,7 @@ import { config, listmonkApiConfigured } from './config';
 import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
 import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
 
-/**
- * The single predicate behind every capacity number: live and seat-holding.
- * Exported so registrations.ts's transactional seat claim recounts against
- * this exact definition rather than a second copy that could drift from it.
- */
+/** The one definition of a seat-holding registration; reused by the seat claim. */
 export const holdsASeat = () =>
   and(isNull(registrations.deleted), inArray(registrations.status, ACTIVE_REGISTRATION_STATUSES));
 
@@ -62,8 +58,6 @@ interface EventWithCapacity {
   activeCount: number;
 }
 
-// Nest the predicate so Drizzle's single-table projection keeps the column
-// qualifiers, and so the DTO reads one snapshot.
 const eventWithCapacityQuery = () =>
   db
     .select({
@@ -98,17 +92,11 @@ export const getPublishedEventBySlug = async (slug: string): Promise<Event | nul
 /** One row per publicly reachable /event/<slug> page, for the XML sitemap. */
 export interface SitemapEvent {
   slug: string;
-  /** ISO timestamp of the last edit — becomes `<lastmod>`. */
   updatedAt: string;
   eventDate: string;
 }
 
-/**
- * Every event that resolves to a public page, newest first. Past events are
- * included: their pages answer 200 with a real "Rückblick" state, and only the
- * next one is linked, so the sitemap is the only way to discover them. The
- * filter mirrors getPublishedEventBySlug exactly.
- */
+/** Every public event page, past ones included (the sitemap is their only link). */
 export const listPublishedEventsForSitemap = async (): Promise<SitemapEvent[]> =>
   db
     .select({ slug: events.slug, updatedAt: events.updatedAt, eventDate: events.eventDate })
@@ -131,14 +119,7 @@ const tryEventDto = async (fetch: () => Promise<EventWithCapacity | null>, label
   }
 };
 
-/**
- * The scheduling state as three cases: `scheduled`, `none` (nothing on the
- * books — a true, sayable fact) and `unavailable` (the read itself failed).
- * Anything that puts the answer in front of a reader must tell those apart —
- * a failed read must never render as "kein Termin geplant", which would be a
- * false claim — so this is the one entry point for "what's the next event"
- * everywhere in the app.
- */
+/** `unavailable` (read failed) must never be shown as "no date planned". */
 export type NextEventState =
   { status: 'scheduled'; event: EventDTO } | { status: 'none'; event: null } | { status: 'unavailable'; event: null };
 
@@ -270,9 +251,7 @@ export interface EventInput {
 }
 
 export const listEventsForAdmin = async (): Promise<Array<Event & { activeCount: number }>> => {
-  // One grouped LEFT JOIN instead of a COUNT per event. `count(<column>)`, not
-  // `count(*)`: it counts matched rows only, so an event with no registrations
-  // yields 0 rather than 1.
+  // count(column), not count(*): an event without registrations counts 0.
   const rows = await db
     .select({
       event: events,
@@ -287,8 +266,7 @@ export const listEventsForAdmin = async (): Promise<Array<Event & { activeCount:
   return rows.map(({ event, activeCount }) => ({ ...event, activeCount }));
 };
 
-// A lookup table, not branching: the cyclomatic count reads every `??` as a
-// decision and lands on 15.
+// A lookup table; every `??` counts as a branch.
 // eslint-disable-next-line complexity
 const inputToColumns = (input: EventInput): Partial<NewEvent> => ({
   title: input.title.trim(),

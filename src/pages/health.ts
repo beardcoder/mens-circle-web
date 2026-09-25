@@ -1,11 +1,4 @@
-/**
- * Liveness probe — `GET /health`, polled every 30s by the Docker HEALTHCHECK.
- * The cheapest possible 200: answering at all proves the request loop is up.
- *
- * Deliberately no DB query. Migrations run at boot, so a process answering
- * requests already has a schema, and probing one would let a transient SQLite
- * lock restart a healthy container.
- */
+/** Liveness probe — `GET /health`, polled every 30s by the Docker HEALTHCHECK. */
 import type { APIRoute } from 'astro';
 
 export const prerender = false;

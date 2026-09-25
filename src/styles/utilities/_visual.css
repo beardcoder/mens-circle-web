@@ -1,10 +1,4 @@
-/**
- * Visual utilities — accessibility helpers only.
- *
- * The global paper-noise overlay and the fixed editorial side rails that used to
- * live here are gone: both were decoration with no job, and the noise sat on
- * `body::before` with `mix-blend-mode: overlay` over every surface on every page.
- */
+/** Visual utilities — accessibility helpers only. */
 
 /* Screen reader only */
 .sr-only {
@@ -19,10 +13,7 @@
   clip-path: inset(50%);
 }
 
-/* Honeypot anti-spam field
-   Pushed far off-screen (not display:none, which some bots skip) and hidden
-   from assistive tech + keyboard. Real users never interact with it; bots that
-   auto-fill every input give themselves away. */
+/* Honeypot anti-spam field Pushed far off-screen (not display:none, which some bots skip) and hidden from assistive tech + keyboard. */
 .hp-field {
   position: absolute;
   left: -9999px;

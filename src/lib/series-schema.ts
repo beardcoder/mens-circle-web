@@ -1,10 +1,6 @@
 import site from '../data/site.json';
 
-/**
- * The recurring circle as one `EventSeries` entity under one site-level `@id`
- * (`/#series`), emitted by both the home page and /event. `url` points at
- * /event, the page about the series itself.
- */
+/** The recurring circle as one `EventSeries` entity under one site-level `@id` (`/#series`), emitted by both the home page and /event. */
 export function eventSeriesSchema(siteUrl: URL): Record<string, unknown> {
   const seriesUrl = new URL('/event', siteUrl).href;
 

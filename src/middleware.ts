@@ -6,31 +6,14 @@ import { readSession, SESSION_COOKIE } from './lib/server/auth';
 /** Retired URLs whose closest page is the home page — the breathing exercise and its app are gone. */
 const HOME_ALIASES = new Set(['/home', '/atemuebung', '/atemuebung/app']);
 
-/**
- * The adapter's static manifest only registers the slash-less path, so
- * `/impressum/` would 404. Skipped while prerendering: with
- * `build.format: 'directory'` Astro renders each static page under its
- * trailing-slash path, and redirecting would replace the HTML with a stub.
- */
+/** The adapter's static manifest only registers the slash-less path, so `/impressum/` would 404. */
 const hasTrailingSlash = ({ isPrerendered, request, url }: APIContext): boolean =>
   !isPrerendered &&
   (request.method === 'GET' || request.method === 'HEAD') &&
   url.pathname !== '/' &&
   url.pathname.endsWith('/');
 
-/**
- * Attach the cache policy, unless the route already stated one of its own —
- * `/health`, `/sitemap-events.xml` and the prerendered documents'
- * `PRERENDERED_CACHE_CONTROL` (lib/cache.ts) all know better than the table does.
- *
- * The copy is for a response whose headers are immutable, which is what
- * `Response.redirect()` returns. Nothing reaching this function builds one
- * today — Astro answers the `redirects` in astro.config.mjs before user
- * middleware runs, so `/events` and `/ueber-uns` never arrive here and keep a
- * 301's default "cache indefinitely", which is what a permanent redirect
- * wants. The guard is here so that a route that does return one gets the
- * policy instead of throwing the request away.
- */
+/** Adds the cache policy unless the route set its own; copies immutable (redirect) responses. */
 const withCacheControl = (response: Response, value: string): Response => {
   if (response.headers.has(CACHE_CONTROL)) return response;
   try {

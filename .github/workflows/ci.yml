@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-# Cancel superseded runs on the same ref (a force-push or a new commit).
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -39,8 +38,6 @@ jobs:
       - name: Type check
         run: bun run check
 
-      # The suite spawns each isolated case as its own Bun process with its own
-      # SQLite file and HTTP fake, so it needs no services and no build output.
       - name: Test
         run: bun test
 

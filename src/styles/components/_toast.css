@@ -1,21 +1,4 @@
-/**
- * Toast Notifications
- *
- * Brought onto the poster system: square, opaque, hairline-and-rule. It used to
- * be the last survivor of the pre-redesign theme — 14px radii, a 2xl drop
- * shadow, a 12px backdrop blur and four tinted `color-mix()` grounds — which is
- * everything the rest of the site stopped doing.
- *
- * The type is carried by a solid bar on the inline start and by the colour of
- * the marker title, not by tinting the panel. That is how priority is marked
- * everywhere else here (the orange rule over the admin's "next event" panel, the
- * orange marker rules on the page), and it keeps the text on a known ground
- * instead of on four slightly different tinted ones.
- *
- * Entry + exit motion is pure CSS. JS appends the element and removes it after
- * the lifetime expires — `@starting-style` handles the rise-in, `.toast--hiding`
- * the fall-out, without a single requestAnimationFrame in JS.
- */
+/** Toasts: square, opaque, hairline-and-rule. */
 
 .toast {
   position: fixed;
@@ -31,9 +14,7 @@
   font-family: var(--font-body);
   color: var(--text-primary);
   pointer-events: auto;
-  /* Opaque. The base used to be `transparent` in light mode and relied on every
-     variant to supply a ground; a variant-less toast was unreadable text over
-     blurred page content. */
+  /* Opaque. */
   background: var(--bg-elevated);
   border: 2px solid var(--rule-strong);
   border-radius: 0;
@@ -43,9 +24,7 @@
     opacity 320ms var(--ease-settle),
     translate 320ms var(--ease-settle);
 
-  /* Enter: animates from the @starting-style snapshot to the rules above.
-     Opacity and translate only — the poster's motion vocabulary is a rise, and
-     the old `scale: .96` popped. */
+  /* Enter: animates from the @starting-style snapshot to the rules above. */
   @starting-style {
     opacity: 0;
     translate: 0 -16px;
@@ -99,10 +78,7 @@
   color: var(--text-primary);
 }
 
-/* Type variants
-   Ground and text stay put; only the bar, the title and the icon change. Each
-   title colour was measured against `--bg-elevated` in both modes and clears
-   4.5:1 (lowest is the light-mode warning at 5.0:1). */
+/* Variants change only the bar, title and icon. */
 
 .toast--success {
   border-inline-start: 6px solid var(--color-success);

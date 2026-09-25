@@ -1,33 +1,13 @@
-/**
- * Executed only by forwarded-origin.test.ts, in a child process started with
- * `--no-env-file` and an explicit environment. That isolation is the point:
- * `astro.config.mjs` derives `security.allowedDomains` from `PUBLIC_SITE_URL`
- * at module load, so reading the config in-process measured whatever the
- * developer happened to have in `.env` — and a local `.env` pointing at
- * localhost failed the suite while the shipped config was fine.
- *
- * Each scenario therefore names the site URL it wants and checks what the
- * config derives from it, which tests the derivation instead of the ambient
- * result.
- */
+/** Executed only by forwarded-origin.test.ts, in a child process started with `--no-env-file` and an explicit environment. */
 import assert from 'node:assert/strict';
-// Deep imports: these two modules are the code that decides, and Astro exports
-// neither. If an upgrade moves them the import fails loudly — re-verify the fix
-// then rather than deleting this test.
+// Deep imports: these two modules are the code that decides, and Astro exports neither.
 import { isForbiddenCrossOriginRequest } from '../node_modules/astro/dist/core/app/origin-check.js';
 import { validateForwardedHeaders } from '../node_modules/astro/dist/core/app/validate-headers.js';
 import config from '../astro.config.mjs';
 
-// Astro types this as `Partial<RemotePattern>[]`; keep that type rather than a
-// narrower local one, so the deep imports above stay the only place this file
-// assumes anything about Astro's internals.
 const allowedDomains = config.security?.allowedDomains ?? [];
 
-/**
- * What Astro does per request: build the URL from the (plain HTTP) request,
- * then let the forwarded headers correct it if `allowedDomains` permits.
- * Mirrors RenderContext#applyForwardedHeaders.
- */
+/** What Astro does per request: build the URL from the (plain HTTP) request, then let the forwarded headers correct it if `allowedDomains` permits. */
 function rejects(
   host: string,
   headers: Record<string, string>,
@@ -55,13 +35,7 @@ function checkOriginStaysOn(): void {
   assert.equal(config.security?.checkOrigin, undefined);
 }
 
-/**
- * The regression this file exists for: TLS terminates at the Coolify/Traefik
- * proxy, so the Bun process sees plain HTTP while the browser's `Origin` says
- * https, and every Anmeldung answered 403 "Cross-site POST form submissions are
- * forbidden". Runs against whichever https host the scenario configured, so it
- * proves the behaviour rather than one hard-coded domain.
- */
+/** Behind the TLS proxy, same-site form POSTs must pass Astro's origin check. */
 function proxiedPostBehaviour(host: string): void {
   /** The proxy's own headers, as Traefik sends them in front of this app. */
   const proxied = { 'x-forwarded-proto': 'https', 'x-forwarded-host': host };
@@ -106,11 +80,7 @@ switch (process.argv[2]) {
     break;
   }
 
-  // A plain-http localhost URL, which is what `.env` carries while someone runs
-  // the site locally. The derivation must still hold — and it must NOT keep
-  // claiming https for a host that is configured as http, or the CSRF check
-  // would trust a protocol nobody configured. No proxy sits in front of a local
-  // dev server, so the https repair above is not what this case is about.
+  // A plain-http localhost URL, which is what `.env` carries while someone runs the site locally.
   case 'local-http': {
     assert.deepEqual(allowedDomains, [{ hostname: 'localhost', protocol: 'http' }]);
     checkOriginStaysOn();
