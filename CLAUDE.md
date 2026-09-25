@@ -12,7 +12,7 @@ bun install                      # deps (uses bun.lock)
 bun run dev                      # dev server (the script bakes in --bun, see below)
 bun run build                    # production build — MUST NOT use --bun (breaks Rollup)
 PORT=3000 DATABASE_PATH=./data/mens-circle.db \
-  ADMIN_EMAIL=a@b.c ADMIN_PASSWORD=x bun run start   # run the built server like prod
+  APP_URL=http://localhost:3000 bun run start   # run the built server like prod
 
 bun run check                    # astro check (type-check .astro/.ts)
 bun run lint                     # eslint .   (lint:fix to autofix)
@@ -40,8 +40,8 @@ breaks both at config-load time. Dependabot is configured to skip the major.
 `tests/` holds the suite: concurrency, the email/listmonk backend (including
 the registration race and the waitlist-promotion-must-not-fire-on-a-waitlist-
 cancellation guards), database performance, the event share metadata, the
-proxied-origin CSRF guard, the cache policy and the admin-session-secret
-fallback closure. Each `*.fixture.ts` case is spawned as **its own Bun
+proxied-origin CSRF guard, the cache policy, the admin-session-secret
+fallback closure and the Pocket ID sign-in (against a fake provider). Each `*.fixture.ts` case is spawned as **its own Bun
 process** — `--no-env-file`, an explicit `env` map, its own SQLite file and its
 own `fetch` fake — so no case can leak module state into another and the suite
 needs neither a listmonk nor a build.
@@ -100,12 +100,31 @@ must-revalidate` (never longer — a stale seat count is a wrong seat count);
 unhashed `public/` files get a week with `stale-while-revalidate` since their
 names carry no hash. Hashed `/assets/*` and self-hosted fonts are untouched —
 they stay the adapter's own `immutable`. A route that sets its own
-`Cache-Control` (`/health`, `/sitemap-events.xml`, the home page's
-island-parameter `no-cache`) is left alone by both consumers. Adding a new
+`Cache-Control` (`/health`, `/sitemap-events.xml`, the four prerendered
+documents below) is left alone by both consumers. Adding a new
 static file type or a route with different freshness needs? Extend the table
 in `cache-policy.ts`, not a one-off header at the call site — `tests/cache-policy.test.ts` pins the table itself.
 
-**SEO / sitemap:** `/event` is a permanent landing page (`src/pages/event.astro`) that reads correctly with or without a scheduled date — it never redirects, and `/event/<slug>` stays the canonical URL for one meeting. The sitemap is in **two parts**: `@astrojs/sitemap` emits `sitemap-0.xml` for the build-time routes, and `src/pages/sitemap-events.xml.ts` lists the event pages per request (their slugs live in SQLite and are unknown at build time). `astro-integrations/publish-generated-files.mjs` adds that route to `sitemap-index.xml`, adds `/event` to `llms.txt` (`astro-llms-md` reads built HTML, so SSR pages are invisible to it) and only then registers every generated file in the adapter's static manifest — patching a file after its byte length is recorded would serve a truncated document. It **must** be registered after `sitemap()` and `llms()`.
+**Caching the prerendered HTML — `src/lib/cache.ts` and `ASTRO_KEY` are one
+decision.** The four prerendered documents (`/`, `/teile-deine-erfahrung`,
+`/warum-…`, the legal `[slug]` pages) set `PRERENDERED_CACHE_CONTROL`: browsers
+revalidate (`max-age=0`, cheap 304 off the adapter's ETag) because the HTML names
+per-build hashed assets that a deploy removes, while `s-maxage=300` lets a shared
+cache answer instead of the origin. That is **only** correct while the build gets
+a stable `ASTRO_KEY` — the home page's `server:defer` props are encrypted with
+it, and a per-build key turns any cached document into a `400` at
+`/_server-islands/<name>`, leaving live scheduling stuck on its fallback. Remove
+the key and the constant goes back to `'no-cache'`. `ASTRO_KEY` is **build-time
+only**: Astro encodes it into the server manifest and the running process reads
+it from there, so it belongs on the build (a Coolify _build_ variable, wired
+through the `ARG` in the Dockerfile) and does nothing in the container's own
+environment. Verified both ways — a build made with the key serves islands for
+older HTML even with no key in its environment, while a build made without one
+answers `400` for HTML from the previous build. Headers alone do not make
+Cloudflare cache a document either: its cache level goes by file extension, so
+`/` stays `cf-cache-status: DYNAMIC` until a Cache Rule marks it eligible.
+
+**SEO / sitemap:** `/event` is a permanent landing page (`src/pages/event.astro`) that reads correctly with or without a scheduled date — it never redirects, and `/event/<slug>` stays the canonical URL for one meeting. The sitemap is in **two parts**: `@astrojs/sitemap` emits `sitemap-0.xml` for the build-time routes, and `src/pages/sitemap-events.xml.ts` lists the event pages per request (their slugs live in SQLite and are unknown at build time). `astro-integrations/publish-generated-files.mjs` adds that route to `sitemap-index.xml`, adds `/event` to `llms.txt` (`astro-llms-md` 3.x would fetch SSR pages from the _live_ site at build time, so `/event` and `/health` are in its `exclude`) and only then registers every generated file in the adapter's static manifest — patching a file after its byte length is recorded would serve a truncated document. It **must** be registered after `sitemap()` and `llms()`.
 
 **Images use native Astro features.** The home page is prerendered, so its
 `<Picture>` and the static subpage pictures are optimized during `astro build`.
@@ -176,21 +195,22 @@ id="{formId}-{fieldname}-error" hidden>` beside each validated field with
   and goes stale after the first view-transition swap. Report outcomes with
   `adminToast('ok' | 'err', text)`.
 
-The only remaining endpoints are `/health`, `/sitemap-events.xml` and
+The only remaining endpoints are `/health`, `/sitemap-events.xml`,
+`/auth/login` + `/auth/callback` (Pocket ID, see **Auth**) and
 `/api/public/events/<slug>/ics` — the latter is linked from the confirmation
 mails (`icsUrl`). The event page embeds its own .ics as a data URL.
 
 **CSRF behind the proxy — `security.allowedDomains`.** Astro's `checkOrigin` compares the browser's `Origin` against `Astro.url`. TLS terminates at Coolify/Traefik, so the Bun process sees plain HTTP and built `http://<host>`, while the form POST's `Origin` said `https://<host>` — every Anmeldung answered 403 "Cross-site POST form submissions are forbidden". `security.allowedDomains` in `astro.config.mjs` (derived from `PUBLIC_SITE_URL`) is the only thing that makes Astro trust `X-Forwarded-Proto`/`X-Forwarded-Host`; an unlisted host header is still ignored, which is what keeps host-header injection out. The check runs as an internal middleware _before_ `src/middleware.ts`, so it cannot be repaired there. Never answer a future 403 by setting `checkOrigin: false` — that drops CSRF protection from every action. `tests/forwarded-origin.test.ts` pins this against Astro's own validator.
 
-**Auth & guards:** `src/middleware.ts` guards admin **pages** (`/admin/*`) behind a signed session cookie (`ADMIN_EMAIL`/`ADMIN_PASSWORD`/`ADMIN_SESSION_SECRET`); every unauthenticated page request — there is no separate API path here — redirects to `/admin/login`. Actions live outside the `/admin` path match, so each mutating action **self-guards** via `requireAdmin`, which is what actually answers 401 for an unauthenticated action call.
+**Auth & guards:** sign-in is **Pocket ID over OpenID Connect** through `openid-client` (`lib/server/oidc.ts`): `/auth/login` starts an authorization-code flow with PKCE + `state` (carried in a 10-minute signed cookie), `/auth/callback` has the library exchange the code, check the ID token and fetch userinfo. Client auth is `client_secret_post` on purpose — Basic form-encodes the id, so a UUID client id arrives as `…%2D…` and the provider may not decode it. The callback URL is rebuilt from `APP_URL`, not the request, because behind the proxy the request reads `http://`. Both routes sit outside `/admin` because the middleware would bounce them. Admission is `ADMIN_EMAIL` (comma list, only if `email_verified` is not false) or membership in `OIDC_ADMIN_GROUP`. There is no password login. `src/middleware.ts` then guards admin **pages** (`/admin/*`) behind the signed session cookie (`ADMIN_SESSION_SECRET`, ≥ 32 chars or sign-in stays disabled); every unauthenticated page request redirects to `/admin/login`. Actions live outside the `/admin` path match, so each mutating action **self-guards** via `requireAdmin`. The callback URL is built from `APP_URL`, so locally `APP_URL` must point at the dev server.
 
 **`ADMIN_SESSION_SECRET` has no fallback, on purpose.** It used to fall back to
 `ADMIN_PASSWORD`, then to a literal string — a real vulnerability, since the
 literal sat in this public repository and let anyone forge a valid admin
 session cookie for a deployment that forgot to set it. `sessionSecretConfigured()`
-(`lib/server/auth.ts`) now gates both `verifyCredentials()` and
-`readSession()`: with the var unset, a login can never succeed and no cookie —
-forged or genuine-looking — is ever trusted. Never reintroduce a default here.
+(`lib/server/auth.ts`, ≥ 32 characters) now gates both signing and
+`readSession()`: with the var unset or short, no session can be created and no
+cookie — forged or genuine-looking — is ever trusted. Never reintroduce a default here.
 
 **Design system — the page is a poster.** Three colours and one superfamily.
 
@@ -335,4 +355,4 @@ notification, and skips `cancelled`/`attended` seats.
 
 ## Environment
 
-Copy `.env.example`. Without `ADMIN_*` the `/admin` area is unusable; without `LISTMONK_*` email/newsletter is inert. `PUBLIC_SITE_URL` is build-time (sitemap/OG); `APP_URL` is runtime (email links, .ics, image URLs); `DATABASE_PATH` defaults to `./data/mens-circle.db` locally and the `/data` volume in Docker. `ADMIN_SESSION_SECRET` specifically has **no fallback** — not to `ADMIN_PASSWORD`, not to a default — leaving it unset locks the admin area out entirely rather than degrading; see **Auth & guards** above for why.
+Copy `.env.example`. Without `OIDC_*`, `ADMIN_EMAIL`/`OIDC_ADMIN_GROUP` and `ADMIN_SESSION_SECRET` the `/admin` area is unusable; without `LISTMONK_*` email/newsletter is inert. `PUBLIC_SITE_URL` is build-time (sitemap/OG); `APP_URL` is runtime (email links, .ics, image URLs); `DATABASE_PATH` defaults to `./data/mens-circle.db` locally and the `/data` volume in Docker. `ADMIN_SESSION_SECRET` specifically has **no fallback** — leaving it unset locks the admin area out entirely rather than degrading; see **Auth & guards** above for why.

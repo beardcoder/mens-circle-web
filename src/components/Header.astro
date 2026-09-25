@@ -23,44 +23,42 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
     <div class="header__inner">
       <a href="/" class="header__logo logo" aria-label={`${site.siteName} – Startseite`}>
         <Icon name="logo" class="logo__icon" aria-hidden="true" />
-        <span class="logo__text">Männerkreis<span class="logo__place">Straubing</span></span>
+        <span class="logo__text">
+          Männerkreis<span class="logo__place">Straubing</span>
+        </span>
       </a>
 
       <nav class="nav" id="nav" aria-label="Hauptnavigation">
         <ul class="nav__list">
-          {
-            links.map((link) => (
-              <li class="nav__item">
-                <a
-                  href={link.url}
-                  class="nav__link"
-                  data-nav-link
-                  data-umami-event="nav-click"
-                  data-umami-event-target={link.umamiTarget}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
+          {links.map((link) => (
+            <li class="nav__item">
+              <a
+                href={link.url}
+                class="nav__link"
+                data-nav-link
+                data-umami-event="nav-click"
+                data-umami-event-target={link.umamiTarget}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
         </ul>
 
         {/* Only rendered inside the mobile panel — the bar keeps three items. */}
         <ul class="nav__secondary">
-          {
-            secondary.map((link) => (
-              <li>
-                <a
-                  href={link.url}
-                  class="nav__secondary-link"
-                  data-nav-link
-                  data-astro-prefetch={prefetchPaths.has(link.url) ? 'hover' : undefined}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
+          {secondary.map((link) => (
+            <li>
+              <a
+                href={link.url}
+                class="nav__secondary-link"
+                data-nav-link
+                data-astro-prefetch={prefetchPaths.has(link.url) ? 'hover' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
         </ul>
 
         <div class="nav__footer">
@@ -71,20 +69,18 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
       <div class="header__actions">
         <ThemeSwitch class="theme-switch--bar" />
 
-        {
-          ctaLinks.map((link) => (
-            <a
-              href={link.url}
-              class="btn btn--primary nav__cta"
-              data-nav-link
-              data-umami-event="cta-click"
-              data-umami-event-location="header"
-              data-umami-event-target={link.umamiTarget}
-            >
-              {link.label}
-            </a>
-          ))
-        }
+        {ctaLinks.map((link) => (
+          <a
+            href={link.url}
+            class="btn btn--primary nav__cta"
+            data-nav-link
+            data-umami-event="cta-click"
+            data-umami-event-location="header"
+            data-umami-event-target={link.umamiTarget}
+          >
+            {link.label}
+          </a>
+        ))}
 
         <button
           class="nav-toggle"

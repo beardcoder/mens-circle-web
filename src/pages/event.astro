@@ -159,9 +159,13 @@ const socialDetails = next
         <h1 class="page-opening__title">Termine und Anmeldung</h1>
 
         <p class="page-opening__lead">
-          Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend dauert
-          zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was
-          dich erwartet, lies zuerst, <a class="link" href="/#ueber">worum es an so einem Abend geht</a>.
+          Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend
+          dauert zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht
+          weißt, was dich erwartet, lies zuerst,{' '}
+          <a class="link" href="/#ueber">
+            worum es an so einem Abend geht
+          </a>
+          .
         </p>
       </div>
     </div>
@@ -170,31 +174,27 @@ const socialDetails = next
   <NextDate state={state} />
   <Facts variant="list" next={next} />
 
-  {
-    /* The top curated entry as a pull quote, quoted as submitted. Not a second
-      testimonials grid — that would put the same quotes on two indexed URLs. */
-  }
-  {
-    voice && (
-      <section class="section section--ruled event-landing-voice" aria-label="Stimme aus dem Kreis">
-        <div class="container">
-          <div class="spine">
-            <p class="rail-heading">Aus dem Kreis</p>
+  {/* The top curated entry as a pull quote, quoted as submitted. Not a second
+      testimonials grid — that would put the same quotes on two indexed URLs. */}
+  {voice && (
+    <section class="section section--ruled event-landing-voice" aria-label="Stimme aus dem Kreis">
+      <div class="container">
+        <div class="spine">
+          <p class="rail-heading">Aus dem Kreis</p>
 
-            <figure class="event-landing-voice__figure spine__body" data-reveal="fade">
-              <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
-              {(voice.author || voice.role) && (
-                <figcaption class="event-landing-voice__author">
-                  {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
-                  {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
-                </figcaption>
-              )}
-            </figure>
-          </div>
+          <figure class="event-landing-voice__figure spine__body" data-reveal="fade">
+            <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
+            {(voice.author || voice.role) && (
+              <figcaption class="event-landing-voice__author">
+                {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
+                {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
+              </figcaption>
+            )}
+          </figure>
         </div>
-      </section>
-    )
-  }
+      </div>
+    </section>
+  )}
 
   <Faq
     data={{
@@ -208,19 +208,19 @@ const socialDetails = next
   <section class="section section--ruled event-landing-more" aria-labelledby="mehr-title">
     <div class="container">
       <div class="spine">
-        <h2 class="rail-heading" id="mehr-title">Weiterlesen</h2>
+        <h2 class="rail-heading" id="mehr-title">
+          Weiterlesen
+        </h2>
 
         <ul class="event-landing-more__list spine__body--wide" role="list" data-reveal-group="55">
-          {
-            moreLinks.map((link) => (
-              <li class="event-landing-more__item" data-reveal="up">
-                <a href={link.href}>
-                  <span class="event-landing-more__title">{link.title}</span>
-                  <span class="event-landing-more__text">{link.text}</span>
-                </a>
-              </li>
-            ))
-          }
+          {moreLinks.map((link) => (
+            <li class="event-landing-more__item" data-reveal="up">
+              <a href={link.href}>
+                <span class="event-landing-more__title">{link.title}</span>
+                <span class="event-landing-more__text">{link.text}</span>
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

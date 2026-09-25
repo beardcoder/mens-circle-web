@@ -57,11 +57,9 @@ const breadcrumbs = {
   <EventHero event={event} />
   <EventRegister event={event} />
   <EventInfo event={event} />
-  {
-    event.latitude !== null && event.longitude !== null && (
-      <EventMapSection event={event} lat={event.latitude} lng={event.longitude} />
-    )
-  }
+  {event.latitude !== null && event.longitude !== null && (
+    <EventMapSection event={event} lat={event.latitude} lng={event.longitude} />
+  )}
   <EventAbout event={event} />
   <EventFinalCta event={event} />
 </Layout>

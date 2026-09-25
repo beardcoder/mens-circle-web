@@ -24,84 +24,74 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
           <span>{site.siteName}</span>
         </a>
         <p class="footer__text">{site.footerDescription}</p>
-        {
-          socialLinks.length > 0 && (
-            <ul class="footer__social-links">
-              {socialLinks.map((link) => (
-                <li>
-                  <a
-                    href={link.href}
-                    title={link.label}
-                    target={link.internal ? undefined : '_blank'}
-                    rel={link.internal ? undefined : 'noopener noreferrer'}
-                    data-umami-event="social-click"
-                    data-umami-event-platform={link.type}
-                    class="social-link"
-                  >
-                    <Icon name={`social-${link.type}`} class="social-link__icon" aria-hidden="true" />
-                    <span class="social-link__label">
-                      {link.label}
-                      {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )
-        }
+        {socialLinks.length > 0 && (
+          <ul class="footer__social-links">
+            {socialLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  title={link.label}
+                  target={link.internal ? undefined : '_blank'}
+                  rel={link.internal ? undefined : 'noopener noreferrer'}
+                  data-umami-event="social-click"
+                  data-umami-event-platform={link.type}
+                  class="social-link"
+                >
+                  <Icon name={`social-${link.type}`} class="social-link__icon" aria-hidden="true" />
+                  <span class="social-link__label">
+                    {link.label}
+                    {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <nav class="footer__nav" aria-label="Fußnavigation">
         <h3 class="footer__heading">Navigation</h3>
         <ul class="footer__links">
-          {
-            nav.footerPrimary.map((item) => (
-              <li>
-                <a
-                  href={item.url}
-                  data-umami-event="footer-link"
-                  data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
-                  target={(item as { target?: string }).target}
-                  rel={(item as { target?: string }).target === '_blank' ? 'noopener' : undefined}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))
-          }
+          {nav.footerPrimary.map((item) => (
+            <li>
+              <a
+                href={item.url}
+                data-umami-event="footer-link"
+                data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
+                target={(item as { target?: string }).target}
+                rel={(item as { target?: string }).target === '_blank' ? 'noopener' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </nav>
 
       <div class="footer__contact">
         <h3 class="footer__heading">Kontakt</h3>
         <ul class="footer__links">
-          {
-            site.contactEmail && (
-              <li>
-                <a href={`mailto:${site.contactEmail}`} data-umami-event="contact-click" data-umami-event-type="email">
-                  E-Mail schreiben
-                </a>
-              </li>
-            )
-          }
-          {
-            phoneHref && (
-              <li>
-                <a href={phoneHref} data-umami-event="contact-click" data-umami-event-type="phone">
-                  {site.contactPhone}
-                </a>
-              </li>
-            )
-          }
-          {
-            nav.footerContact.map((item) => (
-              <li>
-                <a href={item.url} data-umami-event="footer-link">
-                  {item.label}
-                </a>
-              </li>
-            ))
-          }
+          {site.contactEmail && (
+            <li>
+              <a href={`mailto:${site.contactEmail}`} data-umami-event="contact-click" data-umami-event-type="email">
+                E-Mail schreiben
+              </a>
+            </li>
+          )}
+          {phoneHref && (
+            <li>
+              <a href={phoneHref} data-umami-event="contact-click" data-umami-event-type="phone">
+                {site.contactPhone}
+              </a>
+            </li>
+          )}
+          {nav.footerContact.map((item) => (
+            <li>
+              <a href={item.url} data-umami-event="footer-link">
+                {item.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </div>
@@ -109,17 +99,15 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
     <div class="footer__bottom">
       <p class="footer__copyright">{site.footerText}</p>
       <nav class="footer__legal" aria-label="Rechtliches">
-        {
-          nav.footerLegal.map((item) => (
-            <a
-              href={item.url}
-              data-umami-event="footer-link"
-              data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
-            >
-              {item.label}
-            </a>
-          ))
-        }
+        {nav.footerLegal.map((item) => (
+          <a
+            href={item.url}
+            data-umami-event="footer-link"
+            data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
+          >
+            {item.label}
+          </a>
+        ))}
       </nav>
     </div>
   </div>
