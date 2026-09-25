@@ -2,16 +2,18 @@
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-/** A `<picture>` whose variants already carry the aspect ratio they are shown at. */
+/**
+ * A `<picture>` for a box of fixed aspect ratio. Bun.Image cannot crop, so every
+ * variant keeps the source's ratio and CSS crops it with `object-fit: cover`;
+ * the block sets `aspect-ratio` and `object-position` per breakpoint.
+ */
 
 interface Crop {
-  /** Width ÷ height of the box this crop has to fill. */
+  /** Width ÷ height of the box this picture has to fill. */
   ratio: number;
   /** Rendered widths, in CSS pixels × the device ratios worth serving. */
   widths: number[];
   sizes: string;
-  /** Which part of the source survives the crop. Defaults to the centre. */
-  position?: string;
 }
 
 interface Props {
@@ -30,46 +32,39 @@ interface Props {
 
 const { src, alt, class: className, narrow, wide, breakpoint, loading, fetchpriority } = Astro.props;
 
-const FORMATS = ['avif', 'webp'] as const;
+/** WebP for the sources, JPEG for the fallback. AVIF needs an OS encoder that Bun.Image lacks on Linux. */
+type Format = 'webp' | 'jpeg';
 
-const crop = (source: ImageMetadata, spec: Crop, format: (typeof FORMATS)[number] | 'jpeg', width: number) =>
-  getImage({
-    src: source,
-    format,
-    width,
-    height: Math.round(width / spec.ratio),
-    fit: 'cover',
-    position: spec.position ?? 'center',
-  });
+/** The smallest variant that still covers a `width` × `ratio` box; the service keeps the source's ratio. */
+const covering = (spec: Crop, format: Format, width: number) =>
+  getImage({ src, format, width, height: Math.round(width / spec.ratio), fit: 'outside' });
 
-/** One `<source>`'s worth: the same crop and format at every width. */
-async function srcset(spec: Crop, format: (typeof FORMATS)[number] | 'jpeg'): Promise<string> {
-  const images = await Promise.all(spec.widths.map((width) => crop(src, spec, format, width)));
+/**
+ * One `<source>`'s worth. The `w` descriptor names the box width a variant fills after
+ * `cover`, not its pixel width, so the browser picks by the width it actually shows.
+ */
+async function srcset(spec: Crop, format: Format): Promise<string> {
+  const images = await Promise.all(spec.widths.map((width) => covering(spec, format, width)));
   return images.map((image, i) => `${image.src} ${spec.widths[i]}w`).join(', ');
 }
 
 const sources = await Promise.all(
   [
-    ...FORMATS.map((format) => ({ spec: narrow, format, media: `(max-width: ${breakpoint})` })),
-    ...FORMATS.map((format) => ({ spec: wide, format, media: `(min-width: ${breakpoint})` })),
-  ].map(async ({ spec, format, media }) => ({
-    media,
-    type: `image/${format}`,
-    sizes: spec.sizes,
-    srcset: await srcset(spec, format),
-  })),
+    { spec: narrow, media: `(max-width: ${breakpoint})` },
+    { spec: wide, media: `(min-width: ${breakpoint})` },
+  ].map(async ({ spec, media }) => ({ media, sizes: spec.sizes, srcset: await srcset(spec, 'webp') })),
 );
 
-// The fallback carries the wide crop: a browser without avif or webp is not a
-// phone. Its intrinsic size is what reserves the box before the image lands.
+// The fallback carries the wide box: a browser without webp is not a phone.
+// Its width and height reserve the box before CSS and the image land.
 const fallbackSrcset = await srcset(wide, 'jpeg');
 const width = Math.max(...wide.widths);
-const fallback = await crop(src, wide, 'jpeg', width);
+const fallback = await covering(wide, 'jpeg', width);
 ---
 
 <picture>
   {sources.map((source) => (
-    <source media={source.media} type={source.type} srcset={source.srcset} sizes={source.sizes} />
+    <source media={source.media} type="image/webp" srcset={source.srcset} sizes={source.sizes} />
   ))}
   <img
     src={fallback.src}

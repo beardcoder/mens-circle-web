@@ -6,7 +6,7 @@ import { readSession, SESSION_COOKIE } from './lib/server/auth';
 /** Retired URLs whose closest page is the home page — the breathing exercise and its app are gone. */
 const HOME_ALIASES = new Set(['/home', '/atemuebung', '/atemuebung/app']);
 
-/** The adapter's static manifest only registers the slash-less path, so `/impressum/` would 404. */
+/** Static routes register only the slash-less path, so `/impressum/` would 404. */
 const hasTrailingSlash = ({ isPrerendered, request, url }: APIContext): boolean =>
   !isPrerendered &&
   (request.method === 'GET' || request.method === 'HEAD') &&

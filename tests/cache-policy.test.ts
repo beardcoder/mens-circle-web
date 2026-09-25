@@ -76,18 +76,15 @@ test('crawler and installer files stay changeable within the hour', () => {
   expect(cacheControlForFile('/manifest.webmanifest', 'assets')).toBe('public, max-age=3600, must-revalidate');
 });
 
-test('HTML and generated files are left to their own owners', () => {
-  // HTML carries what Astro.response.headers held at prerender time, and the
-  // sitemaps / llms.txt carry what publish-generated-files.mjs gave them.
-  for (const pathname of [
-    '/impressum/index.html',
-    '/index.html',
-    '/llms.txt',
-    '/llms-full.txt',
-    '/index.md',
-    '/sitemap-0.xml',
-    '/sitemap-index.xml',
-  ]) {
+test('crawler files are regenerated per build and stay changeable within the hour', () => {
+  for (const pathname of ['/llms.txt', '/llms-full.txt', '/home.md', '/sitemap-0.xml', '/sitemap-index.xml']) {
+    expect(cacheControlForFile(pathname, 'assets')).toBe('public, max-age=3600, must-revalidate');
+  }
+});
+
+test('HTML is left to the page that rendered it', () => {
+  // Prerendered HTML carries what Astro.response.headers held at prerender time.
+  for (const pathname of ['/impressum/index.html', '/index.html']) {
     expect(cacheControlForFile(pathname, 'assets')).toBeNull();
   }
 });

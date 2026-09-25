@@ -1,8 +1,7 @@
-/** Verifies the built server over HTTP. Sharp runs only in this separate test process. */
+/** Verifies the built server over HTTP. Images are decoded with Bun.Image. */
 import assert from 'node:assert/strict';
 import { PRERENDERED_CACHE_CONTROL } from '../src/lib/cache';
 import { createHash } from 'node:crypto';
-import sharp from 'sharp';
 
 const origin = new URL(process.argv[2] || 'http://127.0.0.1:18092');
 const eventSlug = process.argv[3];
@@ -52,15 +51,18 @@ for (const path of [
     );
   }
 }
-assert.ok(images.size >= 16, 'Native Picture variants missing');
+// WebP and JPEG per width; the two heroes share the narrow widths.
+assert.ok(images.size >= 12, 'Native Picture variants missing');
 images.set('/images/og-default.png', 1200);
 for (const [path, width] of images) {
   const response = await get(path);
   assert.match(response.headers.get('content-type') || '', /^image\//);
   const bytes = new Uint8Array(await response.arrayBuffer());
-  const metadata = await sharp(bytes).metadata();
-  await sharp(bytes).raw().toBuffer();
-  if (width) assert.equal(metadata.width, width, path);
+  const metadata = await new Bun.Image(bytes).metadata();
+  // A full decode (re-encode to PNG), not just the header.
+  await new Bun.Image(bytes).png().bytes();
+  // `w` names the box a variant covers; the variant is at least that wide.
+  if (width) assert.ok(metadata.width >= width, path);
   const changed = new Uint8Array(await (await get(`${path}?w=1&h=2&f=png&q=1`)).arrayBuffer());
   assert.equal(digest(changed), digest(bytes), 'Static bytes changed with parameters');
 }
