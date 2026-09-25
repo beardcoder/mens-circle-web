@@ -1,7 +1,7 @@
 // @ts-check
 
 import sitemap from '@astrojs/sitemap';
-import bun from '@mens-circle/astro-bun';
+import bun, { bunImageService } from '@mens-circle/astro-bun';
 import icon from 'astro-icon';
 import llms from 'astro-llms-md';
 import { defineConfig, fontProviders } from 'astro/config';
@@ -28,12 +28,14 @@ export default defineConfig({
     },
   }),
   image: {
+    // Bun.Image instead of Sharp; needs the build to run on Bun (`bun --bun astro build`).
+    service: bunImageService(),
     // Replaces Astro's runtime transformer with a 404.
     endpoint: { entrypoint: './src/lib/disabled-image-endpoint.ts', route: '/_image' },
   },
   vite: {
     // Bundle everything for the build only; in dev, CommonJS deps break Vite's module runner.
-    ssr: { noExternal: process.argv.includes('build') || undefined, external: ['bun:sqlite', 'sharp'] },
+    ssr: { noExternal: process.argv.includes('build') || undefined, external: ['bun:sqlite'] },
     optimizeDeps: { exclude: ['bun:sqlite'] },
     css: {
       transformer: 'lightningcss',

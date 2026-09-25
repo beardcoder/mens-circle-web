@@ -32,10 +32,26 @@ export default defineConfig({
 - `server.requestIP()` becomes `Astro.clientAddress`; prerendered 404/500 pages are read
   from disk instead of fetched over HTTP.
 
+## Image service
+
+`bunImageService()` replaces Sharp with `Bun.Image` (Bun ≥ 1.4) for Astro's build-time
+images. Astro must run on Bun for it: `bun --bun astro build`.
+
+```js
+import bun, { bunImageService } from '@mens-circle/astro-bun';
+
+export default defineConfig({ adapter: bun(), image: { service: bunImageService() } });
+```
+
+Bun.Image resizes, but cannot crop. `fit: 'cover'` with a different aspect ratio is
+therefore refused rather than stretched; ask for `fit: 'outside'` (the smallest size
+that covers the box, source ratio kept) and crop with `object-fit: cover` in CSS.
+JPEG, PNG and WebP encode everywhere; AVIF needs an OS encoder that Linux lacks.
+
 ## Build
 
-The integration runs under Node (Astro builds with Node), so `src/index.ts` uses `node:*`
-only. After every other integration's `astro:build:done` it writes
+`src/index.ts` sticks to `node:*`, so the integration also works when Astro runs on
+Node. After every other integration's `astro:build:done` it writes
 `dist/server/static-headers.json`: per file, the `staticHeaders()` result plus the headers
 a prerendered page set itself (those win). Paths are resolved relative to the bundle, so
 `dist/` can be moved.

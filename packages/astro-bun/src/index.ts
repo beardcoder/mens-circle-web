@@ -1,6 +1,6 @@
 /**
- * Astro adapter for Bun. The integration runs at build time under Node, so this file
- * uses node:* only; everything Bun-specific lives in server.ts and static.ts.
+ * Astro adapter for Bun. This file uses node:* only, so the integration also works when
+ * Astro itself runs on Node; everything Bun-specific lives in the other modules.
  */
 import type { AstroConfig, AstroIntegration, RouteToHeaders, ViteUserConfig } from 'astro';
 import { readdir, writeFile } from 'node:fs/promises';
@@ -66,6 +66,9 @@ async function writeManifest(
   await writeFile(new URL(MANIFEST_FILE, config.build.server), JSON.stringify(manifest));
   return Object.keys(manifest).length;
 }
+
+/** Astro's `image.service` for the Bun.Image service; see image-service.ts. */
+export const bunImageService = () => ({ entrypoint: `${NAME}/image-service`, config: {} });
 
 export default function bun(options: BunAdapterOptions = {}): AstroIntegration {
   let config: AstroConfig;

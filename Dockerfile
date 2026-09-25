@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
-FROM oven/bun:1 AS build
+# 1.4: the build needs Bun.Image.
+FROM oven/bun:1.4 AS build
 WORKDIR /app
 # The workspace manifests must be present before install.
 COPY package.json bun.lock ./
@@ -12,16 +13,15 @@ ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 # Build-time only: Astro embeds it in the server manifest. Keep it stable across builds.
 ARG ASTRO_KEY
 ENV ASTRO_KEY=$ASTRO_KEY
-# No --bun: the Bun runtime breaks Rollup.
 RUN bun run build
 
-FROM oven/bun:1 AS production-deps
+FROM oven/bun:1.4 AS production-deps
 WORKDIR /app
 COPY package.json bun.lock ./
 COPY packages/astro-bun/package.json ./packages/astro-bun/
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --production
 
-FROM oven/bun:1
+FROM oven/bun:1.4
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
   && rm -rf /var/lib/apt/lists/*

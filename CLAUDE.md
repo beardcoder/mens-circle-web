@@ -8,7 +8,7 @@ Code, comments and docs are English; user-facing content is German.
 
 ```bash
 bun run dev            # daemonizes; bunx astro dev status|logs|stop
-bun run build          # never add --bun (breaks Rollup); dev needs it and already has it
+bun run build          # bun --bun astro build: Astro runs on Bun (≥ 1.4) for Bun.Image
 bun run check          # astro check
 bun run lint           # eslint; complexity ≤ 12, max-depth ≤ 4 are enforced
 bun run format         # prettier; also run after db:generate (drizzle/meta is formatted)
@@ -65,8 +65,11 @@ stable build-time `ASTRO_KEY`; without it, revert to `no-cache`.
 it adds `/sitemap-events.xml` and `/event`. The adapter serves whatever is on disk at startup.
 `astro-llms-md` excludes `event` and `health` so it never fetches the live site at build.
 
-**Images.** Native `<Picture>` at build time only. Keep the `/_image` 404 override;
-no runtime Sharp. All events use `/images/og-default.png`.
+**Images.** `CropPicture` at build time only, through the adapter's Bun.Image service
+(no Sharp). Bun.Image cannot crop and has no AVIF on Linux: variants are WebP/JPEG at the
+source ratio (`fit: 'outside'`), and the block crops them with `aspect-ratio`,
+`object-fit: cover` and `object-position`. Keep the `/_image` 404 override. All events
+use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; tasks
 declare their own cron. No in-process timer and no `Bun.cron` (throws at boot).
