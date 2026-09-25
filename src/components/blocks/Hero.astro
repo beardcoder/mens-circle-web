@@ -74,8 +74,6 @@ const lines = data.displayLines ?? [];
               ratio: 3 / 2,
               widths: [420, 700, 900],
               sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
-              // The subject sits high in the frame; a centred band takes the torso.
-              position: 'top',
             }}
             wide={{
               ratio: 3 / 4,
@@ -209,7 +207,7 @@ const lines = data.displayLines ?? [];
     .home-hero__image {
       display: block;
       inline-size: 100%;
-      /* The variant already carries this ratio, so `cover` never has to crop. */
+      /* The variants keep the source's ratio; `cover` crops them to this box. */
       aspect-ratio: 3 / 4;
       object-fit: cover;
       border-radius: 0;
@@ -258,8 +256,10 @@ const lines = data.displayLines ?? [];
         margin-block-start: 0;
       }
 
+      /* The subject sits high in the frame; the band keeps the head and torso. */
       .home-hero__image {
         aspect-ratio: 3 / 2;
+        object-position: top;
       }
     }
 
