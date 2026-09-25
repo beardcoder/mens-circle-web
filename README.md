@@ -15,7 +15,7 @@ bun run dev            # http://localhost:4321 (daemon: bunx astro dev status|lo
 ```bash
 bun run check && bun run lint && bun test   # types, lint, tests
 bun run format                              # prettier
-bun run build                               # never with --bun (breaks Rollup)
+bun run build                               # runs Astro on Bun (Bun.Image needs Bun ≥ 1.4)
 bun run db:generate                         # migration after editing db/schema.ts
 ```
 

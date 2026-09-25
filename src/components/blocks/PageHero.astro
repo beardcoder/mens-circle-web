@@ -60,7 +60,6 @@ const imageAsset = resolveAssetImage(data.image);
                 ratio: 3 / 2,
                 widths: [420, 700, 900],
                 sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
-                position: 'top',
               }}
               wide={{
                 ratio: 4 / 5,
@@ -148,7 +147,7 @@ const imageAsset = resolveAssetImage(data.image);
     .page-hero__image {
       display: block;
       inline-size: 100%;
-      /* The variant already carries this ratio, so `cover` never has to crop. */
+      /* The variants keep the source's ratio; `cover` crops them to this box. */
       aspect-ratio: 4 / 5;
       object-fit: cover;
       border-radius: 0;
@@ -164,8 +163,10 @@ const imageAsset = resolveAssetImage(data.image);
         max-inline-size: none;
       }
 
+      /* The subject sits high in the frame; the band keeps the head and torso. */
       .page-hero__image {
         aspect-ratio: 3 / 2;
+        object-position: top;
       }
     }
 
