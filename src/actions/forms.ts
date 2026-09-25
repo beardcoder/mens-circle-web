@@ -6,12 +6,7 @@ import { clientIp, rateLimit } from '@lib/server/ratelimit';
 import { register } from '@lib/server/registrations';
 import { submitTestimonial } from '@lib/server/testimonials';
 
-/**
- * The public forms: rate-limited per IP, answered in the visitor's language, and
- * never leaking an internal error. Field rules live in the schemas below; what
- * only the data can decide — capacity, waitlist, duplicates — lives in lib/server
- * and answers with a `FormResult`.
- */
+/** The public forms: rate-limited per IP, answered in the visitor's language, and never leaking an internal error. */
 const publicForm =
   <T>(key: string, maxPerHour: number, handler: (input: T) => Promise<FormResult>) =>
   async (input: T, context: ActionAPIContext): Promise<{ message: string }> => {
@@ -38,11 +33,7 @@ const publicForm =
     return { message: result.body.message };
   };
 
-/*
- * Field rules for the public forms, worded for the visitor. A failed rule comes
- * back as an input error, which the form script writes beside the field
- * (`isInputError(error).fields`). An empty form field arrives as null.
- */
+/* Field rules for the public forms, worded for the visitor. */
 const required = (message: string) => z.string({ error: message }).trim().min(1, { error: message });
 const email = z
   .string({ error: 'Bitte gib deine E-Mail-Adresse an.' })

@@ -1,21 +1,4 @@
-/**
- * Buttons — one token-driven base (`.btn`) with variant and size modifiers.
- * Surfaces override the `--btn-*` tokens rather than redefining geometry.
- *
- * Square-cornered, condensed uppercase, solid orange with an INK label. Never
- * white on orange: that pair measures 2.9:1 and fails. Ink on orange is 5.9:1.
- *
- * The only motion is a small arrow shift on hover — the label and the ground
- * swap nothing, the arrow moves 4px. No lift, no glow, no shimmer.
- *
- *   <a class="btn btn--primary"    — solid orange, the one primary action
- *   <a class="btn btn--secondary"  — outlined, light surfaces
- *   <a class="btn btn--outline"    — outlined on dark surfaces
- *   <a class="btn btn--ghost"      — text-only, low-emphasis
- *   <a class="btn btn--whatsapp"   — the community CTA, deliberately secondary
- *   <a class="btn btn--arrow"      — adds the arrow to a non-primary button
- *   <a class="btn btn--large"      — a touch more presence
- */
+/** Buttons — one token-driven base (`.btn`) with variant and size modifiers. */
 
 /* Base */
 .btn {
@@ -65,18 +48,7 @@
     border-color var(--motion-quick);
 }
 
-/* The arrow. Drawn with a pseudo-element so no call site has to carry an icon,
-   and so it can shift independently of the label.
-
-   It is a masked SVG, not the '\2192' glyph it used to be. Two reasons, both
-   visible on the page: the fonts are subset to `latin`, which carries U+2191
-   and U+2193 but NOT U+2192, so the arrow dropped out of Barlow Condensed and
-   was drawn by the fallback stack in a different hand; and a text arrow rides
-   its font's math axis, which sits well below the optical centre of an
-   all-caps label, so it hung low next to the words. The SVG is symmetric
-   about its viewBox centre, so `align-items: center` on the button now
-   actually centres it. `currentColor` keeps it on the label's colour through
-   the hover transition. */
+/* The arrow. */
 .btn--primary::after {
   flex: none;
   inline-size: var(--btn-arrow-size);
@@ -114,10 +86,7 @@
   }
 }
 
-/* The focus ring has to win on paper, on ink and on the orange field alike, so
-   it pairs a solid outline with an orange halo rather than relying on a single
-   tinted ring. The outline flips with the mode; the sections that carry their
-   own fixed ground override it. */
+/* Must show on paper, ink and orange. */
 .btn:focus-visible {
   outline: 3px solid var(--text-primary);
   outline-offset: 3px;

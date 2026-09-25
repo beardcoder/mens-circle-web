@@ -1,13 +1,7 @@
 ---
 import type { Testimonial } from '@lib/types';
 
-/**
- * Submitted and moderated entries, quoted as written — nothing is added or
- * reworded, and the section renders nothing when none is published.
- *
- * A server island on the static home page: supplied testimonials feed the
- * build-time fallback only, live requests read the database.
- */
+/** Submitted and moderated entries, quoted as written — nothing is added or reworded, and the section renders nothing when none is published. */
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string; title?: string };
@@ -77,9 +71,7 @@ const anchor = data?.anchor ?? 'stimmen';
       min-block-size: 30rem;
     }
 
-    /* A single column, not a two-up grid. Submitted quotes run from two lines
-       to fifteen, so a grid left one cell half-empty beside a wall of text and
-       halved the measure of both. Read down instead. */
+    /* A single column, not a two-up grid. */
     .testimonials__list {
       max-inline-size: var(--measure);
       margin-block-start: var(--rhythm-group);

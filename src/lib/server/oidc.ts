@@ -1,10 +1,4 @@
-/**
- * Admin sign-in through Pocket ID — OpenID Connect via `openid-client`:
- * authorization code flow with PKCE and `state`. The library does discovery,
- * the code exchange and the ID token checks; what stays here is who counts as
- * an admin, and carrying `state` + verifier across the provider round-trip in a
- * short-lived signed cookie.
- */
+/** Admin sign-in through Pocket ID — OpenID Connect via `openid-client`: authorization code flow with PKCE and `state`. */
 import * as client from 'openid-client';
 import { sessionSecretConfigured, signToken, verifyToken } from './auth';
 import { config } from './config';
@@ -35,9 +29,7 @@ const provider = (): Promise<client.Configuration> =>
       new URL(config.OIDC_ISSUER),
       config.OIDC_CLIENT_ID,
       undefined,
-      // Post, not Basic: Basic form-encodes the id first (RFC 6749 §2.3.1), so a
-      // UUID client id arrives as `4d29cf9d%2De1ac…` — whether the provider
-      // decodes that is its choice. The body carries it verbatim.
+      // Post, not Basic: Basic form-encodes the id (a UUID's `-` becomes `%2D`).
       client.ClientSecretPost(config.OIDC_CLIENT_SECRET),
       { timeout: 10 },
     )
@@ -71,11 +63,7 @@ const isAdmin = (user: client.UserInfoResponse, email: string): boolean => {
   return user.email_verified !== false && config.ADMIN_EMAILS.includes(email);
 };
 
-/**
- * Completes the flow from the callback's query string. Returns the admin's
- * email and where to send them; throws `AccessDenied` for a valid sign-in by a
- * non-admin and any other error for a broken or forged round-trip.
- */
+/** Completes the flow from the callback's query string. */
 export const completeLogin = async (
   search: string,
   flowCookie: string | undefined,
@@ -83,9 +71,7 @@ export const completeLogin = async (
   const flow = await verifyToken<Flow>(flowCookie);
   if (!flow) throw new Error('sign-in flow cookie missing, expired or forged');
 
-  // Rebuilt from APP_URL rather than the request: behind the TLS-terminating
-  // proxy the request reads http://, and this URL is the redirect_uri that the
-  // token request must repeat exactly.
+  // From APP_URL, not the request (http:// behind the proxy); must equal the redirect_uri.
   const currentUrl = new URL(callbackUrl());
   currentUrl.search = search;
 

@@ -7,16 +7,7 @@ interface Props {
   event: EventDTO;
 }
 
-/**
- * The event's facts, in the same hairline definition list the home page and
- * /event use. Only rows with a value are rendered: an event with no end time
- * must not print "bis  Uhr".
- *
- * "In Kalender speichern" is plain HTML: a native popover with a Google link and
- * the .ics file itself, rendered here as a data URL. Like the page, the entry
- * names the venue but not the street address — that goes out with the
- * registration confirmation.
- */
+/** The event's facts, in the same hairline definition list the home page and /event use. */
 
 const { event } = Astro.props;
 

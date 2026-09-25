@@ -1,19 +1,4 @@
-/**
- * Layout.
- *
- * Two systems, used for different jobs:
- *
- *   .bay    a 12-column grid at 1320px. The composed sections place their
- *           content into *different* column spans, so the left edge actually
- *           moves down the page instead of every section starting at the same
- *           x. Graphics may break out of it; reading text may not.
- *
- *   .spine  a narrow marker column beside a text column. Kept for the quiet
- *           passages and the sub-pages, where a marginal label beside running
- *           prose is exactly right — and where the previous iteration's mistake
- *           was using it for *everything*, which is what made the page read as
- *           a stock theme.
- */
+/** Layout. */
 
 /* Container */
 .container {
@@ -28,23 +13,15 @@
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--col-gap);
-  /* Start-aligned, not stretched: a marker in the rail column would otherwise
-     be stretched to the height of the text column beside it, and a flex marker
-     would then centre its own content halfway down an empty cell. */
   align-items: start;
 }
 
-/* Named spans, so a section declares its position in words rather than
-   repeating grid-column arithmetic. Below 56em everything collapses to one
-   column — an asymmetric 12-track grid on a phone is just a narrow column
-   with extra steps. */
+/* Named spans, so a section declares its position in words rather than repeating grid-column arithmetic. */
 .bay__left {
   grid-column: 1 / span 7;
 }
 
-/* Pairs with `.bay__left` (cols 1–7) without overlapping it — two spans that
-   share a track are pushed onto separate rows by auto-placement, which is not
-   what a side-by-side pair wants. */
+/* Must not share a track with `.bay__left`, or they wrap onto two rows. */
 .bay__far-right {
   grid-column: 8 / span 5;
 }
@@ -81,10 +58,7 @@
   border-block-start: 1px solid var(--border-light);
 }
 
-/* The two inverted grounds. `--ink` is the quiet one (the facts band, the
-   participation close); `--signal` is the loud one and is used exactly once.
-   Both set their own text colours, so anything dropped inside them stays
-   legible without extra classes at the call site. */
+/* The two inverted grounds. */
 .section--ink {
   color: var(--color-chalk);
   background: var(--color-ink);
@@ -109,15 +83,7 @@
   color: var(--color-chalk);
 }
 
-/* The third ground: warm sand, a half-step down from the page. Neither the
-   bright oat nor the dark band — a calm, set-apart passage, and what gives the
-   page an earthy middle instead of one long stretch of paper broken only by
-   black and orange.
-
-   Both values must flip with the mode. An earlier pass used the literal
-   `--color-paper-sunk` here and painted an oat panel under chalk text in dark
-   mode (1.12:1 on the Markus heading); `--border-light`, tuned for the oat,
-   likewise all but disappears against the sand. */
+/* The third ground: warm sand, a half-step down from the page. */
 .section--sand {
   --border-light: var(--border-medium);
 
@@ -160,10 +126,7 @@
   }
 }
 
-/* `content-visibility: auto` skips style, layout and paint for sections far
-   outside the viewport. Only sections that never sit above the fold are listed,
-   and never one carrying a scroll-driven animation — a skipped section has no
-   layout for the timeline to read. */
+/* `content-visibility: auto` skips style, layout and paint for sections far outside the viewport. */
 @supports (content-visibility: auto) {
   :where(
     .home-circle,

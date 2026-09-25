@@ -1,20 +1,5 @@
 /* eslint-disable no-console */
-/**
- * Executed only by admin-session-secret.test.ts, in a child process started
- * with `--no-env-file` and an explicit environment — config.ts reads
- * ADMIN_SESSION_SECRET (and its siblings) from process.env at module load,
- * exactly the reason forwarded-origin.fixture.ts is isolated the same way.
- *
- * The regression this guards: ADMIN_SESSION_SECRET used to fall back to
- * ADMIN_PASSWORD, then to the literal string 'change-me' — a value visible in
- * this public repository. With neither var set, that literal became the HMAC
- * key signing every admin session cookie, so anyone could forge a valid
- * `mc_admin` cookie for any deployment that forgot to set it, without ever
- * needing to guess a real password. Each scenario proves the closed state
- * from the actual functions callers use, not from re-reading config values.
- * Sign-in is Pocket ID now (see admin-oidc.test.ts); what is left to guard here
- * is the session cookie itself.
- */
+/** Run by admin-session-secret.test.ts: no session is signed or trusted without a proper secret. */
 import assert from 'node:assert/strict';
 
 const encoder = new TextEncoder();
@@ -24,12 +9,7 @@ const base64url = (bytes: Uint8Array): string => {
   return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 };
 
-/**
- * Builds a token exactly like auth.ts's own createSession() would, but signed
- * with a caller-chosen key rather than whatever config.ADMIN_SESSION_SECRET
- * holds — the only way to test "a token forged against key X is rejected"
- * without reaching into auth.ts's private helpers.
- */
+/** A session token signed with an arbitrary key. */
 async function forgeToken(email: string, key: string, exp = Date.now() + 60_000): Promise<string> {
   const payload = base64url(encoder.encode(JSON.stringify({ email, exp })));
   const cryptoKey = await crypto.subtle.importKey(
@@ -53,9 +33,7 @@ switch (process.argv[2]) {
     assert.equal(auth.sessionSecretConfigured(), false);
     await assert.rejects(auth.createSession('a@b.c'), 'nothing may be signed without a secret');
 
-    // The exact historical exploit: a cookie forged with the old literal
-    // default must be rejected — not merely "some token is rejected", but
-    // specifically this one, which used to verify successfully.
+    // The old literal default must not verify.
     const forgedWithOldDefault = await forgeToken('attacker@evil.example', 'change-me');
     assert.equal(await auth.readSession(forgedWithOldDefault), null);
     assert.equal(await auth.readSession('anything.at.all'), null);

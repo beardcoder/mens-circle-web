@@ -361,17 +361,12 @@ const scenarios: Record<string, () => Promise<void>> = {
   },
   async 'waitlist-promotion'() {
     const { db, event } = await seed(5);
-    // r0-r3 hold seats; r4 waits. (p4's derived subscriber id is 5 — clear of
-    // the ids txHandler special-cases to fail, which would otherwise muddy
-    // what this scenario is actually testing.)
+    // r0-r3 hold seats; r4 waits.
     await db.update(registrations).set({ status: 'waitlist' }).where(eq(registrations.id, 'r4'));
 
     const { changeRegistrationStatus } = await import('../src/lib/server/registrations');
 
-    // Cancelling a SEAT (r0, 'registered') frees one — the sole waitlisted
-    // entry must be promoted and mailed. The mail is fire-and-forget from
-    // changeRegistrationStatus's own return, so gate on the actual /api/tx
-    // call rather than racing a fixed delay.
+    // Cancelling a SEAT (r0, 'registered') frees one — the sole waitlisted entry must be promoted and mailed.
     const promoted = deferred();
     handler = (call) => {
       if (call.path === '/api/tx') promoted.resolve();
@@ -387,13 +382,7 @@ const scenarios: Record<string, () => Promise<void>> = {
       'the promoted participant is mailed exactly once',
     );
 
-    // Cancelling a fresh WAITLIST entry that never held a seat must never
-    // promote anyone — even though a second person is genuinely still
-    // waiting and available to be (wrongly) promoted. This is the exact bug
-    // this scenario guards against: promotion used to run for ANY cancelled
-    // entry regardless of what its own status had been, so this second
-    // waiter would have been promoted purely because someone else on the
-    // waitlist cancelled.
+    // A cancelled waitlist entry never held a seat, so nobody may be promoted.
     calls.length = 0;
     handler = txHandler;
     const waiters = await db
@@ -414,10 +403,7 @@ const scenarios: Record<string, () => Promise<void>> = {
       },
     ]);
     await changeRegistrationStatus('r-late', 'cancelled');
-    // Nothing async to await: with the fix, this path never calls
-    // promoteNextWaitlisted, so no fetch is even scheduled. A short pause is
-    // defensive margin only, in case a future change makes that path async
-    // without immediately reaching the network.
+    // Nothing async to await: with the fix, this path never calls promoteNextWaitlisted, so no fetch is even scheduled.
     await pause();
     rows = await db.select().from(registrations);
     assert.equal(rows.find((row) => row.id === 'r-late')?.status, 'cancelled');
@@ -446,16 +432,11 @@ const scenarios: Record<string, () => Promise<void>> = {
       })
       .returning();
 
-    // Every listmonk call any of these registrations triggers in the
-    // background just needs to succeed — this scenario is about the DB row
-    // states, not the side effects.
     handler = () => json({ data: { id: 1 } });
 
     const { register } = await import('../src/lib/server/registrations');
     const RACERS = 12;
-    // Genuinely concurrent: every call starts before any of them can have
-    // finished its own claim, which is exactly what production sees when a
-    // popular event's last few seats get hit at once.
+    // All calls start before any claim finishes.
     const results = await Promise.all(
       Array.from({ length: RACERS }, (_, i) =>
         register({

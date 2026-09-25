@@ -1,7 +1,4 @@
-/**
- * Modern CSS Reset (2025)
- * Based on Josh Comeau's Reset + Modern Best Practices
- */
+/** CSS reset, based on Josh Comeau's. */
 
 *,
 *::before,
@@ -13,23 +10,15 @@
 
 html {
   font-size: 16px;
-  /* Guard against mobile font-size inflation. Lightning CSS autoprefixes this
-     from the configured browser targets (e.g. the -webkit- form Safari/iOS
-     need) at build time — see astro.config.mjs. */
+  /* Guard against mobile font-size inflation. */
   text-size-adjust: none;
 
-  /* Kill the grey tap-flash on every element (the property inherits) so
-     touch interactions read as deliberate, app-like states rather than a
-     browser default. */
   -webkit-tap-highlight-color: transparent;
 
   /* Offset anchored navigation so the fixed header doesn't cover the target
      (applies to on-load fragments, back/forward, and cross-page anchors). */
   scroll-padding-top: var(--header-clearance);
 
-  /* Reserve the scrollbar gutter so short pages (e.g. the legal pages) and
-     long ones share the same content width — no horizontal jump as you
-     navigate between them or as content height changes. */
   scrollbar-gutter: stable;
 }
 
@@ -42,9 +31,7 @@ summary,
   touch-action: manipulation;
 }
 
-/* Smooth scroll only for users who haven't requested reduced motion.
-   Setting this unconditionally breaks keyboard navigation for vestibular
-   disorder users and prevents instant-scroll behaviour when needed. */
+/* Smooth scroll only for users who haven't requested reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
@@ -62,9 +49,7 @@ body {
   /* biome-ignore lint/suspicious/noDuplicateProperties: dvh fallback for browsers without dynamic viewport support */
   min-block-size: 100dvh;
 
-  /* `clip` (not `hidden`) prevents accidental horizontal scrolling
-     without making `body` a scroll container — `view()` timelines on
-     descendants need to walk up to the document scrollport. */
+  /* `clip`, not `hidden`: keeps view() timelines on the document scroller. */
   overflow-x: clip;
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -85,9 +70,7 @@ label {
   line-height: 1.2;
 }
 
-/* Improve paragraph readability. 68ch is the upper bound of the brief's
-   60–68 characters per line; blocks that want a tighter measure set
-   `--measure` themselves. */
+/* Improve paragraph readability. */
 p {
   max-inline-size: var(--measure-wide);
   text-wrap: pretty;

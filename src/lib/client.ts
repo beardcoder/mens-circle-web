@@ -1,8 +1,4 @@
-/**
- * Client entry — wires up theme, header and scroll reveals. Each initialiser is
- * isolated so one failure never blocks the others. The module is deferred, so
- * the DOM is already parsed when it runs.
- */
+/** Client entry — wires up theme, header and scroll reveals. */
 
 import { initMotion } from './motion';
 import { initSiteHeader } from './site-header';

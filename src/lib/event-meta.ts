@@ -1,8 +1,4 @@
-/**
- * Share and search metadata for one event. `lib/event-schema.ts` builds its
- * JSON-LD from the same functions, so structured data and visible metadata
- * cannot drift apart. Server-render only — it imports lib/server/format.
- */
+/** Share and search metadata for one event. */
 import site from '../data/site.json';
 import { formatDateLongDE, formatDayMonthYearDE, timeRange } from './server/format';
 import type { EventDTO } from './types';
@@ -10,11 +6,7 @@ import type { EventDTO } from './types';
 /** Chat previews show more than a SERP's ~160 chars, so budget for the preview. */
 const DESCRIPTION_LIMIT = 200;
 
-/**
- * Strip inline HTML so a value is safe as plain text. Repeats until stable: one
- * pass leaves residue on malformed markup (`<scr<script>ipt>`), and these values
- * land in both a JSON-LD `<script>` block and a `content=""` attribute.
- */
+/** Strip inline HTML so a value is safe as plain text. */
 export function stripHtml(value = ''): string {
   let previous: string;
   let out = value;

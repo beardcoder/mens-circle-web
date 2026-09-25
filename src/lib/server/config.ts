@@ -39,9 +39,7 @@ export const config = {
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean),
   ADMIN_GROUP: env('OIDC_ADMIN_GROUP', ''),
-  // No fallback — never to a literal default (this repo is public, so a
-  // literal here is a published secret). lib/server/auth.ts refuses to sign or
-  // trust any session while this is shorter than 32 characters.
+  // No fallback — never to a literal default (this repo is public, so a literal here is a published secret).
   ADMIN_SESSION_SECRET: env('ADMIN_SESSION_SECRET', ''),
   // Pocket ID (any OIDC provider): the issuer URL, e.g. https://id.example.org.
   OIDC_ISSUER: env('OIDC_ISSUER', '').replace(/\/+$/, ''),

@@ -1,11 +1,7 @@
 import { expect, test } from 'bun:test';
 import { cacheControlForFile, cacheControlForRoute } from '../src/lib/cache-policy';
 
-// Pure string assertions: no server, no database, no build output. Expected
-// values are written as literal strings, matching the rest of this suite —
-// the policy values themselves are private to cache-policy.ts (see its own
-// comment), so a change to one is a real, visible diff here rather than a
-// passing comparison against itself.
+// Pure string assertions: no server, no database, no build output.
 
 test('nothing that carries live or signed-in state may be stored', () => {
   for (const pathname of [

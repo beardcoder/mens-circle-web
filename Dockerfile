@@ -1,98 +1,47 @@
 # syntax=docker/dockerfile:1
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Männerkreis — single-image deploy for Coolify.
-#
-# One process, a small sustainable footprint:
-#
-#   Astro server (Bun runtime, :8090 — the exposed port, the public edge)
-#   ├─ serves the build's static assets + prerendered HTML (immutable caching)
-#   ├─ on-demand SSR (event pages + home server islands)
-#   ├─ the public API (/api/*) and the admin UI (/admin/*)
-#   └─ data layer: Drizzle on bun:sqlite (file in the mounted /data volume),
-#      migrations applied automatically on boot
-#
-# Transactional + newsletter email uses externally managed listmonk via LISTMONK_URL.
-# The frontend runs in the Bun runtime (NOT Node); the Bun server is the single
-# public edge (no nginx, no separate backend process).
-# ─────────────────────────────────────────────────────────────────────────────
-
-# 1) Install dependencies + build the Astro server bundle with Bun.
-#    NB: the build path is baked into the bundle (the adapter records the
-#    absolute client dir), so the runtime stage MUST use the same WORKDIR.
+# The adapter bakes the absolute client path into the bundle, so every stage uses /app.
 FROM oven/bun:1 AS build
 WORKDIR /app
 COPY package.json bun.lock ./
-# BuildKit cache for Bun's global package store: a rebuild after a lockfile
-# change downloads only what changed. Not part of any image layer.
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 COPY . .
-# Canonical URL for sitemap / OG tags (build-time).
 ARG PUBLIC_SITE_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
-# Server-island encryption key — build-time only, and only here. The prerendered
-# home page carries its islands' props encrypted in the HTML; Astro encodes the
-# key it used into the server manifest, so the runtime never reads ASTRO_KEY from
-# its environment (setting it on the container does nothing). Unset at build,
-# Astro mints a fresh key each time, and every cached document from an older
-# build then gets a 400 from /_server-islands/<name> — which is what
-# src/lib/cache.ts depends on not happening. Keep the value stable across builds.
-# This stage is not shipped, but the value does land in its build metadata;
-# rotate it like any other secret.
+# Build-time only: Astro embeds it in the server manifest. Keep it stable across builds.
 ARG ASTRO_KEY
 ENV ASTRO_KEY=$ASTRO_KEY
-# Plain `bun run build` (NOT `bun --bun run`): forcing the Bun runtime breaks
-# Astro's Rollup build, while `bun run` still uses Bun for everything else.
+# No --bun: the Bun runtime breaks Rollup.
 RUN bun run build
 
-# 2) Install only runtime dependencies; keep native packages on the same base
-#    and target architecture as the build/runtime stages (not the host's tree).
 FROM oven/bun:1 AS production-deps
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --production
 
-# 3) Final runtime image — Bun runtime only.
 FROM oven/bun:1
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
   && rm -rf /var/lib/apt/lists/*
 ENV TZ=Europe/Berlin
-# Same WORKDIR as the build stage so the adapter's baked client path resolves.
 WORKDIR /app
 
-# The Astro server bundle + its runtime dependencies + the static client (the
-# Bun server serves these). The build path is baked in, so /app must match.
 COPY --from=build /app/dist ./dist
 COPY --from=production-deps /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
-# Drizzle migrations — applied at runtime on boot (resolved against the WORKDIR).
 COPY --from=build /app/drizzle ./drizzle
-# Operational scripts: scripts/schedule.ts is the one entrypoint Coolify's
-# Scheduled Task calls (`docker exec <web> bun run scripts/schedule.ts`, see
-# CLAUDE.md's "Cron" section) — it dispatches backup-db.ts's runBackup() and
-# reminders.ts's runReminders() by their own cron cadence. scripts/lib/cron.ts
-# is its pure due-task matcher; send-reminders.ts stays as the manual one-shot.
+# Run by Coolify's scheduled task and by hand; they import src/lib/server directly.
 COPY --from=build /app/scripts/schedule.ts /app/scripts/backup-db.ts /app/scripts/send-reminders.ts ./scripts/
 COPY --from=build /app/scripts/lib ./scripts/lib
-# Server-only business logic scripts/schedule.ts reuses at runtime (db, email,
-# listmonk…) — no astro: deps, no path aliases, so it runs under plain Bun
-# without the build toolchain.
 COPY --from=build /app/src/lib/server ./src/lib/server
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Persisted data (the SQLite database) — mount a Coolify volume here.
 ENV DATABASE_PATH=/data/mens-circle.db
 VOLUME ["/data"]
-# The Bun server is the public edge on :8090.
 EXPOSE 8090
 
-# Liveness probe for Coolify/Docker. /health is a dedicated endpoint route
-# (src/pages/health.ts) that returns a bare 200 with no SSR page render and no
-# DB round-trip. Probed with wget (curl is NOT in this image). A 200 means the
-# public edge is accepting and serving requests.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD wget -q -O /dev/null http://127.0.0.1:8090/health || exit 1
 

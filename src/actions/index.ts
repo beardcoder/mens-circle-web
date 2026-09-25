@@ -1,11 +1,4 @@
-/**
- * Every Astro Action, served at `/_actions/*` and called as `actions.<name>()`.
- * Split by area; the names stay flat so callers never see the split.
- *
- *   forms          the public forms (registration, newsletter, testimonial)
- *   auth           admin logout, and `requireAdmin` for the rest (sign-in is Pocket ID)
- *   events, registrations, testimonials   the admin back-office
- */
+/** Every Astro Action, served at `/_actions/*` and called as `actions.<name>()`. */
 import { auth } from './auth';
 import { events } from './events';
 import { forms } from './forms';

@@ -1,13 +1,4 @@
-/**
- * Theme manager — light/dark, persisted across visits.
- *
- *   • `data-mode`          absent (follow OS) | "light" | "dark"
- *   • `data-mode-resolved` the mode actually in effect, mirrored for the icons
- *
- * The layout's inline boot script sets both attributes before first paint so
- * nothing flashes; this wires the buttons and follows the OS while no mode is
- * pinned.
- */
+/** Theme manager — light/dark, persisted across visits. */
 
 type Mode = 'light' | 'dark';
 

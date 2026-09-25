@@ -4,25 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { cacheControlForFile } from '../src/lib/cache-policy.ts';
 
 /**
- * Applies the site's cache policy to the files the Bun adapter serves from
- * disk.
- *
- * The adapter has one knob for every unhashed file (`staticCacheControl`,
- * default `public, max-age=86400, must-revalidate`), and that one value has to
- * cover things with nothing in common: prerendered HTML, the favicons, the OG
- * poster, `robots.txt` and the service worker that exists to unregister
- * itself. A day was too long for the first and the last, and far too short for
- * the rest. src/lib/cache-policy.ts decides per path instead; this hook writes
- * the answer into the manifest.
- *
- * HTML is deliberately not touched here. Those entries carry whatever
- * `Astro.response.headers` held when the page was prerendered, which
- * src/middleware.ts fills from the same table — one policy, one file, two
- * places that read it.
- *
- * Register it LAST: the adapter writes the manifest in its own
- * `astro:build:done`, and publish-generated-files.mjs adds the sitemaps and
- * `llms.txt` to it afterwards.
+ * Writes src/lib/cache-policy.ts into the adapter's static manifest for non-HTML files.
+ * Register last, after publish-generated-files.
  *
  * @returns {import('astro').AstroIntegration}
  */

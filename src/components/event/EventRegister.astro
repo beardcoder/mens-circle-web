@@ -7,11 +7,7 @@ interface Props {
   event: EventDTO;
 }
 
-/**
- * Registration for one event, in three states: open, waiting list, past. The
- * heading names the state plainly rather than selling it, and the seat count is
- * a sentence rather than a numeral.
- */
+/** Registration for one event, in three states: open, waiting list, past. */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);
@@ -63,9 +59,6 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
 
 <style is:global>
   @layer sections {
-    /* The rail heading sits 8px above the title everywhere on the site, so the
-       title needs more than that below it or the three lines read as one
-       undifferentiated stack. Same rung as `.section-title`. */
     .event-register__title {
       margin-block-end: var(--rhythm-stack);
       font-size: var(--text-3xl);

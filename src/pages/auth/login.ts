@@ -1,7 +1,4 @@
-/**
- * `GET /auth/login` — starts the Pocket ID sign-in. Outside `/admin` because
- * the middleware would bounce an unauthenticated request back to the login page.
- */
+/** `GET /auth/login` — starts the Pocket ID sign-in. */
 import type { APIRoute } from 'astro';
 import { beginLogin, FLOW_COOKIE, FLOW_TTL_S, oidcConfigured } from '@lib/server/oidc';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';

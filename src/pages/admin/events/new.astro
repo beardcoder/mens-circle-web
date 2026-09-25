@@ -6,8 +6,6 @@ import { getEventById } from '@lib/server/events';
 export const prerender = false;
 
 // `?from=<id>` pre-fills the form from an existing event for quick duplication.
-// Everything is copied except identity/scheduling/visibility, which must be set
-// fresh: no id (so it's a create), a blank date + slug, and unpublished.
 const from = Astro.url.searchParams.get('from');
 const source = from ? await getEventById(from) : null;
 

@@ -31,21 +31,13 @@ export default defineConfig([
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'no-console': 'warn',
 
-      // A complexity budget, set at the measured ceiling of the code as it
-      // stands rather than as an aspiration — so raising either number is a
-      // deliberate admission that something got harder to read, not a drive-by.
-      // The two functions that legitimately sit above it are exempted by name
-      // below; everything else is under it.
+      // Set at the code's measured ceiling; raising it needs a reason.
       complexity: ['error', 12],
       'max-depth': ['error', 4],
     },
   },
 
-  // The home-page block dispatcher: one `switch` over the block union with a
-  // component per case (CLAUDE.md: adding a block means adding a case here).
-  // The cyclomatic count reads that table as branching; splitting it would
-  // scatter one lookup across several functions and read worse. The file holds
-  // nothing else, so the exemption cannot quietly cover unrelated code.
+  // The home-page block dispatcher: one `switch` over the block union with a component per case (CLAUDE.md: adding a block means adding a case here).
   {
     files: ['src/components/PageContent.astro'],
     rules: { complexity: 'off' },

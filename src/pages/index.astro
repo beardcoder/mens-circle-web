@@ -8,10 +8,7 @@ import { eventSeriesSchema } from '@lib/series-schema';
 
 // Static shell and native <Picture> assets; live content uses server:defer.
 export const prerender = true;
-// Everything live on this page arrives through a server island, so the document
-// itself may be cached. It was a flat `no-cache` because the islands' encrypted
-// props are build-scoped — read PRERENDERED_CACHE_CONTROL before widening this,
-// it depends on ASTRO_KEY being set.
+// Everything live on this page arrives through a server island, so the document itself may be cached.
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 const blocks = home.blocks as Block[];

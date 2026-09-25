@@ -9,22 +9,7 @@ interface Props {
   lng: number;
 }
 
-/**
- * The Anfahrt block. The map draws with Leaflet on the Humanitarian (HOT) style
- * hosted by OpenStreetMap France — keyless on purpose: there is no account to
- * hang a key on, and a key in a client bundle is public anyway. Its warm ground
- * and sparse POI icons suit a palette that is ochre-cast, never blue-cast.
- *
- * Swapping the provider is a change to TILE_URL. The two other verified keyless
- * rasters are tile.openstreetmap.org (standard style, behind Fastly) and
- * tile.openstreetmap.de (same style, German labels). Stadia and Wikimedia are
- * not options — they answer 401 and 403 for third-party use. Every one of them
- * requires the attribution.
- *
- * The address sits above the map and the route links below it, so a tile
- * outage costs nothing the reader needs: after a few failed tiles the map says
- * so in one sentence and releases its reserved box.
- */
+/** The Anfahrt block. */
 
 const { event, lat, lng } = Astro.props;
 
@@ -283,9 +268,7 @@ const address =
     display: none;
   }
 
-  /* The frame reserves a 16/9 box so a loading map
-     cannot shift the page. Once there is no map to load, that box is just a
-     large empty rectangle around one sentence — release it. */
+  /* The frame reserves a 16/9 box so a loading map cannot shift the page. */
   .event-map__frame:has(.event-map[data-state='failed']) {
     aspect-ratio: auto;
   }
@@ -311,10 +294,7 @@ const address =
     fill: currentcolor;
   }
 
-  /* Leaflet ships its own attribution chrome: a translucent white box with
-     #0078a8 links, which measures 3.3:1 on that box and is the only text on the
-     site that fails. It is a required credit, so it has to be legible — put it
-     on our own ground with our own colours. */
+  /* Leaflet's default attribution fails contrast; restyled. */
   .event-map .leaflet-control-attribution {
     font-family: var(--font-body);
     font-size: var(--text-caption);

@@ -14,11 +14,7 @@ interface Props {
   };
 }
 
-/**
- * A keyboard-operable `<details>` list. No `name` attribute: an exclusive
- * accordion closes the answer you were reading the moment you open another.
- * This section answers doubts, not logistics — the facts are stated in the open.
- */
+/** A keyboard-operable `<details>` list. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'faq';

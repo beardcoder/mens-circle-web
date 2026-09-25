@@ -1,20 +1,4 @@
-/**
- * Design tokens. Three colours and two cuts of one typeface. Every hue sits on
- * the warm side of neutral, so the greys are ochre-cast, never blue-cast.
- *
- * The contrast rules that follow, measured rather than guessed:
- *   ink on paper          15.2:1
- *   paper on ink          15.2:1
- *   orange on ink          4.9:1   → orange TEXT is legible on the dark
- *   ink on orange          4.9:1   → the orange field always carries ink text
- *   orange on paper        3.1:1   → LARGE text only (the step numerals), never
- *                                    small text. Otherwise fill and stroke.
- *   white on orange        3.6:1   → fails for normal text. This is why every
- *                                    button on the orange is ink, not white.
- *
- * Light/dark runs through native `light-dark()`, resolved off `color-scheme`.
- * The dark side swaps ground and ink; the orange is identical in both.
- */
+/** Design tokens. */
 
 :root {
   /* Mode — `data-mode` absent follows the OS, "light"/"dark" pins it. Applied
@@ -66,13 +50,7 @@
   --text-muted: light-dark(var(--color-ink-muted), var(--color-chalk-muted));
   --text-on-dark: var(--color-chalk);
 
-  /* Accents.
-       --accent-primary   the orange itself: fills, strokes, the ring
-       --accent-on-fill   what sits ON the orange — always ink, never white
-       --accent-text      accent-coloured *text*; only legible on the dark, so on
-                          paper it resolves to ink and the emphasis is carried by
-                          weight and an orange underline instead
-       --accent-secondary the orange on a dark ground (5.9:1 — safe as text) */
+  /* Accents. */
   --accent-primary: var(--color-orange);
   --accent-text: light-dark(var(--color-ink), var(--color-orange));
   --accent-rare: var(--color-orange);
@@ -81,42 +59,19 @@
   --color-success: light-dark(#2f6b4a, #7fc09a);
   --color-error: light-dark(#9c3a2c, #e0907f);
 
-  /* Borders.
-     `--rule-strong` is the 2-3px structural rule the poster layout is built
-     from — the bar under the header, the line above each step, the edge of the
-     hero's action block. It MUST flip with the mode: a literal `--color-ink`
-     rule is invisible on the dark ground. The same goes for any focus outline
-     that sits on the page ground.
-
-     The literal `--color-ink` / `--color-paper` stay correct only where the
-     ground itself does not flip: the orange statement field, the ink bands,
-     and the footer. */
+  /* Borders. */
   --rule-strong: light-dark(var(--color-ink), var(--color-chalk));
   --border-light: light-dark(var(--color-rule), var(--color-night-rule));
   --border-medium: light-dark(var(--color-rule-strong), #453a31);
   --border-dark: light-dark(var(--color-ink-muted), #5a5048);
   --border-on-dark: rgb(242 237 227 / 18%);
-  /* The focus ring is the orange at full strength — it has to win over a dark
-     field, an orange field and the paper alike, so it is a solid ring plus a
-     contrasting outline rather than a soft tint. */
 
   /* Typography */
-  /* --font-condensed / --font-text are defined by the Astro <Font> components
-     (astro.config.mjs `fonts`) and already expand to the full stack: the
-     webfont, an auto-generated metric-matched fallback face, then the
-     configured generic fallbacks. */
+  /* Set by the Astro <Font> components, fallbacks included. */
   --font-display: var(--font-condensed);
   --font-body: var(--font-text);
 
-  /* Type scale, in two registers that do not overlap.
-     
-     READING SIZES stay where they were — 17–18px body, section titles in the
-     30–48px band. They are set in Barlow.
-     
-     POSTER SIZES start where the reading sizes stop and go far past them:
-     `--display-1` reaches 180px on a wide screen, which is 10× the body. That
-     gap is the point. They are set in Barlow Condensed 800 and are always
-     short — a name, a claim, a numeral — never a paragraph. */
+  /* Type scale, in two registers that do not overlap. */
   --text-xs: 0.8125rem;
   --text-sm: 0.875rem;
   --text-base: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
@@ -142,9 +97,7 @@
   --text-body-compact: 1rem;
   --text-caption: 0.875rem;
 
-  /* The small condensed marker: kickers, rail labels, meta, nav. Uppercase,
-     tracked out, and the only place uppercase is used outside the poster
-     register. */
+  /* The small condensed marker: kickers, rail labels, meta, nav. */
   --text-marker: 0.8125rem;
   --tracking-marker: 0.14em;
 
@@ -179,35 +132,14 @@
   --space-xl: clamp(3rem, 2.2rem + 3vw, 5rem);
   --space-2xl: clamp(4rem, 3rem + 4vw, 6.5rem);
 
-  /* Vertical rhythm — the page's one ladder, four rungs that never cross:
-
-       section  between two sections (the section's own padding-block)
-       group    between the distinct groups inside one section
-       item     between the repeated items of one list
-       tight    inside a single item — label to value to note
-
-     The rungs are what carry the hierarchy, so the ratios matter more than the
-     absolute numbers: each rung is roughly 1.5× the one below it, at every
-     width. Keeping that order is the whole point. It had drifted badly on a
-     phone, where `--space-xl`/`--space-2xl` gaps inside a section (up to 92px)
-     grew larger than the 80px between two sections, so the eye could no longer
-     tell where one passage ended and the next began. Reach for these four
-     before reaching for a `--space-*` token in a vertical margin.
-
-                     390px     1320px
-       section        48px       64px
-       group          28px       37px
-       item           20px       26px
-       tight           8px        8px */
+  /* Vertical rhythm, largest to smallest; never let an inner gap exceed an outer one.
+     section 48→64px, group 28→37px, item 20→26px, tight 8px (390px → 1320px). */
   --rhythm-section: clamp(3rem, 2.55rem + 1.8vw, 4rem);
   --rhythm-group: clamp(1.75rem, 1.5rem + 1vw, 2.5rem);
   --rhythm-item: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
   --rhythm-tight: var(--space-xs);
 
-  /* A section title to its own body. It is the item rung rather than a rung of
-     its own: a title and the prose under it are one group, but at `--space-sm`
-     it measured exactly the paragraph-to-paragraph gap, so the heading had no
-     more separation from its text than the paragraphs had from each other. */
+  /* A section title to its own body. */
   --rhythm-stack: var(--rhythm-item);
 
   /* Motion — short and functional only. */
@@ -227,17 +159,13 @@
   --stagger-2: 80ms;
 
   /* Layout */
-  /* A wide poster measure. Sections place content into a 12-column grid rather
-     than all sharing one centred column, so the left edge genuinely moves from
-     section to section. Graphics may break out of it; reading text may not. */
+  /* A wide poster measure. */
   --container-width: 1320px;
   --container-narrow: 780px;
   --container-gutter: clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem);
   --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
 
-  /* The fixed header's actual height (measured: 77px), plus a little air.
-     Used for `scroll-padding-top`, anchored scrolling and the top of the mobile
-     nav panel — if it drifts from the real height, anchors land under the bar. */
+  /* The fixed header's actual height (measured: 77px), plus a little air. */
   --header-clearance: 84px;
 
   /* Z-Index Scale */
@@ -247,9 +175,7 @@
   --z-toast: 1500;
 }
 
-/* Mode — drives light-dark(). Without `data-mode` the root keeps
-   `color-scheme: light dark` and the OS preference picks the branch; an explicit
-   choice pins it, which also re-tints native UI. */
+/* Mode — drives light-dark(). */
 :root[data-mode='light'] {
   color-scheme: light;
 }
