@@ -1,6 +1,6 @@
 /**
  * The site's one cache policy, read by src/middleware.ts (rendered responses)
- * and astro-integrations/static-cache-headers.mjs (files on disk).
+ * and the adapter's `staticHeaders` in astro.config.mjs (files on disk).
  */
 
 export const CACHE_CONTROL = 'Cache-Control';
@@ -25,11 +25,13 @@ const isPrivatePath = (pathname: string): boolean =>
 export const cacheControlForRoute = (pathname: string): string => (isPrivatePath(pathname) ? NO_STORE : REVALIDATE);
 
 const UNHASHED_ASSET = /\.(?:png|jpe?g|gif|svg|ico|webp|avif|woff2?)$/;
+/** Sitemaps, llms.txt and the per-page Markdown, regenerated on every build. */
+const GENERATED = /^\/(?:sitemap[^/]*\.xml|llms(?:-full)?\.txt)$|\.md$/;
 
-/** `null` keeps the entry as is: hashed assets stay immutable, generated files keep their own policy. */
+/** `null` keeps the adapter's default: hashed assets stay immutable, HTML keeps what the page set. */
 export function cacheControlForFile(pathname: string, assetsPrefix: string): string | null {
   if (pathname.startsWith(`/${assetsPrefix}/`)) return null;
   if (pathname === '/sw.js') return NO_CACHE;
-  if (pathname === '/robots.txt' || pathname === '/manifest.webmanifest') return SHORT;
+  if (pathname === '/robots.txt' || pathname === '/manifest.webmanifest' || GENERATED.test(pathname)) return SHORT;
   return UNHASHED_ASSET.test(pathname) ? PUBLIC_ASSET : null;
 }
