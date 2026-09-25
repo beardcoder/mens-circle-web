@@ -2,8 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import site from '../data/site.json';
 
-// Must NOT be prerendered: the adapter has no static-file fallback for
-// 404.html, so a prerendered version leaves unmatched routes with an empty body.
+// Prerendered: no live data. The adapter reads 404.html from disk for unmatched routes.
+export const prerender = true;
 ---
 
 <Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow">

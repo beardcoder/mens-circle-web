@@ -13,5 +13,4 @@ export interface RuntimeConfig {
   /** `build.assets`: files below it are content-hashed and cached for a year. */
   assets: string;
   staticCacheControl: string;
-  compress: boolean;
 }
