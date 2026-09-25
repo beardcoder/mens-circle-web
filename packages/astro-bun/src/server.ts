@@ -7,7 +7,6 @@ import { setGetEnv } from 'astro/env/setup';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import config from 'virtual:@mens-circle/astro-bun/config';
-import { compressResponse } from './compress';
 import { MANIFEST_FILE, type StaticHeaders } from './shared';
 import { createStaticRoutes } from './static';
 
@@ -25,7 +24,6 @@ const { routes, errorPages } = await createStaticRoutes({
   clientDir,
   assets: config.assets,
   staticCacheControl: config.staticCacheControl,
-  compress: config.compress,
   headers: (await manifest.exists()) ? ((await manifest.json()) as StaticHeaders) : {},
 });
 
@@ -34,8 +32,7 @@ async function errorPage(url: string): Promise<Response> {
   const base = new URL(url, 'http://localhost').pathname.replace(/(?:\/index)?\.html$|\/$/, '');
   const page = errorPages[`${base}.html`] ?? errorPages[`${base}/index.html`];
   if (!page) return new Response(null, { status: 404 });
-  // Identity bytes; compressResponse encodes the final response for the client.
-  return typeof page === 'function' ? page(new Request(url)) : page.clone();
+  return page.clone();
 }
 
 const server = Bun.serve({
@@ -43,15 +40,13 @@ const server = Bun.serve({
   port: Number(process.env.PORT || config.port),
   development: false,
   routes,
-  async fetch(request, server) {
-    const response = await app.render(request, {
+  fetch: (request, server) =>
+    app.render(request, {
       addCookieHeader: true,
       routeData: app.match(request),
       clientAddress: server.requestIP(request)?.address,
       prerenderedErrorPageFetch: errorPage,
-    });
-    return config.compress ? compressResponse(request, response) : response;
-  },
+    }),
   error(error) {
     logger.error(error.stack ?? String(error));
     return new Response('Internal Server Error', { status: 500 });

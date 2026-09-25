@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
-# 1.4: the build needs Bun.Image.
-FROM oven/bun:1.4 AS build
+# Always the latest Bun (the build needs Bun.Image, ≥ 1.4).
+FROM oven/bun:latest AS build
 WORKDIR /app
 # The workspace manifests must be present before install.
 COPY package.json bun.lock ./
@@ -15,13 +15,13 @@ ARG ASTRO_KEY
 ENV ASTRO_KEY=$ASTRO_KEY
 RUN bun run build
 
-FROM oven/bun:1.4 AS production-deps
+FROM oven/bun:latest AS production-deps
 WORKDIR /app
 COPY package.json bun.lock ./
 COPY packages/astro-bun/package.json ./packages/astro-bun/
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --production
 
-FROM oven/bun:1.4
+FROM oven/bun:latest
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
   && rm -rf /var/lib/apt/lists/*

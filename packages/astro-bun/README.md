@@ -11,7 +11,6 @@ export default defineConfig({
   adapter: bun({
     staticHeaders: (pathname, { assets }) => (pathname === '/sw.js' ? { 'cache-control': 'no-cache' } : null),
     staticCacheControl: 'public, max-age=86400, must-revalidate', // default
-    compress: true, // default
   }),
 });
 ```
@@ -23,13 +22,8 @@ export default defineConfig({
 - **Static files** are `routes` entries, so they never reach Astro. Small files are
   static `Response`s held in memory: Bun answers ETag, `If-None-Match` → 304 and HEAD
   itself. Files above 1 MB are file routes (sendfile, `Last-Modified`).
-- **Compression**: text files (HTML, CSS, JS, SVG, XML, JSON, Markdown) are compressed
-  once at startup with `Bun.zstdCompressSync` and `Bun.gzipSync` and negotiated per
-  request (`Vary: Accept-Encoding`, one ETag per encoding). Rendered responses are
-  compressed on the fly with Bun's native `node:zlib` (zstd, then gzip), flushed after
-  every chunk: `CompressionStream` would buffer the whole page and break streaming.
-  Skipped for HEAD, 204/206/304, `no-transform`, event streams, bodies that are already
-  encoded or declare fewer than 1 KB; a strong ETag turns weak.
+- **No compression**: responses leave uncompressed; the reverse proxy or CDN in front
+  (Traefik, Cloudflare) compresses them.
 - **Methods**: routes are registered for GET and HEAD only; a POST to a page and every
   unknown path fall through to the `fetch` handler, i.e. to Astro (middleware, CSRF, 404).
 - **Shutdown**: SIGTERM/SIGINT call `server.stop()`, which lets in-flight requests finish.

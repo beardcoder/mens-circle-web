@@ -2,7 +2,6 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { acceptedEncodings } from '../src/compress';
 import { createStaticRoutes, urlPathsFor } from '../src/static';
 
 test('pages answer to their clean URL too', () => {
@@ -10,13 +9,6 @@ test('pages answer to their clean URL too', () => {
   expect(urlPathsFor('/impressum/index.html')).toEqual(['/impressum/index.html', '/impressum']);
   expect(urlPathsFor('/about.html')).toEqual(['/about.html', '/about']);
   expect(urlPathsFor('/robots.txt')).toEqual(['/robots.txt']);
-});
-
-test('encodings refused with q=0 are not accepted', () => {
-  expect([...acceptedEncodings('gzip, deflate, br, zstd')]).toEqual(['gzip', 'deflate', 'br', 'zstd']);
-  expect(acceptedEncodings('zstd;q=0, gzip;q=0.5').has('zstd')).toBe(false);
-  expect(acceptedEncodings('zstd;q=0, gzip;q=0.5').has('gzip')).toBe(true);
-  expect(acceptedEncodings(null).size).toBe(0);
 });
 
 describe('served over HTTP', () => {
@@ -40,7 +32,6 @@ describe('served over HTTP', () => {
       clientDir: dir,
       assets: 'assets',
       staticCacheControl: 'public, max-age=60',
-      compress: true,
       headers: { '/robots.txt': { 'Cache-Control': 'no-cache' } },
       maxBufferedSize: 16 * 1024,
     });
@@ -53,37 +44,17 @@ describe('served over HTTP', () => {
     await rm(dir, { recursive: true, force: true });
   });
 
-  test('text is negotiated: zstd, then gzip, then identity', async () => {
-    const zstd = await fetch(url('/impressum'), { headers: { 'accept-encoding': 'gzip, zstd' }, decompress: false });
-    expect(zstd.headers.get('content-encoding')).toBe('zstd');
-    expect(zstd.headers.get('vary')).toBe('accept-encoding');
-    expect(new TextDecoder().decode(Bun.zstdDecompressSync(await zstd.bytes()))).toBe(html);
-
-    const gzip = await fetch(url('/impressum'), { headers: { 'accept-encoding': 'gzip' }, decompress: false });
-    expect(gzip.headers.get('content-encoding')).toBe('gzip');
-    expect(new TextDecoder().decode(Bun.gunzipSync(await gzip.bytes()))).toBe(html);
-
-    const identity = await fetch(url('/impressum/index.html'), { headers: { 'accept-encoding': 'identity' } });
-    expect(identity.headers.get('content-encoding')).toBeNull();
-    expect(identity.headers.get('content-type')).toBe('text/html;charset=utf-8');
-    expect(await identity.text()).toBe(html);
-    expect(identity.headers.get('etag')).not.toBe(gzip.headers.get('etag'));
+  test('pages are served as is, with their clean URL and a charset', async () => {
+    const response = await fetch(url('/impressum'), { headers: { 'accept-encoding': 'gzip, zstd' } });
+    expect(response.headers.get('content-encoding')).toBeNull();
+    expect(response.headers.get('content-type')).toBe('text/html;charset=utf-8');
+    expect(await response.text()).toBe(html);
+    expect(await (await fetch(url('/impressum/index.html'))).text()).toBe(html);
   });
 
-  test('each variant revalidates against its own ETag', async () => {
-    const headers = { 'accept-encoding': 'gzip' };
-    const first = await fetch(url('/impressum'), { headers });
-    const etag = first.headers.get('etag')!;
-    const again = await fetch(url('/impressum'), { headers: { ...headers, 'if-none-match': etag } });
-    expect(again.status).toBe(304);
-    const other = await fetch(url('/impressum'), { headers: { 'accept-encoding': 'zstd', 'if-none-match': etag } });
-    expect(other.status).toBe(200);
-  });
-
-  test('HEAD is answered for negotiated and static routes', async () => {
+  test('HEAD is answered natively', async () => {
     for (const path of ['/impressum', '/robots.txt']) {
-      const response = await fetch(url(path), { method: 'HEAD' });
-      expect(response.status).toBe(200);
+      expect((await fetch(url(path), { method: 'HEAD' })).status).toBe(200);
     }
   });
 
@@ -120,7 +91,6 @@ describe('served over HTTP', () => {
     expect((await fetch(url('/404'))).status).toBe(418);
     expect((await fetch(url('/404.html'))).status).toBe(418);
     const page = errorPages['/404.html'];
-    expect(page).toBeInstanceOf(Response);
-    expect(await (page as Response).clone().text()).toBe('<h1>404</h1>');
+    expect(await page.clone().text()).toBe('<h1>404</h1>');
   });
 });
