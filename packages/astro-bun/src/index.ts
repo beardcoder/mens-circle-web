@@ -17,8 +17,6 @@ export interface BunAdapterOptions {
   staticHeaders?: (pathname: string, context: { assets: string }) => Record<string, string> | null | undefined;
   /** Cache-Control for unhashed static files without their own. */
   staticCacheControl?: string;
-  /** Precompress text files with zstd and gzip at startup. */
-  compress?: boolean;
 }
 
 const NAME = '@mens-circle/astro-bun';
@@ -83,7 +81,6 @@ export default function bun(options: BunAdapterOptions = {}): AstroIntegration {
       clientDir: relative(fileURLToPath(config.build.server), fileURLToPath(config.build.client)),
       assets: config.build.assets,
       staticCacheControl: options.staticCacheControl ?? 'public, max-age=86400, must-revalidate',
-      compress: options.compress ?? true,
     };
   };
 

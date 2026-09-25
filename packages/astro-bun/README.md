@@ -11,7 +11,6 @@ export default defineConfig({
   adapter: bun({
     staticHeaders: (pathname, { assets }) => (pathname === '/sw.js' ? { 'cache-control': 'no-cache' } : null),
     staticCacheControl: 'public, max-age=86400, must-revalidate', // default
-    compress: true, // default
   }),
 });
 ```
@@ -23,14 +22,15 @@ export default defineConfig({
 - **Static files** are `routes` entries, so they never reach Astro. Small files are
   static `Response`s held in memory: Bun answers ETag, `If-None-Match` → 304 and HEAD
   itself. Files above 1 MB are file routes (sendfile, `Last-Modified`).
-- **Compression**: text files (HTML, CSS, JS, SVG, XML, JSON, Markdown) are compressed
-  once at startup with `Bun.zstdCompressSync` and `Bun.gzipSync` and negotiated per
-  request (`Vary: Accept-Encoding`, one ETag per encoding).
+- **No compression**: responses leave uncompressed; the reverse proxy or CDN in front
+  (Traefik, Cloudflare) compresses them.
 - **Methods**: routes are registered for GET and HEAD only; a POST to a page and every
   unknown path fall through to the `fetch` handler, i.e. to Astro (middleware, CSRF, 404).
 - **Shutdown**: SIGTERM/SIGINT call `server.stop()`, which lets in-flight requests finish.
-- `server.requestIP()` becomes `Astro.clientAddress`; prerendered 404/500 pages are read
-  from disk instead of fetched over HTTP.
+- `server.requestIP()` becomes `Astro.clientAddress`.
+- **Error pages**: a prerendered `404.html`/`500.html` is not a static route (it would
+  answer `/404` with 200). It is held in memory and handed to Astro through
+  `prerenderedErrorPageFetch`, so every 404 keeps its status and its file's headers.
 
 ## Image service
 
