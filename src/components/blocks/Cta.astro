@@ -29,35 +29,31 @@ const { data } = Astro.props;
       <div class="spine__body" data-reveal-group="55">
         {data.title && <h2 class="cta__title" data-reveal="up" set:html={data.title} />}
 
-        {
-          data.text && (
-            <p class="cta__text" data-reveal="up">
-              {data.text}
-            </p>
-          )
-        }
+        {data.text && (
+          <p class="cta__text" data-reveal="up">
+            {data.text}
+          </p>
+        )}
 
-        {
-          data.buttonText && data.buttonLink && (
-            <p class="actions" data-reveal="up">
-              <a
-                href={data.buttonLink}
-                class="btn btn--primary btn--large"
-                data-umami-event="cta-click"
-                data-umami-event-location="cta-block"
-                data-umami-event-text={data.buttonText}
-              >
-                {data.buttonText}
+        {data.buttonText && data.buttonLink && (
+          <p class="actions" data-reveal="up">
+            <a
+              href={data.buttonLink}
+              class="btn btn--primary btn--large"
+              data-umami-event="cta-click"
+              data-umami-event-location="cta-block"
+              data-umami-event-text={data.buttonText}
+            >
+              {data.buttonText}
+            </a>
+
+            {data.secondaryLabel && data.secondaryLink && (
+              <a href={data.secondaryLink} class="text-link">
+                {data.secondaryLabel}
               </a>
-
-              {data.secondaryLabel && data.secondaryLink && (
-                <a href={data.secondaryLink} class="text-link">
-                  {data.secondaryLabel}
-                </a>
-              )}
-            </p>
-          )
-        }
+            )}
+          </p>
+        )}
       </div>
     </div>
   </div>

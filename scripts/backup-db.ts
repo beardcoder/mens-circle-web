@@ -22,7 +22,6 @@
  *   BACKUP_RETENTION_DAYS      prune older than N days (default 30; 0 = keep all)
  */
 import { Database } from 'bun:sqlite';
-import { gzipSync } from 'node:zlib';
 import { existsSync, rmSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
 
@@ -79,7 +78,7 @@ function readConfig(): BackupConfig {
 }
 
 /** Snapshots `dbPath` via `VACUUM INTO` and gzips the result. Cleans up the snapshot file itself. */
-async function snapshotToGzip(dbPath: string, snapshotPath: string): Promise<Buffer> {
+async function snapshotToGzip(dbPath: string, snapshotPath: string): Promise<Uint8Array> {
   console.log(`[backup] snapshotting ${dbPath} → ${snapshotPath}`);
   try {
     // Read-write open: an explicit `{ readonly: … }` trips bun:sqlite's flag
@@ -92,8 +91,7 @@ async function snapshotToGzip(dbPath: string, snapshotPath: string): Promise<Buf
   }
 
   try {
-    const raw = await Bun.file(snapshotPath).arrayBuffer();
-    return gzipSync(Buffer.from(raw));
+    return Bun.gzipSync(await Bun.file(snapshotPath).bytes());
   } catch (err) {
     throw new Error(`gzip failed: ${String(err)}`, { cause: err });
   } finally {

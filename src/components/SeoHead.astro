@@ -165,20 +165,12 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <meta name="color-scheme" content="light dark" />
 <meta name="msapplication-TileColor" content={site.themeColor} />
 
-{
-  import.meta.env.PROD && (
-    <>
-      <link rel="preconnect" href={umamiOrigin} crossorigin />
-      <script
-        is:inline
-        defer
-        src={`${umamiOrigin}/script.js`}
-        data-website-id={umamiWebsiteId}
-        data-performance="true"
-      />
-    </>
-  )
-}
+{import.meta.env.PROD && (
+  <>
+    <link rel="preconnect" href={umamiOrigin} crossorigin />
+    <script is:inline defer src={`${umamiOrigin}/script.js`} data-website-id={umamiWebsiteId} data-performance="true" />
+  </>
+)}
 
 <!-- Open Graph -->
 <meta property="og:type" content={ogType} />
@@ -186,10 +178,8 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <meta property="og:title" content={socialTitle} />
 <meta property="og:description" content={socialDescription} />
 <meta property="og:image" content={ogImageUrl} />
-{
-  /* Legacy, and Facebook still reads it: some of its pipeline prefers the
-    explicitly-secure URL over og:image when the two differ. Ours never do. */
-}
+{/* Legacy, and Facebook still reads it: some of its pipeline prefers the
+    explicitly-secure URL over og:image when the two differ. Ours never do. */}
 <meta property="og:image:secure_url" content={ogImageUrl} />
 {imageType && <meta property="og:image:type" content={imageType} />}
 {imageWidth && imageHeight && <meta property="og:image:width" content={String(imageWidth)} />}
@@ -208,14 +198,12 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <meta name="twitter:description" content={socialDescription} />
 <meta name="twitter:image" content={ogImageUrl} />
 <meta name="twitter:image:alt" content={ogImageAlt} />
-{
-  cardDetails.map((detail, index) => (
-    <>
-      <meta name={`twitter:label${index + 1}`} content={detail.label} />
-      <meta name={`twitter:data${index + 1}`} content={detail.value} />
-    </>
-  ))
-}
+{cardDetails.map((detail, index) => (
+  <>
+    <meta name={`twitter:label${index + 1}`} content={detail.label} />
+    <meta name={`twitter:data${index + 1}`} content={detail.value} />
+  </>
+))}
 
 <!-- Robots -->
 <meta name="robots" content={robots} />
@@ -229,4 +217,6 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <link rel="manifest" href="/manifest.webmanifest" />
 
 <!-- Structured data -->
-{allSchemas.map((schema) => <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />)}
+{allSchemas.map((schema) => (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+))}

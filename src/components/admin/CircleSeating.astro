@@ -43,28 +43,27 @@ const full = seats.length >= capacity && capacity > 0;
     <circle class="seating__glow" cx={C} cy={C} r="46"></circle>
     <circle class="seating__fire" cx={C} cy={C} r="30"></circle>
     <text class="seating__count" x={C} y={C} text-anchor="middle" dominant-baseline="central">
-      {seats.length}<tspan class="seating__cap">/{capacity}</tspan>
+      {seats.length}
+      <tspan class="seating__cap">/{capacity}</tspan>
     </text>
 
-    {
-      points.map((p) =>
-        p.seat ? (
-          <g class="seat seat--taken">
-            <circle cx={p.x} cy={p.y} r={NODE} />
-            <text x={p.x} y={p.y} text-anchor="middle" dominant-baseline="central">
-              {p.seat.initials}
-            </text>
-          </g>
-        ) : (
-          <g class="seat seat--open">
-            <circle cx={p.x} cy={p.y} r={NODE} fill="none" />
-            <text x={p.x} y={p.y} text-anchor="middle" dominant-baseline="central">
-              {p.n}
-            </text>
-          </g>
-        ),
-      )
-    }
+    {points.map((p) =>
+      p.seat ? (
+        <g class="seat seat--taken">
+          <circle cx={p.x} cy={p.y} r={NODE} />
+          <text x={p.x} y={p.y} text-anchor="middle" dominant-baseline="central">
+            {p.seat.initials}
+          </text>
+        </g>
+      ) : (
+        <g class="seat seat--open">
+          <circle cx={p.x} cy={p.y} r={NODE} fill="none" />
+          <text x={p.x} y={p.y} text-anchor="middle" dominant-baseline="central">
+            {p.n}
+          </text>
+        </g>
+      ),
+    )}
   </svg>
 </figure>
 

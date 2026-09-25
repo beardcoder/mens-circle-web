@@ -67,9 +67,9 @@ const isPrivatePath = (pathname: string): boolean =>
 
 /**
  * The policy for a response the server renders. Routes that set their own
- * `Cache-Control` (`/health`, `/sitemap-events.xml`, the home page's
- * island-parameter `no-cache`) are left alone by the middleware and never
- * reach this function.
+ * `Cache-Control` (`/health`, `/sitemap-events.xml`, the four prerendered
+ * documents' `PRERENDERED_CACHE_CONTROL` from lib/cache.ts) are left alone by
+ * the middleware and never reach this function.
  */
 export const cacheControlForRoute = (pathname: string): string => (isPrivatePath(pathname) ? NO_STORE : REVALIDATE);
 

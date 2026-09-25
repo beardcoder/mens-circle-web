@@ -18,14 +18,8 @@ const baseEnv = { PATH: process.env.PATH, TMPDIR: tmpdir(), NODE_ENV: 'test' };
 const scenarios: Array<[string, Record<string, string>]> = [
   ['unset', {}],
   ['password-only', { ADMIN_EMAIL: 'admin@example.invalid', ADMIN_PASSWORD: 'correct-horse-battery-staple' }],
-  [
-    'configured',
-    {
-      ADMIN_EMAIL: 'admin@example.invalid',
-      ADMIN_PASSWORD: 'correct-horse-battery-staple',
-      ADMIN_SESSION_SECRET: 'a-long-random-session-secret',
-    },
-  ],
+  ['short', { ADMIN_SESSION_SECRET: 'short-secret' }],
+  ['configured', { ADMIN_SESSION_SECRET: 'a-long-random-session-secret-for-the-test-suite' }],
 ];
 
 for (const [scenario, env] of scenarios) {
