@@ -1,10 +1,4 @@
-/**
- * Value item — a hairline-separated list entry, not a card.
- *
- * Used by the "Meine Haltung" list on the Haltung page. The ordinal is a small
- * marginal marker rather than a 3.5rem display numeral: it orders the list, it
- * is not the point of it.
- */
+/** Value item — a hairline-separated list entry, not a card. */
 
 .value-item {
   display: grid;

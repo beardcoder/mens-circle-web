@@ -1,11 +1,5 @@
 ---
-/**
- * Admin shell — the public poster system, after dark. Same palette, same two
- * cuts of Barlow, same square hairline geometry as the public site; it stays
- * dark and denser because it is a tool used at a desk.
- *
- * Auth is enforced by middleware; `Astro.locals.admin` holds the operator email.
- */
+/** Admin shell — the public poster system, after dark. */
 import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 
@@ -100,19 +94,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
     </script>
     <style is:global>
       :root {
-        /* The public site's palette, dark side. The names are the ones the admin
-           components already use; only the pigments changed — "ember" is now the
-           site's burnt orange, and the ground is the site's own bark ink.
-
-           Measured on this ground, because the back-office carries more small
-           text than any public page does:
-             text   on bg        15.2:1
-             muted  on surface    5.8:1
-             faint  on surface    4.8:1   ← the floor; do not darken further
-             ember  on surface    4.5:1
-             ember-bright on the soft orange chip   4.7:1
-             sage   on the soft sage chip           5.4:1
-             danger on the soft danger chip         5.0:1 */
+        /* The public site's palette, dark side. */
         --bg: #1c1714;
         --surface: #241e19;
         --surface-2: #2f2721;
@@ -204,9 +186,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         color: var(--text);
         text-decoration: none;
       }
-      /* The circle motif, at wordmark scale. The public logo's ring has a gap in
-         it; this one is closed, because at 13px a gap reads as a rendering fault
-         rather than as a drawing. */
+      /* The circle motif, at wordmark scale. */
       .brand-ring {
         width: 0.8rem;
         height: 0.8rem;
@@ -217,9 +197,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         display: flex;
         align-items: center;
       }
-      /* Condensed uppercase, like the public nav. The active item is marked by
-         an orange rule under it rather than by a pill — the poster system has no
-         rounded chips in it. */
+      /* Condensed uppercase, like the public nav. */
       .nav-link {
         position: relative;
         padding: 0.45rem 0.1rem;
@@ -295,9 +273,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
       a {
         color: var(--ember);
       }
-      /* Dates, counts, slugs and addresses still need to line
-         up and to read as machine data, but they get that from tabular figures
-         and a little tracking instead of from a third typeface. */
+      /* Data: tabular figures instead of a mono face. */
       .mono {
         font-variant-numeric: tabular-nums;
         letter-spacing: 0.01em;
@@ -342,10 +318,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
       }
 
       /* Buttons. */
-      /* Square, condensed uppercase, 2px border, ink label on orange — the public
-         `.btn`, at back-office density. Hover swaps the ground instead of
-         brightening it: a filter change reads as a glow, and nothing on the
-         poster glows. */
+      /* Square, condensed uppercase, 2px border, ink label on orange — the public `.btn`, at back-office density. */
       .btn {
         --_bg: var(--ember);
         --_fg: var(--bg);
@@ -494,9 +467,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 0 1rem;
       }
-      /* A checkbox label is a sentence to read, not a field marker — it opts back
-         out of the uppercase treatment above. Same reason the public consent
-         checkbox is excluded from `.marker`. */
+      /* A checkbox label is a sentence to read, not a field marker — it opts back out of the uppercase treatment above. */
       .check {
         display: flex;
         align-items: center;
@@ -556,9 +527,7 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         border-color: var(--ember-line);
         background: var(--ember-soft);
       }
-      /* `--faint` already sits at the 4.8:1 floor on this surface; the extra
-         20% transparency pushed it to 3.6:1. The muted colour alone is enough
-         to mark the badge as inactive. */
+      /* `--faint` already sits at the 4.8:1 floor on this surface; the extra 20% transparency pushed it to 3.6:1. */
       .badge--off {
         color: var(--faint);
       }

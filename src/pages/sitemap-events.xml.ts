@@ -1,9 +1,4 @@
-/**
- * The event pages, listed at request time. `@astrojs/sitemap` only sees routes
- * that exist at build time, and the slugs live in SQLite, so this sitemap is a
- * route rather than a build artefact. Deliberately not under /api/, which
- * robots.txt disallows.
- */
+/** The event pages, listed at request time. */
 import type { APIRoute } from 'astro';
 import { listPublishedEventsForSitemap } from '@lib/server/events';
 

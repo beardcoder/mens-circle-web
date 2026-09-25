@@ -1,15 +1,4 @@
-/**
- * Maps "is a date on the books?" to what every surface says and offers — the
- * header, the home hero, the facts band, the closing Termine block and /event
- * all read this one object.
- *
- * Three states, deliberately, not two:
- *   scheduled    — a published, upcoming event exists
- *   none         — nothing is scheduled (a true, sayable fact)
- *   unavailable  — the read failed; we do not know, and must not claim we do
- *
- * Server-render only — it imports lib/server/format.
- */
+/** The next-date state for every surface; `unavailable` must never read as "no date planned". */
 
 import { eventPlace } from './event-meta';
 import { formatDayMonthYearDE, formatWeekdayDE, timeRange } from './server/format';

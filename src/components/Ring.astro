@@ -5,19 +5,7 @@ interface Props {
   class?: string;
 }
 
-/**
- * The site's one graphic motif, used exactly twice: the hero and the closing
- * block. Cropped at a viewport edge, never over text or controls.
- *
- * SVG rather than a bordered div because the gap has to be a clean butt-ended
- * break — a `border-color: … transparent` gap cuts on the diagonal — and the
- * stroke then scales with the box.
- *
- * The wrapper exists because the ring carries two animations that both touch
- * `transform`: a one-shot entrance and a scroll drift. On one element the later
- * one wins, and the `.vt-arrival` rule that stands the entrance down killed the
- * drift with it. The wrapper owns the entrance, the inner SVG the drift.
- */
+/** The site's one graphic motif, used exactly twice: the hero and the closing block. */
 
 const { place, class: className } = Astro.props;
 
@@ -59,18 +47,11 @@ const GAP = 83;
       display: block;
       inline-size: 100%;
       block-size: 100%;
-      /* The drift turns about the circle's own centre. Left on the element's
-         border box: `transform-box: fill-box` on an `<svg>` root resolves
-         against the child bounding box in user units and threw the ring ~1500px
-         off its position as soon as a rotation applied. */
+      /* The drift turns about the circle's own centre. */
       transform-origin: 50% 50%;
     }
 
-    /* Hero.
-       Sits to the upper right, cropped by the top and right edges. The display
-       type runs to its left; the portrait tucks into its lower arc. Sized in vw
-       so the crop stays proportional rather than being a fixed overhang that
-       disappears on a wide screen. */
+    /* Hero. */
     .ring--hero {
       inset-block-start: -3vw;
       inset-inline-end: -6vw;
@@ -78,9 +59,7 @@ const GAP = 83;
       aspect-ratio: 1;
     }
 
-    /* Close.
-       The reprise. Smaller, cropped by the left edge and the bottom, so the
-       page ends on the same mark it opened with, seen from the other side. */
+    /* Close. */
     .ring--close {
       inset-block-end: -13vw;
       inset-inline-start: -11vw;
@@ -89,9 +68,7 @@ const GAP = 83;
     }
 
     @media (width <= 56em) {
-      /* On a phone the ring is recomposed, not shrunk: it crops harder into the
-         headline's top-right corner, so the headline still owns the screen and
-         the action stays above the fold. */
+      /* Phone: cropped harder into the corner, not shrunk. */
       .ring--hero {
         inset-block-start: -16vw;
         inset-inline-end: -24vw;
@@ -105,12 +82,7 @@ const GAP = 83;
       }
     }
 
-    /* Phone, where the closing block's text runs the full width: the same crop
-       put the arc straight behind the last paragraph and its link, and muted
-       chalk over the orange measures about 1.2:1 — the sentence was effectively
-       gone. Cropped harder, the ring keeps its corner and stays clear of the
-       type; `.home-dates` reserves the band it needs (see blocks/Dates.astro).
-       The motif is "cropped at a viewport edge, never over text or controls". */
+    /* Phone: crop harder so the ring stays clear of the closing text. */
     @media (width <= 48em) {
       .ring--close {
         inset-block-end: -6.5rem;
@@ -119,14 +91,7 @@ const GAP = 83;
       }
     }
 
-    /* Scroll reaction.
-       The ring drifts and turns a little as its section passes. Bounded on
-       purpose: ~40px of travel and ~12° of rotation — enough to notice, not
-       enough to chase. Scroll-driven, so the compositor does the work and
-       normal scrolling is untouched: no listeners, no hijacking.
-
-       On the inner SVG, never the wrapper — see the note at the top of this
-       file. */
+    /* Scroll reaction. */
     @media (prefers-reduced-motion: no-preference) {
       @supports (animation-timeline: view()) {
         .ring__svg {

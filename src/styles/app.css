@@ -1,17 +1,4 @@
-/**
- * Männerkreis Niederbayern / Straubing — main stylesheet.
- *
- * Every sheet loads into a named layer so the cascade order is explicit.
- * Un-layered styles beat all layers, so this file stays free of loose rules.
- *
- *   reset      — normalize browser defaults
- *   tokens     — design tokens (colors, spacing, type, motion)
- *   base       — element defaults (typography, fonts)
- *   layout     — page-level layout utilities
- *   components — reusable UI (buttons, cards, forms, toast)
- *   sections   — page sections (hero)
- *   utilities  — helpers, motion, view transitions, print
- */
+/** Männerkreis Niederbayern / Straubing — main stylesheet. */
 
 @layer reset, tokens, base, layout, components, sections, utilities;
 
@@ -29,15 +16,7 @@
 @import url('components/_forms.css') layer(components);
 @import url('components/_toast.css') layer(components);
 @import url('sections/_hero.css') layer(sections);
-/* Event- and error-page section styles are NOT here — they live in the
-   components that own them, each in a `<style is:global>` + `@layer sections`
-   block, like every block in components/blocks/. With
-   `inlineStylesheets: 'always'` a global copy would repeat ~12 kB of event
-   rules into every document; colocating saves ~10.7 kB per page.
-
-   `_hero.css` stays global on purpose: PageHero.astro and
-   pages/teile-deine-erfahrung.astro reuse its unscoped `.hero__*` classes, so
-   it is needed on nearly every page. */
+/* Block and event styles live in their components (CSS is inlined per page); _hero.css is shared by most pages. */
 @import url('utilities/_animations.css') layer(utilities);
 @import url('utilities/_motion.css') layer(utilities);
 @import url('utilities/_visual.css') layer(utilities);
