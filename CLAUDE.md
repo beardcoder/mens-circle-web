@@ -23,9 +23,11 @@ typescript-eslint refuse TS 7.
 
 **Runtime.** One Bun process (`dist/server/entry.mjs` from the workspace adapter
 `packages/astro-bun`) serves static files, SSR, actions and admin. Static files are
-`Bun.serve` routes (native ETag/304; text precompressed with zstd/gzip at startup); POST
-and unknown paths fall through to Astro. The adapter stays generic: site policy goes in
-through its options in `astro.config.mjs`. Migrations run on boot. `src/lib/server/*`
+`Bun.serve` routes (native ETag/304); POST and unknown paths fall through to Astro. No
+compression in the app: the Coolify proxy and Cloudflare do it. `404.astro` is
+prerendered; the adapter hands it to Astro from memory, so every 404, `/404` included,
+keeps its status. The adapter stays generic: site policy goes in through its options in
+`astro.config.mjs`. Migrations run on boot. `src/lib/server/*`
 is server-only; never import it into client scripts.
 
 **Tests.** A test that reads config must spawn a fixture with `--no-env-file` and an
