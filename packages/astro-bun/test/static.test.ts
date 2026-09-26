@@ -4,11 +4,18 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createStaticRoutes, urlPathsFor } from '../src/static';
 
-test('pages answer to their clean URL too', () => {
-  expect(urlPathsFor('/index.html')).toEqual(['/index.html', '/']);
-  expect(urlPathsFor('/impressum/index.html')).toEqual(['/impressum/index.html', '/impressum']);
-  expect(urlPathsFor('/about.html')).toEqual(['/about.html', '/about']);
-  expect(urlPathsFor('/robots.txt')).toEqual(['/robots.txt']);
+test('pages answer to their clean URL in the configured trailing-slash form', () => {
+  expect(urlPathsFor('/index.html', 'never')).toEqual(['/index.html', '/']);
+  expect(urlPathsFor('/impressum/index.html', 'never')).toEqual(['/impressum/index.html', '/impressum']);
+  expect(urlPathsFor('/impressum/index.html', 'always')).toEqual(['/impressum/index.html', '/impressum/']);
+  expect(urlPathsFor('/impressum/index.html', 'ignore')).toEqual([
+    '/impressum/index.html',
+    '/impressum',
+    '/impressum/',
+  ]);
+  expect(urlPathsFor('/about.html', 'never')).toEqual(['/about.html', '/about']);
+  expect(urlPathsFor('/about.html', 'always')).toEqual(['/about.html', '/about/']);
+  expect(urlPathsFor('/robots.txt', 'always')).toEqual(['/robots.txt']);
 });
 
 describe('served over HTTP', () => {
@@ -32,7 +39,12 @@ describe('served over HTTP', () => {
       clientDir: dir,
       assets: 'assets',
       staticCacheControl: 'public, max-age=60',
-      headers: { '/robots.txt': { 'Cache-Control': 'no-cache' } },
+      trailingSlash: 'never',
+      headers: {
+        '/robots.txt': { 'Cache-Control': 'no-cache' },
+        // What Astro's routeToHeaders records for a prerendered page.
+        '/impressum/index.html': { 'content-type': 'text/html' },
+      },
       maxBufferedSize: 16 * 1024,
     });
     errorPages = files.errorPages;

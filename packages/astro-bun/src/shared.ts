@@ -13,4 +13,8 @@ export interface RuntimeConfig {
   /** `build.assets`: files below it are content-hashed and cached for a year. */
   assets: string;
   staticCacheControl: string;
+  /** Astro's `trailingSlash`: which URL form a page is served under. */
+  trailingSlash: TrailingSlash;
 }
+
+export type TrailingSlash = 'always' | 'never' | 'ignore';

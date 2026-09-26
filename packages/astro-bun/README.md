@@ -26,6 +26,11 @@ export default defineConfig({
   (Traefik, Cloudflare) compresses them.
 - **Methods**: routes are registered for GET and HEAD only; a POST to a page and every
   unknown path fall through to the `fetch` handler, i.e. to Astro (middleware, CSRF, 404).
+- **Trailing slash**: a page (`/a/index.html`, `/a.html`) is registered as `/a` under
+  `trailingSlash: 'never'`, `/a/` under `'always'`, both under `'ignore'`. The other
+  form falls through to Astro, which answers it with a 301 (308 for other methods).
+- **Charset**: text files get `;charset=utf-8`, also when a prerendered page's own
+  headers name `text/html` without one.
 - **Shutdown**: SIGTERM/SIGINT call `server.stop()`, which lets in-flight requests finish.
 - `server.requestIP()` becomes `Astro.clientAddress`.
 - **Error pages**: a prerendered `404.html`/`500.html` is not a static route (it would
