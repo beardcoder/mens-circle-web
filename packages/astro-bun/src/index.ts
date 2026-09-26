@@ -81,6 +81,7 @@ export default function bun(options: BunAdapterOptions = {}): AstroIntegration {
       clientDir: relative(fileURLToPath(config.build.server), fileURLToPath(config.build.client)),
       assets: config.build.assets,
       staticCacheControl: options.staticCacheControl ?? 'public, max-age=86400, must-revalidate',
+      trailingSlash: config.trailingSlash,
     };
   };
 

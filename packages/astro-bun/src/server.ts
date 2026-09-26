@@ -24,6 +24,7 @@ const { routes, errorPages } = await createStaticRoutes({
   clientDir,
   assets: config.assets,
   staticCacheControl: config.staticCacheControl,
+  trailingSlash: config.trailingSlash,
   headers: (await manifest.exists()) ? ((await manifest.json()) as StaticHeaders) : {},
 });
 
