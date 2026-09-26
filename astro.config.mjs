@@ -45,7 +45,8 @@ export default defineConfig({
       cssTarget: ['chrome111', 'edge111', 'firefox113', 'safari16.4'],
     },
   },
-  trailingSlash: 'ignore',
+  // Astro 301s `/a/` to `/a`; the adapter leaves that form of a static page to it.
+  trailingSlash: 'never',
   redirects: {
     '/events': '/event',
     // Redirects to `/` live in src/middleware.ts (Astro emits nothing for them here).
