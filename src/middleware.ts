@@ -6,13 +6,6 @@ import { readSession, SESSION_COOKIE } from './lib/server/auth';
 /** Retired URLs whose closest page is the home page — the breathing exercise and its app are gone. */
 const HOME_ALIASES = new Set(['/home', '/atemuebung', '/atemuebung/app']);
 
-/** Static routes register only the slash-less path, so `/impressum/` would 404. */
-const hasTrailingSlash = ({ isPrerendered, request, url }: APIContext): boolean =>
-  !isPrerendered &&
-  (request.method === 'GET' || request.method === 'HEAD') &&
-  url.pathname !== '/' &&
-  url.pathname.endsWith('/');
-
 /** Adds the cache policy unless the route set its own; copies immutable (redirect) responses. */
 const withCacheControl = (response: Response, value: string): Response => {
   if (response.headers.has(CACHE_CONTROL)) return response;
@@ -26,13 +19,9 @@ const withCacheControl = (response: Response, value: string): Response => {
   }
 };
 
-/** Redirects, the admin guard, and otherwise the route itself. */
+/** Retired URLs, the admin guard, and otherwise the route itself. */
 const handle = async (context: APIContext, next: MiddlewareNext): Promise<Response> => {
-  const { pathname, search } = context.url;
-
-  if (hasTrailingSlash(context)) {
-    return context.redirect(`${pathname.replace(/\/+$/, '') || '/'}${search}`, 301);
-  }
+  const { pathname } = context.url;
 
   if (HOME_ALIASES.has(pathname)) return context.redirect('/', 301);
 
