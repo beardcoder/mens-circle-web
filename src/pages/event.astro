@@ -7,6 +7,7 @@ import Faq from '../components/blocks/Faq.astro';
 import Facts from '../components/blocks/Facts.astro';
 import NextDate from '../components/event/NextDate.astro';
 import { eventSeriesSchema } from '@lib/series-schema';
+import { buildEventSchema } from '@lib/event-schema';
 import site from '@data/site.json';
 
 /** Evergreen landing page for the dates; never redirects. SSR so the date is in the HTML. */
@@ -79,18 +80,13 @@ const moreLinks = [
 ];
 
 /** The series is built once in lib/series-schema.ts and shared with the home page, so both describe one entity under one `@id`. */
-const eventSeries: Record<string, unknown> = {
-  ...eventSeriesSchema(siteUrl),
-  ...(next
-    ? {
-        subEvent: {
-          '@type': 'Event',
-          '@id': new URL(`/event/${next.slug}`, siteUrl).href,
-          url: new URL(`/event/${next.slug}`, siteUrl).href,
-        },
-      }
-    : {}),
-};
+const eventSeries: Record<string, unknown> = { ...eventSeriesSchema(siteUrl) };
+if (event) {
+  // Google validates every Event node as a rich result, so a stub with only `@id`/`url`
+  // is flagged invalid: embed the full Event, minus what the series already states.
+  const { '@context': _context, superEvent: _superEvent, ...subEvent } = buildEventSchema(event, siteUrl);
+  eventSeries.subEvent = subEvent;
+}
 
 const faqPage = {
   '@context': 'https://schema.org',
