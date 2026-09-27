@@ -1,3 +1,5 @@
+import type { AstroConfig } from 'astro';
+
 /** Written next to entry.mjs at build time, read once at startup. */
 export const MANIFEST_FILE = 'static-headers.json';
 
@@ -17,4 +19,4 @@ export interface RuntimeConfig {
   trailingSlash: TrailingSlash;
 }
 
-export type TrailingSlash = 'always' | 'never' | 'ignore';
+export type TrailingSlash = AstroConfig['trailingSlash'];

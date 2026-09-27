@@ -41,8 +41,11 @@ const ERROR_PAGE = /^\/(?:404|500)(?:\.html|\/index\.html)$/;
  * the clean URL in the form `trailingSlash` allows, both forms for `ignore`.
  */
 export function urlPathsFor(file: string, trailingSlash: TrailingSlash): string[] {
-  const page = file.endsWith('/index.html') ? file.slice(0, -'index.html'.length) : file.replace(/\.html$/, '/');
-  if (page === file) return [file];
+  let page: string;
+  if (file.endsWith('/index.html')) page = file.slice(0, -'index.html'.length);
+  else if (file.endsWith('.html')) page = `${file.slice(0, -'.html'.length)}/`;
+  else return [file];
+
   if (page === '/') return [file, page];
   const bare = page.slice(0, -1);
   if (trailingSlash === 'always') return [file, page];
@@ -60,7 +63,7 @@ function headersFor(file: string, type: string, options: StaticRouteOptions): He
     'cache-control': file.startsWith(`/${options.assets}/`) ? IMMUTABLE : options.staticCacheControl,
   });
   for (const [name, value] of Object.entries(options.headers[file] ?? {})) headers.set(name, value);
-  headers.set('content-type', withCharset(headers.get('content-type')!));
+  headers.set('content-type', withCharset(headers.get('content-type') ?? type));
   return headers;
 }
 
