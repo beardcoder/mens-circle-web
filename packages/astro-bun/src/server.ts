@@ -21,10 +21,8 @@ const clientDir = join(serverDir, config.clientDir);
 const manifest = Bun.file(join(serverDir, MANIFEST_FILE));
 
 const { routes, errorPages } = await createStaticRoutes({
+  ...config,
   clientDir,
-  assets: config.assets,
-  staticCacheControl: config.staticCacheControl,
-  trailingSlash: config.trailingSlash,
   headers: (await manifest.exists()) ? ((await manifest.json()) as StaticHeaders) : {},
 });
 

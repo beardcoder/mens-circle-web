@@ -6,7 +6,7 @@ import type { AstroConfig, AstroIntegration, RouteToHeaders, ViteUserConfig } fr
 import { readdir, writeFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MANIFEST_FILE, type RuntimeConfig, type StaticHeaders } from './shared';
+import { MANIFEST_FILE, pageRoute, type RuntimeConfig, type StaticHeaders } from './shared';
 
 export interface BunAdapterOptions {
   /**
@@ -43,10 +43,6 @@ async function listFiles(dir: string): Promise<string[]> {
     .map((entry) => `/${relative(dir, join(entry.parentPath, entry.name)).split(sep).join('/')}`);
 }
 
-/** `/impressum/index.html` → `/impressum`, the key Astro uses in `routeToHeaders`. */
-const routeOf = (pathname: string): string =>
-  pathname.endsWith('/index.html') ? pathname.slice(0, -'/index.html'.length) || '/' : pathname.replace(/\.html$/, '');
-
 async function writeManifest(
   config: AstroConfig,
   routeHeaders: RouteToHeaders | undefined,
@@ -57,7 +53,7 @@ async function writeManifest(
   for (const pathname of await listFiles(clientDir)) {
     const headers = {
       ...staticHeaders?.(pathname, { assets: config.build.assets }),
-      ...Object.fromEntries(routeHeaders?.get(routeOf(pathname))?.headers ?? []),
+      ...Object.fromEntries(routeHeaders?.get(pageRoute(pathname) ?? pathname)?.headers ?? []),
     };
     if (Object.keys(headers).length > 0) manifest[pathname] = headers;
   }

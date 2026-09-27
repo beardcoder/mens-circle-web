@@ -80,7 +80,7 @@ const moreLinks = [
 ];
 
 /** The series is built once in lib/series-schema.ts and shared with the home page, so both describe one entity under one `@id`. */
-const eventSeries: Record<string, unknown> = { ...eventSeriesSchema(siteUrl) };
+const eventSeries = eventSeriesSchema(siteUrl);
 if (event) {
   // Google validates every Event node as a rich result, so a stub with only `@id`/`url`
   // is flagged invalid: embed the full Event, minus what the series already states.
