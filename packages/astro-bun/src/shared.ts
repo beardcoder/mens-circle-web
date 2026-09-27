@@ -16,7 +16,12 @@ export interface RuntimeConfig {
   assets: string;
   staticCacheControl: string;
   /** Astro's `trailingSlash`: which URL form a page is served under. */
-  trailingSlash: TrailingSlash;
+  trailingSlash: AstroConfig['trailingSlash'];
 }
 
-export type TrailingSlash = AstroConfig['trailingSlash'];
+/** A page file's route without a trailing slash (`/a/index.html`, `/a.html` → `/a`; `/index.html` → `/`), else null. */
+export function pageRoute(file: string): string | null {
+  if (file.endsWith('/index.html')) return file.slice(0, -'/index.html'.length) || '/';
+  if (file.endsWith('.html')) return file.slice(0, -'.html'.length);
+  return null;
+}

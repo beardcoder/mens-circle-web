@@ -9,14 +9,11 @@
  * - Large files become file routes: streamed with sendfile, Last-Modified natively.
  */
 import { join } from 'node:path';
-import type { StaticHeaders, TrailingSlash } from './shared';
+import { pageRoute, type RuntimeConfig, type StaticHeaders } from './shared';
 
-export interface StaticRouteOptions {
+export interface StaticRouteOptions extends Pick<RuntimeConfig, 'assets' | 'staticCacheControl' | 'trailingSlash'> {
+  /** Absolute path of the client directory. */
   clientDir: string;
-  /** `build.assets`, the content-hashed directory. */
-  assets: string;
-  staticCacheControl: string;
-  trailingSlash: TrailingSlash;
   /** Build-time overrides from the adapter's manifest. */
   headers: StaticHeaders;
   /** Files above this size are streamed from disk instead of held in memory. */
@@ -37,25 +34,16 @@ const MAX_BUFFERED_SIZE = 1024 * 1024;
 const ERROR_PAGE = /^\/(?:404|500)(?:\.html|\/index\.html)$/;
 
 /**
- * The URL paths a file answers to: itself, and for a page (`/a/index.html`, `/a.html`)
- * the clean URL in the form `trailingSlash` allows, both forms for `ignore`.
+ * The URL paths a file answers to: itself, and for a page the clean URL in the form
+ * `trailingSlash` allows, both forms for `ignore`.
  */
-export function urlPathsFor(file: string, trailingSlash: TrailingSlash): string[] {
-  let page: string;
-  if (file.endsWith('/index.html')) page = file.slice(0, -'index.html'.length);
-  else if (file.endsWith('.html')) page = `${file.slice(0, -'.html'.length)}/`;
-  else return [file];
-
-  if (page === '/') return [file, page];
-  const bare = page.slice(0, -1);
-  if (trailingSlash === 'always') return [file, page];
-  if (trailingSlash === 'never') return [file, bare];
-  return [file, bare, page];
+export function urlPathsFor(file: string, trailingSlash: RuntimeConfig['trailingSlash']): string[] {
+  const route = pageRoute(file);
+  if (!route) return [file];
+  if (route === '/' || trailingSlash === 'never') return [file, route];
+  if (trailingSlash === 'always') return [file, `${route}/`];
+  return [file, route, `${route}/`];
 }
-
-/** Text types get an explicit charset, also when an override names the type without one. */
-const withCharset = (type: string): string =>
-  type.startsWith('text/') && !type.includes('charset') ? `${type};charset=utf-8` : type;
 
 function headersFor(file: string, type: string, options: StaticRouteOptions): Headers {
   const headers = new Headers({
@@ -63,7 +51,11 @@ function headersFor(file: string, type: string, options: StaticRouteOptions): He
     'cache-control': file.startsWith(`/${options.assets}/`) ? IMMUTABLE : options.staticCacheControl,
   });
   for (const [name, value] of Object.entries(options.headers[file] ?? {})) headers.set(name, value);
-  headers.set('content-type', withCharset(headers.get('content-type') ?? type));
+  // Text types get an explicit charset, also when an override names the type without one.
+  const contentType = headers.get('content-type') ?? type;
+  if (contentType.startsWith('text/') && !contentType.includes('charset')) {
+    headers.set('content-type', `${contentType};charset=utf-8`);
+  }
   return headers;
 }
 
