@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "tags": ["-lintignore"],
+  "workspaces": {
+    ".": {
+      "entry": [
+        "scripts/schedule.ts",
+        "scripts/send-reminders.ts",
+        "src/lib/disabled-image-endpoint.ts",
+        "public/sw.js"
+      ]
+    }
+  }
+}
