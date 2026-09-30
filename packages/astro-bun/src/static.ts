@@ -20,7 +20,7 @@ export interface StaticRouteOptions extends Pick<RuntimeConfig, 'assets' | 'stat
   maxBufferedSize?: number;
 }
 
-export type StaticRoutes = Record<string, { GET: Response }>;
+type StaticRoutes = Record<string, { GET: Response }>;
 
 export interface StaticFiles {
   routes: StaticRoutes;
