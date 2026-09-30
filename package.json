@@ -21,19 +21,21 @@
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
     "db:backup": "bun run scripts/backup-db.ts",
-    "images:verify": "bun scripts/verify-static-images.ts"
+    "images:verify": "bun scripts/verify-static-images.ts",
+    "knip": "knip"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.3",
     "openid-client": "^6.8.8"
   },
   "devDependencies": {
-    "@mens-circle/astro-bun": "workspace:*",
     "@astrojs/check": "^0.9.10",
     "@astrojs/sitemap": "^3.7.4",
     "@eslint/js": "^10.0.1",
+    "@mens-circle/astro-bun": "workspace:*",
     "@types/bun": "^1.4.2",
     "@types/leaflet": "^1.9.22",
+    "@types/node": "^26.6.3",
     "astro": "7.3.5",
     "astro-icon": "^1.2.0",
     "astro-llms-md": "^3.0.2",
@@ -43,10 +45,11 @@
     "eslint-plugin-astro": "^3.2.1",
     "globals": "^17.12.0",
     "jiti": "^2.7.0",
+    "knip": "^6.39.0",
     "leaflet": "^1.9.4",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.0",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "typescript-eslint": "^8.70.1"
   }
 }
