@@ -16,7 +16,7 @@ export const oidcConfigured = (): boolean =>
   sessionSecretConfigured() &&
   (config.ADMIN_EMAILS.length > 0 || config.ADMIN_GROUP.length > 0);
 
-export const callbackUrl = (): string => `${config.APP_URL}/auth/callback`;
+const callbackUrl = (): string => `${config.APP_URL}/auth/callback`;
 
 /** Only same-site admin paths; anything else falls back to the dashboard. */
 export const safeRedirect = (target: string | null | undefined): string =>
