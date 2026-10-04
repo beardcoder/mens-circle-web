@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 // Executed only by email-backend.test.ts in a separate Bun process; not a suite-level module mock.
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { eq, sql } from 'drizzle-orm';
 import { config } from '../src/lib/server/config';
@@ -466,6 +467,38 @@ const scenarios: Record<string, () => Promise<void>> = {
     // Let every racer's fire-and-forget mail/listmonk work actually finish —
     // register() never awaits it, so it can still be in flight here.
     await waitForIdle();
+  },
+  /** Every `{{ .Tx.Data.x }}` a versioned listmonk template reads is a field its payload sends. */
+  async 'template-contract'() {
+    const { db, event } = await seed(1);
+    const [participant] = await db.select().from(participants);
+    handler = (call) => (call.path === '/api/subscribers' ? json({ data: subscriber }) : json({}));
+    const mail = await import('../src/lib/server/email');
+    await mail.sendRegistrationEmails(event, participant, 'registered', 1);
+    await mail.sendRegistrationConfirmation(event, participant, 'waitlist');
+    await mail.sendWaitlistPromotion(event, participant);
+    await mail.sendEventReminder(event, participant, true);
+    await mail.sendEventMessage(event, participant, 'Betreff', 'Hallo {first_name}');
+
+    const sent = new Map<number, Record<string, unknown>>();
+    for (const call of calls.filter((c) => c.path === '/api/tx'))
+      sent.set(Number(call.body.template_id), call.body.data as Record<string, unknown>);
+    const templates: Record<string, number> = {
+      'tx-registration-confirmation': config.TX_REGISTRATION_CONFIRMATION,
+      'tx-waitlist-confirmation': config.TX_WAITLIST_CONFIRMATION,
+      'tx-admin-notification': config.TX_ADMIN_NOTIFICATION,
+      'tx-waitlist-promotion': config.TX_WAITLIST_PROMOTION,
+      'tx-event-reminder': config.TX_EVENT_REMINDER,
+      'tx-event-message': config.TX_EVENT_MESSAGE,
+    };
+    for (const [file, id] of Object.entries(templates)) {
+      const html = await readFile(new URL(`../listmonk-templates/${file}.html`, import.meta.url), 'utf8');
+      const data = sent.get(id);
+      assert(data, `${file}: no payload was sent`);
+      const read = new Set([...html.matchAll(/\.Tx\.Data\.(\w+)/g)].map((m) => m[1]));
+      assert(read.size > 0, `${file}: reads no data`);
+      for (const key of read) assert(key in data, `${file} reads .Tx.Data.${key}, which the payload does not send`);
+    }
   },
 };
 

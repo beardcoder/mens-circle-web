@@ -79,8 +79,10 @@ declare their own cron. No in-process timer and no `Bun.cron` (throws at boot).
 **Email.** listmonk is external; this repo only integrates it. `lib/server/email.ts` is
 the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) stable.
 `confirmation_sent_at` is set only when listmonk accepted the mail.
-The templates live in listmonk, not here; they load the mail mark from
-`/images/logo-flame.png` by URL, so keep that file.
+`listmonk-templates/` holds the versioned copies of the listmonk templates: edit
+there, then paste into listmonk. The `template-contract` email test fails when a
+template reads a `.Tx.Data` field its payload does not send. The templates load the
+mail mark from `/images/logo-flame.png` by URL, so keep that file.
 
 **Map.** Leaflet on keyless OSM France HOT tiles (`TILE_URL`); keep the attribution.
 
