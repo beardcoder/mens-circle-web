@@ -19,6 +19,12 @@
   }
 }
 
+/* Breathing backgrounds rest while off screen (lib/breath.ts sets the state). */
+[data-breath='paused'],
+[data-breath='paused'] * {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

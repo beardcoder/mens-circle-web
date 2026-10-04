@@ -159,6 +159,106 @@
   }
 }
 
+/* 4. The breathing ground (BreathField.astro). One 31 s phrase of three breaths —
+   10 s, 11 s, 10 s; in 3.8–4.2 s, a short hold, out 5.2–5.8 s, a short rest —
+   with depths 1, 0.82 and 1.12, so no two breaths are alike. The phrase starts
+   and ends at rest, so the loop never shows. Per-element vars: --dx/--dy (drift),
+   --sx/--sy (uneven widening), --o0/--o1 (opacity at rest / at full breath). */
+@keyframes breath-swell {
+  0.00% {
+    opacity: var(--o0);
+    transform: none;
+    animation-timing-function: cubic-bezier(0.33, 0, 0.4, 1);
+  }
+
+  12.26% {
+    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 1);
+    transform: translate(calc(var(--dx) * 1), calc(var(--dy) * 1))
+      scale(calc(1 + var(--sx) * 1), calc(1 + var(--sy) * 1));
+    animation-timing-function: linear;
+  }
+
+  14.19% {
+    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 1.03);
+    transform: translate(calc(var(--dx) * 1.03), calc(var(--dy) * 1.03))
+      scale(calc(1 + var(--sx) * 1.03), calc(1 + var(--sy) * 1.03));
+    animation-timing-function: cubic-bezier(0.45, 0, 0.3, 1);
+  }
+
+  30.97% {
+    opacity: var(--o0);
+    transform: none;
+    animation-timing-function: linear;
+  }
+
+  32.26% {
+    opacity: var(--o0);
+    transform: none;
+    animation-timing-function: cubic-bezier(0.33, 0, 0.4, 1);
+  }
+
+  45.81% {
+    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 0.82);
+    transform: translate(calc(var(--dx) * 0.82), calc(var(--dy) * 0.82))
+      scale(calc(1 + var(--sx) * 0.82), calc(1 + var(--sy) * 0.82));
+    animation-timing-function: linear;
+  }
+
+  47.42% {
+    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 0.845);
+    transform: translate(calc(var(--dx) * 0.845), calc(var(--dy) * 0.845))
+      scale(calc(1 + var(--sx) * 0.845), calc(1 + var(--sy) * 0.845));
+    animation-timing-function: cubic-bezier(0.45, 0, 0.3, 1);
+  }
+
+  66.13% {
+    opacity: var(--o0);
+    transform: none;
+    animation-timing-function: linear;
+  }
+
+  67.74% {
+    opacity: var(--o0);
+    transform: none;
+    animation-timing-function: cubic-bezier(0.33, 0, 0.4, 1);
+  }
+
+  80.32% {
+    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 1.12);
+    transform: translate(calc(var(--dx) * 1.12), calc(var(--dy) * 1.12))
+      scale(calc(1 + var(--sx) * 1.12), calc(1 + var(--sy) * 1.12));
+    animation-timing-function: linear;
+  }
+
+  81.61% {
+    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 1.154);
+    transform: translate(calc(var(--dx) * 1.154), calc(var(--dy) * 1.154))
+      scale(calc(1 + var(--sx) * 1.154), calc(1 + var(--sy) * 1.154));
+    animation-timing-function: cubic-bezier(0.45, 0, 0.3, 1);
+  }
+
+  98.71% {
+    opacity: var(--o0);
+    transform: none;
+    animation-timing-function: linear;
+  }
+
+  100% {
+    opacity: var(--o0);
+    transform: none;
+  }
+}
+
+@keyframes breath-drift {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* View transitions — root crossfade. */
 @keyframes vt-fade-out {
   to {

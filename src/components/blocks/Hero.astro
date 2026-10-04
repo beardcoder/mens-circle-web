@@ -1,9 +1,8 @@
 ---
-import site from '@data/site.json';
+import BreathField from '../BreathField.astro';
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
 import HomeEventStatus from '../HomeEventStatus.astro';
-import Breath from '../Breath.astro';
 import SeatCircle from '../SeatCircle.astro';
 
 /** The home page opening on the night ground: the sentence, the four parts of an evening, and the photograph inside the seat circle. */
@@ -48,12 +47,11 @@ const segments = [
   ...(emphasis ? [{ word: emphasis, em: true }] : []),
   ...words(after).map((word) => ({ word, em: false })),
 ];
-
-const format = (n: number) => n.toFixed(2).replace('.', ',');
-const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`;
 ---
 
 <section class="home-hero surface-night section--clip" aria-labelledby="hero-title">
+  <BreathField />
+
   <div class="container home-hero__grid">
     <h1 class="home-hero__heading" id="hero-title">
       {data.kicker && <span class="marker home-hero__kicker">{data.kicker}</span>}
@@ -111,7 +109,6 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
     {photo && (
       <figure class="home-hero__figure">
         <div class="home-hero__orbit">
-          <Breath class="home-hero__breath" />
           <SeatCircle class="home-hero__ring" seatSize={3.2} entrance />
           <div class="home-hero__plate">
             <CropPicture
@@ -126,10 +123,7 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
             />
           </div>
         </div>
-        <figcaption class="home-hero__caption">
-          {data.imageCaption && <span>{data.imageCaption}</span>}
-          <span class="home-hero__coords">{coordinates}</span>
-        </figcaption>
+        <figcaption class="home-hero__caption">{data.imageCaption && <span>{data.imageCaption}</span>}</figcaption>
       </figure>
     )}
   </div>
@@ -143,6 +137,8 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
     }
 
     .home-hero__grid {
+      position: relative;
+      z-index: 1;
       display: grid;
       grid-template-areas:
         'head    figure'
@@ -291,14 +287,6 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
       }
     }
 
-    /* The breath around the photograph: its outer ring stays inside this box,
-       which ends where the text column begins. */
-    .home-hero__breath {
-      --breath-glow: 32%;
-
-      inset: -28%;
-    }
-
     .home-hero__plate {
       position: absolute;
       inset: 0;
@@ -323,11 +311,6 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
       font-size: var(--text-caption);
       color: var(--text-muted);
       text-align: end;
-    }
-
-    .home-hero__coords {
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.06em;
     }
 
     /* Entrance: the words rise, the circle opens. Starts at first paint, under a second. */
@@ -418,11 +401,6 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
       .home-hero__figure {
         margin-block-start: calc(78vw * 0.2 + var(--space-md));
         margin-inline-end: calc(-1 * var(--container-gutter) - 14vw);
-      }
-
-      /* Stacked, the breath stays within the clear space reserved for the ring. */
-      .home-hero__breath {
-        inset: -21%;
       }
 
       .home-hero__orbit {
