@@ -1,46 +1,188 @@
 ---
 import type { EventDTO } from '@lib/types';
 import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from '@lib/server/format';
+import SeatCircle from '../SeatCircle.astro';
 
 interface Props {
   event: EventDTO;
 }
 
-/** The opening of a single event's page. */
+/** The opening of a single event's page: the date as a poster, the seats as a circle. */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);
 const weekday = formatWeekdayDE(event.event_date);
 const dayMonthYear = formatDayMonthYearDE(event.event_date);
+// "23. Oktober 2026" → "23" and "Oktober 2026", for the poster layout only.
+const [, day = '', monthYear = dayMonthYear] = dayMonthYear.match(/^(\d+)\.\s*(.+)$/) ?? [];
+const taken = Math.max(0, event.max_participants - event.available_spots);
+const seatsLabel = event.is_full
+  ? `Alle ${event.max_participants} Plätze vergeben`
+  : `${event.available_spots} von ${event.max_participants} Plätzen frei`;
 ---
 
 <section class="hero event-hero">
-  <div class="container">
-    <div class="hero__content">
-      <p class="hero__label">{event.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}</p>
+  <div class="container event-hero__grid">
+    <div class="event-hero__copy">
+      <p class="marker hero__label">{event.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}</p>
 
-      <h1 class="hero__title">
+      <h1 class="event-hero__title">
         <time datetime={dateOnly}>
-          {weekday}, {dayMonthYear}
+          <span class="sr-only">
+            {weekday}, {dayMonthYear}
+          </span>
+          <span class="event-hero__poster" aria-hidden="true">
+            {day && <span class="event-hero__day">{day}</span>}
+            <span class="event-hero__month">
+              <span class="event-hero__weekday">{weekday}</span>
+              {monthYear}
+            </span>
+          </span>
         </time>
       </h1>
 
-      <div class="hero__bottom">
-        {/* Built as a string rather than as JSX fragments: the whitespace
-            between elements in the template becomes real text nodes, which put
-            gaps around the en dash of the time range. */}
-        <p class="hero__meta">
-          {[timeRange(event.start_time, event.end_time), event.location].filter(Boolean).join(' · ')}
-        </p>
+      {/* Built as a string rather than as JSX fragments: the whitespace
+          between elements in the template becomes real text nodes, which put
+          gaps around the en dash of the time range. */}
+      <p class="event-hero__meta">
+        {[timeRange(event.start_time, event.end_time), event.location].filter(Boolean).join(' · ')}
+      </p>
 
-        {!event.is_past && (
-          <span class="hero__cta">
-            <a href="#anmeldung" class="btn btn--primary">
-              {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
-            </a>
-          </span>
-        )}
-      </div>
+      {!event.is_past && (
+        <p class="event-hero__cta">
+          <a href="#anmeldung" class="btn btn--primary btn--large">
+            {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
+          </a>
+        </p>
+      )}
     </div>
+
+    {!event.is_past && (
+      <figure class="event-hero__seats">
+        <SeatCircle seats={event.max_participants} taken={taken} ember label={seatsLabel} />
+        <figcaption>{seatsLabel}</figcaption>
+      </figure>
+    )}
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .event-hero__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      gap: var(--space-xl);
+      align-items: center;
+    }
+
+    .event-hero__title {
+      margin-block: var(--space-md) var(--space-md);
+      font-size: inherit;
+      letter-spacing: normal;
+    }
+
+    .event-hero__poster {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 var(--space-md);
+      align-items: flex-end;
+    }
+
+    /* The day number in the heavy register — one of the few places it is used. */
+    .event-hero__day {
+      font-family: var(--font-display);
+      font-size: clamp(6rem, 3rem + 12vw, 13rem);
+      font-weight: 900;
+      line-height: 0.78;
+      color: var(--accent);
+      letter-spacing: -0.04em;
+    }
+
+    .event-hero__month {
+      display: grid;
+      padding-block-end: 0.15em;
+      font-family: var(--font-display);
+      font-size: var(--display-3);
+      line-height: 1.05;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .event-hero__weekday {
+      font-size: 0.55em;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    .event-hero__meta {
+      margin: 0;
+      font-size: var(--text-section-body-lg);
+      color: var(--text-primary);
+    }
+
+    .event-hero__cta {
+      margin-block: var(--space-lg) 0;
+    }
+
+    .event-hero__seats {
+      display: grid;
+      gap: var(--space-sm);
+      justify-items: center;
+      margin: 0;
+    }
+
+    .event-hero__seats .seat-circle {
+      inline-size: min(100%, 20rem);
+    }
+
+    .event-hero__seats figcaption {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .event-hero__poster,
+      .event-hero__meta,
+      .event-hero__cta,
+      .event-hero__seats {
+        animation: rise var(--duration-slow) var(--ease-settle) both;
+      }
+
+      .event-hero__poster {
+        animation-delay: var(--stagger-1);
+      }
+
+      .event-hero__meta,
+      .event-hero__cta {
+        animation-delay: var(--stagger-2);
+      }
+
+      .event-hero__seats {
+        animation-delay: 200ms;
+      }
+
+      .vt-arrival :is(.event-hero__poster, .event-hero__meta, .event-hero__cta, .event-hero__seats) {
+        animation: none;
+      }
+    }
+
+    @media (width <= 56em) {
+      .event-hero__grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-lg);
+      }
+
+      .event-hero__seats {
+        grid-template-columns: 6rem minmax(0, 1fr);
+        justify-items: start;
+        align-items: center;
+      }
+
+      .event-hero__cta .btn {
+        inline-size: 100%;
+      }
+    }
+  }
+</style>

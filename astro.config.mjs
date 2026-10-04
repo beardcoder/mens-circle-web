@@ -63,6 +63,26 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   fonts: [
+    // Public site: a warm serif for the voice, a quiet grotesk for reading and UI.
+    {
+      name: 'Fraunces',
+      cssVariable: '--font-serif',
+      provider: fontProviders.fontsource(),
+      weights: ['400', '600', '900'],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'Times New Roman', 'serif'],
+    },
+    {
+      name: 'Instrument Sans',
+      cssVariable: '--font-sans',
+      provider: fontProviders.fontsource(),
+      weights: ['400', '500', '600'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+    },
+    // Admin only (AdminLayout.astro).
     {
       name: 'Barlow Condensed',
       cssVariable: '--font-condensed',

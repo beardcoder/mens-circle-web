@@ -33,7 +33,7 @@ const schemas = [
   <section class="hero">
     <div class="container">
       <div class="hero__content">
-        <p class="hero__label">Aus dem Kreis</p>
+        <p class="marker hero__label">Aus dem Kreis</p>
         <h1 class="hero__title">Teile deine Erfahrung</h1>
         <p class="hero__subtitle">
           Wenn du beim Männerkreis warst und etwas dazu sagen möchtest: Dein Text hilft anderen Männern einzuschätzen,
@@ -43,11 +43,11 @@ const schemas = [
     </div>
   </section>
 
-  <section class="section testimonial-form-section">
+  <section class="section surface-sand testimonial-form-section">
     <div class="container">
       <div class="testimonial-form__wrapper">
         <div class="testimonial-form__intro">
-          <h2>Was du geschrieben hast, lese ich zuerst</h2>
+          <h2 class="display display--sm">Was du schreibst, lese ich zuerst</h2>
           <p>
             Dein Text wird nicht automatisch veröffentlicht. Ich sehe ihn mir vorher an und stelle ihn dann –
             unverändert – auf die Website. Du entscheidest, welchen Namen du angibst.
@@ -62,44 +62,32 @@ const schemas = [
 
 <style is:global>
   @layer sections {
-    .testimonial-form-section {
-      border-block-start: 1px solid var(--border-light);
-    }
-
     .testimonial-form__wrapper {
-      max-inline-size: var(--container-narrow);
-    }
-
-    .testimonial-form__intro {
-      margin-block-end: var(--space-lg);
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-xl);
+      align-items: start;
     }
 
     .testimonial-form__intro h2 {
-      margin-block-end: var(--space-xs);
-      font-family: var(--font-display);
-      font-size: var(--text-3xl);
-      line-height: 1.15;
-      color: var(--text-primary);
+      margin-block-end: var(--space-md);
     }
 
     .testimonial-form__intro p {
-      max-inline-size: var(--measure);
-      margin-block-end: var(--space-sm);
+      max-inline-size: 42ch;
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
-    .testimonial-form__intro p:last-child {
-      margin-block-end: 0;
-    }
-
     .testimonial-form {
-      max-inline-size: var(--content-max-form);
+      padding: var(--space-lg);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius);
     }
 
-    /* Under the field, not floating inside it: the square corners and the
-       native resize grip leave no clear space in the bottom-right any more. */
+    /* Under the field, not floating inside it. */
     .testimonial-form__counter {
       display: block;
       margin-block-start: var(--space-3xs);
@@ -115,6 +103,17 @@ const schemas = [
       font-size: var(--text-caption);
       line-height: var(--leading-relaxed);
       color: var(--text-muted);
+    }
+
+    @media (width <= 56em) {
+      .testimonial-form__wrapper {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .testimonial-form {
+        padding: var(--space-md);
+        margin-inline: calc(-0.5 * var(--container-gutter));
+      }
     }
   }
 </style>

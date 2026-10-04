@@ -53,9 +53,9 @@ const rows = [
       </h2>
 
       <div class="spine__body--wide">
-        <dl class="deflist" data-reveal-group="55">
+        <dl class="deflist">
           {rows.map((row) => (
-            <div class="deflist__row" data-reveal="up">
+            <div class="deflist__row" data-reveal>
               <dt class="deflist__term">{row.label}</dt>
               <dd class="deflist__desc">
                 {row.value}
@@ -159,8 +159,9 @@ const rows = [
       margin: auto;
       color: var(--text-primary);
       background: var(--bg-primary);
-      border: 2px solid var(--rule-strong);
-      border-radius: 0;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius);
+      box-shadow: 0 30px 60px -30px rgb(20 14 10 / 50%);
       /* Closed / pre-open resting state. A rise, no scale. */
       opacity: 0;
       translate: 0 12px;
@@ -195,7 +196,6 @@ const rows = [
 
     .calendar-modal:popover-open::backdrop {
       background-color: var(--bg-overlay);
-      backdrop-filter: blur(4px);
     }
 
     @starting-style {
@@ -224,6 +224,7 @@ const rows = [
       cursor: pointer;
       background: none;
       border: none;
+      border-radius: 50%;
       transition:
         color var(--motion-quick),
         background-color var(--motion-quick);
@@ -248,7 +249,7 @@ const rows = [
 
     .calendar-modal__content h3 {
       margin-block-end: var(--space-sm);
-      font-size: 1.375rem;
+      font-size: var(--text-2xl);
       letter-spacing: -0.02em;
     }
 

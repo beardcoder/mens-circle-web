@@ -42,14 +42,12 @@ const anchor = data.anchor ?? 'praktisches';
           Gut zu wissen
         </h2>
 
-        <dl class="deflist spine__body--wide" data-reveal-group="55">
+        <dl class="facts-grid spine__body--wide">
           {facts.map((fact) => (
-            <div class="deflist__row" data-reveal="up">
-              <dt class="deflist__term">{fact.label}</dt>
-              <dd class="deflist__desc">
-                {fact.value}
-                <span class="deflist__note">{fact.sub}</span>
-              </dd>
+            <div class="facts-grid__item" data-reveal>
+              <dt class="facts-grid__label">{fact.label}</dt>
+              <dd class="facts-grid__value">{fact.value}</dd>
+              <dd class="facts-grid__note">{fact.sub}</dd>
             </div>
           ))}
         </dl>
@@ -57,18 +55,18 @@ const anchor = data.anchor ?? 'praktisches';
     </div>
   </section>
 ) : (
-  <section class="section section--ink home-facts" id={anchor} aria-labelledby="praktisches-title">
-    <div class="container">
-      <h2 class="marker home-facts__title" id="praktisches-title">
+  <section class="surface-sand home-facts" id={anchor} aria-labelledby="praktisches-title">
+    <div class="container home-facts__inner">
+      <h2 class="home-facts__title" id="praktisches-title">
         {data.eyebrow ?? 'Praktisches'}
       </h2>
 
-      <dl class="home-facts__row">
+      <dl class="facts-grid">
         {facts.map((fact) => (
-          <div class="home-facts__item">
-            <dt class="home-facts__label">{fact.label}</dt>
-            <dd class="home-facts__value">{fact.value}</dd>
-            <dd class="home-facts__note">{fact.sub}</dd>
+          <div class="facts-grid__item">
+            <dt class="facts-grid__label">{fact.label}</dt>
+            <dd class="facts-grid__value">{fact.value}</dd>
+            <dd class="facts-grid__note">{fact.sub}</dd>
           </div>
         ))}
       </dl>
@@ -78,112 +76,108 @@ const anchor = data.anchor ?? 'praktisches';
 
 <style is:global>
   @layer sections {
+    /* A ledger strip directly under the hero: the four answers a cautious
+       reader looks for before anything else. */
     .home-facts {
-      padding-block: var(--rhythm-section);
+      padding-block: var(--space-lg);
+    }
+
+    .home-facts__inner {
+      display: grid;
+      grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
+      gap: var(--space-md) var(--space-xl);
+      align-items: start;
     }
 
     .home-facts__title {
-      margin-block-end: var(--rhythm-group);
-      color: var(--color-orange);
+      padding-block-start: var(--space-sm);
+      font-size: var(--text-xl);
+      font-style: italic;
+      color: var(--accent);
     }
 
-    .home-facts__row {
+    .facts-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0;
       margin: 0;
-      border-block-start: 1px solid var(--border-on-dark);
     }
 
-    /* Levels the columns; lifted once they stack. */
-    .home-facts__item {
-      min-block-size: 11rem;
-      padding-block: var(--space-md) var(--space-sm);
-      padding-inline-end: var(--space-md);
+    .facts-grid__item {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: var(--space-3xs);
+      padding: var(--space-sm) var(--space-md) var(--space-sm) 0;
     }
 
-    /* Vertical rules between the four, none at the outer edges. */
-    .home-facts__item + .home-facts__item {
+    .facts-grid__item + .facts-grid__item {
       padding-inline-start: var(--space-md);
-      border-inline-start: 1px solid var(--border-on-dark);
+      border-inline-start: 1px solid var(--border-light);
     }
 
-    .home-facts__label {
-      font-family: var(--font-display);
+    .facts-grid__label {
       font-size: var(--text-marker);
       font-weight: 600;
-      color: var(--color-chalk-muted);
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: var(--tracking-marker);
     }
 
-    .home-facts__value {
-      margin: var(--space-2xs) 0 0;
+    .facts-grid__value {
+      margin: 0;
       font-family: var(--font-display);
-      font-size: clamp(1.75rem, 1.1rem + 2.4vw, 3rem);
-      font-weight: 800;
-      line-height: 0.95;
-      color: var(--color-chalk);
-      text-transform: uppercase;
-      letter-spacing: -0.01em;
+      font-size: var(--text-2xl);
+      line-height: 1.1;
+      color: var(--text-primary);
+      letter-spacing: -0.015em;
       text-wrap: balance;
     }
 
-    .home-facts__note {
-      margin: var(--space-xs) 0 0;
+    .facts-grid__note {
+      margin: var(--space-3xs) 0 0;
       font-size: var(--text-caption);
-      line-height: var(--leading-normal);
-      color: var(--color-chalk-muted);
+      line-height: 1.5;
+      color: var(--text-muted);
       text-wrap: pretty;
     }
 
-    /* Two-up, then stacked. */
-    @media (width <= 62em) {
-      .home-facts__row {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    @media (width <= 72em) {
+      .home-facts__inner {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
       }
 
-      .home-facts__item {
-        min-block-size: 0;
-        padding-block: var(--rhythm-item);
-      }
-
-      .home-facts__item:nth-child(odd) {
-        padding-inline-start: 0;
-        border-inline-start: none;
-      }
-
-      .home-facts__item:nth-child(n + 3) {
-        border-block-start: 1px solid var(--border-on-dark);
-      }
-
-      /* The list ends on an item's own bottom padding; without this the band
-         carried 48px of air above its title and 68px below its last note. */
-      .home-facts__item:nth-last-child(-n + 2) {
-        padding-block-end: 0;
+      .home-facts__title {
+        padding-block-start: 0;
       }
     }
 
-    @media (width <= 36em) {
-      .home-facts__row {
-        grid-template-columns: minmax(0, 1fr);
+    @media (width <= 62em) {
+      .facts-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .home-facts__item {
-        padding-inline: 0;
-        border-inline-start: none;
-      }
-
-      /* Stacked there is one item per row, so only the true last one ends the
-         band — the two-up rule above would strip the second-to-last as well. */
-      .home-facts__item:nth-last-child(2) {
-        padding-block-end: var(--rhythm-item);
-      }
-
-      .home-facts__item + .home-facts__item {
+      .facts-grid__item:nth-child(3) {
         padding-inline-start: 0;
-        border-block-start: 1px solid var(--border-on-dark);
-        border-inline-start: none;
+        border-inline-start: 0;
+      }
+
+      .facts-grid__item:nth-child(n + 3) {
+        border-block-start: 1px solid var(--border-light);
+      }
+    }
+
+    @media (width <= 30em) {
+      .facts-grid__item,
+      .facts-grid__item + .facts-grid__item {
+        padding-inline: 0 var(--space-xs);
+      }
+
+      .facts-grid__item:nth-child(even) {
+        padding-inline-start: var(--space-sm);
+      }
+
+      .facts-grid__value {
+        font-size: var(--text-xl);
       }
     }
   }

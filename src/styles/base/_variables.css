@@ -1,77 +1,90 @@
-/** Design tokens. */
+/** Design tokens — "Feuerstelle": cream, bark, rust and a little moss. */
 
 :root {
   /* Mode — `data-mode` absent follows the OS, "light"/"dark" pins it. Applied
      before first paint by the inline boot script in Layout.astro. */
   color-scheme: light dark;
 
-  /* Palette primitives */
+  /* Palette primitives. Ratios are against the ground each colour sits on. */
 
-  /* Paper — the ground. Warm oat, never a cool off-white. */
-  --color-paper: #f2ede3;
-  --color-paper-sunk: #e8e0d2; /* a half-step down, for set-apart passages */
-  --color-paper-raised: #f8f4ec; /* a half-step up, for inputs and panels */
+  /* Cream — the ground. Warm, a little toasted, never white. */
+  --color-paper: #f4ede1;
+  --color-paper-sunk: #eae1d2; /* sand, for set-apart passages */
+  --color-paper-raised: #faf6ee; /* panels and inputs */
 
-  /* Ink — a warm bark black, not a blue-black. 15.2:1 on paper. */
-  --color-ink: #1c1714;
-  --color-ink-mid: #4a4139; /* running text on paper — 8.5:1 */
-  --color-ink-muted: #645a50; /* captions, labels — 5.8:1 on paper */
+  /* Bark — a warm dark brown. 14.4:1 on cream. */
+  --color-ink: #241c17;
+  --color-ink-mid: #5a4e44; /* running text on cream — 6.9:1 */
+  --color-ink-muted: #6b5e52; /* captions — 5.4:1 on cream, 4.9:1 on sand */
 
-  /* Burnt orange — a graphic colour first: the ring, the statement field, the
-     button. Never small text on paper; see the contrast table above. */
-  --color-orange: #dd5f33;
+  /* Rust — muted terracotta. 4.9:1 on cream, so it may carry text and the
+     cream label of a button. Used as fill sparingly. */
+  --color-orange: #a84a2a;
+  --color-rust-deep: #8a3a1f;
 
-  /* Hairlines — warm, so they read as a crease in the paper. */
-  --color-rule: #d8cfbe;
-  --color-rule-strong: #bfb29c;
+  /* Ember — rust lifted for dark grounds. 6.5:1 on night. */
+  --color-ember: #e07f57;
 
-  /* On the dark ground */
-  --color-night: var(--color-ink);
-  --color-night-soft: #241e19;
-  --color-night-rule: #3d342c;
-  --color-chalk: #f2ede3;
-  --color-chalk-muted: #a39786; /* 6.2:1 on ink */
+  /* Moss — the pine in the photograph; one quiet ground on the home page. */
+  --color-moss: #364132;
+  --color-moss-deep: #252d22;
 
-  /* Semantic tokens */
+  /* Hairlines */
+  --color-rule: #ddd2bf;
+  --color-rule-strong: #c4b49b;
 
-  /* Surfaces */
+  /* Night — the dark mode ground and the bark surfaces. */
+  --color-night: #16110e;
+  --color-night-soft: #211a15;
+  --color-night-raised: #2b221c;
+  --color-night-rule: #3b3029;
+  --color-chalk: #efe6d6;
+  --color-chalk-muted: #b3a595; /* 7.8:1 on night */
+
+  /* Semantic tokens. Surfaces re-declare the text, rule and accent tokens
+     (see `.surface-*` in utilities/_layout.css), so components only ever use these. */
+
   --bg-primary: light-dark(var(--color-paper), var(--color-night));
   --bg-secondary: light-dark(var(--color-paper-sunk), var(--color-night-soft));
-  --bg-elevated: light-dark(var(--color-paper-raised), var(--color-night-soft));
-  --bg-overlay: light-dark(rgb(38 40 36 / 55%), rgb(10 11 10 / 70%));
+  --bg-elevated: light-dark(var(--color-paper-raised), var(--color-night-raised));
+  --bg-overlay: light-dark(rgb(36 28 23 / 55%), rgb(8 6 5 / 72%));
 
-  /* Form controls sit on the page ground, not on a dark panel. */
   --bg-input: light-dark(var(--color-paper-raised), var(--color-night-soft));
-  --bg-input-focus: light-dark(#fff, #2e332d);
+  --bg-input-focus: light-dark(#fffdf8, var(--color-night-raised));
 
-  /* Text */
   --text-primary: light-dark(var(--color-ink), var(--color-chalk));
-  --text-secondary: light-dark(var(--color-ink-mid), #cdc3b4); /* 10.2:1 on night */
+  --text-secondary: light-dark(var(--color-ink-mid), #d2c6b5);
   --text-muted: light-dark(var(--color-ink-muted), var(--color-chalk-muted));
   --text-on-dark: var(--color-chalk);
 
-  /* Accents. */
-  --accent-primary: var(--color-orange);
-  --accent-text: light-dark(var(--color-ink), var(--color-orange));
-  --accent-rare: var(--color-orange);
+  /* The accent: rust on cream, ember at night. Large text, strokes and fills. */
+  --accent: light-dark(var(--color-orange), var(--color-ember));
+  --accent-primary: var(--accent);
+  --accent-text: var(--accent);
+  --accent-rare: var(--accent);
+  /* What sits on an accent fill. */
+  --on-accent: light-dark(var(--color-paper), var(--color-night));
 
-  /* Status */
-  --color-success: light-dark(#2f6b4a, #7fc09a);
-  --color-error: light-dark(#9c3a2c, #e0907f);
+  --color-success: light-dark(#2f6b4a, #8cc7a2);
+  --color-error: light-dark(#9c3a2c, #ec9a87);
 
-  /* Borders. */
   --rule-strong: light-dark(var(--color-ink), var(--color-chalk));
   --border-light: light-dark(var(--color-rule), var(--color-night-rule));
-  --border-medium: light-dark(var(--color-rule-strong), #453a31);
-  --border-dark: light-dark(var(--color-ink-muted), #5a5048);
-  --border-on-dark: rgb(242 237 227 / 18%);
+  --border-medium: light-dark(var(--color-rule-strong), #4a3d34);
+  --border-dark: light-dark(var(--color-ink-muted), #66584c);
+  --border-on-dark: rgb(239 230 214 / 18%);
+
+  /* The focus ring follows the text colour of whatever surface it is on. */
+  --focus-ring: var(--text-primary);
+
+  /* The one arrow, used as a mask so it takes the text colour. */
+  --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13.5 6l6 6-6 6'/%3E%3C/svg%3E");
 
   /* Typography */
-  /* Set by the Astro <Font> components, fallbacks included. */
-  --font-display: var(--font-condensed);
-  --font-body: var(--font-text);
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
 
-  /* Type scale, in two registers that do not overlap. */
+  /* Reading register */
   --text-xs: 0.8125rem;
   --text-sm: 0.875rem;
   --text-base: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
@@ -80,41 +93,38 @@
   --text-2xl: clamp(1.625rem, 1.4rem + 1vw, 2.25rem);
   --text-3xl: clamp(1.875rem, 1.5rem + 1.7vw, 3rem);
   --text-4xl: clamp(2.25rem, 1.7rem + 2.4vw, 3.75rem);
-  --text-6xl: clamp(3rem, 1.9rem + 5vw, 6rem);
+  --text-6xl: clamp(2.75rem, 1.8rem + 4.2vw, 5.5rem);
 
-  /* Poster register. Condensed 800, uppercase, leading below 1. */
-  --display-1: clamp(3.75rem, 1.2rem + 12.4vw, 11.25rem); /* 60px → 180px */
-  --display-2: clamp(3rem, 1.4rem + 7.4vw, 7rem); /* 48px → 112px */
-  --display-3: clamp(2.25rem, 1.4rem + 4vw, 4rem); /* 36px → 64px */
-  --display-numeral: clamp(3.5rem, 1.6rem + 8vw, 9rem);
+  /* Voice register — Fraunces. Big, but set in a reading weight. */
+  --display-1: clamp(2.75rem, 1.4rem + 5.6vw, 6.25rem); /* 44px → 100px */
+  --display-2: clamp(2.375rem, 1.4rem + 4vw, 4.75rem); /* 38px → 76px */
+  --display-3: clamp(2rem, 1.4rem + 2.6vw, 3.5rem); /* 32px → 56px */
+  --display-numeral: clamp(4rem, 2rem + 9vw, 10rem);
 
-  --leading-display: 0.85;
-  --tracking-display: -0.015em;
+  --leading-display: 1.02;
+  --tracking-display: -0.022em;
 
-  /* Running text */
   --text-section-body: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
-  --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.35vw, 1.375rem);
+  --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.35vw, 1.3125rem);
   --text-body-compact: 1rem;
   --text-caption: 0.875rem;
 
-  /* The small condensed marker: kickers, rail labels, meta, nav. */
-  --text-marker: 0.8125rem;
-  --tracking-marker: 0.14em;
+  /* The label: small sans capitals, widely spaced. The one place for caps. */
+  --text-marker: 0.75rem;
+  --tracking-marker: 0.16em;
 
-  /* Line heights */
   --leading-normal: 1.6;
   --leading-relaxed: 1.7;
 
-  /* Measures. The brief's 60–68 characters per line, expressed where it counts:
-     `--measure` is the default for running text, the rest are the exceptions. */
-  --measure: 64ch;
+  --measure: 62ch;
   --measure-wide: 72ch;
-  --content-max-form: 30rem;
+  --content-max-form: 32rem;
 
   /* Form controls */
-  --control-padding-block: 0.7rem;
-  --control-padding-inline: 0.875rem;
-  --control-radius: 0;
+  --radius: 3px;
+  --control-padding-block: 0.8rem;
+  --control-padding-inline: 1rem;
+  --control-radius: var(--radius);
   --control-border-width: 1px;
   --control-border-color: var(--border-medium);
   --control-bg: var(--bg-input);
@@ -130,52 +140,48 @@
   --space-md: clamp(1.25rem, 1rem + 1vw, 1.75rem);
   --space-lg: clamp(2rem, 1.5rem + 2vw, 3.25rem);
   --space-xl: clamp(3rem, 2.2rem + 3vw, 5rem);
-  --space-2xl: clamp(4rem, 3rem + 4vw, 6.5rem);
+  --space-2xl: clamp(4rem, 2.8rem + 5vw, 8rem);
+  --space-3xl: clamp(5rem, 3rem + 8vw, 11rem);
 
-  /* Vertical rhythm, largest to smallest; never let an inner gap exceed an outer one.
-     section 48→64px, group 28→37px, item 20→26px, tight 8px (390px → 1320px). */
-  --rhythm-section: clamp(3rem, 2.55rem + 1.8vw, 4rem);
-  --rhythm-group: clamp(1.75rem, 1.5rem + 1vw, 2.5rem);
+  /* Vertical rhythm, largest to smallest; never let an inner gap exceed an outer one. */
+  --rhythm-section: clamp(4.5rem, 3rem + 6vw, 9rem);
+  --rhythm-group: clamp(2rem, 1.5rem + 2vw, 3.5rem);
   --rhythm-item: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
   --rhythm-tight: var(--space-xs);
-
-  /* A section title to its own body. */
   --rhythm-stack: var(--rhythm-item);
 
-  /* Motion — short and functional only. */
+  /* Motion */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-ambient: cubic-bezier(0.43, 0.13, 0.23, 0.96);
-  --ease-emphasised: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-emphasised: cubic-bezier(0.16, 1, 0.3, 1);
 
   --duration-fast: 140ms;
-  --duration-normal: 220ms;
-  --duration-slow: 340ms;
+  --duration-normal: 240ms;
+  --duration-slow: 420ms;
 
   --motion-quick: var(--duration-fast) var(--ease-precise);
   --motion-standard: var(--duration-normal) var(--ease-precise);
 
-  --stagger-1: 40ms;
-  --stagger-2: 80ms;
+  --stagger-1: 60ms;
+  --stagger-2: 120ms;
 
   /* Layout */
-  /* A wide poster measure. */
-  --container-width: 1320px;
+  --container-width: 1360px;
   --container-narrow: 780px;
-  --container-gutter: clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem);
+  --container-gutter: clamp(1rem, 0.6rem + 2.6vw, 3.5rem);
   --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
 
-  /* The fixed header's actual height (measured: 77px), plus a little air. */
+  /* The fixed header's height, plus a little air. */
+  --header-height: 68px;
   --header-clearance: 84px;
 
-  /* Z-Index Scale */
   --z-sticky: 100;
   --z-header: 1000;
   --z-modal: 1300;
   --z-toast: 1500;
 }
 
-/* Mode — drives light-dark(). */
 :root[data-mode='light'] {
   color-scheme: light;
 }
@@ -184,7 +190,6 @@
   color-scheme: dark;
 }
 
-/* Smooth auto-height transitions (progressive) */
 @supports (interpolate-size: allow-keywords) {
   :root {
     interpolate-size: allow-keywords;

@@ -1,6 +1,5 @@
-/** Layout. */
+/** Layout and surfaces. */
 
-/* Container */
 .container {
   inline-size: 100%;
   max-inline-size: var(--container-width);
@@ -16,22 +15,20 @@
   align-items: start;
 }
 
-/* Named spans, so a section declares its position in words rather than repeating grid-column arithmetic. */
 .bay__left {
   grid-column: 1 / span 7;
 }
 
-/* Must not share a track with `.bay__left`, or they wrap onto two rows. */
 .bay__far-right {
   grid-column: 8 / span 5;
 }
 
 .bay__marker {
-  grid-column: 1 / span 2;
+  grid-column: 1 / span 3;
 }
 
 .bay__beside-marker {
-  grid-column: 3 / span 7;
+  grid-column: 4 / span 8;
 }
 
 @media (width <= 56em) {
@@ -47,74 +44,117 @@
   }
 }
 
-/* Sections */
 .section {
   position: relative;
   padding-block: var(--rhythm-section);
 }
 
-/* A section set apart by a hairline rather than by a change of ground. */
+/* A hairline set inside the container, not edge to edge. */
 .section--ruled {
-  border-block-start: 1px solid var(--border-light);
+  border-block-start: 0;
 }
 
-/* The two inverted grounds. */
-.section--ink {
-  color: var(--color-chalk);
-  background: var(--color-ink);
-  border-block-start: none;
+.section--ruled::before {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: max(var(--container-gutter), calc((100% - var(--container-width)) / 2 + var(--container-gutter)));
+  block-size: 1px;
+  content: '';
+  background: var(--border-light);
 }
 
-.section--ink .rail-heading,
-.section--ink .caption,
-.section--ink .marker,
-.section--ink .deflist__term,
-.section--ink .deflist__note {
-  color: var(--color-chalk-muted);
-}
-
-.section--ink .deflist,
-.section--ink .deflist__row {
-  border-color: var(--border-on-dark);
-}
-
-.section--ink .deflist__desc,
-.section--ink .section-title {
-  color: var(--color-chalk);
-}
-
-/* The third ground: warm sand, a half-step down from the page. */
-.section--sand {
-  --border-light: var(--border-medium);
-
-  background: var(--bg-secondary);
-  border-block-start: none;
-}
-
-.section--signal {
-  color: var(--color-ink);
-  background: var(--color-orange);
-  border-block-start: none;
-}
-
-/* Anything that crops a graphic at the viewport edge must clip, or the page
-   gains a horizontal scrollbar on wide screens. */
 .section--clip {
   overflow: clip;
 }
 
-/* The prose spine — marker column + text column */
+/* Surfaces. They keep the page's color-scheme, so their light-dark() grounds
+   follow the mode. Each one re-declares the semantic tokens, so everything inside —
+   text, rules, links, buttons, focus rings and form controls — follows. */
+
+.surface-sand,
+.section--sand {
+  --border-light: var(--border-medium);
+
+  --surface: var(--bg-secondary);
+
+  color: var(--text-primary);
+  background: var(--surface);
+}
+
+.surface-bark,
+.section--ink {
+  --text-primary: var(--color-chalk);
+  --text-secondary: #d2c6b5;
+  --text-muted: var(--color-chalk-muted);
+  --accent: var(--color-ember);
+  --on-accent: var(--color-night);
+  --rule-strong: var(--color-chalk);
+  --border-light: var(--color-night-rule);
+  --border-medium: #4a3d34;
+  --border-dark: #66584c;
+  --control-bg: rgb(239 230 214 / 6%);
+  --control-bg-hover: rgb(239 230 214 / 11%);
+  --control-border-color: #574a40;
+  --bg-elevated: var(--color-night-raised);
+
+  --surface: light-dark(var(--color-ink), var(--color-night-soft));
+
+  color: var(--text-primary);
+  background: var(--surface);
+}
+
+.surface-moss {
+  --text-primary: var(--color-chalk);
+  --text-secondary: #d8d6c4;
+  --text-muted: #b9b9a4;
+  --accent: #e9a07c;
+  --on-accent: var(--color-moss-deep);
+  --rule-strong: var(--color-chalk);
+  --border-light: rgb(239 230 214 / 20%);
+
+  --surface: light-dark(var(--color-moss), var(--color-moss-deep));
+
+  color: var(--text-primary);
+  background: var(--surface);
+}
+
+.surface-rust,
+.section--signal {
+  --text-primary: var(--color-paper);
+  --text-secondary: #f6e6da;
+  --text-muted: #f0d6c6;
+  --accent: var(--color-paper);
+  --on-accent: var(--color-rust-deep);
+  --rule-strong: var(--color-paper);
+  --border-light: rgb(244 237 225 / 30%);
+  --border-medium: rgb(244 237 225 / 45%);
+  --control-bg: rgb(244 237 225 / 12%);
+  --control-bg-hover: rgb(244 237 225 / 18%);
+  --control-border-color: rgb(244 237 225 / 55%);
+  --control-placeholder: #f0d6c6;
+  --color-error: #fff1ea;
+
+  --surface: light-dark(var(--color-orange), var(--color-rust-deep));
+
+  color: var(--text-primary);
+  background: var(--surface);
+}
+
+/* The prose spine — marker column + text column (quiet passages, sub-pages). */
 .spine {
   display: grid;
-  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
-  gap: var(--space-sm) var(--space-lg);
+  grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+  gap: var(--space-sm) var(--space-xl);
   align-items: start;
 }
 
-.spine__body {
-  min-inline-size: 0;
+.spine > .rail-heading {
+  position: sticky;
+  inset-block-start: calc(var(--header-clearance) + var(--space-sm));
+  padding-block-start: 0.6em;
 }
 
+.spine__body,
 .spine__body--wide {
   min-inline-size: 0;
 }
@@ -122,16 +162,17 @@
 @media (width <= 56em) {
   .spine {
     grid-template-columns: 1fr;
-    gap: var(--space-xs);
+    gap: var(--space-sm);
+  }
+
+  .spine > .rail-heading {
+    position: static;
   }
 }
 
-/* `content-visibility: auto` skips style, layout and paint for sections far outside the viewport. */
 @supports (content-visibility: auto) {
   :where(
-    .home-circle,
     .home-person,
-    .home-evening,
     .home-frame,
     .faq-section,
     .values-section,
