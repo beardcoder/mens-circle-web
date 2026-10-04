@@ -125,9 +125,12 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
   three soft warm fields (flame, deep rust, amber; eased radial gradients, no blur, a
   still grain against banding) widen unevenly and shift a little on a 31 s phrase of
   three breaths — in shorter than out, a short rest, depth varying — while each turns
-  slowly on its own period, so the form never repeats or restarts. The field starts
-  below the header (mask), so bar and hero stay one surface. `lib/breath.ts` pauses
-  every `[data-breath]` element off screen; under reduced motion it rests, still.
+  slowly on its own period, so the form never repeats or restarts. Scrolling gives
+  depth (`breath-parallax` on `translate`, scroll() timeline over the first screen):
+  rust lags most, amber least. On phones the fields are placed in `svh`, since the
+  hero is several screens tall. The field starts below the header (mask), so bar and
+  hero stay one surface. `lib/breath.ts` pauses every `[data-breath]` element off
+  screen; under reduced motion it rests, still, and does not move with scroll.
 - Smaller breath (`Breath.astro`, keyframes `breathe`, 10 s: 4 in, 0.5 hold, 5 out, 0.5
   rest): rings inside the questions' circle, a light glow on the flame field and a small
   circle to breathe along. Glows stay faint enough that every contrast holds.
