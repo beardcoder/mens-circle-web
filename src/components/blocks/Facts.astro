@@ -19,17 +19,24 @@ const next =
       summarizeNextEvent((await (await import('../../lib/server/events')).fetchNextEventState()).event);
 
 const facts = [
-  { label: 'Wo', value: next?.place || site.geo.locality, sub: 'Die genaue Adresse bekommst du mit der Anmeldung' },
+  {
+    label: 'Wo',
+    value: next?.place || site.geo.locality,
+    sub: 'Die genaue Adresse bekommst du mit der Anmeldebestätigung',
+  },
   // Non-breaking space: the only acceptable break is before "Wochen" — between
   // the 2 and the 4 it reads as a stray hyphen.
-  { label: 'Wie oft', value: 'Alle\u00A02–4 Wochen', sub: 'Ein fester Rhythmus, keine Mitgliedschaft' },
+  { label: 'Wie oft', value: 'Alle\u00A02–4 Wochen', sub: 'Ohne Mitgliedschaft – du kommst, wann es für dich passt' },
   {
     label: 'Dauer',
     value: '2–3 Stunden',
-    sub: next?.timeRange ? `Nächster Termin: ${next.timeRange}` : 'Ein Abend, kein Wochenendseminar',
+    // Word joiners keep "19:00–21:30" on one line.
+    sub: next?.timeRange
+      ? `Nächster Termin: ${next.timeRange.replace('–', '\u2060–\u2060')}`
+      : 'Ein Abend, kein Wochenendseminar',
   },
   // The event's own fee text wins: it may name an amount "Spendenbasis" swallows.
-  { label: 'Beitrag', value: next?.costBasis || 'Spendenbasis', sub: 'Jeder gibt, was für ihn machbar ist' },
+  { label: 'Beitrag', value: next?.costBasis || 'Spendenbasis', sub: 'Du gibst, was für dich machbar ist' },
 ];
 const anchor = data.anchor ?? 'praktisches';
 ---
@@ -58,7 +65,7 @@ const anchor = data.anchor ?? 'praktisches';
   <section class="surface-sand home-facts" id={anchor} aria-labelledby="praktisches-title">
     <div class="container home-facts__inner">
       <h2 class="home-facts__title" id="praktisches-title">
-        {data.eyebrow ?? 'Praktisches'}
+        {data.eyebrow ?? 'Auf einen Blick'}
       </h2>
 
       <dl class="facts-grid">
@@ -128,7 +135,7 @@ const anchor = data.anchor ?? 'praktisches';
       margin: 0;
       font-family: var(--font-display);
       /* Capped by the column, so one long word ("Spendenbasis") never runs out. */
-      font-size: min(var(--text-2xl), 12.5cqi);
+      font-size: min(var(--text-2xl), 14cqi);
       line-height: 1.1;
       color: var(--text-primary);
       letter-spacing: -0.015em;
