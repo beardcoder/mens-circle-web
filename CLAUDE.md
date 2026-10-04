@@ -84,23 +84,39 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
 
 ## Design
 
-- Poster, not theme. Barlow Condensed 800 for display (`.display`, uppercase,
-  `line-height: .85`), Barlow for text; nothing in between.
-- Colours: paper `#F2EDE3`, ink `#1C1714`, orange `#DD5F33`. Orange on paper is fill,
-  stroke and large text only; buttons are ink on orange.
-- Use mode-flipping tokens (`--text-*`, `--bg-*`, `--rule-strong`) on page grounds;
-  literal `--color-ink`/`--color-paper` only on grounds that don't flip.
-- Layout: `.bay` 12-col grid; `.spine` only for quiet passages and sub-pages.
+- Art direction: "the circle keeps a seat for you". Warm, earthy, personal, clear.
+  Loud only once per page; everything else is quiet and set with care.
+- Type: Bricolage Grotesque (variable, `wght`/`wdth`/`opsz`) speaks to the visitor:
+  headings, interface, facts. Newsreader is Markus' voice: leads, prose, quotes,
+  questions (italic). Sentence case. Heavy condensed capitals (`.display--caps`) at
+  most once per page (home: "Dabei sein"). Barlow is loaded for the admin only.
+- Colours (`_variables.css`): cream `#F1E9DC`, rust `#A9512F` (text-capable, 6.4:1),
+  earth `#2A221D`, sand `#E6DAC8`; dark mode night `#1B1512` with ember `#D98A63`.
+  Use the flipping tokens (`--text-*`, `--bg-*`, `--accent`, `--rule`) everywhere;
+  the fixed grounds `.section--earth` (the evening) and `.section--rust` (every way
+  in: dates, closing CTAs) redefine those tokens for their children.
+- Motif: `SeatRing.astro`, a circle of seats with open ones. Decorative unless it
+  carries live data (`free` = the event's real free seats; the number is always in
+  text too). Seats and the scroll-to-top ring are the only round things besides
+  the hero's photo window; everything else uses `--radius` (0.375rem).
+- Layout: `.bay` 12-col grid, sections place parts by line numbers; on phones `.bay`
+  forces one column with `!important` (see `_layout.css`). `.spine` for prose.
+  Phones get their own compositions, not stacked desktop.
 - Vertical rhythm: `--rhythm-section` > `group` > `item` > `tight`; never inverted.
   Lift reserving `min-block-size` once columns stack or an island swaps in.
-- Ring (`Ring.astro`) used exactly twice, never over text. Radius 0 everywhere.
-- Motion: hero entrance, ring scroll drift, statement settle; nothing else. Only
-  `opacity`/`transform`, no `filter: blur()` on display text, one `animation` per
-  element. `.display` keeps `padding-block-start: .14em` for umlauts.
+- Motion: one hero entrance (type rises, photo window opens, seats arrive), the
+  breath, the circle turning on scroll, `[data-reveal]` blocks settling, the evening's
+  arcs lighting up per step (`timeline-scope` + named view timelines). Nothing is ever
+  hidden waiting for motion (reveals start at opacity .35). Only `opacity`/`transform`
+  (and `clip-path` for the window); keyframes and `@property` live unlayered in
+  `_keyframes.css`. Reduced motion: everything rests in its final state.
+- The breath (`Breath.astro`, `lib/breath.ts`) is a WebGL2 shader inside the hero's
+  circle: ~4 s in, ~6 s out, paused off-screen and in hidden tabs; its CSS still is the
+  reduced-motion, no-JS and no-WebGL variant.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Block styles live in the component (`<style is:global>` in `@layer sections`), since
-  CSS is inlined per page.
+  CSS is inlined per page. Shared sub-page openings are `.page-hero` in `_hero.css`.
 
 ## Conventions
 

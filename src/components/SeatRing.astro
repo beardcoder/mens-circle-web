@@ -1,0 +1,128 @@
+---
+/**
+ * The site's motif: a circle of seats, some of them open. In the hero one seat is
+ * kept free; on the date blocks the open seats are the event's real free places.
+ * Decorative unless `label` is given; the numbers are always stated in text nearby.
+ */
+
+interface Props {
+  /** How many seats sit in the circle. */
+  seats?: number;
+  /** Indices of open seats, counted clockwise from the top. */
+  open?: number[];
+  /** Alternatively: this many open seats, filled in from the side facing the viewer. */
+  free?: number;
+  /** Seat radius in viewBox units (the circle runs at r=88 in a 200 box). */
+  seatSize?: number;
+  /** Draw the hairline the seats sit on. */
+  orbit?: boolean;
+  /** Seats arrive one by one on load (see utilities/_motion.css). */
+  enter?: boolean;
+  /** The circle turns a little while it scrolls past. */
+  turn?: boolean;
+  label?: string;
+  class?: string;
+}
+
+const {
+  seats = 12,
+  open,
+  free,
+  seatSize = seats > 16 ? 4.6 : 6.4,
+  orbit = true,
+  enter = false,
+  turn = false,
+  label,
+  class: className,
+} = Astro.props;
+
+const R = 88;
+const angleOf = (i: number) => (i / seats) * 2 * Math.PI - Math.PI / 2;
+
+/** Seats nearest the bottom of the circle open first: the side a newcomer walks up to. */
+const nearest = Array.from({ length: seats }, (_, i) => i).sort(
+  (a, b) => Math.abs(Math.sin(angleOf(a)) - 1) - Math.abs(Math.sin(angleOf(b)) - 1),
+);
+const openSet = new Set(open ?? nearest.slice(0, Math.max(0, Math.min(seats, Math.round(free ?? 0)))));
+
+const points = Array.from({ length: seats }, (_, i) => ({
+  i,
+  x: +(R * Math.cos(angleOf(i))).toFixed(2),
+  y: +(R * Math.sin(angleOf(i))).toFixed(2),
+  open: openSet.has(i),
+}));
+---
+
+<svg
+  class:list={['seat-ring', enter && 'kreis--enter', turn && 'kreis--turn', className]}
+  viewBox="-100 -100 200 200"
+  focusable="false"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <g class="kreis__seats">
+    {orbit && <circle class="seat-ring__orbit" r={R} />}
+    {points.map((p) => (
+      <circle class:list={['seat', p.open && 'seat--open']} cx={p.x} cy={p.y} r={seatSize} style={`--i:${p.i}`} />
+    ))}
+  </g>
+</svg>
+
+<style is:global>
+  @layer components {
+    .seat-ring {
+      display: block;
+      inline-size: 100%;
+      block-size: auto;
+      overflow: visible;
+    }
+
+    /* Turns about the circle's own centre. */
+    .kreis__seats {
+      transform-origin: 50% 50%;
+      transform-box: view-box;
+    }
+
+    .seat-ring__orbit {
+      fill: none;
+      stroke: var(--rule);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .seat {
+      fill: var(--seat);
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    /* An open seat: a ring in the accent, waiting. */
+    .seat--open {
+      fill: var(--bg-primary);
+      stroke: var(--seat-open);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .section--sand .seat--open {
+      fill: var(--bg-secondary);
+    }
+
+    .section--earth .seat--open,
+    .section--rust .seat--open {
+      fill: transparent;
+    }
+
+    @media (forced-colors: active) {
+      .seat {
+        fill: CanvasText;
+      }
+
+      .seat--open {
+        fill: Canvas;
+        stroke: CanvasText;
+      }
+    }
+  }
+</style>

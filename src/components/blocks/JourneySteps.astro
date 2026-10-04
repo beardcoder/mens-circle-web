@@ -8,7 +8,6 @@ interface Step {
 interface Props {
   data: {
     anchor?: string;
-    eyebrow?: string;
     title?: string;
     subtitle?: string;
     steps?: Step[];
@@ -16,118 +15,290 @@ interface Props {
   };
 }
 
-/** The evening as a ruled ladder: big condensed numerals in the margin, a full-width rule above each step. */
+/** The evening as one turn of the circle: four arcs that light up while their step is read. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
-const steps = data.steps ?? [];
+const steps = (data.steps ?? []).slice(0, 4);
+
+// Four quarter arcs on r=80, each 90° less a 14° gap, starting at the top.
+const R = 80;
+const GAP = 14;
+const point = (deg: number) => {
+  const rad = ((deg - 90) * Math.PI) / 180;
+  return `${(R * Math.cos(rad)).toFixed(2)} ${(R * Math.sin(rad)).toFixed(2)}`;
+};
+const arcs = steps.map((_, i) => {
+  const from = i * 90 + GAP / 2;
+  const to = (i + 1) * 90 - GAP / 2;
+  return `M ${point(from)} A ${R} ${R} 0 0 1 ${point(to)}`;
+});
 ---
 
-<section class="section home-evening" id={anchor} aria-labelledby="ablauf-title">
-  <div class="container">
-    <div class="bay home-evening__head">
-      <p class="marker marker--ruled bay__marker">{data.eyebrow}</p>
+<section class="section section--earth home-evening" id={anchor} aria-labelledby="ablauf-title">
+  <div class="container bay">
+    <div class="home-evening__aside">
+      <h2 class="home-evening__title" id="ablauf-title">
+        {data.title}
+      </h2>
+      {data.subtitle && <p class="home-evening__intro">{data.subtitle}</p>}
 
-      <div class="bay__beside-marker">
-        {data.title && (
-          <h2 class="section-title" id="ablauf-title">
-            {data.title}
-          </h2>
-        )}
-        {data.subtitle && <p class="section-intro">{data.subtitle}</p>}
+      <div class="home-evening__clock" aria-hidden="true">
+        <svg viewBox="-100 -100 200 200" focusable="false">
+          <circle class="home-evening__orbit" r={R} />
+          {arcs.map((d, i) => (
+            <path class={`home-evening__arc home-evening__arc--${i + 1}`} d={d} />
+          ))}
+        </svg>
+        <div class="home-evening__labels">
+          {steps.map((step, i) => (
+            <span class={`home-evening__label home-evening__label--${i + 1}`}>{step.title}</span>
+          ))}
+        </div>
       </div>
     </div>
 
-    {steps.length > 0 && (
+    <div class="home-evening__main">
       <ol class="home-evening__list" role="list">
         {steps.map((step) => (
           <li class="home-evening__step">
-            <p class="home-evening__number" aria-hidden="true">
+            <span class="home-evening__number" aria-hidden="true">
               {step.number}
-            </p>
-            <div class="home-evening__text-col">
-              {step.title && <h3 class="home-evening__title">{step.title}</h3>}
+            </span>
+            <div>
+              <h3 class="home-evening__step-title">{step.title}</h3>
               {step.description && <p class="home-evening__text">{step.description}</p>}
             </div>
           </li>
         ))}
       </ol>
-    )}
 
-    {data.close && <div class="home-evening__close prose" set:html={data.close} />}
+      {data.close && <div class="home-evening__close prose" set:html={data.close} />}
+    </div>
   </div>
 </section>
 
 <style is:global>
+  /* Shorter than the distance between two steps, so two names never show at once. */
+  @keyframes phase-label {
+    0%,
+    100% {
+      opacity: 0;
+      translate: 0 0.4em;
+    }
+
+    25%,
+    75% {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
   @layer sections {
-    .home-evening__head {
-      margin-block-end: var(--rhythm-group);
+    .home-evening {
+      timeline-scope: --phase-1, --phase-2, --phase-3, --phase-4;
+    }
+
+    .home-evening__aside {
+      grid-column: 1 / span 5;
+      position: sticky;
+      inset-block-start: calc(var(--header-clearance) + var(--space-md));
+    }
+
+    .home-evening__title {
+      margin: 0;
+      font-size: var(--step-4);
+      color: var(--text-primary);
+    }
+
+    .home-evening__intro {
+      max-inline-size: 34ch;
+      margin-block: var(--space-sm) 0;
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .home-evening__clock {
+      position: relative;
+      inline-size: min(100%, 22rem);
+      margin-block-start: var(--space-lg);
+    }
+
+    .home-evening__clock svg {
+      display: block;
+      inline-size: 100%;
+      overflow: visible;
+    }
+
+    .home-evening__orbit {
+      fill: none;
+      stroke: var(--rule);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .home-evening__arc {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 9;
+      stroke-linecap: round;
+    }
+
+    .home-evening__labels {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    /* Without scroll timelines the centre stays empty and all four arcs show. */
+    .home-evening__label {
+      grid-area: 1 / 1;
+      font-family: var(--font-display);
+      font-size: var(--step-2);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      opacity: 0;
     }
 
     .home-evening__list {
       padding: 0;
       margin: 0;
-      list-style: none;
     }
 
-    /* Each step is a full-width row with a 3px rule on top — the ladder reads
-       as one continuous structure rather than four separate objects. */
     .home-evening__step {
       display: grid;
-      grid-template-columns: minmax(0, 3.5fr) minmax(0, 8.5fr);
-      column-gap: var(--col-gap);
-      align-items: start;
-      padding-block: var(--space-md) var(--space-lg);
-      border-block-start: 3px solid var(--rule-strong);
+      grid-template-columns: 4.5rem minmax(0, 1fr);
+      gap: var(--space-sm);
+      padding-block: var(--space-xl);
+      border-block-start: 1px solid var(--rule);
     }
 
+    .home-evening__step:first-child {
+      padding-block-start: var(--space-sm);
+      border-block-start: none;
+    }
+
+    .home-evening__step:nth-child(1) {
+      view-timeline-name: --phase-1;
+    }
+
+    .home-evening__step:nth-child(2) {
+      view-timeline-name: --phase-2;
+    }
+
+    .home-evening__step:nth-child(3) {
+      view-timeline-name: --phase-3;
+    }
+
+    .home-evening__step:nth-child(4) {
+      view-timeline-name: --phase-4;
+    }
+
+    /* The number as an outlined seat. */
     .home-evening__number {
-      margin: 0;
+      display: grid;
+      place-items: center;
+      inline-size: 3.25rem;
+      block-size: 3.25rem;
       font-family: var(--font-display);
-      font-size: var(--display-numeral);
-      font-weight: 800;
-      line-height: 0.8;
-      /* Orange passes as large text (3.1:1). */
-      color: var(--color-orange);
-      letter-spacing: -0.03em;
+      font-size: 1.375rem;
+      font-weight: 600;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
     }
 
-    .home-evening__title {
-      margin-block-end: var(--space-xs);
-      font-size: var(--text-3xl);
-      line-height: 1.02;
+    .home-evening__step-title {
+      margin: 0.35rem 0 var(--space-xs);
+      font-size: var(--step-3);
       color: var(--text-primary);
-      letter-spacing: -0.015em;
     }
 
     .home-evening__text {
-      max-inline-size: var(--measure);
+      max-inline-size: 46ch;
       margin: 0;
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      line-height: 1.55;
       color: var(--text-secondary);
     }
 
     .home-evening__close {
-      max-inline-size: var(--measure);
+      margin-block-start: var(--space-md);
+      margin-inline-start: calc(4.5rem + var(--space-sm));
       padding-block-start: var(--space-md);
-      margin-block-start: 0;
-      border-block-start: 3px solid var(--rule-strong);
+      border-block-start: 1px solid var(--rule);
     }
 
     .home-evening__close p {
-      font-size: var(--text-section-body);
+      color: var(--text-secondary);
+    }
+
+    .home-evening__main {
+      grid-column: 7 / span 6;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) and (timeline-scope: --a) {
+        .home-evening__arc,
+        .home-evening__label {
+          animation: phase-on linear both;
+          animation-range: cover 15% cover 85%;
+        }
+
+        .home-evening__label {
+          animation-name: phase-label;
+          animation-range: cover 40% cover 60%;
+        }
+
+        .home-evening__arc--1,
+        .home-evening__label--1 {
+          animation-timeline: --phase-1;
+        }
+
+        .home-evening__arc--2,
+        .home-evening__label--2 {
+          animation-timeline: --phase-2;
+        }
+
+        .home-evening__arc--3,
+        .home-evening__label--3 {
+          animation-timeline: --phase-3;
+        }
+
+        .home-evening__arc--4,
+        .home-evening__label--4 {
+          animation-timeline: --phase-4;
+        }
+      }
     }
 
     @media (width <= 56em) {
+      .home-evening__aside {
+        position: static;
+      }
+
+      .home-evening__clock {
+        inline-size: min(60vw, 14rem);
+        margin-block: var(--space-lg) var(--space-md);
+      }
+
       .home-evening__step {
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: var(--space-2xs);
-        padding-block: var(--space-sm) var(--space-md);
+        grid-template-columns: 3.25rem minmax(0, 1fr);
+        padding-block: var(--space-lg);
       }
 
       .home-evening__number {
-        font-size: clamp(2.75rem, 2rem + 4vw, 4rem);
+        inline-size: 2.6rem;
+        block-size: 2.6rem;
+        font-size: 1.125rem;
+      }
+
+      .home-evening__close {
+        margin-inline-start: 0;
       }
     }
   }

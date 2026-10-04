@@ -1,81 +1,52 @@
-/** Buttons — one token-driven base (`.btn`) with variant and size modifiers. */
+/** Buttons — one token-driven base (`.btn`) with variant and size modifiers.
+    The primary carries a seat: an open circle that fills when you take it. */
 
-/* Base */
 .btn {
-  --btn-bg: var(--color-orange);
-  /* Ink on orange in both modes: the orange does not flip, so neither does the
-     label on it. The hover inverts to the page's own ink, which does flip. */
-  --btn-color: var(--color-ink);
-  --btn-border: var(--color-orange);
+  --btn-bg: var(--accent);
+  --btn-color: var(--on-accent);
+  --btn-border: var(--accent);
   --btn-hover-bg: var(--text-primary);
   --btn-hover-color: var(--bg-primary);
   --btn-hover-border: var(--text-primary);
-  --btn-padding-block: 0.85rem;
-  --btn-padding-inline: 1.5rem;
-  --btn-gap: 0.7em;
-  --btn-font-size: 1rem;
-  --btn-radius: 0;
-  --btn-border-width: 2px;
-  --btn-arrow-size: 1.05em;
-  /* 24x24 viewBox, geometry mirrored about y=12 so the mask box centres it.
-     Stroke 2.5 lands near the 2px border weight at this size. */
-  --btn-arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5'%3E%3Cpath d='M3 12h17.5M13.5 5 20.5 12l-7 7'/%3E%3C/svg%3E");
+  --btn-padding-block: 0.8rem;
+  --btn-padding-inline: 1.35rem;
+  --btn-font-size: 1.0625rem;
 
   display: inline-flex;
-  gap: var(--btn-gap);
+  gap: 0.75em;
   align-items: center;
   justify-content: center;
-  /* Every interactive target clears 44px without the padding having to. */
   min-block-size: 48px;
   padding-block: var(--btn-padding-block);
   padding-inline: var(--btn-padding-inline);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: var(--btn-font-size);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.15;
   color: var(--btn-color);
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: -0.003em;
   text-decoration: none;
   cursor: pointer;
   background-color: var(--btn-bg);
-  border: var(--btn-border-width) solid var(--btn-border);
-  border-radius: var(--btn-radius);
+  border: 1.5px solid var(--btn-border);
+  border-radius: var(--radius);
   transition:
     background-color var(--motion-quick),
     color var(--motion-quick),
     border-color var(--motion-quick);
 }
 
-/* The arrow. */
-.btn--primary::after {
+/* The seat. */
+.btn--primary::before {
   flex: none;
-  inline-size: var(--btn-arrow-size);
-  block-size: var(--btn-arrow-size);
+  inline-size: 0.6em;
+  block-size: 0.6em;
   content: '';
-  background-color: currentcolor;
-  mask-image: var(--btn-arrow-icon);
-  mask-repeat: no-repeat;
-  mask-position: center;
-  mask-size: contain;
-  transition: translate var(--motion-quick);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .btn--primary:hover::after {
-    translate: 4px 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .btn--primary::after {
-    transition: none;
-  }
-
-  .btn--primary:hover::after {
-    translate: 0;
-  }
+  border: 1.5px solid currentcolor;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 0 currentcolor;
+  transition: box-shadow var(--duration-normal) var(--ease-settle);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -84,30 +55,26 @@
     background-color: var(--btn-hover-bg);
     border-color: var(--btn-hover-border);
   }
+
+  .btn--primary:hover::before {
+    box-shadow: inset 0 0 0 0.3em currentcolor;
+  }
 }
 
-/* Must show on paper, ink and orange. */
+.btn:active {
+  translate: 0 1px;
+}
+
 .btn:focus-visible {
-  outline: 3px solid var(--text-primary);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
-  box-shadow: 0 0 0 3px var(--color-orange);
-}
-
-.section--ink .btn:focus-visible,
-.section--signal .btn:focus-visible,
-.footer .btn:focus-visible {
-  outline-color: var(--color-paper);
-}
-
-.section--signal .btn:focus-visible {
-  outline-color: var(--color-ink);
 }
 
 .btn:disabled,
 .btn[aria-disabled='true'] {
   pointer-events: none;
   cursor: not-allowed;
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 .btn svg {
@@ -119,44 +86,30 @@
 /* Variants */
 
 .btn--primary {
-  --btn-bg: var(--color-orange);
-  /* Ink on orange in both modes: the orange does not flip, so neither does its
-     label. 5.9:1 either way. */
-  --btn-color: var(--color-ink);
-  --btn-border: var(--color-orange);
-  /* The hover inverts to the page's own ink, which DOES flip — on the dark
-     ground an ink-on-ink hover made the button disappear. */
-  --btn-hover-bg: var(--text-primary);
-  --btn-hover-color: var(--bg-primary);
-  --btn-hover-border: var(--text-primary);
+  --btn-bg: var(--accent);
+  --btn-color: var(--on-accent);
+  --btn-border: var(--accent);
 }
 
-/* On the ink ground the hover cannot go darker, so it goes lighter. */
-.section--ink .btn--primary,
-.footer .btn--primary {
-  --btn-hover-bg: var(--color-paper);
-  --btn-hover-color: var(--color-ink);
-  --btn-hover-border: var(--color-paper);
+/* On the fixed grounds the hover cannot fall back to the page's ink. */
+.section--earth .btn,
+.footer .btn {
+  --btn-hover-bg: var(--on-ground);
+  --btn-hover-color: var(--earth);
+  --btn-hover-border: var(--on-ground);
 }
 
-/* On the orange field the primary would disappear — invert it there. */
-.section--signal .btn--primary {
-  --btn-bg: var(--color-ink);
-  --btn-color: var(--color-paper);
-  --btn-border: var(--color-ink);
-  --btn-hover-bg: transparent;
-  --btn-hover-color: var(--color-ink);
-  --btn-hover-border: var(--color-ink);
+.section--rust .btn {
+  --btn-hover-bg: var(--earth);
+  --btn-hover-color: var(--on-ground);
+  --btn-hover-border: var(--earth);
 }
 
-/* Outlined, on whichever ground the page currently has */
+/* Outlined, on whichever ground the section has. */
 .btn--secondary {
   --btn-bg: transparent;
   --btn-color: var(--text-primary);
-  --btn-border: var(--rule-strong);
-  --btn-hover-bg: var(--text-primary);
-  --btn-hover-color: var(--bg-primary);
-  --btn-hover-border: var(--text-primary);
+  --btn-border: currentcolor;
 }
 
 /* Low-emphasis text button */
@@ -170,17 +123,18 @@
   --btn-padding-inline: var(--space-xs);
 
   text-decoration: underline;
-  text-decoration-color: var(--color-orange);
-  text-decoration-thickness: 2px;
+  text-decoration-color: var(--accent);
   text-underline-offset: 0.25em;
 }
 
 /* Sizes */
 
 .btn--large {
-  --btn-padding-block: 1.05rem;
-  --btn-padding-inline: 2rem;
+  --btn-padding-block: 1rem;
+  --btn-padding-inline: 1.65rem;
   --btn-font-size: 1.125rem;
+
+  min-block-size: 56px;
 }
 
 .btn--block {
@@ -193,4 +147,14 @@
   flex-wrap: wrap;
   gap: var(--space-xs) var(--space-md);
   align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn--primary::before {
+    transition: none;
+  }
+
+  .btn:active {
+    translate: none;
+  }
 }

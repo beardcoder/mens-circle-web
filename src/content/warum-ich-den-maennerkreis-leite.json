@@ -5,70 +5,64 @@
     "ogTitle": "Warum ich den Männerkreis leite",
     "ogDescription": "Ein persönlicher Einblick von Markus Sommer. Für Männer, die spüren, dass sie mehr echten Austausch brauchen, aber vielleicht noch unsicher sind.",
     "datePublished": "2026-06-20",
-    "dateModified": "2026-09-12"
+    "dateModified": "2026-10-04"
   },
   "blocks": [
     {
       "type": "page-hero",
       "data": {
         "anchor": "anfang",
-        "eyebrow": "Persönlich",
+        "eyebrow": "Markus Sommer, Männerkreis Straubing",
         "title": "Warum ich den Männerkreis leite",
-        "lead": "Ich glaube, viele Männer tragen mehr mit sich herum, als man ihnen ansieht. Nach außen läuft vieles. Arbeit. Familie. Alltag. Verantwortung. Aber innen bleibt oft wenig Raum. Für Ruhe. Für ehrliche Worte. Für das, was wirklich da ist. Genau deshalb gibt es diesen Männerkreis.",
+        "lead": "Viele Männer tragen mehr mit sich herum, als man ihnen ansieht. Nach außen läuft vieles – Arbeit, Familie, Verantwortung. Innen bleibt oft wenig Raum für Ruhe und ehrliche Worte. Dafür gibt es diesen Kreis.",
         "align": "left",
         "image": "/images/markus-sommer.jpg",
         "imageAlt": "Markus Sommer sitzt auf einem Felsen und blickt im Abendlicht über eine bewaldete Hügellandschaft.",
-        "imageCaption": "Markus Sommer begleitet den Männerkreis in Straubing."
+        "imageCaption": "Markus Sommer hält den Männerkreis in Straubing."
       }
     },
     {
       "type": "text-section",
       "data": {
-        "eyebrow": "Warum überhaupt",
-        "title": "Ich bin nicht hier, weil ich alles verstanden habe",
-        "content": "<p>Ich leite diesen Kreis nicht, weil ich über den Dingen stehe, und auch nicht, weil ich für alles eine Antwort habe. Ich leite ihn, weil ich selbst erlebt habe, wie wertvoll ehrliche Räume unter Männern sein können.</p><p>Viele Männer haben gelernt, Dinge mit sich selbst auszumachen. Still bleiben. Durchhalten. Weitermachen. Nicht zu viel zeigen. Das kann eine Stärke sein. Es kann aber auch einsam machen.</p><p>Ein Männerkreis ist kein Ort, an dem Männer schwach gemacht werden. Er ist ein Ort, an dem sie wieder ehrlicher werden können: mit sich selbst, mit anderen, mit dem, was sie wirklich bewegt. Nicht dramatisch, nicht künstlich tief. Einfach ehrlich.</p>"
+        "eyebrow": "Warum",
+        "title": "Nicht, weil ich alles verstanden habe",
+        "content": "<p>Ich leite diesen Kreis nicht, weil ich über den Dingen stehe oder für alles eine Antwort habe. Ich leite ihn, weil ich selbst erlebt habe, wie wertvoll ehrliche Räume unter Männern sind.</p><p>Viele von uns haben gelernt, Dinge mit sich selbst auszumachen: still bleiben, durchhalten, weitermachen. Das kann eine Stärke sein. Es kann aber auch einsam machen.</p><p>Im Kreis wird niemand schwach gemacht. Wir werden ehrlicher – mit uns selbst, mit den anderen und mit dem, was uns wirklich bewegt. Nicht dramatisch, nicht künstlich tief. Einfach ehrlich.</p>"
       }
     },
     {
       "type": "text-section",
       "data": {
-        "eyebrow": "Die Hürde davor",
+        "eyebrow": "Vor dem ersten Mal",
         "title": "Vielleicht bist du unsicher",
-        "content": "<p>Vielleicht liest du diese Seite und ein Teil von dir denkt: Das klingt gut. Ein anderer Teil fragt sich: Ist das wirklich etwas für mich?</p><p>Das ist normal.</p><p>Viele Männer sind unsicher, bevor sie zum ersten Mal in einen Männerkreis kommen. Weil sie nicht wissen, was sie erwartet. Weil sie nicht gelernt haben, vor anderen Männern ehrlich zu sprechen. Oder weil sie keine Lust auf etwas Abgehobenes haben.</p><p>Genau deshalb halte ich den Kreis klar und bodenständig.</p><p>Du musst nichts darstellen. Du musst nichts beweisen. Du musst auch nicht sofort viel reden.</p><p>Du darfst erst einmal ankommen.</p>"
+        "content": "<p>Ein Teil von dir denkt vielleicht: Das klingt gut. Ein anderer fragt: Ist das wirklich etwas für mich? So geht es vielen Männern vor ihrem ersten Abend – weil sie nicht wissen, was sie erwartet, oder weil sie keine Lust auf etwas Abgehobenes haben.</p><p>Deshalb halte ich den Kreis klar und bodenständig. Du musst nichts beweisen und nicht gleich viel reden. Du darfst erst einmal ankommen.</p>"
       }
     },
     {
       "type": "value-items",
       "data": {
         "anchor": "haltung",
-        "eyebrow": "Meine Haltung",
         "title": "Was mir im Kreis wichtig ist",
-        "intro": "Mir geht es nicht um große Worte. Nicht um Selbstdarstellung. Nicht um spirituelle Rollenbilder. Mir geht es um etwas Einfaches: Ein Mann sitzt da. Spricht ehrlich. Hört anderen Männern zu. Übernimmt Verantwortung für das, was in ihm da ist.",
+        "intro": "Keine großen Worte und keine Rollenbilder, sondern etwas Einfaches: Ein Mann sitzt da, spricht ehrlich, hört anderen Männern zu und übernimmt Verantwortung für das, was in ihm da ist.",
         "items": [
           {
-            "number": "01",
             "title": "Ehrlichkeit statt Fassade",
-            "description": "Nicht stark wirken müssen. Sondern sagen dürfen, was wirklich da ist."
+            "description": "Nicht stark wirken müssen, sondern sagen dürfen, was wirklich da ist."
           },
           {
-            "number": "02",
             "title": "Verbindung statt Einzelkampf",
             "description": "Männer müssen nicht alles allein mit sich ausmachen."
           },
           {
-            "number": "03",
             "title": "Präsenz statt Dauerdenken",
-            "description": "Raus aus dem Kopf. Wieder mehr in den Körper, den Atem und den Moment."
+            "description": "Raus aus dem Kopf, wieder mehr in den Körper, den Atem und den Moment."
           },
           {
-            "number": "04",
             "title": "Verantwortung statt Schuldzuweisung",
-            "description": "Jeder Mann bleibt bei sich und übernimmt Verantwortung für seinen eigenen Weg."
+            "description": "Jeder bleibt bei sich und übernimmt Verantwortung für seinen eigenen Weg."
           },
           {
-            "number": "05",
             "title": "Würde statt Bewertung",
-            "description": "Jeder Mann wird ernst genommen. Ohne Schauspiel. Ohne Abwertung."
+            "description": "Jeder wird ernst genommen. Ohne Schauspiel, ohne Abwertung."
           }
         ]
       }
@@ -76,42 +70,37 @@
     {
       "type": "text-section",
       "data": {
-        "eyebrow": "Was du erwarten kannst",
-        "title": "Der Kreis bleibt einfach",
-        "content": "<p>Ich weiß, dass viele Männer bei Begriffen wie Männerarbeit, Atemarbeit oder Persönlichkeitsentwicklung erst einmal skeptisch sind. Das verstehe ich. Darum bleibt der Kreis einfach, klar und greifbar: Wir sitzen zusammen, klären den Rahmen, kommen an und sprechen ehrlich.</p><p>Manchmal gehört eine einfache Übung mit Atem oder Körperwahrnehmung dazu. Nicht, um etwas Besonderes zu machen, sondern um aus dem Kopf wieder mehr in den Körper zu kommen.</p><p>Von mir kannst du keinen perfekten Lehrer erwarten und keinen Mann, der dir sagt, wie du zu leben hast. Was du erwarten kannst: einen klaren Rahmen, Vertraulichkeit als gemeinsame Absprache, Ruhe, Respekt und einen Raum, in dem jeder in seiner Würde bleibt. Ich halte den Rahmen – für sich selbst verantwortlich bleibt jeder Mann trotzdem.</p>"
+        "eyebrow": "Atem und Körper",
+        "title": "Aus dem Kopf in den Körper",
+        "content": "<p>Bei Begriffen wie Atemarbeit oder Persönlichkeitsentwicklung sind viele Männer erst einmal skeptisch. Das verstehe ich. Darum bleibt es bei uns einfach: Wir sitzen zusammen, klären den Rahmen, kommen an und sprechen ehrlich.</p><p>Manchmal gehört eine einfache Übung mit Atem oder Körperwahrnehmung dazu – nicht, um etwas Besonderes zu erleben, sondern um aus dem Dauerdenken wieder im Körper und im Moment anzukommen. Du machst mit, soweit es für dich passt.</p>"
       }
     },
     {
       "type": "text-section",
       "data": {
-        "eyebrow": "Einladung",
-        "title": "Komm so, wie du gerade bist",
-        "content": "<p>Du musst nicht wissen, was dich erwartet. Du musst auch nicht besonders offen oder vorbereitet sein.</p><p>Komm einfach als der Mann, der du gerade bist.</p><p>Nicht perfekt. Nicht fertig. Aber ehrlich.</p><p><a class=\"link\" href=\"/\">Zurück zur Übersicht des Männerkreises</a></p>"
+        "eyebrow": "Meine Rolle",
+        "title": "Einen klaren Rahmen, keinen Lehrer",
+        "content": "<p>Von mir bekommst du keine fertigen Antworten und niemanden, der dir sagt, wie du zu leben hast. Was du erwarten kannst: einen klaren Rahmen, Vertraulichkeit als gemeinsame Absprache, Ruhe, Respekt und einen Raum, in dem jeder in seiner Würde bleibt.</p><p>Ich halte den Rahmen. Für sich selbst verantwortlich bleibt jeder Mann.</p>"
       }
     },
     {
       "type": "faq",
       "data": {
         "anchor": "faq",
-        "eyebrow": "Häufige Fragen",
         "title": "Fragen zu mir und meiner Rolle",
-        "intro": "Die allgemeinen Fragen zum Kreis beantwortet die <a class=\"link\" href=\"/#faq\">Startseite</a>. Hier geht es um meine Rolle.",
+        "intro": "Die allgemeinen Fragen zum Kreis beantwortet die <a class=\"link\" href=\"/#faq\">Startseite</a>.",
         "items": [
           {
-            "question": "Muss ich Markus vorher kennen?",
-            "answer": "Nein. Du kannst einfach zum Männerkreis kommen, wenn ein Platz frei ist. Der Rahmen wird am Anfang klar erklärt."
+            "question": "Muss ich dich vorher kennen?",
+            "answer": "Nein. Du kannst einfach kommen, wenn ein Platz frei ist. Den Rahmen erkläre ich am Anfang jedes Abends."
           },
           {
-            "question": "Warum leitest du den Kreis?",
-            "answer": "Weil ich selbst erlebt habe, wie wichtig ehrliche Räume unter Männern sind. Und weil ich glaube, dass viele Männer genau so einen Ort brauchen."
-          },
-          {
-            "question": "Ist der Kreis auch für zurückhaltende Männer geeignet?",
-            "answer": "Ja. Gerade auch. Du musst nicht laut, offen oder besonders erfahren sein. Es reicht, wenn du ehrlich da bist."
+            "question": "Ist der Kreis auch für zurückhaltende Männer?",
+            "answer": "Ja, gerade auch. Du musst nicht laut, offen oder erfahren sein. Es reicht, wenn du ehrlich da bist."
           },
           {
             "question": "Ist das sehr spirituell?",
-            "answer": "Nein. Der Kreis bleibt bodenständig. Es gibt einfache Übungen mit Atem, Körperwahrnehmung und Stille. Aber ohne abgehobene Sprache und ohne Druck."
+            "answer": "Nein. Der Kreis bleibt bodenständig. Es gibt einfache Übungen mit Atem, Körperwahrnehmung und Stille – ohne abgehobene Sprache und ohne Druck."
           }
         ]
       }
@@ -119,11 +108,12 @@
     {
       "type": "cta",
       "data": {
-        "eyebrow": "Nächster Schritt",
-        "title": "Komm dazu, wenn es für dich passt",
-        "text": "Du musst nichts darstellen. Du musst nicht perfekt vorbereitet sein. Es reicht, wenn du ehrlich da bist.",
+        "title": "Komm so, wie du gerade bist.",
+        "text": "Nicht perfekt, nicht fertig, aber ehrlich. Mehr braucht es nicht.",
         "buttonText": "Termine ansehen",
-        "buttonLink": "/event"
+        "buttonLink": "/event",
+        "secondaryLabel": "Zurück zur Übersicht",
+        "secondaryLink": "/"
       }
     }
   ]

@@ -1,99 +1,107 @@
-/** Unlayered: @keyframes inside @layer regressed in Vite/lightningcss builds. Opacity/transform only. */
+/** Unlayered: @keyframes and @property inside @layer regressed in Vite/lightningcss builds. Opacity/transform only. */
 
-/* 1. Hero entrance. */
+/* 1. The hero entrance: type rises, the window opens, the seats take their places. */
 
-@keyframes poster-line-in {
+@keyframes rise {
   from {
     opacity: 0;
-    transform: translate3d(0, 0.45em, 0);
+    translate: 0 0.5em;
+  }
+}
+
+@keyframes seat-in {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+}
+
+@keyframes window-open {
+  from {
+    clip-path: circle(0% at 50% 50%);
+  }
+
+  to {
+    clip-path: circle(50% at 50% 50%);
+  }
+}
+
+/* 2. The circle turns a little as the page scrolls past it (view() timeline). */
+
+@keyframes kreis-turn {
+  from {
+    rotate: -10deg;
+  }
+
+  to {
+    rotate: 14deg;
+  }
+}
+
+/* 3. Blocks settle as they enter. Never fully transparent, so nothing is hidden. */
+
+@keyframes settle {
+  from {
+    opacity: 0.35;
+    translate: 0 1.5rem;
   }
 
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    translate: 0 0;
   }
 }
 
-@keyframes poster-rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 1.25rem, 0);
+/* 4. The phases of the evening light up while their step is in view. */
+
+@keyframes phase-on {
+  0%,
+  100% {
+    opacity: 0.22;
   }
 
-  to {
+  35%,
+  65% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 
-@keyframes ring-in {
+/* 5. The header gains its ground once the page moves. */
+
+@keyframes header-ground {
   from {
+    background-color: transparent;
+    border-block-end-color: transparent;
+  }
+}
+
+/* Scroll-to-top's reading ring (utilities/_animations.css). */
+
+@property --read {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@keyframes scroll-to-top-reveal {
+  0%,
+  8% {
+    pointer-events: none;
     opacity: 0;
-    transform: scale(0.88) rotate(-8deg);
+    translate: 0 0.5rem;
   }
 
-  to {
+  14%,
+  100% {
+    pointer-events: auto;
     opacity: 1;
-    transform: scale(1) rotate(0deg);
+    translate: 0 0;
   }
 }
 
-/* The photograph arrives as a wipe rather than a fade, so it reads as a plate
-   being laid down. `clip-path` on a rect is compositor-friendly. */
-@keyframes plate-in {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-
+@keyframes scroll-to-top-read {
   to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-/* 2. Ring drift on scroll (view() timeline). */
-
-@keyframes ring-drift {
-  from {
-    transform: translate3d(0, -20px, 0) rotate(-6deg);
-  }
-
-  to {
-    transform: translate3d(0, 20px, 0) rotate(6deg);
-  }
-}
-
-@keyframes ring-drift-reverse {
-  from {
-    transform: translate3d(0, 22px, 0) rotate(7deg);
-  }
-
-  to {
-    transform: translate3d(0, -22px, 0) rotate(-5deg);
-  }
-}
-
-/* 3. Statement lines settle flush left. */
-
-@keyframes statement-settle {
-  from {
-    transform: translate3d(var(--statement-from, 8%), 0, 0);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-/* Retained: sub-page openings still use the plain rise. */
-@keyframes hero-rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 0.75rem, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+    --read: 100%;
   }
 }
 

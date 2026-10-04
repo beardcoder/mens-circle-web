@@ -8,7 +8,8 @@
   margin-inline: auto;
 }
 
-/* The 12-column bay */
+/* The 12-column bay. Sections place their parts on it by line numbers in their
+   own styles; it collapses to one column on phones. */
 .bay {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -16,34 +17,16 @@
   align-items: start;
 }
 
-/* Named spans, so a section declares its position in words rather than repeating grid-column arithmetic. */
-.bay__left {
-  grid-column: 1 / span 7;
-}
-
-/* Must not share a track with `.bay__left`, or they wrap onto two rows. */
-.bay__far-right {
-  grid-column: 8 / span 5;
-}
-
-.bay__marker {
-  grid-column: 1 / span 2;
-}
-
-.bay__beside-marker {
-  grid-column: 3 / span 7;
-}
-
 @media (width <= 56em) {
   .bay {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .bay__left,
-  .bay__far-right,
-  .bay__marker,
-  .bay__beside-marker {
-    grid-column: 1 / -1;
+  /* `!important` in this early layer outranks every later layer, which is the
+     point: sections place their parts by line numbers, and on one column those
+     numbers would otherwise open implicit tracks and overflow the page. */
+  .bay > * {
+    grid-column: 1 / -1 !important;
   }
 }
 
@@ -55,46 +38,48 @@
 
 /* A section set apart by a hairline rather than by a change of ground. */
 .section--ruled {
-  border-block-start: 1px solid var(--border-light);
+  border-block-start: 1px solid var(--rule);
 }
 
-/* The two inverted grounds. */
-.section--ink {
-  color: var(--color-chalk);
-  background: var(--color-ink);
-  border-block-start: none;
-}
-
-.section--ink .rail-heading,
-.section--ink .caption,
-.section--ink .marker,
-.section--ink .deflist__term,
-.section--ink .deflist__note {
-  color: var(--color-chalk-muted);
-}
-
-.section--ink .deflist,
-.section--ink .deflist__row {
-  border-color: var(--border-on-dark);
-}
-
-.section--ink .deflist__desc,
-.section--ink .section-title {
-  color: var(--color-chalk);
-}
-
-/* The third ground: warm sand, a half-step down from the page. */
+/* The sunk ground: sand on cream, a step up on night. */
 .section--sand {
-  --border-light: var(--border-medium);
+  --rule: light-dark(#cdbaa0, var(--night-rule));
 
   background: var(--bg-secondary);
-  border-block-start: none;
 }
 
-.section--signal {
-  color: var(--color-ink);
-  background: var(--color-orange);
-  border-block-start: none;
+/* The two fixed grounds. Their own text tokens, so nothing inside needs to know
+   which mode the page is in. */
+.section--earth,
+.section--rust {
+  --text-primary: var(--on-ground);
+  --text-secondary: var(--on-ground-soft);
+  --text-muted: var(--on-ground-soft);
+  --rule: rgb(243 235 223 / 22%);
+  --rule-strong: var(--on-ground);
+  --seat: var(--on-ground);
+  --focus: var(--on-ground);
+
+  color: var(--text-primary);
+}
+
+.section--earth {
+  --accent: var(--ember);
+  --accent-strong: #e9a483;
+  --on-accent: var(--night);
+  --seat-open: var(--ember);
+
+  background: var(--ground-earth);
+}
+
+/* On rust the accent turns to the ground's own light. */
+.section--rust {
+  --accent: var(--on-ground);
+  --accent-strong: #fff;
+  --on-accent: var(--rust-deep);
+  --seat-open: var(--on-ground);
+
+  background: var(--ground-rust);
 }
 
 /* Anything that crops a graphic at the viewport edge must clip, or the page
@@ -103,18 +88,22 @@
   overflow: clip;
 }
 
-/* The prose spine — marker column + text column */
+/* The prose spine — a narrow label column beside a text column. */
 .spine {
   display: grid;
-  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
-  gap: var(--space-sm) var(--space-lg);
+  grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+  gap: var(--space-sm) var(--space-xl);
   align-items: start;
 }
 
-.spine__body {
-  min-inline-size: 0;
+.spine > .rail-heading {
+  position: sticky;
+  inset-block-start: calc(var(--header-clearance) + var(--space-sm));
+  margin: 0;
+  padding-block-start: 0.35em;
 }
 
+.spine__body,
 .spine__body--wide {
   min-inline-size: 0;
 }
@@ -124,6 +113,10 @@
     grid-template-columns: 1fr;
     gap: var(--space-xs);
   }
+
+  .spine > .rail-heading {
+    position: static;
+  }
 }
 
 /* `content-visibility: auto` skips style, layout and paint for sections far outside the viewport. */
@@ -131,12 +124,12 @@
   :where(
     .home-circle,
     .home-person,
-    .home-evening,
     .home-frame,
     .faq-section,
     .values-section,
     .testimonials-section,
     .cta-section,
+    .text-section,
     .event-info-section,
     .event-map-section,
     .event-about-section,

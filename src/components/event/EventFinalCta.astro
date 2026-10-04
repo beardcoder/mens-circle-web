@@ -12,60 +12,46 @@ const { event } = Astro.props;
 
 <section class="section section--ruled event-cta-section" aria-labelledby="weiter-title">
   <div class="container">
-    <div class="spine">
-      <h2 class="rail-heading" id="weiter-title">
-        Weiter
-      </h2>
+    <h2 class="event-cta__title" id="weiter-title">
+      Weiterlesen
+    </h2>
 
-      <ul class="event-cta__list spine__body--wide" role="list">
-        {event.is_past && (
-          <li>
-            <a href="/#termine">Bei neuen Terminen benachrichtigen</a>
-          </li>
-        )}
+    <ul class="doors" role="list">
+      {event.is_past && (
         <li>
-          <a href="/event">Alle Termine</a>
+          <a class="doors__link" href="/#termine">
+            <span class="doors__title">Benachrichtigt werden</span>
+            <span class="doors__text">Eine kurze Nachricht, sobald der nächste Abend feststeht.</span>
+          </a>
         </li>
-        <li>
-          <a href="/#ueber">Worum es an so einem Abend geht</a>
-        </li>
-        <li>
-          <a href="/warum-ich-den-maennerkreis-leite">Warum ich den Männerkreis leite</a>
-        </li>
-      </ul>
-    </div>
+      )}
+      <li>
+        <a class="doors__link" href="/event">
+          <span class="doors__title">Alle Termine</span>
+          <span class="doors__text">Der aktuelle Stand und die Benachrichtigung.</span>
+        </a>
+      </li>
+      <li>
+        <a class="doors__link" href="/#ueber">
+          <span class="doors__title">Worum es an einem Abend geht</span>
+          <span class="doors__text">Was im Kreis passiert und was dort gilt.</span>
+        </a>
+      </li>
+      <li>
+        <a class="doors__link" href="/warum-ich-den-maennerkreis-leite">
+          <span class="doors__title">Warum ich den Kreis leite</span>
+          <span class="doors__text">Ein persönlicher Text von Markus.</span>
+        </a>
+      </li>
+    </ul>
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    .event-cta__list {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .event-cta__list li {
-      border-block-end: 1px solid var(--border-light);
-    }
-
-    .event-cta__list a {
-      display: flex;
-      align-items: center;
-      min-block-size: 44px;
-      padding-block: var(--space-xs);
-      font-family: var(--font-display);
-      font-size: var(--text-lg);
-      color: var(--text-primary);
-      transition: color var(--motion-quick);
-    }
-
-    .event-cta__list a:hover,
-    .event-cta__list a:focus-visible {
-      color: var(--accent-text);
-      text-decoration: underline;
-      text-underline-offset: 0.2em;
+    .event-cta__title {
+      margin-block-end: var(--space-lg);
+      font-size: var(--step-3);
     }
   }
 </style>

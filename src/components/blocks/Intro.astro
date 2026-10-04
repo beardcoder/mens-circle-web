@@ -11,7 +11,8 @@ interface Props {
   };
 }
 
-/** A two-column spread: the heading holds the left, the prose the right — the one section that puts no marker in the left column. */
+/** What the evening is about: the title and serif text side by side, then the questions
+ *  the circle keeps coming back to, set as voices around the room rather than a list. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'ueber';
@@ -20,116 +21,125 @@ const questions = data.questions ?? [];
 
 <section class="section home-circle" id={anchor} aria-labelledby="ueber-title">
   <div class="container">
-    <div class="bay">
-      <div class="home-circle__head">
-        <p class="marker marker--ruled">{data.eyebrow}</p>
-        {data.title && (
-          <h2 class="section-title" id="ueber-title">
-            {data.title}
-          </h2>
-        )}
-      </div>
-
-      {data.text && <div class="home-circle__text prose" set:html={data.text} />}
+    <div class="bay home-circle__spread">
+      {data.title && (
+        <h2 class="home-circle__title" id="ueber-title" data-reveal>
+          {data.title}
+        </h2>
+      )}
+      {data.text && <div class="home-circle__text prose" data-reveal set:html={data.text} />}
     </div>
 
     {questions.length > 0 && (
-      <div class="home-circle__questions">
-        <p class="marker home-circle__questions-label">{data.questionsLabel}</p>
-
+      <figure class="home-circle__questions">
+        <figcaption class="home-circle__questions-label">{data.questionsLabel}</figcaption>
         <ul class="home-circle__list" role="list">
           {questions.map((question) => (
-            <li class="home-circle__question">{question}</li>
+            <li class="home-circle__question" data-reveal>
+              {question}
+            </li>
           ))}
         </ul>
-      </div>
+      </figure>
     )}
 
-    {data.close && (
-      <div class="bay">
-        <p class="home-circle__close">{data.close}</p>
-      </div>
-    )}
+    {data.close && <p class="home-circle__close">{data.close}</p>}
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    /* 5 / 7: the heading takes the narrower column and wraps to three or four
-       short lines, which is what gives the spread its edge. */
-    .home-circle__head {
+    .home-circle__title {
       grid-column: 1 / span 5;
+      margin: 0;
+      font-size: var(--step-4);
     }
 
     .home-circle__text {
       grid-column: 7 / span 6;
-      max-inline-size: var(--measure);
+      padding-block-start: 0.4em;
     }
 
     .home-circle__text p {
-      font-size: var(--text-section-body);
-    }
-
-    @media (width <= 56em) {
-      .home-circle__head,
-      .home-circle__text {
-        grid-column: 1 / -1;
-      }
-
-      /* Stacked: one gap, on the text column. */
-      .home-circle__head .section-title {
-        margin-block-end: 0;
-      }
-
-      .home-circle__text {
-        margin-block-start: var(--rhythm-group);
-      }
+      font-size: var(--step-1);
+      line-height: 1.55;
     }
 
     .home-circle__questions {
-      margin-block: var(--rhythm-group);
+      margin: var(--rhythm-section) 0 0;
     }
 
-    /* Full width: this marker carries the rule the list hangs from. */
     .home-circle__questions-label {
-      max-inline-size: none;
-      padding-block-end: var(--space-xs);
-      margin-block-end: 0;
-      border-block-end: 3px solid var(--rule-strong);
+      margin-block-end: var(--space-md);
+      font-family: var(--font-ui);
+      font-size: 0.9375rem;
+      font-weight: 560;
+      color: var(--text-muted);
     }
 
     .home-circle__list {
+      display: grid;
+      gap: var(--space-sm);
       padding: 0;
       margin: 0;
-      list-style: none;
     }
 
-    /* Poster-scale questions on hairlines. Condensed, sentence case rather than
-       uppercase — these are questions being asked, not a slogan being shouted. */
+    /* Each question enters from a different seat: the indents step across the
+       grid like voices taking turns. Serif italic, because these are spoken. */
     .home-circle__question {
-      padding-block: var(--space-sm);
-      font-family: var(--font-display);
-      font-size: clamp(1.5rem, 0.9rem + 2.6vw, 3.25rem);
-      font-weight: 800;
-      line-height: 1;
+      --indent: 0%;
+
+      max-inline-size: 22ch;
+      margin-inline-start: var(--indent);
+      font-family: var(--font-body);
+      font-size: var(--step-4);
+      font-style: italic;
+      font-weight: 360;
+      line-height: 1.08;
       color: var(--text-primary);
-      border-block-end: 1px solid var(--border-medium);
+      letter-spacing: -0.015em;
       text-wrap: balance;
     }
 
-    /* Lands under the prose column, mirroring the spread at the top of the section. */
+    .home-circle__question:nth-child(2) {
+      --indent: 34%;
+    }
+
+    .home-circle__question:nth-child(3) {
+      --indent: 12%;
+    }
+
+    .home-circle__question:nth-child(4) {
+      --indent: 46%;
+    }
+
     .home-circle__close {
-      grid-column: 7 / span 6;
-      max-inline-size: var(--measure);
-      margin-block-start: 0;
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
+      max-inline-size: 30ch;
+      margin: var(--rhythm-group) 0 0 auto;
+      font-family: var(--font-ui);
+      font-size: var(--step-1);
+      font-weight: 520;
+      line-height: var(--leading-snug);
       color: var(--text-secondary);
     }
 
     @media (width <= 56em) {
+      .home-circle__text {
+        margin-block-start: var(--space-md);
+        padding: 0;
+      }
+
+      .home-circle__question:nth-child(n) {
+        --indent: 0%;
+      }
+
+      .home-circle__question:nth-child(even) {
+        margin-inline-start: auto;
+        text-align: end;
+      }
+
       .home-circle__close {
-        grid-column: 1 / -1;
+        margin-inline-start: 0;
       }
     }
   }

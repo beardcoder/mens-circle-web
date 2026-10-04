@@ -8,7 +8,6 @@ import Hero from './blocks/Hero.astro';
 import Intro from './blocks/Intro.astro';
 import JourneySteps from './blocks/JourneySteps.astro';
 import Moderator from './blocks/Moderator.astro';
-import Statement from './blocks/Statement.astro';
 import PageHero from './blocks/PageHero.astro';
 import Testimonials from './blocks/Testimonials.astro';
 import TextSection from './blocks/TextSection.astro';
@@ -43,8 +42,6 @@ const { blocks } = Astro.props;
       return <Moderator data={data} />;
     case 'journey-steps':
       return <JourneySteps data={data} />;
-    case 'statement':
-      return <Statement data={data} />;
     case 'frame':
       return <Frame data={data} />;
     case 'faq':

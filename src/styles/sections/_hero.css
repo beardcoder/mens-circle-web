@@ -1,77 +1,121 @@
-/** Page opening — the block at the top of a sub-page. */
-
-.hero {
+/** Page opening — the block at the top of every sub-page (PageHero.astro, /event, the event pages, 404). */
+.page-hero {
   position: relative;
-  padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
-  border-block-end: 2px solid var(--rule-strong);
+  padding-block: calc(var(--header-clearance) + var(--space-xl)) var(--space-xl);
+  overflow: clip;
 }
 
-.hero__content {
-  max-inline-size: var(--measure-wide);
+.page-hero__layout {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--col-gap);
+  align-items: end;
 }
 
-.hero__label {
-  display: flex;
-  gap: 0.6em;
-  align-items: center;
-  margin-block-end: var(--space-sm);
-  font-family: var(--font-display);
-  font-size: var(--text-marker);
-  font-weight: 600;
-  color: var(--text-primary);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-marker);
+.page-hero__content {
+  grid-column: 1 / span 8;
 }
 
-.hero__label::before {
-  flex: none;
-  inline-size: 1.75rem;
-  block-size: 3px;
-  content: '';
-  background: var(--color-orange);
-}
-
-.hero__title {
-  margin-block-end: var(--space-sm);
-  font-size: var(--display-3);
-  line-height: 0.98;
-  color: var(--text-primary);
-  letter-spacing: -0.015em;
-  text-wrap: balance;
-}
-
-.hero__bottom {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm) var(--space-md);
-  align-items: center;
-  margin-block-start: var(--space-md);
-}
-
-.hero__subtitle {
-  max-inline-size: var(--measure);
+.page-hero__title {
   margin: 0;
-  font-size: var(--text-section-body-lg);
-  line-height: var(--leading-relaxed);
+  font-size: var(--step-5);
+}
+
+.page-hero__lead {
+  max-inline-size: 44ch;
+  margin-block: var(--space-lg) 0;
+  font-family: var(--font-body);
+  font-size: var(--step-2);
+  font-weight: 360;
+  line-height: 1.4;
   color: var(--text-secondary);
-  text-wrap: pretty;
 }
 
-.hero__cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs) var(--space-md);
-  align-items: center;
+.page-hero__cta {
+  margin-block: var(--space-lg) 0;
 }
 
-/* The single-event page: same opening, with the date carrying the weight. */
-.event-hero .hero__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2xs) var(--space-sm);
-  align-items: baseline;
+.page-hero__media {
+  position: relative;
+  grid-column: 9 / -1;
   margin: 0;
-  font-size: var(--text-section-body-lg);
-  line-height: var(--leading-normal);
-  color: var(--text-primary);
+}
+
+.page-hero__frame {
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.page-hero__image {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 20% 50%;
+}
+
+/* A small circle of seats, half over the photograph's corner. */
+.page-hero__seats {
+  position: absolute;
+  inset-block-end: 3rem;
+  inset-inline-start: -4.5rem;
+  inline-size: 9rem;
+}
+
+.page-hero__media .caption {
+  margin-block-start: var(--space-xs);
+}
+
+/* Legal pages and other plain openings: the title alone, a size down. */
+.page-hero--compact {
+  padding-block-end: var(--space-md);
+}
+
+.page-hero--compact .page-hero__title {
+  font-size: var(--step-4);
+}
+
+@media (width <= 56em) {
+  .page-hero {
+    padding-block: calc(var(--header-clearance) + var(--space-lg)) var(--space-lg);
+  }
+
+  .page-hero__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-hero__content,
+  .page-hero__media {
+    grid-column: 1;
+  }
+
+  .page-hero__media {
+    margin-block-start: var(--space-lg);
+  }
+
+  .page-hero__image {
+    aspect-ratio: 4 / 3;
+    object-position: 20% 30%;
+  }
+
+  .page-hero__seats {
+    inset-block-end: auto;
+    inset-block-start: -2.5rem;
+    inset-inline-start: auto;
+    inset-inline-end: 1rem;
+    inline-size: 5.5rem;
+  }
+}
+
+/* The single-event page: the date carries the title, its facts sit under it. */
+.page-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-md);
+  align-items: baseline;
+  margin-block: var(--space-md) 0;
+  font-family: var(--font-ui);
+  font-size: var(--step-1);
+  font-weight: 520;
+  color: var(--text-secondary);
 }

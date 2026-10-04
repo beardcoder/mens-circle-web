@@ -1,0 +1,121 @@
+---
+/**
+ * The breathing ground: one soft, warm body, about four seconds in and six out.
+ * `lib/breath.ts` draws it with a fragment shader; the CSS still below is the same
+ * body at rest, shown without JS, without WebGL2 and with reduced motion. The parent
+ * places it and may set `--breath-x/-y/-radius/-fade`.
+ */
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['breath', className]} data-breath aria-hidden="true">
+  <div class="breath__still"></div>
+  <canvas class="breath__canvas"></canvas>
+</div>
+
+<script>
+  import { initBreath } from '@lib/breath';
+
+  try {
+    initBreath();
+  } catch (error) {
+    // The still stays; the hero needs nothing from this.
+    // eslint-disable-next-line no-console
+    console.error('[breath]', error);
+  }
+</script>
+
+<style is:global>
+  /* Registered, so the shader reads the radius back in resolved pixels. */
+  @property --breath-radius {
+    syntax: '<length>';
+    inherits: true;
+    initial-value: 0px;
+  }
+
+  @layer sections {
+    .breath {
+      /* Centre as a fraction of the hero, radius as a length. */
+      --breath-x: 0.5;
+      --breath-y: 0.5;
+      --breath-radius: min(27vw, 25rem);
+      --breath-fade: 0.22;
+
+      /* Sand (--sand-deep / --night-rule) under a diluted rust core. Kept faint
+         enough that muted text over the core still clears 4.5:1 in both modes. */
+      --breath-flesh: light-dark(rgb(214 198 175 / 62%), rgb(61 50 43 / 66%));
+      --breath-core: light-dark(rgb(169 81 47 / 22%), rgb(217 138 99 / 15%));
+
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: clip;
+      pointer-events: none;
+      contain: strict;
+    }
+
+    .breath__still,
+    .breath__canvas {
+      position: absolute;
+      inset: 0;
+      transition: opacity 1.6s linear;
+    }
+
+    .breath__canvas {
+      inline-size: 100%;
+      block-size: 100%;
+      opacity: 0;
+    }
+
+    .breath[data-live] .breath__canvas {
+      opacity: 1;
+    }
+
+    .breath[data-live] .breath__still {
+      opacity: 0;
+    }
+
+    /* The shader's rest pose in two gradients: the stops trace its smoothstep falloff,
+       the core sits low and left, and the lower edge fades like the canvas does. */
+    .breath__still {
+      --core-x: calc(var(--breath-x) * 100% - var(--breath-radius) * 0.064);
+      --core-y: calc(var(--breath-y) * 100% + var(--breath-radius) * 0.04);
+
+      background:
+        radial-gradient(
+          calc(var(--breath-radius) * 0.78) calc(var(--breath-radius) * 0.74) at var(--core-x) var(--core-y),
+          var(--breath-core),
+          color-mix(in srgb, var(--breath-core) 72%, transparent) 35%,
+          color-mix(in srgb, var(--breath-core) 30%, transparent) 70%,
+          transparent
+        ),
+        radial-gradient(
+          calc(var(--breath-radius) * 1.22) calc(var(--breath-radius) * 1.16) at calc(var(--breath-x) * 100%)
+            calc(var(--breath-y) * 100%),
+          var(--breath-flesh) 37%,
+          color-mix(in srgb, var(--breath-flesh) 80%, transparent) 55%,
+          color-mix(in srgb, var(--breath-flesh) 47%, transparent) 70%,
+          color-mix(in srgb, var(--breath-flesh) 17%, transparent) 85%,
+          transparent
+        );
+      mask-image: linear-gradient(to top, transparent, #000 calc(var(--breath-fade) * 100%));
+    }
+
+    @media (forced-colors: active) {
+      .breath {
+        display: none;
+      }
+    }
+
+    @media print {
+      .breath {
+        display: none;
+      }
+    }
+  }
+</style>

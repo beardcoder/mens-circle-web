@@ -1,7 +1,7 @@
 {
   "siteName": "Männerkreis Straubing",
   "tagline": "Ein Abend, an dem du nichts darstellen musst",
-  "description": "Ein Männerkreis in Straubing: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt.",
+  "description": "Ein Männerkreis in Straubing: Männer sitzen im Kreis, hören einander zu und sprechen über das, was sie gerade beschäftigt.",
   "footerDescription": "Ein Männerkreis in Straubing, Niederbayern. Wir treffen uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.",
   "contactEmail": "hallo@mens-circle.de",
   "contactPhone": "0151 26072643",
@@ -33,5 +33,5 @@
     "postalCode": "94315",
     "country": "DE"
   },
-  "themeColor": "#f2ede3"
+  "themeColor": "#f1e9dc"
 }

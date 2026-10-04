@@ -1,10 +1,11 @@
 ---
 import type { Testimonial } from '@lib/types';
 
-/** Submitted and moderated entries, quoted as written — nothing is added or reworded, and the section renders nothing when none is published. */
+/** Submitted and moderated entries, quoted as written — nothing is added or reworded.
+ *  Without a published entry the section shrinks to an invitation to write one. */
 
 interface Props {
-  data?: { anchor?: string; eyebrow?: string; title?: string };
+  data?: { anchor?: string; title?: string };
   testimonials?: Testimonial[];
   loading?: boolean;
 }
@@ -13,83 +14,94 @@ const { data, loading = false } = Astro.props;
 const testimonials =
   Astro.props.testimonials ?? (await (await import('../../lib/server/testimonials')).fetchTestimonials());
 const anchor = data?.anchor ?? 'stimmen';
+const empty = testimonials.length === 0;
 ---
 
-{
-  <section
-    class:list={['section', 'section--sand', 'testimonials-section', loading && 'testimonials-section--pending']}
-    id={anchor}
-    aria-labelledby="testimonials-title"
-  >
-    <div class="container">
-      <div class="spine">
-        <p class="rail-heading">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
+<section
+  class:list={[
+    'section',
+    'section--ruled',
+    'testimonials-section',
+    loading && 'testimonials-section--pending',
+    empty && 'testimonials-section--empty',
+  ]}
+  id={anchor}
+  aria-labelledby="testimonials-title"
+>
+  <div class="container bay">
+    <h2 class="testimonials__title" id="testimonials-title">
+      {data?.title ?? 'Aus dem Kreis'}
+    </h2>
 
-        <div class="spine__body--wide">
-          <h2 class="section-title" id="testimonials-title">
-            {data?.title ?? 'Was Teilnehmer geschrieben haben'}
-          </h2>
+    <div class="testimonials__body">
+      {empty ? (
+        <p class="testimonials__empty">
+          {loading
+            ? 'Erfahrungen von Teilnehmern werden geladen.'
+            : 'Erfahrungen von Männern, die schon dabei waren, erscheinen hier nach ihrer Freigabe – so, wie sie sie aufgeschrieben haben.'}
+        </p>
+      ) : (
+        <ul class="testimonials__list" role="list">
+          {testimonials.map((t) => (
+            <li class="testimonial-item" data-reveal>
+              <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
+              {(t.author || t.role) && (
+                <p class="testimonial-item__author">
+                  {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
+                  {t.role && <span class="testimonial-item__role">{t.role}</span>}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
 
-          {testimonials.length === 0 && (
-            <p>
-              {loading
-                ? 'Erfahrungen von Teilnehmern werden geladen.'
-                : 'Erfahrungen veröffentlichen wir nach ihrer Freigabe.'}
-            </p>
-          )}
-          <ul class="testimonials__list" role="list">
-            {testimonials.map((t) => (
-              <li class="testimonial-item">
-                <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
-                {(t.author || t.role) && (
-                  <p class="testimonial-item__author">
-                    {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
-                    {t.role && <span class="testimonial-item__role">{t.role}</span>}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-
-          <p class="testimonials__note">
-            Die Zitate stammen von Männern, die beim Kreis waren.{' '}
-            <a class="link" href="/teile-deine-erfahrung">
-              Du warst dabei und möchtest etwas beitragen?
-            </a>
-          </p>
-        </div>
-      </div>
+      <p class="testimonials__note">
+        Du warst schon dabei?{' '}
+        <a class="link" href="/teile-deine-erfahrung">
+          Erzähl in ein paar Sätzen, wie der Abend für dich war.
+        </a>
+      </p>
     </div>
-  </section>
-}
+  </div>
+</section>
 
 <style is:global>
   @layer sections {
-    /* The island's loading floor, and only that: on the loaded section the same
-       rule held a 480px minimum open under a short list of quotes. */
+    /* The island's loading floor, and only that. */
     .testimonials-section--pending {
-      min-block-size: 30rem;
+      min-block-size: 16rem;
     }
 
-    /* A single column, not a two-up grid. */
+    .testimonials-section--empty {
+      padding-block: var(--space-xl);
+    }
+
+    .testimonials__title {
+      grid-column: 1 / span 4;
+      margin: 0;
+      font-size: var(--step-3);
+    }
+
+    .testimonials__body {
+      grid-column: 6 / span 7;
+    }
+
     .testimonials__list {
-      max-inline-size: var(--measure);
-      margin-block-start: var(--rhythm-group);
+      display: grid;
+      gap: var(--rhythm-group);
       padding: 0;
-      list-style: none;
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .testimonial-item {
-      padding-block: var(--rhythm-item);
-      border-block-end: 1px solid var(--border-light);
+      margin: 0;
     }
 
     .testimonial-item__quote {
+      max-inline-size: 34ch;
       margin: 0;
-      font-family: var(--font-display);
-      font-size: var(--text-lg);
-      line-height: var(--leading-normal);
+      font-family: var(--font-body);
+      font-size: var(--step-2);
+      font-style: italic;
+      font-weight: 380;
+      line-height: 1.32;
       color: var(--text-primary);
       text-wrap: pretty;
     }
@@ -99,28 +111,42 @@ const anchor = data?.anchor ?? 'stimmen';
       flex-wrap: wrap;
       gap: var(--space-3xs) var(--space-xs);
       align-items: baseline;
-      margin: 0;
-      padding-block-start: var(--space-xs);
+      margin: var(--space-xs) 0 0;
+      font-family: var(--font-ui);
     }
 
     .testimonial-item__name {
-      font-size: var(--text-caption);
+      font-size: 0.9375rem;
       font-style: normal;
       font-weight: 600;
       color: var(--text-primary);
     }
 
     .testimonial-item__role {
-      font-size: var(--text-caption);
+      font-size: 0.9375rem;
       color: var(--text-muted);
     }
 
+    .testimonials__empty {
+      max-inline-size: 40ch;
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
     .testimonials__note {
-      max-inline-size: var(--measure);
-      margin-block-start: var(--rhythm-group);
-      font-size: var(--text-caption);
-      line-height: var(--leading-relaxed);
+      margin-block-start: var(--space-md);
+      font-family: var(--font-ui);
+      font-size: 0.9375rem;
       color: var(--text-muted);
+    }
+
+    @media (width <= 56em) {
+      .testimonials__title {
+        margin-block-end: var(--space-md);
+      }
     }
   }
 </style>

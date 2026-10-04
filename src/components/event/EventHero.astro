@@ -1,46 +1,92 @@
 ---
 import type { EventDTO } from '@lib/types';
 import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from '@lib/server/format';
+import SeatRing from '../SeatRing.astro';
 
 interface Props {
   event: EventDTO;
 }
 
-/** The opening of a single event's page. */
+/** The opening of a single event's page: the date as the title, the real free seats beside it. */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);
 const weekday = formatWeekdayDE(event.event_date);
 const dayMonthYear = formatDayMonthYearDE(event.event_date);
+const time = timeRange(event.start_time, event.end_time);
+const free = event.is_full || event.is_past ? 0 : event.available_spots;
 ---
 
-<section class="hero event-hero">
-  <div class="container">
-    <div class="hero__content">
-      <p class="hero__label">{event.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}</p>
+<section class="page-hero event-hero">
+  <div class="container page-hero__layout">
+    <div class="page-hero__content">
+      <p class="kicker">{event.is_past ? 'Vergangener Abend' : 'Nächster Abend im Kreis'}</p>
 
-      <h1 class="hero__title">
+      <h1 class="page-hero__title display">
         <time datetime={dateOnly}>
-          {weekday}, {dayMonthYear}
+          <span class="display__line">{weekday},</span>
+          <span class="display__line">{dayMonthYear}</span>
         </time>
       </h1>
 
-      <div class="hero__bottom">
-        {/* Built as a string rather than as JSX fragments: the whitespace
-            between elements in the template becomes real text nodes, which put
-            gaps around the en dash of the time range. */}
-        <p class="hero__meta">
-          {[timeRange(event.start_time, event.end_time), event.location].filter(Boolean).join(' · ')}
-        </p>
+      <p class="page-hero__meta">
+        {time && <span>{time}</span>}
+        {event.location && <span>{event.location}</span>}
+      </p>
 
-        {!event.is_past && (
-          <span class="hero__cta">
-            <a href="#anmeldung" class="btn btn--primary">
-              {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
-            </a>
-          </span>
-        )}
-      </div>
+      {!event.is_past && (
+        <p class="page-hero__cta">
+          <a href="#anmeldung" class="btn btn--primary btn--large">
+            {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
+          </a>
+        </p>
+      )}
     </div>
+
+    {!event.is_past && (
+      <div class="page-hero__media event-hero__seats">
+        <SeatRing seats={event.max_participants} free={free} enter />
+        <p class="event-hero__count">
+          <span class="event-hero__count-number">{free}</span>
+          <span>von {event.max_participants} Plätzen frei</span>
+        </p>
+      </div>
+    )}
   </div>
 </section>
+
+<style is:global>
+  @layer sections {
+    .event-hero__seats {
+      position: relative;
+      align-self: center;
+    }
+
+    .event-hero__count {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      margin: 0;
+      font-family: var(--font-ui);
+      font-size: 0.9375rem;
+      font-weight: 560;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .event-hero__count-number {
+      font-size: var(--step-5);
+      font-weight: 650;
+      font-variation-settings: 'wdth' 85;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    @media (width <= 56em) {
+      .event-hero__seats {
+        inline-size: min(15rem, 66vw);
+      }
+    }
+  }
+</style>
