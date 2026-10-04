@@ -4,6 +4,7 @@ import { formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText } from 
 import { sendTransactional } from './listmonk';
 
 const icsUrlFor = (slug: string): string => `${config.APP_URL}/api/public/events/${slug}/ics`;
+const eventUrlFor = (slug: string): string => `${config.APP_URL}/event/${slug}`;
 
 const fullName = (p: Participant): string => `${p.firstName || ''} ${p.lastName || ''}`.trim();
 
@@ -15,6 +16,7 @@ const participantCtx = (p: Participant) => ({
 });
 
 const eventDetail = (ev: Event, opts: { includeAddress?: boolean } = {}) => ({
+  eventUrl: eventUrlFor(ev.slug),
   dateLong: formatDateLongDE(ev.eventDate),
   dateShort: formatDateShortDE(ev.eventDate),
   timeRange: timeRangeText(ev),
@@ -101,7 +103,7 @@ export const sendEventReminder = async (ev: Event, participant: Participant, isT
     whenWord: isToday ? 'heute' : 'morgen',
     whenWordCap: isToday ? 'Heute' : 'Morgen',
     closingWord: isToday ? 'gleich' : 'morgen',
-    ...eventDetail(ev),
+    ...eventDetail(ev, { includeAddress: true }),
     description: ev.description,
     costBasis: ev.costBasis,
   });
