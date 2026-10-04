@@ -97,18 +97,21 @@
   --text-lg: clamp(1.25rem, 1.17rem + 0.35vw, 1.5rem);
   --text-xl: clamp(1.375rem, 1.25rem + 0.55vw, 1.875rem);
   --text-2xl: clamp(1.625rem, 1.4rem + 1vw, 2.375rem);
-  --text-3xl: clamp(1.875rem, 1.5rem + 1.7vw, 3.125rem);
-  --text-4xl: clamp(2.25rem, 1.7rem + 2.5vw, 4rem); /* 36px → 64px */
-  --text-6xl: clamp(2.75rem, 1.6rem + 4.6vw, 6rem);
+  --text-3xl: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  --text-4xl: clamp(2.5rem, 1.7rem + 3.2vw, 4.75rem); /* 40px → 76px */
+  --text-6xl: clamp(3rem, 1.6rem + 5.4vw, 7rem);
 
-  /* Voice register — Fraunces 800, set big: the headline carries the page. */
-  --display-1: clamp(2.625rem, 1.3rem + 5.2vw, 6rem); /* 42px → 96px */
-  --display-2: clamp(2.25rem, 1.3rem + 3.8vw, 4.75rem); /* 36px → 76px */
-  --display-3: clamp(1.75rem, 1.3rem + 2vw, 3.125rem); /* 28px → 50px */
+  /* Voice register — Fraunces at its regular weight, set big: the size carries the
+     headline, not the stroke. Small serif lines (h3–h5, names, terms) take 500. */
+  --weight-display: 400;
+  --weight-display-small: 500;
+  --display-1: clamp(2.875rem, 1.2rem + 6.4vw, 7.25rem); /* 46px → 116px */
+  --display-2: clamp(2.5rem, 1.3rem + 4.6vw, 5.75rem); /* 40px → 92px */
+  --display-3: clamp(1.875rem, 1.3rem + 2.4vw, 3.625rem); /* 30px → 58px */
   --display-numeral: clamp(4rem, 2rem + 9vw, 10rem);
 
   --leading-display: 1;
-  --tracking-display: -0.02em;
+  --tracking-display: -0.025em;
 
   --text-section-body: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem);
   --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.4vw, 1.375rem); /* 19px → 22px */

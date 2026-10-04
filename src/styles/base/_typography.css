@@ -7,10 +7,17 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: var(--weight-display);
   line-height: 1.02;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display);
   text-wrap: balance;
+}
+
+h3,
+h4,
+h5 {
+  font-weight: var(--weight-display-small);
+  letter-spacing: -0.015em;
 }
 
 h1 {
@@ -50,11 +57,11 @@ h6 {
   }
 }
 
-/* The voice: Fraunces 800 in sentence case. Emphasis turns to the accent. */
+/* The voice: Fraunces, regular and large, in sentence case. Emphasis turns to the accent. */
 .display {
   font-family: var(--font-display);
   font-size: var(--display-2);
-  font-weight: 800;
+  font-weight: var(--weight-display);
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-display);
   text-wrap: balance;
@@ -84,7 +91,7 @@ h6 {
 
 /* The poster register: capitals, for a date line or a slogan. Rare by design. */
 .display--heavy {
-  font-weight: 800;
+  font-weight: var(--weight-display);
   /* Room for umlaut dots over capitals: below 1 they touch the line above. */
   line-height: 1;
   text-transform: uppercase;
@@ -153,7 +160,7 @@ p:last-child {
   margin-block-end: var(--rhythm-stack);
   font-size: var(--text-4xl);
   line-height: 1.02;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display);
 }
 
 .section-intro {
@@ -332,7 +339,7 @@ p:last-child {
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--text-lg);
-  font-weight: 700;
+  font-weight: var(--weight-display-small);
   line-height: 1.35;
   color: var(--text-primary);
   text-wrap: pretty;

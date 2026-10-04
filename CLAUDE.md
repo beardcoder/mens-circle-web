@@ -85,11 +85,14 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
 ## Design
 
 - "Feuerstelle", set like the flyer: warm, earthy, direct. Fraunces (a soft, warm
-  old-style serif with an organic wobble) speaks: headlines 800 in sentence case, and
-  its italic is the quiet voice for questions and quotes (`.quote-voice`,
-  `--font-quote`). Instrument Sans explains: text, UI, buttons and the date line.
-  Both are wide, so a single long word is capped by its column (`cqi`: hero title,
-  step titles, facts, frame terms, "Dabei sein."), never left to overflow. Capitals
+  old-style serif with an organic wobble) speaks: headlines at its regular weight
+  (`--weight-display`, 400), set large, in sentence case; small serif lines (h3–h5,
+  names, terms) take 500 (`--weight-display-small`). Its italic is the quiet voice
+  for questions and quotes (`.quote-voice`, `--font-quote`). Instrument Sans explains: text, UI, buttons and the date line.
+  A single long word is capped by its column (`cqi`: hero and page titles, step
+  titles, facts, frame terms, "Dabei sein.", "Anmeldung"), never left to overflow.
+  A dash in running copy is bound to the word before it (`\u00a0–`), so no line
+  starts with one. Capitals
   for wide-spaced labels (`.marker`), the date line (`.date-line`: bold orange
   capitals) and the one poster slogan (`.display--heavy`). Figures are lining.
   Barlow is loaded for the admin only.
