@@ -130,21 +130,6 @@
   }
 }
 
-/* Concentric rings: in, out, settle. */
-@keyframes breath {
-  0% {
-    transform: scale(0.8);
-  }
-
-  50% {
-    transform: scale(1.04);
-  }
-
-  100% {
-    transform: scale(0.9);
-  }
-}
-
 /* One quarter of the evening lights up while its step is on screen. */
 @keyframes quarter-on {
   0%,

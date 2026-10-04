@@ -3,7 +3,7 @@ interface Props {
   data: {
     anchor?: string;
     eyebrow?: string;
-    /** Lines in the heavy register. Each becomes its own block and settles independently. */
+    /** Lines in the poster register. Each becomes its own block and settles independently. */
     lines?: string[];
     text?: string;
     linkLabel?: string;
@@ -11,22 +11,16 @@ interface Props {
   };
 }
 
-/** The one moss ground on the page: breath and body, in the heavy register. */
+/** The one orange field on the page, set like the flyer: night capitals on flame. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'haltung';
 const lines = data.lines ?? [];
 ---
 
-<section class="section surface-moss section--clip statement" id={anchor} aria-labelledby="statement-title">
-  <span class="statement__breath" aria-hidden="true">
-    {[0, 1, 2, 3, 4].map((i) => (
-      <span style={`--i: ${i}`}></span>
-    ))}
-  </span>
-
+<section class="section surface-flame section--clip statement" id={anchor} aria-labelledby="statement-title">
   <div class="container statement__inner">
-    {data.eyebrow && <p class="marker statement__marker">{data.eyebrow}</p>}
+    {data.eyebrow && <p class="marker marker--plain statement__marker">{data.eyebrow}</p>}
 
     <h2 class="display display--heavy statement__display" id="statement-title">
       {lines.map((line) => (
@@ -50,11 +44,10 @@ const lines = data.lines ?? [];
 <style is:global>
   @layer sections {
     .statement {
-      padding-block: var(--space-3xl);
+      padding-block: var(--space-2xl);
     }
 
     .statement__inner {
-      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
       gap: var(--space-lg) var(--space-xl);
@@ -63,62 +56,41 @@ const lines = data.lines ?? [];
 
     .statement__marker {
       grid-column: 1 / -1;
+      color: var(--text-primary);
     }
 
     .statement__display {
       margin: 0;
-      font-size: clamp(2.75rem, 1rem + 6.4vw, 7.5rem);
+      font-size: clamp(2.5rem, 1rem + 5.6vw, 6.5rem);
+      /* Figtree's Ö dots rise above the cap height; this keeps them off the line above. */
+      line-height: 1.12;
       color: var(--text-primary);
-    }
-
-    .statement__line:nth-child(2) {
-      font-style: italic;
-      font-weight: 400;
-      text-transform: none;
-      color: var(--accent);
     }
 
     .statement__foot {
       display: grid;
       gap: var(--space-sm);
       justify-items: start;
+      padding-block-start: var(--space-md);
+      border-block-start: 2px solid var(--rule-strong);
     }
 
     .statement__text {
       max-inline-size: 42ch;
       margin: 0;
       font-size: var(--text-section-body-lg);
+      font-weight: 500;
       line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
+      color: var(--text-primary);
     }
 
-    /* Breath: concentric rings off the right edge that widen and narrow as the
-       section passes — one slow exhale across the scroll. */
-    .statement__breath {
-      position: absolute;
-      inset-block-start: 50%;
-      inset-inline-end: -14vw;
-      inline-size: min(70vw, 56rem);
-      aspect-ratio: 1;
-      translate: 0 -50%;
-      pointer-events: none;
-    }
-
-    .statement__breath span {
-      position: absolute;
-      inset: calc(var(--i) * 10%);
-      border: 1px solid var(--border-light);
-      border-radius: 50%;
+    .statement__link {
+      font-weight: 700;
+      text-decoration-color: var(--text-primary);
     }
 
     @media (prefers-reduced-motion: no-preference) {
       @supports (animation-timeline: view()) {
-        .statement__breath span {
-          animation: breath linear both;
-          animation-timeline: view();
-          animation-range: cover 0% cover 100%;
-        }
-
         .statement__line {
           animation: statement-settle linear both;
           animation-timeline: view();
@@ -132,19 +104,8 @@ const lines = data.lines ?? [];
     }
 
     @media (width <= 56em) {
-      .statement {
-        padding-block: var(--space-2xl);
-      }
-
       .statement__inner {
         grid-template-columns: minmax(0, 1fr);
-      }
-
-      .statement__breath {
-        inset-block-start: 0;
-        inset-inline-end: -40vw;
-        inline-size: 110vw;
-        translate: 0 -30%;
       }
 
       @supports (animation-timeline: view()) {
