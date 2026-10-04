@@ -130,19 +130,6 @@
   }
 }
 
-/* One quarter of the evening lights up while its step is on screen. */
-@keyframes quarter-on {
-  0%,
-  100% {
-    opacity: 0.18;
-  }
-
-  20%,
-  80% {
-    opacity: 1;
-  }
-}
-
 /* View transitions — root crossfade. */
 @keyframes vt-fade-out {
   to {
