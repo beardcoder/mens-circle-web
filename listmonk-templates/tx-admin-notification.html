@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
+  <title>{{ .Tx.Data.subject }}</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <style>.em-serif { font-family: Georgia, serif !important; } .em-sans { font-family: Arial, sans-serif !important; }</style>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400&amp;family=Instrument+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin:0 !important; padding:0 !important; width:100% !important; -webkit-text-size-adjust:100%; }
+    table { border-collapse:collapse !important; }
+    img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+    a { color:#241c17; }
+    .em-link { color:#241c17 !important; text-decoration:underline; text-decoration-color:#a84a2a; text-underline-offset:0.2em; }
+    @media only screen and (max-width:620px) {
+      .em-sheet { width:100% !important; }
+      .em-pad { padding-left:24px !important; padding-right:24px !important; }
+      .em-display { font-size:34px !important; }
+      .em-ticket { padding:22px 22px 24px !important; }
+      .em-date { font-size:16px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#e9e0d1;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#e9e0d1;opacity:0;">Neue Anmeldung: {{ .Tx.Data.participantName }}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#e9e0d1;">
+  <tr><td align="center" style="padding:28px 12px;">
+    <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+    <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#f4ede1;">
+
+      <!-- Masthead: the night bar, the brush mark in flame -->
+      <tr><td class="em-pad" style="padding:22px 40px;background-color:#151210;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="padding-right:12px;vertical-align:middle;"><a href="https://mens-circle.de" target="_blank"><img src="https://mens-circle.de/images/logo-flame.png" width="38" height="38" alt="" style="display:block;width:38px;height:38px;"></a></td>
+          <td style="vertical-align:middle;">
+            <div class="em-serif" style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:22px;font-weight:500;line-height:1.05;color:#f1e9db;">Männerkreis</div>
+            <div class="em-sans" style="margin-top:4px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:600;line-height:1.2;letter-spacing:0.2em;text-transform:uppercase;color:#b3a594;">Straubing&nbsp;·&nbsp;Niederbayern</div>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Content -->
+      <tr><td class="em-pad" style="padding:38px 40px 34px;">
+<p class="em-sans" style="margin:0 0 14px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;line-height:1.3;letter-spacing:0.18em;text-transform:uppercase;color:#6b5d52;"><span style="display:inline-block;width:7px;height:7px;margin-right:9px;border:1.5px solid #a84a2a;border-radius:50%;vertical-align:1px;"></span>Benachrichtigung</p>
+<h1 class="em-display em-serif" style="margin:0 0 18px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:42px;font-weight:400;line-height:1.04;letter-spacing:-0.02em;color:#241c17;">Neue <span style="color:#a84a2a;">Anmeldung</span>.</h1>
+<p class="em-sans" style="margin:0 0 24px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#4f4239;"><strong style="font-weight:600;color:#241c17;">{{ .Tx.Data.eventTitle }}</strong></p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px;">
+      <tr>
+        <td width="110" class="em-sans" style="padding:10px 12px 10px 0;border-top:1px solid #dccfbd;vertical-align:top;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;line-height:1.7;letter-spacing:0.16em;text-transform:uppercase;color:#6b5d52;">Name</td>
+        <td class="em-sans" style="padding:10px 0;border-top:1px solid #dccfbd;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#241c17;">{{ .Tx.Data.participantName }}</td>
+      </tr>
+      <tr>
+        <td width="110" class="em-sans" style="padding:10px 12px 10px 0;border-top:1px solid #dccfbd;vertical-align:top;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;line-height:1.7;letter-spacing:0.16em;text-transform:uppercase;color:#6b5d52;">E-Mail</td>
+        <td class="em-sans" style="padding:10px 0;border-top:1px solid #dccfbd;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#241c17;"><a href="mailto:{{ .Tx.Data.participantEmail }}" class="em-link" style="color:#241c17;font-weight:600;text-decoration:underline;text-decoration-color:#a84a2a;text-underline-offset:0.2em;white-space:nowrap;">{{ .Tx.Data.participantEmail }}</a></td>
+      </tr>
+{{ if .Tx.Data.participantPhone }}
+      <tr>
+        <td width="110" class="em-sans" style="padding:10px 12px 10px 0;border-top:1px solid #dccfbd;vertical-align:top;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;line-height:1.7;letter-spacing:0.16em;text-transform:uppercase;color:#6b5d52;">Telefon</td>
+        <td class="em-sans" style="padding:10px 0;border-top:1px solid #dccfbd;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#241c17;">{{ .Tx.Data.participantPhone }}</td>
+      </tr>
+{{ end }}
+      <tr>
+        <td width="110" class="em-sans" style="padding:10px 12px 10px 0;border-top:1px solid #dccfbd;vertical-align:top;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;line-height:1.7;letter-spacing:0.16em;text-transform:uppercase;color:#6b5d52;">Status</td>
+        <td class="em-sans" style="padding:10px 0;border-top:1px solid #dccfbd;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#241c17;">{{ .Tx.Data.statusLabel }}</td>
+      </tr>
+</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px;">
+      <tr>
+        <td width="110" class="em-sans" style="padding:10px 12px 10px 0;border-top:1px solid #dccfbd;vertical-align:top;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;line-height:1.7;letter-spacing:0.16em;text-transform:uppercase;color:#6b5d52;">Datum</td>
+        <td class="em-sans" style="padding:10px 0;border-top:1px solid #dccfbd;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#241c17;">{{ .Tx.Data.dateShort }}</td>
+      </tr>
+{{ if .Tx.Data.timeRange }}
+      <tr>
+        <td width="110" class="em-sans" style="padding:10px 12px 10px 0;border-top:1px solid #dccfbd;vertical-align:top;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;line-height:1.7;letter-spacing:0.16em;text-transform:uppercase;color:#6b5d52;">Uhrzeit</td>
+        <td class="em-sans" style="padding:10px 0;border-top:1px solid #dccfbd;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#241c17;">{{ .Tx.Data.timeRange }}</td>
+      </tr>
+{{ end }}
+{{ if .Tx.Data.location }}
+      <tr>
+        <td width="110" class="em-sans" style="padding:10px 12px 10px 0;border-top:1px solid #dccfbd;vertical-align:top;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;line-height:1.7;letter-spacing:0.16em;text-transform:uppercase;color:#6b5d52;">Ort</td>
+        <td class="em-sans" style="padding:10px 0;border-top:1px solid #dccfbd;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#241c17;">{{ .Tx.Data.location }}</td>
+      </tr>
+{{ end }}
+</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 0;">
+  <tr><td style="padding:22px 26px;background-color:#151210;border-radius:3px;">
+    <p class="em-serif" style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:44px;font-weight:400;line-height:1;color:#f1e9db;">{{ .Tx.Data.activeCount }}<span style="color:#b3a594;font-size:26px;">&nbsp;von&nbsp;{{ .Tx.Data.maxParticipants }}</span></p>
+    <p class="em-sans" style="margin:8px 0 0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#e4632e;">Plätzen belegt</p>
+  </td></tr>
+</table>
+
+      </td></tr>
+
+      <tr><td class="em-pad" style="padding:18px 40px 22px;background-color:#151210;">
+        <p class="em-sans" style="margin:0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#b3a594;">Automatische Benachrichtigung von <a href="https://mens-circle.de/admin" target="_blank" style="color:#e4632e;text-decoration:none;">mens-circle.de</a></p>
+      </td></tr>
+
+    </table>
+    <!--[if mso]></td></tr></table><![endif]-->
+  </td></tr>
+</table>
+</body>
+</html>
