@@ -5,6 +5,8 @@ import type { EventDTO } from './types';
 
 /** Chat previews show more than a SERP's ~160 chars, so budget for the preview. */
 const DESCRIPTION_LIMIT = 200;
+/** What a SERP shows of a <title>. */
+const TITLE_LIMIT = 60;
 
 /** Strip inline HTML so a value is safe as plain text. */
 export function stripHtml(value = ''): string {
@@ -114,8 +116,14 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
   // name twice eats the 60 chars a SERP shows.
   const brand = name.toLowerCase().includes(site.siteName.toLowerCase()) ? '' : ` – ${site.siteName}`;
 
+  // Held outside the home town, the place is what a local search asks for: it goes
+  // into the title, and the brand stays only while both fit (WebSite names the site).
+  const elsewhere = place.toLowerCase() !== site.geo.locality.toLowerCase();
+  const base = day ? `${name} am ${day}${elsewhere ? ` in ${place}` : ''}` : name;
+  const title = !elsewhere || `${base}${brand}`.length <= TITLE_LIMIT ? `${base}${brand}` : base;
+
   return {
-    title: day ? `${name} am ${day}${brand}` : `${name}${brand}`,
+    title,
     ogTitle: longDate ? `${name} am ${longDate} in ${place}` : `${name} in ${place}`,
     description: truncate(
       [eventWhenWhere(event), statusSentence(event), tailSentence(event)].map(asSentence).join(' '),
