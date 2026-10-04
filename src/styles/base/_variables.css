@@ -83,9 +83,10 @@
   --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13.5 6l6 6-6 6'/%3E%3C/svg%3E");
 
   /* Typography */
-  --font-display: var(--font-sans);
+  /* Alegreya speaks (headlines), Figtree explains (text, UI, date lines). */
+  --font-display: var(--font-serif);
   --font-body: var(--font-sans);
-  /* The quiet register: Fraunces italic, for questions and quotes only. */
+  /* The quiet register: Alegreya italic, for questions and quotes. */
   --font-quote: var(--font-serif);
 
   /* Reading register */
@@ -99,14 +100,14 @@
   --text-4xl: clamp(2.25rem, 1.7rem + 2.4vw, 3.75rem);
   --text-6xl: clamp(2.75rem, 1.8rem + 4.2vw, 5.5rem);
 
-  /* Voice register — Figtree 800, sentence case, tight. */
+  /* Voice register — Alegreya 800. Its small x-height takes the sizes a step up. */
   --display-1: clamp(2.5rem, 1.25rem + 4.8vw, 5.5rem); /* 40px → 88px */
   --display-2: clamp(2.125rem, 1.3rem + 3.3vw, 4.25rem); /* 34px → 68px */
   --display-3: clamp(1.75rem, 1.3rem + 1.9vw, 3rem); /* 28px → 48px */
   --display-numeral: clamp(4rem, 2rem + 9vw, 10rem);
 
-  --leading-display: 0.98;
-  --tracking-display: -0.035em;
+  --leading-display: 1;
+  --tracking-display: -0.015em;
 
   --text-section-body: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
   --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.35vw, 1.3125rem);
