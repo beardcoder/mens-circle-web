@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import TestimonialForm from '../components/forms/TestimonialForm.astro';
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
+import site from '@data/site.json';
 
 // Prerendered: the form posts to the submitTestimonial action client-side
 // (see src/lib/form.ts), so nothing here needs server rendering.
@@ -26,7 +27,7 @@ const schemas = [
 ---
 
 <Layout
-  title="Teile deine Erfahrung – Männerkreis Straubing"
+  title={`Teile deine Erfahrung – ${site.siteName}`}
   description="Du warst schon einmal da? Erzähl in ein paar Sätzen, wie der Abend für dich war. Deine Worte helfen Männern, die noch überlegen, ob sie kommen."
   robots="noindex, follow"
   schemas={schemas}

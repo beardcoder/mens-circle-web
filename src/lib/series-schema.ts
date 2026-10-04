@@ -17,7 +17,7 @@ export function eventSeriesSchema(siteUrl: URL): Record<string, unknown> {
     audience: { '@type': 'Audience', audienceType: 'Männer' },
     location: {
       '@type': 'Place',
-      name: `Männerkreis ${site.geo.locality}`,
+      name: site.siteName,
       address: {
         '@type': 'PostalAddress',
         addressLocality: site.geo.locality,

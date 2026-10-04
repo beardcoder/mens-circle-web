@@ -28,7 +28,7 @@ function buildPlace(event: EventDTO): Record<string, unknown> {
   const hasCoordinates = event.latitude != null && event.longitude != null;
   return {
     '@type': 'Place',
-    name: event.location || `Männerkreis ${site.geo.locality}`,
+    name: event.location || site.siteName,
     address: {
       '@type': 'PostalAddress',
       ...(event.street ? { streetAddress: event.street } : {}),
