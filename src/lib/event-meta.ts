@@ -29,7 +29,7 @@ function truncate(text: string, limit = DESCRIPTION_LIMIT): string {
 }
 
 /** The event's own title, or the circle's name when it was left empty. */
-export const eventName = (event: EventDTO): string => stripHtml(event.title) || `Männerkreis ${site.geo.locality}`;
+export const eventName = (event: EventDTO): string => stripHtml(event.title) || site.siteName;
 
 /** City, then venue name, then home town. */
 export const eventPlace = (event: EventDTO): string =>
@@ -110,7 +110,7 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
   const day = formatDayMonthYearDE(event.event_date);
   const longDate = formatDateLongDE(event.event_date);
   // One static 1200×630 poster for every event — SeoHead's default image.
-  const image = new URL('/images/og-default.png', siteUrl).href;
+  const image = new URL('/images/og-default.png?v=2', siteUrl).href;
 
   // Only append the brand when the title does not already carry it — saying the
   // name twice eats the 60 chars a SERP shows.

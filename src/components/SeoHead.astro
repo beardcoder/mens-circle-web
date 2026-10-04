@@ -60,7 +60,8 @@ const socialTitle = ogTitle ?? title ?? site.siteName;
 const socialDescription = ogDescription ?? description;
 // Declared dimensions must match the file, or a summary_large_image card gets downgraded to a small one.
 const usesDefaultImage = !ogImage;
-const ogImageUrl = new URL(ogImage ?? '/images/og-default.png', siteUrl).href;
+// `?v=` busts the share caches (a week here, longer at the platforms) when an image is redrawn.
+const ogImageUrl = new URL(ogImage ?? '/images/og-default.png?v=2', siteUrl).href;
 const imageWidth = usesDefaultImage ? 1200 : ogImageWidth;
 const imageHeight = usesDefaultImage ? 630 : ogImageHeight;
 
@@ -93,7 +94,7 @@ const person = {
   jobTitle: 'Leiter des Männerkreises',
   knowsAbout: ['Männerkreis', 'Atemübungen', 'Körperwahrnehmung'],
   url: new URL('/warum-ich-den-maennerkreis-leite', siteUrl).href,
-  image: new URL('/images/og-markus.jpg', siteUrl).href,
+  image: new URL('/images/og-markus.jpg?v=2', siteUrl).href,
   worksFor: { '@id': `${siteUrl.origin}/#organization` },
 };
 
@@ -111,7 +112,7 @@ const localBusiness = {
     width: 512,
     height: 513,
   },
-  image: new URL('/images/og-default.png', siteUrl).href,
+  image: new URL('/images/og-default.png?v=2', siteUrl).href,
   email: site.contactEmail,
   telephone: site.contactPhone,
   founder: { '@id': `${siteUrl.origin}/#markus` },
