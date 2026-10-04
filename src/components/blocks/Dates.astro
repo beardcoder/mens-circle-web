@@ -1,6 +1,7 @@
 ---
 import site from '../../data/site.json';
 import BrushRing from '../BrushRing.astro';
+import Breath from '../Breath.astro';
 import HomeEventStatus from '../HomeEventStatus.astro';
 import NewsletterForm from '../forms/NewsletterForm.astro';
 
@@ -29,6 +30,7 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       <p class="marker marker--plain home-dates__marker">{data.eyebrow}</p>
 
       <div class="home-dates__ring-wrap">
+        <Breath variant="glow" class="home-dates__breath" />
         <BrushRing class="home-dates__ring" seed={37} />
         <h2 class="home-dates__display" id="termine-title">
           {lines.map((line) => (
@@ -115,6 +117,13 @@ const lines = data.displayLines ?? ['Dabei sein.'];
     .home-dates__ring {
       position: absolute;
       inset: 0;
+    }
+
+    /* A low glow inside the ring; at 18 % the cream type keeps well over 7:1. */
+    .home-dates__breath {
+      --breath-glow: 18%;
+
+      inset: 8%;
     }
 
     .home-dates__display {

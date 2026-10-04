@@ -1,4 +1,5 @@
 ---
+import Breath from '../Breath.astro';
 import BrushRing from '../BrushRing.astro';
 
 interface Props {
@@ -43,6 +44,7 @@ const questions = (data.questions ?? []).slice(0, 4);
 
         <div class="home-circle__center" aria-hidden="true">
           <BrushRing seed={23} class="home-circle__mark" />
+          <Breath class="home-circle__breath" />
         </div>
 
         <ul class="home-circle__list" role="list">
@@ -110,8 +112,14 @@ const questions = (data.questions ?? []).slice(0, 4);
       letter-spacing: var(--tracking-marker);
     }
 
+    /* The empty middle of the circle breathes; the breath stays inside the stroke. */
     .home-circle__center {
+      position: relative;
       grid-area: c;
+    }
+
+    .home-circle__breath {
+      inset: 16%;
     }
 
     .home-circle__mark {

@@ -1,4 +1,6 @@
 ---
+import Breath from '../Breath.astro';
+
 interface Props {
   data: {
     anchor?: string;
@@ -8,6 +10,8 @@ interface Props {
     text?: string;
     linkLabel?: string;
     linkUrl?: string;
+    /** A short line beside the small breathing circle. */
+    breathGuide?: string;
   };
 }
 
@@ -19,6 +23,8 @@ const lines = data.lines ?? [];
 ---
 
 <section class="section surface-flame section--clip statement" id={anchor} aria-labelledby="statement-title">
+  <Breath variant="glow" class="statement__breath" />
+
   <div class="container statement__inner">
     {data.eyebrow && <p class="marker marker--plain statement__marker">{data.eyebrow}</p>}
 
@@ -31,6 +37,12 @@ const lines = data.lines ?? [];
     {(data.text || data.linkLabel) && (
       <div class="statement__foot">
         {data.text && <p class="statement__text">{data.text}</p>}
+        {data.breathGuide && (
+          <p class="statement__guide">
+            <span class="statement__guide-circle" aria-hidden="true"></span>
+            {data.breathGuide}
+          </p>
+        )}
         {data.linkLabel && data.linkUrl && (
           <a href={data.linkUrl} class="text-link statement__link">
             {data.linkLabel}
@@ -47,7 +59,20 @@ const lines = data.lines ?? [];
       padding-block: var(--space-2xl);
     }
 
+    /* A light breath across the field. Lightening the orange behind night text
+       only raises the contrast. */
+    .statement__breath {
+      --breath-color: #fff4e6;
+      --breath-glow: 34%;
+
+      inset-block-start: 50%;
+      inset-inline-start: 30%;
+      inline-size: max(70vw, 40rem);
+      translate: -50% -50%;
+    }
+
     .statement__inner {
+      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
       gap: var(--space-lg) var(--space-xl);
@@ -82,6 +107,36 @@ const lines = data.lines ?? [];
       font-weight: 500;
       line-height: var(--leading-relaxed);
       color: var(--text-primary);
+    }
+
+    /* The breath to follow: a small circle on the same 10-second cycle. */
+    .statement__guide {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: center;
+      margin: 0;
+      font-size: var(--text-caption);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .statement__guide-circle {
+      --rest: 0.45;
+      --alpha: 1;
+
+      flex: none;
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
+      border: 2px solid var(--text-primary);
+      border-radius: 50%;
+      animation: breathe 10s infinite both;
+    }
+
+    /* Still, the circle cannot guide a breath; the line goes with it. */
+    @media (prefers-reduced-motion: reduce) {
+      .statement__guide {
+        display: none;
+      }
     }
 
     .statement__link {
