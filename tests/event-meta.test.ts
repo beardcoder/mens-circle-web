@@ -36,9 +36,9 @@ test('held outside the home town, the title names the place before the brand', (
   expect(meta.title).toBe('Männerkreis am 18. September 2026 in Geiselhöring');
   expect(meta.title.length).toBeLessThanOrEqual(60);
   // Short enough, both stay.
-  expect(buildEventMeta(event({ title: 'Kreis', city: 'Bogen' }), SITE).title).toBe(
-    'Kreis am 18. September 2026 in Bogen – Männerkreis Straubing',
-  );
+  expect(
+    buildEventMeta(event({ title: 'Kreis', city: 'Bogen', event_date: '2026-05-02T00:00:00.000Z' }), SITE).title,
+  ).toBe('Kreis am 2. Mai 2026 in Bogen – Männerkreis Niederbayern');
 });
 
 test('the share title and description carry date, time, place and seats', () => {
@@ -47,7 +47,7 @@ test('the share title and description carry date, time, place and seats', () => 
   // The single question a forwarded link has to answer, in the bold line.
   expect(meta.ogTitle).toBe('Männerkreis am Freitag, 18. September 2026 in Straubing');
   // The <title> stays short enough to survive a SERP and names the brand once.
-  expect(meta.title).toBe('Männerkreis am 18. September 2026 – Männerkreis Straubing');
+  expect(meta.title).toBe('Männerkreis am 18. September 2026 – Männerkreis Niederbayern');
   expect(meta.title.length).toBeLessThanOrEqual(60);
 
   expect(meta.description).toContain('Freitag, 18. September 2026, 19:00–21:30 Uhr in Straubing');
@@ -73,14 +73,14 @@ test('the brand is appended once, never twice', () => {
   // An empty admin title falls back to the circle's own name; appending the site
   // name again would say it twice.
   const meta = buildEventMeta(event({ title: '   ' }), SITE);
-  expect(meta.title).toBe('Männerkreis Straubing am 18. September 2026');
+  expect(meta.title).toBe('Männerkreis Niederbayern am 18. September 2026');
   expect(buildEventMeta(event({ title: 'Wintersonnwende' }), SITE).title).toBe(
-    'Wintersonnwende am 18. September 2026 – Männerkreis Straubing',
+    'Wintersonnwende am 18. September 2026 – Männerkreis Niederbayern',
   );
 });
 
 test('unknown/new events use a real static poster without transformation URLs', () => {
-  expect(buildEventMeta(event(), SITE).image).toBe('https://mens-circle.de/images/og-default.png');
+  expect(buildEventMeta(event(), SITE).image).toBe('https://mens-circle.de/images/og-default.png?v=2');
   expect(buildEventMeta(event({ available_spots: 3 }), SITE).image).toBe(buildEventMeta(event(), SITE).image);
   expect(buildEventMeta(event(), SITE).extraImage).toBeNull();
 });
@@ -94,7 +94,7 @@ test('additional event images remain direct original URLs', () => {
 test('missing or unparseable dates never produce a half-written line', () => {
   const meta = buildEventMeta(event({ event_date: 'not-a-date', start_time: '', end_time: '' }), SITE);
   expect(meta.ogTitle).toBe('Männerkreis in Straubing');
-  expect(meta.title).toBe('Männerkreis – Männerkreis Straubing');
+  expect(meta.title).toBe('Männerkreis – Männerkreis Niederbayern');
   expect(meta.description.startsWith('Männerkreis in Straubing.')).toBe(true);
   expect(eventWhenWhere(event({ event_date: '', start_time: '', end_time: '' }))).toBe('Männerkreis in Straubing');
 });

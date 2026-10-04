@@ -47,7 +47,7 @@ schemas.push({
 });
 
 // `Article`, not a bare `WebPage`: a signed piece of writing, attributed to the `Person` entity in SeoHead.
-const articleImage = new URL('/images/og-markus.jpg', siteUrl).href;
+const articleImage = new URL('/images/og-markus.jpg?v=2', siteUrl).href;
 
 schemas.push({
   '@context': 'https://schema.org',
@@ -78,7 +78,7 @@ const OG_IMAGE = { width: 1200, height: 630 };
   ogTitle={page.meta.ogTitle}
   ogDescription={page.meta.ogDescription}
   ogType="article"
-  ogImage="/images/og-markus.jpg"
+  ogImage="/images/og-markus.jpg?v=2"
   ogImageWidth={OG_IMAGE.width}
   ogImageHeight={OG_IMAGE.height}
   ogImageAlt="Markus Sommer, der den Männerkreis in Straubing leitet"
