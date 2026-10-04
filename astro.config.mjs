@@ -74,15 +74,25 @@ export default defineConfig({
       fallbacks: ['system-ui', 'sans-serif'],
       options: { experimental: { variableAxis: { opsz: [['12', '96']], wdth: [['75', '100']] } } },
     },
+    // Only the weights the serif is set in (360–600; italics stay light), and no opsz
+    // axis: together they halve the download.
     {
       name: 'Newsreader',
       cssVariable: '--font-serif',
       provider: fontProviders.google(),
-      weights: ['200 800'],
-      styles: ['normal', 'italic'],
+      weights: ['300 600'],
+      styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
-      options: { experimental: { variableAxis: { opsz: [['6', '72']] } } },
+    },
+    {
+      name: 'Newsreader',
+      cssVariable: '--font-serif',
+      provider: fontProviders.google(),
+      weights: ['300 500'],
+      styles: ['italic'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'serif'],
     },
     // Admin only (AdminLayout.astro).
     {
