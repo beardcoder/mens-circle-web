@@ -3,6 +3,7 @@ import site from '@data/site.json';
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
 import HomeEventStatus from '../HomeEventStatus.astro';
+import Breath from '../Breath.astro';
 import SeatCircle from '../SeatCircle.astro';
 
 /** The home page opening on the night ground: the sentence, the four parts of an evening, and the photograph inside the seat circle. */
@@ -110,6 +111,7 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
     {photo && (
       <figure class="home-hero__figure">
         <div class="home-hero__orbit">
+          <Breath class="home-hero__breath" />
           <SeatCircle class="home-hero__ring" seatSize={3.2} entrance />
           <div class="home-hero__plate">
             <CropPicture
@@ -289,6 +291,14 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
       }
     }
 
+    /* The breath around the photograph: its outer ring stays inside this box,
+       which ends where the text column begins. */
+    .home-hero__breath {
+      --breath-glow: 32%;
+
+      inset: -28%;
+    }
+
     .home-hero__plate {
       position: absolute;
       inset: 0;
@@ -408,6 +418,11 @@ const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`
       .home-hero__figure {
         margin-block-start: calc(78vw * 0.2 + var(--space-md));
         margin-inline-end: calc(-1 * var(--container-gutter) - 14vw);
+      }
+
+      /* Stacked, the breath stays within the clear space reserved for the ring. */
+      .home-hero__breath {
+        inset: -21%;
       }
 
       .home-hero__orbit {

@@ -130,6 +130,35 @@
   }
 }
 
+/* 3. Breath — one calm cycle (with --breath-cycle: 10s): in 4 s, hold 0.5 s,
+   out 5 s, rest 0.5 s. Sine-shaped in and out, so it eases like a real breath.
+   Elements set --rest (scale when empty) and --alpha (opacity when full). */
+@keyframes breathe {
+  0% {
+    opacity: calc(var(--alpha, 1) * 0.4);
+    transform: scale(var(--rest, 0.88));
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+
+  40% {
+    opacity: var(--alpha, 1);
+    transform: scale(1);
+    animation-timing-function: linear;
+  }
+
+  45% {
+    opacity: var(--alpha, 1);
+    transform: scale(1);
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+
+  95%,
+  100% {
+    opacity: calc(var(--alpha, 1) * 0.4);
+    transform: scale(var(--rest, 0.88));
+  }
+}
+
 /* View transitions — root crossfade. */
 @keyframes vt-fade-out {
   to {
