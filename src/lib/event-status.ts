@@ -84,7 +84,7 @@ export const primaryAction = (state: DateStatus, fallbackHref = '#termine'): Pri
   }
 
   return {
-    label: 'Zum Termin und anmelden',
+    label: 'Zur Anmeldung',
     href: `/event/${next.slug}`,
     note: `Nächster Termin: ${when} in ${next.place}.`,
   };
