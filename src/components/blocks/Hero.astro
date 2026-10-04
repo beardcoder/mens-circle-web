@@ -46,7 +46,8 @@ const segments = [
 
   <div class="container home-hero__grid">
     <h1 class="home-hero__heading" id="hero-title">
-      {data.kicker && <span class="marker home-hero__kicker">{data.kicker}</span>}
+      {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
+      {data.kicker && <span class="marker home-hero__kicker">{data.kicker}</span>}{' '}
       <span class="display display--xl home-hero__title">
         {segments.map(({ word, em }, i) => (
           <>

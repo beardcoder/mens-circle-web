@@ -31,6 +31,16 @@ const event = (overrides: Partial<EventDTO> = {}): EventDTO => ({
   ...overrides,
 });
 
+test('held outside the home town, the title names the place before the brand', () => {
+  const meta = buildEventMeta(event({ city: 'Geiselhöring', location: 'Gasthaus' }), SITE);
+  expect(meta.title).toBe('Männerkreis am 18. September 2026 in Geiselhöring');
+  expect(meta.title.length).toBeLessThanOrEqual(60);
+  // Short enough, both stay.
+  expect(buildEventMeta(event({ title: 'Kreis', city: 'Bogen' }), SITE).title).toBe(
+    'Kreis am 18. September 2026 in Bogen – Männerkreis Straubing',
+  );
+});
+
 test('the share title and description carry date, time, place and seats', () => {
   const meta = buildEventMeta(event(), SITE);
 
