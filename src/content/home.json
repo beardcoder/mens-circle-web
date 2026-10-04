@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Männerkreis Straubing / Niederbayern – ein Abend unter Männern",
-    "description": "Ein Männerkreis in Straubing: Männer sitzen im Kreis, hören einander zu und sprechen über das, was sie beschäftigt – dazu einfache Übungen mit Atem und Körperwahrnehmung. Auf Spendenbasis, ohne Vorerfahrung."
+    "title": "Männerkreis Straubing / Niederbayern\u00a0– ein Abend unter Männern",
+    "description": "Ein Männerkreis in Straubing: Männer sitzen im Kreis, hören einander zu und sprechen über das, was sie beschäftigt\u00a0– dazu einfache Übungen mit Atem und Körperwahrnehmung. Auf Spendenbasis, ohne Vorerfahrung."
   },
   "blocks": [
     {
@@ -10,8 +10,8 @@
         "kicker": "Männerkreis in Straubing · Niederbayern",
         "title": "Ein Abend, an dem du nichts darstellen musst.",
         "titleEmphasis": "nichts darstellen",
-        "lede": "Wir sitzen im Kreis und sprechen über das, was gerade wirklich da ist. Die anderen hören zu – ohne zu bewerten, ohne Ratschläge. Je nach Abend kommen einfache Übungen mit Atem und Körperwahrnehmung dazu; du machst mit, soweit es für dich passt.",
-        "pillarsLabel": "Aus dem Kopf, in den Körper.",
+        "lede": "Wir sitzen im Kreis und sprechen über das, was gerade wirklich da ist. Die anderen hören zu\u00a0– ohne zu bewerten, ohne Ratschläge. Je nach Abend kommen einfache Übungen mit Atem und Körperwahrnehmung dazu; du machst mit, soweit es für dich passt.",
+        "pillarsLabel": "Was einen Abend trägt.",
         "pillars": [
           {
             "title": "Austausch",
@@ -27,7 +27,7 @@
           },
           {
             "title": "Präsenz",
-            "text": "Da sein, statt schon beim Nächsten."
+            "text": "Da sein, statt mit dem Kopf schon woanders."
           }
         ],
         "secondaryLabel": "Wie ein Abend abläuft",
@@ -42,7 +42,7 @@
       "type": "facts",
       "data": {
         "anchor": "praktisches",
-        "eyebrow": "Praktisches"
+        "eyebrow": "Auf einen Blick"
       }
     },
     {
@@ -51,7 +51,7 @@
         "anchor": "ueber",
         "eyebrow": "Der Kreis",
         "title": "Worum es an so einem Abend geht",
-        "text": "<p>Im Alltag läuft viel: Arbeit, Familie, Beziehung, Verantwortung. Das meiste davon machen wir mit uns selbst aus – und Gespräche unter Männern landen oft schnell bei Job, Sport oder dem nächsten Ratschlag.</p><p>Im Kreis ist Platz für das, was darunter liegt. Fertige Antworten brauchst du dafür nicht. Es reicht, dass du den anderen zuhörst und ehrlich bist, wenn du dran bist.</p>",
+        "text": "<p>Im Alltag läuft viel: Arbeit, Familie, Beziehung, Verantwortung. Das meiste davon machen wir mit uns selbst aus\u00a0– und Gespräche unter Männern landen oft schnell bei Job, Sport oder dem nächsten Ratschlag.</p><p>Im Kreis ist Platz für das, was darunter liegt. Fertige Antworten brauchst du dafür nicht. Es reicht, dass du den anderen zuhörst und ehrlich bist, wenn du dran bist.</p>",
         "questionsLabel": "Fragen, um die ein Abend oft kreist",
         "questions": [
           "Was beschäftigt dich gerade wirklich?",
@@ -68,7 +68,7 @@
         "anchor": "reise",
         "eyebrow": "Ablauf",
         "title": "Wie ein Abend abläuft",
-        "subtitle": "Kein Minutenplan, aber eine verlässliche Reihenfolge. Wir sitzen im Kreis, auf Augenhöhe – keiner steht über dem anderen.",
+        "subtitle": "Kein Minutenplan, aber eine verlässliche Reihenfolge. Wir sitzen im Kreis, auf Augenhöhe\u00a0– keiner steht über dem anderen.",
         "steps": [
           {
             "number": "1",
@@ -83,12 +83,12 @@
           {
             "number": "3",
             "title": "Teilen",
-            "description": "Wenn du dran bist, erzählst du, was dich gerade beschäftigt – so persönlich, wie du möchtest. Auch nichts zu sagen ist in Ordnung."
+            "description": "Wenn du dran bist, erzählst du, was dich gerade beschäftigt\u00a0– so persönlich, wie du möchtest. Auch nichts zu sagen ist in Ordnung."
           },
           {
             "number": "4",
             "title": "Mitnehmen",
-            "description": "Du musst keine große Erkenntnis mit nach Hause nehmen. Oft ist es ein Gedanke, eine andere Sicht – oder die Erfahrung, mit etwas nicht allein zu sein."
+            "description": "Du musst keine große Erkenntnis mit nach Hause nehmen. Oft ist es ein Gedanke, eine andere Sicht\u00a0– oder die Erfahrung, mit etwas nicht allein zu sein."
           }
         ],
         "close": "<p>Vorerfahrung mit Männerkreisen, Meditation oder Atemarbeit brauchst du nicht, vorbereiten musst du nichts. Den Rahmen erkläre ich zu Beginn jedes Abends.</p>"
@@ -100,7 +100,7 @@
         "anchor": "haltung",
         "eyebrow": "Atem und Körper",
         "lines": ["Aus dem Kopf.", "In den Körper."],
-        "text": "Viele Männer leben im Kopf: planen, abwägen, funktionieren. Deshalb beginnt der Abend mit Ankommen – je nach Abend mit ein paar ruhigen Atemzügen, den Füßen auf dem Boden, einem kurzen Spüren, wie es dir gerade geht. Jede Übung ist ein Angebot, kein Programm. Du machst mit, soweit es für dich passt.",
+        "text": "Viele Männer leben im Kopf: planen, abwägen, funktionieren. Deshalb beginnt der Abend mit Ankommen\u00a0– je nach Abend mit ein paar ruhigen Atemzügen, den Füßen auf dem Boden, einem kurzen Spüren, wie es dir gerade geht. Jede Übung ist ein Angebot, kein Programm. Du machst mit, soweit es für dich passt.",
         "linkLabel": "Was wir miteinander vereinbaren",
         "linkUrl": "#rahmen",
         "breathGuide": "Atme ein paar Züge mit: vier Sekunden ein, fünf aus."
@@ -110,14 +110,14 @@
       "type": "moderator",
       "data": {
         "anchor": "moderator",
-        "eyebrow": "Wer den Abend hält",
+        "eyebrow": "Wer den Kreis leitet",
         "name": "Ich bin Markus.",
-        "quote": "Ich habe keine Antworten für dich. Ich sorge dafür, dass der Rahmen hält.",
-        "bio": "<p>Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.</p><p>Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit – einfach, ruhig und ohne große Worte.</p>",
+        "quote": "Ich gebe dir keine Ratschläge. Ich sorge dafür, dass du in Ruhe reden kannst\u00a0– und gehört wirst.",
+        "bio": "<p>Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.</p><p>Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit\u00a0– einfach, ruhig und ohne große Worte.</p>",
         "rolesLabel": "Meine Rolle im Kreis",
         "roles": [
-          "Ich erkläre den Rahmen und halte ihn über den ganzen Abend.",
-          "Ich achte darauf, dass jeder zu Wort kommt – und niemand muss.",
+          "Ich erkläre zu Beginn die Absprachen und achte den ganzen Abend darauf, dass sie gelten.",
+          "Ich achte darauf, dass jeder zu Wort kommen kann\u00a0– und keiner muss.",
           "Ich leite einfache Übungen mit Atem und Körperwahrnehmung an. Jede ist ein Angebot."
         ],
         "image": "/images/markus-sommer.jpg",
@@ -132,11 +132,11 @@
         "anchor": "rahmen",
         "eyebrow": "Der Rahmen",
         "title": "Was wir miteinander vereinbaren",
-        "intro": "Zu Beginn jedes Abends benennen wir ein paar Absprachen. Niemand kontrolliert sie – sie machen es leichter, ehrlich zu sein.",
+        "intro": "Zu Beginn jedes Abends benennen wir ein paar Absprachen. Niemand kontrolliert sie\u00a0– sie machen es leichter, ehrlich zu sein.",
         "agreements": [
           {
             "title": "Vertraulichkeit",
-            "text": "Was im Kreis erzählt wird, bleibt im Kreis. Darauf verständigen sich alle Anwesenden zu Beginn."
+            "text": "Was im Kreis erzählt wird, bleibt im Kreis. Das sagen wir uns zu Beginn gegenseitig zu."
           },
           {
             "title": "Respekt",
@@ -152,7 +152,7 @@
           }
         ],
         "boundaryTitle": "Gut zu wissen",
-        "boundaryText": "Der Männerkreis ist keine Therapie und kein Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Im Kreis sitzen Männer, die einander zuhören – ohne Lehre, ohne Glaubensrichtung und ohne Vorstellung davon, wie ein Mann zu sein hat."
+        "boundaryText": "Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Im Kreis sitzen Männer, die einander zuhören\u00a0– ohne Lehre, ohne Glaubensrichtung und ohne Vorstellung davon, wie ein Mann zu sein hat."
       }
     },
     {
@@ -180,7 +180,7 @@
           },
           {
             "question": "Muss ich bei den Atem- und Körperübungen mitmachen?",
-            "answer": "Nein. Die Übungen sind einfach und ein Angebot. Du machst mit, soweit es für dich passt – oder bleibst einfach sitzen und bist dabei."
+            "answer": "Nein. Die Übungen sind einfach und ein Angebot. Du machst mit, soweit es für dich passt\u00a0– oder bleibst einfach sitzen und bist dabei."
           },
           {
             "question": "Ich war noch nie in einem Männerkreis. Ist das ein Problem?",
@@ -188,7 +188,7 @@
           },
           {
             "question": "Wie vertraulich ist das, was ich erzähle?",
-            "answer": "Vertraulichkeit ist die erste Absprache jedes Abends: Was hier erzählt wird, bleibt hier. Sie gilt unter den Anwesenden – wie viel du erzählst, entscheidest deshalb immer du."
+            "answer": "Vertraulichkeit ist die erste Absprache jedes Abends: Was hier erzählt wird, bleibt hier. Sie ist eine Zusage der Anwesenden untereinander\u00a0– wie viel du erzählst, entscheidest deshalb immer du."
           }
         ]
       }
@@ -199,9 +199,9 @@
         "anchor": "termine",
         "eyebrow": "Nächster Schritt",
         "displayLines": ["Dabei sein."],
-        "lede": "Angemeldet wird über die Seite des jeweiligen Termins. Du brauchst nur Name und E-Mail-Adresse – den genauen Treffpunkt bekommst du mit der Bestätigung.",
+        "lede": "Du meldest dich auf der Seite des jeweiligen Termins an. Dafür brauchst du nur Name und E-Mail-Adresse\u00a0– den genauen Treffpunkt bekommst du mit der Bestätigung.",
         "newsletterText": "Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler nicht verschickt.",
-        "whatsappText": "Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine WhatsApp-Gruppe."
+        "whatsappText": "Für den Austausch zwischen den Abenden gibt es außerdem eine WhatsApp-Gruppe."
       }
     }
   ]

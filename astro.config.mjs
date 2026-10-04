@@ -64,8 +64,8 @@ export default defineConfig({
   },
   fonts: [
     // Public site: Fraunces — a soft, warm old-style serif with an organic
-    // wobble — for the headlines (800, the mobile menu at 400) and the quiet
-    // lines (italic); Instrument Sans for text, UI and the date line.
+    // wobble — for the headlines (regular, large; 500 for small serif lines) and
+    // the quiet lines (italic); Instrument Sans for text, UI and the date line.
     {
       name: 'Instrument Sans',
       cssVariable: '--font-sans',
@@ -79,7 +79,7 @@ export default defineConfig({
       name: 'Fraunces',
       cssVariable: '--font-serif',
       provider: fontProviders.fontsource(),
-      weights: ['400', '800'],
+      weights: ['400', '500'],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
