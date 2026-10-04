@@ -16,43 +16,100 @@ interface Props {
   };
 }
 
-/** The evening as a ruled ladder: big condensed numerals in the margin, a full-width rule above each step. */
+/**
+ * The evening as one circle in four quarters. On wide screens the circle stays
+ * in view while the steps pass, and the quarter of the step on screen lights up
+ * (a scroll-driven animation per step, shared through `timeline-scope`). Without
+ * timeline support all four quarters simply stand.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
-const steps = data.steps ?? [];
+const steps = (data.steps ?? []).slice(0, 4);
+
+const C = 120;
+const R = 100;
+const QUARTER = (2 * Math.PI * R) / 4;
+const GAP = 14;
+const timelines = steps.map((_, i) => `--evening-step-${i + 1}`);
+// Label positions just outside each quarter's midpoint (NE, SE, SW, NW).
+const labelAngle = (i: number) => -Math.PI / 4 + (i * Math.PI) / 2;
+const labelAt = (i: number, r: number) => ({
+  x: +(C + r * Math.cos(labelAngle(i))).toFixed(1),
+  y: +(C + r * Math.sin(labelAngle(i))).toFixed(1),
+});
 ---
 
-<section class="section home-evening" id={anchor} aria-labelledby="ablauf-title">
+<section
+  class="section surface-bark home-evening"
+  id={anchor}
+  aria-labelledby="ablauf-title"
+  style={`timeline-scope: ${timelines.join(', ')}`}
+>
   <div class="container">
-    <div class="bay home-evening__head">
-      <p class="marker marker--ruled bay__marker">{data.eyebrow}</p>
-
-      <div class="bay__beside-marker">
-        {data.title && (
-          <h2 class="section-title" id="ablauf-title">
-            {data.title}
-          </h2>
-        )}
-        {data.subtitle && <p class="section-intro">{data.subtitle}</p>}
-      </div>
+    <div class="home-evening__head">
+      <p class="marker">{data.eyebrow}</p>
+      {data.title && (
+        <h2 class="display home-evening__title" id="ablauf-title">
+          {data.title}
+        </h2>
+      )}
+      {data.subtitle && <p class="section-intro home-evening__intro">{data.subtitle}</p>}
     </div>
 
-    {steps.length > 0 && (
-      <ol class="home-evening__list" role="list">
-        {steps.map((step) => (
-          <li class="home-evening__step">
-            <p class="home-evening__number" aria-hidden="true">
-              {step.number}
-            </p>
-            <div class="home-evening__text-col">
-              {step.title && <h3 class="home-evening__title">{step.title}</h3>}
-              {step.description && <p class="home-evening__text">{step.description}</p>}
-            </div>
-          </li>
-        ))}
-      </ol>
-    )}
+    <div class="home-evening__body">
+      <div class="home-evening__dial" aria-hidden="true">
+        <svg viewBox="0 0 240 240" focusable="false">
+          <circle class="home-evening__track" cx={C} cy={C} r={R} fill="none"></circle>
+          {steps.map((_, i) => (
+            <circle
+              class="home-evening__quarter"
+              cx={C}
+              cy={C}
+              r={R}
+              fill="none"
+              stroke-dasharray={`${(QUARTER - GAP).toFixed(2)} ${(QUARTER * 3 + GAP).toFixed(2)}`}
+              transform={`rotate(${-90 + i * 90 + (GAP / (2 * Math.PI * R)) * 180} ${C} ${C})`}
+              style={`animation-timeline: ${timelines[i]}`}
+            ></circle>
+          ))}
+          {steps.map((step, i) => (
+            <text
+              class="home-evening__dial-label"
+              x={labelAt(i, 70).x}
+              y={labelAt(i, 70).y}
+              text-anchor="middle"
+              dominant-baseline="middle"
+              style={`animation-timeline: ${timelines[i]}`}
+            >
+              {step.title}
+            </text>
+          ))}
+          <circle class="home-evening__ember-halo" cx={C} cy={C} r="22" fill="none"></circle>
+          <circle class="home-evening__ember" cx={C} cy={C} r="9"></circle>
+        </svg>
+      </div>
+
+      {steps.length > 0 && (
+        <ol class="home-evening__list" role="list">
+          {steps.map((step, i) => (
+            <li class="home-evening__step" style={`view-timeline-name: ${timelines[i]}`}>
+              <p class="home-evening__number" aria-hidden="true">
+                <svg class="home-evening__glyph" viewBox="0 0 24 24" focusable="false">
+                  <circle cx="12" cy="12" r="10" fill="none"></circle>
+                  <path d="M12 12 L12 2 A10 10 0 0 1 22 12 Z" transform={`rotate(${i * 90} 12 12)`}></path>
+                </svg>
+                {step.number?.padStart(2, '0')}
+              </p>
+              <div class="home-evening__text-col">
+                {step.title && <h3 class="home-evening__step-title">{step.title}</h3>}
+                {step.description && <p class="home-evening__text">{step.description}</p>}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
 
     {data.close && <div class="home-evening__close prose" set:html={data.close} />}
   </div>
@@ -61,7 +118,85 @@ const steps = data.steps ?? [];
 <style is:global>
   @layer sections {
     .home-evening__head {
-      margin-block-end: var(--rhythm-group);
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: 0 var(--space-xl);
+      align-items: end;
+      margin-block-end: var(--space-2xl);
+    }
+
+    .home-evening__head .marker {
+      grid-column: 1 / -1;
+    }
+
+    .home-evening__title {
+      max-inline-size: 11ch;
+      margin: 0;
+    }
+
+    .home-evening__intro {
+      max-inline-size: 46ch;
+    }
+
+    .home-evening__body {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    .home-evening__dial {
+      position: sticky;
+      inset-block-start: calc(var(--header-clearance) + var(--space-lg));
+      inline-size: min(100%, 30rem);
+    }
+
+    .home-evening__dial svg {
+      display: block;
+      inline-size: 100%;
+      overflow: visible;
+    }
+
+    /* Stroke widths in user units: dash lengths only line up without
+       non-scaling-stroke. The dial is drawn at roughly twice its 240-unit box. */
+    .home-evening__track {
+      stroke: var(--border-medium);
+      stroke-width: 0.6;
+    }
+
+    .home-evening__quarter {
+      stroke: var(--accent);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+    }
+
+    .home-evening__dial-label {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-style: italic;
+      fill: var(--text-primary);
+    }
+
+    .home-evening__ember {
+      fill: var(--accent);
+    }
+
+    .home-evening__ember-halo {
+      stroke: var(--accent);
+      stroke-width: 1px;
+      vector-effect: non-scaling-stroke;
+      opacity: 0.45;
+    }
+
+    /* Each quarter (and its label) is lit while its own step crosses the screen. */
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) and (timeline-scope: none) {
+        .home-evening__quarter,
+        .home-evening__dial-label {
+          animation: quarter-on linear both;
+          animation-range: cover 15% cover 85%;
+        }
+      }
     }
 
     .home-evening__list {
@@ -70,64 +205,104 @@ const steps = data.steps ?? [];
       list-style: none;
     }
 
-    /* Each step is a full-width row with a 3px rule on top — the ladder reads
-       as one continuous structure rather than four separate objects. */
     .home-evening__step {
       display: grid;
-      grid-template-columns: minmax(0, 3.5fr) minmax(0, 8.5fr);
-      column-gap: var(--col-gap);
+      grid-template-columns: 4.5rem minmax(0, 1fr);
+      gap: var(--space-md);
       align-items: start;
-      padding-block: var(--space-md) var(--space-lg);
-      border-block-start: 3px solid var(--rule-strong);
+      align-content: center;
+      min-block-size: min(44vh, 26rem);
+      padding-block: var(--space-lg);
+      border-block-start: 1px solid var(--border-light);
+    }
+
+    .home-evening__step:last-child {
+      border-block-end: 1px solid var(--border-light);
     }
 
     .home-evening__number {
+      display: grid;
+      gap: var(--space-xs);
+      align-content: start;
+      justify-items: start;
       margin: 0;
-      font-family: var(--font-display);
-      font-size: var(--display-numeral);
-      font-weight: 800;
-      line-height: 0.8;
-      /* Orange passes as large text (3.1:1). */
-      color: var(--color-orange);
-      letter-spacing: -0.03em;
+      font-size: var(--text-caption);
+      font-weight: 600;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.1em;
     }
 
-    .home-evening__title {
+    .home-evening__glyph {
+      inline-size: 2.25rem;
+      block-size: 2.25rem;
+    }
+
+    .home-evening__glyph circle {
+      stroke: var(--border-dark);
+      stroke-width: 1px;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .home-evening__glyph path {
+      fill: var(--accent);
+    }
+
+    .home-evening__step-title {
       margin-block-end: var(--space-xs);
-      font-size: var(--text-3xl);
-      line-height: 1.02;
-      color: var(--text-primary);
-      letter-spacing: -0.015em;
+      font-size: var(--display-3);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
     }
 
     .home-evening__text {
-      max-inline-size: var(--measure);
+      max-inline-size: 46ch;
       margin: 0;
-      font-size: var(--text-section-body);
+      font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
     .home-evening__close {
-      max-inline-size: var(--measure);
-      padding-block-start: var(--space-md);
-      margin-block-start: 0;
-      border-block-start: 3px solid var(--rule-strong);
+      max-inline-size: 52ch;
+      margin-block-start: var(--space-xl);
+      margin-inline-start: auto;
     }
 
     .home-evening__close p {
       font-size: var(--text-section-body);
     }
 
+    /* Phone: no dial; each step carries its own quarter. */
     @media (width <= 56em) {
-      .home-evening__step {
+      .home-evening__head {
         grid-template-columns: minmax(0, 1fr);
-        row-gap: var(--space-2xs);
-        padding-block: var(--space-sm) var(--space-md);
+        gap: var(--space-md);
+        margin-block-end: var(--space-xl);
       }
 
-      .home-evening__number {
-        font-size: clamp(2.75rem, 2rem + 4vw, 4rem);
+      .home-evening__body {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .home-evening__dial {
+        display: none;
+      }
+
+      .home-evening__step {
+        grid-template-columns: 3rem minmax(0, 1fr);
+        gap: var(--space-sm);
+        min-block-size: 0;
+        padding-block: var(--space-md);
+      }
+
+      .home-evening__glyph {
+        inline-size: 2rem;
+        block-size: 2rem;
+      }
+
+      .home-evening__close {
+        margin-inline-start: 0;
       }
     }
   }

@@ -1,48 +1,55 @@
 ---
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
-import { Icon } from 'astro-icon/components';
+import SeatCircle from './SeatCircle.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 
-/** A wordmark, three destinations and one action. */
+/** A wordmark, three destinations and one action; on phones a full panel. */
 
 const links = nav.header.links;
 const ctaLinks = nav.header.cta;
 const secondary = nav.header.secondary;
 // Explicit allowlist, so new entries do not silently become speculative.
 const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
+const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]/g, '')}` : null;
 ---
 
 <header class="header" id="header">
-  <div class="container">
-    <div class="header__inner">
-      <a href="/" class="header__logo logo" aria-label={`${site.siteName} – Startseite`}>
-        <Icon name="logo" class="logo__icon" aria-hidden="true" />
-        <span class="logo__text">
-          Männerkreis<span class="logo__place">Straubing</span>
+  <div class="container header__inner">
+    <a href="/" class="header__logo logo" aria-label={`${site.siteName} – Startseite`}>
+      <SeatCircle class="logo__mark" ember />
+      <span class="logo__text">
+        <span class="logo__name">Männerkreis</span>
+        <span class="logo__place">
+          {site.geo.locality} <span class="logo__region">· Niederbayern</span>
         </span>
-      </a>
+      </span>
+    </a>
 
-      <nav class="nav" id="nav" aria-label="Hauptnavigation">
-        <ul class="nav__list">
-          {links.map((link) => (
-            <li class="nav__item">
-              <a
-                href={link.url}
-                class="nav__link"
-                data-nav-link
-                data-umami-event="nav-click"
-                data-umami-event-target={link.umamiTarget}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+    <nav class="nav" id="nav" aria-label="Hauptnavigation">
+      <ol class="nav__list">
+        {links.map((link, i) => (
+          <li class="nav__item" style={`--i: ${i}`}>
+            <a
+              href={link.url}
+              class="nav__link"
+              data-nav-link
+              data-umami-event="nav-click"
+              data-umami-event-target={link.umamiTarget}
+            >
+              <span class="nav__index" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ol>
 
-        {/* Only rendered inside the mobile panel — the bar keeps three items. */}
+      {/* Only rendered inside the mobile panel — the bar keeps three items. */}
+      <div class="nav__panel-extra">
         <ul class="nav__secondary">
-          {secondary.map((link) => (
+          {[...ctaLinks, ...secondary].map((link) => (
             <li>
               <a
                 href={link.url}
@@ -56,44 +63,53 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
           ))}
         </ul>
 
+        <div class="nav__contact">
+          <p class="marker">Fragen vorab?</p>
+          {site.contactEmail && <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>}
+          {phoneHref && <a href={phoneHref}>{site.contactPhone}</a>}
+        </div>
+
         <div class="nav__footer">
+          <span class="nav__footer-label">Darstellung</span>
           <ThemeSwitch class="theme-switch--nav" />
         </div>
-      </nav>
-
-      <div class="header__actions">
-        <ThemeSwitch class="theme-switch--bar" />
-
-        {ctaLinks.map((link) => (
-          <a
-            href={link.url}
-            class="btn btn--primary nav__cta"
-            data-nav-link
-            data-umami-event="cta-click"
-            data-umami-event-location="header"
-            data-umami-event-target={link.umamiTarget}
-          >
-            {link.label}
-          </a>
-        ))}
-
-        <button
-          class="nav-toggle"
-          id="navToggle"
-          type="button"
-          aria-controls="nav"
-          aria-expanded="false"
-          aria-label="Menü öffnen"
-        >
-          <span class="nav-toggle__bars" aria-hidden="true">
-            <span class="nav-toggle__bar"></span>
-            <span class="nav-toggle__bar"></span>
-            <span class="nav-toggle__bar"></span>
-          </span>
-        </button>
       </div>
+    </nav>
+
+    <div class="header__actions">
+      <ThemeSwitch class="theme-switch--bar" />
+
+      {ctaLinks.map((link) => (
+        <a
+          href={link.url}
+          class="btn btn--primary nav__cta"
+          data-nav-link
+          data-umami-event="cta-click"
+          data-umami-event-location="header"
+          data-umami-event-target={link.umamiTarget}
+        >
+          {link.label}
+        </a>
+      ))}
+
+      <button
+        class="nav-toggle"
+        id="navToggle"
+        type="button"
+        aria-controls="nav"
+        aria-expanded="false"
+        aria-label="Menü öffnen"
+      >
+        <span class="nav-toggle__bars" aria-hidden="true">
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+          <span class="nav-toggle__bar"></span>
+        </span>
+      </button>
     </div>
   </div>
+
+  <span class="header__progress" aria-hidden="true"></span>
 </header>
 
 <style is:global>
@@ -103,89 +119,123 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
       inset-block-start: 0;
       inset-inline: 0;
       z-index: var(--z-header);
-      padding-block: var(--space-xs);
       color: var(--text-primary);
+    }
+
+    /* The bar's ground. Solid by default; with scroll timelines it fades in over
+       the first stretch of the page, so the hero opens without a lid on it. */
+    .header::before {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      content: '';
       background: var(--bg-primary);
-      /* A 2px ink rule, not a hairline: the bar is part of the poster now. */
-      border-block-end: 2px solid var(--rule-strong);
+      border-block-end: 1px solid var(--border-light);
+    }
+
+    @supports (animation-timeline: scroll()) {
+      @media (prefers-reduced-motion: no-preference) {
+        .header::before {
+          animation: fade-in linear both;
+          animation-timeline: scroll(root block);
+          animation-range: 0 120px;
+        }
+      }
+    }
+
+    /* Reading progress: a hairline of the accent along the bar's lower edge. */
+    .header__progress {
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: -1px;
+      display: none;
+      block-size: 2px;
+      background: var(--accent);
+      transform-origin: 0 50%;
+    }
+
+    @supports (animation-timeline: scroll()) {
+      @media (prefers-reduced-motion: no-preference) {
+        .header__progress {
+          display: block;
+          animation: progress linear both;
+          animation-timeline: scroll(root block);
+        }
+      }
     }
 
     .header__inner {
       display: grid;
-      /* `minmax(0, …)` on every track: the default `auto` minimum is min-content,
-         which lets the actions cluster push past the header box. */
       grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
-      gap: var(--header-gap, var(--space-md));
+      gap: var(--space-md);
       align-items: center;
-      min-block-size: 60px;
-    }
-
-    .header__logo {
-      grid-column: 1;
-      justify-self: start;
-      /* `min-inline-size: 0` so the wordmark yields instead of growing the
-         track and painting over the actions on a 320px screen. */
-      min-inline-size: 0;
-      overflow: hidden;
+      min-block-size: var(--header-height);
     }
 
     .header__actions {
       display: flex;
       grid-column: 3;
-      gap: var(--header-gap, var(--space-xs));
-      align-items: center;
-      justify-self: end;
-      min-inline-size: 0;
-    }
-
-    /* Wordmark. */
-    .logo {
-      display: flex;
       gap: var(--space-xs);
       align-items: center;
+      justify-self: end;
+    }
+
+    /* Wordmark: the seat circle and the name, stacked over the place. */
+    .logo {
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+      min-inline-size: 0;
       color: inherit;
+      text-decoration: none;
     }
 
     .logo:focus-visible {
-      outline: 3px solid var(--text-primary);
-      outline-offset: 4px;
-      box-shadow: 0 0 0 3px var(--color-orange);
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 6px;
+      border-radius: var(--radius);
     }
 
-    .logo__icon {
-      flex-shrink: 0;
-      inline-size: 28px;
-      block-size: 28px;
+    .logo__mark {
+      flex: none;
+      inline-size: 2.125rem;
+      transition: rotate var(--duration-slow) var(--ease-settle);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .logo:hover .logo__mark {
+        rotate: 22.5deg;
+      }
     }
 
     .logo__text {
-      display: flex;
-      flex-direction: column;
+      display: grid;
       min-inline-size: 0;
+      line-height: 1.1;
+    }
+
+    .logo__name {
       font-family: var(--font-display);
-      font-size: 1.4rem;
-      font-weight: 800;
-      line-height: 0.95;
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+
+    .logo__place {
+      overflow: hidden;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-overflow: ellipsis;
       text-transform: uppercase;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.14em;
       white-space: nowrap;
     }
 
-    /* The locality belongs in the wordmark: it is the single most useful thing
-       a visitor can learn in the first second. */
-    .logo__place {
-      font-family: var(--font-display);
-      font-size: 0.6875rem;
-      font-weight: 600;
-      /* Not orange: at 11px the orange measures 3.52:1 on paper, under the 4.5:1 small text requires. */
-      color: var(--text-muted);
-      letter-spacing: 0.2em;
-    }
-
-    /* Bar navigation (wide screens). */
+    /* Bar navigation. */
     .nav__list {
       display: flex;
-      gap: var(--space-md);
+      gap: clamp(1rem, 0.5rem + 1.5vw, 2.25rem);
       align-items: center;
       justify-content: center;
       padding: 0;
@@ -194,48 +244,63 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
     }
 
     .nav__link {
+      position: relative;
       display: inline-flex;
-      align-items: center;
+      gap: 0.45em;
+      align-items: baseline;
       min-block-size: 44px;
-      font-family: var(--font-display);
-      font-size: var(--text-marker);
-      font-weight: 600;
+      align-content: center;
+      padding-block: 0.75rem;
+      font-size: 0.9375rem;
+      font-weight: 500;
       color: var(--text-primary);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-marker);
-      border-block-end: 3px solid transparent;
-      transition: border-color var(--motion-quick);
+      text-decoration: none;
+    }
+
+    .nav__index {
+      font-family: var(--font-display);
+      font-size: 0.8em;
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .nav__link::after {
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0.55rem;
+      block-size: 1.5px;
+      content: '';
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: 0 50%;
+      transition: transform var(--motion-standard);
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .nav__link:hover {
-        border-block-end-color: var(--color-orange);
+      .nav__link:hover::after {
+        transform: scaleX(1);
       }
     }
 
     .nav__link:focus-visible {
-      outline: 3px solid var(--text-primary);
-      outline-offset: 4px;
-      box-shadow: 0 0 0 3px var(--color-orange);
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+      border-radius: var(--radius);
     }
 
-    .nav__secondary {
-      display: none;
-    }
-
-    .nav__footer {
+    .nav__panel-extra {
       display: none;
     }
 
     .nav__cta {
-      --btn-padding-block: 0.5rem;
+      --btn-padding-block: 0.55rem;
       --btn-padding-inline: 1rem;
-      --btn-font-size: var(--text-caption);
+      --btn-font-size: 0.9375rem;
 
+      min-block-size: 44px;
       white-space: nowrap;
     }
 
-    /* Mobile panel. */
     .nav-toggle {
       display: none;
       place-items: center;
@@ -245,25 +310,14 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
       color: var(--text-primary);
       cursor: pointer;
       background: none;
-      border: 2px solid var(--rule-strong);
-      border-radius: 0;
-      transition:
-        color var(--motion-quick),
-        background-color var(--motion-quick);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .nav-toggle:hover {
-        /* Ink on orange in both modes — the orange field does not flip. */
-        color: var(--color-ink);
-        background: var(--color-orange);
-      }
+      border: 1px solid var(--border-medium);
+      border-radius: 50%;
+      transition: border-color var(--motion-quick);
     }
 
     .nav-toggle:focus-visible {
-      outline: 3px solid var(--text-primary);
+      outline: 2px solid var(--focus-ring);
       outline-offset: 3px;
-      box-shadow: 0 0 0 3px var(--color-orange);
     }
 
     .nav-toggle__bars {
@@ -275,13 +329,13 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
 
     .nav-toggle__bar {
       display: block;
-      inline-size: 22px;
-      block-size: 2.5px;
+      inline-size: 18px;
+      block-size: 1.5px;
       background: currentcolor;
       transform-origin: center;
     }
 
-    /* Theme control. */
+    /* Theme control: a round seat with a sun or a moon. */
     .theme-switch {
       display: flex;
       align-items: center;
@@ -296,21 +350,23 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
       color: inherit;
       cursor: pointer;
       background: none;
-      border: 2px solid transparent;
-      border-radius: 0;
-      transition: border-color var(--motion-quick);
+      border: 1px solid transparent;
+      border-radius: 50%;
+      transition:
+        border-color var(--motion-quick),
+        rotate var(--duration-slow) var(--ease-settle);
     }
 
     @media (hover: hover) and (pointer: fine) {
       .theme-switch__btn:hover {
-        border-color: var(--rule-strong);
+        border-color: var(--border-medium);
+        rotate: -20deg;
       }
     }
 
     .theme-switch__btn:focus-visible {
-      outline: 3px solid var(--text-primary);
+      outline: 2px solid var(--focus-ring);
       outline-offset: 2px;
-      box-shadow: 0 0 0 3px var(--color-orange);
     }
 
     .theme-switch__icon {
@@ -318,13 +374,11 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
       block-size: 18px;
       fill: none;
       stroke: currentcolor;
-      stroke-width: 1.7;
+      stroke-width: 1.6;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
 
-    /* Only the icon matching the resolved mode. The attribute is set before
-       first paint by the layout's boot script, so nothing flashes. */
     :root:not([data-mode-resolved='dark']) .theme-switch__icon--dark,
     :root[data-mode-resolved='dark'] .theme-switch__icon--light {
       display: none;
@@ -334,7 +388,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
       display: none;
     }
 
-    /* Narrow screens: the panel takes over. */
+    /* Narrow screens: a full panel on the bark surface. */
     @media (width <= 54em) {
       .nav-toggle {
         display: grid;
@@ -348,22 +402,27 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
         display: flex;
       }
 
-      /* The panel hangs off the bottom edge of the bar. */
       .nav {
-        position: absolute;
-        inset-block-start: 100%;
-        inset-inline: 0;
-        block-size: calc(100dvh - 100%);
+        --text-primary: var(--color-chalk);
+        --text-secondary: #d2c6b5;
+        --text-muted: var(--color-chalk-muted);
+        --accent: var(--color-ember);
+        --border-light: var(--color-night-rule);
+        --border-medium: #4a3d34;
+
+        position: fixed;
+        inset: var(--header-height) 0 0;
         display: flex;
         visibility: hidden;
         flex-direction: column;
-        gap: var(--space-md);
+        gap: var(--space-lg);
         padding-block: var(--space-md) var(--space-lg);
         padding-inline: var(--container-gutter);
         overflow-y: auto;
         overscroll-behavior: contain;
+        color: var(--text-primary);
         pointer-events: none;
-        background: var(--bg-primary);
+        background: light-dark(var(--color-ink), var(--color-night-soft));
         opacity: 0;
         transition:
           opacity var(--motion-standard),
@@ -380,30 +439,63 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
         flex-direction: column;
         gap: 0;
         align-items: stretch;
-        border-block-start: 2px solid var(--rule-strong);
+        border-block-start: 1px solid var(--border-light);
       }
 
       .nav__item {
-        border-block-end: 2px solid var(--rule-strong);
+        border-block-end: 1px solid var(--border-light);
       }
 
       .nav__link {
         inline-size: 100%;
+        gap: 0.9rem;
         padding-block: var(--space-sm);
         font-family: var(--font-display);
-        font-size: var(--text-4xl);
-        font-weight: 800;
-        line-height: 1;
-        color: var(--text-primary);
-        text-transform: uppercase;
-        letter-spacing: -0.01em;
-        border-block-end: none;
+        font-size: clamp(2rem, 1.4rem + 3vw, 2.75rem);
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+
+      .nav__link::after {
+        display: none;
+      }
+
+      .nav__index {
+        font-size: 0.45em;
+        font-style: normal;
+        font-family: var(--font-body);
+        font-weight: 600;
+        letter-spacing: 0.1em;
+      }
+
+      /* The links settle in one after another as the panel opens. */
+      @media (prefers-reduced-motion: no-preference) {
+        .nav__item {
+          opacity: 0;
+          transform: translateY(0.75rem);
+          transition:
+            opacity var(--duration-slow) var(--ease-settle),
+            transform var(--duration-slow) var(--ease-settle);
+          transition-delay: calc(var(--i) * 50ms + 60ms);
+        }
+
+        .nav.is-open .nav__item {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .nav__panel-extra {
+        display: grid;
+        gap: var(--space-lg);
+        margin-block-start: auto;
       }
 
       .nav__secondary {
         display: flex;
-        flex-direction: column;
-        gap: var(--space-xs);
+        flex-wrap: wrap;
+        gap: var(--space-xs) var(--space-md);
         padding: 0;
         margin: 0;
         list-style: none;
@@ -413,62 +505,113 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
         display: inline-flex;
         align-items: center;
         min-block-size: 44px;
-        font-family: var(--font-display);
-        font-size: var(--text-marker);
-        font-weight: 600;
+        font-size: var(--text-body-compact);
+        font-weight: 500;
         color: var(--text-primary);
-        text-transform: uppercase;
-        letter-spacing: var(--tracking-marker);
         text-decoration: underline;
-        text-decoration-color: var(--color-orange);
-        text-decoration-thickness: 2px;
+        text-decoration-color: var(--accent);
+        text-decoration-thickness: 1.5px;
         text-underline-offset: 0.3em;
       }
 
-      .nav__secondary-link:focus-visible {
-        outline: 3px solid var(--text-primary);
-        outline-offset: 4px;
+      .nav__contact {
+        display: grid;
+        gap: var(--space-3xs);
+      }
+
+      .nav__contact .marker {
+        margin-block-end: var(--space-2xs);
+      }
+
+      .nav__contact a {
+        display: inline-flex;
+        align-items: center;
+        min-block-size: 44px;
+        font-family: var(--font-display);
+        font-size: var(--text-xl);
+        color: var(--text-primary);
       }
 
       .nav__footer {
         display: flex;
-        margin-block-start: auto;
+        align-items: center;
+        justify-content: space-between;
         padding-block-start: var(--space-sm);
-        border-block-start: 2px solid var(--rule-strong);
+        border-block-start: 1px solid var(--border-light);
       }
 
-      /* The panel covers the page; the body lock lives in lib/site-header.ts. */
+      .nav__footer-label {
+        font-size: var(--text-caption);
+        color: var(--text-muted);
+      }
+
+      .theme-switch--nav .theme-switch__btn {
+        border-color: var(--border-medium);
+      }
+
       body.nav-open {
         position: fixed;
         inline-size: 100%;
         min-block-size: 100%;
         overflow: hidden;
       }
+
+      /* With the panel open the bar sits on the same dark ground. */
+      body.nav-open .header {
+        --text-primary: var(--color-chalk);
+        --text-muted: var(--color-chalk-muted);
+        --accent: var(--color-ember);
+        --surface: light-dark(var(--color-ink), var(--color-night-soft));
+
+        color: var(--text-primary);
+      }
+
+      body.nav-open .header::before {
+        background: light-dark(var(--color-ink), var(--color-night-soft));
+        border-color: var(--color-night-rule);
+        opacity: 1;
+        animation: none;
+      }
+
+      body.nav-open .header .nav-toggle {
+        border-color: #4a3d34;
+      }
+
+      body.nav-open .header .nav__cta {
+        display: none;
+      }
     }
 
-    /* The smallest phones. */
     @media (width <= 420px) {
-      .header__inner,
-      .header__actions {
-        --header-gap: var(--space-xs);
+      .header__inner {
+        gap: var(--space-xs);
+      }
+
+      .logo__mark {
+        inline-size: 1.75rem;
+      }
+
+      .logo__name {
+        font-size: 1.125rem;
       }
 
       .logo__place {
-        display: none;
-      }
-
-      .logo__icon {
-        inline-size: 24px;
-        block-size: 24px;
-      }
-
-      .logo__text {
-        font-size: 1rem;
+        font-size: 0.625rem;
+        letter-spacing: 0.1em;
       }
 
       .nav__cta {
-        --btn-padding-inline: 0.75rem;
-        --btn-font-size: var(--text-xs);
+        --btn-padding-inline: 0.8rem;
+      }
+
+      .nav__cta::before {
+        display: none;
+      }
+    }
+
+    @media (width <= 30em) {
+      .logo__region {
+        display: none;
       }
     }
 

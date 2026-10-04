@@ -12,127 +12,182 @@ interface Props {
     intro?: string;
     agreements?: Agreement[];
     boundaryTitle?: string;
-    boundaryItems?: string[];
     boundaryText?: string;
   };
 }
 
-/** The ground rules, and what the circle is not. */
+/** The agreements every evening starts with, and the one place that says what the circle is not. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'rahmen';
 const agreements = data.agreements ?? [];
-const boundaryItems = data.boundaryItems ?? [];
 ---
 
-<section class="section section--ruled home-frame" id={anchor} aria-labelledby="rahmen-title">
+<section class="section surface-sand home-frame" id={anchor} aria-labelledby="rahmen-title">
   <div class="container">
-    <div class="spine">
-      <p class="rail-heading">{data.eyebrow}</p>
-
-      <div class="spine__body" data-reveal-group="60">
-        {data.title && (
-          <h2 class="section-title" id="rahmen-title" data-reveal="up">
-            {data.title}
-          </h2>
-        )}
-        {data.intro && (
-          <p class="section-intro" data-reveal="up">
-            {data.intro}
-          </p>
-        )}
-
-        {agreements.length > 0 && (
-          <dl class="deflist home-frame__list" data-reveal-group="55">
-            {agreements.map((rule) => (
-              <div class="deflist__row" data-reveal="up">
-                <dt class="deflist__term home-frame__term">{rule.title}</dt>
-                <dd class="deflist__desc home-frame__text">{rule.text}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </div>
+    <div class="home-frame__head">
+      <p class="marker">{data.eyebrow}</p>
+      {data.title && (
+        <h2 class="display home-frame__title" id="rahmen-title">
+          {data.title}
+        </h2>
+      )}
+      {data.intro && <p class="section-intro home-frame__intro">{data.intro}</p>}
     </div>
 
-    {(boundaryItems.length > 0 || data.boundaryText) && (
-      <div class="spine home-frame__boundary-row">
-        <p class="rail-heading" aria-hidden="true">
-          Abgrenzung
-        </p>
+    {agreements.length > 0 && (
+      <ol class="home-frame__list" role="list">
+        {agreements.map((rule, i) => (
+          <li class="home-frame__item" data-reveal>
+            <span class="home-frame__seat" aria-hidden="true">
+              {i + 1}
+            </span>
+            <h3 class="home-frame__term">{rule.title}</h3>
+            <p class="home-frame__text">{rule.text}</p>
+          </li>
+        ))}
+      </ol>
+    )}
 
-        <div class="home-frame__boundary spine__body" data-reveal="up">
-          {data.boundaryTitle && <h3 class="home-frame__boundary-title">{data.boundaryTitle}</h3>}
-
-          {boundaryItems.length > 0 && (
-            <ul class="home-frame__boundary-list" role="list">
-              {boundaryItems.map((item) => (
-                <li>{item}</li>
-              ))}
-            </ul>
-          )}
-
-          {data.boundaryText && <p class="home-frame__boundary-text">{data.boundaryText}</p>}
-        </div>
-      </div>
+    {data.boundaryText && (
+      <aside class="home-frame__boundary" aria-labelledby="rahmen-boundary-title" data-reveal>
+        <h3 class="home-frame__boundary-title" id="rahmen-boundary-title">
+          {data.boundaryTitle ?? 'Gut zu wissen'}
+        </h3>
+        <p class="home-frame__boundary-text">{data.boundaryText}</p>
+      </aside>
     )}
   </div>
 </section>
 
 <style is:global>
   @layer sections {
+    .home-frame__head {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-md) var(--space-xl);
+      align-items: end;
+      margin-block-end: var(--space-xl);
+    }
+
+    .home-frame__head .marker {
+      grid-column: 1 / -1;
+      margin: 0;
+    }
+
+    .home-frame__title {
+      max-inline-size: 13ch;
+      margin: 0;
+    }
+
     .home-frame__list {
-      margin-block-start: var(--rhythm-group);
-    }
-
-    .home-frame__term {
-      font-size: var(--text-section-body);
-      color: var(--text-primary);
-    }
-
-    .home-frame__text {
-      color: var(--text-secondary);
-    }
-
-    .home-frame__boundary-row {
-      margin-block-start: var(--rhythm-group);
-    }
-
-    /* Set apart by a change of ground and a single accent rule — the one place
-       on the page the warm accent is used for anything. */
-    /* A mode-flipping ground; the text inside flips too. */
-    .home-frame__boundary {
-      padding: var(--space-md);
-      background: var(--bg-secondary);
-      border-inline-start: 6px solid var(--color-orange);
-      border-radius: 0;
-    }
-
-    .home-frame__boundary-title {
-      margin-block-end: var(--space-xs);
-      font-size: var(--text-2xl);
-      line-height: 1.08;
-    }
-
-    .home-frame__boundary-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-lg);
       padding: 0;
-      margin: 0 0 var(--space-sm);
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
-      color: var(--text-primary);
+      margin: 0;
       list-style: none;
     }
 
-    .home-frame__boundary-list li {
-      padding-block: 0.15rem;
+    .home-frame__item {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: var(--space-sm);
+      align-content: start;
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid var(--rule-strong);
     }
 
-    .home-frame__boundary-text {
-      max-inline-size: var(--measure);
+    /* A numbered seat. */
+    .home-frame__seat {
+      display: grid;
+      place-items: center;
+      inline-size: 3rem;
+      block-size: 3rem;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-style: italic;
+      line-height: 1;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+    }
+
+    .home-frame__term {
+      font-size: var(--text-xl);
+      line-height: 1.15;
+      hyphens: auto;
+      overflow-wrap: break-word;
+    }
+
+    .home-frame__text {
       margin: 0;
       font-size: var(--text-section-body);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
+    }
+
+    .home-frame__boundary {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      gap: var(--space-sm) var(--space-xl);
+      align-items: baseline;
+      padding: var(--space-lg);
+      margin-block-start: var(--space-2xl);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius);
+    }
+
+    .home-frame__boundary-title {
+      display: flex;
+      gap: 0.6em;
+      align-items: baseline;
+      font-size: var(--text-2xl);
+      font-style: italic;
+    }
+
+    .home-frame__boundary-text {
+      max-inline-size: 58ch;
+      margin: 0;
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+
+    @media (width <= 72em) {
+      .home-frame__list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        row-gap: var(--space-xl);
+      }
+    }
+
+    @media (width <= 56em) {
+      .home-frame__head,
+      .home-frame__boundary {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .home-frame__boundary {
+        padding: var(--space-md);
+      }
+    }
+
+    @media (width <= 36em) {
+      .home-frame__list {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: var(--space-lg);
+      }
+
+      .home-frame__item {
+        grid-template-columns: 3rem minmax(0, 1fr);
+        grid-template-rows: none;
+        column-gap: var(--space-sm);
+      }
+
+      .home-frame__seat {
+        grid-row: 1 / span 2;
+      }
     }
   }
 </style>
