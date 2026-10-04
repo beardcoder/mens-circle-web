@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Männerkreis Straubing / Niederbayern\u00a0– ein Abend unter Männern",
-    "description": "Ein Männerkreis in Straubing: Männer sitzen im Kreis, hören einander zu und sprechen über das, was sie beschäftigt\u00a0– dazu einfache Übungen mit Atem und Körperwahrnehmung. Auf Spendenbasis, ohne Vorerfahrung."
+    "description": "Männerkreis in Straubing, Niederbayern: Männer sitzen im Kreis, hören zu und sprechen offen, dazu einfache Atemübungen. Auf Spendenbasis, ohne Vorerfahrung."
   },
   "blocks": [
     {
@@ -141,6 +141,10 @@
         "eyebrow": "Häufige Fragen",
         "title": "Was Männer vorher wissen wollen",
         "items": [
+          {
+            "question": "Was ist ein Männerkreis?",
+            "answer": "Ein Männerkreis ist eine feste Runde von Männern, die sich regelmäßig trifft, im Kreis sitzt und offen über das spricht, was gerade da ist. Einer spricht, die anderen hören zu\u00a0– ohne Bewertung und ohne Ratschläge. In Straubing treffen wir uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung."
+          },
           {
             "question": "Für wen ist der Männerkreis?",
             "answer": "Für Männer, die sich ehrlichere Gespräche mit anderen Männern wünschen. Alter, Beruf und Lebenssituation spielen keine Rolle. Mitbringen musst du nur die Bereitschaft, zuzuhören und die anderen respektvoll zu behandeln."
