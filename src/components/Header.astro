@@ -204,19 +204,19 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
 
     .logo__name {
       font-family: var(--font-display);
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       font-weight: 800;
       letter-spacing: 0;
     }
 
     .logo__place {
       overflow: hidden;
-      font-size: 0.6875rem;
-      font-weight: 500;
+      font-size: 0.75rem;
+      font-weight: 700;
       color: var(--text-muted);
       text-overflow: ellipsis;
       text-transform: uppercase;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.2em;
       white-space: nowrap;
     }
 
@@ -239,7 +239,7 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       min-block-size: 44px;
       align-content: center;
       padding-block: 0.75rem;
-      font-size: 0.9375rem;
+      font-size: 1.125rem;
       font-weight: 500;
       color: var(--text-primary);
       text-decoration: none;
@@ -276,7 +276,7 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
     .nav__cta {
       --btn-padding-block: 0.55rem;
       --btn-padding-inline: 1rem;
-      --btn-font-size: 0.9375rem;
+      --btn-font-size: 1.0625rem;
 
       min-block-size: 44px;
       white-space: nowrap;
@@ -546,11 +546,11 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       }
 
       .logo__name {
-        font-size: 1.125rem;
+        font-size: 1.3125rem;
       }
 
       .logo__place {
-        font-size: 0.625rem;
+        font-size: 0.6875rem;
         letter-spacing: 0.1em;
       }
 
@@ -567,6 +567,18 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
     @media (width <= 30em) {
       .logo__region {
         display: none;
+      }
+    }
+
+    /* The smallest phones: name and button step down so they never meet. */
+    @media (width <= 22.5em) {
+      .logo__name {
+        font-size: 1.125rem;
+      }
+
+      .nav__cta {
+        --btn-padding-inline: 0.65rem;
+        --btn-font-size: 1rem;
       }
     }
 
