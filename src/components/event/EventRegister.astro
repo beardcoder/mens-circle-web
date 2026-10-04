@@ -37,16 +37,9 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
       ) : (
         <p class="event-register__text">
           Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen Vor-
-          und Nachname und eine E-Mail-Adresse; den genauen Treffpunkt bekommst du mit der Bestätigung.
+          und Nachname und eine E-Mail-Adresse. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail&nbsp;–
+          am Abend musst du dann nur noch vorbeikommen.
         </p>
-      )}
-
-      {!event.is_past && (
-        <ol class="event-register__steps" role="list">
-          <li>Formular ausfüllen</li>
-          <li>Bestätigung mit Treffpunkt per E-Mail</li>
-          <li>Am Abend vorbeikommen – mehr braucht es nicht</li>
-        </ol>
       )}
     </div>
 
@@ -87,41 +80,6 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
-    }
-
-    .event-register__steps {
-      display: grid;
-      gap: 0;
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      counter-reset: register-step;
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .event-register__steps li {
-      display: flex;
-      gap: var(--space-sm);
-      align-items: center;
-      padding-block: var(--space-sm);
-      font-size: var(--text-body-compact);
-      color: var(--text-primary);
-      counter-increment: register-step;
-      border-block-end: 1px solid var(--border-light);
-    }
-
-    .event-register__steps li::before {
-      display: grid;
-      flex: none;
-      place-items: center;
-      inline-size: 2rem;
-      block-size: 2rem;
-      font-family: var(--font-quote);
-      font-style: italic;
-      color: var(--accent);
-      content: counter(register-step);
-      border: 1px solid var(--accent);
-      border-radius: 50%;
     }
 
     /* The form sits on a raised panel: the one place on the page that asks for something. */

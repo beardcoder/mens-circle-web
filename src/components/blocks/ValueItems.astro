@@ -1,6 +1,5 @@
 ---
 interface Item {
-  number?: string;
   title?: string;
   description?: string;
 }
@@ -37,14 +36,9 @@ const items = (data.items ?? []).map((item) => {
     </div>
 
     {items.length > 0 && (
-      <ol class="values-section__list" role="list">
+      <ul class="values-section__list" role="list">
         {items.map((item) => (
           <li class="value-item" data-reveal>
-            {item.number && (
-              <span class="value-item__number" aria-hidden="true">
-                {item.number}
-              </span>
-            )}
             <h3 class="value-item__title">
               <span class="value-item__keep">{item.keep}</span>
               {item.instead && <span class="value-item__instead"> statt {item.instead}</span>}
@@ -52,7 +46,7 @@ const items = (data.items ?? []).map((item) => {
             {item.description && <p class="value-item__description">{item.description}</p>}
           </li>
         ))}
-      </ol>
+      </ul>
     )}
   </div>
 </section>
@@ -91,24 +85,13 @@ const items = (data.items ?? []).map((item) => {
   }
 
   @layer components {
+    /* Unnumbered pairs, held apart by space alone. */
     .value-item {
       display: grid;
-      grid-template-columns: 4rem minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--space-2xs) var(--space-lg);
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-2xs) var(--space-xl);
       align-items: baseline;
       padding-block: var(--space-md);
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .value-item:last-child {
-      border-block-end: 1px solid var(--border-light);
-    }
-
-    .value-item__number {
-      font-family: var(--font-quote);
-      font-size: var(--text-lg);
-      font-style: italic;
-      color: var(--accent);
     }
 
     .value-item__title {
@@ -137,11 +120,7 @@ const items = (data.items ?? []).map((item) => {
 
     @media (width <= 56em) {
       .value-item {
-        grid-template-columns: 2.5rem minmax(0, 1fr);
-      }
-
-      .value-item__description {
-        grid-column: 2;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
   }

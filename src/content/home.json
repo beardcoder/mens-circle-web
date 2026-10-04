@@ -11,25 +11,6 @@
         "title": "Ein Abend, an dem du nichts darstellen musst.",
         "titleEmphasis": "nichts darstellen",
         "lede": "Wir sitzen im Kreis und sprechen über das, was gerade wirklich da ist. Die anderen hören zu\u00a0– ohne zu bewerten, ohne Ratschläge. Je nach Abend kommen einfache Übungen mit Atem und Körperwahrnehmung dazu; du machst mit, soweit es für dich passt.",
-        "pillarsLabel": "Was einen Abend trägt.",
-        "pillars": [
-          {
-            "title": "Austausch",
-            "text": "Einer spricht, die anderen hören zu."
-          },
-          {
-            "title": "Atem",
-            "text": "Ein paar ruhige Atemzüge zum Ankommen."
-          },
-          {
-            "title": "Körper",
-            "text": "Spüren, wie du gerade dasitzt."
-          },
-          {
-            "title": "Präsenz",
-            "text": "Da sein, statt mit dem Kopf schon woanders."
-          }
-        ],
         "secondaryLabel": "Wie ein Abend abläuft",
         "secondaryLink": "#reise",
         "image": "/images/markus-sommer.jpg",
@@ -71,22 +52,18 @@
         "subtitle": "Kein Minutenplan, aber eine verlässliche Reihenfolge. Wir sitzen im Kreis, auf Augenhöhe\u00a0– keiner steht über dem anderen.",
         "steps": [
           {
-            "number": "1",
             "title": "Ankommen",
             "description": "Raus aus dem Alltag. Wir nehmen uns Zeit, wirklich da zu sein. Je nach Abend gehört eine einfache Übung dazu: ein paar bewusste Atemzüge, kurz spüren, wie du gerade dasitzt."
           },
           {
-            "number": "2",
             "title": "Zuhören",
             "description": "Einer spricht, die anderen hören zu. Nicht um eine Lösung zu finden oder zu diskutieren, sondern um zu verstehen."
           },
           {
-            "number": "3",
             "title": "Teilen",
             "description": "Wenn du dran bist, erzählst du, was dich gerade beschäftigt\u00a0– so persönlich, wie du möchtest. Auch nichts zu sagen ist in Ordnung."
           },
           {
-            "number": "4",
             "title": "Mitnehmen",
             "description": "Du musst keine große Erkenntnis mit nach Hause nehmen. Oft ist es ein Gedanke, eine andere Sicht\u00a0– oder die Erfahrung, mit etwas nicht allein zu sein."
           }
@@ -113,13 +90,7 @@
         "eyebrow": "Wer den Kreis leitet",
         "name": "Ich bin Markus.",
         "quote": "Ich gebe dir keine Ratschläge. Ich sorge dafür, dass du in Ruhe reden kannst\u00a0– und gehört wirst.",
-        "bio": "<p>Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.</p><p>Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit\u00a0– einfach, ruhig und ohne große Worte.</p>",
-        "rolesLabel": "Meine Rolle im Kreis",
-        "roles": [
-          "Ich erkläre zu Beginn die Absprachen und achte den ganzen Abend darauf, dass sie gelten.",
-          "Ich achte darauf, dass jeder zu Wort kommen kann\u00a0– und keiner muss.",
-          "Ich leite einfache Übungen mit Atem und Körperwahrnehmung an. Jede ist ein Angebot."
-        ],
+        "bio": "<p>Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.</p><p>Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit\u00a0– einfach, ruhig und ohne große Worte.</p><p>Zu Beginn jedes Abends erkläre ich die Absprachen und achte darauf, dass sie gelten. Jeder kann zu Wort kommen, keiner muss. Und wenn wir eine Übung mit Atem oder Körperwahrnehmung machen, leite ich sie an\u00a0– als Angebot, nicht als Pflicht.</p>",
         "image": "/images/markus-sommer.jpg",
         "imageAlt": "Markus Sommer, von der Seite, auf einem Felsen sitzend.",
         "linkLabel": "Warum ich den Männerkreis leite",
