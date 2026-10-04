@@ -23,6 +23,11 @@
       "type": "phone",
       "value": "015126072643",
       "label": "Telefon"
+    },
+    {
+      "type": "google",
+      "value": "https://maps.google.com/?cid=16952958160248463162",
+      "label": "Google-Profil"
     }
   ],
   "geo": {
