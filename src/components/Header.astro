@@ -37,9 +37,6 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
               data-umami-event="nav-click"
               data-umami-event-target={link.umamiTarget}
             >
-              <span class="nav__index" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
-              </span>
               {link.label}
             </a>
           </li>
@@ -108,8 +105,6 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       </button>
     </div>
   </div>
-
-  <span class="header__progress" aria-hidden="true"></span>
 </header>
 
 <style is:global>
@@ -130,26 +125,26 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       z-index: -1;
       content: '';
       background: var(--surface);
-      border-block-end: 1px solid var(--border-light);
     }
 
-    /* Reading progress: a hairline of the accent along the bar's lower edge. */
-    .header__progress {
+    /* The hairline under the bar. At the top of the page header and hero read as
+       one ground; the line fades in once the page moves (without scroll
+       timelines it is simply there). */
+    .header::after {
       position: absolute;
       inset-inline: 0;
-      inset-block-end: -1px;
-      display: none;
-      block-size: 2px;
-      background: var(--accent);
-      transform-origin: 0 50%;
+      inset-block-end: 0;
+      block-size: 1px;
+      content: '';
+      background: var(--border-light);
     }
 
     @supports (animation-timeline: scroll()) {
       @media (prefers-reduced-motion: no-preference) {
-        .header__progress {
-          display: block;
-          animation: progress linear both;
+        .header::after {
+          animation: fade-in linear both;
           animation-timeline: scroll(root block);
+          animation-range: 0 80px;
         }
       }
     }
@@ -248,13 +243,6 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       font-weight: 500;
       color: var(--text-primary);
       text-decoration: none;
-    }
-
-    .nav__index {
-      font-family: var(--font-quote);
-      font-size: 0.8em;
-      font-style: italic;
-      color: var(--accent);
     }
 
     .nav__link::after {
@@ -415,7 +403,8 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         overscroll-behavior: contain;
         color: var(--text-primary);
         pointer-events: none;
-        background: light-dark(var(--color-ink), var(--color-night-soft));
+        /* The same ground as the bar above it, so panel and bar are one surface. */
+        background: light-dark(var(--color-night), var(--color-night-deep));
         opacity: 0;
         transition:
           opacity var(--motion-standard),
@@ -452,14 +441,6 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
 
       .nav__link::after {
         display: none;
-      }
-
-      .nav__index {
-        font-size: 0.45em;
-        font-style: normal;
-        font-family: var(--font-body);
-        font-weight: 600;
-        letter-spacing: 0.1em;
       }
 
       /* The links settle in one after another as the panel opens. */

@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import site from '../data/site.json';
-import BrushRing from '../components/BrushRing.astro';
+import SeatCircle from '../components/SeatCircle.astro';
 
 // Prerendered: no live data. The adapter reads 404.html from disk for unmatched routes.
 export const prerender = true;
@@ -10,7 +10,7 @@ export const prerender = true;
 <Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow">
   <section class="error-page">
     <div class="error-page__content">
-      <BrushRing class="error-page__mark" seed={404} />
+      <SeatCircle class="error-page__mark" taken={7} ember />
       <p class="marker error-page__code">Fehler 404</p>
       <h1 class="display error-page__title">Diese Seite gibt es nicht.</h1>
       <p class="error-page__text">Die Seite, die du suchst, wurde verschoben, umbenannt oder hat es nie gegeben.</p>

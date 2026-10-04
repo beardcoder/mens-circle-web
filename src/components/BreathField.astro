@@ -1,0 +1,165 @@
+---
+/**
+ * The hero's breathing ground: three soft, warm colour fields that widen and
+ * narrow like a body at rest. Each field breathes on one shared, three-breath
+ * phrase (`breath-swell` in base/_keyframes.css: in shorter than out, a short
+ * rest, depth and length varying from breath to breath) while its wrapper turns
+ * very slowly on its own period, so the outline never repeats and never restarts.
+ *
+ * Pure CSS on transform and opacity — elliptical radial gradients, no blur
+ * filter — so it stays on the compositor. lib/breath.ts pauses it off screen;
+ * under reduced motion it rests in a still, exhaled pose.
+ */
+---
+
+<div class="breath-field" aria-hidden="true" data-breath>
+  <div class="breath-field__drift breath-field__drift--flame">
+    <div class="breath-field__blob"></div>
+  </div>
+  <div class="breath-field__drift breath-field__drift--ember">
+    <div class="breath-field__blob"></div>
+  </div>
+  <div class="breath-field__drift breath-field__drift--amber">
+    <div class="breath-field__blob"></div>
+  </div>
+</div>
+
+<style is:global>
+  @layer sections {
+    .breath-field {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: clip;
+      pointer-events: none;
+      contain: strict;
+      /* No edge under the header: the field starts below the bar and rises
+         slowly out of the ground, so the bar and the hero stay one surface. */
+      mask-image: linear-gradient(
+        to bottom,
+        transparent var(--header-height),
+        rgb(0 0 0 / 35%) calc(var(--header-height) + 7rem),
+        #000 calc(var(--header-height) + 16rem)
+      );
+    }
+
+    /* A fine, still grain over the field. It dissolves the steps that soft
+       gradients show on a near-black ground and gives the light some body. */
+    .breath-field::after {
+      position: absolute;
+      inset: 0;
+      content: '';
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.05;
+    }
+
+    /* The wrapper sets place and size and carries the slow turn; turning about
+       an off-centre point also moves the field a little through the room. */
+    .breath-field__drift {
+      position: absolute;
+      inset-block-start: var(--y);
+      inset-inline-start: var(--x);
+      inline-size: var(--w);
+      block-size: calc(var(--w) * var(--ratio, 0.78));
+      margin-block-start: calc(var(--w) * var(--ratio, 0.78) / -2);
+      margin-inline-start: calc(var(--w) / -2);
+      transform-origin: var(--origin, 54% 46%);
+      animation: breath-drift var(--turn) linear infinite;
+    }
+
+    .breath-field__blob {
+      inline-size: 100%;
+      block-size: 100%;
+      border-radius: 50%;
+      /* An eased fall-off — more stops, no visible centre. */
+      background: radial-gradient(
+        closest-side,
+        rgb(var(--rgb) / var(--core)),
+        rgb(var(--rgb) / calc(var(--core) * 0.78)) 20%,
+        rgb(var(--rgb) / calc(var(--core) * 0.5)) 40%,
+        rgb(var(--rgb) / calc(var(--core) * 0.24)) 62%,
+        rgb(var(--rgb) / calc(var(--core) * 0.07)) 82%,
+        rgb(var(--rgb) / 0) 100%
+      );
+      will-change: transform, opacity;
+      animation: breath-swell 31s infinite both;
+      animation-delay: var(--lag, 0s);
+    }
+
+    /* Flame, behind the photograph: the warm centre of the breath. */
+    .breath-field__drift--flame {
+      --x: 70%;
+      --y: 40%;
+      --w: 64vmax;
+      --turn: 84s;
+      --rgb: 228 99 46;
+      --core: 0.32;
+      --dx: -3%;
+      --dy: -2%;
+      --sx: 0.11;
+      --sy: 0.07;
+      --o0: 0.7;
+      --o1: 1;
+    }
+
+    /* Deep rust, low and to the left: the ground the breath rests on. */
+    .breath-field__drift--ember {
+      --x: 16%;
+      --y: 86%;
+      --w: 74vmax;
+      --ratio: 0.66;
+      --origin: 40% 58%;
+      --turn: 112s;
+      --rgb: 150 58 28;
+      --core: 0.34;
+      --dx: 2%;
+      --dy: -3%;
+      --sx: 0.06;
+      --sy: 0.1;
+      --o0: 0.75;
+      --o1: 1;
+      --lag: -0.35s;
+
+      animation-direction: reverse;
+    }
+
+    /* Amber, high and small: where the inhale lifts. */
+    .breath-field__drift--amber {
+      --x: 40%;
+      --y: 22%;
+      --w: 56vmax;
+      --ratio: 0.8;
+      --origin: 60% 40%;
+      --turn: 66s;
+      --rgb: 232 163 92;
+      --core: 0.1;
+      --dx: 1%;
+      --dy: -5%;
+      --sx: 0.14;
+      --sy: 0.09;
+      --o0: 0.5;
+      --o1: 1;
+      --lag: -0.7s;
+    }
+
+    /* Phones: the photograph sits below the sentence, so the warm centre moves down. */
+    @media (width <= 56em) {
+      .breath-field__drift--flame {
+        --x: 78%;
+        --y: 62%;
+        --w: 82vmax;
+      }
+
+      .breath-field__drift--ember {
+        --x: 10%;
+        --y: 96%;
+      }
+
+      .breath-field__drift--amber {
+        --x: 30%;
+        --y: 18%;
+        --w: 52vmax;
+      }
+    }
+  }
+</style>

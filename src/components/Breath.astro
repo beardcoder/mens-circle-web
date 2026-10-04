@@ -17,7 +17,7 @@ const { variant = 'rings', class: className } = Astro.props;
 const rings = variant === 'rings' ? [0.7, 0.84, 0.98] : [];
 ---
 
-<span class:list={['breath', `breath--${variant}`, className]} aria-hidden="true">
+<span class:list={['breath', `breath--${variant}`, className]} aria-hidden="true" data-breath>
   <span class="breath__glow"></span>
   {rings.map((size, i) => (
     <span
