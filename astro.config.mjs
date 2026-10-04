@@ -63,23 +63,23 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   fonts: [
-    // Public site: one broad-pen family. Alegreya — organic and grounded — for the
-    // headlines (800) and the quiet lines (italic); its humanist sibling Alegreya
-    // Sans for text, UI and the date line.
+    // Public site: Fraunces — a soft, warm old-style serif with an organic
+    // wobble — for the headlines (800, the mobile menu at 400) and the quiet
+    // lines (italic); Instrument Sans for text, UI and the date line.
     {
-      name: 'Alegreya Sans',
+      name: 'Instrument Sans',
       cssVariable: '--font-sans',
       provider: fontProviders.fontsource(),
-      weights: ['400', '500', '700', '800'],
+      weights: ['400', '500', '600', '700'],
       styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
     },
     {
-      name: 'Alegreya',
+      name: 'Fraunces',
       cssVariable: '--font-serif',
       provider: fontProviders.fontsource(),
-      weights: ['500', '800'],
+      weights: ['400', '800'],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],

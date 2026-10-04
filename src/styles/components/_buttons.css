@@ -10,7 +10,7 @@
   --btn-padding-block: 0.8rem;
   --btn-padding-inline: 1.35rem;
   --btn-gap: 0.75em;
-  --btn-font-size: 1.125rem;
+  --btn-font-size: 1rem;
   --btn-radius: var(--radius);
   --btn-border-width: 1.5px;
 
@@ -148,7 +148,7 @@
 .btn--large {
   --btn-padding-block: 1rem;
   --btn-padding-inline: 1.6rem;
-  --btn-font-size: 1.25rem;
+  --btn-font-size: 1.0625rem;
 
   min-block-size: 56px;
 }
