@@ -46,27 +46,22 @@
         "intro": "Mir geht es um etwas Einfaches: Ein Mann sitzt da, spricht ehrlich, hört anderen Männern zu und übernimmt Verantwortung für das, was in ihm vorgeht.",
         "items": [
           {
-            "number": "01",
             "title": "Ehrlichkeit statt Fassade",
             "description": "Nicht stark wirken müssen. Sondern sagen dürfen, was wirklich da ist."
           },
           {
-            "number": "02",
             "title": "Verbindung statt Einzelkampf",
             "description": "Männer müssen nicht alles allein mit sich ausmachen."
           },
           {
-            "number": "03",
             "title": "Präsenz statt Dauerdenken",
             "description": "Raus aus dem Kopf. Wieder mehr in den Körper, den Atem und den Moment."
           },
           {
-            "number": "04",
             "title": "Verantwortung statt Schuldzuweisung",
             "description": "Jeder Mann bleibt bei sich und übernimmt Verantwortung für seinen eigenen Weg."
           },
           {
-            "number": "05",
             "title": "Respekt statt Bewertung",
             "description": "Jeder Mann wird ernst genommen. Ohne Schauspiel. Ohne Abwertung."
           }

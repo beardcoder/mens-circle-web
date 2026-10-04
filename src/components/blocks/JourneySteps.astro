@@ -1,6 +1,5 @@
 ---
 interface Step {
-  number?: string;
   title?: string;
   description?: string;
 }
@@ -16,7 +15,7 @@ interface Props {
   };
 }
 
-/** The evening in four steps, side by side; each carries a small circle with its own quarter filled. */
+/** The evening in four steps, unnumbered: each sits a little lower than the one before, so the row reads as a way through the evening, not a checklist. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
@@ -38,14 +37,7 @@ const steps = (data.steps ?? []).slice(0, 4);
     {steps.length > 0 && (
       <ol class="home-evening__list" role="list">
         {steps.map((step, i) => (
-          <li class="home-evening__step" data-reveal>
-            <p class="home-evening__number" aria-hidden="true">
-              <svg class="home-evening__glyph" viewBox="0 0 24 24" focusable="false">
-                <circle cx="12" cy="12" r="10" fill="none"></circle>
-                <path d="M12 12 L12 2 A10 10 0 0 1 22 12 Z" transform={`rotate(${i * 90} 12 12)`}></path>
-              </svg>
-              {step.number?.padStart(2, '0')}
-            </p>
+          <li class="home-evening__step" style={`--i: ${i}; --pair: ${i % 2}`} data-reveal>
             {step.title && <h3 class="home-evening__step-title">{step.title}</h3>}
             {step.description && <p class="home-evening__text">{step.description}</p>}
           </li>
@@ -89,43 +81,13 @@ const steps = (data.steps ?? []).slice(0, 4);
       list-style: none;
     }
 
+    /* No numbers and no rules between them: the descent carries the order. */
     .home-evening__step {
       container-type: inline-size;
       display: grid;
-      grid-template-rows: auto auto 1fr;
       gap: var(--space-sm);
       align-content: start;
-      padding-block-start: var(--space-md);
-      border-block-start: 1px solid var(--rule-strong);
-    }
-
-    .home-evening__number {
-      display: flex;
-      gap: var(--space-xs);
-      align-items: center;
-      margin: 0;
-      font-size: var(--text-caption);
-      font-weight: 700;
-      color: var(--text-muted);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.1em;
-    }
-
-    /* The small circle: the evening, with this step's quarter filled. */
-    .home-evening__glyph {
-      flex: none;
-      inline-size: 2.25rem;
-      block-size: 2.25rem;
-    }
-
-    .home-evening__glyph circle {
-      stroke: var(--border-dark);
-      stroke-width: 1px;
-      vector-effect: non-scaling-stroke;
-    }
-
-    .home-evening__glyph path {
-      fill: var(--accent);
+      margin-block-start: calc(var(--i) * var(--space-lg));
     }
 
     .home-evening__step-title {
@@ -157,6 +119,10 @@ const steps = (data.steps ?? []).slice(0, 4);
         grid-template-columns: repeat(2, minmax(0, 1fr));
         row-gap: var(--space-xl);
       }
+
+      .home-evening__step {
+        margin-block-start: calc(var(--pair) * var(--space-xl));
+      }
     }
 
     @media (width <= 56em) {
@@ -167,29 +133,16 @@ const steps = (data.steps ?? []).slice(0, 4);
       }
     }
 
-    /* Phone: a ladder, the circle beside each step. */
+    /* Phone: one after another, the descent turned into a gentle indent. */
     @media (width <= 36em) {
       .home-evening__list {
         grid-template-columns: minmax(0, 1fr);
-        row-gap: 0;
+        row-gap: var(--space-lg);
       }
 
       .home-evening__step {
-        grid-template-columns: 3rem minmax(0, 1fr);
-        grid-template-rows: none;
-        column-gap: var(--space-sm);
-        padding-block: var(--space-md);
-      }
-
-      .home-evening__number {
-        grid-row: 1 / span 2;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .home-evening__glyph {
-        inline-size: 2rem;
-        block-size: 2rem;
+        margin-block-start: 0;
+        margin-inline-start: calc(var(--i) * var(--space-sm));
       }
     }
   }

@@ -122,8 +122,10 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
   hairline fades in on scroll. No progress bar, no numbers in the navigation.
 - Motion: hero entrance (words, photo opening, seats), scroll-driven reveals
   (`[data-reveal]`, view() only, no JS, nothing hidden without timeline support), the
-  hero ring's turn, statement settle, reading progress. The Ablauf has no dial: each
-  step carries a small circle with its quarter filled.
+  hero ring's turn, statement settle, reading progress.
+- No enumerations: nothing on the public pages is numbered or bulleted (Ablauf,
+  agreements, positions, register). Steps are told by placement (the Ablauf steps
+  each sit a little lower), roles and how-tos are written as sentences.
 - The hero breathes (`BreathField.astro`, keyframes `breath-swell` and `breath-drift`):
   three soft warm fields (flame, deep rust, amber; eased radial gradients, no blur, a
   still grain against banding) widen unevenly and shift a little on a 31 s phrase of
