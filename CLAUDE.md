@@ -84,15 +84,15 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
 
 ## Design
 
-- "Feuerstelle", set like the flyer: warm, earthy, direct. Alegreya (a broad-pen serif:
-  nature, fire, earth) speaks: headlines 800 in sentence case, and its italic is the
-  quiet voice for questions and quotes (`.quote-voice`, `--font-quote`). Its sibling
-  Alegreya Sans explains: text, UI, buttons and the date line. Both have a small
-  x-height, so the scale runs large (body 19–21px, hero up to 104px); a single long
-  word is capped by its column (`cqi`), never left to overflow. Capitals for
-  wide-spaced labels (`.marker`), the date line (`.date-line`: bold orange capitals)
-  and the one poster slogan (`.display--heavy`). Figures are lining. Barlow is loaded
-  for the admin only.
+- "Feuerstelle", set like the flyer: warm, earthy, direct. Fraunces (a soft, warm
+  old-style serif with an organic wobble) speaks: headlines 800 in sentence case, and
+  its italic is the quiet voice for questions and quotes (`.quote-voice`,
+  `--font-quote`). Instrument Sans explains: text, UI, buttons and the date line.
+  Both are wide, so a single long word is capped by its column (`cqi`: hero title,
+  step titles, facts, frame terms, "Dabei sein."), never left to overflow. Capitals
+  for wide-spaced labels (`.marker`), the date line (`.date-line`: bold orange
+  capitals) and the one poster slogan (`.display--heavy`). Figures are lining.
+  Barlow is loaded for the admin only.
 - Colours: cream `#F4EDE1`, night `#151210`, flame `#E4632E` (5.4:1 on night; on cream
   only as fill or stroke), rust `#A84A2A` (4.9:1, the accent and button on cream).
   Grounds: night for the header, hero, Termine and footer; one flame field per page

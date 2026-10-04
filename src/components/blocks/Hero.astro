@@ -152,6 +152,7 @@ const segments = [
     }
 
     .home-hero__heading {
+      container-type: inline-size;
       grid-area: head;
       margin: 0;
       font-size: inherit;
@@ -165,7 +166,8 @@ const segments = [
     .home-hero__title {
       display: block;
       max-inline-size: 14ch;
-      font-size: clamp(3.25rem, 1.6rem + 5.4vw, 6.5rem);
+      /* Capped by its column: "nichts darstellen" stays on one line. */
+      font-size: min(clamp(2.75rem, 1.4rem + 4.6vw, 5.75rem), 11.5cqi);
       color: var(--text-primary);
     }
 
