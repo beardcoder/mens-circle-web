@@ -104,6 +104,7 @@ const anchor = data.anchor ?? 'praktisches';
     }
 
     .facts-grid__item {
+      container-type: inline-size;
       display: grid;
       grid-template-rows: auto auto 1fr;
       gap: var(--space-3xs);
@@ -126,7 +127,8 @@ const anchor = data.anchor ?? 'praktisches';
     .facts-grid__value {
       margin: 0;
       font-family: var(--font-display);
-      font-size: var(--text-2xl);
+      /* Capped by the column, so one long word ("Spendenbasis") never runs out. */
+      font-size: min(var(--text-2xl), 15cqi);
       line-height: 1.1;
       color: var(--text-primary);
       letter-spacing: -0.015em;

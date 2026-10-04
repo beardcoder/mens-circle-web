@@ -82,6 +82,12 @@ const items = (data.items ?? []).map((item) => {
       margin: 0;
       list-style: none;
     }
+
+    @media (width <= 56em) {
+      .values-section__head {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
   }
 
   @layer components {
@@ -130,10 +136,6 @@ const items = (data.items ?? []).map((item) => {
     }
 
     @media (width <= 56em) {
-      .values-section__head {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
       .value-item {
         grid-template-columns: 2.5rem minmax(0, 1fr);
       }
