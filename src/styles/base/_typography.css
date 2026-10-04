@@ -1,4 +1,4 @@
-/** Typography — one broad-pen family: Alegreya speaks (grown, warm, grounded); Alegreya Sans explains. */
+/** Typography — Fraunces speaks (soft, warm, a little wild); Instrument Sans explains. */
 
 h1,
 h2,
@@ -8,8 +8,8 @@ h5,
 h6 {
   font-family: var(--font-display);
   font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.015em;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -50,7 +50,7 @@ h6 {
   }
 }
 
-/* The voice: Alegreya 800 in sentence case. Emphasis turns to the accent. */
+/* The voice: Fraunces 800 in sentence case. Emphasis turns to the accent. */
 .display {
   font-family: var(--font-display);
   font-size: var(--display-2);
@@ -66,11 +66,11 @@ h6 {
   color: var(--accent);
 }
 
-/* The quiet register: Alegreya italic. Questions, quotes, a word in passing. */
+/* The quiet register: Fraunces italic. Questions, quotes, a word in passing. */
 .quote-voice {
   font-family: var(--font-quote);
   font-style: italic;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0;
 }
 
@@ -94,7 +94,7 @@ h6 {
 /* A date line as on the flyer: bold capitals in the accent, spaced. */
 .date-line {
   font-family: var(--font-body);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.15;
   color: var(--accent);
   text-transform: uppercase;
@@ -152,8 +152,8 @@ p:last-child {
   max-inline-size: 18ch;
   margin-block-end: var(--rhythm-stack);
   font-size: var(--text-4xl);
-  line-height: 1;
-  letter-spacing: -0.015em;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
 }
 
 .section-intro {
