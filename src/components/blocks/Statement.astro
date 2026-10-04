@@ -39,7 +39,7 @@ const lines = data.lines ?? [];
         {data.text && <p class="statement__text">{data.text}</p>}
         {data.breathGuide && (
           <p class="statement__guide">
-            <span class="statement__guide-circle" aria-hidden="true"></span>
+            <span class="statement__guide-circle" aria-hidden="true" data-breath></span>
             {data.breathGuide}
           </p>
         )}
