@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
+  <title>{{ .Tx.Data.subject }}</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <style>.em-serif { font-family: Georgia, serif !important; } .em-sans { font-family: Arial, sans-serif !important; }</style>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;1,400&amp;family=Instrument+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin:0 !important; padding:0 !important; width:100% !important; -webkit-text-size-adjust:100%; }
+    table { border-collapse:collapse !important; }
+    img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+    a { color:#241c17; }
+    .em-link { color:#241c17 !important; text-decoration:underline; text-decoration-color:#a84a2a; text-underline-offset:0.2em; }
+    @media only screen and (max-width:620px) {
+      .em-sheet { width:100% !important; }
+      .em-pad { padding-left:24px !important; padding-right:24px !important; }
+      .em-display { font-size:34px !important; }
+      .em-ticket { padding:22px 22px 24px !important; }
+      .em-date { font-size:16px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#e9e0d1;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#e9e0d1;opacity:0;">Du rückst von der Warteliste nach: dein Platz ist jetzt reserviert.&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#e9e0d1;">
+  <tr><td align="center" style="padding:28px 12px;">
+    <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+    <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#f4ede1;">
+
+      <!-- Masthead: the night bar, the brush mark in flame -->
+      <tr><td class="em-pad" style="padding:22px 40px;background-color:#151210;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="padding-right:12px;vertical-align:middle;"><a href="https://mens-circle.de" target="_blank"><img src="https://mens-circle.de/images/logo-flame.png" width="38" height="38" alt="" style="display:block;width:38px;height:38px;"></a></td>
+          <td style="vertical-align:middle;">
+            <div class="em-serif" style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:22px;font-weight:500;line-height:1.05;color:#f1e9db;">Männerkreis</div>
+            <div class="em-sans" style="margin-top:4px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:600;line-height:1.2;letter-spacing:0.2em;text-transform:uppercase;color:#b3a594;">Straubing&nbsp;·&nbsp;Niederbayern</div>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Content -->
+      <tr><td class="em-pad" style="padding:38px 40px 34px;">
+<p class="em-sans" style="margin:0 0 14px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;line-height:1.3;letter-spacing:0.18em;text-transform:uppercase;color:#6b5d52;"><span style="display:inline-block;width:7px;height:7px;margin-right:9px;border:1.5px solid #a84a2a;border-radius:50%;vertical-align:1px;"></span>Gute Nachricht</p>
+<h1 class="em-display em-serif" style="margin:0 0 18px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:42px;font-weight:400;line-height:1.04;letter-spacing:-0.02em;color:#241c17;">Ein Platz ist <span style="color:#a84a2a;">frei</span>.</h1>
+<p class="em-sans" style="margin:0 0 18px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#4f4239;">Hallo {{ .Tx.Data.firstName }}, du rückst von der Warteliste nach: dein Platz beim <strong style="font-weight:600;color:#241c17;">{{ .Tx.Data.eventTitle }}</strong> ist jetzt reserviert.</p>
+
+<!-- Ticket: the date on the night ground -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 30px;">
+  <tr><td class="em-ticket" style="padding:26px 28px 28px;background-color:#151210;border-radius:3px;">
+        <p class="em-sans" style="margin:0 0 12px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;line-height:1.3;letter-spacing:0.18em;text-transform:uppercase;color:#b3a594;"><span style="display:inline-block;width:7px;height:7px;margin-right:9px;border:1.5px solid #e4632e;border-radius:50%;vertical-align:1px;"></span>Dein Termin</p>
+        <p class="em-date em-sans" style="margin:0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:19px;font-weight:700;line-height:1.25;letter-spacing:0.1em;text-transform:uppercase;color:#e4632e;">{{ .Tx.Data.dateLong }}</p>
+        <p class="em-sans" style="margin:6px 0 0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5;color:#f1e9db;">{{ .Tx.Data.timeRange }}{{ if and .Tx.Data.timeRange .Tx.Data.location }}&nbsp;·&nbsp;{{ end }}{{ .Tx.Data.location }}</p>
+{{ if .Tx.Data.address }}
+        <p class="em-sans" style="margin:6px 0 0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#b3a594;">{{ .Tx.Data.address }}</p>
+{{ end }}
+{{ if .Tx.Data.locationDetails }}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
+          <tr><td style="padding-top:14px;border-top:1px solid #3a302a;">
+            <p class="em-sans" style="margin:0 0 4px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;line-height:1.3;letter-spacing:0.18em;text-transform:uppercase;color:#b3a594;">Treffpunkt</p>
+            <p class="em-sans" style="margin:0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#f1e9db;white-space:pre-line;">{{ .Tx.Data.locationDetails }}</p>
+          </td></tr>
+        </table>
+{{ end }}
+  </td></tr>
+</table>
+{{ if .Tx.Data.icsUrl }}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 30px;">
+  <tr><td bgcolor="#a84a2a" style="background-color:#a84a2a;border-radius:3px;">
+    <a href="{{ .Tx.Data.icsUrl }}" target="_blank" class="em-sans" style="display:inline-block;padding:14px 24px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;line-height:1.1;color:#f4ede1;text-decoration:none;border-radius:3px;">In den Kalender eintragen&nbsp;&nbsp;&rarr;</a>
+  </td></tr>
+</table>
+{{ end }}{{ if .Tx.Data.description }}<h2 class="em-serif" style="margin:34px 0 12px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;font-weight:400;line-height:1.15;letter-spacing:-0.015em;color:#241c17;">Was dich erwartet</h2>
+<p class="em-sans" style="margin:0 0 18px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#4f4239;white-space:pre-line;">{{ .Tx.Data.description }}</p>
+{{ end }}{{ if .Tx.Data.costBasis }}<p class="em-sans" style="margin:0 0 18px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#4f4239;"><strong style="font-weight:600;color:#241c17;">Beitrag:</strong> {{ .Tx.Data.costBasis }}</p>
+{{ end }}<h2 class="em-serif" style="margin:34px 0 12px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;font-weight:400;line-height:1.15;letter-spacing:-0.015em;color:#241c17;">Gut zu wissen</h2>
+<p class="em-sans" style="margin:0 0 18px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#4f4239;">Vorbereiten musst du nichts. Falls du inzwischen doch nicht mehr kannst, gib mir bitte kurz Bescheid an <a href="mailto:{{ .Tx.Data.contactEmail }}" class="em-link" style="color:#241c17;font-weight:600;text-decoration:underline;text-decoration-color:#a84a2a;text-underline-offset:0.2em;white-space:nowrap;">{{ .Tx.Data.contactEmail }}</a>&nbsp;– dann geht der Platz an den Nächsten auf der Liste.</p>
+{{ if .Tx.Data.eventUrl }}<p class="em-sans" style="margin:0 0 18px;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#6b5d52;">Alle Infos zum Abend findest du jederzeit auf der <a href="{{ .Tx.Data.eventUrl }}" class="em-link" style="color:#241c17;font-weight:600;text-decoration:underline;text-decoration-color:#a84a2a;text-underline-offset:0.2em;">Seite des Termins</a>.</p>
+{{ end }}
+<p class="em-sans" style="margin:30px 0 0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5;color:#4f4239;">Bis bald und herzliche Grüße</p>
+<p class="em-serif" style="margin:2px 0 0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;font-style:italic;font-weight:400;line-height:1.2;color:#241c17;">Markus</p>
+
+      </td></tr>
+
+      <!-- Footer: the night ground again -->
+      <tr><td class="em-pad" style="padding:30px 40px 34px;background-color:#151210;">
+        <p class="em-serif" style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:24px;font-weight:400;line-height:1.2;letter-spacing:-0.01em;color:#f1e9db;">Komm so, wie du <span style="color:#e4632e;">gerade</span> bist.</p>
+        <p class="em-sans" style="margin:12px 0 0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.65;color:#b3a594;">Ein Männerkreis in Straubing, Niederbayern. Wir treffen uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.</p>
+        <p class="em-sans" style="margin:16px 0 0;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.5;"><a href="https://mens-circle.de" target="_blank" style="color:#e4632e;text-decoration:none;">mens-circle.de</a><span style="color:#b3a594;">&nbsp;&nbsp;·&nbsp;&nbsp;</span><a href="mailto:{{ .Tx.Data.contactEmail }}" style="color:#e4632e;text-decoration:none;white-space:nowrap;">{{ .Tx.Data.contactEmail }}</a></p>
+        <p class="em-sans" style="margin:20px 0 0;padding-top:16px;border-top:1px solid #3a302a;font-family:'Instrument Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#b3a594;">Diese E-Mail ging an {{ .Tx.Data.recipientEmail }}, weil du dich für einen Abend des Männerkreises angemeldet hast.</p>
+      </td></tr>
+
+    </table>
+    <!--[if mso]></td></tr></table><![endif]-->
+  </td></tr>
+</table>
+</body>
+</html>
