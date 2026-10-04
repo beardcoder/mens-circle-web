@@ -1,66 +1,251 @@
 ---
+import CropPicture from '../CropPicture.astro';
+import SeatCircle from '../SeatCircle.astro';
+import { resolveAssetImage } from '../../lib/images';
+
 interface Props {
   data: {
     anchor?: string;
     eyebrow?: string;
     name?: string;
+    quote?: string;
     bio?: string;
+    rolesLabel?: string;
+    roles?: string[];
+    image?: string;
+    imageAlt?: string;
     linkLabel?: string;
     linkUrl?: string;
   };
 }
 
-/** The quietest section: no portrait, it is already in the hero. */
+/** Markus, in his own words: a closer crop than the hero, his sentence, his role in the circle. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
+const photo = resolveAssetImage(data.image);
+const roles = data.roles ?? [];
 ---
 
-<section class="section section--sand home-person" id={anchor} aria-labelledby="person-title">
-  <div class="container">
-    <div class="bay">
-      <p class="marker bay__marker">{data.eyebrow}</p>
+<section class="section home-person" id={anchor} aria-labelledby="person-title">
+  <div class="container home-person__grid">
+    {photo && (
+      <figure class="home-person__figure" data-reveal>
+        <div class="home-person__frame">
+          <CropPicture
+            src={photo}
+            class="home-person__image"
+            breakpoint="56em"
+            narrow={{ ratio: 4 / 5, widths: [320, 480, 640], sizes: '72vw' }}
+            wide={{ ratio: 3 / 4, widths: [400, 600, 800], sizes: 'min(30rem, 34vw)' }}
+            loading="lazy"
+            alt={data.imageAlt ?? ''}
+          />
+        </div>
+        <SeatCircle class="home-person__mark" taken={1} />
+      </figure>
+    )}
 
-      <div class="bay__beside-marker home-person__body">
-        {data.name && (
-          <h2 class="home-person__name" id="person-title">
-            {data.name}
-          </h2>
-        )}
+    <div class="home-person__body">
+      <p class="marker">{data.eyebrow}</p>
+      {data.name && (
+        <h2 class="display display--xl home-person__name" id="person-title">
+          {data.name}
+        </h2>
+      )}
 
-        {data.bio && <div class="home-person__bio prose" set:html={data.bio} />}
+      {data.quote && (
+        <blockquote class="home-person__quote" data-reveal>
+          <p>{data.quote}</p>
+        </blockquote>
+      )}
 
-        {data.linkLabel && data.linkUrl && (
-          <p class="home-person__link">
-            <a href={data.linkUrl} class="link">
-              {data.linkLabel}
-            </a>
-          </p>
-        )}
-      </div>
+      {data.bio && <div class="home-person__bio prose" set:html={data.bio} data-reveal />}
+
+      {roles.length > 0 && (
+        <div class="home-person__roles" data-reveal>
+          {data.rolesLabel && <h3 class="home-person__roles-title">{data.rolesLabel}</h3>}
+          <ul class="home-person__role-list" role="list">
+            {roles.map((role) => (
+              <li>{role}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {data.linkLabel && data.linkUrl && (
+        <p class="home-person__link">
+          <a href={data.linkUrl} class="text-link" data-astro-prefetch="hover">
+            {data.linkLabel}
+          </a>
+        </p>
+      )}
     </div>
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    .home-person__body {
-      max-inline-size: 62ch;
+    .home-person__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    /* The figure hangs lower than the name: the two columns never start on one line. */
+    .home-person__figure {
+      position: sticky;
+      inset-block-start: calc(var(--header-clearance) + var(--space-md));
+      margin: var(--space-2xl) 0 0;
+    }
+
+    .home-person__frame {
+      overflow: clip;
+      border-radius: var(--radius);
+      aspect-ratio: 3 / 4;
+    }
+
+    .home-person__frame picture {
+      display: block;
+      block-size: 100%;
+    }
+
+    /* A closer crop of the same photograph: the man, not the view. */
+    .home-person__image {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      object-position: 12% 50%;
+      scale: 1.45;
+      transform-origin: 22% 34%;
+    }
+
+    .home-person__mark {
+      position: absolute;
+      inset-block-end: -2.5rem;
+      inset-inline-end: -2.5rem;
+      inline-size: 7.5rem;
     }
 
     .home-person__name {
-      margin-block-end: var(--space-sm);
+      margin-block-end: var(--space-lg);
+    }
+
+    .home-person__quote {
+      max-inline-size: 24ch;
+      padding: 0;
+      margin: 0 0 var(--space-lg);
+      font-family: var(--font-display);
       font-size: var(--text-3xl);
-      line-height: 1.02;
+      font-style: italic;
+      line-height: 1.2;
+      color: var(--accent);
+      text-wrap: balance;
+    }
+
+    .home-person__quote p {
+      max-inline-size: none;
     }
 
     .home-person__bio p {
+      font-size: var(--text-section-body-lg);
+    }
+
+    .home-person__roles {
+      max-inline-size: var(--measure);
+      margin-block-start: var(--space-lg);
+    }
+
+    .home-person__roles-title {
+      margin-block-end: var(--space-xs);
+      font-family: var(--font-body);
+      font-size: var(--text-marker);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-marker);
+    }
+
+    .home-person__role-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      border-block-start: 1px solid var(--border-light);
+    }
+
+    .home-person__role-list li {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: baseline;
+      padding-block: var(--space-sm);
       font-size: var(--text-section-body);
+      line-height: var(--leading-normal);
+      color: var(--text-primary);
+      border-block-end: 1px solid var(--border-light);
+    }
+
+    .home-person__role-list li::before {
+      flex: none;
+      inline-size: 0.55rem;
+      block-size: 0.55rem;
+      content: '';
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      translate: 0 -0.1em;
     }
 
     .home-person__link {
       margin-block-start: var(--space-md);
-      font-size: var(--text-section-body);
+    }
+
+    @media (width <= 56em) {
+      .home-person__grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-lg);
+      }
+
+      /* Phone: the name first, then the portrait off-centre with the seat mark. */
+      .home-person__body {
+        display: contents;
+      }
+
+      .home-person__body > .marker {
+        order: -3;
+        margin-block-end: 0;
+      }
+
+      .home-person__name {
+        order: -2;
+        margin-block-end: 0;
+      }
+
+      .home-person__figure {
+        position: relative;
+        inset-block-start: auto;
+        order: -1;
+        inline-size: 72%;
+        margin: 0;
+      }
+
+      .home-person__frame {
+        aspect-ratio: 4 / 5;
+      }
+
+      .home-person__mark {
+        inset-inline-end: -3.25rem;
+        inline-size: 6rem;
+      }
+
+      .home-person__quote {
+        margin-block: var(--space-md) 0;
+      }
+
+      .home-person__roles,
+      .home-person__link {
+        margin-block-start: 0;
+      }
     }
   }
 </style>

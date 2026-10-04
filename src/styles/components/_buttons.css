@@ -1,43 +1,35 @@
 /** Buttons — one token-driven base (`.btn`) with variant and size modifiers. */
 
-/* Base */
 .btn {
-  --btn-bg: var(--color-orange);
-  /* Ink on orange in both modes: the orange does not flip, so neither does the
-     label on it. The hover inverts to the page's own ink, which does flip. */
-  --btn-color: var(--color-ink);
-  --btn-border: var(--color-orange);
+  --btn-bg: var(--accent);
+  --btn-color: var(--on-accent);
+  --btn-border: var(--accent);
   --btn-hover-bg: var(--text-primary);
   --btn-hover-color: var(--bg-primary);
   --btn-hover-border: var(--text-primary);
-  --btn-padding-block: 0.85rem;
-  --btn-padding-inline: 1.5rem;
-  --btn-gap: 0.7em;
+  --btn-padding-block: 0.8rem;
+  --btn-padding-inline: 1.35rem;
+  --btn-gap: 0.75em;
   --btn-font-size: 1rem;
-  --btn-radius: 0;
-  --btn-border-width: 2px;
-  --btn-arrow-size: 1.05em;
-  /* 24x24 viewBox, geometry mirrored about y=12 so the mask box centres it.
-     Stroke 2.5 lands near the 2px border weight at this size. */
-  --btn-arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5'%3E%3Cpath d='M3 12h17.5M13.5 5 20.5 12l-7 7'/%3E%3C/svg%3E");
+  --btn-radius: var(--radius);
+  --btn-border-width: 1.5px;
 
+  position: relative;
   display: inline-flex;
   gap: var(--btn-gap);
   align-items: center;
   justify-content: center;
-  /* Every interactive target clears 44px without the padding having to. */
   min-block-size: 48px;
   padding-block: var(--btn-padding-block);
   padding-inline: var(--btn-padding-inline);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--btn-font-size);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.15;
   color: var(--btn-color);
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   text-decoration: none;
+  letter-spacing: 0.005em;
   cursor: pointer;
   background-color: var(--btn-bg);
   border: var(--btn-border-width) solid var(--btn-border);
@@ -45,37 +37,31 @@
   transition:
     background-color var(--motion-quick),
     color var(--motion-quick),
-    border-color var(--motion-quick);
+    border-color var(--motion-quick),
+    scale var(--motion-quick);
 }
 
-/* The arrow. */
+/* The primary carries a seat: a small ring that fills when the button is pressed into. */
+.btn--primary::before {
+  flex: none;
+  inline-size: 0.6em;
+  block-size: 0.6em;
+  content: '';
+  border: 1.5px solid currentcolor;
+  border-radius: 50%;
+  transition:
+    background-color var(--motion-quick),
+    scale var(--motion-standard);
+}
+
 .btn--primary::after {
   flex: none;
-  inline-size: var(--btn-arrow-size);
-  block-size: var(--btn-arrow-size);
+  inline-size: 1.1em;
+  block-size: 1.1em;
   content: '';
   background-color: currentcolor;
-  mask-image: var(--btn-arrow-icon);
-  mask-repeat: no-repeat;
-  mask-position: center;
-  mask-size: contain;
-  transition: translate var(--motion-quick);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .btn--primary:hover::after {
-    translate: 4px 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .btn--primary::after {
-    transition: none;
-  }
-
-  .btn--primary:hover::after {
-    translate: 0;
-  }
+  mask: var(--arrow-icon) center / contain no-repeat;
+  transition: translate var(--motion-standard);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -84,30 +70,31 @@
     background-color: var(--btn-hover-bg);
     border-color: var(--btn-hover-border);
   }
+
+  .btn--primary:hover::before {
+    background-color: currentcolor;
+    scale: 1.15;
+  }
+
+  .btn--primary:hover::after {
+    translate: 0.3em 0;
+  }
 }
 
-/* Must show on paper, ink and orange. */
+.btn:active {
+  scale: 0.98;
+}
+
 .btn:focus-visible {
-  outline: 3px solid var(--text-primary);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
-  box-shadow: 0 0 0 3px var(--color-orange);
-}
-
-.section--ink .btn:focus-visible,
-.section--signal .btn:focus-visible,
-.footer .btn:focus-visible {
-  outline-color: var(--color-paper);
-}
-
-.section--signal .btn:focus-visible {
-  outline-color: var(--color-ink);
 }
 
 .btn:disabled,
 .btn[aria-disabled='true'] {
   pointer-events: none;
   cursor: not-allowed;
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 .btn svg {
@@ -119,47 +106,28 @@
 /* Variants */
 
 .btn--primary {
-  --btn-bg: var(--color-orange);
-  /* Ink on orange in both modes: the orange does not flip, so neither does its
-     label. 5.9:1 either way. */
-  --btn-color: var(--color-ink);
-  --btn-border: var(--color-orange);
-  /* The hover inverts to the page's own ink, which DOES flip — on the dark
-     ground an ink-on-ink hover made the button disappear. */
-  --btn-hover-bg: var(--text-primary);
-  --btn-hover-color: var(--bg-primary);
-  --btn-hover-border: var(--text-primary);
+  --btn-bg: var(--accent);
+  --btn-color: var(--on-accent);
+  --btn-border: var(--accent);
 }
 
-/* On the ink ground the hover cannot go darker, so it goes lighter. */
-.section--ink .btn--primary,
-.footer .btn--primary {
-  --btn-hover-bg: var(--color-paper);
-  --btn-hover-color: var(--color-ink);
-  --btn-hover-border: var(--color-paper);
-}
-
-/* On the orange field the primary would disappear — invert it there. */
-.section--signal .btn--primary {
-  --btn-bg: var(--color-ink);
-  --btn-color: var(--color-paper);
-  --btn-border: var(--color-ink);
-  --btn-hover-bg: transparent;
-  --btn-hover-color: var(--color-ink);
-  --btn-hover-border: var(--color-ink);
-}
-
-/* Outlined, on whichever ground the page currently has */
+/* Outlined, on whichever surface it sits */
 .btn--secondary {
   --btn-bg: transparent;
   --btn-color: var(--text-primary);
-  --btn-border: var(--rule-strong);
+  --btn-border: var(--border-dark);
   --btn-hover-bg: var(--text-primary);
   --btn-hover-color: var(--bg-primary);
   --btn-hover-border: var(--text-primary);
 }
 
-/* Low-emphasis text button */
+/* On a dark or coloured surface the hover goes to the surface's text colour. */
+:is(.surface-bark, .surface-moss, .surface-rust, .section--ink, .section--signal) .btn {
+  --btn-hover-bg: var(--text-primary);
+  --btn-hover-border: var(--text-primary);
+  --btn-hover-color: var(--color-ink);
+}
+
 .btn--ghost {
   --btn-bg: transparent;
   --btn-color: var(--text-secondary);
@@ -170,21 +138,35 @@
   --btn-padding-inline: var(--space-xs);
 
   text-decoration: underline;
-  text-decoration-color: var(--color-orange);
-  text-decoration-thickness: 2px;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 0.25em;
 }
 
 /* Sizes */
 
 .btn--large {
-  --btn-padding-block: 1.05rem;
-  --btn-padding-inline: 2rem;
-  --btn-font-size: 1.125rem;
+  --btn-padding-block: 1rem;
+  --btn-padding-inline: 1.6rem;
+  --btn-font-size: 1.0625rem;
+
+  min-block-size: 56px;
 }
 
 .btn--block {
   inline-size: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn::before,
+  .btn::after {
+    transition: none;
+  }
+
+  .btn:active {
+    scale: none;
+  }
 }
 
 /* Action row — a primary button with at most one quiet text link beside it. */

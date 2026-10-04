@@ -1,99 +1,160 @@
-/** Unlayered: @keyframes inside @layer regressed in Vite/lightningcss builds. Opacity/transform only. */
+/** Unlayered: @keyframes inside @layer regressed in Vite/lightningcss builds. */
 
-/* 1. Hero entrance. */
+/* 1. Entrances — short, run once, start at first paint. */
 
-@keyframes poster-line-in {
+@keyframes line-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 0.45em, 0);
+    transform: translate3d(0, 0.4em, 0);
   }
 
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
-@keyframes poster-rise {
+@keyframes rise {
   from {
     opacity: 0;
-    transform: translate3d(0, 1.25rem, 0);
+    transform: translate3d(0, 1rem, 0);
   }
 
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
+/* The photograph opens from the circle's centre outward. */
+@keyframes plate-open {
+  from {
+    clip-path: circle(18% at 30% 45%);
+  }
+
+  to {
+    clip-path: circle(150% at 30% 45%);
+  }
+}
+
+/* The ring turns into place, then the seats take theirs. */
 @keyframes ring-in {
   from {
     opacity: 0;
-    transform: scale(0.88) rotate(-8deg);
+    transform: rotate(-40deg) scale(0.92);
   }
 
   to {
     opacity: 1;
-    transform: scale(1) rotate(0deg);
+    transform: none;
   }
 }
 
-/* The photograph arrives as a wipe rather than a fade, so it reads as a plate
-   being laid down. `clip-path` on a rect is compositor-friendly. */
-@keyframes plate-in {
+@keyframes seat-in {
   from {
-    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    transform: scale(0.3);
   }
 
   to {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    transform: none;
   }
 }
 
-/* 2. Ring drift on scroll (view() timeline). */
-
-@keyframes ring-drift {
+@keyframes ember-glow {
   from {
-    transform: translate3d(0, -20px, 0) rotate(-6deg);
+    opacity: 0;
+    transform: scale(0.5);
   }
 
   to {
-    transform: translate3d(0, 20px, 0) rotate(6deg);
+    opacity: 1;
+    transform: none;
   }
 }
 
-@keyframes ring-drift-reverse {
+/* 2. Scroll-driven (view()/scroll() timelines). */
+
+/* A reveal that is tied to scroll position, not to a timer or a script: nothing
+   waits on JavaScript, and without timeline support the content simply stands. */
+@keyframes reveal {
   from {
-    transform: translate3d(0, 22px, 0) rotate(7deg);
+    opacity: 0.001;
+    transform: translate3d(0, 1.5rem, 0);
   }
 
   to {
-    transform: translate3d(0, -22px, 0) rotate(-5deg);
+    opacity: 1;
+    transform: none;
   }
 }
 
-/* 3. Statement lines settle flush left. */
+@keyframes ring-turn {
+  from {
+    transform: rotate(-14deg);
+  }
+
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
 
 @keyframes statement-settle {
   from {
-    transform: translate3d(var(--statement-from, 8%), 0, 0);
+    transform: translate3d(var(--statement-from, 6%), 0, 0);
   }
 
   to {
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
-/* Retained: sub-page openings still use the plain rise. */
-@keyframes hero-rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 0.75rem, 0);
+/* Concentric rings: in, out, settle. */
+@keyframes breath {
+  0% {
+    transform: scale(0.8);
   }
 
-  to {
+  50% {
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(0.9);
+  }
+}
+
+/* One quarter of the evening lights up while its step is on screen. */
+@keyframes quarter-on {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+
+  20%,
+  80% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 

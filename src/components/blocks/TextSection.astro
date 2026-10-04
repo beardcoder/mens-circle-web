@@ -8,7 +8,7 @@ interface Props {
   };
 }
 
-/** Prose with a marginal heading, on the spine. */
+/** Prose with a marginal heading, on the spine — the essay register of the sub-pages. */
 
 const { data } = Astro.props;
 const slug = (data.title ?? '')
@@ -21,16 +21,16 @@ const anchor = data.anchor ?? slug;
 <section class="section section--ruled text-section" id={anchor || undefined}>
   <div class="container">
     <div class="spine">
-      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
+      {data.eyebrow ? <p class="rail-heading">{data.eyebrow}</p> : <span aria-hidden="true"></span>}
 
       <div class="spine__body">
         {data.title && (
-          <h2 class="text-section__title" data-reveal="up">
+          <h2 class="text-section__title" data-reveal>
             {data.title}
           </h2>
         )}
 
-        {data.content && <div class="prose" data-reveal="up" set:html={data.content} />}
+        {data.content && <div class="prose text-section__prose" set:html={data.content} />}
       </div>
     </div>
   </div>
@@ -39,14 +39,31 @@ const anchor = data.anchor ?? slug;
 <style is:global>
   @layer sections {
     .text-section__title {
+      max-inline-size: 20ch;
       margin-block-end: var(--rhythm-stack);
-      font-size: var(--text-3xl);
-      line-height: 1.15;
-      text-wrap: balance;
+      font-size: var(--display-3);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+
+    .text-section .prose {
+      max-inline-size: 60ch;
     }
 
     .text-section .prose p {
       font-size: var(--text-section-body-lg);
+    }
+
+    /* The essay's first paragraph opens with a dropped initial where supported. */
+    @supports (initial-letter: 3) or (-webkit-initial-letter: 3) {
+      .page-hero + .text-section .prose > p:first-child::first-letter {
+        -webkit-initial-letter: 3;
+        initial-letter: 3;
+        margin-inline-end: 0.12em;
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--accent);
+      }
     }
   }
 </style>

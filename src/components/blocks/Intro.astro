@@ -1,4 +1,6 @@
 ---
+import SeatCircle from '../SeatCircle.astro';
+
 interface Props {
   data: {
     anchor?: string;
@@ -11,125 +13,210 @@ interface Props {
   };
 }
 
-/** A two-column spread: the heading holds the left, the prose the right — the one section that puts no marker in the left column. */
+/** What an evening is about: an editorial spread, then the questions seated around the circle. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'ueber';
-const questions = data.questions ?? [];
+const questions = (data.questions ?? []).slice(0, 4);
 ---
 
 <section class="section home-circle" id={anchor} aria-labelledby="ueber-title">
   <div class="container">
-    <div class="bay">
+    <div class="home-circle__spread">
       <div class="home-circle__head">
-        <p class="marker marker--ruled">{data.eyebrow}</p>
+        <p class="marker">{data.eyebrow}</p>
         {data.title && (
-          <h2 class="section-title" id="ueber-title">
+          <h2 class="display home-circle__title" id="ueber-title" data-reveal>
             {data.title}
           </h2>
         )}
       </div>
 
-      {data.text && <div class="home-circle__text prose" set:html={data.text} />}
+      {data.text && <div class="home-circle__text prose" set:html={data.text} data-reveal />}
     </div>
 
     {questions.length > 0 && (
-      <div class="home-circle__questions">
-        <p class="marker home-circle__questions-label">{data.questionsLabel}</p>
+      <figure class="home-circle__questions" aria-labelledby="ueber-questions-label">
+        <figcaption class="home-circle__label" id="ueber-questions-label">
+          {data.questionsLabel}
+        </figcaption>
+
+        <div class="home-circle__center" aria-hidden="true">
+          <SeatCircle ember seatSize={5} class="home-circle__mark" />
+        </div>
 
         <ul class="home-circle__list" role="list">
-          {questions.map((question) => (
-            <li class="home-circle__question">{question}</li>
+          {questions.map((question, i) => (
+            <li class={`home-circle__question home-circle__question--${i + 1}`} data-reveal>
+              {question}
+            </li>
           ))}
         </ul>
-      </div>
+      </figure>
     )}
 
     {data.close && (
-      <div class="bay">
-        <p class="home-circle__close">{data.close}</p>
-      </div>
+      <p class="home-circle__close" data-reveal>
+        {data.close}
+      </p>
     )}
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    /* 5 / 7: the heading takes the narrower column and wraps to three or four
-       short lines, which is what gives the spread its edge. */
-    .home-circle__head {
-      grid-column: 1 / span 5;
+    .home-circle__spread {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-lg) var(--space-xl);
+      align-items: end;
+    }
+
+    .home-circle__title {
+      max-inline-size: 12ch;
+      margin: 0;
     }
 
     .home-circle__text {
-      grid-column: 7 / span 6;
-      max-inline-size: var(--measure);
+      max-inline-size: 48ch;
     }
 
     .home-circle__text p {
-      font-size: var(--text-section-body);
+      font-size: var(--text-section-body-lg);
     }
 
-    @media (width <= 56em) {
-      .home-circle__head,
-      .home-circle__text {
-        grid-column: 1 / -1;
-      }
-
-      /* Stacked: one gap, on the text column. */
-      .home-circle__head .section-title {
-        margin-block-end: 0;
-      }
-
-      .home-circle__text {
-        margin-block-start: var(--rhythm-group);
-      }
-    }
-
+    /* The questions sit around the circle like the men they belong to: north,
+       east, south, west — read clockwise, in DOM order. */
     .home-circle__questions {
-      margin-block: var(--rhythm-group);
+      display: grid;
+      grid-template-areas:
+        '.  label .'
+        '.  q1    .'
+        'q4 c     q2'
+        '.  q3    .';
+      grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem) minmax(0, 1fr);
+      gap: var(--space-md) var(--space-lg);
+      align-items: center;
+      margin-block: var(--space-2xl) 0;
     }
 
-    /* Full width: this marker carries the rule the list hangs from. */
-    .home-circle__questions-label {
-      max-inline-size: none;
-      padding-block-end: var(--space-xs);
-      margin-block-end: 0;
-      border-block-end: 3px solid var(--rule-strong);
+    .home-circle__label {
+      grid-area: label;
+      font-size: var(--text-marker);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-marker);
+    }
+
+    .home-circle__center {
+      grid-area: c;
+    }
+
+    .home-circle__mark {
+      inline-size: 100%;
     }
 
     .home-circle__list {
-      padding: 0;
-      margin: 0;
-      list-style: none;
+      display: contents;
     }
 
-    /* Poster-scale questions on hairlines. Condensed, sentence case rather than
-       uppercase — these are questions being asked, not a slogan being shouted. */
     .home-circle__question {
-      padding-block: var(--space-sm);
       font-family: var(--font-display);
-      font-size: clamp(1.5rem, 0.9rem + 2.6vw, 3.25rem);
-      font-weight: 800;
-      line-height: 1;
+      font-size: var(--text-2xl);
+      font-style: italic;
+      line-height: 1.2;
       color: var(--text-primary);
-      border-block-end: 1px solid var(--border-medium);
       text-wrap: balance;
     }
 
-    /* Lands under the prose column, mirroring the spread at the top of the section. */
+    .home-circle__question--1 {
+      grid-area: q1;
+      text-align: center;
+    }
+
+    .home-circle__question--2 {
+      grid-area: q2;
+      max-inline-size: 16ch;
+    }
+
+    .home-circle__question--3 {
+      grid-area: q3;
+      text-align: center;
+    }
+
+    .home-circle__question--4 {
+      grid-area: q4;
+      max-inline-size: 16ch;
+      justify-self: end;
+      text-align: end;
+    }
+
     .home-circle__close {
-      grid-column: 7 / span 6;
-      max-inline-size: var(--measure);
-      margin-block-start: 0;
+      max-inline-size: 36ch;
+      margin: var(--space-xl) auto 0;
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
+      text-align: center;
     }
 
     @media (width <= 56em) {
+      .home-circle__spread {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+      }
+
+      /* Phone: the circle becomes a small mark and the questions a ladder that
+         hangs from it, each one starting at a seat. */
+      .home-circle__questions {
+        grid-template-areas:
+          'c label'
+          'list list';
+        grid-template-columns: 4.5rem minmax(0, 1fr);
+        gap: var(--space-md);
+        margin-block-start: var(--space-xl);
+      }
+
+      .home-circle__label {
+        text-align: start;
+      }
+
+      .home-circle__list {
+        display: grid;
+        grid-area: list;
+        padding: 0;
+        margin: 0;
+        border-block-start: 1px solid var(--border-light);
+      }
+
+      .home-circle__question,
+      .home-circle__question--4 {
+        display: flex;
+        gap: var(--space-sm);
+        align-items: baseline;
+        max-inline-size: none;
+        padding-block: var(--space-sm);
+        font-size: var(--text-xl);
+        text-align: start;
+        border-block-end: 1px solid var(--border-light);
+        justify-self: stretch;
+      }
+
+      .home-circle__question::before {
+        flex: none;
+        inline-size: 0.55rem;
+        block-size: 0.55rem;
+        content: '';
+        background: var(--accent);
+        border-radius: 50%;
+        translate: 0 -0.15em;
+      }
+
       .home-circle__close {
-        grid-column: 1 / -1;
+        margin-inline: 0;
+        text-align: start;
       }
     }
   }

@@ -2,68 +2,69 @@
 import site from '../../data/site.json';
 import HomeEventStatus from '../HomeEventStatus.astro';
 import NewsletterForm from '../forms/NewsletterForm.astro';
-import Ring from '../Ring.astro';
+import SeatCircle from '../SeatCircle.astro';
 
 interface Props {
   data: {
     anchor?: string;
     eyebrow?: string;
     displayLines?: string[];
+    lede?: string;
     newsletterText?: string;
     whatsappText?: string;
   };
 }
 
-/** The close: the date, the action that fits it, and the way to hear about the next one. */
+/** The close: the date, the action that fits it, and the way to hear about the next one. The one rust ground. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'termine';
 const whatsapp = site.whatsappCommunityLink;
-const lines = data.displayLines ?? ['DABEI SEIN.'];
+const lines = data.displayLines ?? ['Dabei sein.'];
 ---
 
-<section class="section section--ink section--clip home-dates" id={anchor} aria-labelledby="termine-title">
-  <Ring place="close" />
+<section class="section surface-rust section--clip home-dates" id={anchor} aria-labelledby="termine-title">
+  <SeatCircle class="home-dates__ring" seatSize={2.5} />
 
   <div class="container home-dates__inner">
-    <div class="bay">
-      <div class="bay__left home-dates__lead">
-        <p class="marker marker--ruled home-dates__marker">{data.eyebrow}</p>
+    <div class="home-dates__lead">
+      <p class="marker">{data.eyebrow}</p>
 
-        <h2 class="display home-dates__display" id="termine-title">
-          {lines.map((line) => (
-            <span class="display__line">{line}</span>
-          ))}
-        </h2>
+      <h2 class="display display--xl home-dates__display" id="termine-title">
+        {lines.map((line) => (
+          <span class="display__line">{line}</span>
+        ))}
+      </h2>
 
-        <HomeEventStatus placement="dates" server:defer>
-          <HomeEventStatus placement="dates" fallback slot="fallback" />
-        </HomeEventStatus>
-      </div>
+      {data.lede && <p class="home-dates__lede">{data.lede}</p>}
 
-      <div class="bay__far-right home-dates__notify" id="newsletter">
-        <h3 class="home-dates__sub">Bei neuen Terminen benachrichtigen</h3>
-        {data.newsletterText && <p class="home-dates__text">{data.newsletterText}</p>}
-        <NewsletterForm context={{ location: 'home-dates' }} />
+      <HomeEventStatus placement="dates" server:defer>
+        <HomeEventStatus placement="dates" fallback slot="fallback" />
+      </HomeEventStatus>
+    </div>
 
-        {whatsapp && (
-          <p class="home-dates__alt" id="whatsapp-community">
-            {data.whatsappText}{' '}
-            <a
-              class="link home-dates__alt-link"
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-umami-event="whatsapp-click"
-              data-umami-event-type="community-join"
-            >
-              Zur WhatsApp-Gruppe
-              <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
-            </a>
-            .
-          </p>
-        )}
-      </div>
+    <div class="surface-bark home-dates__notify" id="newsletter">
+      <h3 class="home-dates__sub">Bei neuen Terminen benachrichtigen</h3>
+      {data.newsletterText && <p class="home-dates__text">{data.newsletterText}</p>}
+      <NewsletterForm context={{ location: 'home-dates' }} />
+
+      {whatsapp && (
+        <p class="home-dates__alt" id="whatsapp-community">
+          {data.whatsappText}{' '}
+          <a
+            class="link"
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-umami-event="whatsapp-click"
+            data-umami-event-type="community-join"
+          >
+            Zur WhatsApp-Gruppe
+            <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+          </a>
+          .
+        </p>
+      )}
     </div>
   </div>
 </section>
@@ -74,95 +75,123 @@ const lines = data.displayLines ?? ['DABEI SEIN.'];
       padding-block: var(--space-2xl);
     }
 
-    .home-dates__inner {
-      position: relative;
-      z-index: 1;
+    /* The big circle sits behind the headline, cropped by the section edge. */
+    .home-dates__ring {
+      --seat-color: var(--text-primary);
+
+      position: absolute;
+      inset-block-end: -62%;
+      inset-inline-end: -22%;
+      inline-size: min(80vw, 60rem);
+      opacity: 0.4;
     }
 
-    .home-dates__marker {
-      color: var(--color-chalk);
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) {
+        .home-dates__ring svg {
+          animation: ring-turn linear both;
+          animation-timeline: view();
+          animation-range: cover 0% cover 100%;
+        }
+      }
+    }
+
+    .home-dates__inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: var(--space-xl);
+      align-items: start;
     }
 
     .home-dates__display {
       margin-block-end: var(--space-md);
-      color: var(--color-chalk);
+    }
+
+    .home-dates__lede {
+      max-inline-size: 40ch;
+      margin-block-end: var(--space-lg);
+      font-size: var(--text-section-body-lg);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
     }
 
     .home-dates__status {
-      max-inline-size: var(--measure);
+      max-inline-size: 44ch;
       margin-block-end: var(--space-md);
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-normal);
-      color: var(--color-chalk);
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      line-height: 1.35;
+      color: var(--text-primary);
     }
 
-    .home-dates__status[data-status='unavailable'] {
-      color: var(--color-orange);
+    /* The seats of the next evening, drawn: taken ones filled, free ones open. */
+    .home-dates__ticket {
+      display: grid;
+      grid-template-columns: 9rem minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: center;
+      margin-block-end: var(--space-lg);
     }
 
-    .home-dates__meta {
-      margin-block-end: var(--space-md);
+    .home-dates__seats {
+      inline-size: 100%;
+    }
+
+    .home-dates__meta .deflist__row {
+      grid-template-columns: minmax(4.5rem, 6rem) minmax(0, 1fr);
     }
 
     .home-dates__action {
       margin: 0;
     }
 
-    /* The form column. On the ink ground the inputs invert too, otherwise a
-       bright panel would punch a hole in the field. */
     .home-dates__notify {
-      --control-bg: rgb(242 237 227 / 7%);
-      --control-bg-hover: rgb(242 237 227 / 12%);
-      --control-color: var(--color-chalk);
-      --control-border-color: var(--border-on-dark);
-      --control-placeholder: var(--color-chalk-muted);
-    }
-
-    .home-dates__notify .form-label {
-      color: var(--color-chalk);
+      padding: var(--space-lg);
+      border-radius: var(--radius);
     }
 
     .home-dates__sub {
-      margin-block-end: var(--space-2xs);
-      font-size: var(--text-xl);
+      margin-block-end: var(--space-xs);
+      font-size: var(--text-2xl);
       line-height: 1.15;
-      color: var(--color-chalk);
     }
 
     .home-dates__text {
-      max-inline-size: var(--measure);
-      margin-block-end: var(--space-sm);
+      margin-block-end: var(--space-md);
       font-size: var(--text-section-body);
       line-height: var(--leading-relaxed);
-      color: var(--color-chalk-muted);
+      color: var(--text-secondary);
     }
 
     .home-dates__alt {
-      max-inline-size: var(--measure);
       margin-block-start: var(--space-md);
       font-size: var(--text-caption);
       line-height: var(--leading-relaxed);
-      color: var(--color-chalk-muted);
+      color: var(--text-muted);
     }
 
-    .home-dates__alt-link {
-      color: var(--color-chalk);
-    }
-
-    @media (width <= 56em) {
-      .home-dates {
-        /* Room for the cropped ring, including its scroll drift. */
-        padding-block: var(--space-xl) calc(var(--space-xl) + 2.5rem);
-      }
-
-      .home-dates__notify {
-        padding-block-start: var(--rhythm-item);
-        margin-block-start: var(--rhythm-group);
-        border-block-start: 1px solid var(--border-on-dark);
+    @media (width <= 62em) {
+      .home-dates__inner {
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
     @media (width <= 30em) {
+      .home-dates__ticket {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-md);
+      }
+
+      .home-dates__seats {
+        inline-size: 7rem;
+      }
+
+      .home-dates__notify {
+        padding: var(--space-md);
+        margin-inline: calc(-0.5 * var(--container-gutter));
+      }
+
       .home-dates__action .btn {
         inline-size: 100%;
       }
