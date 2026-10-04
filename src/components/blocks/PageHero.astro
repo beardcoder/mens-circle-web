@@ -94,9 +94,12 @@ const imageAsset = resolveAssetImage(data.image);
     }
 
     .page-hero__title {
-      max-inline-size: 14ch;
+      /* A single long word ("Datenschutzerklärung") widens the box, then breaks. */
+      max-inline-size: max(14ch, min-content);
       margin: 0;
       font-size: var(--display-1);
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
 
     .page-hero--center .page-hero__title {
