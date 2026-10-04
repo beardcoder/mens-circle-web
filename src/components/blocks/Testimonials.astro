@@ -89,18 +89,13 @@ const empty = testimonials.length === 0;
       list-style: none;
     }
 
+    /* Every voice is set alike: one size, one rule above, no voice louder than another. */
     .testimonial-item {
       display: grid;
       gap: var(--space-sm);
       align-content: start;
       padding-block-start: var(--space-md);
       border-block-start: 1px solid var(--rule-strong);
-    }
-
-    /* The first voice gets the room of a pull quote. */
-    .testimonial-item:first-child {
-      grid-column: 1 / -1;
-      border-block-start: 0;
     }
 
     .testimonial-item__quote {
@@ -112,13 +107,6 @@ const empty = testimonials.length === 0;
       line-height: 1.5;
       color: var(--text-primary);
       text-wrap: pretty;
-    }
-
-    .testimonial-item:first-child .testimonial-item__quote {
-      max-inline-size: 34ch;
-      font-size: var(--text-3xl);
-      line-height: 1.25;
-      text-indent: -0.4em;
     }
 
     .testimonial-item__quote::before {
