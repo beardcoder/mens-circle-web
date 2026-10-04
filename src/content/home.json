@@ -102,7 +102,8 @@
         "lines": ["Aus dem Kopf.", "In den Körper."],
         "text": "Viele Männer leben im Kopf: planen, abwägen, funktionieren. Deshalb beginnt der Abend mit Ankommen – je nach Abend mit ein paar ruhigen Atemzügen, den Füßen auf dem Boden, einem kurzen Spüren, wie es dir gerade geht. Jede Übung ist ein Angebot, kein Programm. Du machst mit, soweit es für dich passt.",
         "linkLabel": "Was wir miteinander vereinbaren",
-        "linkUrl": "#rahmen"
+        "linkUrl": "#rahmen",
+        "breathGuide": "Atme ein paar Züge mit: vier Sekunden ein, fünf aus."
       }
     },
     {
