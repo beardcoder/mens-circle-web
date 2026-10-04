@@ -7,46 +7,43 @@ interface Props {
   event: EventDTO;
 }
 
-/** The opening of a single event's page: the date as a poster, the seats as a circle. */
+/** The opening of a single event's page, set like the flyer: the date in orange capitals, then time and place. */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);
 const weekday = formatWeekdayDE(event.event_date);
 const dayMonthYear = formatDayMonthYearDE(event.event_date);
-// "23. Oktober 2026" → "23" and "Oktober 2026", for the poster layout only.
-const [, day = '', monthYear = dayMonthYear] = dayMonthYear.match(/^(\d+)\.\s*(.+)$/) ?? [];
+const time = timeRange(event.start_time, event.end_time);
 const taken = Math.max(0, event.max_participants - event.available_spots);
 const seatsLabel = event.is_full
   ? `Alle ${event.max_participants} Plätze vergeben`
   : `${event.available_spots} von ${event.max_participants} Plätzen frei`;
 ---
 
-<section class="hero event-hero">
+<section class="hero event-hero surface-night">
   <div class="container event-hero__grid">
     <div class="event-hero__copy">
-      <p class="marker hero__label">{event.is_past ? 'Vergangenes Treffen' : 'Nächstes Treffen'}</p>
+      <p class="marker marker--plain hero__label">
+        {event.is_past ? 'Vergangenes Treffen' : 'Männerkreis · Nächstes Treffen'}
+      </p>
 
       <h1 class="event-hero__title">
         <time datetime={dateOnly}>
           <span class="sr-only">
             {weekday}, {dayMonthYear}
           </span>
-          <span class="event-hero__poster" aria-hidden="true">
-            {day && <span class="event-hero__day">{day}</span>}
-            <span class="event-hero__month">
-              <span class="event-hero__weekday">{weekday}</span>
-              {monthYear}
-            </span>
+          <span class="date-line event-hero__date" aria-hidden="true">
+            {weekday.slice(0, 2)} · {dayMonthYear}
           </span>
         </time>
       </h1>
 
-      {/* Built as a string rather than as JSX fragments: the whitespace
-          between elements in the template becomes real text nodes, which put
-          gaps around the en dash of the time range. */}
-      <p class="event-hero__meta">
-        {[timeRange(event.start_time, event.end_time), event.location].filter(Boolean).join(' · ')}
-      </p>
+      <div class="event-hero__meta">
+        {time && <p>{time}</p>}
+        {event.location && <p>{event.location}</p>}
+      </div>
+
+      <p class="event-hero__facts">Ohne Vorerfahrung{event.cost_basis ? ` · ${event.cost_basis}` : ''}</p>
 
       {!event.is_past && (
         <p class="event-hero__cta">
@@ -76,48 +73,37 @@ const seatsLabel = event.is_full
     }
 
     .event-hero__title {
-      margin-block: var(--space-md) var(--space-md);
+      margin-block: var(--space-md);
       font-size: inherit;
       letter-spacing: normal;
     }
 
-    .event-hero__poster {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0 var(--space-md);
-      align-items: flex-end;
+    .event-hero__date {
+      display: block;
+      font-size: clamp(2rem, 1rem + 4.2vw, 4.5rem);
+      line-height: 1;
+      letter-spacing: 0.02em;
     }
 
-    /* The day number in the heavy register — one of the few places it is used. */
-    .event-hero__day {
-      font-family: var(--font-display);
-      font-size: clamp(6rem, 3rem + 12vw, 13rem);
-      font-weight: 900;
-      line-height: 0.78;
-      color: var(--accent);
-      letter-spacing: -0.04em;
-    }
-
-    .event-hero__month {
-      display: grid;
-      padding-block-end: 0.15em;
-      font-family: var(--font-display);
-      font-size: var(--display-3);
-      line-height: 1.05;
-      color: var(--text-primary);
-      letter-spacing: -0.02em;
-    }
-
-    .event-hero__weekday {
-      font-size: 0.55em;
-      font-style: italic;
-      color: var(--text-secondary);
-    }
-
-    .event-hero__meta {
+    .event-hero__meta p {
       margin: 0;
-      font-size: var(--text-section-body-lg);
+      font-size: var(--text-3xl);
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
       color: var(--text-primary);
+    }
+
+    .event-hero__facts {
+      max-inline-size: 30rem;
+      padding-block-start: var(--space-sm);
+      margin: var(--space-md) 0 0;
+      font-size: var(--text-marker);
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-marker);
+      border-block-start: 2px solid var(--accent);
     }
 
     .event-hero__cta {
@@ -132,26 +118,21 @@ const seatsLabel = event.is_full
     }
 
     .event-hero__seats .seat-circle {
-      inline-size: min(100%, 20rem);
+      inline-size: min(100%, 18rem);
     }
 
     .event-hero__seats figcaption {
-      font-family: var(--font-display);
       font-size: var(--text-lg);
-      font-style: italic;
+      font-weight: 700;
       color: var(--text-secondary);
     }
 
     @media (prefers-reduced-motion: no-preference) {
-      .event-hero__poster,
+      .event-hero__date,
       .event-hero__meta,
       .event-hero__cta,
       .event-hero__seats {
         animation: rise var(--duration-slow) var(--ease-settle) both;
-      }
-
-      .event-hero__poster {
-        animation-delay: var(--stagger-1);
       }
 
       .event-hero__meta,
@@ -163,7 +144,7 @@ const seatsLabel = event.is_full
         animation-delay: 200ms;
       }
 
-      .vt-arrival :is(.event-hero__poster, .event-hero__meta, .event-hero__cta, .event-hero__seats) {
+      .vt-arrival :is(.event-hero__date, .event-hero__meta, .event-hero__cta, .event-hero__seats) {
         animation: none;
       }
     }

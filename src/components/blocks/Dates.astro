@@ -1,8 +1,8 @@
 ---
 import site from '../../data/site.json';
+import BrushRing from '../BrushRing.astro';
 import HomeEventStatus from '../HomeEventStatus.astro';
 import NewsletterForm from '../forms/NewsletterForm.astro';
-import SeatCircle from '../SeatCircle.astro';
 
 interface Props {
   data: {
@@ -15,7 +15,7 @@ interface Props {
   };
 }
 
-/** The close: the date, the action that fits it, and the way to hear about the next one. The one rust ground. */
+/** The close, set like the flyer: the invitation inside the ring, the date in orange capitals, and the way to hear about the next one. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'termine';
@@ -23,27 +23,30 @@ const whatsapp = site.whatsappCommunityLink;
 const lines = data.displayLines ?? ['Dabei sein.'];
 ---
 
-<section class="section surface-rust section--clip home-dates" id={anchor} aria-labelledby="termine-title">
-  <SeatCircle class="home-dates__ring" seatSize={2.5} />
-
+<section class="section surface-night home-dates" id={anchor} aria-labelledby="termine-title">
   <div class="container home-dates__inner">
     <div class="home-dates__lead">
-      <p class="marker">{data.eyebrow}</p>
+      <p class="marker marker--plain home-dates__marker">{data.eyebrow}</p>
 
-      <h2 class="display display--xl home-dates__display" id="termine-title">
-        {lines.map((line) => (
-          <span class="display__line">{line}</span>
-        ))}
-      </h2>
+      <div class="home-dates__ring-wrap">
+        <BrushRing class="home-dates__ring" seed={37} />
+        <h2 class="home-dates__display" id="termine-title">
+          {lines.map((line) => (
+            <span class="display__line">{line}</span>
+          ))}
+        </h2>
+      </div>
 
       {data.lede && <p class="home-dates__lede">{data.lede}</p>}
+    </div>
 
+    <div class="home-dates__ticket">
       <HomeEventStatus placement="dates" server:defer>
         <HomeEventStatus placement="dates" fallback slot="fallback" />
       </HomeEventStatus>
     </div>
 
-    <div class="surface-bark home-dates__notify" id="newsletter">
+    <div class="home-dates__notify" id="newsletter">
       <h3 class="home-dates__sub">Bei neuen Terminen benachrichtigen</h3>
       {data.newsletterText && <p class="home-dates__text">{data.newsletterText}</p>}
       <NewsletterForm context={{ location: 'home-dates' }} />
@@ -75,86 +78,80 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       padding-block: var(--space-2xl);
     }
 
-    /* The big circle sits behind the headline, cropped by the section edge. */
-    .home-dates__ring {
-      --seat-color: var(--text-primary);
-
-      position: absolute;
-      inset-block-end: -62%;
-      inset-inline-end: -22%;
-      inline-size: min(80vw, 60rem);
-      opacity: 0.4;
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .home-dates__ring svg {
-          animation: ring-turn linear both;
-          animation-timeline: view();
-          animation-range: cover 0% cover 100%;
-        }
-      }
-    }
-
     .home-dates__inner {
-      position: relative;
       display: grid;
+      grid-template-areas:
+        'lead   notify'
+        'ticket notify';
+      grid-template-rows: auto 1fr;
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--space-xl);
+      gap: var(--space-lg) var(--space-xl);
       align-items: start;
     }
 
+    .home-dates__lead {
+      grid-area: lead;
+      display: grid;
+      grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .home-dates__marker {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    /* The invitation sits inside a small ring; a size container keeps it there. */
+    .home-dates__ring-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      aspect-ratio: 1;
+      container-type: inline-size;
+    }
+
+    .home-dates__ring {
+      position: absolute;
+      inset: 0;
+    }
+
     .home-dates__display {
-      margin-block-end: var(--space-md);
+      position: relative;
+      margin: 0;
+      font-size: 15cqi;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      text-align: center;
+    }
+
+    .home-dates__ticket {
+      grid-area: ticket;
+      padding-block-start: var(--space-md);
+      border-block-start: 2px solid var(--accent);
     }
 
     .home-dates__lede {
-      max-inline-size: 40ch;
-      margin-block-end: var(--space-lg);
-      font-size: var(--text-section-body-lg);
+      max-inline-size: 36ch;
+      margin: 0;
+      font-size: var(--text-section-body);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
-    .home-dates__status {
-      max-inline-size: 44ch;
-      margin-block-end: var(--space-md);
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      line-height: 1.35;
-      color: var(--text-primary);
-    }
-
-    /* The seats of the next evening, drawn: taken ones filled, free ones open. */
-    .home-dates__ticket {
-      display: grid;
-      grid-template-columns: 9rem minmax(0, 1fr);
-      gap: var(--space-lg);
-      align-items: center;
-      margin-block-end: var(--space-lg);
-    }
-
-    .home-dates__seats {
-      inline-size: 100%;
-    }
-
-    .home-dates__meta .deflist__row {
-      grid-template-columns: minmax(4.5rem, 6rem) minmax(0, 1fr);
-    }
-
-    .home-dates__action {
-      margin: 0;
-    }
-
     .home-dates__notify {
+      grid-area: notify;
       padding: var(--space-lg);
+      background: var(--color-night-soft);
+      border: 1px solid var(--border-light);
       border-radius: var(--radius);
     }
 
     .home-dates__sub {
       margin-block-end: var(--space-xs);
       font-size: var(--text-2xl);
-      line-height: 1.15;
+      line-height: 1.1;
     }
 
     .home-dates__text {
@@ -173,27 +170,36 @@ const lines = data.displayLines ?? ['Dabei sein.'];
 
     @media (width <= 62em) {
       .home-dates__inner {
+        grid-template-areas:
+          'lead'
+          'ticket'
+          'notify';
+        grid-template-rows: none;
         grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    @media (width <= 30em) {
-      .home-dates__ticket {
+    @media (width <= 36em) {
+      .home-dates__lead {
         grid-template-columns: minmax(0, 1fr);
-        gap: var(--space-md);
+        justify-items: center;
       }
 
-      .home-dates__seats {
-        inline-size: 7rem;
+      .home-dates__marker {
+        justify-self: center;
+      }
+
+      .home-dates__ring-wrap {
+        inline-size: min(100%, 17rem);
+      }
+
+      .home-dates__lede {
+        text-align: center;
       }
 
       .home-dates__notify {
         padding: var(--space-md);
         margin-inline: calc(-0.5 * var(--container-gutter));
-      }
-
-      .home-dates__action .btn {
-        inline-size: 100%;
       }
     }
   }

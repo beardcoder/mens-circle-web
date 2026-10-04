@@ -2,7 +2,6 @@
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
 import { Icon } from 'astro-icon/components';
-import SeatCircle from './SeatCircle.astro';
 
 // `mailto:` and `tel:` stay in place; external profiles open in a new tab,
 // announced as part of the accessible name. Icons: src/icons/social-<type>.svg.
@@ -35,7 +34,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
     <div class="footer__top">
       <div class="footer__brand">
         <a href="/" class="footer__logo">
-          <SeatCircle class="footer__mark" ember />
+          <Icon name="logo" class="footer__mark" aria-hidden="true" />
           <span>{site.siteName}</span>
         </a>
         <p class="footer__text">{site.footerDescription}</p>
@@ -116,7 +115,7 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
     .footer {
       padding-block-start: var(--space-2xl);
       overflow: clip;
-      background: light-dark(var(--color-ink), #0f0b09);
+      background: light-dark(var(--color-night), var(--color-night-deep));
     }
 
     .footer__close {
@@ -134,11 +133,13 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
       margin: 0;
       font-family: var(--font-display);
       font-size: var(--display-2);
-      line-height: 1.02;
+      font-weight: 800;
+      line-height: var(--leading-display);
       letter-spacing: var(--tracking-display);
     }
 
     .footer__line em {
+      font-style: normal;
       color: var(--accent);
     }
 
@@ -160,12 +161,14 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
       margin-block-end: var(--space-sm);
       font-family: var(--font-display);
       font-size: var(--text-xl);
-      font-weight: 600;
-      letter-spacing: -0.015em;
+      font-weight: 800;
+      letter-spacing: -0.025em;
     }
 
     .footer__mark {
       inline-size: 2.5rem;
+      block-size: 2.5rem;
+      color: var(--color-flame);
     }
 
     .footer__text {
@@ -257,12 +260,12 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
       max-inline-size: none;
       margin: var(--space-lg) 0 0;
       font-family: var(--font-display);
-      font-size: 13.4vw;
-      font-weight: 900;
-      line-height: 0.72;
-      color: var(--color-night-raised);
+      font-size: 15.6vw;
+      font-weight: 800;
+      line-height: 0.74;
+      color: var(--color-night-soft);
       text-align: center;
-      letter-spacing: -0.045em;
+      letter-spacing: -0.05em;
       white-space: nowrap;
       user-select: none;
     }
