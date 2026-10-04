@@ -63,10 +63,11 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   fonts: [
-    // Public site: Alegreya — a broad-pen serif, organic and grounded — for the
-    // headlines (800) and the quiet lines (italic); Figtree for text and UI.
+    // Public site: one broad-pen family. Alegreya — organic and grounded — for the
+    // headlines (800) and the quiet lines (italic); its humanist sibling Alegreya
+    // Sans for text, UI and the date line.
     {
-      name: 'Figtree',
+      name: 'Alegreya Sans',
       cssVariable: '--font-sans',
       provider: fontProviders.fontsource(),
       weights: ['400', '500', '700', '800'],

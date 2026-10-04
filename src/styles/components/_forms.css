@@ -58,7 +58,7 @@
   padding-block: var(--control-padding-block);
   padding-inline: var(--control-padding-inline);
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: 1.5;
   color: var(--control-color);
   background: var(--control-bg);

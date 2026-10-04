@@ -53,10 +53,13 @@ body {
   overflow-x: clip;
   font-family: var(--font-body);
   font-size: var(--text-base);
-  line-height: 1.65;
+  line-height: 1.6;
   color: var(--text-primary);
   background-color: var(--bg-primary);
   font-kerning: normal;
+  /* Alegreya's figures default to old style; dates, times and prices read
+     clearer on the line. */
+  font-variant-numeric: lining-nums;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 }

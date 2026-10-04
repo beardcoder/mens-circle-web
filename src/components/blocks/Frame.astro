@@ -90,6 +90,7 @@ const agreements = data.agreements ?? [];
     }
 
     .home-frame__item {
+      container-type: inline-size;
       display: grid;
       grid-template-rows: auto auto 1fr;
       gap: var(--space-sm);
@@ -114,7 +115,8 @@ const agreements = data.agreements ?? [];
     }
 
     .home-frame__term {
-      font-size: var(--text-xl);
+      /* Capped by the column: "Eigenverantwortung" is one word. */
+      font-size: min(var(--text-xl), 10.5cqi);
       line-height: 1.15;
       hyphens: auto;
       overflow-wrap: break-word;
