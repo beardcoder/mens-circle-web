@@ -84,19 +84,34 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
 
 ## Design
 
-- Poster, not theme. Barlow Condensed 800 for display (`.display`, uppercase,
-  `line-height: .85`), Barlow for text; nothing in between.
-- Colours: paper `#F2EDE3`, ink `#1C1714`, orange `#DD5F33`. Orange on paper is fill,
-  stroke and large text only; buttons are ink on orange.
-- Use mode-flipping tokens (`--text-*`, `--bg-*`, `--rule-strong`) on page grounds;
-  literal `--color-ink`/`--color-paper` only on grounds that don't flip.
-- Layout: `.bay` 12-col grid; `.spine` only for quiet passages and sub-pages.
+- "Feuerstelle": warm, earthy, calm. Fraunces speaks (headlines, quotes, numbers;
+  400, italic for emphasis), Instrument Sans explains (text, UI). Capitals only for
+  small labels (`.marker`) and `.display--heavy` (Fraunces 900), a few words per page.
+  Barlow is loaded for the admin only.
+- Colours: cream `#F4EDE1`, bark `#241C17`, rust `#A84A2A` (4.9:1, may carry text and
+  the cream label of a button), ember `#E07F57` at night, moss `#364132` once on the
+  home page. Strong grounds are rare: bark (Ablauf, footer), moss (statement), rust
+  (Termine, sub-page CTA).
+- Surfaces (`.surface-sand|bark|moss|rust`) re-declare `--text-*`, `--accent`,
+  `--on-accent`, `--border-*`, `--surface` and the control tokens; components only use
+  those tokens, so buttons, links, focus rings and forms follow the ground. Surfaces
+  keep the page's color-scheme, so their `light-dark()` grounds follow the mode.
+- Layout: asymmetric two-column grids per block; `.spine` only for quiet passages and
+  sub-pages. Phones get their own compositions (hero circle breaks out to the right,
+  questions become a ladder, Markus' name comes before his photo).
 - Vertical rhythm: `--rhythm-section` > `group` > `item` > `tight`; never inverted.
   Lift reserving `min-block-size` once columns stack or an island swaps in.
-- Ring (`Ring.astro`) used exactly twice, never over text. Radius 0 everywhere.
-- Motion: hero entrance, ring scroll drift, statement settle; nothing else. Only
-  `opacity`/`transform`, no `filter: blur()` on display text, one `animation` per
-  element. `.display` keeps `padding-block-start: .14em` for umlauts.
+- The seat circle (`SeatCircle.astro`) is the mark: a hairline ring with seats and an
+  ember. It frames the hero photo, sits at the centre of the questions, draws the
+  seats of an event (taken/open), the logo and the footer. Never behind running text.
+  Ring strokes use `non-scaling-stroke`, so never put dash arrays on them.
+- Radius `--radius` (3px) on controls and panels; full circles only for seats, the
+  theme and scroll-to-top buttons and the hero photo.
+- Motion: hero entrance (words, circle), scroll-driven reveals (`[data-reveal]`,
+  view() only, no JS, nothing hidden without timeline support), ring turn, the
+  Ablauf dial (per-step view timelines via `timeline-scope`), statement settle,
+  breath rings, header ground and progress. Only `opacity`/`transform`; all off under
+  `prefers-reduced-motion`.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Block styles live in the component (`<style is:global>` in `@layer sections`), since

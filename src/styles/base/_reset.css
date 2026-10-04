@@ -53,9 +53,12 @@ body {
   overflow-x: clip;
   font-family: var(--font-body);
   font-size: var(--text-base);
-  line-height: 1.7;
+  line-height: 1.65;
   color: var(--text-primary);
   background-color: var(--bg-primary);
+  font-kerning: normal;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
 }
 
 :where(ul, ol)[role='list'] {
@@ -125,7 +128,7 @@ fieldset {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
   transition: outline-offset var(--motion-quick);
 }
@@ -135,8 +138,8 @@ fieldset {
 }
 
 ::selection {
-  color: light-dark(var(--color-paper), var(--color-night));
-  background-color: var(--accent-primary);
+  color: var(--on-accent);
+  background-color: var(--accent);
 }
 
 table {

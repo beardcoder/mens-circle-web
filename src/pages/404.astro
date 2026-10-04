@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import site from '../data/site.json';
+import SeatCircle from '../components/SeatCircle.astro';
 
 // Prerendered: no live data. The adapter reads 404.html from disk for unmatched routes.
 export const prerender = true;
@@ -9,10 +10,9 @@ export const prerender = true;
 <Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow">
   <section class="error-page">
     <div class="error-page__content">
-      <p class="error-page__code" aria-hidden="true">
-        404
-      </p>
-      <h1 class="error-page__title">Diese Seite gibt es nicht</h1>
+      <SeatCircle class="error-page__mark" taken={7} ember />
+      <p class="marker error-page__code">Fehler 404</p>
+      <h1 class="display error-page__title">Diese Seite gibt es nicht.</h1>
       <p class="error-page__text">Die Seite, die du suchst, wurde verschoben, umbenannt oder hat es nie gegeben.</p>
       <div class="error-page__actions">
         <a href="/" class="btn btn--primary">
@@ -34,38 +34,30 @@ export const prerender = true;
 <style is:global>
   @layer sections {
     .error-page {
-      /* Clear the fixed header, and leave enough height that the footer never
-         floats into view on short error content. */
       min-block-size: 70svh;
-      padding-block: calc(var(--header-clearance) + var(--space-lg)) var(--space-xl);
+      padding-block: calc(var(--header-height) + var(--space-xl)) var(--space-2xl);
       padding-inline: var(--container-gutter);
     }
 
     .error-page__content {
-      max-inline-size: var(--container-width);
+      max-inline-size: calc(var(--container-width) - 2 * var(--container-gutter));
       margin-inline: auto;
     }
 
-    .error-page__code {
-      margin-block-end: var(--space-xs);
-      font-family: var(--font-body);
-      font-size: var(--text-caption);
-      font-weight: 600;
-      line-height: 1;
-      color: var(--text-muted);
-      letter-spacing: 0.04em;
+    /* One seat stays open. */
+    .error-page__mark {
+      inline-size: clamp(6rem, 4rem + 8vw, 10rem);
+      margin-block-end: var(--space-lg);
     }
 
     .error-page__title {
-      margin-block-end: var(--space-sm);
-      font-size: var(--text-4xl);
-      line-height: 1.1;
-      color: var(--text-primary);
+      max-inline-size: 14ch;
+      margin-block-end: var(--space-md);
     }
 
     .error-page__text {
       max-inline-size: var(--measure);
-      margin-block-end: var(--space-md);
+      margin-block-end: var(--space-lg);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
@@ -79,25 +71,17 @@ export const prerender = true;
 
     .error-page__contact {
       max-inline-size: var(--measure);
-      margin-block-start: var(--space-md);
+      margin-block-start: var(--space-lg);
       font-size: var(--text-caption);
       color: var(--text-muted);
     }
 
-    .error-page__contact a,
-    .error-page__text a {
-      color: var(--accent-text);
+    .error-page__contact a {
+      color: var(--text-primary);
       text-decoration: underline;
-      text-decoration-thickness: 1px;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 1.5px;
       text-underline-offset: 0.2em;
-      transition: color var(--motion-quick);
-    }
-
-    .error-page__contact a:hover,
-    .error-page__contact a:focus-visible,
-    .error-page__text a:hover,
-    .error-page__text a:focus-visible {
-      color: var(--accent-rare);
     }
   }
 </style>

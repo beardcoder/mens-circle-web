@@ -22,16 +22,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  inline-size: 44px;
-  block-size: 44px;
-  /* Ink on orange in both modes — the orange ground does not flip. */
-  color: var(--color-ink);
+  inline-size: 48px;
+  block-size: 48px;
+  color: var(--text-primary);
   cursor: pointer;
-  background: var(--color-orange);
-  border: 2px solid var(--rule-strong);
-  border-radius: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-medium);
+  /* A seat, not a pill: the one round control. */
+  border-radius: 50%;
   transition:
     background-color var(--motion-quick),
+    color var(--motion-quick),
     border-color var(--motion-quick);
 }
 
@@ -46,15 +47,15 @@
 
 @media (hover: hover) and (pointer: fine) {
   .scroll-to-top:hover {
-    color: var(--bg-primary);
-    background: var(--text-primary);
+    color: var(--on-accent);
+    background: var(--accent);
+    border-color: var(--accent);
   }
 }
 
 .scroll-to-top:focus-visible {
-  outline: 3px solid var(--text-primary);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
-  box-shadow: 0 0 0 3px var(--color-orange);
 }
 
 .scroll-to-top svg {

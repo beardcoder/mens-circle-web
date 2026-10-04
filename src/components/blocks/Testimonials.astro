@@ -1,7 +1,7 @@
 ---
 import type { Testimonial } from '@lib/types';
 
-/** Submitted and moderated entries, quoted as written — nothing is added or reworded, and the section renders nothing when none is published. */
+/** Submitted and moderated entries, quoted as written — nothing is added or reworded. With none published the section shrinks to an invitation. */
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string; title?: string };
@@ -13,85 +13,122 @@ const { data, loading = false } = Astro.props;
 const testimonials =
   Astro.props.testimonials ?? (await (await import('../../lib/server/testimonials')).fetchTestimonials());
 const anchor = data?.anchor ?? 'stimmen';
+const empty = testimonials.length === 0;
 ---
 
-{
-  <section
-    class:list={['section', 'section--sand', 'testimonials-section', loading && 'testimonials-section--pending']}
-    id={anchor}
-    aria-labelledby="testimonials-title"
-  >
-    <div class="container">
-      <div class="spine">
-        <p class="rail-heading">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
-
-        <div class="spine__body--wide">
-          <h2 class="section-title" id="testimonials-title">
-            {data?.title ?? 'Was Teilnehmer geschrieben haben'}
-          </h2>
-
-          {testimonials.length === 0 && (
-            <p>
-              {loading
-                ? 'Erfahrungen von Teilnehmern werden geladen.'
-                : 'Erfahrungen veröffentlichen wir nach ihrer Freigabe.'}
-            </p>
-          )}
-          <ul class="testimonials__list" role="list">
-            {testimonials.map((t) => (
-              <li class="testimonial-item">
-                <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
-                {(t.author || t.role) && (
-                  <p class="testimonial-item__author">
-                    {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
-                    {t.role && <span class="testimonial-item__role">{t.role}</span>}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-
-          <p class="testimonials__note">
-            Die Zitate stammen von Männern, die beim Kreis waren.{' '}
-            <a class="link" href="/teile-deine-erfahrung">
-              Du warst dabei und möchtest etwas beitragen?
-            </a>
-          </p>
-        </div>
-      </div>
+<section
+  class:list={[
+    'section',
+    'testimonials-section',
+    loading && 'testimonials-section--pending',
+    empty && !loading && 'testimonials-section--empty',
+  ]}
+  id={anchor}
+  aria-labelledby="testimonials-title"
+>
+  <div class="container">
+    <div class="testimonials__head">
+      <p class="marker">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
+      <h2 class="display display--sm testimonials__title" id="testimonials-title">
+        {data?.title ?? 'Was Teilnehmer geschrieben haben'}
+      </h2>
     </div>
-  </section>
-}
+
+    {empty ? (
+      <p class="testimonials__empty">
+        {loading
+          ? 'Erfahrungen von Teilnehmern werden geladen.'
+          : 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'}
+      </p>
+    ) : (
+      <ul class="testimonials__list" role="list">
+        {testimonials.map((t) => (
+          <li class="testimonial-item" data-reveal>
+            <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
+            {(t.author || t.role) && (
+              <p class="testimonial-item__author">
+                {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
+                {t.role && <span class="testimonial-item__role">{t.role}</span>}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <p class="testimonials__note">
+      {!empty && 'Die Zitate stammen von Männern, die beim Kreis waren. '}
+      <a class="link" href="/teile-deine-erfahrung">
+        Du warst dabei und möchtest etwas beitragen?
+      </a>
+    </p>
+  </div>
+</section>
 
 <style is:global>
   @layer sections {
-    /* The island's loading floor, and only that: on the loaded section the same
-       rule held a 480px minimum open under a short list of quotes. */
     .testimonials-section--pending {
-      min-block-size: 30rem;
+      min-block-size: 24rem;
     }
 
-    /* A single column, not a two-up grid. */
+    .testimonials__head {
+      margin-block-end: var(--space-xl);
+    }
+
+    .testimonials__title {
+      max-inline-size: 18ch;
+      margin: 0;
+    }
+
     .testimonials__list {
-      max-inline-size: var(--measure);
-      margin-block-start: var(--rhythm-group);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+      gap: var(--space-xl) var(--space-lg);
       padding: 0;
+      margin: 0;
       list-style: none;
-      border-block-start: 1px solid var(--border-light);
     }
 
     .testimonial-item {
-      padding-block: var(--rhythm-item);
-      border-block-end: 1px solid var(--border-light);
+      display: grid;
+      gap: var(--space-sm);
+      align-content: start;
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid var(--rule-strong);
+    }
+
+    /* The first voice gets the room of a pull quote. */
+    .testimonial-item:first-child {
+      grid-column: 1 / -1;
+      border-block-start: 0;
     }
 
     .testimonial-item__quote {
+      max-inline-size: 52ch;
       margin: 0;
       font-family: var(--font-display);
       font-size: var(--text-lg);
-      line-height: var(--leading-normal);
+      font-style: italic;
+      line-height: 1.5;
       color: var(--text-primary);
       text-wrap: pretty;
+    }
+
+    .testimonial-item:first-child .testimonial-item__quote {
+      max-inline-size: 34ch;
+      font-size: var(--text-3xl);
+      line-height: 1.25;
+      text-indent: -0.4em;
+    }
+
+    .testimonial-item__quote::before {
+      content: '„';
+      color: var(--accent);
+    }
+
+    .testimonial-item__quote::after {
+      content: '“';
+      color: var(--accent);
     }
 
     .testimonial-item__author {
@@ -100,7 +137,6 @@ const anchor = data?.anchor ?? 'stimmen';
       gap: var(--space-3xs) var(--space-xs);
       align-items: baseline;
       margin: 0;
-      padding-block-start: var(--space-xs);
     }
 
     .testimonial-item__name {
@@ -115,12 +151,31 @@ const anchor = data?.anchor ?? 'stimmen';
       color: var(--text-muted);
     }
 
+    .testimonials__empty {
+      max-inline-size: var(--measure);
+      font-size: var(--text-section-body-lg);
+      color: var(--text-secondary);
+    }
+
     .testimonials__note {
       max-inline-size: var(--measure);
-      margin-block-start: var(--rhythm-group);
+      margin-block-start: var(--space-lg);
       font-size: var(--text-caption);
       line-height: var(--leading-relaxed);
       color: var(--text-muted);
+    }
+
+    /* No published voices yet: a quiet two-line band, not an empty stage. */
+    .testimonials-section--empty {
+      padding-block: var(--space-xl);
+    }
+
+    .testimonials-section--empty .testimonials__head {
+      margin-block-end: var(--space-sm);
+    }
+
+    .testimonials-section--empty .testimonials__note {
+      margin-block-start: var(--space-xs);
     }
   }
 </style>

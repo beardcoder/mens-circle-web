@@ -15,66 +15,115 @@ const dateOnly = isoDay(event.event_date);
 const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full ? 'Warteliste' : 'Anmeldung';
 ---
 
-<section class="section section--ruled event-register-section" id="anmeldung" aria-labelledby="anmeldung-title">
-  <div class="container">
-    <div class="spine">
-      <p class="rail-heading">{event.is_past ? 'Rückblick' : 'Teilnehmen'}</p>
+<section class="section surface-sand event-register-section" id="anmeldung" aria-labelledby="anmeldung-title">
+  <div class="container event-register__grid">
+    <div class="event-register__intro">
+      <p class="marker">{event.is_past ? 'Rückblick' : 'Teilnehmen'}</p>
+      <h2 class="display event-register__title" id="anmeldung-title">
+        {heading}
+      </h2>
 
-      <div class="spine__body">
-        <h2 class="event-register__title" id="anmeldung-title">
-          {heading}
-        </h2>
+      {event.is_past ? (
+        <p class="event-register__text">
+          Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine Anmeldung
+          ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich benachrichtigen, sobald der
+          nächste Termin feststeht.
+        </p>
+      ) : event.is_full ? (
+        <p class="event-register__text">
+          Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch
+          nach und bekommst sofort eine E-Mail.
+        </p>
+      ) : (
+        <p class="event-register__text">
+          Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen Vor-
+          und Nachname und eine E-Mail-Adresse; den genauen Treffpunkt bekommst du mit der Bestätigung.
+        </p>
+      )}
 
-        {event.is_past ? (
-          <p class="event-register__text">
-            Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine
-            Anmeldung ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich benachrichtigen,
-            sobald der nächste Termin feststeht.
-          </p>
-        ) : event.is_full ? (
-          <p class="event-register__text">
-            Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch
-            nach und bekommst sofort eine E-Mail.
-          </p>
-        ) : (
-          <p class="event-register__text">
-            Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen Vor-
-            und Nachname und eine E-Mail-Adresse; den genauen Treffpunkt bekommst du mit der Bestätigung.
-          </p>
-        )}
+      {!event.is_past && (
+        <ol class="event-register__steps" role="list">
+          <li>Formular ausfüllen</li>
+          <li>Bestätigung mit Treffpunkt per E-Mail</li>
+          <li>Am Abend einfach da sein</li>
+        </ol>
+      )}
+    </div>
 
-        <div class="event-register__form-wrap">
-          {event.is_past ? (
-            <a href="/#termine" class="btn btn--primary">
-              Bei neuen Terminen benachrichtigen
-            </a>
-          ) : (
-            <RegistrationForm eventId={event.id} isFull={event.is_full} />
-          )}
-        </div>
-      </div>
+    <div class="event-register__form-wrap">
+      {event.is_past ? (
+        <a href="/#termine" class="btn btn--primary btn--large">
+          Bei neuen Terminen benachrichtigen
+        </a>
+      ) : (
+        <RegistrationForm eventId={event.id} isFull={event.is_full} />
+      )}
     </div>
   </div>
 </section>
 
 <style is:global>
   @layer sections {
+    .event-register__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
     .event-register__title {
       margin-block-end: var(--rhythm-stack);
-      font-size: var(--text-3xl);
-      line-height: 1.15;
     }
 
     .event-register__text {
-      max-inline-size: var(--measure);
-      margin-block-end: var(--rhythm-group);
+      max-inline-size: 42ch;
+      margin-block-end: var(--space-lg);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
+    .event-register__steps {
+      display: grid;
+      gap: 0;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      counter-reset: register-step;
+      border-block-start: 1px solid var(--border-light);
+    }
+
+    .event-register__steps li {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: center;
+      padding-block: var(--space-sm);
+      font-size: var(--text-body-compact);
+      color: var(--text-primary);
+      counter-increment: register-step;
+      border-block-end: 1px solid var(--border-light);
+    }
+
+    .event-register__steps li::before {
+      display: grid;
+      flex: none;
+      place-items: center;
+      inline-size: 2rem;
+      block-size: 2rem;
+      font-family: var(--font-display);
+      font-style: italic;
+      color: var(--accent);
+      content: counter(register-step);
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+    }
+
+    /* The form sits on a raised panel: the one place on the page that asks for something. */
     .event-register__form-wrap {
-      max-inline-size: var(--content-max-form);
+      padding: var(--space-lg);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius);
     }
 
     .event-register__form {
@@ -84,6 +133,18 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
     .event-register__submit {
       margin-block-start: var(--space-sm);
       inline-size: 100%;
+    }
+
+    @media (width <= 56em) {
+      .event-register__grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-lg);
+      }
+
+      .event-register__form-wrap {
+        padding: var(--space-md);
+        margin-inline: calc(-0.5 * var(--container-gutter));
+      }
     }
   }
 </style>
