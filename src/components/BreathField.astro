@@ -91,10 +91,13 @@
       animation-delay: var(--lag, 0s);
     }
 
+    /* Placed by the screen (svh), never by the hero's height: the hero grows when the
+       date island arrives, and a field that moved with it would count as a layout shift. */
+
     /* Flame, behind the photograph: the warm centre of the breath. */
     .breath-field__drift--flame {
       --x: 70%;
-      --y: 40%;
+      --y: 62svh;
       --w: 64vmax;
       --turn: 84s;
       --rgb: 228 99 46;
@@ -112,7 +115,7 @@
     /* Deep rust, low and to the left: the ground the breath rests on. */
     .breath-field__drift--ember {
       --x: 12%;
-      --y: 72%;
+      --y: 112svh;
       --w: 72vmax;
       --ratio: 0.66;
       --origin: 40% 58%;
@@ -135,7 +138,7 @@
     /* Amber, high and small: where the inhale lifts. */
     .breath-field__drift--amber {
       --x: 32%;
-      --y: 18%;
+      --y: 28svh;
       --w: 54vmax;
       --ratio: 0.8;
       --origin: 60% 40%;
@@ -173,9 +176,8 @@
       }
     }
 
-    /* Phones: the hero is several screens tall, so the fields are placed by the
-       screen, not by the hero — amber behind the sentence, flame behind the
-       photograph, rust under the reading that follows. */
+    /* Phones: amber behind the sentence, flame behind the photograph, rust under
+       the reading that follows. */
     @media (width <= 56em) {
       .breath-field__drift--flame {
         --x: 82%;

@@ -51,7 +51,15 @@ const props = Astro.props;
     </script>
     {/* Preload the serif headline weight — the hero sentence is the LCP. Config in astro.config.mjs. */}
     <Font cssVariable="--font-serif" preload={[{ weight: '400', style: 'normal' }]} />
-    <Font cssVariable="--font-sans" preload={[{ weight: '400', style: 'normal' }]} />
+    {/* And the bold sans: the date lines in the first screen are set in it, and a late
+        swap rewraps them (a layout shift on /event). */}
+    <Font
+      cssVariable="--font-sans"
+      preload={[
+        { weight: '400', style: 'normal' },
+        { weight: '700', style: 'normal' },
+      ]}
+    />
     <SeoHead {...props} />
   </head>
   <body>
