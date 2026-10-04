@@ -1,14 +1,11 @@
 ---
+import site from '@data/site.json';
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
-import BrushRing from '../BrushRing.astro';
 import HomeEventStatus from '../HomeEventStatus.astro';
+import SeatCircle from '../SeatCircle.astro';
 
-/**
- * The home page opening, set like the flyer: a near-black poster, the sentence
- * inside the painted ring, the date in orange capitals — and the photograph
- * beside it. Below, the four parts of an evening.
- */
+/** The home page opening on the night ground: the sentence, the four parts of an evening, and the photograph inside the seat circle. */
 
 interface Pillar {
   title?: string;
@@ -22,7 +19,7 @@ interface Props {
     title?: string;
     /** A phrase inside `title` set in the accent. */
     titleEmphasis?: string;
-    /** Three short words under the sentence, inside the ring. */
+    /** Three short words under the sentence. */
     claim?: string;
     lede?: string;
     pillarsLabel?: string;
@@ -39,35 +36,61 @@ const { data } = Astro.props;
 const photo = resolveAssetImage(data.image);
 const pillars = data.pillars ?? [];
 
+// The sentence, word by word, so the entrance can stagger it; the emphasis
+// keeps its words together inside one <em>.
 const title = data.title ?? '';
 const emphasis = data.titleEmphasis && title.includes(data.titleEmphasis) ? data.titleEmphasis : '';
 const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
+const words = (text: string) => text.split(/\s+/).filter(Boolean);
+const segments = [
+  ...words(before).map((word) => ({ word, em: false })),
+  ...(emphasis ? [{ word: emphasis, em: true }] : []),
+  ...words(after).map((word) => ({ word, em: false })),
+];
+
+const format = (n: number) => n.toFixed(2).replace('.', ',');
+const coordinates = `${format(site.geo.lat)}° N · ${format(site.geo.lng)}° O`;
 ---
 
 <section class="home-hero surface-night section--clip" aria-labelledby="hero-title">
   <div class="container home-hero__grid">
-    <div class="home-hero__poster">
-      {data.kicker && (
-        <p class="marker marker--plain home-hero__kicker" aria-hidden="true">
-          {data.kicker}
-        </p>
-      )}
+    <h1 class="home-hero__heading" id="hero-title">
+      {data.kicker && <span class="marker home-hero__kicker">{data.kicker}</span>}
+      <span class="display display--xl home-hero__title">
+        {segments.map(({ word, em }, i) => (
+          <>
+            {em ? (
+              <em class="home-hero__word" style={`--i: ${i}`}>
+                {word}
+              </em>
+            ) : (
+              <span class="home-hero__word" style={`--i: ${i}`}>
+                {word}
+              </span>
+            )}{' '}
+          </>
+        ))}
+      </span>
+      {data.claim && <span class="home-hero__claim">{data.claim}</span>}
+    </h1>
 
-      <div class="home-hero__ring-wrap">
-        <BrushRing class="home-hero__ring" seed={11} entrance />
-        <div class="home-hero__inside">
-          <h1 class="home-hero__title" id="hero-title">
-            {data.kicker && <span class="sr-only">{data.kicker}: </span>}
-            {before}
-            {emphasis && <em>{emphasis}</em>}
-            {after}
-          </h1>
-          {data.claim && <p class="home-hero__claim">{data.claim}</p>}
-        </div>
+    {data.lede && <p class="home-hero__lede">{data.lede}</p>}
+
+    {pillars.length > 0 && (
+      <div class="home-hero__pillars">
+        {data.pillarsLabel && <p class="home-hero__pillars-label">{data.pillarsLabel}</p>}
+        <ul class="home-hero__pillar-list" role="list">
+          {pillars.map((pillar, i) => (
+            <li class="home-hero__pillar" style={`--i: ${i}`}>
+              <span class="home-hero__pillar-title">{pillar.title}</span>
+              <span class="home-hero__pillar-text">{pillar.text}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-    </div>
+    )}
 
-    <div class="home-hero__details">
+    <div class="home-hero__action">
       <HomeEventStatus
         placement="hero"
         secondaryLabel={data.secondaryLabel}
@@ -86,181 +109,108 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
 
     {photo && (
       <figure class="home-hero__figure">
-        <div class="home-hero__frame">
-          <CropPicture
-            src={photo}
-            class="home-hero__image"
-            breakpoint="56em"
-            narrow={{ ratio: 4 / 3, widths: [420, 700, 960], sizes: '100vw' }}
-            wide={{ ratio: 4 / 5, widths: [420, 640, 840], sizes: 'min(30rem, 36vw)' }}
-            loading="eager"
-            fetchpriority="high"
-            alt={data.imageAlt ?? ''}
-          />
+        <div class="home-hero__orbit">
+          <SeatCircle class="home-hero__ring" seatSize={3.2} entrance />
+          <div class="home-hero__plate">
+            <CropPicture
+              src={photo}
+              class="home-hero__image"
+              breakpoint="56em"
+              narrow={{ ratio: 1, widths: [360, 540, 720, 960], sizes: '78vw' }}
+              wide={{ ratio: 1, widths: [480, 720, 960], sizes: 'min(32rem, 34vw)' }}
+              loading="eager"
+              fetchpriority="high"
+              alt={data.imageAlt ?? ''}
+            />
+          </div>
         </div>
-        {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
+        <figcaption class="home-hero__caption">
+          {data.imageCaption && <span>{data.imageCaption}</span>}
+          <span class="home-hero__coords">{coordinates}</span>
+        </figcaption>
       </figure>
     )}
   </div>
-
-  {(data.lede || pillars.length > 0) && (
-    <div class="container home-hero__below">
-      {data.lede && <p class="home-hero__lede">{data.lede}</p>}
-
-      {pillars.length > 0 && (
-        <div class="home-hero__pillars">
-          {data.pillarsLabel && <p class="home-hero__pillars-label quote-voice">{data.pillarsLabel}</p>}
-          <ul class="home-hero__pillar-list" role="list">
-            {pillars.map((pillar) => (
-              <li class="home-hero__pillar">
-                <span class="home-hero__pillar-title">{pillar.title}</span>
-                <span class="home-hero__pillar-text">{pillar.text}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  )}
 </section>
 
 <style is:global>
   @layer sections {
     .home-hero {
-      padding-block: calc(var(--header-height) + var(--space-lg)) var(--space-xl);
+      position: relative;
+      padding-block: calc(var(--header-height) + var(--space-lg)) var(--space-2xl);
     }
 
     .home-hero__grid {
       display: grid;
       grid-template-areas:
-        'poster  figure'
-        'details figure';
-      grid-template-rows: auto 1fr;
+        'head    figure'
+        'lede    figure'
+        'pillars figure'
+        'action  figure';
+      grid-template-rows: auto auto auto 1fr;
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--space-lg) var(--space-xl);
+      column-gap: var(--space-xl);
       align-items: start;
     }
 
-    .home-hero__poster {
-      grid-area: poster;
+    .home-hero__heading {
+      grid-area: head;
+      margin: 0;
+      font-size: inherit;
+      letter-spacing: normal;
     }
 
     .home-hero__kicker {
-      justify-content: center;
-      max-inline-size: 36rem;
       margin-block-end: var(--space-md);
-      color: var(--text-primary);
-    }
-
-    /* The ring and its sentence. The wrapper is a size container, so the type
-       scales with the ring and can never run into the stroke. */
-    .home-hero__ring-wrap {
-      position: relative;
-      display: grid;
-      place-items: center;
-      inline-size: min(100%, 36rem);
-      aspect-ratio: 1;
-      container-type: inline-size;
-    }
-
-    .home-hero__ring {
-      position: absolute;
-      inset: 0;
-    }
-
-    .home-hero__inside {
-      position: relative;
-      display: grid;
-      gap: 3cqi;
-      justify-items: center;
-      inline-size: 68%;
-      text-align: center;
     }
 
     .home-hero__title {
-      margin: 0;
-      font-size: 9.4cqi;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.012em;
+      display: block;
+      max-inline-size: 14ch;
+      font-size: clamp(2.75rem, 1.2rem + 4.4vw, 5.5rem);
       color: var(--text-primary);
-      text-wrap: balance;
     }
 
-    .home-hero__title em {
-      font-style: normal;
-      color: var(--accent);
+    .home-hero__word {
+      display: inline-block;
     }
 
     .home-hero__claim {
-      margin: 0;
-      font-size: 3.6cqi;
+      display: block;
+      margin-block-start: var(--space-md);
+      font-family: var(--font-body);
+      font-size: var(--text-lg);
       font-weight: 500;
       color: var(--text-secondary);
       letter-spacing: 0.02em;
     }
 
-    .home-hero__details {
-      grid-area: details;
-      max-inline-size: 36rem;
-      padding-block-start: var(--space-md);
-      border-block-start: 2px solid var(--accent);
-    }
-
-    .home-hero__figure {
-      grid-area: figure;
-      /* Level with the top of the ring, below the kicker line. */
-      margin: calc(var(--space-md) + 1rem) 0 0;
-    }
-
-    .home-hero__frame {
-      overflow: clip;
-      aspect-ratio: 4 / 5;
-      border-radius: var(--radius);
-    }
-
-    .home-hero__frame picture {
-      display: block;
-      block-size: 100%;
-    }
-
-    .home-hero__image {
-      display: block;
-      inline-size: 100%;
-      block-size: 100%;
-      object-fit: cover;
-      object-position: 30% 50%;
-    }
-
-    .home-hero__below {
-      display: grid;
-      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
-      gap: var(--space-lg) var(--space-xl);
-      align-items: start;
-      padding-block-start: var(--space-xl);
-      margin-block-start: var(--space-xl);
-      /* A hairline across the content box only, not into the gutters. */
-      background: linear-gradient(var(--border-light), var(--border-light)) center top /
-        calc(100% - 2 * var(--container-gutter)) 1px no-repeat;
-    }
-
     .home-hero__lede {
+      grid-area: lede;
       max-inline-size: 46ch;
-      margin: 0;
+      margin-block: var(--space-lg) 0;
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
+    /* Four parts of an evening, on hairlines — the vocabulary, before the details. */
+    .home-hero__pillars {
+      grid-area: pillars;
+      margin-block-start: var(--space-lg);
+    }
+
     .home-hero__pillars-label {
       margin-block-end: var(--space-xs);
+      font-family: var(--font-quote);
       font-size: var(--text-xl);
+      font-style: italic;
       color: var(--accent);
     }
 
     .home-hero__pillar-list {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       padding: 0;
       margin: 0;
       list-style: none;
@@ -271,11 +221,11 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
       display: grid;
       gap: var(--space-3xs);
       align-content: start;
-      padding: var(--space-sm) var(--space-sm) var(--space-sm) 0;
-      border-block-end: 1px solid var(--border-light);
+      padding-block: var(--space-sm);
+      padding-inline-end: var(--space-sm);
     }
 
-    .home-hero__pillar:nth-child(even) {
+    .home-hero__pillar + .home-hero__pillar {
       padding-inline-start: var(--space-sm);
       border-inline-start: 1px solid var(--border-light);
     }
@@ -284,9 +234,8 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
       display: flex;
       gap: 0.5em;
       align-items: center;
-      font-size: var(--text-lg);
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-size: var(--text-body-compact);
+      font-weight: 600;
       color: var(--text-primary);
     }
 
@@ -305,70 +254,175 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
       color: var(--text-muted);
     }
 
-    /* Entrance: the sentence rises inside the turning ring. Under a second. */
+    .home-hero__action {
+      grid-area: action;
+      margin-block-start: var(--space-lg);
+    }
+
+    /* The photograph inside the circle, the seats around it. */
+    .home-hero__figure {
+      grid-area: figure;
+      align-self: start;
+      margin: var(--space-xl) 0 0;
+    }
+
+    .home-hero__orbit {
+      position: relative;
+      inline-size: min(82%, 32rem);
+      margin-inline: auto 8%;
+      aspect-ratio: 1;
+    }
+
+    /* Ring diameter = 200/240 of the box: at -20% it runs ~14% outside the plate. */
+    .home-hero__ring {
+      position: absolute;
+      inset: -20%;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) {
+        .home-hero__ring svg {
+          animation: ring-turn linear both;
+          animation-timeline: view();
+          animation-range: cover 30% cover 100%;
+        }
+      }
+    }
+
+    .home-hero__plate {
+      position: absolute;
+      inset: 0;
+      overflow: clip;
+      background: var(--bg-secondary);
+      border-radius: 50%;
+    }
+
+    .home-hero__image {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+    }
+
+    .home-hero__caption {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3xs) var(--space-sm);
+      justify-content: flex-end;
+      margin-block-start: calc(19% + var(--space-sm));
+      font-size: var(--text-caption);
+      color: var(--text-muted);
+      text-align: end;
+    }
+
+    .home-hero__coords {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.06em;
+    }
+
+    /* Entrance: the words rise, the circle opens. Starts at first paint, under a second. */
     @media (prefers-reduced-motion: no-preference) {
       .home-hero__kicker {
         animation: rise 520ms var(--ease-settle) both;
       }
 
-      .home-hero__inside {
-        animation: rise 700ms var(--ease-emphasised) 120ms both;
+      .home-hero__word {
+        animation: line-in 680ms var(--ease-emphasised) both;
+        animation-delay: calc(80ms + var(--i) * 45ms);
       }
 
-      .home-hero__details {
-        animation: rise 600ms var(--ease-settle) 320ms both;
+      .home-hero__lede,
+      .home-hero__pillars,
+      .home-hero__action {
+        animation: rise 600ms var(--ease-settle) both;
       }
 
-      .home-hero__figure {
-        animation: fade-in 800ms var(--ease-settle) 200ms both;
+      .home-hero__lede {
+        animation-delay: 380ms;
       }
 
-      .vt-arrival :is(.home-hero__kicker, .home-hero__inside, .home-hero__details, .home-hero__figure) {
+      .home-hero__pillars {
+        animation-delay: 460ms;
+      }
+
+      .home-hero__action {
+        animation-delay: 540ms;
+      }
+
+      .home-hero__plate {
+        animation: plate-open 1100ms var(--ease-emphasised) 120ms both;
+      }
+
+      .vt-arrival
+        :is(
+          .home-hero__kicker,
+          .home-hero__word,
+          .home-hero__lede,
+          .home-hero__pillars,
+          .home-hero__action,
+          .home-hero__plate
+        ) {
         animation: none;
       }
     }
 
-    /* Phone and tablet: its own order. The ring first, full width; then the date
-       and the action; then the photograph as a band; then the reading. */
+    /* Tablet: the pillars go two-up. */
+    @media (width <= 72em) {
+      .home-hero__pillar-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .home-hero__pillar:nth-child(3) {
+        padding-inline-start: 0;
+        border-inline-start: 0;
+      }
+
+      .home-hero__pillar:nth-child(n + 3) {
+        border-block-start: 1px solid var(--border-light);
+      }
+    }
+
+    /* Phone: its own composition. The sentence first, then the circle breaking
+       out past the right edge, then the reading. */
     @media (width <= 56em) {
       .home-hero {
-        padding-block: calc(var(--header-height) + var(--space-md)) var(--space-xl);
+        padding-block: calc(var(--header-height) + var(--space-lg)) var(--space-xl);
       }
 
       .home-hero__grid {
         grid-template-areas:
-          'poster'
-          'details'
-          'figure';
+          'head'
+          'figure'
+          'lede'
+          'pillars'
+          'action';
         grid-template-rows: none;
         grid-template-columns: minmax(0, 1fr);
       }
 
-      .home-hero__kicker,
-      .home-hero__ring-wrap {
-        margin-inline: auto;
+      .home-hero__title {
+        max-inline-size: 12ch;
       }
 
-      .home-hero__details {
-        max-inline-size: none;
-      }
-
+      /* The ring reaches 20% of the photo's width past it on every side. */
       .home-hero__figure {
-        margin: var(--space-md) calc(-1 * var(--container-gutter)) 0;
+        margin-block-start: calc(78vw * 0.2 + var(--space-md));
+        margin-inline-end: calc(-1 * var(--container-gutter) - 14vw);
       }
 
-      .home-hero__frame {
-        aspect-ratio: 4 / 3;
-        border-radius: 0;
+      .home-hero__orbit {
+        inline-size: 78vw;
+        margin-inline: auto 6vw;
       }
 
-      .home-hero__figure .caption {
-        padding-inline: var(--container-gutter);
+      .home-hero__caption {
+        justify-content: flex-start;
+        padding-inline-end: calc(var(--container-gutter) + 14vw);
+        margin-block-start: calc(78vw * 0.2 + var(--space-sm));
+        text-align: start;
       }
 
-      .home-hero__below {
-        grid-template-columns: minmax(0, 1fr);
-        padding-block-start: var(--space-lg);
+      .home-hero__lede {
         margin-block-start: var(--space-lg);
       }
     }
@@ -379,9 +433,24 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
       }
 
       .home-hero__pillar,
-      .home-hero__pillar:nth-child(even) {
+      .home-hero__pillar + .home-hero__pillar {
+        grid-template-columns: 6.5rem minmax(0, 1fr);
+        gap: var(--space-sm);
         padding-inline: 0;
         border-inline-start: 0;
+      }
+
+      .home-hero__pillar + .home-hero__pillar {
+        border-block-start: 1px solid var(--border-light);
+      }
+
+      .home-hero__action .actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .home-hero__action .btn {
+        inline-size: 100%;
       }
     }
   }
