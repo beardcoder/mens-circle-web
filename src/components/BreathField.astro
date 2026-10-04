@@ -6,9 +6,14 @@
  * rest, depth and length varying from breath to breath) while its wrapper turns
  * very slowly on its own period, so the outline never repeats and never restarts.
  *
+ * Scrolling gives it depth: each field lags behind the page at its own rate
+ * (`breath-parallax` on a scroll() timeline, on `translate` so it composes with
+ * the turn), the deep rust slowest, the amber nearly with the page. No script,
+ * no scroll listener; without timeline support the fields simply stay put.
+ *
  * Pure CSS on transform and opacity — elliptical radial gradients, no blur
  * filter — so it stays on the compositor. lib/breath.ts pauses it off screen;
- * under reduced motion it rests in a still, exhaled pose.
+ * under reduced motion it rests in a still, exhaled pose and does not move.
  */
 ---
 
@@ -100,18 +105,20 @@
       --sy: 0.07;
       --o0: 0.7;
       --o1: 1;
+      --px: -2vw;
+      --py: 34vh;
     }
 
     /* Deep rust, low and to the left: the ground the breath rests on. */
     .breath-field__drift--ember {
-      --x: 16%;
-      --y: 86%;
-      --w: 74vmax;
+      --x: 12%;
+      --y: 72%;
+      --w: 72vmax;
       --ratio: 0.66;
       --origin: 40% 58%;
       --turn: 112s;
       --rgb: 150 58 28;
-      --core: 0.34;
+      --core: 0.3;
       --dx: 2%;
       --dy: -3%;
       --sx: 0.06;
@@ -119,20 +126,22 @@
       --o0: 0.75;
       --o1: 1;
       --lag: -0.35s;
+      --px: 3vw;
+      --py: 52vh;
 
       animation-direction: reverse;
     }
 
     /* Amber, high and small: where the inhale lifts. */
     .breath-field__drift--amber {
-      --x: 40%;
-      --y: 22%;
-      --w: 56vmax;
+      --x: 32%;
+      --y: 18%;
+      --w: 54vmax;
       --ratio: 0.8;
       --origin: 60% 40%;
       --turn: 66s;
       --rgb: 232 163 92;
-      --core: 0.1;
+      --core: 0.13;
       --dx: 1%;
       --dy: -5%;
       --sx: 0.14;
@@ -140,25 +149,51 @@
       --o0: 0.5;
       --o1: 1;
       --lag: -0.7s;
+      --px: 1vw;
+      --py: 18vh;
     }
 
-    /* Phones: the photograph sits below the sentence, so the warm centre moves down. */
+    /* Depth while scrolling: over the first screen each field falls behind the
+       page by --py, so the hero's content glides over a slower ground. */
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: scroll()) {
+        .breath-field__drift {
+          animation:
+            breath-drift var(--turn) linear infinite,
+            breath-parallax linear both;
+          animation-timeline: auto, scroll(root block);
+          animation-range:
+            normal,
+            0 100vh;
+        }
+
+        .breath-field__drift--ember {
+          animation-direction: reverse, normal;
+        }
+      }
+    }
+
+    /* Phones: the hero is several screens tall, so the fields are placed by the
+       screen, not by the hero — amber behind the sentence, flame behind the
+       photograph, rust under the reading that follows. */
     @media (width <= 56em) {
       .breath-field__drift--flame {
-        --x: 78%;
-        --y: 62%;
-        --w: 82vmax;
+        --x: 82%;
+        --y: 72svh;
+        --w: 92vmax;
       }
 
       .breath-field__drift--ember {
-        --x: 10%;
-        --y: 96%;
+        --x: 8%;
+        --y: 128svh;
+        --w: 84vmax;
       }
 
       .breath-field__drift--amber {
-        --x: 30%;
-        --y: 18%;
-        --w: 52vmax;
+        --x: 24%;
+        --y: 30svh;
+        --w: 70vmax;
+        --core: 0.15;
       }
     }
   }
