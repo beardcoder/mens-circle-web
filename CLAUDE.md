@@ -100,12 +100,10 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
   `--accent-*`). Without it inputs and focus rings keep the page's colours. Surfaces
   keep the page's color-scheme, so their `light-dark()` grounds follow the mode.
 - The mark is the original brush-stroke logo (`src/icons/logo.svg`, header and footer).
-  `SeatCircle.astro` (hairline ring with seats) frames the round hero photo and counts
-  an event's seats (taken/open); keep clear space for its ring, which reaches 20% of
-  the photo's width past it. `BrushRing.astro` (a seeded, filter-roughened painted
-  ring) appears in the questions and around "Dabei sein."; text inside a ring sits in
-  a size container sized in `cqi`, never across the stroke. Each ring needs its own
-  `seed`. No decorative ring ever runs behind text.
+  `SeatCircle.astro` (hairline ring with seats) frames the round hero photo, sits in the
+  middle of the questions and counts an event's seats (taken/open); keep clear space for
+  its ring, which reaches 20% of the photo's width past it. No painted/brush rings, and
+  no decorative ring ever runs behind text.
 - Layout: asymmetric two-column grids per block; `.spine` only for quiet passages and
   sub-pages. Phones get their own order (sentence first, then the round photo breaking out to the
   right, then the reading and the date).
@@ -114,17 +112,22 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
   Lift reserving `min-block-size` once columns stack or an island swaps in.
 - Radius `--radius` (3px) on controls and panels; full circles only for seats and the
   round icon buttons. Capital lines keep `line-height` ≥ 1 for umlaut dots.
-- The header is solid at all times (nothing scrolls visibly beneath it).
+- The header is solid night at all times (nothing scrolls visibly beneath it); its
+  hairline fades in on scroll. No progress bar, no numbers in the navigation.
 - Motion: hero entrance (words, photo opening, seats), scroll-driven reveals
   (`[data-reveal]`, view() only, no JS, nothing hidden without timeline support), the
   hero ring's turn, statement settle, reading progress. The Ablauf has no dial: each
   step carries a small circle with its quarter filled.
-- Breath (`Breath.astro`, keyframes `breathe`): background rings and radial glows on a
-  calm 10 s cycle — 4 s in, 0.5 s hold, 5 s out, 0.5 s rest, sine-eased. Around the hero
-  photo, inside the questions' ring, as a light glow on the flame field (with a small
-  circle to breathe along) and inside "Dabei sein.". Rings never behind running text;
-  glows stay faint enough that every contrast holds. Still under reduced motion.
-  Only `opacity`/`transform`; all off under `prefers-reduced-motion`.
+- The hero breathes (`BreathField.astro`, keyframes `breath-swell` and `breath-drift`):
+  three soft warm fields (flame, deep rust, amber; eased radial gradients, no blur, a
+  still grain against banding) widen unevenly and shift a little on a 31 s phrase of
+  three breaths — in shorter than out, a short rest, depth varying — while each turns
+  slowly on its own period, so the form never repeats or restarts. The field starts
+  below the header (mask), so bar and hero stay one surface. `lib/breath.ts` pauses
+  every `[data-breath]` element off screen; under reduced motion it rests, still.
+- Smaller breath (`Breath.astro`, keyframes `breathe`, 10 s: 4 in, 0.5 hold, 5 out, 0.5
+  rest): rings inside the questions' circle, a light glow on the flame field and a small
+  circle to breathe along. Glows stay faint enough that every contrast holds.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Block styles live in the component (`<style is:global>` in `@layer sections`), since

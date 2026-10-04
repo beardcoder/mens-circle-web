@@ -1,9 +1,10 @@
-/** Client entry — wires up theme and header. Reveals are pure CSS (utilities/_motion.css). */
+/** Client entry — wires up theme, header and the breathing backgrounds. Reveals are pure CSS (utilities/_motion.css). */
 
+import { initBreath } from './breath';
 import { initSiteHeader } from './site-header';
 import { initTheme } from './theme';
 
-for (const init of [initTheme, initSiteHeader]) {
+for (const init of [initTheme, initSiteHeader, initBreath]) {
   try {
     init();
   } catch (error) {

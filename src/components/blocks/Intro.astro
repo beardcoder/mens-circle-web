@@ -1,6 +1,6 @@
 ---
 import Breath from '../Breath.astro';
-import BrushRing from '../BrushRing.astro';
+import SeatCircle from '../SeatCircle.astro';
 
 interface Props {
   data: {
@@ -43,7 +43,7 @@ const questions = (data.questions ?? []).slice(0, 4);
         </figcaption>
 
         <div class="home-circle__center" aria-hidden="true">
-          <BrushRing seed={23} class="home-circle__mark" />
+          <SeatCircle ember seatSize={5} class="home-circle__mark" />
           <Breath class="home-circle__breath" />
         </div>
 
