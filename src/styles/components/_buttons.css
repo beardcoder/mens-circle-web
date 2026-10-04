@@ -24,7 +24,7 @@
   padding-inline: var(--btn-padding-inline);
   font-family: var(--font-body);
   font-size: var(--btn-font-size);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.15;
   color: var(--btn-color);
   text-align: center;
@@ -122,10 +122,10 @@
 }
 
 /* On a dark or coloured surface the hover goes to the surface's text colour. */
-:is(.surface-bark, .surface-moss, .surface-rust, .section--ink, .section--signal) .btn {
+:is(.surface-bark, .surface-night, .surface-flame, .surface-rust, .section--ink, .section--signal) .btn {
   --btn-hover-bg: var(--text-primary);
   --btn-hover-border: var(--text-primary);
-  --btn-hover-color: var(--color-ink);
+  --btn-hover-color: var(--surface);
 }
 
 .btn--ghost {

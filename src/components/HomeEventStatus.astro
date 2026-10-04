@@ -20,122 +20,183 @@ const action = fallback
       href: '/event',
     }
   : primaryAction(state, placement === 'dates' ? '#newsletter' : '#termine');
+
+const next = !fallback && state.status === 'scheduled' ? state.next : null;
+// The flyer's date line: "Freitag, 23. Oktober 2026" → "Fr · 23. Oktober 2026".
+const [weekday = '', date = ''] = next?.dateLabel.split(/,\s*/) ?? [];
+const dateLine = weekday && date ? `${weekday.slice(0, 2)} · ${date}` : (next?.dateLabel ?? '');
+const meta = next ? [next.timeRange, next.place].filter(Boolean).join(' · ') : '';
+const fee = next?.costBasis || 'Auf Spendenbasis';
+const seatsLabel = next
+  ? state.isFull
+    ? `Ausgebucht – Warteliste möglich`
+    : `${next.availableSpots} von ${next.maxParticipants} Plätzen frei`
+  : '';
 ---
 
 <div class={`home-live-event home-live-event--${placement}${fallback ? ` home-live-event--pending` : ''}`}>
-  {placement === 'hero' ? (
-    <>
-      <p class="home-hero__status" data-status={status}>
-        {action.note}
+  {next ? (
+    <div class="poster-date">
+      <p class="poster-date__line">
+        <span class="sr-only">Nächster Termin: {next.dateLabel}</span>
+        <span class="date-line" aria-hidden="true">
+          {dateLine}
+        </span>
       </p>
-      <div class="actions">
-        <a
-          href={action.href}
-          class="btn btn--primary btn--large"
-          data-umami-event="cta-click"
-          data-umami-event-location="home-hero"
-          data-umami-event-state={status}
-        >
-          {action.label}
-        </a>
-        {secondaryLabel && secondaryLink && (
-          <a href={secondaryLink} class="text-link">
-            {secondaryLabel}
-          </a>
-        )}
-      </div>
-    </>
-  ) : (
-    <>
-      {/* Scheduled, the ticket below says it all; the sentence would repeat it. */}
-      {state.status !== 'scheduled' && (
-        <p class="home-dates__status" data-status={status}>
-          {action.note}
-        </p>
-      )}
-
-      {state.status === 'scheduled' && state.next && (
-        <div class="home-dates__ticket">
+      {meta && <p class="poster-date__meta">{meta}</p>}
+      {placement === 'hero' ? (
+        <p class="poster-date__facts">Ohne Vorerfahrung · {fee}</p>
+      ) : (
+        <div class="poster-date__seats">
           <SeatCircle
-            class="home-dates__seats"
-            seats={state.next.maxParticipants}
-            taken={state.next.maxParticipants - state.next.availableSpots}
+            class="poster-date__circle"
+            seats={next.maxParticipants}
+            taken={next.maxParticipants - next.availableSpots}
             ember
-            label={
-              state.isFull
-                ? `Alle ${state.next.maxParticipants} Plätze vergeben`
-                : `${state.next.availableSpots} von ${state.next.maxParticipants} Plätzen frei`
-            }
+            label={seatsLabel}
           />
-          <dl class="deflist home-dates__meta">
-            <div class="deflist__row">
-              <dt class="deflist__term">Wann</dt>
-              <dd class="deflist__desc">
-                {state.next.dateLabel}
-                {state.next.timeRange && <span class="deflist__note">{state.next.timeRange}</span>}
-              </dd>
-            </div>
-            <div class="deflist__row">
-              <dt class="deflist__term">Wo</dt>
-              <dd class="deflist__desc">
-                {state.next.place}
-                <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
-              </dd>
-            </div>
-            <div class="deflist__row">
-              <dt class="deflist__term">Plätze</dt>
-              <dd class="deflist__desc">
-                {state.isFull
-                  ? 'Ausgebucht – du kannst auf die Warteliste'
-                  : `${state.next.availableSpots} von ${state.next.maxParticipants} frei`}
-                <span class="deflist__note">
-                  {state.isFull
-                    ? 'Wird ein Platz frei, rückst du automatisch nach.'
-                    : 'Für die Anmeldung genügen Name und E-Mail-Adresse.'}
-                </span>
-              </dd>
-            </div>
-          </dl>
+          <p>
+            {seatsLabel}
+            <span>
+              {state.isFull
+                ? 'Wird ein Platz frei, rückst du automatisch nach.'
+                : 'Für die Anmeldung genügen Name und E-Mail-Adresse.'}
+            </span>
+          </p>
         </div>
       )}
-
-      <p class="home-dates__action">
-        <a
-          href={action.href}
-          class="btn btn--primary btn--large"
-          data-umami-event="cta-click"
-          data-umami-event-location="home-dates"
-          data-umami-event-state={state.status}
-        >
-          {action.label}
-        </a>
-      </p>
-    </>
+    </div>
+  ) : (
+    <p class="poster-date__status" data-status={status}>
+      {action.note}
+    </p>
   )}
+
+  <div class="actions poster-date__actions">
+    <a
+      href={action.href}
+      class="btn btn--primary btn--large"
+      data-umami-event="cta-click"
+      data-umami-event-location={placement === 'hero' ? 'home-hero' : 'home-dates'}
+      data-umami-event-state={status}
+    >
+      {action.label}
+    </a>
+    {secondaryLabel && secondaryLink && (
+      <a href={secondaryLink} class="text-link">
+        {secondaryLabel}
+      </a>
+    )}
+  </div>
 </div>
+
 <style is:global>
   @layer sections {
-    /* Reserve space while the native island loads — and ONLY while it loads. */
+    /* The date as the flyer sets it: bold orange capitals, then the plain facts. */
+    .poster-date__line {
+      margin: 0;
+    }
+
+    .poster-date__line .date-line {
+      font-size: clamp(1.375rem, 1rem + 1.5vw, 2.125rem);
+    }
+
+    .poster-date__meta {
+      margin: var(--space-2xs) 0 0;
+      font-size: var(--text-xl);
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--text-primary);
+    }
+
+    .poster-date__facts {
+      margin: var(--space-sm) 0 0;
+      font-size: var(--text-marker);
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-marker);
+    }
+
+    .poster-date__seats {
+      display: grid;
+      grid-template-columns: 5.5rem minmax(0, 1fr);
+      gap: var(--space-md);
+      align-items: center;
+      margin-block-start: var(--space-md);
+    }
+
+    .poster-date__seats p {
+      display: grid;
+      gap: var(--space-3xs);
+      margin: 0;
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .poster-date__seats p span {
+      font-size: var(--text-caption);
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .poster-date__status {
+      display: flex;
+      gap: 0.65em;
+      align-items: baseline;
+      max-inline-size: 44ch;
+      margin: 0;
+      font-size: var(--text-lg);
+      font-weight: 500;
+      line-height: var(--leading-normal);
+      color: var(--text-primary);
+    }
+
+    /* A failed read is marked by an open seat, never by a calm "nothing planned". */
+    .poster-date__status::before {
+      flex: none;
+      inline-size: 0.6rem;
+      block-size: 0.6rem;
+      content: '';
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      translate: 0 -0.05em;
+    }
+
+    .poster-date__status[data-status='none']::before {
+      background: var(--accent);
+    }
+
+    .poster-date__actions {
+      margin-block-start: var(--space-lg);
+    }
+
+    /* Reserve space while the island loads — and only while it loads. */
     .home-live-event--pending.home-live-event--hero {
-      min-block-size: 8rem;
+      min-block-size: 9rem;
     }
 
     .home-live-event--pending.home-live-event--dates {
-      min-block-size: 22rem;
-    }
-
-    /* No min height here: the sentence length varies by state. */
-    .home-live-event--pending .home-hero__status {
-      min-block-size: 4lh;
+      min-block-size: 15rem;
     }
 
     @media (width <= 30em) {
       .home-live-event--pending.home-live-event--hero {
-        min-block-size: 15rem;
+        min-block-size: 12rem;
       }
 
-      .home-live-event--pending.home-live-event--dates {
-        min-block-size: 30rem;
+      .poster-date__actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .poster-date__actions .btn {
+        inline-size: 100%;
+      }
+
+      .poster-date__actions .text-link {
+        justify-content: center;
       }
     }
   }

@@ -1,7 +1,7 @@
 ---
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
-import SeatCircle from './SeatCircle.astro';
+import { Icon } from 'astro-icon/components';
 import ThemeSwitch from './ThemeSwitch.astro';
 
 /** A wordmark, three destinations and one action; on phones a full panel. */
@@ -14,10 +14,10 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
 const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]/g, '')}` : null;
 ---
 
-<header class="header" id="header">
+<header class="header surface-night" id="header">
   <div class="container header__inner">
     <a href="/" class="header__logo logo" aria-label={`${site.siteName} – Startseite`}>
-      <SeatCircle class="logo__mark" ember />
+      <Icon name="logo" class="logo__mark" aria-hidden="true" />
       <span class="logo__text">
         <span class="logo__name">Männerkreis</span>
         <span class="logo__place">
@@ -122,25 +122,15 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       color: var(--text-primary);
     }
 
-    /* The bar's ground. Solid by default; with scroll timelines it fades in over
-       the first stretch of the page, so the hero opens without a lid on it. */
+    /* The bar's ground: the flyer's near-black, solid from the first pixel, so
+       nothing ever shows through it while the page scrolls underneath. */
     .header::before {
       position: absolute;
       inset: 0;
       z-index: -1;
       content: '';
-      background: var(--bg-primary);
+      background: var(--surface);
       border-block-end: 1px solid var(--border-light);
-    }
-
-    @supports (animation-timeline: scroll()) {
-      @media (prefers-reduced-motion: no-preference) {
-        .header::before {
-          animation: fade-in linear both;
-          animation-timeline: scroll(root block);
-          animation-range: 0 120px;
-        }
-      }
     }
 
     /* Reading progress: a hairline of the accent along the bar's lower edge. */
@@ -196,9 +186,12 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       border-radius: var(--radius);
     }
 
+    /* The original brush-stroke logo, in the flyer's orange. */
     .logo__mark {
       flex: none;
-      inline-size: 2.125rem;
+      inline-size: 2.25rem;
+      block-size: 2.25rem;
+      color: var(--color-flame);
       transition: rotate var(--duration-slow) var(--ease-settle);
     }
 
@@ -216,9 +209,9 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
 
     .logo__name {
       font-family: var(--font-display);
-      font-size: 1.3rem;
-      font-weight: 600;
-      letter-spacing: -0.015em;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
     }
 
     .logo__place {
@@ -228,7 +221,7 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       color: var(--text-muted);
       text-overflow: ellipsis;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.22em;
       white-space: nowrap;
     }
 
@@ -258,7 +251,7 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
     }
 
     .nav__index {
-      font-family: var(--font-display);
+      font-family: var(--font-quote);
       font-size: 0.8em;
       font-style: italic;
       color: var(--accent);
@@ -556,27 +549,6 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         overflow: hidden;
       }
 
-      /* With the panel open the bar sits on the same dark ground. */
-      body.nav-open .header {
-        --text-primary: var(--color-chalk);
-        --text-muted: var(--color-chalk-muted);
-        --accent: var(--color-ember);
-        --surface: light-dark(var(--color-ink), var(--color-night-soft));
-
-        color: var(--text-primary);
-      }
-
-      body.nav-open .header::before {
-        background: light-dark(var(--color-ink), var(--color-night-soft));
-        border-color: var(--color-night-rule);
-        opacity: 1;
-        animation: none;
-      }
-
-      body.nav-open .header .nav-toggle {
-        border-color: #4a3d34;
-      }
-
       body.nav-open .header .nav__cta {
         display: none;
       }
@@ -588,7 +560,8 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       }
 
       .logo__mark {
-        inline-size: 1.75rem;
+        inline-size: 1.875rem;
+        block-size: 1.875rem;
       }
 
       .logo__name {
@@ -604,7 +577,8 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         --btn-padding-inline: 0.8rem;
       }
 
-      .nav__cta::before {
+      .nav__cta::before,
+      .nav__cta::after {
         display: none;
       }
     }
