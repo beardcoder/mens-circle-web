@@ -1,38 +1,33 @@
-/** Scroll-to-top button — revealed by scroll position via `animation-timeline: scroll(root block)`, no JS. */
-
-@keyframes scroll-to-top-reveal {
-  0%,
-  10% {
-    pointer-events: none;
-    opacity: 0;
-  }
-
-  18%,
-  100% {
-    pointer-events: auto;
-    opacity: 1;
-  }
-}
+/** Scroll-to-top: a seat that appears once you have read a little, its ring closing
+    as the page does. Both driven by `animation-timeline: scroll(root block)`, no JS. */
 
 .scroll-to-top {
   position: fixed;
   inset-block-end: var(--space-sm);
   inset-inline-end: var(--space-sm);
   z-index: var(--z-sticky);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  inline-size: 44px;
-  block-size: 44px;
-  /* Ink on orange in both modes — the orange ground does not flip. */
-  color: var(--color-ink);
+  display: grid;
+  place-items: center;
+  inline-size: 48px;
+  block-size: 48px;
+  color: var(--text-primary);
   cursor: pointer;
-  background: var(--color-orange);
-  border: 2px solid var(--rule-strong);
-  border-radius: 0;
+  background: var(--bg-elevated);
+  border-radius: 50%;
+  box-shadow: 0 6px 18px -10px rgb(42 34 29 / 55%);
   transition:
     background-color var(--motion-quick),
-    border-color var(--motion-quick);
+    color var(--motion-quick);
+}
+
+/* The reading ring: a 2px conic stroke masked out of a disc. */
+.scroll-to-top::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: conic-gradient(var(--accent) var(--read), var(--rule) 0);
+  border-radius: 50%;
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
 }
 
 @supports (animation-timeline: scroll()) {
@@ -42,22 +37,27 @@
     animation: scroll-to-top-reveal linear both;
     animation-timeline: scroll(root block);
   }
+
+  .scroll-to-top::before {
+    animation: scroll-to-top-read linear both;
+    animation-timeline: scroll(root block);
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
   .scroll-to-top:hover {
-    color: var(--bg-primary);
-    background: var(--text-primary);
+    color: var(--on-accent);
+    background: var(--accent);
   }
 }
 
 .scroll-to-top:focus-visible {
-  outline: 3px solid var(--text-primary);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
-  box-shadow: 0 0 0 3px var(--color-orange);
 }
 
 .scroll-to-top svg {
+  position: relative;
   inline-size: 18px;
   block-size: 18px;
 }

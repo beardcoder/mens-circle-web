@@ -7,72 +7,70 @@ interface FaqItem {
 interface Props {
   data: {
     anchor?: string;
-    eyebrow?: string;
     title?: string;
     intro?: string;
     items?: FaqItem[];
   };
 }
 
-/** A keyboard-operable `<details>` list. */
+/** A keyboard-operable `<details>` list beside a title that stays in view. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'faq';
 const items = (data.items ?? []).filter((i) => i.question && i.answer);
 ---
 
-<section class="section section--ruled faq-section" id={anchor} aria-labelledby="faq-title">
-  <div class="container">
-    <div class="spine">
-      <p class="rail-heading">{data.eyebrow}</p>
-
-      <div class="spine__body">
-        {data.title && <h2 class="section-title" id="faq-title" data-reveal="up" set:html={data.title} />}
-        {data.intro && <p class="section-intro faq__intro" data-reveal="up" set:html={data.intro} />}
-
-        {items.length > 0 && (
-          <div class="faq__list" data-reveal-group="45">
-            {items.map((item) => (
-              <details class="accordion-item" data-reveal="up">
-                <summary
-                  class="accordion-item__trigger"
-                  data-umami-event="faq-expand"
-                  data-umami-event-question={item.question!.slice(0, 50)}
-                >
-                  <span class="accordion-item__question">{item.question}</span>
-                  <span class="accordion-item__icon" aria-hidden="true" />
-                </summary>
-                <div class="accordion-item__body">
-                  <div class="accordion-item__content" set:html={item.answer} />
-                </div>
-              </details>
-            ))}
-          </div>
-        )}
-      </div>
+<section class="section section--ruled faq-section" id={anchor} aria-labelledby={`${anchor}-title`}>
+  <div class="container bay">
+    <div class="faq__head">
+      {data.title && <h2 class="faq__title" id={`${anchor}-title`} set:html={data.title} />}
+      {data.intro && <p class="faq__intro" set:html={data.intro} />}
     </div>
+
+    {items.length > 0 && (
+      <div class="faq__list">
+        {items.map((item) => (
+          <details class="accordion-item">
+            <summary
+              class="accordion-item__trigger"
+              data-umami-event="faq-expand"
+              data-umami-event-question={item.question!.slice(0, 50)}
+            >
+              <span class="accordion-item__question">{item.question}</span>
+              <span class="accordion-item__icon" aria-hidden="true" />
+            </summary>
+            <div class="accordion-item__body">
+              <div class="accordion-item__content" set:html={item.answer} />
+            </div>
+          </details>
+        ))}
+      </div>
+    )}
   </div>
 </section>
 
 <style is:global>
   @layer components {
     .accordion-item {
-      border-block-end: 1px solid var(--border-light);
+      border-block-end: 1px solid var(--rule);
     }
 
     .accordion-item:first-child {
-      border-block-start: 1px solid var(--border-light);
+      border-block-start: 1px solid var(--rule);
     }
 
     .accordion-item__trigger {
       display: flex;
-      gap: var(--space-sm);
-      align-items: baseline;
+      gap: var(--space-md);
+      align-items: center;
       justify-content: space-between;
       inline-size: 100%;
       min-block-size: 44px;
-      padding-block: var(--space-sm);
-      font-size: var(--text-lg);
+      padding-block: var(--space-md);
+      font-family: var(--font-ui);
+      font-size: var(--step-1);
+      font-weight: 560;
+      line-height: var(--leading-snug);
       color: var(--text-primary);
       text-align: start;
       cursor: pointer;
@@ -85,31 +83,33 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
     }
 
     .accordion-item__question {
-      font-family: var(--font-display);
-      line-height: 1.3;
       text-wrap: pretty;
     }
 
     @media (hover: hover) and (pointer: fine) {
       .accordion-item__trigger:hover {
-        color: var(--accent-text);
+        color: var(--accent);
       }
     }
 
     .accordion-item__trigger:focus-visible {
-      outline: 2px solid var(--accent-primary);
+      outline: 2px solid var(--focus);
       outline-offset: 2px;
     }
 
-    /* A plus that becomes a minus. Two 1px rules, no ring, no fill. */
+    /* A seat with a plus; taken (filled, a minus) while the answer is open. */
     .accordion-item__icon {
       position: relative;
       flex: none;
-      inline-size: 0.75rem;
-      block-size: 0.75rem;
-      /* Sits on the first line's baseline area rather than floating mid-row. */
-      align-self: center;
-      color: var(--text-muted);
+      inline-size: 1.75rem;
+      block-size: 1.75rem;
+      color: var(--text-primary);
+      border: 1.5px solid currentcolor;
+      border-radius: 50%;
+      transition:
+        background-color var(--motion-standard),
+        border-color var(--motion-standard),
+        color var(--motion-standard);
     }
 
     .accordion-item__icon::before,
@@ -117,28 +117,26 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
       position: absolute;
       inset-block-start: 50%;
       inset-inline-start: 50%;
+      inline-size: 0.7rem;
+      block-size: 1.5px;
       content: '';
       background: currentcolor;
-      transform: translate(-50%, -50%);
-      transition: transform var(--motion-quick);
-    }
-
-    .accordion-item__icon::before {
-      inline-size: 0.75rem;
-      block-size: 1px;
+      translate: -50% -50%;
+      transition: rotate var(--motion-standard);
     }
 
     .accordion-item__icon::after {
-      inline-size: 1px;
-      block-size: 0.75rem;
+      rotate: 90deg;
+    }
+
+    [open] > .accordion-item__trigger .accordion-item__icon {
+      color: var(--on-accent);
+      background: var(--accent);
+      border-color: var(--accent);
     }
 
     [open] > .accordion-item__trigger .accordion-item__icon::after {
-      transform: translate(-50%, -50%) scaleY(0);
-    }
-
-    [open] > .accordion-item__trigger {
-      color: var(--text-primary);
+      rotate: 0deg;
     }
 
     .accordion-item::details-content {
@@ -157,14 +155,16 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
     }
 
     .accordion-item__body {
-      font-size: var(--text-section-body);
+      font-family: var(--font-body);
+      font-size: var(--step-0);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
     .accordion-item__content {
       max-inline-size: var(--measure);
-      padding-block-end: var(--space-sm);
+      padding-block-end: var(--space-md);
+      padding-inline-end: calc(1.75rem + var(--space-md));
     }
 
     .accordion-item__content p:last-child {
@@ -173,6 +173,7 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 
     @media (prefers-reduced-motion: reduce) {
       .accordion-item__trigger,
+      .accordion-item__icon,
       .accordion-item__icon::before,
       .accordion-item__icon::after,
       .accordion-item::details-content {
@@ -182,12 +183,34 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
   }
 
   @layer sections {
+    .faq__head {
+      grid-column: 1 / span 4;
+      position: sticky;
+      inset-block-start: calc(var(--header-clearance) + var(--space-md));
+    }
+
+    .faq__title {
+      margin: 0;
+      font-size: var(--step-3);
+    }
+
     .faq__intro {
-      margin-block-end: var(--rhythm-group);
+      margin-block: var(--space-sm) 0;
+      font-family: var(--font-body);
+      font-size: var(--step-0);
+      line-height: var(--leading-normal);
+      color: var(--text-secondary);
     }
 
     .faq__list {
-      margin-block-start: var(--rhythm-group);
+      grid-column: 6 / span 7;
+    }
+
+    @media (width <= 56em) {
+      .faq__head {
+        position: static;
+        margin-block-end: var(--space-md);
+      }
     }
   }
 </style>

@@ -8,7 +8,7 @@ interface Props {
   };
 }
 
-/** Prose with a marginal heading, on the spine. */
+/** Prose in the serif voice, with a short label that stays beside it while it is read. */
 
 const { data } = Astro.props;
 const slug = (data.title ?? '')
@@ -21,16 +21,16 @@ const anchor = data.anchor ?? slug;
 <section class="section section--ruled text-section" id={anchor || undefined}>
   <div class="container">
     <div class="spine">
-      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
+      {data.eyebrow ? <p class="rail-heading">{data.eyebrow}</p> : <span aria-hidden="true" />}
 
       <div class="spine__body">
         {data.title && (
-          <h2 class="text-section__title" data-reveal="up">
+          <h2 class="text-section__title" data-reveal>
             {data.title}
           </h2>
         )}
 
-        {data.content && <div class="prose" data-reveal="up" set:html={data.content} />}
+        {data.content && <div class="prose text-section__prose" set:html={data.content} />}
       </div>
     </div>
   </div>
@@ -39,14 +39,14 @@ const anchor = data.anchor ?? slug;
 <style is:global>
   @layer sections {
     .text-section__title {
-      margin-block-end: var(--rhythm-stack);
-      font-size: var(--text-3xl);
-      line-height: 1.15;
-      text-wrap: balance;
+      max-inline-size: 22ch;
+      margin-block-end: var(--space-md);
+      font-size: var(--step-3);
     }
 
-    .text-section .prose p {
-      font-size: var(--text-section-body-lg);
+    .text-section__prose p {
+      font-size: var(--step-1);
+      line-height: 1.6;
     }
   }
 </style>

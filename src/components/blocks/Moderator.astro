@@ -1,38 +1,88 @@
 ---
+import site from '@data/site.json';
+import CropPicture from '../CropPicture.astro';
+import { resolveAssetImage } from '../../lib/images';
+
 interface Props {
   data: {
     anchor?: string;
-    eyebrow?: string;
     name?: string;
+    role?: string;
+    quote?: string;
     bio?: string;
+    image?: string;
+    imageAlt?: string;
+    contactText?: string;
     linkLabel?: string;
     linkUrl?: string;
   };
 }
 
-/** The quietest section: no portrait, it is already in the hero. */
+/** Markus, in his own words: his role in one line, why the circle exists, how to reach him. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
+const photo = resolveAssetImage(data.image);
+const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]/g, '')}` : null;
 ---
 
 <section class="section section--sand home-person" id={anchor} aria-labelledby="person-title">
-  <div class="container">
-    <div class="bay">
-      <p class="marker bay__marker">{data.eyebrow}</p>
+  <div class="container bay">
+    {photo && (
+      <figure class="home-person__figure" data-motion="image">
+        <CropPicture
+          src={photo}
+          class="home-person__image"
+          breakpoint="56em"
+          narrow={{ ratio: 4 / 3, widths: [420, 700, 900], sizes: '100vw' }}
+          wide={{ ratio: 3 / 4, widths: [480, 720, 960], sizes: 'min(32vw, 30rem)' }}
+          loading="lazy"
+          alt={data.imageAlt ?? ''}
+        />
+      </figure>
+    )}
 
-      <div class="bay__beside-marker home-person__body">
-        {data.name && (
-          <h2 class="home-person__name" id="person-title">
-            {data.name}
-          </h2>
-        )}
+    <div class="home-person__body">
+      <h2 class="home-person__name" id="person-title" data-reveal>
+        {data.name}
+      </h2>
+      {data.role && <p class="home-person__role">{data.role}</p>}
 
-        {data.bio && <div class="home-person__bio prose" set:html={data.bio} />}
+      {data.quote && (
+        <blockquote class="home-person__quote" data-reveal>
+          <p>{data.quote}</p>
+        </blockquote>
+      )}
+
+      {data.bio && <div class="home-person__bio prose" set:html={data.bio} />}
+
+      <div class="home-person__foot">
+        {data.contactText && <p class="home-person__contact-text">{data.contactText}</p>}
+        <ul class="home-person__contact" role="list">
+          {site.contactEmail && (
+            <li>
+              <a
+                class="text-link"
+                href={`mailto:${site.contactEmail}`}
+                data-umami-event="contact-click"
+                data-umami-event-type="email"
+              >
+                {site.contactEmail}
+              </a>
+            </li>
+          )}
+          {phoneHref && (
+            <li>
+              <a class="text-link" href={phoneHref} data-umami-event="contact-click" data-umami-event-type="phone">
+                {site.contactPhone}
+              </a>
+            </li>
+          )}
+        </ul>
 
         {data.linkLabel && data.linkUrl && (
           <p class="home-person__link">
-            <a href={data.linkUrl} class="link">
+            <a href={data.linkUrl} class="btn btn--secondary" data-astro-prefetch="hover">
               {data.linkLabel}
             </a>
           </p>
@@ -44,23 +94,97 @@ const anchor = data.anchor ?? 'moderator';
 
 <style is:global>
   @layer sections {
+    .home-person__figure {
+      grid-column: 1 / span 5;
+      margin: 0;
+      overflow: hidden;
+      border-radius: var(--radius);
+    }
+
+    /* A detail of the same evening light: the hand on the rock, the arm, the bracelets. */
+    .home-person__image {
+      display: block;
+      inline-size: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      object-position: 0% 100%;
+      scale: 1.45;
+      transform-origin: 24% 92%;
+    }
+
     .home-person__body {
-      max-inline-size: 62ch;
+      grid-column: 7 / span 6;
     }
 
     .home-person__name {
-      margin-block-end: var(--space-sm);
-      font-size: var(--text-3xl);
-      line-height: 1.02;
+      margin: 0;
+      font-size: var(--step-4);
     }
 
-    .home-person__bio p {
-      font-size: var(--text-section-body);
+    .home-person__role {
+      max-inline-size: 30ch;
+      margin-block: var(--space-xs) 0;
+      font-family: var(--font-ui);
+      font-size: var(--step-1);
+      font-weight: 480;
+      line-height: var(--leading-snug);
+      color: var(--text-secondary);
+    }
+
+    /* His own sentence, at the size of a voice in the room. */
+    .home-person__quote {
+      position: relative;
+      margin: var(--rhythm-group) 0;
+      padding-inline-start: var(--space-md);
+      border-inline-start: 2px solid var(--accent);
+    }
+
+    .home-person__quote p {
+      max-inline-size: 26ch;
+      font-family: var(--font-body);
+      font-size: var(--step-3);
+      font-style: italic;
+      font-weight: 360;
+      line-height: 1.18;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+    }
+
+    .home-person__foot {
+      margin-block-start: var(--rhythm-group);
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid var(--rule);
+    }
+
+    .home-person__contact-text {
+      margin-block-end: var(--space-2xs);
+      font-family: var(--font-ui);
+      font-weight: 560;
+    }
+
+    .home-person__contact {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 var(--space-md);
+      padding: 0;
+      margin: 0;
     }
 
     .home-person__link {
       margin-block-start: var(--space-md);
-      font-size: var(--text-section-body);
+    }
+
+    @media (width <= 56em) {
+      .home-person__figure {
+        margin-block-end: var(--space-lg);
+      }
+
+      .home-person__image {
+        aspect-ratio: 4 / 3;
+        scale: 1.35;
+        transform-origin: 24% 95%;
+      }
     }
   }
 </style>

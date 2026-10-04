@@ -7,132 +7,139 @@ interface Agreement {
 interface Props {
   data: {
     anchor?: string;
-    eyebrow?: string;
     title?: string;
+    /** The one agreement everything rests on, set large. */
+    lead?: string;
     intro?: string;
     agreements?: Agreement[];
-    boundaryTitle?: string;
-    boundaryItems?: string[];
-    boundaryText?: string;
   };
 }
 
-/** The ground rules, and what the circle is not. */
+/** The agreements the circle makes at the start of each evening. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'rahmen';
 const agreements = data.agreements ?? [];
-const boundaryItems = data.boundaryItems ?? [];
 ---
 
-<section class="section section--ruled home-frame" id={anchor} aria-labelledby="rahmen-title">
-  <div class="container">
-    <div class="spine">
-      <p class="rail-heading">{data.eyebrow}</p>
-
-      <div class="spine__body" data-reveal-group="60">
-        {data.title && (
-          <h2 class="section-title" id="rahmen-title" data-reveal="up">
-            {data.title}
-          </h2>
-        )}
-        {data.intro && (
-          <p class="section-intro" data-reveal="up">
-            {data.intro}
-          </p>
-        )}
-
-        {agreements.length > 0 && (
-          <dl class="deflist home-frame__list" data-reveal-group="55">
-            {agreements.map((rule) => (
-              <div class="deflist__row" data-reveal="up">
-                <dt class="deflist__term home-frame__term">{rule.title}</dt>
-                <dd class="deflist__desc home-frame__text">{rule.text}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </div>
+<section class="section home-frame" id={anchor} aria-labelledby="rahmen-title">
+  <div class="container bay">
+    <div class="home-frame__head">
+      <h2 class="home-frame__title" id="rahmen-title">
+        {data.title}
+      </h2>
+      {data.lead && (
+        <p class="home-frame__lead" data-reveal>
+          {data.lead}
+        </p>
+      )}
+      {data.intro && <p class="home-frame__intro">{data.intro}</p>}
     </div>
 
-    {(boundaryItems.length > 0 || data.boundaryText) && (
-      <div class="spine home-frame__boundary-row">
-        <p class="rail-heading" aria-hidden="true">
-          Abgrenzung
-        </p>
-
-        <div class="home-frame__boundary spine__body" data-reveal="up">
-          {data.boundaryTitle && <h3 class="home-frame__boundary-title">{data.boundaryTitle}</h3>}
-
-          {boundaryItems.length > 0 && (
-            <ul class="home-frame__boundary-list" role="list">
-              {boundaryItems.map((item) => (
-                <li>{item}</li>
-              ))}
-            </ul>
-          )}
-
-          {data.boundaryText && <p class="home-frame__boundary-text">{data.boundaryText}</p>}
-        </div>
-      </div>
+    {agreements.length > 0 && (
+      <dl class="home-frame__list">
+        {agreements.map((rule) => (
+          <div class="home-frame__item" data-reveal>
+            <dt class="home-frame__term">{rule.title}</dt>
+            <dd class="home-frame__text">{rule.text}</dd>
+          </div>
+        ))}
+      </dl>
     )}
   </div>
 </section>
 
 <style is:global>
   @layer sections {
+    .home-frame__head {
+      grid-column: 1 / span 6;
+      position: sticky;
+      inset-block-start: calc(var(--header-clearance) + var(--space-md));
+    }
+
+    .home-frame__title {
+      margin: 0 0 var(--space-md);
+      font-family: var(--font-ui);
+      font-size: var(--step-1);
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      color: var(--accent);
+    }
+
+    .home-frame__lead {
+      max-inline-size: 14ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--step-4);
+      font-weight: 620;
+      font-variation-settings: 'wdth' 92;
+      line-height: 1;
+      letter-spacing: -0.018em;
+      color: var(--text-primary);
+      text-wrap: balance;
+    }
+
+    .home-frame__intro {
+      max-inline-size: 38ch;
+      margin-block: var(--space-md) 0;
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
     .home-frame__list {
-      margin-block-start: var(--rhythm-group);
+      grid-column: 8 / span 5;
+      margin: 0;
+    }
+
+    .home-frame__item {
+      display: grid;
+      grid-template-columns: 1.1rem minmax(0, 1fr);
+      column-gap: var(--space-sm);
+      padding-block: var(--space-md);
+      border-block-start: 1px solid var(--rule);
+    }
+
+    .home-frame__item:last-child {
+      border-block-end: 1px solid var(--rule);
+    }
+
+    /* A taken seat in front of each agreement: everyone in the room has made it. */
+    .home-frame__item::before {
+      grid-row: 1;
+      align-self: center;
+      inline-size: 0.7rem;
+      block-size: 0.7rem;
+      content: '';
+      background: var(--seat);
+      border-radius: 50%;
     }
 
     .home-frame__term {
-      font-size: var(--text-section-body);
+      grid-column: 2;
+      font-family: var(--font-display);
+      font-size: var(--step-2);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.015em;
       color: var(--text-primary);
     }
 
     .home-frame__text {
-      color: var(--text-secondary);
-    }
-
-    .home-frame__boundary-row {
-      margin-block-start: var(--rhythm-group);
-    }
-
-    /* Set apart by a change of ground and a single accent rule — the one place
-       on the page the warm accent is used for anything. */
-    /* A mode-flipping ground; the text inside flips too. */
-    .home-frame__boundary {
-      padding: var(--space-md);
-      background: var(--bg-secondary);
-      border-inline-start: 6px solid var(--color-orange);
-      border-radius: 0;
-    }
-
-    .home-frame__boundary-title {
-      margin-block-end: var(--space-xs);
-      font-size: var(--text-2xl);
-      line-height: 1.08;
-    }
-
-    .home-frame__boundary-list {
-      padding: 0;
-      margin: 0 0 var(--space-sm);
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
-      color: var(--text-primary);
-      list-style: none;
-    }
-
-    .home-frame__boundary-list li {
-      padding-block: 0.15rem;
-    }
-
-    .home-frame__boundary-text {
-      max-inline-size: var(--measure);
-      margin: 0;
-      font-size: var(--text-section-body);
+      grid-column: 2;
+      margin: var(--space-2xs) 0 0;
+      font-family: var(--font-body);
+      font-size: var(--step-0);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
+    }
+
+    @media (width <= 56em) {
+      .home-frame__head {
+        position: static;
+        margin-block-end: var(--space-lg);
+      }
     }
   }
 </style>

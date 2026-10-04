@@ -64,18 +64,18 @@ const faqItems = [
 const moreLinks = [
   {
     href: '/#ueber',
-    title: 'Worum es an so einem Abend geht',
-    text: 'Der Ablauf, der Rahmen und was der Kreis ausdrücklich nicht ist.',
+    title: 'Worum es an einem Abend geht',
+    text: 'Was im Kreis passiert, wie ein Abend abläuft und was dort gilt.',
   },
   {
     href: '/warum-ich-den-maennerkreis-leite',
-    title: 'Warum ich den Männerkreis leite',
+    title: 'Warum ich den Kreis leite',
     text: 'Ein persönlicher Text von Markus: was ihm wichtig ist und was du von ihm erwarten kannst.',
   },
   {
-    href: '/#stimmen',
-    title: 'Stimmen aus dem Kreis',
-    text: 'Was Männer nach einem Abend geschrieben haben.',
+    href: '/#faq',
+    title: 'Häufige Fragen',
+    text: 'Was Männer vor ihrem ersten Abend wissen wollen – auch zu Therapie und Coaching.',
   },
 ];
 
@@ -132,17 +132,14 @@ const socialDetails = next
   socialDetails={socialDetails}
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  <section class="page-opening">
-    <div class="container">
-      <div class="page-opening__inner">
-        <p class="marker marker--ruled page-opening__eyebrow">Männerkreis · Straubing / Niederbayern</p>
-
-        <h1 class="page-opening__title">Termine und Anmeldung</h1>
-
-        <p class="page-opening__lead">
-          Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend
-          dauert zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht
-          weißt, was dich erwartet, lies zuerst,{' '}
+  <section class="page-hero">
+    <div class="container page-hero__layout">
+      <div class="page-hero__content">
+        <p class="kicker">Männerkreis Straubing, Niederbayern</p>
+        <h1 class="page-hero__title display">Termine und Anmeldung</h1>
+        <p class="page-hero__lead">
+          Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality}. Ein Abend dauert zwei bis
+          drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Noch unsicher? Lies zuerst,{' '}
           <a class="link" href="/#ueber">
             worum es an so einem Abend geht
           </a>
@@ -160,19 +157,15 @@ const socialDetails = next
   {voice && (
     <section class="section section--ruled event-landing-voice" aria-label="Stimme aus dem Kreis">
       <div class="container">
-        <div class="spine">
-          <p class="rail-heading">Aus dem Kreis</p>
-
-          <figure class="event-landing-voice__figure spine__body" data-reveal="fade">
-            <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
-            {(voice.author || voice.role) && (
-              <figcaption class="event-landing-voice__author">
-                {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
-                {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
-              </figcaption>
-            )}
-          </figure>
-        </div>
+        <figure class="event-landing-voice__figure" data-reveal>
+          <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
+          {(voice.author || voice.role) && (
+            <figcaption class="event-landing-voice__author">
+              {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
+              {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
+            </figcaption>
+          )}
+        </figure>
       </div>
     </section>
   )}
@@ -180,77 +173,45 @@ const socialDetails = next
   <Faq
     data={{
       anchor: 'fragen-zum-termin',
-      eyebrow: 'Vor dem Termin',
       title: 'Fragen zu Termin und Anmeldung',
       items: faqItems,
     }}
   />
 
-  <section class="section section--ruled event-landing-more" aria-labelledby="mehr-title">
+  <section class="section section--sand event-landing-more" aria-labelledby="mehr-title">
     <div class="container">
-      <div class="spine">
-        <h2 class="rail-heading" id="mehr-title">
-          Weiterlesen
-        </h2>
+      <h2 class="event-landing-more__heading" id="mehr-title">
+        Bevor du dich anmeldest
+      </h2>
 
-        <ul class="event-landing-more__list spine__body--wide" role="list" data-reveal-group="55">
-          {moreLinks.map((link) => (
-            <li class="event-landing-more__item" data-reveal="up">
-              <a href={link.href}>
-                <span class="event-landing-more__title">{link.title}</span>
-                <span class="event-landing-more__text">{link.text}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ul class="doors" role="list">
+        {moreLinks.map((link) => (
+          <li data-reveal>
+            <a class="doors__link" href={link.href}>
+              <span class="doors__title">{link.title}</span>
+              <span class="doors__text">{link.text}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 </Layout>
 
 <style is:global>
   @layer sections {
-    .page-opening {
-      padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
-    }
-
-    .page-opening__inner {
-      max-inline-size: var(--measure-wide);
-    }
-
-    .page-opening__eyebrow {
-      margin-block-end: var(--space-sm);
-      color: var(--text-primary);
-    }
-
-    .page-opening__title {
-      margin-block-end: var(--space-sm);
-      font-size: var(--display-3);
-      line-height: 0.98;
-      letter-spacing: -0.015em;
-      text-wrap: balance;
-    }
-
-    .page-opening__lead {
-      max-inline-size: var(--measure);
-      margin: 0;
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
     .event-landing-voice__figure {
-      max-inline-size: var(--measure);
-      margin: 0;
+      max-inline-size: 40ch;
+      margin: 0 0 0 auto;
     }
 
-    /* Sized to be read, not to be admired: submitted quotes run to a dozen
-       lines, and a dozen lines of 2rem display serif is a wall. */
     .event-landing-voice__quote {
       margin: 0;
-      font-family: var(--font-display);
-      font-size: var(--text-lg);
-      line-height: var(--leading-normal);
+      font-family: var(--font-body);
+      font-size: var(--step-2);
+      font-style: italic;
+      font-weight: 380;
+      line-height: 1.32;
       color: var(--text-primary);
       text-wrap: pretty;
     }
@@ -261,64 +222,24 @@ const socialDetails = next
       gap: var(--space-3xs) var(--space-xs);
       align-items: baseline;
       margin-block-start: var(--space-sm);
+      font-family: var(--font-ui);
     }
 
     .event-landing-voice__name {
-      font-size: var(--text-caption);
+      font-size: 0.9375rem;
       font-style: normal;
       font-weight: 600;
       color: var(--text-primary);
     }
 
     .event-landing-voice__role {
-      font-size: var(--text-caption);
+      font-size: 0.9375rem;
       color: var(--text-muted);
     }
 
-    .event-landing-more__list {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .event-landing-more__item {
-      border-block-end: 1px solid var(--border-light);
-    }
-
-    .event-landing-more__item a {
-      display: grid;
-      gap: var(--space-3xs);
-      padding-block: var(--space-sm);
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .event-landing-more__item a:hover .event-landing-more__title,
-    .event-landing-more__item a:focus-visible .event-landing-more__title {
-      color: var(--accent-text);
-      text-decoration: underline;
-      text-underline-offset: 0.2em;
-    }
-
-    .event-landing-more__item a:focus-visible {
-      outline: 2px solid var(--accent-primary);
-      outline-offset: 2px;
-    }
-
-    .event-landing-more__title {
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      line-height: 1.25;
-      color: var(--text-primary);
-      transition: color var(--motion-quick);
-    }
-
-    .event-landing-more__text {
-      max-inline-size: var(--measure);
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
+    .event-landing-more__heading {
+      margin-block-end: var(--space-lg);
+      font-size: var(--step-3);
     }
   }
 </style>

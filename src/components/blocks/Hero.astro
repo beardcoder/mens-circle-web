@@ -1,18 +1,17 @@
 ---
+import Breath from '../Breath.astro';
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
 import HomeEventStatus from '../HomeEventStatus.astro';
-import Ring from '../Ring.astro';
+import SeatRing from '../SeatRing.astro';
 
-/** The home page opening: headline, ring and photograph sharing one overlapping grid. */
+/** The home page opening: the sentence, the circle with one seat kept free, and the way in. */
 
 interface Props {
   data: {
     kicker?: string;
-    /** Poster lines, e.g. ["MÄNNER.", "IM KREIS."] — one block element each. */
+    /** The central sentence, one block element per line. */
     displayLines?: string[];
-    /** The invitation, set below the poster lines and inside the same h1. */
-    lede?: string;
     body?: string;
     secondaryLabel?: string;
     secondaryLink?: string;
@@ -25,69 +24,60 @@ interface Props {
 const { data } = Astro.props;
 const photo = resolveAssetImage(data.image);
 const lines = data.displayLines ?? [];
+// Seat 7 sits low on the left, on the side of the text: the one that is free.
+const OPEN_SEAT = 7;
 ---
 
 <section class="home-hero section--clip">
-  <Ring place="hero" />
+  <div class="container home-hero__grid">
+    <div class="home-hero__type">
+      <h1 class="home-hero__heading">
+        {data.kicker && <span class="kicker home-hero__kicker">{data.kicker}</span>}
+        <span class="display home-hero__display">
+          {lines.map((line) => (
+            <span class="display__line">{line}</span>
+          ))}
+        </span>
+      </h1>
 
-  <div class="container">
-    <div class="home-hero__grid">
-      <div class="home-hero__type">
-        {data.kicker && <p class="marker marker--ruled home-hero__kicker">{data.kicker}</p>}
+      {data.body && <p class="home-hero__lede">{data.body}</p>}
+    </div>
 
-        <h1 class="home-hero__heading">
-          <span class="display display--xl home-hero__display">
-            {lines.map((line) => (
-              <span class="display__line">{line}</span>
-            ))}
-          </span>
-          {data.lede && <span class="home-hero__lede">{data.lede}</span>}
-        </h1>
-      </div>
-
-      {data.body && <p class="home-hero__body">{data.body}</p>}
-
-      <div class="home-hero__action">
-        <HomeEventStatus
-          placement="hero"
-          secondaryLabel={data.secondaryLabel}
-          secondaryLink={data.secondaryLink}
-          server:defer
-        >
-          <HomeEventStatus
-            placement="hero"
-            secondaryLabel={data.secondaryLabel}
-            secondaryLink={data.secondaryLink}
-            fallback
-            slot="fallback"
-          />
-        </HomeEventStatus>
-      </div>
-
+    <figure class="home-hero__kreis kreis">
+      <Breath class="kreis__breath" />
       {photo && (
-        <figure class="home-hero__figure">
+        <div class="kreis__window">
           <CropPicture
             src={photo}
-            class="home-hero__image"
+            class="kreis__image"
             breakpoint="56em"
-            narrow={{
-              ratio: 3 / 2,
-              widths: [420, 700, 900],
-              sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
-            }}
-            wide={{
-              ratio: 3 / 4,
-              widths: [400, 560, 768],
-              sizes:
-                'calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem) - 2 * clamp(1rem, 0.6rem + 1.6vw, 2rem)) / 3)',
-            }}
+            narrow={{ ratio: 1, widths: [400, 640, 900], sizes: '80vw' }}
+            wide={{ ratio: 1, widths: [440, 640, 880], sizes: 'min(38vw, 34rem)' }}
             loading="eager"
             fetchpriority="high"
             alt={data.imageAlt ?? ''}
           />
-          {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
-        </figure>
+        </div>
       )}
+      <SeatRing class="kreis__ring" seats={12} open={[OPEN_SEAT]} seatSize={4.8} enter turn />
+      {data.imageCaption && <figcaption class="caption kreis__caption">{data.imageCaption}</figcaption>}
+    </figure>
+
+    <div class="home-hero__action">
+      <HomeEventStatus
+        placement="hero"
+        secondaryLabel={data.secondaryLabel}
+        secondaryLink={data.secondaryLink}
+        server:defer
+      >
+        <HomeEventStatus
+          placement="hero"
+          secondaryLabel={data.secondaryLabel}
+          secondaryLink={data.secondaryLink}
+          fallback
+          slot="fallback"
+        />
+      </HomeEventStatus>
     </div>
   </div>
 </section>
@@ -96,28 +86,23 @@ const lines = data.displayLines ?? [];
   @layer sections {
     .home-hero {
       position: relative;
-      padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-xl);
+      padding-block: calc(var(--header-clearance) + var(--space-lg)) var(--space-xl);
       isolation: isolate;
     }
 
-    /* The composition grid. */
     .home-hero__grid {
-      position: relative;
-      z-index: 1;
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: auto 1fr;
       column-gap: var(--col-gap);
       align-items: start;
     }
 
     .home-hero__type {
+      position: relative;
+      z-index: 1;
       grid-row: 1;
-      grid-column: 1 / span 8;
-    }
-
-    .home-hero__kicker {
-      margin-block-end: var(--space-sm);
-      color: var(--text-primary);
+      grid-column: 1 / span 7;
     }
 
     .home-hero__heading {
@@ -126,98 +111,130 @@ const lines = data.displayLines ?? [];
       letter-spacing: normal;
     }
 
-    .home-hero__display {
-      display: block;
-      color: var(--text-primary);
-    }
-
-    /* The invitation. Set in the reading face at a size that clearly belongs to
-       the reading register — the jump from 180px to 28px is the hierarchy. */
-    .home-hero__lede {
-      display: block;
-      max-inline-size: 26ch;
-      margin-block-start: var(--space-sm);
-      font-family: var(--font-body);
-      font-size: var(--text-2xl);
-      font-weight: 400;
-      line-height: 1.25;
-      color: var(--text-primary);
-      text-transform: none;
-      letter-spacing: normal;
-    }
-
-    .home-hero__body {
-      grid-row: 2;
-      grid-column: 1 / span 5;
-      max-inline-size: 44ch;
-      margin-block: var(--space-md) 0;
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
+    .home-hero__kicker {
+      margin-block-end: var(--space-md);
       color: var(--text-secondary);
     }
 
-    /* Under the paragraph, spanning half the grid so the button never has to wrap or collide with the plate beside it. */
-    .home-hero__action {
-      grid-row: 3;
-      grid-column: 1 / span 6;
-      padding-block-start: var(--space-sm);
-      margin-block-start: var(--space-md);
-      border-block-start: 3px solid var(--rule-strong);
-    }
-
-    /* The one line on the page that states the scheduling state: plain text, not a badge. */
-    .home-hero__status {
-      margin-block-end: var(--space-sm);
-      max-inline-size: 46ch;
-      font-family: var(--font-body);
-      font-size: var(--text-section-body);
-      font-weight: 600;
-      line-height: var(--leading-normal);
-      color: var(--text-primary);
-    }
-
-    /* A failed read is marked, not tinted: orange text at this size measures 3.52:1 on paper and would fail. */
-    .home-hero__status[data-status='unavailable'] {
-      display: flex;
-      gap: 0.6em;
-      align-items: baseline;
-      color: var(--text-primary);
-    }
-
-    .home-hero__status[data-status='unavailable']::before {
-      flex: none;
-      inline-size: 0.7em;
-      block-size: 0.7em;
-      content: '';
-      background: var(--color-orange);
-    }
-
-    /* The plate. Pulled up into the headline's row so the ring, the type and
-       the photograph genuinely overlap instead of sitting in three tidy boxes. */
-    /* The plate. */
-    /* Picture sizes mirrors the container gutter and four of twelve columns:
-       (content width - 2 column gaps) / 3. Keep both in sync with the tokens. */
-    .home-hero__figure {
-      grid-row: 1 / span 3;
-      grid-column: 9 / -1;
-      align-self: center;
-      margin: 0;
-    }
-
-    .home-hero__image {
+    .home-hero__display {
       display: block;
-      inline-size: 100%;
-      /* The variants keep the source's ratio; `cover` crops them to this box. */
-      aspect-ratio: 3 / 4;
-      object-fit: cover;
+      font-size: clamp(2.6rem, 1.2rem + 5.2vw, 6.75rem);
+      color: var(--text-primary);
+    }
+
+    /* The serif speaks after the sentence: what actually happens on such an evening. */
+    .home-hero__lede {
+      max-inline-size: 40ch;
+      margin-block: var(--space-lg) 0;
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      font-weight: 380;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .home-hero__action {
+      position: relative;
+      z-index: 1;
+      grid-row: 2;
+      grid-column: 1 / span 7;
+      align-self: end;
+      margin-block-start: var(--space-lg);
+    }
+
+    /* The status line: the circle's open seat, in words. */
+    .home-hero__status {
+      display: flex;
+      gap: 0.65em;
+      align-items: baseline;
+      max-inline-size: 46ch;
+      margin-block-end: var(--space-sm);
+      font-family: var(--font-ui);
+      font-size: 1.0625rem;
+      font-weight: 560;
+      line-height: var(--leading-snug);
+      color: var(--text-primary);
+    }
+
+    .home-hero__status::before {
+      flex: none;
+      inline-size: 0.6em;
+      block-size: 0.6em;
+      content: '';
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      translate: 0 -0.05em;
+    }
+
+    .home-hero__status[data-status='none']::before,
+    .home-hero__status[data-status='loading']::before {
+      border-color: var(--text-muted);
+    }
+
+    /* A failed read is marked, never dressed as "nothing planned". */
+    .home-hero__status[data-status='unavailable']::before {
+      background: var(--color-error);
+      border-color: var(--color-error);
       border-radius: 0;
     }
 
-    .home-hero__figure .caption {
-      max-inline-size: 34ch;
+    /* The circle: photograph in a round window, the breath around it, the seats around that. */
+    .kreis {
+      position: relative;
+      container-type: inline-size;
+      aspect-ratio: 1;
+      margin: 0;
     }
 
-    /* Phone: recomposed, not stacked. */
+    .home-hero__kreis {
+      grid-row: 1 / span 2;
+      grid-column: 8 / -1;
+      align-self: center;
+      inline-size: calc(100% + var(--container-gutter) * 0.6);
+    }
+
+    .kreis .kreis__breath {
+      --breath-x: 0.5;
+      --breath-y: 0.5;
+      --breath-radius: 47cqi;
+      --breath-fade: 0;
+
+      inset: -18%;
+      overflow: visible;
+    }
+
+    .kreis__window {
+      position: absolute;
+      inset: 13%;
+      overflow: hidden;
+      background: var(--bg-secondary);
+      border-radius: 50%;
+    }
+
+    /* Zoomed a little towards the figure, who sits at the left of the frame. */
+    .kreis__image {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      scale: 1.12;
+      transform-origin: 30% 30%;
+    }
+
+    .kreis__ring {
+      position: absolute;
+      inset: 0;
+    }
+
+    .kreis__caption {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline-start: 13%;
+      margin: 0;
+    }
+
+    /* Phones and tablets: a composition of its own. The sentence first, then the
+       circle breaking out of the column to the right, then the way in. */
     @media (width <= 56em) {
       .home-hero {
         padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
@@ -225,41 +242,29 @@ const lines = data.displayLines ?? [];
 
       .home-hero__grid {
         grid-template-columns: minmax(0, 1fr);
-        row-gap: var(--rhythm-group);
+        grid-template-rows: none;
       }
 
       .home-hero__type,
-      .home-hero__body,
-      .home-hero__action,
-      .home-hero__figure {
+      .home-hero__kreis,
+      .home-hero__action {
         grid-row: auto;
-        grid-column: 1 / -1;
-        align-self: auto;
+        grid-column: 1;
+      }
+
+      .home-hero__kreis {
+        justify-self: end;
+        inline-size: min(88vw, 30rem);
+        margin-block: var(--space-md) calc(var(--space-lg) + 1.5rem);
+        margin-inline-end: calc(var(--container-gutter) * -1 - 6vw);
       }
 
       .home-hero__lede {
-        max-inline-size: none;
-        font-size: var(--text-xl);
-      }
-
-      .home-hero__body {
-        max-inline-size: none;
-        margin-block-start: 0;
+        margin-block-start: var(--space-md);
       }
 
       .home-hero__action {
         margin-block-start: 0;
-      }
-
-      /* The row gap now carries the separation on its own. */
-      .home-hero__figure {
-        margin-block-start: 0;
-      }
-
-      /* The subject sits high in the frame; the band keeps the head and torso. */
-      .home-hero__image {
-        aspect-ratio: 3 / 2;
-        object-position: top;
       }
     }
 
@@ -274,7 +279,7 @@ const lines = data.displayLines ?? [];
       }
 
       .home-hero__action .text-link {
-        justify-content: center;
+        align-self: center;
       }
     }
   }

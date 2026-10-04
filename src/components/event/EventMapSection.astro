@@ -168,7 +168,9 @@ const address =
   @layer sections {
     .event-map__address {
       margin-block-end: var(--space-sm);
-      font-size: var(--text-section-body-lg);
+      font-family: var(--font-ui);
+      font-size: var(--step-2);
+      font-weight: 560;
       line-height: var(--leading-normal);
       color: var(--text-primary);
     }
@@ -178,7 +180,7 @@ const address =
       aspect-ratio: 16 / 9;
       overflow: clip;
       border: 1px solid var(--border-medium);
-      border-radius: 0;
+      border-radius: var(--radius);
     }
 
     .event-map__frame > * {
@@ -312,8 +314,8 @@ const address =
     color: var(--text-primary);
     font-family: var(--font-body);
     background: var(--bg-elevated);
-    border: 2px solid var(--rule-strong);
-    border-radius: 0;
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius);
   }
 
   .event-map .leaflet-popup-content {
@@ -325,9 +327,9 @@ const address =
   .event-map .leaflet-popup-content strong {
     display: inline-block;
     margin-block-end: var(--space-3xs);
-    font-family: var(--font-display);
+    font-family: var(--font-ui);
     font-size: var(--text-section-body);
-    font-weight: 400;
+    font-weight: 600;
   }
 
   .event-map .leaflet-popup-tip {

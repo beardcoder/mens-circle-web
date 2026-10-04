@@ -19,10 +19,9 @@ const next =
       summarizeNextEvent((await (await import('../../lib/server/events')).fetchNextEventState()).event);
 
 const facts = [
-  { label: 'Wo', value: next?.place || site.geo.locality, sub: 'Die genaue Adresse bekommst du mit der Anmeldung' },
-  // Non-breaking space: the only acceptable break is before "Wochen" — between
-  // the 2 and the 4 it reads as a stray hyphen.
-  { label: 'Wie oft', value: 'Alle\u00A02–4 Wochen', sub: 'Ein fester Rhythmus, keine Mitgliedschaft' },
+  { label: 'Wo', value: next?.place || site.geo.locality, sub: 'Die genaue Adresse kommt mit der Anmeldung' },
+  // Non-breaking space: the only acceptable break is before "Wochen".
+  { label: 'Wie oft', value: 'Alle 2–4 Wochen', sub: 'Ein fester Rhythmus, keine Mitgliedschaft' },
   {
     label: 'Dauer',
     value: '2–3 Stunden',
@@ -42,9 +41,9 @@ const anchor = data.anchor ?? 'praktisches';
           Gut zu wissen
         </h2>
 
-        <dl class="deflist spine__body--wide" data-reveal-group="55">
+        <dl class="deflist spine__body--wide">
           {facts.map((fact) => (
-            <div class="deflist__row" data-reveal="up">
+            <div class="deflist__row" data-reveal>
               <dt class="deflist__term">{fact.label}</dt>
               <dd class="deflist__desc">
                 {fact.value}
@@ -57,10 +56,10 @@ const anchor = data.anchor ?? 'praktisches';
     </div>
   </section>
 ) : (
-  <section class="section section--ink home-facts" id={anchor} aria-labelledby="praktisches-title">
+  <section class="home-facts" id={anchor} aria-labelledby="praktisches-title">
     <div class="container">
-      <h2 class="marker home-facts__title" id="praktisches-title">
-        {data.eyebrow ?? 'Praktisches'}
+      <h2 class="sr-only" id="praktisches-title">
+        {data.eyebrow ?? 'Das Wichtigste vorab'}
       </h2>
 
       <dl class="home-facts__row">
@@ -78,112 +77,53 @@ const anchor = data.anchor ?? 'praktisches';
 
 <style is:global>
   @layer sections {
+    /* The hero's footing: four facts on one rule, read in a single glance. */
     .home-facts {
-      padding-block: var(--rhythm-section);
-    }
-
-    .home-facts__title {
-      margin-block-end: var(--rhythm-group);
-      color: var(--color-orange);
+      padding-block-end: var(--space-md);
     }
 
     .home-facts__row {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0;
+      gap: var(--space-md) var(--col-gap);
       margin: 0;
-      border-block-start: 1px solid var(--border-on-dark);
-    }
-
-    /* Levels the columns; lifted once they stack. */
-    .home-facts__item {
-      min-block-size: 11rem;
-      padding-block: var(--space-md) var(--space-sm);
-      padding-inline-end: var(--space-md);
-    }
-
-    /* Vertical rules between the four, none at the outer edges. */
-    .home-facts__item + .home-facts__item {
-      padding-inline-start: var(--space-md);
-      border-inline-start: 1px solid var(--border-on-dark);
+      padding-block: var(--space-md) 0;
+      border-block-start: 1px solid var(--rule-strong);
     }
 
     .home-facts__label {
-      font-family: var(--font-display);
-      font-size: var(--text-marker);
-      font-weight: 600;
-      color: var(--color-chalk-muted);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-marker);
+      font-family: var(--font-ui);
+      font-size: 0.875rem;
+      font-weight: 560;
+      color: var(--text-muted);
     }
 
     .home-facts__value {
-      margin: var(--space-2xs) 0 0;
+      margin: var(--space-3xs) 0 0;
       font-family: var(--font-display);
-      font-size: clamp(1.75rem, 1.1rem + 2.4vw, 3rem);
-      font-weight: 800;
-      line-height: 0.95;
-      color: var(--color-chalk);
-      text-transform: uppercase;
-      letter-spacing: -0.01em;
+      font-size: var(--step-2);
+      font-weight: 600;
+      font-variation-settings: 'wdth' 90;
+      line-height: 1.05;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
       text-wrap: balance;
     }
 
     .home-facts__note {
-      margin: var(--space-xs) 0 0;
-      font-size: var(--text-caption);
+      max-inline-size: 26ch;
+      margin: var(--space-2xs) 0 0;
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
       line-height: var(--leading-normal);
-      color: var(--color-chalk-muted);
+      color: var(--text-muted);
       text-wrap: pretty;
     }
 
-    /* Two-up, then stacked. */
-    @media (width <= 62em) {
+    @media (width <= 56em) {
       .home-facts__row {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .home-facts__item {
-        min-block-size: 0;
-        padding-block: var(--rhythm-item);
-      }
-
-      .home-facts__item:nth-child(odd) {
-        padding-inline-start: 0;
-        border-inline-start: none;
-      }
-
-      .home-facts__item:nth-child(n + 3) {
-        border-block-start: 1px solid var(--border-on-dark);
-      }
-
-      /* The list ends on an item's own bottom padding; without this the band
-         carried 48px of air above its title and 68px below its last note. */
-      .home-facts__item:nth-last-child(-n + 2) {
-        padding-block-end: 0;
-      }
-    }
-
-    @media (width <= 36em) {
-      .home-facts__row {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .home-facts__item {
-        padding-inline: 0;
-        border-inline-start: none;
-      }
-
-      /* Stacked there is one item per row, so only the true last one ends the
-         band — the two-up rule above would strip the second-to-last as well. */
-      .home-facts__item:nth-last-child(2) {
-        padding-block-end: var(--rhythm-item);
-      }
-
-      .home-facts__item + .home-facts__item {
-        padding-inline-start: 0;
-        border-block-start: 1px solid var(--border-on-dark);
-        border-inline-start: none;
+        row-gap: var(--space-lg);
       }
     }
   }

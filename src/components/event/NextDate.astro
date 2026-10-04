@@ -2,8 +2,9 @@
 import site from '@data/site.json';
 import { primaryAction, type DateStatus } from '@lib/event-status';
 import NewsletterForm from '../forms/NewsletterForm.astro';
+import SeatRing from '../SeatRing.astro';
 
-/** The one block on /event that depends on live data. */
+/** The one block on /event that depends on live data: the date, its real free seats, the way in. */
 
 interface Props {
   state: DateStatus;
@@ -13,130 +14,170 @@ const { state } = Astro.props;
 const { next } = state;
 const action = primaryAction(state, '#benachrichtigung');
 const whatsapp = site.whatsappCommunityLink;
+const free = next ? (state.isFull ? 0 : next.availableSpots) : 0;
 ---
 
-<section class="section section--ink event-next" id="naechster-termin" aria-labelledby="naechster-termin-title">
-  <div class="container">
-    <div class="spine">
-      <p class="rail-heading event-next__rail">Nächster Termin</p>
-
-      <div class="spine__body">
-        {next ? (
-          <>
-            <h2 class="display display--sm event-next__title" id="naechster-termin-title">
-              <time datetime={next.slug}>{next.dateLabel}</time>
-            </h2>
-
-            <dl class="deflist event-next__meta">
-              {next.timeRange && (
-                <div class="deflist__row">
-                  <dt class="deflist__term">Uhrzeit</dt>
-                  <dd class="deflist__desc">{next.timeRange}</dd>
-                </div>
-              )}
-              <div class="deflist__row">
-                <dt class="deflist__term">Ort</dt>
-                <dd class="deflist__desc">
-                  {next.place}
-                  <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
-                </dd>
-              </div>
-              <div class="deflist__row">
-                <dt class="deflist__term">Plätze</dt>
-                <dd class="deflist__desc">
-                  {state.isFull
-                    ? 'Ausgebucht – du kannst auf die Warteliste'
-                    : `${next.availableSpots} von ${next.maxParticipants} frei`}
-                  <span class="deflist__note">
-                    {state.isFull
-                      ? 'Wird ein Platz frei, rückst du automatisch nach.'
-                      : 'Für die Anmeldung genügen Vor- und Nachname und eine E-Mail-Adresse.'}
-                  </span>
-                </dd>
-              </div>
-              {next.costBasis && (
-                <div class="deflist__row">
-                  <dt class="deflist__term">Beitrag</dt>
-                  <dd class="deflist__desc">{next.costBasis}</dd>
-                </div>
-              )}
-            </dl>
-
-            <p class="event-next__action">
-              <a
-                href={action.href}
-                class="btn btn--primary btn--large"
-                data-umami-event="cta-click"
-                data-umami-event-location="event-landing"
-                data-umami-event-state={state.status}
-              >
-                {action.label}
-              </a>
-            </p>
-          </>
-        ) : (
-          <>
-            <h2 class="display display--sm event-next__title" id="naechster-termin-title">
-              {state.status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
-            </h2>
-
-            <p class="event-next__text" data-status={state.status}>
-              {state.status === 'unavailable'
-                ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
-                : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich unten ein, dann bekommst du eine kurze Nachricht.'}
-            </p>
-          </>
-        )}
-      </div>
-    </div>
-
-    <div class="spine event-next__notify" id="benachrichtigung">
-      <p class="rail-heading">Benachrichtigung</p>
-
-      <div class="spine__body">
-        <h3 class="event-next__sub">Bei neuen Terminen benachrichtigen</h3>
-        <p class="event-next__text">
-          Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler
-          nicht verschickt.
-        </p>
-
-        <NewsletterForm context={{ page: 'event-landing' }} />
-
-        {whatsapp && (
-          <p class="event-next__alt" id="whatsapp-community">
-            Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine{' '}
-            <a
-              class="link"
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-umami-event="whatsapp-click"
-              data-umami-event-type="community-join"
-            >
-              WhatsApp-Gruppe
-              <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
-            </a>
-            .
+<section
+  class="section section--rust section--clip event-next"
+  id="naechster-termin"
+  aria-labelledby="naechster-termin-title"
+>
+  <div class="container bay">
+    {next ? (
+      <>
+        <div class="event-next__seats">
+          <SeatRing seats={next.maxParticipants} free={free} turn />
+          <p class="event-next__count">
+            <span class="event-next__count-number">{free}</span>
+            <span>von {next.maxParticipants} Plätzen frei</span>
           </p>
-        )}
+        </div>
+
+        <div class="event-next__body">
+          <p class="event-next__label">Nächster Termin</p>
+          <h2 class="event-next__title" id="naechster-termin-title">
+            <time datetime={next.slug}>{next.dateLabel}</time>
+          </h2>
+
+          <dl class="deflist event-next__meta">
+            {next.timeRange && (
+              <div class="deflist__row">
+                <dt class="deflist__term">Uhrzeit</dt>
+                <dd class="deflist__desc">{next.timeRange}</dd>
+              </div>
+            )}
+            <div class="deflist__row">
+              <dt class="deflist__term">Ort</dt>
+              <dd class="deflist__desc">
+                {next.place}
+                <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
+              </dd>
+            </div>
+            <div class="deflist__row">
+              <dt class="deflist__term">Anmeldung</dt>
+              <dd class="deflist__desc">
+                {state.isFull ? 'Ausgebucht – Warteliste offen' : 'Vor- und Nachname und E-Mail genügen'}
+                {state.isFull && <span class="deflist__note">Wird ein Platz frei, rückst du automatisch nach.</span>}
+              </dd>
+            </div>
+            {next.costBasis && (
+              <div class="deflist__row">
+                <dt class="deflist__term">Beitrag</dt>
+                <dd class="deflist__desc">{next.costBasis}</dd>
+              </div>
+            )}
+          </dl>
+
+          <p class="event-next__action">
+            <a
+              href={action.href}
+              class="btn btn--primary btn--large"
+              data-umami-event="cta-click"
+              data-umami-event-location="event-landing"
+              data-umami-event-state={state.status}
+            >
+              {action.label}
+            </a>
+          </p>
+        </div>
+      </>
+    ) : (
+      <div class="event-next__body event-next__body--empty">
+        <p class="event-next__label">Nächster Termin</p>
+        <h2 class="event-next__title" id="naechster-termin-title">
+          {state.status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
+        </h2>
+        <p class="event-next__text" data-status={state.status}>
+          {state.status === 'unavailable'
+            ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
+            : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich ein, dann bekommst du eine kurze Nachricht.'}
+        </p>
       </div>
+    )}
+
+    <div class="event-next__notify" id="benachrichtigung">
+      <h3 class="event-next__sub">Bei neuen Terminen benachrichtigen</h3>
+      <p class="event-next__text">
+        Du bekommst eine kurze Nachricht, sobald der nächste Abend feststeht. Mehr verschicke ich über diesen Verteiler
+        nicht.
+      </p>
+
+      <NewsletterForm context={{ page: 'event-landing' }} />
+
+      {whatsapp && (
+        <p class="event-next__alt" id="whatsapp-community">
+          Lieber zwischendurch im Austausch bleiben? Dafür gibt es die{' '}
+          <a
+            class="link"
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-umami-event="whatsapp-click"
+            data-umami-event-type="community-join"
+          >
+            WhatsApp-Gruppe
+            <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+          </a>
+          .
+        </p>
+      )}
     </div>
   </div>
 </section>
 
 <style is:global>
   @layer sections {
-    .event-next__rail {
-      color: var(--color-orange);
+    .event-next__seats {
+      position: relative;
+      grid-column: 1 / span 4;
+      align-self: start;
+    }
+
+    .event-next__count {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      margin: 0;
+      font-family: var(--font-ui);
+      font-size: 0.9375rem;
+      font-weight: 560;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .event-next__count-number {
+      font-size: var(--step-5);
+      font-weight: 650;
+      font-variation-settings: 'wdth' 85;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .event-next__body {
+      grid-column: 6 / span 7;
+    }
+
+    .event-next__body--empty {
+      grid-column: 1 / span 7;
+    }
+
+    .event-next__label {
+      margin-block-end: var(--space-xs);
+      font-family: var(--font-ui);
+      font-size: 0.9375rem;
+      font-weight: 560;
+      color: var(--text-secondary);
     }
 
     .event-next__title {
-      margin-block-end: var(--space-md);
-      color: var(--color-chalk);
+      margin-block-end: var(--space-lg);
+      font-size: var(--step-4);
+      color: var(--text-primary);
     }
 
     .event-next__meta {
-      margin-block-end: var(--space-md);
+      margin-block-end: var(--space-lg);
     }
 
     .event-next__action {
@@ -145,52 +186,55 @@ const whatsapp = site.whatsappCommunityLink;
 
     .event-next__text {
       max-inline-size: var(--measure);
-      margin-block-end: var(--space-sm);
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--color-chalk-muted);
+      margin-block-end: var(--space-md);
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      line-height: 1.5;
+      color: var(--text-secondary);
     }
 
-    /* A failed read is not a calm "nothing scheduled" — mark it. */
     .event-next__text[data-status='unavailable'] {
-      color: var(--color-orange);
+      color: var(--text-primary);
     }
 
-    /* The form inverts with the section, or a bright panel would punch a hole
-       in the field. */
     .event-next__notify {
-      --control-bg: rgb(242 237 227 / 7%);
-      --control-bg-hover: rgb(242 237 227 / 12%);
-      --control-color: var(--color-chalk);
-      --control-border-color: var(--border-on-dark);
-      --control-placeholder: var(--color-chalk-muted);
+      --control-bg: rgb(255 250 242 / 10%);
+      --control-bg-hover: rgb(255 250 242 / 16%);
+      --control-color: var(--on-ground);
+      --control-border-color: rgb(243 235 223 / 50%);
+      --control-placeholder: var(--on-ground-soft);
+      --border-dark: var(--on-ground);
 
-      margin-block-start: var(--space-lg);
-      padding-block-start: var(--space-md);
-      border-block-start: 1px solid var(--border-on-dark);
+      grid-column: 6 / span 7;
+      margin-block-start: var(--space-xl);
+      padding-block-start: var(--space-lg);
+      border-block-start: 1px solid var(--rule);
     }
 
-    .event-next__notify .form-label {
-      color: var(--color-chalk);
+    .event-next__body--empty ~ .event-next__notify {
+      grid-column: 1 / span 7;
     }
 
     .event-next__sub {
-      margin-block-end: var(--space-3xs);
-      font-size: var(--text-xl);
-      line-height: 1.15;
-      color: var(--color-chalk);
+      margin-block-end: var(--space-xs);
+      font-size: var(--step-2);
+      color: var(--text-primary);
     }
 
     .event-next__alt {
       max-inline-size: var(--measure);
       margin-block-start: var(--space-md);
-      font-size: var(--text-caption);
-      line-height: var(--leading-relaxed);
-      color: var(--color-chalk-muted);
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      line-height: var(--leading-normal);
+      color: var(--text-secondary);
     }
 
-    .event-next__alt .link {
-      color: var(--color-chalk);
+    @media (width <= 56em) {
+      .event-next__seats {
+        inline-size: min(16rem, 70vw);
+        margin-block-end: var(--space-lg);
+      }
     }
 
     @media (width <= 480px) {

@@ -1,5 +1,6 @@
 ---
 import { primaryAction, dateStatus } from '../lib/event-status';
+import SeatRing from './SeatRing.astro';
 
 interface Props {
   placement: 'hero' | 'dates';
@@ -19,6 +20,7 @@ const action = fallback
       href: '/event',
     }
   : primaryAction(state, placement === 'dates' ? '#newsletter' : '#termine');
+const next = fallback ? null : state.next;
 ---
 
 <div class={`home-live-event home-live-event--${placement}${fallback ? ` home-live-event--pending` : ''}`}>
@@ -45,80 +47,153 @@ const action = fallback
       </div>
     </>
   ) : (
-    <>
-      <p class="home-dates__status" data-status={status}>
-        {action.note}
-      </p>
-
-      {state.status === 'scheduled' && state.next && (
-        <dl class="deflist home-dates__meta">
-          <div class="deflist__row">
-            <dt class="deflist__term">Wann</dt>
-            <dd class="deflist__desc">
-              {state.next.dateLabel}
-              {state.next.timeRange && <span class="deflist__note">{state.next.timeRange}</span>}
-            </dd>
-          </div>
-          <div class="deflist__row">
-            <dt class="deflist__term">Wo</dt>
-            <dd class="deflist__desc">
-              {state.next.place}
-              <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
-            </dd>
-          </div>
-          <div class="deflist__row">
-            <dt class="deflist__term">Plätze</dt>
-            <dd class="deflist__desc">
-              {state.isFull
-                ? 'Ausgebucht – du kannst auf die Warteliste'
-                : `${state.next.availableSpots} von ${state.next.maxParticipants} frei`}
-              <span class="deflist__note">
-                {state.isFull
-                  ? 'Wird ein Platz frei, rückst du automatisch nach.'
-                  : 'Für die Anmeldung genügen Name und E-Mail-Adresse.'}
-              </span>
-            </dd>
-          </div>
-        </dl>
+    <div class:list={['home-dates__live', next && 'home-dates__live--scheduled']}>
+      {next && (
+        <div class="home-dates__seats">
+          <SeatRing seats={next.maxParticipants} free={next.availableSpots} />
+          <p class="home-dates__seats-count">
+            <span class="home-dates__seats-number">{state.isFull ? 0 : next.availableSpots}</span>
+            <span>von {next.maxParticipants} Plätzen frei</span>
+          </p>
+        </div>
       )}
 
-      <p class="home-dates__action">
-        <a
-          href={action.href}
-          class="btn btn--primary btn--large"
-          data-umami-event="cta-click"
-          data-umami-event-location="home-dates"
-          data-umami-event-state={state.status}
-        >
-          {action.label}
-        </a>
-      </p>
-    </>
+      <div class="home-dates__info">
+        {/* Scheduled, the list below says it all; otherwise the note is the news. */}
+        {!next && (
+          <p class="home-dates__status" data-status={status}>
+            {action.note}
+          </p>
+        )}
+
+        {next && (
+          <dl class="deflist home-dates__meta">
+            <div class="deflist__row">
+              <dt class="deflist__term">Wann</dt>
+              <dd class="deflist__desc">
+                {next.dateLabel}
+                {next.timeRange && <span class="deflist__note">{next.timeRange}</span>}
+              </dd>
+            </div>
+            <div class="deflist__row">
+              <dt class="deflist__term">Wo</dt>
+              <dd class="deflist__desc">
+                {next.place}
+                <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
+              </dd>
+            </div>
+            <div class="deflist__row">
+              <dt class="deflist__term">Anmeldung</dt>
+              <dd class="deflist__desc">
+                {state.isFull ? 'Ausgebucht – Warteliste offen' : 'Name und E-Mail genügen'}
+                <span class="deflist__note">
+                  {state.isFull
+                    ? 'Wird ein Platz frei, rückst du automatisch nach.'
+                    : 'Den genauen Treffpunkt bekommst du mit der Bestätigung.'}
+                </span>
+              </dd>
+            </div>
+          </dl>
+        )}
+
+        {status === 'none' && (
+          <p class="home-dates__hint">
+            Sobald der nächste Abend feststeht, steht er hier. Mit der Benachrichtigung erfährst du es per E-Mail.
+          </p>
+        )}
+
+        {/* With nothing scheduled the form beside this block is the action. */}
+        {status !== 'none' && (
+          <p class="home-dates__action">
+            <a
+              href={action.href}
+              class="btn btn--primary btn--large"
+              data-umami-event="cta-click"
+              data-umami-event-location="home-dates"
+              data-umami-event-state={state.status}
+            >
+              {action.label}
+            </a>
+          </p>
+        )}
+      </div>
+    </div>
   )}
 </div>
 <style is:global>
   @layer sections {
     /* Reserve space while the native island loads — and ONLY while it loads. */
     .home-live-event--pending.home-live-event--hero {
-      min-block-size: 11rem;
+      min-block-size: 9.5rem;
     }
 
     .home-live-event--pending.home-live-event--dates {
-      min-block-size: 30rem;
-    }
-
-    /* No min height here: the sentence length varies by state. */
-    .home-live-event--pending .home-hero__status {
-      min-block-size: 4lh;
+      min-block-size: 16rem;
     }
 
     @media (width <= 30em) {
       .home-live-event--pending.home-live-event--hero {
-        min-block-size: 15rem;
+        min-block-size: 13rem;
+      }
+    }
+
+    .home-dates__hint {
+      max-inline-size: 40ch;
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .home-dates__live--scheduled {
+      display: grid;
+      grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .home-dates__seats {
+      position: relative;
+    }
+
+    .home-dates__seats-count {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      margin: 0;
+      font-family: var(--font-ui);
+      font-size: 0.9375rem;
+      font-weight: 560;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .home-dates__seats-number {
+      font-size: var(--step-4);
+      font-weight: 650;
+      font-variation-settings: 'wdth' 85;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    @media (width <= 40em) {
+      .home-dates__hint {
+        max-inline-size: 40ch;
+        margin: 0;
+        font-family: var(--font-body);
+        font-size: var(--step-1);
+        line-height: 1.5;
+        color: var(--text-secondary);
       }
 
-      .home-live-event--pending.home-live-event--dates {
-        min-block-size: 34rem;
+      .home-dates__live--scheduled {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .home-dates__seats {
+        inline-size: min(15rem, 70vw);
       }
     }
   }

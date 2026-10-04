@@ -1,5 +1,6 @@
 ---
 import CropPicture from '../CropPicture.astro';
+import SeatRing from '../SeatRing.astro';
 import { resolveAssetImage } from '../../lib/images';
 
 interface Props {
@@ -17,163 +18,51 @@ interface Props {
   };
 }
 
-/** The opening block of a sub-page: text beside an optional photograph, on the page's own ground. */
+/** The opening of a sub-page: a large title and the serif lead, with the photograph
+ *  and a small circle of seats beside it when there is one. */
 
 const { data } = Astro.props;
-const align = data.align === 'center' ? 'center' : 'left';
-const hasImage = Boolean(data.image);
-const hasButton = Boolean(data.buttonText && data.buttonLink);
-const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
+const compact = data.align === 'center';
 const imageAsset = resolveAssetImage(data.image);
+const hasButton = Boolean(data.buttonText && data.buttonLink);
 ---
 
-<section class={`page-hero page-hero--${align}${hasImage ? ' page-hero--with-image' : ''}`} id={data.anchor}>
-  <div class="container">
-    <div class="page-hero__layout">
-      <div class="page-hero__content">
-        {data.eyebrow && <p class="marker marker--ruled page-hero__eyebrow">{data.eyebrow}</p>}
-        {data.title && <h1 class="page-hero__title" set:html={data.title} />}
-        {data.lead && <p class="page-hero__lead">{data.lead}</p>}
+<section
+  class:list={['page-hero', compact && 'page-hero--compact', imageAsset && 'page-hero--with-image']}
+  id={data.anchor}
+>
+  <div class="container page-hero__layout">
+    <div class="page-hero__content">
+      {data.eyebrow && <p class="kicker">{data.eyebrow}</p>}
+      {data.title && <h1 class="page-hero__title display" set:html={data.title} />}
+      {data.lead && <p class="page-hero__lead">{data.lead}</p>}
 
-        {hasButton && (
-          <p class="page-hero__cta">
-            <a
-              href={data.buttonLink}
-              class="btn btn--primary btn--large"
-              target={buttonExternal ? '_blank' : undefined}
-              rel={buttonExternal ? 'noopener noreferrer' : undefined}
-            >
-              {data.buttonText}
-            </a>
-          </p>
-        )}
-      </div>
-
-      {hasImage && (
-        <figure class="page-hero__media">
-          {imageAsset ? (
-            <CropPicture
-              src={imageAsset}
-              class="page-hero__image"
-              breakpoint="54em"
-              narrow={{
-                ratio: 3 / 2,
-                widths: [420, 700, 900],
-                sizes: 'calc(100vw - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem))',
-              }}
-              wide={{
-                ratio: 4 / 5,
-                widths: [352, 512, 704],
-                sizes: 'min(22rem, calc((min(100vw, 1320px) - 2 * clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem)) * 0.32))',
-              }}
-              loading="eager"
-              fetchpriority="high"
-              alt={data.imageAlt ?? ''}
-            />
-          ) : (
-            <img
-              src={data.image}
-              class="page-hero__image"
-              loading="eager"
-              fetchpriority="high"
-              alt={data.imageAlt ?? ''}
-            />
-          )}
-          {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
-        </figure>
+      {hasButton && (
+        <p class="page-hero__cta">
+          <a href={data.buttonLink} class="btn btn--primary btn--large">
+            {data.buttonText}
+          </a>
+        </p>
       )}
     </div>
+
+    {imageAsset && (
+      <figure class="page-hero__media">
+        <div class="page-hero__frame">
+          <CropPicture
+            src={imageAsset}
+            class="page-hero__image"
+            breakpoint="56em"
+            narrow={{ ratio: 4 / 3, widths: [420, 700, 900], sizes: '100vw' }}
+            wide={{ ratio: 4 / 5, widths: [400, 560, 800], sizes: 'min(30vw, 26rem)' }}
+            loading="eager"
+            fetchpriority="high"
+            alt={data.imageAlt ?? ''}
+          />
+        </div>
+        <SeatRing class="page-hero__seats" seats={12} open={[7]} seatSize={5.5} enter />
+        {data.imageCaption && <figcaption class="caption">{data.imageCaption}</figcaption>}
+      </figure>
+    )}
   </div>
 </section>
-
-<style is:global>
-  @layer sections {
-    .page-hero {
-      padding-block: calc(var(--header-clearance) + var(--space-md)) var(--space-lg);
-      border-block-end: 2px solid var(--rule-strong);
-    }
-
-    .page-hero__layout {
-      display: grid;
-      gap: var(--space-lg);
-      align-items: start;
-    }
-
-    /* Picture sizes mirrors this cap, the container gutter and the 54em
-       breakpoint below. The percentage is of the grid's content width. */
-    .page-hero--with-image .page-hero__layout {
-      grid-template-columns: minmax(0, 1fr) minmax(0, min(22rem, 32%));
-    }
-
-    .page-hero--center .page-hero__layout {
-      grid-template-columns: 1fr;
-      max-inline-size: var(--measure-wide);
-    }
-
-    .page-hero__content {
-      max-inline-size: 36rem;
-    }
-
-    .page-hero__eyebrow {
-      margin-block-end: var(--space-sm);
-      color: var(--text-primary);
-    }
-
-    .page-hero__title {
-      margin-block-end: var(--space-sm);
-      font-size: var(--display-3);
-      line-height: 0.98;
-      letter-spacing: -0.015em;
-      text-wrap: balance;
-    }
-
-    .page-hero__lead {
-      max-inline-size: var(--measure);
-      margin: 0;
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    .page-hero__cta {
-      margin-block-start: var(--space-md);
-      margin-block-end: 0;
-    }
-
-    .page-hero__media {
-      margin: 0;
-    }
-
-    .page-hero__image {
-      display: block;
-      inline-size: 100%;
-      /* The variants keep the source's ratio; `cover` crops them to this box. */
-      aspect-ratio: 4 / 5;
-      object-fit: cover;
-      border-radius: 0;
-    }
-
-    @media (width <= 54em) {
-      .page-hero--with-image .page-hero__layout {
-        grid-template-columns: 1fr;
-        gap: var(--space-md);
-      }
-
-      .page-hero__content {
-        max-inline-size: none;
-      }
-
-      /* The subject sits high in the frame; the band keeps the head and torso. */
-      .page-hero__image {
-        aspect-ratio: 3 / 2;
-        object-position: top;
-      }
-    }
-
-    @media (width <= 480px) {
-      .page-hero__cta .btn {
-        inline-size: 100%;
-      }
-    }
-  }
-</style>

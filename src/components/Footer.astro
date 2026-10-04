@@ -18,48 +18,34 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
 <footer class="footer">
   <div class="container">
     <div class="footer__top">
-      <div class="footer__brand">
-        <a href="/" class="footer__logo">
-          <Icon name="logo" class="footer__logo-icon" aria-hidden="true" />
-          <span>{site.siteName}</span>
-        </a>
-        <p class="footer__text">{site.footerDescription}</p>
-        {socialLinks.length > 0 && (
-          <ul class="footer__social-links">
-            {socialLinks.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  title={link.label}
-                  target={link.internal ? undefined : '_blank'}
-                  rel={link.internal ? undefined : 'noopener noreferrer'}
-                  data-umami-event="social-click"
-                  data-umami-event-platform={link.type}
-                  class="social-link"
-                >
-                  <Icon name={`social-${link.type}`} class="social-link__icon" aria-hidden="true" />
-                  <span class="social-link__label">
-                    {link.label}
-                    {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
+      <div class="footer__contact">
+        <p class="footer__lead">Fragen vorab? Schreib mir oder ruf an.</p>
+        {site.contactEmail && (
+          <a
+            class="footer__mail"
+            href={`mailto:${site.contactEmail}`}
+            data-umami-event="contact-click"
+            data-umami-event-type="email"
+          >
+            {site.contactEmail}
+          </a>
+        )}
+        {phoneHref && (
+          <a class="footer__phone" href={phoneHref} data-umami-event="contact-click" data-umami-event-type="phone">
+            {site.contactPhone}
+          </a>
         )}
       </div>
 
       <nav class="footer__nav" aria-label="Fußnavigation">
-        <h3 class="footer__heading">Navigation</h3>
-        <ul class="footer__links">
+        <h2 class="footer__heading">Seiten</h2>
+        <ul class="footer__links" role="list">
           {nav.footerPrimary.map((item) => (
             <li>
               <a
                 href={item.url}
                 data-umami-event="footer-link"
                 data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
-                target={(item as { target?: string }).target}
-                rel={(item as { target?: string }).target === '_blank' ? 'noopener' : undefined}
               >
                 {item.label}
               </a>
@@ -68,215 +54,267 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
         </ul>
       </nav>
 
-      <div class="footer__contact">
-        <h3 class="footer__heading">Kontakt</h3>
-        <ul class="footer__links">
-          {site.contactEmail && (
-            <li>
-              <a href={`mailto:${site.contactEmail}`} data-umami-event="contact-click" data-umami-event-type="email">
-                E-Mail schreiben
-              </a>
-            </li>
-          )}
-          {phoneHref && (
-            <li>
-              <a href={phoneHref} data-umami-event="contact-click" data-umami-event-type="phone">
-                {site.contactPhone}
-              </a>
-            </li>
-          )}
-          {nav.footerContact.map((item) => (
-            <li>
-              <a href={item.url} data-umami-event="footer-link">
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {socialLinks.length > 0 && (
+        <div class="footer__social">
+          <h2 class="footer__heading">Erreichbar über</h2>
+          <ul class="footer__links" role="list">
+            {socialLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  target={link.internal ? undefined : '_blank'}
+                  rel={link.internal ? undefined : 'noopener noreferrer'}
+                  data-umami-event="social-click"
+                  data-umami-event-platform={link.type}
+                  class="social-link"
+                >
+                  <Icon name={`social-${link.type}`} class="social-link__icon" aria-hidden="true" />
+                  <span>
+                    {link.label}
+                    {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
 
     <div class="footer__bottom">
-      <p class="footer__copyright">{site.footerText}</p>
-      <nav class="footer__legal" aria-label="Rechtliches">
-        {nav.footerLegal.map((item) => (
-          <a
-            href={item.url}
-            data-umami-event="footer-link"
-            data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
-          >
-            {item.label}
-          </a>
-        ))}
-      </nav>
+      <a href="/" class="footer__logo">
+        <Icon name="logo" class="footer__logo-icon" aria-hidden="true" />
+        <span>{site.siteName}</span>
+      </a>
+      <p class="footer__text">{site.footerDescription}</p>
+      <div class="footer__legal">
+        <p class="footer__copyright">{site.footerText}</p>
+        <nav aria-label="Rechtliches">
+          <ul class="footer__legal-links" role="list">
+            {nav.footerLegal.map((item) => (
+              <li>
+                <a
+                  href={item.url}
+                  data-umami-event="footer-link"
+                  data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
 </footer>
 
 <style is:global>
   @layer components {
-    /* The one inverted surface on the site — it marks the end of the page and
-       carries the legal links. Everything in it is a plain list. */
+    /* The page ends on earth in both modes. */
     .footer {
-      padding-block: var(--space-xl) var(--space-md);
-      color: var(--text-on-dark);
-      background: var(--color-ink);
-      border-block-start: 4px solid var(--color-orange);
+      --text-primary: var(--on-ground);
+      --text-secondary: var(--on-ground-soft);
+      --rule: rgb(243 235 223 / 18%);
+      --focus: var(--on-ground);
+
+      padding-block: var(--space-2xl) var(--space-md);
+      font-family: var(--font-ui);
+      color: var(--on-ground);
+      background: var(--ground-earth);
     }
 
     .footer__top {
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
-      gap: var(--space-lg);
-      padding-block-end: var(--space-lg);
-      border-block-end: 1px solid var(--border-on-dark);
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      row-gap: var(--space-xl);
+      padding-block-end: var(--space-xl);
     }
 
-    @media (width <= 800px) {
-      .footer__top {
-        grid-template-columns: 1fr;
-        gap: var(--rhythm-group);
-      }
-
-      .footer__links a,
-      .footer__legal a,
-      .social-link {
-        min-block-size: 44px;
-      }
+    .footer__contact {
+      grid-column: 1 / span 7;
     }
 
-    .footer__brand {
-      max-inline-size: 34ch;
+    .footer__lead {
+      margin-block-end: var(--space-sm);
+      font-size: var(--step-1);
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .footer__mail {
+      display: inline-block;
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 0.9rem + 3.6vw, 4rem);
+      font-weight: 600;
+      font-variation-settings: 'wdth' 92;
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+      overflow-wrap: anywhere;
+      text-decoration: underline;
+      text-decoration-color: var(--ember);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 0.16em;
+      transition: color var(--motion-quick);
+    }
+
+    .footer__phone {
+      display: flex;
+      align-items: center;
+      min-block-size: 44px;
+      margin-block-start: var(--space-xs);
+      font-size: var(--step-2);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .footer__mail:hover,
+    .footer__phone:hover {
+      color: var(--ember);
+    }
+
+    .footer__nav {
+      grid-column: 8 / span 3;
+    }
+
+    .footer__social {
+      grid-column: 11 / span 2;
+    }
+
+    .footer__heading {
+      margin-block-end: var(--space-xs);
+      font-family: var(--font-ui);
+      font-size: 0.875rem;
+      font-weight: 560;
+      letter-spacing: 0;
+      color: var(--ember);
+    }
+
+    .footer__links {
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer__links a {
+      display: inline-flex;
+      gap: var(--space-xs);
+      align-items: center;
+      min-block-size: 40px;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      transition: color var(--motion-quick);
+    }
+
+    .footer__links a:hover,
+    .footer__legal-links a:hover {
+      color: var(--on-ground);
+      text-decoration: underline;
+      text-decoration-color: var(--ember);
+      text-underline-offset: 0.25em;
+    }
+
+    .social-link__icon {
+      inline-size: 18px;
+      block-size: 18px;
+    }
+
+    .footer__bottom {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      row-gap: var(--space-sm);
+      align-items: start;
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid var(--rule);
     }
 
     .footer__logo {
       display: flex;
+      grid-column: 1 / span 4;
       gap: var(--space-xs);
       align-items: center;
-      margin-block-end: var(--space-sm);
       font-family: var(--font-display);
-      font-size: 1.4rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.01em;
-    }
-
-    .footer__logo:focus-visible {
-      outline: 3px solid var(--color-paper);
-      outline-offset: 4px;
+      font-size: 1.125rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
     }
 
     .footer__logo-icon {
       flex-shrink: 0;
       inline-size: 26px;
       block-size: 26px;
-      color: var(--color-orange);
+      color: var(--ember);
     }
 
     .footer__text {
-      font-size: var(--text-caption);
-      line-height: var(--leading-relaxed);
-      color: var(--color-chalk-muted);
+      grid-column: 5 / span 5;
+      max-inline-size: 48ch;
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      line-height: var(--leading-normal);
+      color: var(--text-secondary);
     }
 
-    .footer__social-links {
-      display: grid;
-      gap: var(--space-3xs);
-      margin-block-start: var(--space-sm);
-      list-style: none;
-    }
-
-    /* 24px minimum target (WCAG 2.5.8). */
-    .social-link {
-      display: inline-flex;
-      gap: var(--space-xs);
-      align-items: center;
-      min-block-size: 32px;
-      font-size: var(--text-caption);
-      color: var(--color-chalk-muted);
-      transition: color var(--motion-quick);
-    }
-
-    .social-link:hover,
-    .social-link:focus-visible {
-      color: var(--color-chalk);
-    }
-
-    .social-link__icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      inline-size: 18px;
-      block-size: 18px;
-    }
-
-    .social-link__icon svg {
-      inline-size: 100%;
-      block-size: 100%;
-    }
-
-    .social-link__label {
-      line-height: 1.4;
-    }
-
-    .footer__heading {
-      margin-block-end: var(--space-xs);
-      font-family: var(--font-display);
-      font-size: var(--text-marker);
-      font-weight: 600;
-      color: var(--color-orange);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-marker);
-    }
-
-    .footer__links {
-      list-style: none;
-    }
-
-    .footer__links a,
-    .footer__legal a {
-      display: inline-flex;
-      align-items: center;
-      min-block-size: 32px;
-      font-size: var(--text-caption);
-      color: var(--color-chalk-muted);
-      transition: color var(--motion-quick);
-    }
-
-    .footer__links a:hover,
-    .footer__links a:focus-visible,
-    .footer__legal a:hover,
-    .footer__legal a:focus-visible {
-      color: var(--color-chalk);
-      text-decoration: underline;
-      text-underline-offset: 0.2em;
-    }
-
-    .footer__bottom {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs) var(--space-md);
-      align-items: center;
-      justify-content: space-between;
-      padding-block-start: var(--space-sm);
+    .footer__legal {
+      grid-column: 10 / span 3;
+      justify-self: end;
+      text-align: end;
     }
 
     .footer__copyright {
       margin: 0;
-      font-size: var(--text-caption);
-      color: var(--color-chalk-muted);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
     }
 
-    .footer__legal {
+    .footer__legal-links {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--space-md);
+      gap: 0 var(--space-md);
+      justify-content: flex-end;
+      padding: 0;
+      margin: 0;
     }
 
-    .footer a:focus-visible {
-      outline: 3px solid var(--color-paper);
-      outline-offset: 3px;
-      border-radius: 0;
+    .footer__legal-links a {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: 40px;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    @media (width <= 56em) {
+      .footer__top,
+      .footer__bottom {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .footer__contact,
+      .footer__logo,
+      .footer__text,
+      .footer__legal {
+        grid-column: 1 / -1;
+      }
+
+      .footer__nav {
+        grid-column: 1;
+      }
+
+      .footer__social {
+        grid-column: 2;
+      }
+
+      .footer__legal {
+        justify-self: start;
+        text-align: start;
+      }
+
+      .footer__legal-links {
+        justify-content: flex-start;
+      }
     }
   }
 </style>

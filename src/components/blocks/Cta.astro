@@ -1,8 +1,9 @@
 ---
+import SeatRing from '../SeatRing.astro';
+
 interface Props {
   data: {
     anchor?: string;
-    eyebrow?: string;
     title?: string;
     text?: string;
     buttonText?: string;
@@ -12,64 +13,77 @@ interface Props {
   };
 }
 
-/** A closing invitation on a sub-page: one action, one optional quiet link. */
+/** A closing invitation on a sub-page: on rust, the colour of every way in. */
 
 const { data } = Astro.props;
 ---
 
-<section class="section section--ruled cta-section" id={data.anchor}>
-  <div class="container">
-    <div class="spine">
-      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
+<section class="section section--rust section--clip cta-section" id={data.anchor}>
+  <div class="container bay">
+    <div class="cta__body">
+      {data.title && <h2 class="cta__title" set:html={data.title} />}
+      {data.text && <p class="cta__text">{data.text}</p>}
 
-      <div class="spine__body" data-reveal-group="55">
-        {data.title && <h2 class="cta__title" data-reveal="up" set:html={data.title} />}
+      {data.buttonText && data.buttonLink && (
+        <p class="actions">
+          <a
+            href={data.buttonLink}
+            class="btn btn--primary btn--large"
+            data-umami-event="cta-click"
+            data-umami-event-location="cta-block"
+            data-umami-event-text={data.buttonText}
+          >
+            {data.buttonText}
+          </a>
 
-        {data.text && (
-          <p class="cta__text" data-reveal="up">
-            {data.text}
-          </p>
-        )}
-
-        {data.buttonText && data.buttonLink && (
-          <p class="actions" data-reveal="up">
-            <a
-              href={data.buttonLink}
-              class="btn btn--primary btn--large"
-              data-umami-event="cta-click"
-              data-umami-event-location="cta-block"
-              data-umami-event-text={data.buttonText}
-            >
-              {data.buttonText}
+          {data.secondaryLabel && data.secondaryLink && (
+            <a href={data.secondaryLink} class="text-link">
+              {data.secondaryLabel}
             </a>
-
-            {data.secondaryLabel && data.secondaryLink && (
-              <a href={data.secondaryLink} class="text-link">
-                {data.secondaryLabel}
-              </a>
-            )}
-          </p>
-        )}
-      </div>
+          )}
+        </p>
+      )}
     </div>
+
+    <SeatRing class="cta__seats" seats={12} open={[7]} turn />
   </div>
 </section>
 
 <style is:global>
   @layer sections {
+    .cta__body {
+      grid-column: 1 / span 7;
+      align-self: center;
+    }
+
     .cta__title {
-      margin-block-end: var(--space-sm);
-      font-size: var(--text-3xl);
-      line-height: 1.15;
-      text-wrap: balance;
+      max-inline-size: 16ch;
+      margin-block-end: var(--space-md);
+      font-size: var(--step-4);
+      color: var(--text-primary);
     }
 
     .cta__text {
-      max-inline-size: var(--measure);
-      margin-block-end: var(--space-md);
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
+      max-inline-size: 40ch;
+      margin-block-end: var(--space-lg);
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      line-height: 1.5;
       color: var(--text-secondary);
+    }
+
+    .cta__seats {
+      grid-column: 9 / -1;
+      inline-size: min(100%, 24rem);
+      justify-self: end;
+    }
+
+    @media (width <= 56em) {
+      .cta__seats {
+        inline-size: 10rem;
+        margin-block-start: var(--space-lg);
+        justify-self: start;
+      }
     }
 
     @media (width <= 480px) {
@@ -83,7 +97,7 @@ const { data } = Astro.props;
       }
 
       .cta-section .text-link {
-        justify-content: center;
+        align-self: center;
       }
     }
   }

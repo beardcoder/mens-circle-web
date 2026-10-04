@@ -1,6 +1,5 @@
 ---
 interface Item {
-  number?: string;
   title?: string;
   description?: string;
 }
@@ -15,58 +14,120 @@ interface Props {
   };
 }
 
-/** A numbered list of positions, on the same spine as the surrounding prose so it reads as part of the text rather than as a widget dropped into it. */
+/** Positions written as "A statt B": the kept word stands, the one left behind is struck through. */
 
 const { data } = Astro.props;
-const items = data.items ?? [];
+const items = (data.items ?? []).map((item) => {
+  const [keep, ...rest] = (item.title ?? '').split(' statt ');
+  return { keep, instead: rest.join(' statt '), description: item.description };
+});
 ---
 
-<section class="section section--ruled values-section" id={data.anchor}>
-  <div class="container">
-    <div class="spine">
-      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
-
-      <div class="spine__body">
-        {data.title && <h2 class="values-section__title" data-reveal="up" set:html={data.title} />}
-        {data.intro && (
-          <p class="section-intro" data-reveal="up">
-            {data.intro}
-          </p>
-        )}
-
-        {items.length > 0 && (
-          <ol class="values-section__list" role="list" data-reveal-group="55">
-            {items.map((item) => (
-              <li class="value-item" data-reveal="up">
-                {item.number && (
-                  <span class="value-item__number" aria-hidden="true">
-                    {item.number}
-                  </span>
-                )}
-                {item.title && <h3 class="value-item__title">{item.title}</h3>}
-                {item.description && <p class="value-item__description">{item.description}</p>}
-              </li>
-            ))}
-          </ol>
-        )}
-      </div>
+<section class="section section--sand values-section" id={data.anchor}>
+  <div class="container bay">
+    <div class="values-section__head">
+      {data.title && <h2 class="values-section__title" set:html={data.title} />}
+      {data.intro && <p class="values-section__intro">{data.intro}</p>}
     </div>
+
+    {items.length > 0 && (
+      <ul class="values-section__list" role="list">
+        {items.map((item) => (
+          <li class="value-item" data-reveal>
+            <p class="value-item__pair">
+              <span class="value-item__keep">{item.keep}</span>
+              {item.instead && (
+                <span class="value-item__instead">
+                  statt <s>{item.instead}</s>
+                </span>
+              )}
+            </p>
+            {item.description && <p class="value-item__description">{item.description}</p>}
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
 </section>
 
 <style is:global>
   @layer sections {
+    .values-section__head {
+      grid-column: 1 / span 5;
+      position: sticky;
+      inset-block-start: calc(var(--header-clearance) + var(--space-md));
+    }
+
     .values-section__title {
-      margin-block-end: var(--space-sm);
-      font-size: var(--text-3xl);
-      line-height: 1.15;
-      text-wrap: balance;
+      margin: 0;
+      font-size: var(--step-4);
+    }
+
+    .values-section__intro {
+      max-inline-size: 40ch;
+      margin-block: var(--space-md) 0;
+      font-family: var(--font-body);
+      font-size: var(--step-1);
+      line-height: 1.5;
+      color: var(--text-secondary);
     }
 
     .values-section__list {
+      grid-column: 7 / span 6;
       padding: 0;
-      margin: var(--space-md) 0 0;
-      list-style: none;
+      margin: 0;
+    }
+
+    .value-item {
+      padding-block: var(--space-md);
+      border-block-start: 1px solid var(--rule);
+    }
+
+    .value-item:last-child {
+      border-block-end: 1px solid var(--rule);
+    }
+
+    .value-item__pair {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 0.4em;
+      align-items: baseline;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--step-3);
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+    }
+
+    .value-item__keep {
+      font-weight: 640;
+      color: var(--text-primary);
+    }
+
+    .value-item__instead {
+      font-weight: 380;
+      color: var(--text-muted);
+    }
+
+    .value-item__instead s {
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+    }
+
+    .value-item__description {
+      max-inline-size: 46ch;
+      margin: var(--space-xs) 0 0;
+      font-family: var(--font-body);
+      font-size: var(--step-0);
+      line-height: var(--leading-relaxed);
+      color: var(--text-secondary);
+    }
+
+    @media (width <= 56em) {
+      .values-section__head {
+        position: static;
+        margin-block-end: var(--space-lg);
+      }
     }
   }
 </style>

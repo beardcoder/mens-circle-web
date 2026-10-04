@@ -5,7 +5,7 @@ type Mode = 'light' | 'dark';
 const STORAGE_KEY = 'mc-mode';
 
 /** Mobile browser chrome colour per resolved mode (matches --bg-primary). */
-const THEME_COLOR: Record<Mode, string> = { light: '#f3f0e9', dark: '#1c1e1b' };
+const THEME_COLOR: Record<Mode, string> = { light: '#f1e9dc', dark: '#1b1512' };
 
 const darkQuery = matchMedia('(prefers-color-scheme: dark)');
 

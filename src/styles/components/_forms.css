@@ -10,26 +10,22 @@
   margin-block-end: var(--space-md);
 }
 
-/* Field names take the small condensed marker. */
+/* Field names: the interface face, sentence case. */
 .form-label,
 .form-group label:not(.form-checkbox):not(.form-checkbox-label) {
   display: block;
   margin-block-end: var(--space-2xs);
-  font-family: var(--font-display);
-  font-size: var(--text-marker);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--text-primary);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-marker);
 }
 
 .form-checkbox,
 .form-checkbox-label,
 .form-checkbox span,
 .form-checkbox-text {
-  font-family: var(--font-body);
-  text-transform: none;
-  letter-spacing: normal;
+  font-family: var(--font-ui);
 }
 
 .form-label--plain {
@@ -57,8 +53,8 @@
   min-block-size: 44px;
   padding-block: var(--control-padding-block);
   padding-inline: var(--control-padding-inline);
-  font-family: var(--font-body);
-  font-size: 1rem;
+  font-family: var(--font-ui);
+  font-size: 1.0625rem;
   line-height: 1.5;
   color: var(--control-color);
   background: var(--control-bg);
@@ -101,8 +97,8 @@ textarea.form-control {
 .newsletter__input:focus-visible,
 .form-group input:focus-visible,
 .form-group textarea:focus-visible {
-  outline: 3px solid var(--color-orange);
-  outline-offset: 0;
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
   background: var(--control-bg-hover);
   border-color: var(--text-primary);
 }
@@ -118,6 +114,7 @@ textarea.form-control {
 .form-hint {
   display: block;
   margin-block-start: var(--space-3xs);
+  font-family: var(--font-ui);
   font-size: var(--text-caption);
   color: var(--text-secondary);
 }
@@ -147,10 +144,11 @@ textarea.form-control {
   padding: 0.3em 0.6em;
   font-size: var(--text-caption);
   font-weight: 600;
+  font-family: var(--font-ui);
   color: #7a2a1c;
   text-wrap: pretty;
   background: #f7e0d9;
-  border-radius: 0;
+  border-radius: var(--radius);
 }
 
 /* Colour alone must never be the only signal (WCAG 1.4.1), so each message
@@ -216,7 +214,7 @@ textarea.form-control {
 
 .form-checkbox input:focus-visible,
 .form-checkbox-control:focus-visible {
-  outline: 3px solid var(--color-orange);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 

@@ -52,8 +52,9 @@ body {
   /* `clip`, not `hidden`: keeps view() timelines on the document scroller. */
   overflow-x: clip;
   font-family: var(--font-body);
-  font-size: var(--text-base);
-  line-height: 1.7;
+  font-size: var(--step-0);
+  font-optical-sizing: auto;
+  line-height: var(--leading-relaxed);
   color: var(--text-primary);
   background-color: var(--bg-primary);
 }
@@ -62,11 +63,13 @@ body {
   list-style: none;
 }
 
-/* Interactive text stays on one tight line; headings keep the leading set in
-   base/_typography.css — they are sentences here, not display slabs. */
+/* Interactive text stays on one tight line and speaks in the interface face. */
 button,
 input,
-label {
+label,
+select,
+textarea {
+  font-family: var(--font-ui);
   line-height: 1.2;
 }
 
@@ -101,7 +104,7 @@ input,
 button,
 textarea,
 select {
-  font: inherit;
+  font-size: inherit;
   color: inherit;
 }
 
@@ -125,9 +128,9 @@ fieldset {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid var(--focus);
   outline-offset: 3px;
-  transition: outline-offset var(--motion-quick);
+  border-radius: 2px;
 }
 
 :focus:not(:focus-visible) {
@@ -135,8 +138,8 @@ fieldset {
 }
 
 ::selection {
-  color: light-dark(var(--color-paper), var(--color-night));
-  background-color: var(--accent-primary);
+  color: var(--on-accent);
+  background-color: var(--accent);
 }
 
 table {

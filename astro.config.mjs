@@ -63,6 +63,28 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   fonts: [
+    // Public site: a variable grotesk for display and interface, a reading serif for the voice.
+    {
+      name: 'Bricolage Grotesque',
+      cssVariable: '--font-grotesk',
+      provider: fontProviders.google(),
+      weights: ['200 800'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+      options: { experimental: { variableAxis: { opsz: [['12', '96']], wdth: [['75', '100']] } } },
+    },
+    {
+      name: 'Newsreader',
+      cssVariable: '--font-serif',
+      provider: fontProviders.google(),
+      weights: ['200 800'],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'serif'],
+      options: { experimental: { variableAxis: { opsz: [['6', '72']] } } },
+    },
+    // Admin only (AdminLayout.astro).
     {
       name: 'Barlow Condensed',
       cssVariable: '--font-condensed',

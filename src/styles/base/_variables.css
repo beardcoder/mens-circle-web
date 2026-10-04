@@ -1,120 +1,129 @@
-/** Design tokens. */
+/** Design tokens. Lime-washed cream, rust and earth; every ground flips with the mode. */
 
 :root {
   /* Mode — `data-mode` absent follows the OS, "light"/"dark" pins it. Applied
      before first paint by the inline boot script in Layout.astro. */
   color-scheme: light dark;
 
-  /* Palette primitives */
+  /* Palette primitives. Contrast figures are against the ground they sit on. */
 
-  /* Paper — the ground. Warm oat, never a cool off-white. */
-  --color-paper: #f2ede3;
-  --color-paper-sunk: #e8e0d2; /* a half-step down, for set-apart passages */
-  --color-paper-raised: #f8f4ec; /* a half-step up, for inputs and panels */
+  /* Light ground: lime-washed plaster, warm but not yellow. */
+  --cream: #f1e9dc;
+  --cream-raised: #f8f3ea;
+  --sand: #e6dac8;
+  --sand-deep: #d6c6af; /* hairlines on cream and sand */
 
-  /* Ink — a warm bark black, not a blue-black. 15.2:1 on paper. */
-  --color-ink: #1c1714;
-  --color-ink-mid: #4a4139; /* running text on paper — 8.5:1 */
-  --color-ink-muted: #645a50; /* captions, labels — 5.8:1 on paper */
+  /* Rust: a fired-clay terracotta, dark enough to carry text (6.4:1 on cream). */
+  --rust: #a9512f;
+  --rust-deep: #8a3f22;
+  /* Ember: the rust lifted for dark grounds (6.3:1 on night). */
+  --ember: #d98a63;
 
-  /* Burnt orange — a graphic colour first: the ring, the statement field, the
-     button. Never small text on paper; see the contrast table above. */
-  --color-orange: #dd5f33;
+  /* Earth: warm dark brown for text and the dark band. 13:1 on cream. */
+  --earth: #2a221d;
+  --earth-mid: #4d4038; /* running text, 8.2:1 */
+  --earth-soft: #6b5d52; /* captions and labels, 5.5:1 */
 
-  /* Hairlines — warm, so they read as a crease in the paper. */
-  --color-rule: #d8cfbe;
-  --color-rule-strong: #bfb29c;
+  /* Dark ground. */
+  --night: #1b1512;
+  --night-raised: #261e19;
+  --night-rule: #3d322b;
+  --chalk: #efe6d8; /* 14:1 on night */
+  --chalk-mid: #d3c7b6;
+  --chalk-soft: #b4a797; /* 7.6:1 on night */
 
-  /* On the dark ground */
-  --color-night: var(--color-ink);
-  --color-night-soft: #241e19;
-  --color-night-rule: #3d342c;
-  --color-chalk: #f2ede3;
-  --color-chalk-muted: #a39786; /* 6.2:1 on ink */
+  /* Grounds that keep their colour in both modes. */
+  --ground-earth: light-dark(#2a221d, #241c18);
+  --ground-rust: light-dark(#a9512f, #8f4427);
+  --on-ground: #f3ebdf;
+  --on-ground-soft: #e4d4c3;
 
   /* Semantic tokens */
 
   /* Surfaces */
-  --bg-primary: light-dark(var(--color-paper), var(--color-night));
-  --bg-secondary: light-dark(var(--color-paper-sunk), var(--color-night-soft));
-  --bg-elevated: light-dark(var(--color-paper-raised), var(--color-night-soft));
-  --bg-overlay: light-dark(rgb(38 40 36 / 55%), rgb(10 11 10 / 70%));
-
-  /* Form controls sit on the page ground, not on a dark panel. */
-  --bg-input: light-dark(var(--color-paper-raised), var(--color-night-soft));
-  --bg-input-focus: light-dark(#fff, #2e332d);
+  --bg-primary: light-dark(var(--cream), var(--night));
+  --bg-secondary: light-dark(var(--sand), var(--night-raised));
+  --bg-elevated: light-dark(var(--cream-raised), var(--night-raised));
+  --bg-overlay: light-dark(rgb(42 34 29 / 50%), rgb(8 6 5 / 70%));
+  --bg-input: light-dark(var(--cream-raised), var(--night-raised));
+  --bg-input-focus: light-dark(#fffaf2, #2e2520);
 
   /* Text */
-  --text-primary: light-dark(var(--color-ink), var(--color-chalk));
-  --text-secondary: light-dark(var(--color-ink-mid), #cdc3b4); /* 10.2:1 on night */
-  --text-muted: light-dark(var(--color-ink-muted), var(--color-chalk-muted));
-  --text-on-dark: var(--color-chalk);
+  --text-primary: light-dark(var(--earth), var(--chalk));
+  --text-secondary: light-dark(var(--earth-mid), var(--chalk-mid));
+  --text-muted: light-dark(var(--earth-soft), var(--chalk-soft));
 
-  /* Accents. */
-  --accent-primary: var(--color-orange);
-  --accent-text: light-dark(var(--color-ink), var(--color-orange));
-  --accent-rare: var(--color-orange);
+  /* The accent: rust on cream, ember on night. Text-capable in both modes. */
+  --accent: light-dark(var(--rust), var(--ember));
+  --accent-strong: light-dark(var(--rust-deep), #e9a483);
+  --on-accent: light-dark(var(--cream-raised), var(--night));
+  /* Aliases kept for the map, toast and form styles. */
+  --accent-primary: var(--accent);
+  --accent-text: var(--accent);
+  --accent-rare: var(--accent-strong);
 
   /* Status */
-  --color-success: light-dark(#2f6b4a, #7fc09a);
-  --color-error: light-dark(#9c3a2c, #e0907f);
+  --color-success: light-dark(#3f6b45, #93c39a);
+  --color-error: light-dark(#9c3a2c, #e7998a);
 
-  /* Borders. */
-  --rule-strong: light-dark(var(--color-ink), var(--color-chalk));
-  --border-light: light-dark(var(--color-rule), var(--color-night-rule));
-  --border-medium: light-dark(var(--color-rule-strong), #453a31);
-  --border-dark: light-dark(var(--color-ink-muted), #5a5048);
-  --border-on-dark: rgb(242 237 227 / 18%);
+  /* Lines */
+  --rule: light-dark(var(--sand-deep), var(--night-rule));
+  --rule-strong: light-dark(var(--earth), var(--chalk));
+  --border-light: var(--rule);
+  --border-medium: light-dark(#c4b29a, #4d4038);
+  --border-dark: light-dark(var(--earth-soft), #6b5d52);
+
+  /* The seats of the circle motif. */
+  --seat: light-dark(var(--earth), var(--chalk));
+  --seat-open: var(--accent);
+
+  /* Focus: one ring everywhere, redefined on the fixed grounds. */
+  --focus: var(--accent);
 
   /* Typography */
-  /* Set by the Astro <Font> components, fallbacks included. */
-  --font-display: var(--font-condensed);
-  --font-body: var(--font-text);
+  --font-display: var(--font-grotesk);
+  --font-ui: var(--font-grotesk);
+  --font-body: var(--font-serif);
 
-  /* Type scale, in two registers that do not overlap. */
+  /* One modular scale (≈1.25 on phones, ≈1.4 on wide screens). */
+  --step--1: 0.875rem;
+  --step-0: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-1: clamp(1.1875rem, 1.08rem + 0.5vw, 1.4375rem);
+  --step-2: clamp(1.4375rem, 1.2rem + 1vw, 1.9375rem);
+  --step-3: clamp(1.75rem, 1.35rem + 1.9vw, 2.75rem);
+  --step-4: clamp(2.25rem, 1.5rem + 3.4vw, 4.25rem);
+  --step-5: clamp(2.6rem, 1.4rem + 5.4vw, 6.5rem);
+  --step-6: clamp(3.75rem, 1.6rem + 10vw, 11rem);
+
+  /* Legacy aliases, mapped onto the scale. */
   --text-xs: 0.8125rem;
-  --text-sm: 0.875rem;
-  --text-base: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
-  --text-lg: clamp(1.1875rem, 1.12rem + 0.3vw, 1.375rem);
-  --text-xl: clamp(1.375rem, 1.25rem + 0.55vw, 1.75rem);
-  --text-2xl: clamp(1.625rem, 1.4rem + 1vw, 2.25rem);
-  --text-3xl: clamp(1.875rem, 1.5rem + 1.7vw, 3rem);
-  --text-4xl: clamp(2.25rem, 1.7rem + 2.4vw, 3.75rem);
-  --text-6xl: clamp(3rem, 1.9rem + 5vw, 6rem);
-
-  /* Poster register. Condensed 800, uppercase, leading below 1. */
-  --display-1: clamp(3.75rem, 1.2rem + 12.4vw, 11.25rem); /* 60px → 180px */
-  --display-2: clamp(3rem, 1.4rem + 7.4vw, 7rem); /* 48px → 112px */
-  --display-3: clamp(2.25rem, 1.4rem + 4vw, 4rem); /* 36px → 64px */
-  --display-numeral: clamp(3.5rem, 1.6rem + 8vw, 9rem);
-
-  --leading-display: 0.85;
-  --tracking-display: -0.015em;
-
-  /* Running text */
-  --text-section-body: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
-  --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.35vw, 1.375rem);
+  --text-sm: var(--step--1);
+  --text-base: var(--step-0);
+  --text-lg: var(--step-1);
+  --text-xl: var(--step-1);
+  --text-2xl: var(--step-2);
+  --text-3xl: var(--step-3);
+  --text-4xl: var(--step-4);
+  --text-section-body: var(--step-0);
+  --text-section-body-lg: var(--step-1);
   --text-body-compact: 1rem;
-  --text-caption: 0.875rem;
+  --text-caption: 0.9375rem;
 
-  /* The small condensed marker: kickers, rail labels, meta, nav. */
-  --text-marker: 0.8125rem;
-  --tracking-marker: 0.14em;
+  --leading-tight: 1.04;
+  --leading-snug: 1.25;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.68;
 
-  /* Line heights */
-  --leading-normal: 1.6;
-  --leading-relaxed: 1.7;
-
-  /* Measures. The brief's 60–68 characters per line, expressed where it counts:
-     `--measure` is the default for running text, the rest are the exceptions. */
-  --measure: 64ch;
+  /* Measures */
+  --measure: 62ch;
   --measure-wide: 72ch;
-  --content-max-form: 30rem;
+  --content-max-form: 32rem;
 
   /* Form controls */
-  --control-padding-block: 0.7rem;
-  --control-padding-inline: 0.875rem;
-  --control-radius: 0;
+  --radius: 0.375rem;
+  --control-padding-block: 0.75rem;
+  --control-padding-inline: 0.9rem;
+  --control-radius: var(--radius);
   --control-border-width: 1px;
   --control-border-color: var(--border-medium);
   --control-bg: var(--bg-input);
@@ -130,42 +139,38 @@
   --space-md: clamp(1.25rem, 1rem + 1vw, 1.75rem);
   --space-lg: clamp(2rem, 1.5rem + 2vw, 3.25rem);
   --space-xl: clamp(3rem, 2.2rem + 3vw, 5rem);
-  --space-2xl: clamp(4rem, 3rem + 4vw, 6.5rem);
+  --space-2xl: clamp(4rem, 2.8rem + 5vw, 8rem);
+  --space-3xl: clamp(5rem, 3rem + 8vw, 11rem);
 
-  /* Vertical rhythm, largest to smallest; never let an inner gap exceed an outer one.
-     section 48→64px, group 28→37px, item 20→26px, tight 8px (390px → 1320px). */
-  --rhythm-section: clamp(3rem, 2.55rem + 1.8vw, 4rem);
-  --rhythm-group: clamp(1.75rem, 1.5rem + 1vw, 2.5rem);
+  /* Vertical rhythm, largest to smallest; never let an inner gap exceed an outer one. */
+  --rhythm-section: clamp(4.5rem, 3rem + 6vw, 9rem);
+  --rhythm-group: clamp(2rem, 1.5rem + 2vw, 3.5rem);
   --rhythm-item: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
   --rhythm-tight: var(--space-xs);
-
-  /* A section title to its own body. */
   --rhythm-stack: var(--rhythm-item);
 
-  /* Motion — short and functional only. */
+  /* Motion */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-ambient: cubic-bezier(0.43, 0.13, 0.23, 0.96);
+  --ease-breath: cubic-bezier(0.45, 0, 0.25, 1);
   --ease-emphasised: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-ambient: cubic-bezier(0.43, 0.13, 0.23, 0.96);
 
   --duration-fast: 140ms;
-  --duration-normal: 220ms;
-  --duration-slow: 340ms;
+  --duration-normal: 240ms;
+  --duration-slow: 420ms;
 
   --motion-quick: var(--duration-fast) var(--ease-precise);
   --motion-standard: var(--duration-normal) var(--ease-precise);
 
-  --stagger-1: 40ms;
-  --stagger-2: 80ms;
-
   /* Layout */
-  /* A wide poster measure. */
-  --container-width: 1320px;
+  --container-width: 1360px;
   --container-narrow: 780px;
-  --container-gutter: clamp(1.25rem, 0.9rem + 2.6vw, 3.25rem);
-  --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+  --container-gutter: clamp(1.25rem, 0.8rem + 3vw, 4rem);
+  --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2.25rem);
 
-  /* The fixed header's actual height (measured: 77px), plus a little air. */
+  /* The fixed header's height, plus a little air. Plain pixels: lib/site-header.ts parses the clearance. */
+  --header-height: 68px;
   --header-clearance: 84px;
 
   /* Z-Index Scale */
