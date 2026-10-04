@@ -176,11 +176,12 @@ export const ensureEventList = async (ev: Event): Promise<number> => {
   return id;
 };
 
-export const DEFAULT_EVENT_NEWSLETTER_INTRO = `es ist wieder so weit – der nächste Männerkreis steht an. Ein Abend, an dem wir gemeinsam zur Ruhe kommen, offen sprechen und einander auf Augenhöhe begegnen.
+// Opens after the campaign template's "Hallo,": hence the lower case.
+export const DEFAULT_EVENT_NEWSLETTER_INTRO = `der nächste Männerkreis steht fest. Ein Abend, an dem wir im Kreis sitzen, einander zuhören und über das sprechen, was gerade wirklich da ist\u00a0– ohne Bewertung und ohne Ratschläge.
 
-Der Männerkreis ist ein geschützter Raum, in dem du dich zeigen kannst, wie du wirklich bist – ohne Rollen, ohne Bewertung. Es geht um echte Begegnung, gegenseitige Unterstützung und darum, gemeinsam zu wachsen.
+Vorbereiten musst du nichts, und darstellen auch nicht. Je nach Abend kommen einfache Übungen mit Atem und Körperwahrnehmung dazu; du machst mit, soweit es für dich passt.
 
-Die Teilnehmerzahl ist bewusst klein gehalten. Wenn du dabei sein möchtest, sichere dir deinen Platz – ich freue mich auf dich.`;
+Die Runde bleibt bewusst klein. Wenn du dabei sein möchtest, melde dich auf der Seite des Termins an\u00a0– ich freue mich auf dich.`;
 
 const introToProse = (text: string): string =>
   text
@@ -189,27 +190,31 @@ const introToProse = (text: string): string =>
     .map((para) => `<p>${escapeHtml(para.trim()).replace(/\r?\n/g, '<br />')}</p>`)
     .join('\n');
 
+// The campaign template's palette; inline, so the block holds in any template.
+const NL = { night: '#151210', chalk: '#f1e9db', muted: '#b3a594', flame: '#e4632e' };
+
+/** The event as the site sets it: the date in flame capitals on the night ground, then the facts as one line. */
 const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
   const url = `${config.APP_URL}/event/${ev.slug}`;
   const dateLong = formatDateLongDE(ev.eventDate);
-  const time = timeRangeText(ev);
-  const address = fullAddress(ev) || ev.location || '';
-
-  const facts: string[] = [];
-  if (dateLong) facts.push(`<strong>Wann:</strong> ${escapeHtml(dateLong)}${time ? `, ${escapeHtml(time)}` : ''}`);
-  if (address) facts.push(`<strong>Wo:</strong> ${escapeHtml(address)}`);
-  if (ev.costBasis) facts.push(`<strong>Beitrag:</strong> ${escapeHtml(ev.costBasis)}`);
-
+  const where = [timeRangeText(ev), fullAddress(ev) || ev.location || ''].filter(Boolean).join(' · ');
   const body = intro.trim() ? intro : DEFAULT_EVENT_NEWSLETTER_INTRO;
 
-  return [
-    introToProse(body),
-    `<h2>${escapeHtml(ev.title)}</h2>`,
-    facts.length ? `<p>${facts.join('<br />')}</p>` : '',
-    `<p><a href="${escapeHtml(url)}"><strong>Zum Termin &amp; zur Anmeldung →</strong></a></p>`,
+  const event = [
+    `<div class="em-event" style="margin:8px 0 26px;padding:24px 26px;background-color:${NL.night};border-radius:3px;">`,
+    dateLong
+      ? `<p class="em-event__date" style="margin:0 0 8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${NL.flame};">${escapeHtml(dateLong)}</p>`
+      : '',
+    `<h2 style="margin:0 0 10px;color:${NL.chalk};">${escapeHtml(ev.title)}</h2>`,
+    where ? `<p style="margin:0 0 6px;color:${NL.chalk};">${escapeHtml(where)}</p>` : '',
+    ev.costBasis ? `<p style="margin:0 0 6px;color:${NL.muted};">Beitrag: ${escapeHtml(ev.costBasis)}</p>` : '',
+    `<p style="margin:14px 0 0;"><a href="${escapeHtml(url)}" style="color:${NL.chalk};font-weight:600;text-decoration:underline;text-decoration-color:${NL.flame};">Zur Anmeldung&nbsp;→</a></p>`,
+    '</div>',
   ]
     .filter(Boolean)
     .join('\n');
+
+  return [introToProse(body), event].join('\n');
 };
 
 export const sendEventNewsletter = async (
