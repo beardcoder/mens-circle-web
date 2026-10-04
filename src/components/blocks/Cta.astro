@@ -1,4 +1,6 @@
 ---
+import SeatCircle from '../SeatCircle.astro';
+
 interface Props {
   data: {
     anchor?: string;
@@ -12,78 +14,90 @@ interface Props {
   };
 }
 
-/** A closing invitation on a sub-page: one action, one optional quiet link. */
+/** A closing invitation on a sub-page, on the rust ground: one action, one optional quiet link. */
 
 const { data } = Astro.props;
 ---
 
-<section class="section section--ruled cta-section" id={data.anchor}>
-  <div class="container">
-    <div class="spine">
-      {data.eyebrow && <p class="rail-heading">{data.eyebrow}</p>}
+<section class="section surface-rust section--clip cta-section" id={data.anchor}>
+  <SeatCircle class="cta__ring" ember />
 
-      <div class="spine__body" data-reveal-group="55">
-        {data.title && <h2 class="cta__title" data-reveal="up" set:html={data.title} />}
+  <div class="container cta__inner">
+    {data.eyebrow && <p class="marker">{data.eyebrow}</p>}
+    {data.title && <h2 class="display cta__title" set:html={data.title} />}
 
-        {data.text && (
-          <p class="cta__text" data-reveal="up">
-            {data.text}
-          </p>
+    {data.text && <p class="cta__text">{data.text}</p>}
+
+    {data.buttonText && data.buttonLink && (
+      <p class="actions cta__actions">
+        <a
+          href={data.buttonLink}
+          class="btn btn--primary btn--large"
+          data-umami-event="cta-click"
+          data-umami-event-location="cta-block"
+          data-umami-event-text={data.buttonText}
+        >
+          {data.buttonText}
+        </a>
+
+        {data.secondaryLabel && data.secondaryLink && (
+          <a href={data.secondaryLink} class="text-link">
+            {data.secondaryLabel}
+          </a>
         )}
-
-        {data.buttonText && data.buttonLink && (
-          <p class="actions" data-reveal="up">
-            <a
-              href={data.buttonLink}
-              class="btn btn--primary btn--large"
-              data-umami-event="cta-click"
-              data-umami-event-location="cta-block"
-              data-umami-event-text={data.buttonText}
-            >
-              {data.buttonText}
-            </a>
-
-            {data.secondaryLabel && data.secondaryLink && (
-              <a href={data.secondaryLink} class="text-link">
-                {data.secondaryLabel}
-              </a>
-            )}
-          </p>
-        )}
-      </div>
-    </div>
+      </p>
+    )}
   </div>
 </section>
 
 <style is:global>
   @layer sections {
+    .cta-section {
+      padding-block: var(--space-2xl);
+    }
+
+    .cta__ring {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-end: -8%;
+      inline-size: min(60vw, 40rem);
+      opacity: 0.4;
+      translate: 0 -50%;
+    }
+
+    .cta__inner {
+      position: relative;
+    }
+
     .cta__title {
-      margin-block-end: var(--space-sm);
-      font-size: var(--text-3xl);
-      line-height: 1.15;
-      text-wrap: balance;
+      max-inline-size: 16ch;
+      margin-block-end: var(--space-md);
     }
 
     .cta__text {
-      max-inline-size: var(--measure);
-      margin-block-end: var(--space-md);
+      max-inline-size: 46ch;
+      margin-block-end: var(--space-lg);
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
     @media (width <= 480px) {
-      .cta-section .actions {
+      .cta__ring {
+        inset-block-start: auto;
+        inset-block-end: -30%;
+        inset-inline-end: -40%;
+        inline-size: 90vw;
+        translate: none;
+      }
+
+      .cta__actions {
         flex-direction: column;
         align-items: stretch;
       }
 
-      .cta-section .btn {
+      .cta__actions .btn {
         inline-size: 100%;
-      }
-
-      .cta-section .text-link {
-        justify-content: center;
       }
     }
   }

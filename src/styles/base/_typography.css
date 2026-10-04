@@ -1,6 +1,5 @@
-/** Typography. */
+/** Typography — Fraunces speaks, Instrument Sans explains. */
 
-/* Headings — the reading register */
 h1,
 h2,
 h3,
@@ -8,10 +7,10 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  font-weight: 800;
-  line-height: 1.02;
-  letter-spacing: -0.005em;
-  text-wrap: pretty;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
 h1 {
@@ -35,23 +34,26 @@ h5 {
 }
 
 h6 {
-  font-size: var(--text-base);
   font-family: var(--font-body);
+  font-size: var(--text-base);
   font-weight: 600;
   letter-spacing: 0;
 }
 
-/* Poster register; a modifier, so any heading level can use it. */
+/* The voice: large serif in a reading weight. Emphasis turns italic and warm. */
 .display {
   font-family: var(--font-display);
   font-size: var(--display-2);
-  font-weight: 800;
+  font-weight: 400;
   line-height: var(--leading-display);
-  text-transform: uppercase;
   letter-spacing: var(--tracking-display);
   text-wrap: balance;
-  /* Reserves the overshoot of umlauts above the cap height at .85 leading. */
-  padding-block-start: 0.14em;
+}
+
+.display em,
+.section-title em {
+  font-style: italic;
+  color: var(--accent);
 }
 
 .display--xl {
@@ -62,67 +64,69 @@ h6 {
   font-size: var(--display-3);
 }
 
-/* A line of the poster register. Block-level so each line is its own row and
-   can be staggered independently by the entrance. */
+/* The heavy register: Fraunces Black in capitals. Rare by design — a few words per page. */
+.display--heavy {
+  font-weight: 900;
+  line-height: 0.92;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
 .display__line {
   display: block;
 }
 
-/* The descender half-leading is real space below the last line; pull it back so
-   the block sits tight against whatever follows. */
-.display {
-  margin-block-end: -0.06em;
-}
-
-/* Body text */
 p {
-  margin-block-end: 1.25em;
+  margin-block-end: 1.2em;
 }
 
 p:last-child {
   margin-block-end: 0;
 }
 
-/* The marker — small condensed uppercase. */
+/* The label — small sans capitals with a seat in front. */
 .marker,
 .eyebrow {
-  display: block;
-  margin-block-end: var(--space-xs);
-  font-family: var(--font-display);
+  display: flex;
+  gap: 0.7em;
+  align-items: center;
+  margin-block-end: var(--space-sm);
+  font-family: var(--font-body);
   font-size: var(--text-marker);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.3;
   color: var(--text-muted);
-  text-align: inherit;
   text-transform: uppercase;
   letter-spacing: var(--tracking-marker);
 }
 
-/* A marker that carries the orange as a leading rule rather than as colour. */
-.marker--ruled {
-  display: flex;
-  gap: 0.6em;
-  align-items: center;
-}
-
-.marker--ruled::before {
+.marker::before,
+.eyebrow::before {
   flex: none;
-  inline-size: 1.75rem;
-  block-size: 3px;
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
   content: '';
-  background: var(--color-orange);
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
 }
 
-/* Section title — the reading register's top end. */
+/* Kept for call sites: the same label, with a filled seat. */
+.marker--ruled::before {
+  background: var(--accent);
+}
+
+.marker--plain::before {
+  display: none;
+}
+
 .section-title {
-  max-inline-size: 18ch;
+  max-inline-size: 20ch;
   margin-block-end: var(--rhythm-stack);
   font-size: var(--text-4xl);
-  line-height: 1.04;
-  text-wrap: balance;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
 }
 
-/* Intro paragraph under a `.section-title`. */
 .section-intro {
   max-inline-size: var(--measure);
   margin-block-end: 0;
@@ -131,46 +135,66 @@ p:last-child {
   color: var(--text-secondary);
 }
 
-/* Links: ink text with a 2px orange underline that thickens on hover. */
-.link {
+/* Links: a hairline in the accent that thickens on hover. */
+.link,
+.prose a {
   color: var(--text-primary);
   text-decoration: underline;
-  text-decoration-color: var(--color-orange);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.18em;
-  transition: text-decoration-thickness var(--motion-quick);
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.22em;
+  transition:
+    text-decoration-thickness var(--motion-quick),
+    text-underline-offset var(--motion-quick);
 }
 
 .link:hover,
-.link:focus-visible {
-  text-decoration-thickness: 4px;
+.link:focus-visible,
+.prose a:hover,
+.prose a:focus-visible {
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.16em;
 }
 
-/* A quiet, self-contained text link used next to a primary action. Padded to
-   clear the 44px target without looking like a second button. */
+/* A quiet self-contained link next to a primary action: an arrow that moves. */
 .text-link {
   display: inline-flex;
+  gap: 0.55em;
   align-items: center;
   min-block-size: 44px;
-  font-family: var(--font-display);
-  font-size: var(--text-marker);
-  font-weight: 600;
+  font-family: var(--font-body);
+  font-size: var(--text-body-compact);
+  font-weight: 500;
   color: var(--text-primary);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-marker);
   text-decoration: underline;
-  text-decoration-color: var(--color-orange);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.35em;
-  transition: text-decoration-thickness var(--motion-quick);
+  text-decoration-color: color-mix(in oklab, var(--accent) 70%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color var(--motion-quick);
+}
+
+.text-link::after {
+  flex: none;
+  inline-size: 1em;
+  block-size: 1em;
+  content: '';
+  background-color: currentcolor;
+  mask: var(--arrow-icon) center / contain no-repeat;
+  transition: translate var(--motion-standard);
 }
 
 .text-link:hover,
 .text-link:focus-visible {
-  text-decoration-thickness: 4px;
+  text-decoration-color: var(--accent);
 }
 
-/* Prose — long-form rich text from the JSON content files */
+@media (hover: hover) and (pointer: fine) {
+  .text-link:hover::after {
+    translate: 0.25em 0;
+  }
+}
+
+/* Prose — rich text from the JSON content files */
 .prose {
   max-inline-size: var(--measure);
 }
@@ -199,7 +223,6 @@ p:last-child {
   color: var(--text-secondary);
 }
 
-/* `.prose p` outranks the global last-child trim. */
 .prose > :last-child {
   margin-block-end: 0;
 }
@@ -213,18 +236,8 @@ p:last-child {
   margin-block-end: 0.4rem;
 }
 
-.prose a {
-  color: var(--text-primary);
-  text-decoration: underline;
-  text-decoration-color: var(--color-orange);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.18em;
-  transition: text-decoration-thickness var(--motion-quick);
-}
-
-.prose a:hover,
-.prose a:focus-visible {
-  text-decoration-thickness: 4px;
+.prose li::marker {
+  color: var(--accent);
 }
 
 .prose strong {
@@ -235,10 +248,12 @@ p:last-child {
 .prose blockquote {
   padding-inline-start: var(--space-sm);
   margin-block: var(--space-md);
-  font-size: var(--text-lg);
-  line-height: var(--leading-normal);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-style: italic;
+  line-height: 1.4;
   color: var(--text-primary);
-  border-inline-start: 3px solid var(--color-orange);
+  border-inline-start: 2px solid var(--accent);
 }
 
 .prose table {
@@ -260,8 +275,6 @@ p:last-child {
   color: var(--text-primary);
 }
 
-/* Shared editorial primitives. */
-
 /* A hairline-separated definition list. */
 .deflist {
   margin: 0;
@@ -270,23 +283,27 @@ p:last-child {
 
 .deflist__row {
   display: grid;
-  grid-template-columns: minmax(6rem, 11rem) minmax(0, 1fr);
+  grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr);
   gap: var(--space-2xs) var(--space-md);
   padding-block: var(--space-sm);
   border-block-end: 1px solid var(--border-light);
 }
 
 .deflist__term {
-  font-size: var(--text-caption);
+  padding-block-start: 0.2em;
+  font-size: var(--text-marker);
   font-weight: 600;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-marker);
 }
 
 .deflist__desc {
   max-inline-size: var(--measure);
   margin: 0;
-  font-size: var(--text-section-body);
-  line-height: var(--leading-normal);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  line-height: 1.35;
   color: var(--text-primary);
   text-wrap: pretty;
 }
@@ -294,6 +311,7 @@ p:last-child {
 .deflist__note {
   display: block;
   margin-block-start: var(--space-3xs);
+  font-family: var(--font-body);
   font-size: var(--text-caption);
   line-height: var(--leading-normal);
   color: var(--text-muted);
@@ -305,19 +323,30 @@ p:last-child {
   }
 }
 
-/* A short marginal heading sitting beside a text column. */
+/* A short marginal heading beside a text column. */
 .rail-heading {
+  display: flex;
+  gap: 0.7em;
+  align-items: center;
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: var(--text-marker);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.3;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: var(--tracking-marker);
 }
 
-/* Image caption. Factual, never a headline. */
+.rail-heading::before {
+  flex: none;
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  content: '';
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+}
+
 .caption {
   margin-block-start: var(--space-xs);
   font-size: var(--text-caption);

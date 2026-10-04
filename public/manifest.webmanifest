@@ -56,6 +56,6 @@
     "scope": "/",
     "start_url": "/",
     "display": "standalone",
-    "theme_color": "#f2ede3",
-    "background_color": "#f2ede3"
+    "theme_color": "#f4ede1",
+    "background_color": "#f4ede1"
 }

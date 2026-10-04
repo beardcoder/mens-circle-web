@@ -1,0 +1,146 @@
+---
+interface Props {
+  /** How many seats sit on the ring. The circle is set for eight. */
+  seats?: number;
+  /** Seats drawn as taken (filled); the rest stay open. Defaults to all. */
+  taken?: number;
+  /** A glowing centre: the fire the circle sits around. */
+  ember?: boolean;
+  /** Seat radius in the 240-unit box; smaller for the large instances. */
+  seatSize?: number;
+  /** Runs the one-time draw-in (hero only). */
+  entrance?: boolean;
+  /** An accessible description; without it the graphic is decorative. */
+  label?: string;
+  class?: string;
+}
+
+/**
+ * The identity mark: a hairline ring with seats on it. Used at different scales —
+ * around the hero photograph, as the evening's four quarters, beside Markus, as
+ * the seat count of an event and in the footer.
+ */
+
+const {
+  seats = 8,
+  taken = seats,
+  seatSize = 7.5,
+  ember = false,
+  entrance = false,
+  label,
+  class: className,
+} = Astro.props;
+
+const C = 120;
+const R = 100;
+// Start at the top and go clockwise, with a half-step offset so no seat sits
+// exactly at twelve o'clock — the circle reads as people, not as a clock.
+const positions = Array.from({ length: seats }, (_, i) => {
+  const angle = ((i + 0.5) / seats) * Math.PI * 2 - Math.PI / 2;
+  return { x: +(C + R * Math.cos(angle)).toFixed(2), y: +(C + R * Math.sin(angle)).toFixed(2), filled: i < taken };
+});
+---
+
+<span
+  class:list={['seat-circle', entrance && 'seat-circle--entrance', className]}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <svg viewBox="0 0 240 240" focusable="false">
+    <circle class="seat-circle__ring" cx={C} cy={C} r={R} fill="none"></circle>
+    {ember && (
+      <g class="seat-circle__ember">
+        <circle cx={C} cy={C} r="22" fill="none"></circle>
+        <circle cx={C} cy={C} r="9"></circle>
+      </g>
+    )}
+    {positions.map((seat, i) => (
+      <circle
+        class:list={['seat-circle__seat', seat.filled ? 'is-taken' : 'is-open']}
+        cx={seat.x}
+        cy={seat.y}
+        r={seatSize}
+        style={`--i: ${i}`}
+      ></circle>
+    ))}
+  </svg>
+</span>
+
+<style is:global>
+  @layer components {
+    .seat-circle {
+      --seat-color: var(--text-primary);
+      --ring-color: var(--accent);
+
+      display: block;
+      aspect-ratio: 1;
+      pointer-events: none;
+    }
+
+    .seat-circle svg {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      overflow: visible;
+    }
+
+    .seat-circle__ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      stroke: var(--ring-color);
+      stroke-width: 1.25px;
+      /* A hairline at every size. */
+      vector-effect: non-scaling-stroke;
+    }
+
+    .seat-circle__seat {
+      transform-box: fill-box;
+      transform-origin: center;
+      stroke: var(--seat-color);
+      stroke-width: 1.5px;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .seat-circle__seat.is-taken {
+      fill: var(--seat-color);
+    }
+
+    .seat-circle__seat.is-open {
+      fill: var(--surface, var(--bg-primary));
+    }
+
+    .seat-circle__ember {
+      transform-box: fill-box;
+      transform-origin: center;
+      fill: var(--accent);
+      stroke: var(--accent);
+      stroke-width: 1px;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .seat-circle__ember circle:first-child {
+      fill: none;
+      opacity: 0.45;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .seat-circle--entrance .seat-circle__ring {
+        animation: ring-in 1000ms var(--ease-emphasised) both;
+      }
+
+      .seat-circle--entrance .seat-circle__seat {
+        animation: seat-in 420ms var(--ease-settle) both;
+        animation-delay: calc(500ms + var(--i) * 70ms);
+      }
+
+      .seat-circle--entrance .seat-circle__ember {
+        animation: ember-glow 700ms var(--ease-settle) 1000ms both;
+      }
+
+      .vt-arrival .seat-circle--entrance :is(.seat-circle__ring, .seat-circle__seat, .seat-circle__ember) {
+        animation: none;
+      }
+    }
+  }
+</style>
