@@ -1,4 +1,4 @@
-/** Design tokens — "Feuerstelle": cream, bark, rust and a little moss. */
+/** Design tokens — "Feuerstelle": cream, night, flame and rust. */
 
 :root {
   /* Mode — `data-mode` absent follows the OS, "light"/"dark" pins it. Applied
@@ -22,24 +22,26 @@
   --color-orange: #a84a2a;
   --color-rust-deep: #8a3a1f;
 
-  /* Ember — rust lifted for dark grounds. 6.5:1 on night. */
-  --color-ember: #e07f57;
+  /* Flame — the brush ring of the flyer. 5.4:1 on night; on cream only as
+     fill, stroke and the orange field (with night text on it). */
+  --color-flame: #e4632e;
+  --color-flame-deep: #c9521f;
 
-  /* Moss — the pine in the photograph; one quiet ground on the home page. */
-  --color-moss: #364132;
-  --color-moss-deep: #252d22;
+  /* Ember — kept as an alias of flame for dark grounds. */
+  --color-ember: var(--color-flame);
 
   /* Hairlines */
   --color-rule: #ddd2bf;
   --color-rule-strong: #c4b49b;
 
   /* Night — the dark mode ground and the bark surfaces. */
-  --color-night: #16110e;
-  --color-night-soft: #211a15;
-  --color-night-raised: #2b221c;
-  --color-night-rule: #3b3029;
-  --color-chalk: #efe6d6;
-  --color-chalk-muted: #b3a595; /* 7.8:1 on night */
+  --color-night: #151210;
+  --color-night-deep: #0e0c0a;
+  --color-night-soft: #201b18;
+  --color-night-raised: #2a241f;
+  --color-night-rule: #3a322b;
+  --color-chalk: #f1e9db;
+  --color-chalk-muted: #a79a8a; /* 6.8:1 on night */
 
   /* Semantic tokens. Surfaces re-declare the text, rule and accent tokens
      (see `.surface-*` in utilities/_layout.css), so components only ever use these. */
@@ -57,8 +59,8 @@
   --text-muted: light-dark(var(--color-ink-muted), var(--color-chalk-muted));
   --text-on-dark: var(--color-chalk);
 
-  /* The accent: rust on cream, ember at night. Large text, strokes and fills. */
-  --accent: light-dark(var(--color-orange), var(--color-ember));
+  /* The accent: rust on cream (may carry text), flame at night. */
+  --accent: light-dark(var(--color-orange), var(--color-flame));
   --accent-primary: var(--accent);
   --accent-text: var(--accent);
   --accent-rare: var(--accent);
@@ -81,8 +83,10 @@
   --arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13.5 6l6 6-6 6'/%3E%3C/svg%3E");
 
   /* Typography */
-  --font-display: var(--font-serif);
+  --font-display: var(--font-sans);
   --font-body: var(--font-sans);
+  /* The quiet register: Fraunces italic, for questions and quotes only. */
+  --font-quote: var(--font-serif);
 
   /* Reading register */
   --text-xs: 0.8125rem;
@@ -95,23 +99,23 @@
   --text-4xl: clamp(2.25rem, 1.7rem + 2.4vw, 3.75rem);
   --text-6xl: clamp(2.75rem, 1.8rem + 4.2vw, 5.5rem);
 
-  /* Voice register — Fraunces. Big, but set in a reading weight. */
-  --display-1: clamp(2.75rem, 1.4rem + 5.6vw, 6.25rem); /* 44px → 100px */
-  --display-2: clamp(2.375rem, 1.4rem + 4vw, 4.75rem); /* 38px → 76px */
-  --display-3: clamp(2rem, 1.4rem + 2.6vw, 3.5rem); /* 32px → 56px */
+  /* Voice register — Figtree 800, sentence case, tight. */
+  --display-1: clamp(2.5rem, 1.25rem + 4.8vw, 5.5rem); /* 40px → 88px */
+  --display-2: clamp(2.125rem, 1.3rem + 3.3vw, 4.25rem); /* 34px → 68px */
+  --display-3: clamp(1.75rem, 1.3rem + 1.9vw, 3rem); /* 28px → 48px */
   --display-numeral: clamp(4rem, 2rem + 9vw, 10rem);
 
-  --leading-display: 1.02;
-  --tracking-display: -0.022em;
+  --leading-display: 0.98;
+  --tracking-display: -0.035em;
 
   --text-section-body: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem);
   --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.35vw, 1.3125rem);
   --text-body-compact: 1rem;
   --text-caption: 0.875rem;
 
-  /* The label: small sans capitals, widely spaced. The one place for caps. */
+  /* The label: small capitals, spaced wide like the flyer's top line. */
   --text-marker: 0.75rem;
-  --tracking-marker: 0.16em;
+  --tracking-marker: 0.26em;
 
   --leading-normal: 1.6;
   --leading-relaxed: 1.7;
