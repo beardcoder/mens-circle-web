@@ -157,5 +157,9 @@ mail mark from `/images/logo-flame.png` by URL, so keep that file.
   `PageContent.astro`; a new block needs a component and a case.
 - The brand name comes from `site.siteName`; never type it out.
 - Canonical URLs come from `lib/canonical.ts`.
+- Search: utility pages (`/teile-deine-erfahrung`, `/auth/*`) are `noindex, follow` and
+  stay out of the sitemap and llms.txt. An event held outside Straubing names its
+  place in the `<title>` (≤ 60 chars, brand dropped first). Structured data states only
+  what the pages say (Person, `areaServed`); no FAQPage for rich results.
 - JSON-LD ids (`#organization`, `#markus`, `#website`, `#series`) are defined once.
 - Aliases: `@lib/*`, `@components/*`, `@data/*`.
