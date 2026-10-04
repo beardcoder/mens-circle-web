@@ -12,3 +12,6 @@ public/
 
 # tooling
 .claude/
+
+# listmonk templates: Go template syntax inside hand-tuned email HTML
+listmonk-templates/
