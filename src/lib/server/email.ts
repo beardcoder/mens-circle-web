@@ -122,5 +122,6 @@ export const sendEventMessage = async (
     eventTitle: ev.title,
     siteName: config.SITE_NAME,
     recipientEmail: participant.email,
+    contactEmail: config.CONTACT_EMAIL,
   });
 };
