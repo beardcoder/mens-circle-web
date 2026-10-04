@@ -36,17 +36,14 @@ const agreements = data.agreements ?? [];
     </div>
 
     {agreements.length > 0 && (
-      <ol class="home-frame__list" role="list">
-        {agreements.map((rule, i) => (
+      <ul class="home-frame__list" role="list">
+        {agreements.map((rule) => (
           <li class="home-frame__item" data-reveal>
-            <span class="home-frame__seat" aria-hidden="true">
-              {i + 1}
-            </span>
             <h3 class="home-frame__term">{rule.title}</h3>
             <p class="home-frame__text">{rule.text}</p>
           </li>
         ))}
-      </ol>
+      </ul>
     )}
 
     {data.boundaryText && (
@@ -80,10 +77,12 @@ const agreements = data.agreements ?? [];
       margin: 0;
     }
 
+    /* The agreements, two by two and unnumbered: none comes first. */
     .home-frame__list {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: var(--space-lg);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-xl) var(--space-2xl);
+      max-inline-size: 64rem;
       padding: 0;
       margin: 0;
       list-style: none;
@@ -92,31 +91,13 @@ const agreements = data.agreements ?? [];
     .home-frame__item {
       container-type: inline-size;
       display: grid;
-      grid-template-rows: auto auto 1fr;
-      gap: var(--space-sm);
+      gap: var(--space-xs);
       align-content: start;
-      padding-block-start: var(--space-md);
-      border-block-start: 1px solid var(--rule-strong);
-    }
-
-    /* A numbered seat. */
-    .home-frame__seat {
-      display: grid;
-      place-items: center;
-      inline-size: 3rem;
-      block-size: 3rem;
-      font-family: var(--font-quote);
-      font-size: var(--text-xl);
-      font-style: italic;
-      line-height: 1;
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      border-radius: 50%;
     }
 
     .home-frame__term {
       /* Capped by the column: "Eigenverantwortung" is one word. */
-      font-size: min(var(--text-xl), 10cqi);
+      font-size: min(var(--text-2xl), 9.5cqi);
       line-height: 1.15;
       hyphens: auto;
       overflow-wrap: break-word;
@@ -158,13 +139,6 @@ const agreements = data.agreements ?? [];
       color: var(--text-secondary);
     }
 
-    @media (width <= 72em) {
-      .home-frame__list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        row-gap: var(--space-xl);
-      }
-    }
-
     @media (width <= 56em) {
       .home-frame__head,
       .home-frame__boundary {
@@ -180,16 +154,6 @@ const agreements = data.agreements ?? [];
       .home-frame__list {
         grid-template-columns: minmax(0, 1fr);
         row-gap: var(--space-lg);
-      }
-
-      .home-frame__item {
-        grid-template-columns: 3rem minmax(0, 1fr);
-        grid-template-rows: none;
-        column-gap: var(--space-sm);
-      }
-
-      .home-frame__seat {
-        grid-row: 1 / span 2;
       }
     }
   }
