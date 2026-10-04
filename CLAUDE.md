@@ -55,7 +55,9 @@ replica on the same SQLite file is not supported.
 
 **Rendering.** Home is prerendered with exactly four `server:defer` islands
 (`HomeEventStatus` ×2, `Facts`, `Testimonials`); fallbacks never read the DB, islands
-get no images. Event pages are SSR. `lib/event-status.ts` has three states; a failed
+get no images. The `HomeEventStatus` fallback sets the same lines as a scheduled date
+(static words, same length or shorter), so the swap changes text, not height: no
+layout shift. Text in the first screen that an island fills stays one fixed line. Event pages are SSR. `lib/event-status.ts` has three states; a failed
 read (`unavailable`) must never render as "no date planned".
 
 **Caching.** `lib/cache-policy.ts` is the one table (middleware + the adapter's `staticHeaders`);
@@ -136,8 +138,9 @@ mail mark from `/images/logo-flame.png` by URL, so keep that file.
   three breaths — in shorter than out, a short rest, depth varying — while each turns
   slowly on its own period, so the form never repeats or restarts. Scrolling gives
   depth (`breath-parallax` on `translate`, scroll() timeline over the first screen):
-  rust lags most, amber least. On phones the fields are placed in `svh`, since the
-  hero is several screens tall. The field starts below the header (mask), so bar and
+  rust lags most, amber least. The fields are placed in `svh`, never in % of the hero:
+  the hero grows when the date island swaps in, and a field moving with it is a
+  layout shift. The field starts below the header (mask), so bar and
   hero stay one surface. `lib/breath.ts` pauses every `[data-breath]` element off
   screen; under reduced motion it rests, still, and does not move with scroll.
 - Smaller breath (`Breath.astro`, keyframes `breathe`, 10 s: 4 in, 0.5 hold, 5 out, 0.5

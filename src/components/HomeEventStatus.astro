@@ -26,7 +26,6 @@ const next = !fallback && state.status === 'scheduled' ? state.next : null;
 const [weekday = '', date = ''] = next?.dateLabel.split(/,\s*/) ?? [];
 const dateLine = weekday && date ? `${weekday.slice(0, 2)} · ${date}` : (next?.dateLabel ?? '');
 const meta = next ? [next.timeRange, next.place].filter(Boolean).join(' · ') : '';
-const fee = next?.costBasis || 'Auf Spendenbasis';
 const seatsLabel = next
   ? state.isFull
     ? `Ausgebucht – Warteliste möglich`
@@ -45,7 +44,9 @@ const seatsLabel = next
       </p>
       {meta && <p class="poster-date__meta">{meta}</p>}
       {placement === 'hero' ? (
-        <p class="poster-date__facts">Ohne Vorerfahrung · {fee}</p>
+        /* Fixed words, as in the fallback: an event's fee text can run to two lines (the
+           recommendation stands in the facts strip below), and the swap must not grow. */
+        <p class="poster-date__facts">Ohne Vorerfahrung · Spendenbasis</p>
       ) : (
         <div class="poster-date__seats">
           <SeatCircle
@@ -62,6 +63,25 @@ const seatsLabel = next
                 ? 'Wird ein Platz frei, rückst du automatisch nach.'
                 : 'Für die Anmeldung genügen Name und E-Mail-Adresse.'}
             </span>
+          </p>
+        </div>
+      )}
+    </div>
+  ) : fallback ? (
+    /* The same lines the loaded date sets, with static words: the swap changes text, not height. */
+    <div class="poster-date poster-date--pending">
+      <p class="poster-date__line">
+        <span class="date-line">Nächster Termin</span>
+      </p>
+      <p class="poster-date__meta">Alles auf der Terminseite</p>
+      {placement === 'hero' ? (
+        <p class="poster-date__facts">Ohne Vorerfahrung · Spendenbasis</p>
+      ) : (
+        <div class="poster-date__seats">
+          <SeatCircle class="poster-date__circle poster-date__circle--pending" />
+          <p>
+            Anmeldung
+            <span>Für die Anmeldung genügen Name und E-Mail-Adresse.</span>
           </p>
         </div>
       )}
@@ -172,20 +192,12 @@ const seatsLabel = next
       margin-block-start: var(--space-lg);
     }
 
-    /* Reserve space while the island loads — and only while it loads. */
-    .home-live-event--pending.home-live-event--hero {
-      min-block-size: 9rem;
-    }
-
-    .home-live-event--pending.home-live-event--dates {
-      min-block-size: 15rem;
+    /* The circle keeps its place while the seats load, but shows none. */
+    .poster-date__circle--pending {
+      visibility: hidden;
     }
 
     @media (width <= 30em) {
-      .home-live-event--pending.home-live-event--hero {
-        min-block-size: 12rem;
-      }
-
       .poster-date__actions {
         flex-direction: column;
         align-items: stretch;
