@@ -107,7 +107,9 @@ export default defineConfig({
   integrations: [
     icon(),
     sitemap({
-      filter: (page) => !page.includes('/admin') && !page.includes('/impressum') && !page.includes('/datenschutz'),
+      // The testimonial form is for people who were there, not for search (noindex too).
+      filter: (page) =>
+        !['/admin', '/impressum', '/datenschutz', '/teile-deine-erfahrung', '/auth'].some((p) => page.includes(p)),
       // Slash-less, matching the canonicals.
       serialize(item) {
         const url = new URL(item.url);
@@ -131,7 +133,7 @@ export default defineConfig({
         '.testimonials-section',
       ],
       // event/health: v3 would fetch these SSR routes from the live site at build time.
-      exclude: ['admin/**', 'impressum/**', 'datenschutz/**', 'event', 'health'],
+      exclude: ['admin/**', 'auth/**', 'impressum/**', 'datenschutz/**', 'teile-deine-erfahrung/**', 'event', 'health'],
     }),
     // After sitemap() and llms(), whose output it patches.
     publishGeneratedFiles({

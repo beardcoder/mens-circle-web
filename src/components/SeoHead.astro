@@ -86,6 +86,10 @@ const person = {
   '@type': 'Person',
   '@id': `${siteUrl.origin}/#markus`,
   name: 'Markus Sommer',
+  // What his own page says of him, nothing more.
+  description: `Gebürtiger Niederbayer, Gründer und Leiter des Männerkreises in ${site.geo.locality}.`,
+  jobTitle: 'Leiter des Männerkreises',
+  knowsAbout: ['Männerkreis', 'Atemübungen', 'Körperwahrnehmung'],
   url: new URL('/warum-ich-den-maennerkreis-leite', siteUrl).href,
   image: new URL('/images/og-markus.jpg', siteUrl).href,
   worksFor: { '@id': `${siteUrl.origin}/#organization` },
@@ -121,15 +125,23 @@ const localBusiness = {
     latitude: site.geo.lat,
     longitude: site.geo.lng,
   },
-  areaServed: {
-    '@type': 'GeoCircle',
-    geoMidpoint: {
-      '@type': 'GeoCoordinates',
-      latitude: site.geo.lat,
-      longitude: site.geo.lng,
+  // The circle, and the places a search names: the evenings are held in and around
+  // Straubing (Landkreis Straubing-Bogen), for men from Niederbayern.
+  areaServed: [
+    {
+      '@type': 'GeoCircle',
+      geoMidpoint: {
+        '@type': 'GeoCoordinates',
+        latitude: site.geo.lat,
+        longitude: site.geo.lng,
+      },
+      geoRadius: 50000,
     },
-    geoRadius: 50000,
-  },
+    { '@type': 'City', name: site.geo.locality },
+    { '@type': 'AdministrativeArea', name: 'Landkreis Straubing-Bogen' },
+    { '@type': 'AdministrativeArea', name: 'Niederbayern' },
+  ],
+  slogan: site.tagline,
   priceRange: '€',
   ...(sameAs.length ? { sameAs } : {}),
 };
