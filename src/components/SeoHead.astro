@@ -78,6 +78,8 @@ const imageType = MIME_BY_EXTENSION[new URL(ogImageUrl).pathname.split('.').pop(
 const cardDetails = socialDetails.slice(0, 2);
 
 const sameAs = site.socialLinks.filter((l) => !['email', 'phone', 'whatsapp'].includes(l.type)).map((l) => l.value);
+// The Google business profile is also the business's map.
+const googleProfile = site.socialLinks.find((l) => l.type === 'google')?.value;
 
 // One `@id` for Markus, referenced from the business below and from the Article
 // on his page, so the three mentions tie together.
@@ -142,6 +144,7 @@ const localBusiness = {
     { '@type': 'AdministrativeArea', name: 'Niederbayern' },
   ],
   slogan: site.tagline,
+  ...(googleProfile ? { hasMap: googleProfile } : {}),
   priceRange: '€',
   ...(sameAs.length ? { sameAs } : {}),
 };
