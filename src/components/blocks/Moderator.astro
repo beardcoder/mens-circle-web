@@ -1,6 +1,5 @@
 ---
 import CropPicture from '../CropPicture.astro';
-import SeatCircle from '../SeatCircle.astro';
 import { resolveAssetImage } from '../../lib/images';
 
 interface Props {
@@ -42,7 +41,6 @@ const roles = data.roles ?? [];
             alt={data.imageAlt ?? ''}
           />
         </div>
-        <SeatCircle class="home-person__mark" taken={1} />
       </figure>
     )}
 
@@ -100,9 +98,11 @@ const roles = data.roles ?? [];
       margin: var(--space-2xl) 0 0;
     }
 
+    /* The frame sits on a flame bar: the one orange stroke in this section. */
     .home-person__frame {
       overflow: clip;
       border-radius: var(--radius);
+      border-block-end: 6px solid var(--color-flame);
       aspect-ratio: 3 / 4;
     }
 
@@ -122,13 +122,6 @@ const roles = data.roles ?? [];
       transform-origin: 22% 34%;
     }
 
-    .home-person__mark {
-      position: absolute;
-      inset-block-end: -2.5rem;
-      inset-inline-end: -2.5rem;
-      inline-size: 7.5rem;
-    }
-
     .home-person__name {
       margin-block-end: var(--space-lg);
     }
@@ -137,7 +130,7 @@ const roles = data.roles ?? [];
       max-inline-size: 24ch;
       padding: 0;
       margin: 0 0 var(--space-lg);
-      font-family: var(--font-display);
+      font-family: var(--font-quote);
       font-size: var(--text-3xl);
       font-style: italic;
       line-height: 1.2;
@@ -206,7 +199,7 @@ const roles = data.roles ?? [];
         gap: var(--space-lg);
       }
 
-      /* Phone: the name first, then the portrait off-centre with the seat mark. */
+      /* Phone: the name first, then the portrait off-centre. */
       .home-person__body {
         display: contents;
       }
@@ -231,11 +224,6 @@ const roles = data.roles ?? [];
 
       .home-person__frame {
         aspect-ratio: 4 / 5;
-      }
-
-      .home-person__mark {
-        inset-inline-end: -3.25rem;
-        inline-size: 6rem;
       }
 
       .home-person__quote {

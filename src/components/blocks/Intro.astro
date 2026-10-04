@@ -1,5 +1,5 @@
 ---
-import SeatCircle from '../SeatCircle.astro';
+import BrushRing from '../BrushRing.astro';
 
 interface Props {
   data: {
@@ -42,7 +42,7 @@ const questions = (data.questions ?? []).slice(0, 4);
         </figcaption>
 
         <div class="home-circle__center" aria-hidden="true">
-          <SeatCircle ember seatSize={5} class="home-circle__mark" />
+          <BrushRing seed={23} class="home-circle__mark" />
         </div>
 
         <ul class="home-circle__list" role="list">
@@ -123,7 +123,7 @@ const questions = (data.questions ?? []).slice(0, 4);
     }
 
     .home-circle__question {
-      font-family: var(--font-display);
+      font-family: var(--font-quote);
       font-size: var(--text-2xl);
       font-style: italic;
       line-height: 1.2;
@@ -191,8 +191,11 @@ const questions = (data.questions ?? []).slice(0, 4);
         border-block-start: 1px solid var(--border-light);
       }
 
+      /* The desktop's named areas do not exist in this grid: without resetting
+         them every question lands in the same implicit cell. */
       .home-circle__question,
       .home-circle__question--4 {
+        grid-area: auto;
         display: flex;
         gap: var(--space-sm);
         align-items: baseline;

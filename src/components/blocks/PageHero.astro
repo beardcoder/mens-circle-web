@@ -1,6 +1,5 @@
 ---
 import CropPicture from '../CropPicture.astro';
-import SeatCircle from '../SeatCircle.astro';
 import { resolveAssetImage } from '../../lib/images';
 
 interface Props {
@@ -30,7 +29,7 @@ const imageAsset = resolveAssetImage(data.image);
 <section class={`page-hero page-hero--${align}${imageAsset ? ' page-hero--with-image' : ''}`} id={data.anchor}>
   <div class="container page-hero__layout">
     <div class="page-hero__content">
-      {data.eyebrow && <p class="marker page-hero__eyebrow">{data.eyebrow}</p>}
+      {data.eyebrow && <p class="marker marker--plain page-hero__eyebrow">{data.eyebrow}</p>}
       {data.title && <h1 class="display page-hero__title" set:html={data.title} />}
     </div>
 
@@ -66,7 +65,6 @@ const imageAsset = resolveAssetImage(data.image);
           fetchpriority="high"
           alt={data.imageAlt ?? ''}
         />
-        <SeatCircle class="page-hero__mark" seatSize={5} ember />
       </div>
       {data.imageCaption && (
         <figcaption class="container">
@@ -134,15 +132,8 @@ const imageAsset = resolveAssetImage(data.image);
       inline-size: 100%;
       aspect-ratio: 21 / 9;
       object-fit: cover;
-      object-position: 50% 14%;
+      object-position: 50% 4%;
       border-radius: var(--radius);
-    }
-
-    .page-hero__mark {
-      position: absolute;
-      inset-block-end: -4.5rem;
-      inset-inline-end: calc(var(--container-gutter) + var(--space-lg));
-      inline-size: clamp(5rem, 3rem + 6vw, 9rem);
     }
 
     .page-hero__media figcaption {
@@ -186,11 +177,6 @@ const imageAsset = resolveAssetImage(data.image);
         aspect-ratio: 4 / 3;
         object-position: 22% 40%;
         border-radius: 0;
-      }
-
-      .page-hero__mark {
-        inset-block-end: -2.25rem;
-        inset-inline-end: var(--container-gutter);
       }
 
       .page-hero__cta .btn {

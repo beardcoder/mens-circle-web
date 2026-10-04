@@ -84,34 +84,37 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
 
 ## Design
 
-- "Feuerstelle": warm, earthy, calm. Fraunces speaks (headlines, quotes, numbers;
-  400, italic for emphasis), Instrument Sans explains (text, UI). Capitals only for
-  small labels (`.marker`) and `.display--heavy` (Fraunces 900), a few words per page.
-  Barlow is loaded for the admin only.
-- Colours: cream `#F4EDE1`, bark `#241C17`, rust `#A84A2A` (4.9:1, may carry text and
-  the cream label of a button), ember `#E07F57` at night, moss `#364132` once on the
-  home page. Strong grounds are rare: bark (Ablauf, footer), moss (statement), rust
-  (Termine, sub-page CTA).
-- Surfaces (`.surface-sand|bark|moss|rust`) re-declare `--text-*`, `--accent`,
-  `--on-accent`, `--border-*`, `--surface` and the control tokens; components only use
-  those tokens, so buttons, links, focus rings and forms follow the ground. Surfaces
+- "Feuerstelle", set like the flyer: warm, earthy, direct. Figtree speaks and explains
+  (headlines 800 in sentence case, tight; text 400/500). Fraunces italic is the quiet
+  voice for questions and quotes only (`.quote-voice`, `--font-quote`). Capitals for
+  wide-spaced labels (`.marker`), the date line (`.date-line`: bold orange capitals)
+  and the one poster slogan (`.display--heavy`). Barlow is loaded for the admin only.
+- Colours: cream `#F4EDE1`, night `#151210`, flame `#E4632E` (5.4:1 on night; on cream
+  only as fill or stroke), rust `#A84A2A` (4.9:1, the accent and button on cream).
+  Grounds: night for the header, hero, Termine and footer; one flame field per page
+  (night text on it); sand for quiet passages.
+- Surfaces (`.surface-sand|bark|night|flame|rust`) re-declare `--text-*`, `--accent`,
+  `--on-accent`, `--border-*`, `--surface`; a shared `:where()` block re-declares the
+  aliases that `:root` defines in terms of them (control colours, `--focus-ring`,
+  `--accent-*`). Without it inputs and focus rings keep the page's colours. Surfaces
   keep the page's color-scheme, so their `light-dark()` grounds follow the mode.
+- The mark is the original brush-stroke logo (`src/icons/logo.svg`, header and footer)
+  and its big sibling `BrushRing.astro`: a seeded, filter-roughened painted ring. Text
+  may sit inside a ring (in a size container, sized in `cqi`), never across its stroke
+  and never behind running text; each ring on a page needs its own `seed`.
+  `SeatCircle.astro` only counts seats (taken/open) for an event.
 - Layout: asymmetric two-column grids per block; `.spine` only for quiet passages and
-  sub-pages. Phones get their own compositions (hero circle breaks out to the right,
-  questions become a ladder, Markus' name comes before his photo).
+  sub-pages. Phones get their own order (ring first, then date and action, then photo).
+  Never reuse desktop `grid-area` names in a stacked grid without resetting them.
 - Vertical rhythm: `--rhythm-section` > `group` > `item` > `tight`; never inverted.
   Lift reserving `min-block-size` once columns stack or an island swaps in.
-- The seat circle (`SeatCircle.astro`) is the mark: a hairline ring with seats and an
-  ember. It frames the hero photo, sits at the centre of the questions, draws the
-  seats of an event (taken/open), the logo and the footer. Never behind running text.
-  Ring strokes use `non-scaling-stroke`, so never put dash arrays on them.
-- Radius `--radius` (3px) on controls and panels; full circles only for seats, the
-  theme and scroll-to-top buttons and the hero photo.
-- Motion: hero entrance (words, circle), scroll-driven reveals (`[data-reveal]`,
-  view() only, no JS, nothing hidden without timeline support), ring turn, the
-  Ablauf dial (per-step view timelines via `timeline-scope`), statement settle,
-  breath rings, header ground and progress. Only `opacity`/`transform`; all off under
-  `prefers-reduced-motion`.
+- Radius `--radius` (3px) on controls and panels; full circles only for seats and the
+  round icon buttons. Capital lines keep `line-height` ≥ 1 for umlaut dots.
+- The header is solid at all times (nothing scrolls visibly beneath it).
+- Motion: hero entrance (ring turn, sentence), scroll-driven reveals (`[data-reveal]`,
+  view() only, no JS, nothing hidden without timeline support), the Ablauf dial
+  (per-step view timelines via `timeline-scope`), statement settle, reading progress.
+  Only `opacity`/`transform`; all off under `prefers-reduced-motion`.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Block styles live in the component (`<style is:global>` in `@layer sections`), since

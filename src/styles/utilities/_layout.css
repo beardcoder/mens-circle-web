@@ -82,37 +82,45 @@
 }
 
 .surface-bark,
+.surface-night,
 .section--ink {
   --text-primary: var(--color-chalk);
-  --text-secondary: #d2c6b5;
+  --text-secondary: #d6cbbb;
   --text-muted: var(--color-chalk-muted);
-  --accent: var(--color-ember);
+  --accent: var(--color-flame);
   --on-accent: var(--color-night);
   --rule-strong: var(--color-chalk);
   --border-light: var(--color-night-rule);
-  --border-medium: #4a3d34;
-  --border-dark: #66584c;
-  --control-bg: rgb(239 230 214 / 6%);
-  --control-bg-hover: rgb(239 230 214 / 11%);
-  --control-border-color: #574a40;
+  --border-medium: #4a4038;
+  --border-dark: #6a5e53;
+  --control-bg: rgb(241 233 219 / 6%);
+  --control-bg-hover: rgb(241 233 219 / 11%);
+  --control-border-color: #574c43;
   --bg-elevated: var(--color-night-raised);
 
-  --surface: light-dark(var(--color-ink), var(--color-night-soft));
+  --surface: light-dark(var(--color-night), var(--color-night-soft));
 
   color: var(--text-primary);
   background: var(--surface);
 }
 
-.surface-moss {
-  --text-primary: var(--color-chalk);
-  --text-secondary: #d8d6c4;
-  --text-muted: #b9b9a4;
-  --accent: #e9a07c;
-  --on-accent: var(--color-moss-deep);
-  --rule-strong: var(--color-chalk);
-  --border-light: rgb(239 230 214 / 20%);
+/* The poster ground: the flyer's near-black in both modes. */
+.surface-night {
+  --surface: light-dark(var(--color-night), var(--color-night-deep));
+}
 
-  --surface: light-dark(var(--color-moss), var(--color-moss-deep));
+/* The orange field: night text on flame (5.4:1). Once per page at most. */
+.surface-flame {
+  --text-primary: var(--color-night);
+  --text-secondary: #2b1d15;
+  --text-muted: #3d2a1e;
+  --accent: var(--color-night);
+  --on-accent: var(--color-flame);
+  --rule-strong: var(--color-night);
+  --border-light: rgb(21 18 16 / 25%);
+  --border-medium: rgb(21 18 16 / 40%);
+
+  --surface: light-dark(var(--color-flame), var(--color-flame-deep));
 
   color: var(--text-primary);
   background: var(--surface);
@@ -138,6 +146,29 @@
 
   color: var(--text-primary);
   background: var(--surface);
+}
+
+/* Aliases that :root defines in terms of other tokens resolve where they are
+   declared, so every surface (and the mobile nav panel) declares them again:
+   otherwise inputs, placeholders and focus rings keep the page's colours. */
+:where(
+  .surface-sand,
+  .surface-bark,
+  .surface-night,
+  .surface-flame,
+  .surface-rust,
+  .section--ink,
+  .section--sand,
+  .section--signal,
+  .nav
+) {
+  --control-color: var(--text-primary);
+  --control-placeholder: var(--text-muted);
+  --control-border-color: var(--border-medium);
+  --focus-ring: var(--text-primary);
+  --accent-primary: var(--accent);
+  --accent-text: var(--accent);
+  --accent-rare: var(--accent);
 }
 
 /* The prose spine — marker column + text column (quiet passages, sub-pages). */
