@@ -16,36 +16,14 @@ interface Props {
   };
 }
 
-/**
- * The evening as one circle in four quarters. On wide screens the circle stays
- * in view while the steps pass, and the quarter of the step on screen lights up
- * (a scroll-driven animation per step, shared through `timeline-scope`). Without
- * timeline support all four quarters simply stand.
- */
+/** The evening in four steps, side by side; each carries a small circle with its own quarter filled. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
 const steps = (data.steps ?? []).slice(0, 4);
-
-const C = 120;
-const R = 100;
-const QUARTER = (2 * Math.PI * R) / 4;
-const GAP = 14;
-const timelines = steps.map((_, i) => `--evening-step-${i + 1}`);
-// Label positions just outside each quarter's midpoint (NE, SE, SW, NW).
-const labelAngle = (i: number) => -Math.PI / 4 + (i * Math.PI) / 2;
-const labelAt = (i: number, r: number) => ({
-  x: +(C + r * Math.cos(labelAngle(i))).toFixed(1),
-  y: +(C + r * Math.sin(labelAngle(i))).toFixed(1),
-});
 ---
 
-<section
-  class="section surface-sand home-evening"
-  id={anchor}
-  aria-labelledby="ablauf-title"
-  style={`timeline-scope: ${timelines.join(', ')}`}
->
+<section class="section surface-sand home-evening" id={anchor} aria-labelledby="ablauf-title">
   <div class="container">
     <div class="home-evening__head">
       <p class="marker">{data.eyebrow}</p>
@@ -57,59 +35,23 @@ const labelAt = (i: number, r: number) => ({
       {data.subtitle && <p class="section-intro home-evening__intro">{data.subtitle}</p>}
     </div>
 
-    <div class="home-evening__body">
-      <div class="home-evening__dial" aria-hidden="true">
-        <svg viewBox="0 0 240 240" focusable="false">
-          <circle class="home-evening__track" cx={C} cy={C} r={R} fill="none"></circle>
-          {steps.map((_, i) => (
-            <circle
-              class="home-evening__quarter"
-              cx={C}
-              cy={C}
-              r={R}
-              fill="none"
-              stroke-dasharray={`${(QUARTER - GAP).toFixed(2)} ${(QUARTER * 3 + GAP).toFixed(2)}`}
-              transform={`rotate(${-90 + i * 90 + (GAP / (2 * Math.PI * R)) * 180} ${C} ${C})`}
-              style={`animation-timeline: ${timelines[i]}`}
-            ></circle>
-          ))}
-          {steps.map((step, i) => (
-            <text
-              class="home-evening__dial-label"
-              x={labelAt(i, 70).x}
-              y={labelAt(i, 70).y}
-              text-anchor="middle"
-              dominant-baseline="middle"
-              style={`animation-timeline: ${timelines[i]}`}
-            >
-              {step.title}
-            </text>
-          ))}
-          <circle class="home-evening__ember-halo" cx={C} cy={C} r="22" fill="none"></circle>
-          <circle class="home-evening__ember" cx={C} cy={C} r="9"></circle>
-        </svg>
-      </div>
-
-      {steps.length > 0 && (
-        <ol class="home-evening__list" role="list">
-          {steps.map((step, i) => (
-            <li class="home-evening__step" style={`view-timeline-name: ${timelines[i]}`}>
-              <p class="home-evening__number" aria-hidden="true">
-                <svg class="home-evening__glyph" viewBox="0 0 24 24" focusable="false">
-                  <circle cx="12" cy="12" r="10" fill="none"></circle>
-                  <path d="M12 12 L12 2 A10 10 0 0 1 22 12 Z" transform={`rotate(${i * 90} 12 12)`}></path>
-                </svg>
-                {step.number?.padStart(2, '0')}
-              </p>
-              <div class="home-evening__text-col">
-                {step.title && <h3 class="home-evening__step-title">{step.title}</h3>}
-                {step.description && <p class="home-evening__text">{step.description}</p>}
-              </div>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
+    {steps.length > 0 && (
+      <ol class="home-evening__list" role="list">
+        {steps.map((step, i) => (
+          <li class="home-evening__step" data-reveal>
+            <p class="home-evening__number" aria-hidden="true">
+              <svg class="home-evening__glyph" viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="10" fill="none"></circle>
+                <path d="M12 12 L12 2 A10 10 0 0 1 22 12 Z" transform={`rotate(${i * 90} 12 12)`}></path>
+              </svg>
+              {step.number?.padStart(2, '0')}
+            </p>
+            {step.title && <h3 class="home-evening__step-title">{step.title}</h3>}
+            {step.description && <p class="home-evening__text">{step.description}</p>}
+          </li>
+        ))}
+      </ol>
+    )}
 
     {data.close && <div class="home-evening__close prose" set:html={data.close} />}
   </div>
@@ -122,7 +64,7 @@ const labelAt = (i: number, r: number) => ({
       grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
       gap: 0 var(--space-xl);
       align-items: end;
-      margin-block-end: var(--space-2xl);
+      margin-block-end: var(--space-xl);
     }
 
     .home-evening__head .marker {
@@ -138,68 +80,10 @@ const labelAt = (i: number, r: number) => ({
       max-inline-size: 46ch;
     }
 
-    .home-evening__body {
-      display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-      gap: var(--space-xl);
-      align-items: start;
-    }
-
-    .home-evening__dial {
-      position: sticky;
-      inset-block-start: calc(var(--header-clearance) + var(--space-lg));
-      inline-size: min(100%, 30rem);
-    }
-
-    .home-evening__dial svg {
-      display: block;
-      inline-size: 100%;
-      overflow: visible;
-    }
-
-    /* Stroke widths in user units: dash lengths only line up without
-       non-scaling-stroke. The dial is drawn at roughly twice its 240-unit box. */
-    .home-evening__track {
-      stroke: var(--border-medium);
-      stroke-width: 0.6;
-    }
-
-    .home-evening__quarter {
-      stroke: var(--accent);
-      stroke-width: 2.5;
-      stroke-linecap: round;
-    }
-
-    .home-evening__dial-label {
-      font-family: var(--font-quote);
-      font-size: 11px;
-      font-style: italic;
-      fill: var(--text-primary);
-    }
-
-    .home-evening__ember {
-      fill: var(--accent);
-    }
-
-    .home-evening__ember-halo {
-      stroke: var(--accent);
-      stroke-width: 1px;
-      vector-effect: non-scaling-stroke;
-      opacity: 0.45;
-    }
-
-    /* Each quarter (and its label) is lit while its own step crosses the screen. */
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) and (timeline-scope: none) {
-        .home-evening__quarter,
-        .home-evening__dial-label {
-          animation: quarter-on linear both;
-          animation-range: cover 15% cover 85%;
-        }
-      }
-    }
-
     .home-evening__list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-lg);
       padding: 0;
       margin: 0;
       list-style: none;
@@ -207,33 +91,28 @@ const labelAt = (i: number, r: number) => ({
 
     .home-evening__step {
       display: grid;
-      grid-template-columns: 4.5rem minmax(0, 1fr);
-      gap: var(--space-md);
-      align-items: start;
-      align-content: center;
-      min-block-size: min(44vh, 26rem);
-      padding-block: var(--space-lg);
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .home-evening__step:last-child {
-      border-block-end: 1px solid var(--border-light);
+      grid-template-rows: auto auto 1fr;
+      gap: var(--space-sm);
+      align-content: start;
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid var(--rule-strong);
     }
 
     .home-evening__number {
-      display: grid;
+      display: flex;
       gap: var(--space-xs);
-      align-content: start;
-      justify-items: start;
+      align-items: center;
       margin: 0;
       font-size: var(--text-caption);
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-muted);
       font-variant-numeric: tabular-nums;
       letter-spacing: 0.1em;
     }
 
+    /* The small circle: the evening, with this step's quarter filled. */
     .home-evening__glyph {
+      flex: none;
       inline-size: 2.25rem;
       block-size: 2.25rem;
     }
@@ -249,60 +128,66 @@ const labelAt = (i: number, r: number) => ({
     }
 
     .home-evening__step-title {
-      margin-block-end: var(--space-xs);
-      font-size: var(--display-3);
+      font-size: var(--text-3xl);
       line-height: 1.05;
-      letter-spacing: -0.02em;
     }
 
     .home-evening__text {
-      max-inline-size: 46ch;
       margin: 0;
-      font-size: var(--text-section-body-lg);
+      font-size: var(--text-section-body);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
     .home-evening__close {
-      max-inline-size: 52ch;
+      max-inline-size: 60ch;
+      padding-block-start: var(--space-md);
       margin-block-start: var(--space-xl);
-      margin-inline-start: auto;
+      border-block-start: 1px solid var(--border-medium);
     }
 
     .home-evening__close p {
       font-size: var(--text-section-body);
     }
 
-    /* Phone: no dial; each step carries its own quarter. */
+    @media (width <= 72em) {
+      .home-evening__list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        row-gap: var(--space-xl);
+      }
+    }
+
     @media (width <= 56em) {
       .home-evening__head {
         grid-template-columns: minmax(0, 1fr);
         gap: var(--space-md);
-        margin-block-end: var(--space-xl);
+        margin-block-end: var(--space-lg);
       }
+    }
 
-      .home-evening__body {
+    /* Phone: a ladder, the circle beside each step. */
+    @media (width <= 36em) {
+      .home-evening__list {
         grid-template-columns: minmax(0, 1fr);
-      }
-
-      .home-evening__dial {
-        display: none;
+        row-gap: 0;
       }
 
       .home-evening__step {
         grid-template-columns: 3rem minmax(0, 1fr);
-        gap: var(--space-sm);
-        min-block-size: 0;
+        grid-template-rows: none;
+        column-gap: var(--space-sm);
         padding-block: var(--space-md);
+      }
+
+      .home-evening__number {
+        grid-row: 1 / span 2;
+        flex-direction: column;
+        align-items: flex-start;
       }
 
       .home-evening__glyph {
         inline-size: 2rem;
         block-size: 2rem;
-      }
-
-      .home-evening__close {
-        margin-inline-start: 0;
       }
     }
   }
