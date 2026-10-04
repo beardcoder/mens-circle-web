@@ -63,8 +63,8 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   fonts: [
-    // Public site: a warm, heavy grotesk for the voice and the UI; Fraunces
-    // italic only for the quiet, personal lines (questions, quotes).
+    // Public site: Alegreya — a broad-pen serif, organic and grounded — for the
+    // headlines (800) and the quiet lines (italic); Figtree for text and UI.
     {
       name: 'Figtree',
       cssVariable: '--font-sans',
@@ -75,11 +75,11 @@ export default defineConfig({
       fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
     },
     {
-      name: 'Fraunces',
+      name: 'Alegreya',
       cssVariable: '--font-serif',
       provider: fontProviders.fontsource(),
-      weights: ['400'],
-      styles: ['italic'],
+      weights: ['500', '800'],
+      styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
     },
