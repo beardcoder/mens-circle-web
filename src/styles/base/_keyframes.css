@@ -259,6 +259,18 @@
   }
 }
 
+/* Scroll-linked depth: on `translate`, so it composes with the drift's `transform`.
+   Each layer sets --px/--py (its offset after one screen of scrolling). */
+@keyframes breath-parallax {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: var(--px, 0) var(--py, 0);
+  }
+}
+
 /* View transitions — root crossfade. */
 @keyframes vt-fade-out {
   to {
