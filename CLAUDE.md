@@ -84,11 +84,12 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
 
 ## Design
 
-- "Feuerstelle", set like the flyer: warm, earthy, direct. Figtree speaks and explains
-  (headlines 800 in sentence case, tight; text 400/500). Fraunces italic is the quiet
-  voice for questions and quotes only (`.quote-voice`, `--font-quote`). Capitals for
-  wide-spaced labels (`.marker`), the date line (`.date-line`: bold orange capitals)
-  and the one poster slogan (`.display--heavy`). Barlow is loaded for the admin only.
+- "Feuerstelle", set like the flyer: warm, earthy, direct. Alegreya (a broad-pen serif:
+  nature, fire, earth) speaks: headlines 800 in sentence case, and its italic is the
+  quiet voice for questions and quotes (`.quote-voice`, `--font-quote`). Figtree
+  explains: text, UI, buttons and the date line. Capitals for wide-spaced labels
+  (`.marker`), the date line (`.date-line`: bold orange Figtree capitals) and the one
+  poster slogan (`.display--heavy`). Barlow is loaded for the admin only.
 - Colours: cream `#F4EDE1`, night `#151210`, flame `#E4632E` (5.4:1 on night; on cream
   only as fill or stroke), rust `#A84A2A` (4.9:1, the accent and button on cream).
   Grounds: night for the header, hero, Termine and footer; one flame field per page
