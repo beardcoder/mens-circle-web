@@ -99,22 +99,26 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
   aliases that `:root` defines in terms of them (control colours, `--focus-ring`,
   `--accent-*`). Without it inputs and focus rings keep the page's colours. Surfaces
   keep the page's color-scheme, so their `light-dark()` grounds follow the mode.
-- The mark is the original brush-stroke logo (`src/icons/logo.svg`, header and footer)
-  and its big sibling `BrushRing.astro`: a seeded, filter-roughened painted ring. Text
-  may sit inside a ring (in a size container, sized in `cqi`), never across its stroke
-  and never behind running text; each ring on a page needs its own `seed`.
-  `SeatCircle.astro` only counts seats (taken/open) for an event.
+- The mark is the original brush-stroke logo (`src/icons/logo.svg`, header and footer).
+  `SeatCircle.astro` (hairline ring with seats) frames the round hero photo and counts
+  an event's seats (taken/open); keep clear space for its ring, which reaches 20% of
+  the photo's width past it. `BrushRing.astro` (a seeded, filter-roughened painted
+  ring) appears in the questions and around "Dabei sein."; text inside a ring sits in
+  a size container sized in `cqi`, never across the stroke. Each ring needs its own
+  `seed`. No decorative ring ever runs behind text.
 - Layout: asymmetric two-column grids per block; `.spine` only for quiet passages and
-  sub-pages. Phones get their own order (ring first, then date and action, then photo).
+  sub-pages. Phones get their own order (sentence first, then the round photo breaking out to the
+  right, then the reading and the date).
   Never reuse desktop `grid-area` names in a stacked grid without resetting them.
 - Vertical rhythm: `--rhythm-section` > `group` > `item` > `tight`; never inverted.
   Lift reserving `min-block-size` once columns stack or an island swaps in.
 - Radius `--radius` (3px) on controls and panels; full circles only for seats and the
   round icon buttons. Capital lines keep `line-height` ≥ 1 for umlaut dots.
 - The header is solid at all times (nothing scrolls visibly beneath it).
-- Motion: hero entrance (ring turn, sentence), scroll-driven reveals (`[data-reveal]`,
-  view() only, no JS, nothing hidden without timeline support), the Ablauf dial
-  (per-step view timelines via `timeline-scope`), statement settle, reading progress.
+- Motion: hero entrance (words, photo opening, seats), scroll-driven reveals
+  (`[data-reveal]`, view() only, no JS, nothing hidden without timeline support), the
+  hero ring's turn, statement settle, reading progress. The Ablauf has no dial: each
+  step carries a small circle with its quarter filled.
   Only `opacity`/`transform`; all off under `prefers-reduced-motion`.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
