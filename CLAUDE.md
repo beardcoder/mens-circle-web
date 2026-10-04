@@ -119,6 +119,11 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
   (`[data-reveal]`, view() only, no JS, nothing hidden without timeline support), the
   hero ring's turn, statement settle, reading progress. The Ablauf has no dial: each
   step carries a small circle with its quarter filled.
+- Breath (`Breath.astro`, keyframes `breathe`): background rings and radial glows on a
+  calm 10 s cycle — 4 s in, 0.5 s hold, 5 s out, 0.5 s rest, sine-eased. Around the hero
+  photo, inside the questions' ring, as a light glow on the flame field (with a small
+  circle to breathe along) and inside "Dabei sein.". Rings never behind running text;
+  glows stay faint enough that every contrast holds. Still under reduced motion.
   Only `opacity`/`transform`; all off under `prefers-reduced-motion`.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
