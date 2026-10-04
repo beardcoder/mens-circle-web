@@ -1,7 +1,5 @@
 ---
 import site from '../../data/site.json';
-import BrushRing from '../BrushRing.astro';
-import Breath from '../Breath.astro';
 import HomeEventStatus from '../HomeEventStatus.astro';
 import NewsletterForm from '../forms/NewsletterForm.astro';
 
@@ -29,15 +27,11 @@ const lines = data.displayLines ?? ['Dabei sein.'];
     <div class="home-dates__lead">
       <p class="marker marker--plain home-dates__marker">{data.eyebrow}</p>
 
-      <div class="home-dates__ring-wrap">
-        <Breath variant="glow" class="home-dates__breath" />
-        <BrushRing class="home-dates__ring" seed={37} />
-        <h2 class="home-dates__display" id="termine-title">
-          {lines.map((line) => (
-            <span class="display__line">{line}</span>
-          ))}
-        </h2>
-      </div>
+      <h2 class="display display--xl home-dates__display" id="termine-title">
+        {lines.map((line) => (
+          <span class="display__line">{line}</span>
+        ))}
+      </h2>
 
       {data.lede && <p class="home-dates__lede">{data.lede}</p>}
     </div>
@@ -94,9 +88,9 @@ const lines = data.displayLines ?? ['Dabei sein.'];
     .home-dates__lead {
       grid-area: lead;
       display: grid;
-      grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: var(--space-lg);
-      align-items: center;
+      align-items: end;
     }
 
     .home-dates__marker {
@@ -105,34 +99,8 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       color: var(--text-primary);
     }
 
-    /* The invitation sits inside a small ring; a size container keeps it there. */
-    .home-dates__ring-wrap {
-      position: relative;
-      display: grid;
-      place-items: center;
-      aspect-ratio: 1;
-      container-type: inline-size;
-    }
-
-    .home-dates__ring {
-      position: absolute;
-      inset: 0;
-    }
-
-    /* A low glow inside the ring; at 18 % the cream type keeps well over 7:1. */
-    .home-dates__breath {
-      --breath-glow: 18%;
-
-      inset: 8%;
-    }
-
     .home-dates__display {
-      position: relative;
       margin: 0;
-      font-size: 15cqi;
-      line-height: 0.95;
-      letter-spacing: -0.015em;
-      text-align: center;
     }
 
     .home-dates__ticket {
@@ -196,10 +164,6 @@ const lines = data.displayLines ?? ['Dabei sein.'];
 
       .home-dates__marker {
         justify-self: center;
-      }
-
-      .home-dates__ring-wrap {
-        inline-size: min(100%, 17rem);
       }
 
       .home-dates__lede {
