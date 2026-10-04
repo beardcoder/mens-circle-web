@@ -5,12 +5,7 @@ import { resolveAssetImage } from '../../lib/images';
 import HomeEventStatus from '../HomeEventStatus.astro';
 import SeatCircle from '../SeatCircle.astro';
 
-/** The home page opening on the night ground: the sentence, the four parts of an evening, and the photograph inside the seat circle. */
-
-interface Pillar {
-  title?: string;
-  text?: string;
-}
+/** The home page opening on the night ground: the sentence, a short reading, the next date, and the photograph inside the seat circle. */
 
 interface Props {
   data: {
@@ -22,8 +17,6 @@ interface Props {
     /** Three short words under the sentence. */
     claim?: string;
     lede?: string;
-    pillarsLabel?: string;
-    pillars?: Pillar[];
     secondaryLabel?: string;
     secondaryLink?: string;
     image?: string;
@@ -34,7 +27,6 @@ interface Props {
 
 const { data } = Astro.props;
 const photo = resolveAssetImage(data.image);
-const pillars = data.pillars ?? [];
 
 // The sentence, word by word, so the entrance can stagger it; the emphasis
 // keeps its words together inside one <em>.
@@ -74,20 +66,6 @@ const segments = [
     </h1>
 
     {data.lede && <p class="home-hero__lede">{data.lede}</p>}
-
-    {pillars.length > 0 && (
-      <div class="home-hero__pillars">
-        {data.pillarsLabel && <p class="home-hero__pillars-label">{data.pillarsLabel}</p>}
-        <ul class="home-hero__pillar-list" role="list">
-          {pillars.map((pillar, i) => (
-            <li class="home-hero__pillar" style={`--i: ${i}`}>
-              <span class="home-hero__pillar-title">{pillar.title}</span>
-              <span class="home-hero__pillar-text">{pillar.text}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
 
     <div class="home-hero__action">
       <HomeEventStatus
@@ -141,11 +119,10 @@ const segments = [
       z-index: 1;
       display: grid;
       grid-template-areas:
-        'head    figure'
-        'lede    figure'
-        'pillars figure'
-        'action  figure';
-      grid-template-rows: auto auto auto 1fr;
+        'head   figure'
+        'lede   figure'
+        'action figure';
+      grid-template-rows: auto auto 1fr;
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
       column-gap: var(--space-xl);
       align-items: start;
@@ -194,69 +171,9 @@ const segments = [
       color: var(--text-secondary);
     }
 
-    /* Four parts of an evening, on hairlines — the vocabulary, before the details. */
-    .home-hero__pillars {
-      grid-area: pillars;
-      margin-block-start: var(--space-lg);
-    }
-
-    .home-hero__pillars-label {
-      margin-block-end: var(--space-xs);
-      font-family: var(--font-quote);
-      font-size: var(--text-xl);
-      font-style: italic;
-      color: var(--accent);
-    }
-
-    .home-hero__pillar-list {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      border-block-start: 1px solid var(--border-medium);
-    }
-
-    .home-hero__pillar {
-      display: grid;
-      gap: var(--space-3xs);
-      align-content: start;
-      padding-block: var(--space-sm);
-      padding-inline-end: var(--space-sm);
-    }
-
-    .home-hero__pillar + .home-hero__pillar {
-      padding-inline-start: var(--space-sm);
-      border-inline-start: 1px solid var(--border-light);
-    }
-
-    .home-hero__pillar-title {
-      display: flex;
-      gap: 0.5em;
-      align-items: center;
-      font-size: var(--text-body-compact);
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .home-hero__pillar-title::before {
-      flex: none;
-      inline-size: 0.5rem;
-      block-size: 0.5rem;
-      content: '';
-      background: var(--accent);
-      border-radius: 50%;
-    }
-
-    .home-hero__pillar-text {
-      font-size: var(--text-caption);
-      line-height: 1.5;
-      color: var(--text-muted);
-    }
-
     .home-hero__action {
       grid-area: action;
-      margin-block-start: var(--space-lg);
+      margin-block-start: var(--space-xl);
     }
 
     /* The photograph inside the circle, the seats around it. */
@@ -327,7 +244,6 @@ const segments = [
       }
 
       .home-hero__lede,
-      .home-hero__pillars,
       .home-hero__action {
         animation: rise 600ms var(--ease-settle) both;
       }
@@ -336,44 +252,16 @@ const segments = [
         animation-delay: 380ms;
       }
 
-      .home-hero__pillars {
-        animation-delay: 460ms;
-      }
-
       .home-hero__action {
-        animation-delay: 540ms;
+        animation-delay: 480ms;
       }
 
       .home-hero__plate {
         animation: plate-open 1100ms var(--ease-emphasised) 120ms both;
       }
 
-      .vt-arrival
-        :is(
-          .home-hero__kicker,
-          .home-hero__word,
-          .home-hero__lede,
-          .home-hero__pillars,
-          .home-hero__action,
-          .home-hero__plate
-        ) {
+      .vt-arrival :is(.home-hero__kicker, .home-hero__word, .home-hero__lede, .home-hero__action, .home-hero__plate) {
         animation: none;
-      }
-    }
-
-    /* Tablet: the pillars go two-up. */
-    @media (width <= 72em) {
-      .home-hero__pillar-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .home-hero__pillar:nth-child(3) {
-        padding-inline-start: 0;
-        border-inline-start: 0;
-      }
-
-      .home-hero__pillar:nth-child(n + 3) {
-        border-block-start: 1px solid var(--border-light);
       }
     }
 
@@ -389,7 +277,6 @@ const segments = [
           'head'
           'figure'
           'lede'
-          'pillars'
           'action';
         grid-template-rows: none;
         grid-template-columns: minmax(0, 1fr);
@@ -423,22 +310,6 @@ const segments = [
     }
 
     @media (width <= 30em) {
-      .home-hero__pillar-list {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .home-hero__pillar,
-      .home-hero__pillar + .home-hero__pillar {
-        grid-template-columns: 6.5rem minmax(0, 1fr);
-        gap: var(--space-sm);
-        padding-inline: 0;
-        border-inline-start: 0;
-      }
-
-      .home-hero__pillar + .home-hero__pillar {
-        border-block-start: 1px solid var(--border-light);
-      }
-
       .home-hero__action .actions {
         flex-direction: column;
         align-items: stretch;

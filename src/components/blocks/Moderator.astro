@@ -9,8 +9,6 @@ interface Props {
     name?: string;
     quote?: string;
     bio?: string;
-    rolesLabel?: string;
-    roles?: string[];
     image?: string;
     imageAlt?: string;
     linkLabel?: string;
@@ -23,7 +21,6 @@ interface Props {
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
 const photo = resolveAssetImage(data.image);
-const roles = data.roles ?? [];
 ---
 
 <section class="section home-person" id={anchor} aria-labelledby="person-title">
@@ -59,17 +56,6 @@ const roles = data.roles ?? [];
       )}
 
       {data.bio && <div class="home-person__bio prose" set:html={data.bio} data-reveal />}
-
-      {roles.length > 0 && (
-        <div class="home-person__roles" data-reveal>
-          {data.rolesLabel && <h3 class="home-person__roles-title">{data.rolesLabel}</h3>}
-          <ul class="home-person__role-list" role="list">
-            {roles.map((role) => (
-              <li>{role}</li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {data.linkLabel && data.linkUrl && (
         <p class="home-person__link">
@@ -146,49 +132,6 @@ const roles = data.roles ?? [];
       font-size: var(--text-section-body-lg);
     }
 
-    .home-person__roles {
-      max-inline-size: var(--measure);
-      margin-block-start: var(--space-lg);
-    }
-
-    .home-person__roles-title {
-      margin-block-end: var(--space-xs);
-      font-family: var(--font-body);
-      font-size: var(--text-marker);
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-marker);
-    }
-
-    .home-person__role-list {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .home-person__role-list li {
-      display: flex;
-      gap: var(--space-sm);
-      align-items: baseline;
-      padding-block: var(--space-sm);
-      font-size: var(--text-section-body);
-      line-height: var(--leading-normal);
-      color: var(--text-primary);
-      border-block-end: 1px solid var(--border-light);
-    }
-
-    .home-person__role-list li::before {
-      flex: none;
-      inline-size: 0.55rem;
-      block-size: 0.55rem;
-      content: '';
-      border: 1.5px solid var(--accent);
-      border-radius: 50%;
-      translate: 0 -0.1em;
-    }
-
     .home-person__link {
       margin-block-start: var(--space-md);
     }
@@ -230,7 +173,6 @@ const roles = data.roles ?? [];
         margin-block: var(--space-md) 0;
       }
 
-      .home-person__roles,
       .home-person__link {
         margin-block-start: 0;
       }
