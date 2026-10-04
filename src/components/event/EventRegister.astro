@@ -45,7 +45,7 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
         <ol class="event-register__steps" role="list">
           <li>Formular ausfüllen</li>
           <li>Bestätigung mit Treffpunkt per E-Mail</li>
-          <li>Am Abend einfach da sein</li>
+          <li>Am Abend vorbeikommen – mehr braucht es nicht</li>
         </ol>
       )}
     </div>
@@ -71,8 +71,14 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
       align-items: start;
     }
 
+    .event-register__grid > :first-child {
+      container-type: inline-size;
+    }
+
     .event-register__title {
       margin-block-end: var(--rhythm-stack);
+      /* "Anmeldung" is one word: capped by its column. */
+      font-size: min(var(--display-2), 18cqi);
     }
 
     .event-register__text {
