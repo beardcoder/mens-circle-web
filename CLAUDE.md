@@ -3,6 +3,7 @@
 Website for the Männerkreis. Astro 7 (no UI framework), SSR on the Bun runtime,
 Drizzle on `bun:sqlite`, email via external listmonk, admin sign-in via Pocket ID.
 Code, comments and docs are English; user-facing content is German.
+Commit messages are English too, in Conventional Commits form (`fix(seo): …`).
 
 ## Commands
 
@@ -120,6 +121,10 @@ mail mark from `/images/logo-flame.png` by URL, so keep that file.
   sub-pages. Phones get their own order (sentence first, then the round photo breaking out to the
   right, then the reading and the date).
   Never reuse desktop `grid-area` names in a stacked grid without resetting them.
+  Wide screens keep one split line (`--split-columns` 5fr rail / 7fr content,
+  `--split-gap`) for every home block and `.spine`, and are set like a poster: the
+  `> 56em` token block in `_variables.css` raises the headlines and steps the reading
+  down. Phones stay on the token floors; change desktop type only there or in `> 56em` rules.
 - Vertical rhythm: `--rhythm-section` > `group` > `item` > `tight`; never inverted.
   Lift reserving `min-block-size` once columns stack or an island swaps in.
 - Radius `--radius` (3px) on controls and panels; full circles only for seats and the
