@@ -26,7 +26,7 @@ const empty = testimonials.length === 0;
   id={anchor}
   aria-labelledby="testimonials-title"
 >
-  <div class="container">
+  <div class="container testimonials__grid">
     <div class="testimonials__head">
       <p class="marker">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
       <h2 class="display display--sm testimonials__title" id="testimonials-title">
@@ -151,6 +151,44 @@ const empty = testimonials.length === 0;
       font-size: var(--text-caption);
       line-height: var(--leading-relaxed);
       color: var(--text-muted);
+    }
+
+    /* Wide: the head holds the rail, the voices follow one another in the
+       content column, each at a reading measure. */
+    @media (width > 56em) {
+      .testimonials__grid {
+        display: grid;
+        grid-template-columns: var(--split-columns);
+        grid-template-rows: auto 1fr;
+        column-gap: var(--split-gap);
+        align-items: start;
+      }
+
+      .testimonials__head {
+        position: sticky;
+        inset-block-start: calc(var(--header-clearance) + var(--space-md));
+        grid-row: 1 / span 2;
+        margin: 0;
+      }
+
+      .testimonials__title {
+        font-size: var(--display-2);
+      }
+
+      .testimonials__list,
+      .testimonials__note,
+      .testimonials__empty {
+        grid-column: 2;
+      }
+
+      .testimonials__list {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-lg);
+      }
+
+      .testimonial-item__quote {
+        max-inline-size: 56ch;
+      }
     }
 
     /* No published voices yet: a quiet two-line band, not an empty stage. */

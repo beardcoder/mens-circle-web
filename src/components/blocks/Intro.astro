@@ -69,9 +69,9 @@ const questions = (data.questions ?? []).slice(0, 4);
   @layer sections {
     .home-circle__spread {
       display: grid;
-      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-      gap: var(--space-lg) var(--space-xl);
-      align-items: end;
+      grid-template-columns: var(--split-columns);
+      gap: var(--space-lg) var(--split-gap);
+      align-items: start;
     }
 
     .home-circle__title {
@@ -80,7 +80,28 @@ const questions = (data.questions ?? []).slice(0, 4);
     }
 
     .home-circle__text {
-      max-inline-size: 48ch;
+      max-inline-size: 54ch;
+    }
+
+    /* Wide: the marker runs over both columns, the title sits in the rail and the
+       reading starts level with it. */
+    @media (width > 56em) {
+      .home-circle__spread {
+        row-gap: var(--space-sm);
+      }
+
+      .home-circle__head {
+        display: contents;
+      }
+
+      .home-circle__head .marker {
+        grid-column: 1 / -1;
+        margin: 0;
+      }
+
+      .home-circle__text {
+        padding-block-start: 0.4em;
+      }
     }
 
     .home-circle__text p {
@@ -92,11 +113,11 @@ const questions = (data.questions ?? []).slice(0, 4);
     .home-circle__questions {
       display: grid;
       grid-template-areas:
-        '.  label .'
+        'label label label'
         '.  q1    .'
         'q4 c     q2'
         '.  q3    .';
-      grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem) minmax(0, 1fr);
       gap: var(--space-md) var(--space-lg);
       align-items: center;
       margin-block: var(--space-2xl) 0;
@@ -132,7 +153,7 @@ const questions = (data.questions ?? []).slice(0, 4);
 
     .home-circle__question {
       font-family: var(--font-quote);
-      font-size: var(--text-2xl);
+      font-size: clamp(1.5rem, 1.1rem + 1vw, 2rem);
       font-style: italic;
       line-height: 1.2;
       color: var(--text-primary);
@@ -163,7 +184,7 @@ const questions = (data.questions ?? []).slice(0, 4);
 
     .home-circle__close {
       max-inline-size: 36ch;
-      margin: var(--space-xl) auto 0;
+      margin: var(--space-lg) auto 0;
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
@@ -226,6 +247,7 @@ const questions = (data.questions ?? []).slice(0, 4);
       }
 
       .home-circle__close {
+        margin-block-start: var(--space-xl);
         margin-inline: 0;
         text-align: start;
       }

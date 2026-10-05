@@ -24,7 +24,7 @@ const agreements = data.agreements ?? [];
 ---
 
 <section class="section surface-sand home-frame" id={anchor} aria-labelledby="rahmen-title">
-  <div class="container">
+  <div class="container home-frame__grid">
     <div class="home-frame__head">
       <p class="marker">{data.eyebrow}</p>
       {data.title && (
@@ -116,7 +116,7 @@ const agreements = data.agreements ?? [];
       gap: var(--space-sm) var(--space-xl);
       align-items: baseline;
       padding: var(--space-lg);
-      margin-block-start: var(--space-2xl);
+      margin-block-start: var(--space-xl);
       background: var(--bg-primary);
       border: 1px solid var(--border-medium);
       border-radius: var(--radius);
@@ -139,6 +139,41 @@ const agreements = data.agreements ?? [];
       color: var(--text-secondary);
     }
 
+    /* Wide: the head holds the rail while the agreements and the boundary pass. */
+    @media (width > 56em) {
+      .home-frame__grid {
+        display: grid;
+        grid-template-columns: var(--split-columns);
+        grid-template-rows: auto 1fr;
+        column-gap: var(--split-gap);
+        align-items: start;
+      }
+
+      .home-frame__head {
+        position: sticky;
+        inset-block-start: calc(var(--header-clearance) + var(--space-md));
+        grid-row: 1 / span 2;
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: var(--space-md);
+        margin: 0;
+      }
+
+      .home-frame__head .marker {
+        margin-block-end: calc(var(--space-sm) - var(--space-md));
+      }
+
+      .home-frame__list {
+        grid-column: 2;
+        gap: var(--space-lg) var(--space-xl);
+        padding-block-start: 0.4em;
+      }
+
+      .home-frame__boundary {
+        grid-column: 2;
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
     @media (width <= 56em) {
       .home-frame__head,
       .home-frame__boundary {
@@ -147,6 +182,7 @@ const agreements = data.agreements ?? [];
 
       .home-frame__boundary {
         padding: var(--space-md);
+        margin-block-start: var(--space-2xl);
       }
     }
 

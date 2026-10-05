@@ -171,11 +171,12 @@
   --accent-rare: var(--accent);
 }
 
-/* The prose spine — marker column + text column (quiet passages, sub-pages). */
+/* The prose spine — marker column + text column (quiet passages, sub-pages). It keeps
+   the home's split line, so a sub-page's text starts where the home's does. */
 .spine {
   display: grid;
-  grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
-  gap: var(--space-sm) var(--space-xl);
+  grid-template-columns: var(--split-columns);
+  gap: var(--space-sm) var(--split-gap);
   align-items: start;
 }
 
