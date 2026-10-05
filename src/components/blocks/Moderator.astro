@@ -70,18 +70,19 @@ const photo = resolveAssetImage(data.image);
 
 <style is:global>
   @layer sections {
+    /* The portrait takes the rail, his words the content column. */
     .home-person__grid {
       display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      gap: var(--space-xl);
+      grid-template-columns: var(--split-columns);
+      gap: var(--space-xl) var(--split-gap);
       align-items: start;
     }
 
-    /* The figure hangs lower than the name: the two columns never start on one line. */
+    /* The figure hangs a little lower than the marker: it starts level with the name. */
     .home-person__figure {
       position: sticky;
       inset-block-start: calc(var(--header-clearance) + var(--space-md));
-      margin: var(--space-2xl) 0 0;
+      margin: calc(var(--text-marker) * 1.3 + var(--space-sm)) 0 0;
     }
 
     /* The frame sits on a flame bar: the one orange stroke in this section. */
@@ -109,15 +110,16 @@ const photo = resolveAssetImage(data.image);
     }
 
     .home-person__name {
-      margin-block-end: var(--space-lg);
+      margin-block-end: var(--space-md);
+      font-size: var(--display-2);
     }
 
     .home-person__quote {
-      max-inline-size: 24ch;
+      max-inline-size: 30ch;
       padding: 0;
       margin: 0 0 var(--space-lg);
       font-family: var(--font-quote);
-      font-size: var(--text-3xl);
+      font-size: clamp(2rem, 1.4rem + 1.1vw, 2.375rem);
       font-style: italic;
       line-height: 1.2;
       color: var(--accent);
@@ -126,6 +128,10 @@ const photo = resolveAssetImage(data.image);
 
     .home-person__quote p {
       max-inline-size: none;
+    }
+
+    .home-person__bio {
+      max-inline-size: 58ch;
     }
 
     .home-person__bio p {
@@ -155,6 +161,7 @@ const photo = resolveAssetImage(data.image);
       .home-person__name {
         order: -2;
         margin-block-end: 0;
+        font-size: var(--display-1);
       }
 
       .home-person__figure {
@@ -170,7 +177,9 @@ const photo = resolveAssetImage(data.image);
       }
 
       .home-person__quote {
+        max-inline-size: 24ch;
         margin-block: var(--space-md) 0;
+        font-size: var(--text-3xl);
       }
 
       .home-person__link {
