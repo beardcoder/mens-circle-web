@@ -161,6 +161,8 @@ const anchor = data.anchor ?? 'praktisches';
       }
     }
 
+    /* Two by two once the row is narrow: on a phone or tablet, and always in the
+       content column of the list variant. */
     @media (width <= 62em) {
       .facts-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -174,6 +176,19 @@ const anchor = data.anchor ?? 'praktisches';
       .facts-grid__item:nth-child(n + 3) {
         border-block-start: 1px solid var(--border-light);
       }
+    }
+
+    .event-landing-facts .facts-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .event-landing-facts .facts-grid__item:nth-child(3) {
+      padding-inline-start: 0;
+      border-inline-start: 0;
+    }
+
+    .event-landing-facts .facts-grid__item:nth-child(n + 3) {
+      border-block-start: 1px solid var(--border-light);
     }
 
     @media (width <= 30em) {

@@ -74,14 +74,16 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       padding-block: var(--space-2xl);
     }
 
+    /* The invitation holds the rail; the date and the way to hear about the next
+       one stand in the content column, the date first. */
     .home-dates__inner {
       display: grid;
       grid-template-areas:
-        'lead   notify'
-        'ticket notify';
+        'lead ticket'
+        'lead notify';
       grid-template-rows: auto 1fr;
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--space-lg) var(--space-xl);
+      grid-template-columns: var(--split-columns);
+      gap: var(--space-xl) var(--split-gap);
       align-items: start;
     }
 
@@ -89,8 +91,8 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       container-type: inline-size;
       grid-area: lead;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: var(--space-lg);
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-md);
       align-items: end;
     }
 
@@ -102,7 +104,7 @@ const lines = data.displayLines ?? ['Dabei sein.'];
 
     .home-dates__display {
       margin: 0;
-      /* Half the lead: capped so "Dabei" never outgrows its column. */
+      /* Capped by the lead, so "Dabei" never outgrows its column. */
       font-size: min(var(--display-1), 17cqi);
     }
 
@@ -110,6 +112,10 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       grid-area: ticket;
       padding-block-start: var(--space-md);
       border-block-start: 2px solid var(--accent);
+    }
+
+    .home-dates__notify {
+      max-inline-size: 40rem;
     }
 
     .home-dates__lede {
@@ -156,6 +162,16 @@ const lines = data.displayLines ?? ['Dabei sein.'];
           'notify';
         grid-template-rows: none;
         grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-lg) var(--space-xl);
+      }
+
+      .home-dates__lead {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: var(--space-lg);
+      }
+
+      .home-dates__notify {
+        max-inline-size: none;
       }
     }
 

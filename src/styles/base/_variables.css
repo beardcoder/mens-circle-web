@@ -97,24 +97,25 @@
   --text-lg: clamp(1.25rem, 1.17rem + 0.35vw, 1.5rem);
   --text-xl: clamp(1.375rem, 1.25rem + 0.55vw, 1.875rem);
   --text-2xl: clamp(1.625rem, 1.4rem + 1vw, 2.375rem);
-  --text-3xl: clamp(2rem, 1.5rem + 2vw, 3.5rem);
-  --text-4xl: clamp(2.5rem, 1.7rem + 3.2vw, 4.75rem); /* 40px → 76px */
-  --text-6xl: clamp(3rem, 1.6rem + 5.4vw, 7rem);
+  --text-3xl: clamp(2rem, 1.5rem + 2vw, 2.75rem);
+  --text-4xl: clamp(2.5rem, 1.7rem + 3.2vw, 3.5rem); /* 40px → 56px */
+  --text-6xl: clamp(3rem, 1.6rem + 5.4vw, 5.5rem);
 
   /* Voice register — Fraunces at its regular weight, set big: the size carries the
-     headline, not the stroke. Small serif lines (h3–h5, names, terms) take 500. */
+     headline, not the stroke. Small serif lines (h3–h5, names, terms) take 500.
+     Phones sit on the floors; the ceilings keep a wide screen from shouting. */
   --weight-display: 400;
   --weight-display-small: 500;
-  --display-1: clamp(2.875rem, 1.2rem + 6.4vw, 7.25rem); /* 46px → 116px */
-  --display-2: clamp(2.5rem, 1.3rem + 4.6vw, 5.75rem); /* 40px → 92px */
-  --display-3: clamp(1.875rem, 1.3rem + 2.4vw, 3.625rem); /* 30px → 58px */
+  --display-1: clamp(2.875rem, 1.2rem + 6.4vw, 5.5rem); /* 46px → 88px */
+  --display-2: clamp(2.5rem, 1.3rem + 4.6vw, 3.5rem); /* 40px → 56px */
+  --display-3: clamp(1.875rem, 1.3rem + 2.4vw, 3rem); /* 30px → 48px */
   --display-numeral: clamp(4rem, 2rem + 9vw, 10rem);
 
   --leading-display: 1;
   --tracking-display: -0.025em;
 
   --text-section-body: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem);
-  --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.4vw, 1.375rem); /* 19px → 22px */
+  --text-section-body-lg: clamp(1.1875rem, 1.1rem + 0.4vw, 1.25rem); /* 19px → 20px */
   --text-body-compact: 1.0625rem;
   --text-caption: 0.9375rem;
 
@@ -149,11 +150,11 @@
   --space-md: clamp(1.25rem, 1rem + 1vw, 1.75rem);
   --space-lg: clamp(2rem, 1.5rem + 2vw, 3.25rem);
   --space-xl: clamp(3rem, 2.2rem + 3vw, 5rem);
-  --space-2xl: clamp(4rem, 2.8rem + 5vw, 8rem);
+  --space-2xl: clamp(4rem, 2.8rem + 5vw, 6rem);
   --space-3xl: clamp(5rem, 3rem + 8vw, 11rem);
 
   /* Vertical rhythm, largest to smallest; never let an inner gap exceed an outer one. */
-  --rhythm-section: clamp(4.5rem, 3rem + 6vw, 9rem);
+  --rhythm-section: clamp(4.5rem, 3rem + 6vw, 7rem);
   --rhythm-group: clamp(2rem, 1.5rem + 2vw, 3.5rem);
   --rhythm-item: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
   --rhythm-tight: var(--space-xs);
@@ -180,6 +181,10 @@
   --container-narrow: 780px;
   --container-gutter: clamp(1rem, 0.6rem + 2.6vw, 3.5rem);
   --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+  /* The one line every home block keeps on a wide screen: a rail for its head
+     (marker, title), a column for its content. Stacked below 56em. */
+  --split-columns: minmax(0, 5fr) minmax(0, 7fr);
+  --split-gap: clamp(2rem, 6.6vw, 6rem);
 
   /* The fixed header's height, plus a little air. */
   --header-height: 68px;

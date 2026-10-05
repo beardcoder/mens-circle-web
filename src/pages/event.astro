@@ -211,14 +211,15 @@ const socialDetails = next
 <style is:global>
   @layer sections {
     .event-landing-voice__figure {
-      max-inline-size: 40ch;
       margin: 0;
     }
 
+    /* Measured in the quote's own size: a ch of the body font left a narrow strip. */
     .event-landing-voice__quote {
+      max-inline-size: 30ch;
       margin: 0;
       font-family: var(--font-quote);
-      font-size: var(--text-2xl);
+      font-size: clamp(1.625rem, 1.4rem + 1vw, 2.125rem);
       font-style: italic;
       line-height: 1.35;
       color: var(--text-primary);
