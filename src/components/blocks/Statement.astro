@@ -102,6 +102,15 @@ const lines = data.lines ?? [];
       color: var(--text-primary);
     }
 
+    /* Wide: the slogan as large as the field allows. "In den Körper." is about 9.5em
+       of capitals, so 7.4vw keeps it on one line inside the container. */
+    @media (width > 56em) {
+      .statement__display {
+        font-size: min(7.4vw, 7.5rem);
+        line-height: 1.04;
+      }
+    }
+
     .statement__foot {
       display: grid;
       gap: var(--space-sm);

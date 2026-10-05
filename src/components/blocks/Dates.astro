@@ -108,6 +108,13 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       font-size: min(var(--display-1), 17cqi);
     }
 
+    /* Wide: the page's last call, set as large as the rail allows, on two lines. */
+    @media (width > 62em) {
+      .home-dates__display {
+        font-size: min(var(--display-1), 26cqi);
+      }
+    }
+
     .home-dates__ticket {
       grid-area: ticket;
       padding-block-start: var(--space-md);
