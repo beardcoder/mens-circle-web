@@ -13,23 +13,32 @@ const socialLinks = site.socialLinks.map((link) => {
 });
 // Only these prerendered pages are safe to fetch before a click.
 const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum', '/datenschutz']);
+
+interface Props {
+  /** The invitation with its button. Off where the page already closes on one (home: "Dabei sein."). */
+  close?: boolean;
+}
+
+const { close = true } = Astro.props;
 ---
 
-<footer class="footer surface-bark">
+<footer class:list={['footer', 'surface-bark', !close && 'footer--plain']}>
   <div class="container">
-    <div class="footer__close">
-      <p class="footer__line">
-        Komm so, wie du <em>gerade</em> bist.
-      </p>
-      <a
-        href="/event"
-        class="btn btn--primary btn--large"
-        data-umami-event="cta-click"
-        data-umami-event-location="footer"
-      >
-        Termine &amp; Anmeldung
-      </a>
-    </div>
+    {close && (
+      <div class="footer__close">
+        <p class="footer__line">
+          Komm so, wie du <em>gerade</em> bist.
+        </p>
+        <a
+          href="/event"
+          class="btn btn--primary btn--large"
+          data-umami-event="cta-click"
+          data-umami-event-location="footer"
+        >
+          Termine &amp; Anmeldung
+        </a>
+      </div>
+    )}
 
     <div class="footer__top">
       <div class="footer__brand">
@@ -116,6 +125,16 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum'
       padding-block-start: var(--space-2xl);
       overflow: clip;
       background: light-dark(var(--color-night), var(--color-night-deep));
+    }
+
+    /* Without the invitation the page's own close sits right above: a hairline
+       parts it from the footer, as the invitation's rule would. */
+    .footer--plain {
+      padding-block-start: 0;
+    }
+
+    .footer--plain .footer__top {
+      border-block-start: 1px solid var(--border-light);
     }
 
     .footer__close {
