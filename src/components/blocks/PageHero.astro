@@ -106,6 +106,14 @@ const imageAsset = resolveAssetImage(data.image);
       font-size: var(--display-2);
     }
 
+    /* Wide: the column holds every word of a left title ("Männerkreis"), so it breaks
+       between words, never inside one. */
+    @media (width > 56em) {
+      .page-hero:not(.page-hero--center) .page-hero__title {
+        hyphens: manual;
+      }
+    }
+
     .page-hero__lead {
       max-inline-size: 44ch;
       margin: 0;

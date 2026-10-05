@@ -196,6 +196,19 @@
   --z-toast: 1500;
 }
 
+/* Wide screens are set like a poster: headlines grow, the reading steps down, so the
+   two registers never meet in the middle. Phones keep the values above. The section
+   title follows the viewport so its longest word ("geschrieben") fits the 5fr rail. */
+@media (width > 56em) {
+  :root {
+    --display-1: clamp(4rem, 7vw, 7rem);
+    --display-2: clamp(3rem, 5.6vw, 4.75rem); /* 50px → 76px */
+    --text-4xl: var(--display-2);
+    --text-section-body: 1.0625rem; /* 17px */
+    --text-section-body-lg: 1.1875rem; /* 19px */
+  }
+}
+
 :root[data-mode='light'] {
   color-scheme: light;
 }
