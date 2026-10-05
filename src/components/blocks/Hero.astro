@@ -112,7 +112,7 @@ const segments = [
   @layer sections {
     .home-hero {
       position: relative;
-      padding-block: calc(var(--header-height) + var(--space-lg)) var(--space-2xl);
+      padding-block: calc(var(--header-height) + var(--space-lg)) var(--space-xl);
     }
 
     .home-hero__grid {
@@ -125,7 +125,7 @@ const segments = [
         'action figure';
       grid-template-rows: auto auto 1fr;
       grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      column-gap: var(--space-xl);
+      column-gap: var(--split-gap);
       align-items: start;
     }
 
@@ -138,7 +138,7 @@ const segments = [
     }
 
     .home-hero__kicker {
-      margin-block-end: var(--space-md);
+      margin-block-end: var(--space-sm);
     }
 
     .home-hero__title {
@@ -147,6 +147,17 @@ const segments = [
       /* Capped by its column: "nichts darstellen" stays on one line. */
       font-size: min(clamp(3rem, 1.4rem + 5.6vw, 7rem), 13cqi);
       color: var(--text-primary);
+    }
+
+    /* Wide: three lines — "Ein Abend, an dem du" is 9.7em, so at 10cqi it fills the
+       first line and "nichts darstellen" the second, at any width. Shorter than four
+       lines, the date and the button stay in the first screen. */
+    @media (width > 56em) {
+      .home-hero__title {
+        max-inline-size: none;
+        font-size: min(clamp(3rem, 1.4rem + 5.6vw, 7rem), 10cqi);
+        text-wrap: wrap;
+      }
     }
 
     .home-hero__word {
@@ -165,8 +176,8 @@ const segments = [
 
     .home-hero__lede {
       grid-area: lede;
-      max-inline-size: 46ch;
-      margin-block: var(--space-lg) 0;
+      max-inline-size: 56ch;
+      margin-block: var(--space-md) 0;
       font-size: var(--text-section-body-lg);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
@@ -174,20 +185,25 @@ const segments = [
 
     .home-hero__action {
       grid-area: action;
-      margin-block-start: var(--space-xl);
+      margin-block-start: var(--space-md);
+    }
+
+    .home-hero__action .poster-date__actions {
+      margin-block-start: var(--space-md);
     }
 
     /* The photograph inside the circle, the seats around it. */
+    /* Centred on the text beside it, with room for the ring on every side. */
     .home-hero__figure {
       grid-area: figure;
-      align-self: start;
-      margin: var(--space-xl) 0 0;
+      align-self: center;
+      margin: 0;
     }
 
     .home-hero__orbit {
       position: relative;
-      inline-size: min(82%, 32rem);
-      margin-inline: auto 8%;
+      inline-size: min(76%, 30rem);
+      margin-inline: auto;
       aspect-ratio: 1;
     }
 
@@ -226,11 +242,11 @@ const segments = [
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-3xs) var(--space-sm);
-      justify-content: flex-end;
-      margin-block-start: calc(19% + var(--space-sm));
+      justify-content: center;
+      margin-block-start: calc(12% + var(--space-sm));
       font-size: var(--text-caption);
       color: var(--text-muted);
-      text-align: end;
+      text-align: center;
     }
 
     /* Entrance: the words rise, the circle opens. Starts at first paint, under a second. */
@@ -307,6 +323,18 @@ const segments = [
 
       .home-hero__lede {
         margin-block-start: var(--space-lg);
+      }
+
+      .home-hero__action {
+        margin-block-start: var(--space-xl);
+      }
+
+      .home-hero__action .poster-date__actions {
+        margin-block-start: var(--space-lg);
+      }
+
+      .home-hero__kicker {
+        margin-block-end: var(--space-md);
       }
     }
 

@@ -186,8 +186,8 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
   @layer sections {
     .faq__grid {
       display: grid;
-      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
-      gap: var(--space-lg) var(--space-xl);
+      grid-template-columns: var(--split-columns);
+      gap: var(--space-lg) var(--split-gap);
       align-items: start;
     }
 
@@ -198,6 +198,12 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 
     .faq__title {
       margin-block-end: var(--space-md);
+    }
+
+    @media (width > 56em) {
+      .faq__title {
+        font-size: var(--display-2);
+      }
     }
 
     @media (width <= 56em) {

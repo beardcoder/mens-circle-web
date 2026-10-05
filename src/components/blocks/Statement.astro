@@ -71,12 +71,22 @@ const lines = data.lines ?? [];
       translate: -50% -50%;
     }
 
+    /* The capitals run across the field like the flyer's slogan; the reading
+       follows below them, on the content line. */
     .statement__inner {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--space-lg) var(--space-xl);
+      grid-template-columns: var(--split-columns);
+      gap: var(--space-lg) var(--split-gap);
       align-items: end;
+    }
+
+    .statement__display {
+      grid-column: 1 / -1;
+    }
+
+    .statement__foot {
+      grid-column: 2;
     }
 
     .statement__marker {
@@ -86,7 +96,7 @@ const lines = data.lines ?? [];
 
     .statement__display {
       margin: 0;
-      font-size: clamp(2.5rem, 1rem + 5vw, 6rem);
+      font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
       /* Umlaut dots rise above the cap height; this keeps them off the line above. */
       line-height: 1.12;
       color: var(--text-primary);
@@ -164,6 +174,10 @@ const lines = data.lines ?? [];
     @media (width <= 56em) {
       .statement__inner {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      .statement__foot {
+        grid-column: auto;
       }
 
       @supports (animation-timeline: view()) {
