@@ -149,17 +149,6 @@ const segments = [
       color: var(--text-primary);
     }
 
-    /* Wide: three lines — "Ein Abend, an dem du" is 9.7em, so at 10cqi it fills the
-       first line and "nichts darstellen" the second, at any width. Shorter than four
-       lines, the date and the button stay in the first screen. */
-    @media (width > 56em) {
-      .home-hero__title {
-        max-inline-size: none;
-        font-size: min(clamp(3rem, 1.4rem + 5.6vw, 7rem), 10cqi);
-        text-wrap: wrap;
-      }
-    }
-
     .home-hero__word {
       display: inline-block;
     }
@@ -192,17 +181,64 @@ const segments = [
       margin-block-start: var(--space-md);
     }
 
-    /* The photograph inside the circle, the seats around it. */
-    /* Centred on the text beside it, with room for the ring on every side. */
+    /* Wide: set like a poster. The sentence runs across the whole width on two lines:
+       "Ein Abend, an dem du" is 9.7em and "nichts darstellen musst." 10.5em, so at
+       9.2cqi (10.9em to the line) it breaks there at any width. The claim turns to the
+       quiet italic, the reading steps down, so no two registers meet. */
+    @media (width > 56em) {
+      .home-hero__grid {
+        grid-template-areas:
+          'head   head'
+          'lede   figure'
+          'action figure';
+        grid-template-rows: auto auto 1fr;
+      }
+
+      .home-hero__title {
+        max-inline-size: none;
+        font-size: min(8.5rem, 9.2cqi);
+        line-height: 0.98;
+        text-wrap: wrap;
+      }
+
+      .home-hero__claim {
+        margin-block-start: var(--space-sm);
+        font-family: var(--font-quote);
+        font-size: clamp(1.5rem, 0.9rem + 1.1vw, 2rem);
+        font-style: italic;
+        font-weight: 400;
+        letter-spacing: 0;
+      }
+
+      .home-hero__lede {
+        max-inline-size: 52ch;
+        margin-block-start: var(--space-lg);
+        font-size: 1.125rem;
+      }
+
+      .home-hero__action .poster-date__status {
+        font-size: var(--text-section-body-lg);
+      }
+
+      .home-hero__action .poster-date__meta {
+        font-size: var(--text-lg);
+      }
+    }
+
+    /* The photograph inside the circle, the seats around it: beside the reading, held
+       clear of the sentence above by the ring's reach (about 16% of the photo). The
+       height term keeps it in the first screen of a short laptop. */
     .home-hero__figure {
+      --orbit: min(70%, 19rem, 34svh);
+
       grid-area: figure;
       align-self: center;
-      margin: 0;
+      margin: calc(var(--orbit) * 0.16 + var(--space-xs)) 0 0;
     }
 
     .home-hero__orbit {
       position: relative;
-      inline-size: min(76%, 30rem);
+      inline-size: var(--orbit);
       margin-inline: auto;
       aspect-ratio: 1;
     }
