@@ -56,6 +56,7 @@ if (evening?.data?.steps?.length) {
 schemas.push(eventSeriesSchema(siteUrl));
 ---
 
-<Layout title={home.meta.title} description={home.meta.description} schemas={schemas}>
+{/* The Termine block is the page's close, so the footer drops its own invitation. */}
+<Layout title={home.meta.title} description={home.meta.description} schemas={schemas} footerClose={false}>
   <PageContent blocks={blocks} />
 </Layout>
