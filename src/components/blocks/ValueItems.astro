@@ -1,4 +1,7 @@
 ---
+import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
+
 interface Item {
   title?: string;
   description?: string;
@@ -16,8 +19,8 @@ interface Props {
 
 /**
  * Positions set as pairs: "Ehrlichkeit statt Fassade" becomes the word that
- * counts, large, and what it replaces, quiet beside it. On the bark ground, so
- * the essay page has one turn of colour.
+ * counts, large, and what it replaces, quiet beside it. On the night ground, so
+ * the essay page has one turn of colour. Unnumbered, held apart by hairlines.
  */
 
 const { data } = Astro.props;
@@ -27,101 +30,27 @@ const items = (data.items ?? []).map((item) => {
 });
 ---
 
-<section class="section surface-bark values-section" id={data.anchor}>
-  <div class="container">
-    <div class="values-section__head">
-      {data.eyebrow && <p class="marker">{data.eyebrow}</p>}
-      {data.title && <h2 class="display values-section__title" set:html={data.title} />}
-      {data.intro && <p class="section-intro values-section__intro">{data.intro}</p>}
-    </div>
+<Section id={data.anchor} ground="night" defer>
+  <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml lead={data.intro} layout="split" />
 
-    {items.length > 0 && (
-      <ul class="values-section__list" role="list">
-        {items.map((item) => (
-          <li class="value-item" data-reveal>
-            <h3 class="value-item__title">
-              <span class="value-item__keep">{item.keep}</span>
-              {item.instead && <span class="value-item__instead"> statt {item.instead}</span>}
-            </h3>
-            {item.description && <p class="value-item__description">{item.description}</p>}
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-</section>
-
-<style is:global>
-  @layer sections {
-    .values-section__head {
-      display: grid;
-      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-      gap: var(--space-md) var(--space-xl);
-      align-items: end;
-      margin-block-end: var(--space-xl);
-    }
-
-    .values-section__head .marker {
-      grid-column: 1 / -1;
-      margin: 0;
-    }
-
-    .values-section__title {
-      max-inline-size: 14ch;
-      margin: 0;
-    }
-
-    .values-section__list {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-
-    @media (width <= 56em) {
-      .values-section__head {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-  }
-
-  @layer components {
-    /* Unnumbered pairs, held apart by space alone. */
-    .value-item {
-      display: grid;
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--space-2xs) var(--space-xl);
-      align-items: baseline;
-      padding-block: var(--space-md);
-    }
-
-    .value-item__title {
-      margin: 0;
-      font-size: var(--display-3);
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-    }
-
-    .value-item__instead {
-      font-size: 0.5em;
-      font-family: var(--font-quote);
-      font-style: italic;
-      color: var(--text-muted);
-      letter-spacing: 0;
-      white-space: nowrap;
-    }
-
-    .value-item__description {
-      max-inline-size: 38ch;
-      margin: 0;
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    @media (width <= 56em) {
-      .value-item {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-  }
-</style>
+  {items.length > 0 && (
+    <ul role="list" class="mt-group border-t border-line">
+      {items.map((item) => (
+        <li class="reveal grid items-baseline gap-x-grid gap-y-2 border-b border-line py-6 lg:grid-cols-12">
+          <h3 class="text-display-3 text-fg lg:col-span-6">
+            {item.keep}
+            {item.instead && (
+              <span class="font-serif text-[0.5em] tracking-normal whitespace-nowrap text-fg-muted italic">
+                {' '}
+                statt {item.instead}
+              </span>
+            )}
+          </h3>
+          {item.description && (
+            <p class="max-w-[38ch] text-md text-fg-soft lg:col-span-6 lg:col-start-7">{item.description}</p>
+          )}
+        </li>
+      ))}
+    </ul>
+  )}
+</Section>

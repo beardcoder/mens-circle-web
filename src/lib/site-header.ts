@@ -4,7 +4,7 @@ import { prefersReducedMotion } from './helpers';
 
 /** Offset anchored scrolling must clear below the fixed header. */
 const headerOffset = (): number =>
-  Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-clearance'), 10) || 92;
+  Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--spacing-clearance'), 10) || 92;
 
 /** A link's fragment when it targets the current page, else `null`. */
 const samePageHash = (link: HTMLAnchorElement): string | null => {
@@ -27,23 +27,25 @@ const scrollToAnchor = (hash: string): boolean => {
 };
 
 export function initSiteHeader(): void {
+  const header = document.getElementById('header');
   const nav = document.getElementById('nav');
   const toggle = document.getElementById('navToggle');
-  if (!nav || !toggle) return;
+  if (!header || !nav || !toggle) return;
 
   let isOpen = false;
   let scrollPosition = 0;
 
   const render = (): void => {
-    toggle.classList.toggle('is-open', isOpen);
     toggle.setAttribute('aria-expanded', String(isOpen));
     toggle.setAttribute('aria-label', isOpen ? 'Menü schließen' : 'Menü öffnen');
-    nav.classList.toggle('is-open', isOpen);
-    document.body.classList.toggle('nav-open', isOpen);
+    // The header's `data-open` drives the panel, the toggle and the bar's button
+    // (`group-data-[open]/header:` in Header.astro); the body's locks the page.
+    header.toggleAttribute('data-open', isOpen);
+    document.body.toggleAttribute('data-nav-open', isOpen);
     document.body.style.top = isOpen ? `-${scrollPosition}px` : '';
   };
 
-  /** The panel opens as a circle from the toggle's centre (see `.nav` in Header.astro). */
+  /** The panel opens as a circle from the toggle's centre (see `#nav` in Header.astro). */
   const setOrigin = (): void => {
     const button = toggle.getBoundingClientRect();
     const panel = nav.getBoundingClientRect();
@@ -90,7 +92,7 @@ export function initSiteHeader(): void {
 
   // Widening past the panel breakpoint while open would leave the body locked
   // with no visible panel.
-  matchMedia('(width > 860px)').addEventListener('change', (event) => {
+  matchMedia('(width >= 56rem)').addEventListener('change', (event) => {
     if (event.matches) close();
   });
 

@@ -1,6 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import PageOpening from '../components/PageOpening.astro';
 import TestimonialForm from '../components/forms/TestimonialForm.astro';
+import Section from '../components/ui/Section.astro';
+import Split from '../components/ui/Split.astro';
+import { panel } from '@lib/ui';
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import site from '@data/site.json';
 
@@ -32,106 +36,27 @@ const schemas = [
   robots="noindex, follow"
   schemas={schemas}
 >
-  <section class="hero">
-    <div class="container">
-      <div class="hero__content">
-        <p class="marker hero__label">Aus dem Kreis</p>
-        <h1 class="hero__title">Teile deine Erfahrung</h1>
-        <p class="hero__subtitle">
-          Wenn du beim Männerkreis warst und etwas dazu sagen möchtest: Dein Text hilft anderen Männern einzuschätzen,
-          worauf sie sich einlassen.
+  <PageOpening eyebrow="Aus dem Kreis" title="Teile deine Erfahrung">
+    <Fragment slot="lead">
+      Wenn du beim Männerkreis warst und etwas dazu sagen möchtest: Dein Text hilft anderen Männern einzuschätzen,
+      worauf sie sich einlassen.
+    </Fragment>
+  </PageOpening>
+
+  <Section ground="sand" labelledby="teilen-title">
+    <Split sticky>
+      <div slot="head" class="grid gap-5">
+        <h2 id="teilen-title" class="max-w-[17ch] text-display-3 text-fg">
+          Was du schreibst, lese ich zuerst
+        </h2>
+        <p class="max-w-[42ch] text-lg text-fg-soft">
+          Dein Text wird nicht automatisch veröffentlicht. Ich sehe ihn mir vorher an und stelle ihn dann&nbsp;–
+          unverändert&nbsp;– auf die Website. Du entscheidest, welchen Namen du angibst.
         </p>
       </div>
-    </div>
-  </section>
-
-  <section class="section surface-sand testimonial-form-section">
-    <div class="container">
-      <div class="testimonial-form__wrapper">
-        <div class="testimonial-form__intro">
-          <h2 class="display display--sm">Was du schreibst, lese ich zuerst</h2>
-          <p>
-            Dein Text wird nicht automatisch veröffentlicht. Ich sehe ihn mir vorher an und stelle ihn dann –
-            unverändert – auf die Website. Du entscheidest, welchen Namen du angibst.
-          </p>
-        </div>
-
+      <div class={panel}>
         <TestimonialForm />
       </div>
-    </div>
-  </section>
+    </Split>
+  </Section>
 </Layout>
-
-<style is:global>
-  @layer sections {
-    .testimonial-form__wrapper {
-      display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-      gap: var(--space-xl);
-      align-items: start;
-    }
-
-    /* Wide: on the split line — the note in columns 1–5, the form from 7. */
-    @media (width > 56em) {
-      .testimonial-form__wrapper {
-        grid-template-columns: var(--field);
-        column-gap: var(--field-gap);
-      }
-
-      /* By class: the form component ends in a <script>, so :last-child misses. */
-      .testimonial-form__intro {
-        grid-column: 1 / span 5;
-      }
-
-      .testimonial-form__wrapper > .testimonial-form {
-        grid-column: 7 / span 6;
-      }
-    }
-
-    .testimonial-form__intro h2 {
-      margin-block-end: var(--space-md);
-    }
-
-    .testimonial-form__intro p {
-      max-inline-size: 42ch;
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    .testimonial-form {
-      padding: var(--space-lg);
-      background: var(--bg-primary);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius);
-    }
-
-    /* Under the field, not floating inside it. */
-    .testimonial-form__counter {
-      display: block;
-      margin-block-start: var(--space-3xs);
-      font-size: var(--text-caption);
-      color: var(--text-muted);
-      text-align: end;
-      pointer-events: none;
-    }
-
-    .testimonial-form__note {
-      max-inline-size: var(--measure);
-      margin-block-start: var(--space-sm);
-      font-size: var(--text-caption);
-      line-height: var(--leading-relaxed);
-      color: var(--text-muted);
-    }
-
-    @media (width <= 56em) {
-      .testimonial-form__wrapper {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .testimonial-form {
-        padding: var(--space-md);
-      }
-    }
-  }
-</style>

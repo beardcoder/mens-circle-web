@@ -6,8 +6,7 @@ interface Props {
   event: EventDTO;
 }
 
-/** The admin's own text about this event, and nothing else. Renders nothing
- *  when the event has no description. */
+/** The admin's own text about this event, and nothing else. Renders nothing when the event has no description. */
 
 const { event } = Astro.props;
 
@@ -17,26 +16,10 @@ const descriptionHtml = escapeHtml(description).replace(/\r\n|\r|\n/g, '<br />')
 ---
 
 {description && (
-  <section class="section section--ruled event-about-section" aria-labelledby="ueber-den-abend">
-    <div class="container">
-      <div class="spine">
-        <h2 class="rail-heading" id="ueber-den-abend">
-          Zu diesem Abend
-        </h2>
-
-        <div class="event-about__text spine__body" data-reveal set:html={descriptionHtml} />
-      </div>
-    </div>
-  </section>
+  <div class="reveal">
+    <h2 id="ueber-den-abend" class="mb-4 text-2xl text-fg">
+      Zu diesem Abend
+    </h2>
+    <p class="max-w-measure text-lg text-fg-soft" set:html={descriptionHtml} />
+  </div>
 )}
-
-<style is:global>
-  @layer sections {
-    .event-about__text {
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-      text-wrap: pretty;
-    }
-  }
-</style>

@@ -4,8 +4,16 @@ import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
 import HomeEventStatus from '../HomeEventStatus.astro';
 import SeatCircle from '../SeatCircle.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Section from '../ui/Section.astro';
 
-/** The home page opening on the night ground: the sentence, a short reading, the next date, and the photograph inside the seat circle. */
+/**
+ * The home page opening on the night ground: the sentence, a short reading, the
+ * next date, and the photograph inside the seat circle. Wide: the sentence runs
+ * across the whole field, the reading and the date on the left, the photo on the
+ * right. Phones: the sentence, then the photo breaking out to the right, then
+ * the reading and the date.
+ */
 
 interface Props {
   data: {
@@ -39,342 +47,94 @@ const segments = [
   ...(emphasis ? [{ word: emphasis, em: true }] : []),
   ...words(after).map((word) => ({ word, em: false })),
 ];
+const word = 'inline-block entrance:animate-line-in entrance:animate-delay-[calc(80ms+var(--i)*45ms)]';
 ---
 
-<section class="home-hero surface-night section--clip" aria-labelledby="hero-title">
-  <BreathField />
+<Section
+  ground="night"
+  space="none"
+  labelledby="hero-title"
+  class="overflow-clip pt-[calc(var(--spacing-header)+clamp(2rem,1.5rem+2vw,3.25rem))] pb-group"
+  innerClass="relative z-1 grid grid-cols-1 lg:grid-cols-12 lg:gap-x-grid"
+>
+  <BreathField slot="before" />
 
-  <div class="container home-hero__grid">
-    <h1 class="home-hero__heading" id="hero-title">
-      {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
-      {data.kicker && <span class="marker home-hero__kicker">{data.kicker}</span>}{' '}
-      <span class="display display--xl home-hero__title">
-        {segments.map(({ word, em }, i) => (
-          <>
-            {em ? (
-              <em class="home-hero__word" style={`--i: ${i}`}>
-                {word}
-              </em>
-            ) : (
-              <span class="home-hero__word" style={`--i: ${i}`}>
-                {word}
-              </span>
-            )}{' '}
-          </>
-        ))}
+  <h1 id="hero-title" class="@container lg:col-span-12">
+    {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
+    {data.kicker && (
+      <Eyebrow as="span" class="mb-5 entrance:animate-rise lg:mb-4">
+        {data.kicker}
+      </Eyebrow>
+    )}{' '}
+    {/* Capped by its column: "nichts darstellen" stays on one line. Wide: two lines across the field. */}
+    <span class="block max-w-[12ch] text-[length:min(var(--text-display-1),13cqi)] leading-[0.98] tracking-display text-fg lg:max-w-none lg:text-[length:min(8.5rem,9.2cqi)]">
+      {segments.map(({ word: text, em }, i) => (
+        <>
+          {em ? (
+            <em class:list={[word, 'text-accent not-italic']} style={`--i: ${i}`}>
+              {text}
+            </em>
+          ) : (
+            <span class={word} style={`--i: ${i}`}>
+              {text}
+            </span>
+          )}{' '}
+        </>
+      ))}
+    </span>
+    {data.claim && (
+      <span class="mt-4 block font-serif text-[clamp(1.5rem,0.9rem+1.1vw,2rem)] leading-tight text-fg-soft italic">
+        {data.claim}
       </span>
-      {data.claim && <span class="home-hero__claim">{data.claim}</span>}
-    </h1>
+    )}
+  </h1>
 
-    {data.lede && <p class="home-hero__lede">{data.lede}</p>}
+  {photo && (
+    <figure class="relative mt-[calc(78vw*0.2+1.5rem)] [--orbit:78vw] lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-2 lg:mt-[calc(var(--orbit)*0.16+0.5rem)] lg:self-center lg:[--orbit:min(70%,19rem,34svh)]">
+      {/* The ring reaches 20% of the photo's width past it on every side. */}
+      <div class="relative ml-auto aspect-square w-(--orbit) max-lg:-mr-[10vw] lg:mx-auto">
+        <SeatCircle class="absolute -inset-[20%]" seatSize={3.2} entrance turn />
+        <div class="absolute inset-0 overflow-clip rounded-full bg-ground-alt entrance:animate-plate-open entrance:animate-delay-120">
+          <CropPicture
+            src={photo}
+            class="block size-full object-cover"
+            breakpoint="56em"
+            narrow={{ ratio: 1, widths: [360, 540, 720, 960], sizes: '78vw' }}
+            wide={{ ratio: 1, widths: [480, 720, 960], sizes: 'min(32rem, 34vw)' }}
+            loading="eager"
+            fetchpriority="high"
+            alt={data.imageAlt ?? ''}
+          />
+        </div>
+      </div>
+      {data.imageCaption && (
+        <figcaption class="mt-[calc(78vw*0.2+1rem)] text-sm text-fg-muted lg:mt-[calc(var(--orbit)*0.2+1rem)] lg:text-center">
+          {data.imageCaption}
+        </figcaption>
+      )}
+    </figure>
+  )}
 
-    <div class="home-hero__action">
+  {data.lede && (
+    <p class="mt-group max-w-[54ch] text-lg text-fg-soft entrance:animate-rise-slow entrance:animate-delay-380 lg:col-span-6 lg:row-start-2 lg:mt-group">
+      {data.lede}
+    </p>
+  )}
+
+  <div class="mt-group entrance:animate-rise-slow entrance:animate-delay-480 lg:col-span-6 lg:row-start-3 lg:mt-8">
+    <HomeEventStatus
+      placement="hero"
+      secondaryLabel={data.secondaryLabel}
+      secondaryLink={data.secondaryLink}
+      server:defer
+    >
       <HomeEventStatus
         placement="hero"
         secondaryLabel={data.secondaryLabel}
         secondaryLink={data.secondaryLink}
-        server:defer
-      >
-        <HomeEventStatus
-          placement="hero"
-          secondaryLabel={data.secondaryLabel}
-          secondaryLink={data.secondaryLink}
-          fallback
-          slot="fallback"
-        />
-      </HomeEventStatus>
-    </div>
-
-    {photo && (
-      <figure class="home-hero__figure">
-        <div class="home-hero__orbit">
-          <SeatCircle class="home-hero__ring" seatSize={3.2} entrance />
-          <div class="home-hero__plate">
-            <CropPicture
-              src={photo}
-              class="home-hero__image"
-              breakpoint="56em"
-              narrow={{ ratio: 1, widths: [360, 540, 720, 960], sizes: '78vw' }}
-              wide={{ ratio: 1, widths: [480, 720, 960], sizes: 'min(32rem, 34vw)' }}
-              loading="eager"
-              fetchpriority="high"
-              alt={data.imageAlt ?? ''}
-            />
-          </div>
-        </div>
-        <figcaption class="home-hero__caption">{data.imageCaption && <span>{data.imageCaption}</span>}</figcaption>
-      </figure>
-    )}
+        fallback
+        slot="fallback"
+      />
+    </HomeEventStatus>
   </div>
-</section>
-
-<style is:global>
-  @layer sections {
-    .home-hero {
-      position: relative;
-      padding-block: calc(var(--header-height) + var(--space-lg)) var(--space-xl);
-    }
-
-    .home-hero__grid {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-areas:
-        'head   figure'
-        'lede   figure'
-        'action figure';
-      grid-template-rows: auto auto 1fr;
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      column-gap: var(--split-gap);
-      align-items: start;
-    }
-
-    .home-hero__heading {
-      container-type: inline-size;
-      grid-area: head;
-      margin: 0;
-      font-size: inherit;
-      letter-spacing: normal;
-    }
-
-    .home-hero__kicker {
-      margin-block-end: var(--space-sm);
-    }
-
-    .home-hero__title {
-      display: block;
-      max-inline-size: 14ch;
-      /* Capped by its column: "nichts darstellen" stays on one line. */
-      font-size: min(clamp(3rem, 1.4rem + 5.6vw, 7rem), 13cqi);
-      color: var(--text-primary);
-    }
-
-    .home-hero__word {
-      display: inline-block;
-    }
-
-    /* The claim in the quiet voice, under the sentence. */
-    .home-hero__claim {
-      display: block;
-      margin-block-start: var(--space-sm);
-      font-family: var(--font-quote);
-      font-size: clamp(1.5rem, 0.9rem + 1.1vw, 2rem);
-      font-style: italic;
-      font-weight: 400;
-      color: var(--text-secondary);
-    }
-
-    .home-hero__lede {
-      grid-area: lede;
-      max-inline-size: 56ch;
-      margin-block: var(--space-md) 0;
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    .home-hero__action {
-      grid-area: action;
-      margin-block-start: var(--space-md);
-    }
-
-    .home-hero__action .poster-date__actions {
-      margin-block-start: var(--space-md);
-    }
-
-    /* Wide: set like a poster. The sentence runs across the whole width on two lines:
-       "Ein Abend, an dem du" is 9.7em and "nichts darstellen musst." 10.5em, so at
-       9.2cqi (10.9em to the line) it breaks there at any width. The reading steps
-       down, so no two registers meet. */
-    @media (width > 56em) {
-      .home-hero__grid {
-        grid-template-areas:
-          'head   head'
-          'lede   figure'
-          'action figure';
-        grid-template-rows: auto auto 1fr;
-      }
-
-      .home-hero__title {
-        max-inline-size: none;
-        font-size: min(8.5rem, 9.2cqi);
-        line-height: 0.98;
-        text-wrap: wrap;
-      }
-
-      .home-hero__lede {
-        max-inline-size: 52ch;
-        margin-block-start: var(--space-lg);
-        font-size: 1.125rem;
-      }
-
-      .home-hero__action .poster-date__status {
-        font-size: var(--text-section-body-lg);
-      }
-
-      .home-hero__action .poster-date__meta {
-        font-size: var(--text-lg);
-      }
-    }
-
-    /* The photograph inside the circle, the seats around it: beside the reading, held
-       clear of the sentence above by the ring's reach (about 16% of the photo). The
-       height term keeps it in the first screen of a short laptop. */
-    .home-hero__figure {
-      --orbit: min(70%, 19rem, 34svh);
-
-      grid-area: figure;
-      align-self: center;
-      margin: calc(var(--orbit) * 0.16 + var(--space-xs)) 0 0;
-    }
-
-    .home-hero__orbit {
-      position: relative;
-      inline-size: var(--orbit);
-      margin-inline: auto;
-      aspect-ratio: 1;
-    }
-
-    /* Ring diameter = 200/240 of the box: at -20% it runs ~14% outside the plate. */
-    .home-hero__ring {
-      position: absolute;
-      inset: -20%;
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .home-hero__ring svg {
-          animation: ring-turn linear both;
-          animation-timeline: view();
-          animation-range: cover 30% cover 100%;
-        }
-      }
-    }
-
-    .home-hero__plate {
-      position: absolute;
-      inset: 0;
-      overflow: clip;
-      background: var(--bg-secondary);
-      border-radius: 50%;
-    }
-
-    .home-hero__image {
-      display: block;
-      inline-size: 100%;
-      block-size: 100%;
-      object-fit: cover;
-    }
-
-    .home-hero__caption {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3xs) var(--space-sm);
-      justify-content: center;
-      margin-block-start: calc(12% + var(--space-sm));
-      font-size: var(--text-caption);
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    /* Entrance: the words rise, the circle opens. Starts at first paint, under a second. */
-    @media (prefers-reduced-motion: no-preference) {
-      .home-hero__kicker {
-        animation: rise 520ms var(--ease-settle) both;
-      }
-
-      .home-hero__word {
-        animation: line-in 680ms var(--ease-emphasised) both;
-        animation-delay: calc(80ms + var(--i) * 45ms);
-      }
-
-      .home-hero__lede,
-      .home-hero__action {
-        animation: rise 600ms var(--ease-settle) both;
-      }
-
-      .home-hero__lede {
-        animation-delay: 380ms;
-      }
-
-      .home-hero__action {
-        animation-delay: 480ms;
-      }
-
-      .home-hero__plate {
-        animation: plate-open 1100ms var(--ease-emphasised) 120ms both;
-      }
-
-      .vt-arrival :is(.home-hero__kicker, .home-hero__word, .home-hero__lede, .home-hero__action, .home-hero__plate) {
-        animation: none;
-      }
-    }
-
-    /* Phone: its own composition. The sentence first, then the circle breaking
-       out past the right edge, then the reading. */
-    @media (width <= 56em) {
-      .home-hero {
-        padding-block: calc(var(--header-height) + var(--space-lg)) var(--space-xl);
-      }
-
-      .home-hero__grid {
-        grid-template-areas:
-          'head'
-          'figure'
-          'lede'
-          'action';
-        grid-template-rows: none;
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .home-hero__title {
-        max-inline-size: 12ch;
-      }
-
-      /* The ring reaches 20% of the photo's width past it on every side. */
-      .home-hero__figure {
-        margin-block-start: calc(78vw * 0.2 + var(--space-md));
-        margin-inline-end: calc(-1 * var(--container-gutter) - 14vw);
-      }
-
-      .home-hero__orbit {
-        inline-size: 78vw;
-        margin-inline: auto 6vw;
-      }
-
-      .home-hero__caption {
-        justify-content: flex-start;
-        padding-inline-end: calc(var(--container-gutter) + 14vw);
-        margin-block-start: calc(78vw * 0.2 + var(--space-sm));
-        text-align: start;
-      }
-
-      .home-hero__lede {
-        margin-block-start: var(--space-lg);
-      }
-
-      .home-hero__action {
-        margin-block-start: var(--space-xl);
-      }
-
-      .home-hero__action .poster-date__actions {
-        margin-block-start: var(--space-lg);
-      }
-
-      .home-hero__kicker {
-        margin-block-end: var(--space-md);
-      }
-    }
-
-    @media (width <= 30em) {
-      .home-hero__action .actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .home-hero__action .btn {
-        inline-size: 100%;
-      }
-    }
-  }
-</style>
+</Section>

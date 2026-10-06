@@ -1,0 +1,40 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/** Where to go next: whole rows as links, a serif title, an optional line, an arrow that moves. */
+interface Item {
+  href: string;
+  title: string;
+  text?: string;
+  prefetch?: boolean;
+}
+
+interface Props {
+  items: Item[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+---
+
+<ul class:list={['border-t border-line', className]} role="list">
+  {items.map((item) => (
+    <li class="border-b border-line">
+      <a
+        href={item.href}
+        data-astro-prefetch={item.prefetch ? 'hover' : undefined}
+        class="group/row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1 py-5"
+      >
+        <span class="font-serif text-2xl text-fg transition-colors duration-150 group-hover/row:text-accent">
+          {item.title}
+        </span>
+        <Icon
+          name="arrow"
+          aria-hidden="true"
+          class="col-start-2 row-span-2 row-start-1 size-6 text-accent transition-transform duration-200 group-hover/row:translate-x-1.5"
+        />
+        {item.text && <span class="max-w-measure text-md text-fg-soft">{item.text}</span>}
+      </a>
+    </li>
+  ))}
+</ul>

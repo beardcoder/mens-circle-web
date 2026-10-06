@@ -1,0 +1,84 @@
+---
+import Eyebrow from './Eyebrow.astro';
+
+/**
+ * Label, title and lead of a block. `stack` sets them one under the other;
+ * `split` puts the title on columns 1–5 and the lead from column 7, level with
+ * the title's first line. A phrase in `<em>` turns to the accent.
+ */
+
+type Size = 'display-1' | 'display-2' | 'display-3';
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  /** The title holds trusted HTML from the content files (e.g. `<em>`). */
+  titleHtml?: boolean;
+  titleId?: string;
+  lead?: string;
+  as?: 'h1' | 'h2';
+  size?: Size;
+  layout?: 'stack' | 'split';
+  /** The eyebrow's tone; `fg` on the flame field. */
+  tone?: 'muted' | 'fg';
+  /** The page opening animates in. */
+  entrance?: boolean;
+  class?: string;
+}
+
+const SIZES: Record<Size, string> = {
+  'display-1': 'text-display-1',
+  'display-2': 'text-display-2',
+  'display-3': 'text-display-3',
+};
+
+const {
+  eyebrow,
+  title,
+  titleHtml = false,
+  titleId,
+  lead,
+  as: Heading = 'h2',
+  size = 'display-2',
+  layout = 'stack',
+  tone = 'muted',
+  entrance = false,
+  class: className,
+} = Astro.props;
+
+const split = layout === 'split';
+const titleClass = [
+  'max-w-[17ch] font-serif text-fg wrap-break-word max-sm:hyphens-auto [&_em]:text-accent [&_em]:not-italic',
+  SIZES[size],
+  split && 'lg:col-span-5',
+  entrance && 'entrance:animate-rise entrance:animate-delay-60',
+];
+---
+
+<div class:list={['grid gap-5', split && 'lg:grid-cols-12 lg:gap-x-grid', className]}>
+  {eyebrow && (
+    <Eyebrow tone={tone} class:list={[split && 'lg:col-span-12', entrance && 'entrance:animate-rise']}>
+      {eyebrow}
+    </Eyebrow>
+  )}
+  {title &&
+    (titleHtml ? (
+      <Heading id={titleId} class:list={titleClass} set:html={title} />
+    ) : (
+      <Heading id={titleId} class:list={titleClass}>
+        {title}
+      </Heading>
+    ))}
+  {lead && (
+    <p
+      class:list={[
+        'max-w-[46ch] text-lg text-fg-soft',
+        split && 'lg:col-span-6 lg:col-start-7 lg:self-start lg:pt-[0.4em]',
+        entrance && 'entrance:animate-rise entrance:animate-delay-120',
+      ]}
+    >
+      {lead}
+    </p>
+  )}
+  <slot />
+</div>

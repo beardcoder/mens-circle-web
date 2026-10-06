@@ -26,7 +26,7 @@ interface Props {
 const { blocks } = Astro.props;
 ---
 
-{blocks.map((block) => {
+{blocks.map((block, i) => {
   const data = block.data ?? {};
   switch (block.type) {
     case 'hero':
@@ -64,7 +64,7 @@ const { blocks } = Astro.props;
     case 'page-hero':
       return <PageHero data={data} />;
     case 'text-section':
-      return <TextSection data={data} />;
+      return <TextSection data={data} opening={blocks[i - 1]?.type === 'page-hero'} />;
     default:
       return null;
   }

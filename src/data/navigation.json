@@ -1,9 +1,26 @@
 {
   "header": {
     "links": [
-      { "label": "Der Kreis", "url": "/#ueber", "umamiTarget": "ueber" },
-      { "label": "Ablauf", "url": "/#reise", "umamiTarget": "ablauf" },
-      { "label": "Markus", "url": "/#moderator", "umamiTarget": "markus" }
+      {
+        "label": "Der Kreis",
+        "url": "/#ueber",
+        "umamiTarget": "ueber"
+      },
+      {
+        "label": "Ablauf",
+        "url": "/#reise",
+        "umamiTarget": "ablauf"
+      },
+      {
+        "label": "Markus",
+        "url": "/#moderator",
+        "umamiTarget": "markus"
+      },
+      {
+        "label": "Fragen",
+        "url": "/#faq",
+        "umamiTarget": "faq"
+      }
     ],
     "cta": [
       {
@@ -13,21 +30,52 @@
       }
     ],
     "secondary": [
-      { "label": "Häufige Fragen", "url": "/#faq" },
-      { "label": "Meine Haltung", "url": "/warum-ich-den-maennerkreis-leite" }
+      {
+        "label": "Meine Haltung",
+        "url": "/warum-ich-den-maennerkreis-leite"
+      }
     ]
   },
   "footerPrimary": [
-    { "label": "Der Kreis", "url": "/#ueber" },
-    { "label": "Ablauf", "url": "/#reise" },
-    { "label": "Markus", "url": "/#moderator" },
-    { "label": "Häufige Fragen", "url": "/#faq" },
-    { "label": "Meine Haltung", "url": "/warum-ich-den-maennerkreis-leite" },
-    { "label": "Termine & Anmeldung", "url": "/event" }
+    {
+      "label": "Der Kreis",
+      "url": "/#ueber"
+    },
+    {
+      "label": "Ablauf",
+      "url": "/#reise"
+    },
+    {
+      "label": "Markus",
+      "url": "/#moderator"
+    },
+    {
+      "label": "Häufige Fragen",
+      "url": "/#faq"
+    },
+    {
+      "label": "Meine Haltung",
+      "url": "/warum-ich-den-maennerkreis-leite"
+    },
+    {
+      "label": "Termine & Anmeldung",
+      "url": "/event"
+    }
   ],
-  "footerContact": [{ "label": "Bei neuen Terminen benachrichtigen", "url": "/#termine" }],
+  "footerContact": [
+    {
+      "label": "Bei neuen Terminen benachrichtigen",
+      "url": "/#termine"
+    }
+  ],
   "footerLegal": [
-    { "label": "Impressum", "url": "/impressum" },
-    { "label": "Datenschutz", "url": "/datenschutz" }
+    {
+      "label": "Impressum",
+      "url": "/impressum"
+    },
+    {
+      "label": "Datenschutz",
+      "url": "/datenschutz"
+    }
   ]
 }

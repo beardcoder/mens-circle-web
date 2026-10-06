@@ -1,23 +1,28 @@
 ---
 import { Icon } from 'astro-icon/components';
 
+/** A round seat with a sun or a moon. Rendered twice (bar and phone panel); lib/theme.ts keeps both in sync. */
 interface Props {
-  /** Extra class on the wrapper, used to place or hide each instance. */
+  /** Placement classes from the caller (which instance shows where). */
   class?: string;
+  /** A visible outline, for the phone panel. */
+  outlined?: boolean;
 }
 
-const { class: className } = Astro.props;
+const { class: className, outlined = false } = Astro.props;
 ---
 
-<div class:list={['theme-switch', className]}>
-  <button
-    class="theme-switch__btn"
-    type="button"
-    data-mode-toggle
-    aria-label="Hell- oder Dunkelmodus wechseln"
-    title="Hell- oder Dunkelmodus wechseln"
-  >
-    <Icon class="theme-switch__icon theme-switch__icon--light" name="theme-light" aria-hidden="true" />
-    <Icon class="theme-switch__icon theme-switch__icon--dark" name="theme-dark" aria-hidden="true" />
-  </button>
-</div>
+<button
+  type="button"
+  data-mode-toggle
+  aria-label="Hell- oder Dunkelmodus wechseln"
+  title="Hell- oder Dunkelmodus wechseln"
+  class:list={[
+    'grid size-11 place-items-center rounded-full border text-current transition-[border-color,rotate] duration-[420ms] ease-settle hover:-rotate-20 hover:border-line-strong',
+    outlined ? 'border-line-strong' : 'border-transparent',
+    className,
+  ]}
+>
+  <Icon name="theme-light" aria-hidden="true" class="size-4.5 dark:hidden" />
+  <Icon name="theme-dark" aria-hidden="true" class="hidden size-4.5 dark:block" />
+</button>

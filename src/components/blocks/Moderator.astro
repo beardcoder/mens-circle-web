@@ -1,6 +1,10 @@
 ---
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Prose from '../ui/Prose.astro';
+import Section from '../ui/Section.astro';
+import TextLink from '../ui/TextLink.astro';
 
 interface Props {
   data: {
@@ -16,181 +20,64 @@ interface Props {
   };
 }
 
-/** Markus, in his own words: a closer crop than the hero, his sentence, his role in the circle. */
+/**
+ * Markus, in his own words: a closer crop than the hero, his sentence, his role in
+ * the circle. Wide: the portrait holds columns 1–5 while his words pass on the
+ * right. Phones: the name first, then the portrait off-centre.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
 const photo = resolveAssetImage(data.image);
 ---
 
-<section class="section home-person" id={anchor} aria-labelledby="person-title">
-  <div class="container home-person__grid">
-    {photo && (
-      <figure class="home-person__figure" data-reveal>
-        <div class="home-person__frame">
-          <CropPicture
-            src={photo}
-            class="home-person__image"
-            breakpoint="56em"
-            narrow={{ ratio: 4 / 5, widths: [320, 480, 640], sizes: '72vw' }}
-            wide={{ ratio: 3 / 4, widths: [400, 600, 800], sizes: 'min(30rem, 34vw)' }}
-            loading="lazy"
-            alt={data.imageAlt ?? ''}
-          />
-        </div>
-      </figure>
-    )}
+<Section
+  id={anchor}
+  labelledby="person-title"
+  defer
+  innerClass="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-x-grid lg:gap-y-group"
+>
+  {photo && (
+    <figure class="reveal w-[72%] max-lg:order-[-1] lg:sticky lg:top-[calc(var(--spacing-clearance)+1.5rem)] lg:col-span-5 lg:w-auto">
+      {/* The frame sits on a flame bar: the one orange stroke in this section. */}
+      <div class="aspect-4/5 overflow-clip rounded-control border-b-[6px] border-flame lg:aspect-3/4 [&_picture]:block [&_picture]:h-full">
+        <CropPicture
+          src={photo}
+          class="block size-full origin-[22%_34%] scale-[1.45] object-cover object-[12%_50%]"
+          breakpoint="56em"
+          narrow={{ ratio: 4 / 5, widths: [320, 480, 640], sizes: '72vw' }}
+          wide={{ ratio: 3 / 4, widths: [400, 600, 800], sizes: 'min(30rem, 34vw)' }}
+          loading="lazy"
+          alt={data.imageAlt ?? ''}
+        />
+      </div>
+    </figure>
+  )}
 
-    <div class="home-person__body">
-      <p class="marker">{data.eyebrow}</p>
+  <div class="grid content-start gap-8 max-lg:contents lg:col-span-6 lg:col-start-7">
+    <div class="grid gap-5 max-lg:order-[-2]">
+      {data.eyebrow && <Eyebrow>{data.eyebrow}</Eyebrow>}
       {data.name && (
-        <h2 class="display display--xl home-person__name" id="person-title">
+        <h2 id="person-title" class="text-display-1 text-fg lg:text-display-2">
           {data.name}
         </h2>
       )}
-
-      {data.quote && (
-        <blockquote class="home-person__quote" data-reveal>
-          <p>{data.quote}</p>
-        </blockquote>
-      )}
-
-      {data.bio && <div class="home-person__bio prose" set:html={data.bio} data-reveal />}
-
-      {data.linkLabel && data.linkUrl && (
-        <p class="home-person__link">
-          <a href={data.linkUrl} class="text-link" data-astro-prefetch="hover">
-            {data.linkLabel}
-          </a>
-        </p>
-      )}
     </div>
+
+    {data.quote && (
+      <blockquote class="reveal max-w-[24ch] font-serif text-3xl leading-[1.2] text-balance text-accent italic lg:max-w-[30ch] lg:text-[clamp(2rem,1.4rem+1.1vw,2.375rem)]">
+        <p>{data.quote}</p>
+      </blockquote>
+    )}
+
+    {data.bio && <Prose html={data.bio} size="lg" class="reveal max-w-[36em]" />}
+
+    {data.linkLabel && data.linkUrl && (
+      <p>
+        <TextLink href={data.linkUrl} data-astro-prefetch="hover">
+          {data.linkLabel}
+        </TextLink>
+      </p>
+    )}
   </div>
-</section>
-
-<style is:global>
-  @layer sections {
-    /* The portrait takes the left five columns, his words the right six, both
-       starting on the same line. */
-    .home-person__grid {
-      display: grid;
-      grid-template-columns: var(--field);
-      gap: var(--space-xl) var(--field-gap);
-      align-items: start;
-    }
-
-    .home-person__figure {
-      position: sticky;
-      inset-block-start: calc(var(--header-clearance) + var(--space-md));
-      grid-column: 1 / span 5;
-      margin: 0;
-    }
-
-    .home-person__body {
-      grid-column: 7 / span 6;
-    }
-
-    /* The frame sits on a flame bar: the one orange stroke in this section. */
-    .home-person__frame {
-      overflow: clip;
-      border-radius: var(--radius);
-      border-block-end: 6px solid var(--color-flame);
-      aspect-ratio: 3 / 4;
-    }
-
-    .home-person__frame picture {
-      display: block;
-      block-size: 100%;
-    }
-
-    /* A closer crop of the same photograph: the man, not the view. */
-    .home-person__image {
-      display: block;
-      inline-size: 100%;
-      block-size: 100%;
-      object-fit: cover;
-      object-position: 12% 50%;
-      scale: 1.45;
-      transform-origin: 22% 34%;
-    }
-
-    .home-person__name {
-      margin-block-end: var(--space-md);
-      font-size: var(--display-2);
-    }
-
-    .home-person__quote {
-      max-inline-size: 30ch;
-      padding: 0;
-      margin: 0 0 var(--space-lg);
-      font-family: var(--font-quote);
-      font-size: clamp(2rem, 1.4rem + 1.1vw, 2.375rem);
-      font-style: italic;
-      line-height: 1.2;
-      color: var(--accent);
-      text-wrap: balance;
-    }
-
-    .home-person__quote p {
-      max-inline-size: none;
-    }
-
-    .home-person__bio {
-      max-inline-size: 36em;
-    }
-
-    .home-person__bio p {
-      font-size: var(--text-section-body-lg);
-    }
-
-    .home-person__link {
-      margin-block-start: var(--space-md);
-    }
-
-    @media (width <= 56em) {
-      .home-person__grid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: var(--space-lg);
-      }
-
-      /* Phone: the name first, then the portrait off-centre. */
-      .home-person__body {
-        display: contents;
-      }
-
-      .home-person__body > .marker {
-        order: -3;
-        margin-block-end: 0;
-      }
-
-      .home-person__name {
-        order: -2;
-        margin-block-end: 0;
-        font-size: var(--display-1);
-      }
-
-      .home-person__figure {
-        position: relative;
-        inset-block-start: auto;
-        grid-column: auto;
-        order: -1;
-        inline-size: 72%;
-        margin: 0;
-      }
-
-      .home-person__frame {
-        aspect-ratio: 4 / 5;
-      }
-
-      .home-person__quote {
-        max-inline-size: 24ch;
-        margin-block: var(--space-md) 0;
-        font-size: var(--text-3xl);
-      }
-
-      .home-person__link {
-        margin-block-start: 0;
-      }
-    }
-  }
-</style>
+</Section>

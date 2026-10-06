@@ -1,129 +1,99 @@
 ---
-/** "Teile deine Erfahrung" — stored unpublished for moderation. */
+import { checkbox, control, fieldError, link } from '@lib/ui';
+import Button from '../ui/Button.astro';
+import Field from '../ui/Field.astro';
+import Honeypot from './Honeypot.astro';
+
+/** "Teile deine Erfahrung" — stored unpublished for moderation. Required fields carry `required`; the rest say "(optional)". */
 ---
 
-<form
-  id="testimonial"
-  class="testimonial-form"
-  data-form="testimonial"
-  data-track="testimonial"
-  data-track-context="{}"
->
-  <div class="hp-field" aria-hidden="true">
-    <label>
-      Website
-      <input type="text" name="website" tabindex="-1" autocomplete="off" />
-    </label>
-  </div>
+<form id="testimonial" data-form="testimonial" data-track="testimonial" data-track-context="{}" class="grid gap-6">
+  <Honeypot />
 
-  <div class="form-field form-field--spaced">
-    <label for="quote" class="form-label form-label--plain">
-      Deine Erfahrung <span class="form-required">*</span>
-    </label>
+  <Field for="quote" label="Deine Erfahrung" errorId="testimonial-quote-error">
     <textarea
       id="quote"
       name="quote"
-      class="form-control form-control--light"
       rows="6"
-      placeholder='z.B. "Hier kann ich endlich ich selbst sein, ohne Maske und ohne Leistungsdruck..."'
+      placeholder="z. B. „Hier kann ich ich selbst sein, ohne Maske und ohne Leistungsdruck …“"
       required
       minlength="10"
       maxlength="1000"
       aria-describedby="testimonial-quote-error testimonial-quote-hint"
+      class:list={[control(), 'min-h-40 resize-y']}
     ></textarea>
-    <span class="form-hint" id="testimonial-quote-hint">
-      Mindestens 10 Zeichen, maximal 1000 Zeichen
+    {/* The rule and the live count on one line under the field. */}
+    <span class="mt-1.5 flex justify-between gap-4 text-sm text-fg-muted">
+      <span id="testimonial-quote-hint">Mindestens 10, höchstens 1000 Zeichen.</span>
+      <span class="tabular-nums" aria-hidden="true">
+        <span data-char-count>0</span>/1000
+      </span>
     </span>
-    <span class="form-error" id="testimonial-quote-error" hidden></span>
-    <span class="testimonial-form__counter">
-      <span class="char-count">0</span>/1000
-    </span>
-  </div>
+  </Field>
 
-  <div class="form-field form-field--spaced">
-    <label for="author_name" class="form-label form-label--plain">
-      Dein Name <span class="form-optional">(optional)</span>
-    </label>
+  <Field for="author_name" label="Dein Name" optional hint="Leer lassen, wenn du anonym bleiben möchtest.">
     <input
       type="text"
       id="author_name"
       name="author_name"
-      class="form-control form-control--light"
-      placeholder="z.B. Michael oder anonym lassen"
+      placeholder="z. B. Michael"
       maxlength="255"
+      class={control()}
     />
-    <span class="form-hint">Leer lassen für ein anonymes Testimonial</span>
-  </div>
+  </Field>
 
-  <div class="form-field form-field--spaced">
-    <label for="role" class="form-label form-label--plain">
-      Rolle/Beschreibung <span class="form-optional">(optional)</span>
-    </label>
+  <Field for="role" label="Rolle oder Beschreibung" optional>
     <input
       type="text"
       id="role"
       name="role"
-      class="form-control form-control--light"
-      placeholder="z.B. Teilnehmer seit 2023"
+      placeholder="z. B. Teilnehmer seit 2023"
       maxlength="255"
+      class={control()}
     />
-  </div>
+  </Field>
 
-  <div class="form-field form-field--spaced">
-    <label for="testimonial_email" class="form-label form-label--plain">
-      E-Mail-Adresse <span class="form-required">*</span>
-    </label>
+  <Field
+    for="testimonial_email"
+    label="E-Mail-Adresse"
+    hint="Wird nicht veröffentlicht. Nur für Rückfragen."
+    hintId="testimonial-email-hint"
+    errorId="testimonial-email-error"
+  >
     <input
       type="email"
       id="testimonial_email"
       name="email"
-      class="form-control form-control--light"
       placeholder="deine@email.de"
       required
       maxlength="255"
+      autocomplete="email"
       aria-describedby="testimonial-email-error testimonial-email-hint"
+      class={control()}
     />
-    <span class="form-hint" id="testimonial-email-hint">
-      Wird nicht veröffentlicht. Nur für Rückfragen.
-    </span>
-    <span class="form-error" id="testimonial-email-error" hidden></span>
-  </div>
+  </Field>
 
-  <div class="form-field form-field--checkbox">
-    <label class="form-checkbox-label">
-      <input
-        type="checkbox"
-        name="privacy"
-        class="form-checkbox-control"
-        required
-        aria-describedby="testimonial-privacy-error"
-      />
-      <span class="form-checkbox-text">
+  <div>
+    <label class="flex cursor-pointer items-start gap-3">
+      <input type="checkbox" name="privacy" required aria-describedby="testimonial-privacy-error" class={checkbox} />
+      <span class="text-base text-fg">
         Ich habe die{' '}
-        <a href="/datenschutz" target="_blank" rel="noopener" class="link">
+        <a href="/datenschutz" target="_blank" rel="noopener" class={link}>
           Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span>
         </a>{' '}
         zur Kenntnis genommen und bin damit einverstanden, dass meine Daten zum Zwecke der Veröffentlichung gespeichert
         werden.
-        <span class="form-required">*</span>
       </span>
     </label>
-    <span class="form-error" id="testimonial-privacy-error" hidden></span>
+    <span class={fieldError} id="testimonial-privacy-error" hidden></span>
   </div>
 
-  <div class="form-actions">
-    <button type="submit" class="btn btn--primary">
+  <div class="grid justify-items-start gap-3">
+    <Button type="submit" size="lg" class="max-sm:w-full">
       Erfahrung teilen
-    </button>
+    </Button>
+    <p class="text-sm text-fg-muted">Dein Text wird erst nach Prüfung veröffentlicht.</p>
   </div>
-
-  <p class="testimonial-form__note">
-    <small>
-      Alle Felder mit <span class="form-required">*</span> sind Pflichtfelder.
-      <br />
-      Dein Testimonial wird nach Prüfung durch uns veröffentlicht.
-    </small>
-  </p>
 </form>
 
 <script>
@@ -134,7 +104,7 @@
 
   // Live character count under the textarea; reset with the form.
   const quote = document.querySelector<HTMLTextAreaElement>('#quote');
-  const count = document.querySelector('.testimonial-form .char-count');
+  const count = document.querySelector('[data-char-count]');
   const update = (): void => {
     if (quote && count) count.textContent = String(quote.value.length);
   };

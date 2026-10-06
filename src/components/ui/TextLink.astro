@@ -1,0 +1,31 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/** A quiet, self-contained link beside a primary action: underlined, with an arrow that moves. */
+interface Props {
+  href: string;
+  /** Bold, underlined in the text colour: on the flame field. */
+  strong?: boolean;
+  class?: string;
+  [attribute: string]: unknown;
+}
+
+const { href, strong = false, class: className, ...attributes } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    'group/link inline-flex min-h-11 items-center gap-[0.55em] font-sans text-base text-fg underline decoration-[1.5px] underline-offset-[0.3em] transition-[text-decoration-color]',
+    strong ? 'font-bold decoration-fg' : 'font-medium decoration-accent/70 hover:decoration-accent',
+    className,
+  ]}
+  {...attributes}
+>
+  <slot />
+  <Icon
+    name="arrow"
+    aria-hidden="true"
+    class="size-[1em] shrink-0 transition-transform duration-200 group-hover/link:translate-x-1"
+  />
+</a>

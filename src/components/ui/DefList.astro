@@ -1,0 +1,29 @@
+---
+/** Facts as a hairline-separated definition list: the term in capitals, the value in the serif. */
+interface Row {
+  label: string;
+  value: string;
+  note?: string;
+}
+
+interface Props {
+  rows: Row[];
+  class?: string;
+}
+
+const { rows, class: className } = Astro.props;
+---
+
+<dl class:list={['border-t border-line', className]}>
+  {rows.map((row) => (
+    <div class="grid gap-x-6 gap-y-1 border-b border-line py-4 sm:grid-cols-[minmax(6rem,10rem)_minmax(0,1fr)]">
+      <dt class="pt-[0.3em] text-xs font-semibold tracking-label text-fg-muted uppercase">{row.label}</dt>
+      <dd class="font-serif text-lg leading-snug font-medium text-fg">
+        {row.value}
+        {row.note && (
+          <span class="mt-1 block font-sans text-sm leading-normal font-normal text-fg-muted">{row.note}</span>
+        )}
+      </dd>
+    </div>
+  ))}
+</dl>

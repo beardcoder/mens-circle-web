@@ -9,6 +9,7 @@ import EventHero from '../../components/event/EventHero.astro';
 import EventInfo from '../../components/event/EventInfo.astro';
 import EventMapSection from '../../components/event/EventMapSection.astro';
 import EventRegister from '../../components/event/EventRegister.astro';
+import Section from '../../components/ui/Section.astro';
 
 // One SSR page per event, read per request, so a new or edited event is live with no rebuild.
 const { slug } = Astro.params;
@@ -16,6 +17,7 @@ const event = slug ? await getEventBySlug(slug) : null;
 if (!event) return Astro.redirect('/event', 302);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const hasMap = event.latitude !== null && event.longitude !== null;
 
 // This is the page people forward, so the preview answers "when, where, still a
 // seat?" without anyone opening the link.
@@ -53,11 +55,25 @@ const breadcrumbs = {
   schemas={[eventSchema, breadcrumbs]}
 >
   <EventHero event={event} />
-  <EventRegister event={event} />
-  <EventInfo event={event} />
-  {event.latitude !== null && event.longitude !== null && (
-    <EventMapSection event={event} lat={event.latitude} lng={event.longitude} />
-  )}
-  <EventAbout event={event} />
-  <EventFinalCta event={event} />
+
+  {/* What the evening is beside the one thing the page asks for: facts and the
+      admin's text on the left, the registration panel on the right, holding its
+      place while the facts pass. Phones read the facts first. */}
+  <Section
+    ground="sand"
+    labelledby="termin-fakten"
+    innerClass="grid items-start gap-group lg:grid-cols-12 lg:gap-x-grid"
+  >
+    <div class="grid gap-group lg:col-span-5">
+      <EventInfo event={event} />
+      <EventAbout event={event} />
+    </div>
+    <EventRegister
+      event={event}
+      class="lg:sticky lg:top-[calc(var(--spacing-clearance)+1.5rem)] lg:col-span-6 lg:col-start-7"
+    />
+  </Section>
+
+  {hasMap && <EventMapSection event={event} lat={event.latitude!} lng={event.longitude!} />}
+  <EventFinalCta event={event} ground={hasMap ? 'sand' : 'default'} />
 </Layout>

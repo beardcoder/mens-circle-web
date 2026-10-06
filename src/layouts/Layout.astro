@@ -1,5 +1,5 @@
 ---
-import '../styles/app.css';
+import '../styles/global.css';
 import { Font } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import Footer from '../components/Footer.astro';
@@ -52,11 +52,11 @@ const props = Astro.props;
       })();
     </script>
     {/* Preload the serif headline weight — the hero sentence is the LCP. Config in astro.config.mjs. */}
-    <Font cssVariable="--font-serif" preload={[{ weight: '400', style: 'normal' }]} />
+    <Font cssVariable="--font-fraunces" preload={[{ weight: '400', style: 'normal' }]} />
     {/* And the bold sans: the date lines in the first screen are set in it, and a late
         swap rewraps them (a layout shift on /event). */}
     <Font
-      cssVariable="--font-sans"
+      cssVariable="--font-instrument"
       preload={[
         { weight: '400', style: 'normal' },
         { weight: '700', style: 'normal' },
@@ -64,11 +64,15 @@ const props = Astro.props;
     />
     <SeoHead {...props} />
   </head>
-  <body>
+  <body class="max-lg:data-[nav-open]:fixed max-lg:data-[nav-open]:min-h-full max-lg:data-[nav-open]:w-full max-lg:data-[nav-open]:overflow-hidden">
+    {/* lib/site-header.ts sets `data-nav-open` while the phone panel is open: the page holds still. */}
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
     <span id="top" aria-hidden="true"></span>
 
-    <a href="#main" class="skip-link">
+    <a
+      href="#main"
+      class="fixed -top-full left-4 z-50 rounded-control bg-accent px-5 py-3 text-sm font-semibold text-on-accent transition-[top] duration-150 focus:top-2 print:hidden"
+    >
       Zum Inhalt springen
     </a>
 
@@ -80,8 +84,13 @@ const props = Astro.props;
 
     <Footer close={props.footerClose ?? true} />
 
-    <a href="#top" class="scroll-to-top" aria-label="Nach oben scrollen" title="Nach oben">
-      <Icon name="chevron-up" aria-hidden="true" />
+    <a
+      href="#top"
+      aria-label="Nach oben scrollen"
+      title="Nach oben"
+      class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full border border-line-strong bg-raised text-fg transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-on-accent scroll-motion:pointer-events-none scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
+    >
+      <Icon name="chevron-up" aria-hidden="true" class="size-4.5" />
     </a>
 
     <script>
@@ -89,25 +98,3 @@ const props = Astro.props;
     </script>
   </body>
 </html>
-
-<style is:global>
-  @layer components {
-    .skip-link {
-      position: absolute;
-      inset-block-start: -100%;
-      inset-inline-start: var(--space-sm);
-      z-index: var(--z-toast);
-      padding: 0.75rem 1.25rem;
-      font-size: var(--text-caption);
-      font-weight: 600;
-      color: var(--on-accent);
-      background: var(--accent);
-      border-radius: var(--radius);
-      transition: inset-block-start var(--motion-quick);
-    }
-
-    .skip-link:focus {
-      inset-block-start: var(--space-xs);
-    }
-  }
-</style>
