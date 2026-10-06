@@ -97,18 +97,35 @@ const imageAsset = resolveAssetImage(data.image);
       /* A single long word ("Datenschutzerklärung") widens the box, then breaks. */
       max-inline-size: max(14ch, min-content);
       margin: 0;
-      font-size: var(--display-1);
+      /* The section size: only the home's opening sentence is set larger. */
+      font-size: var(--display-2);
       overflow-wrap: break-word;
       hyphens: auto;
     }
 
-    .page-hero--center .page-hero__title {
-      font-size: var(--display-2);
-    }
-
-    /* Wide: the column holds every word of a left title ("Männerkreis"), so it breaks
-       between words, never inside one. */
+    /* Wide: on the home's split line. The title takes the left half, the lead
+       stands from column 7, level with the title's last line; a title without a
+       lead (the legal pages) takes the whole width. The column holds every word
+       of a title ("Männerkreis", "Datenschutzerklärung"), so it breaks between
+       words, never inside one. */
     @media (width > 56em) {
+      .page-hero:not(.page-hero--center) .page-hero__layout {
+        grid-template-columns: var(--field);
+        column-gap: var(--field-gap);
+      }
+
+      .page-hero:not(.page-hero--center) .page-hero__content {
+        grid-column: 1 / span 6;
+      }
+
+      .page-hero:not(.page-hero--center) .page-hero__content:only-child {
+        grid-column: 1 / -1;
+      }
+
+      .page-hero:not(.page-hero--center) .page-hero__aside {
+        grid-column: 7 / span 6;
+      }
+
       .page-hero:not(.page-hero--center) .page-hero__title {
         hyphens: manual;
       }

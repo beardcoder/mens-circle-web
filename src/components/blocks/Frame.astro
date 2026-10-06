@@ -142,8 +142,8 @@ const agreements = data.agreements ?? [];
       color: var(--text-secondary);
     }
 
-    /* Wide: the title on the left half, its short reading beside it, level with
-       its first line, as in the circle's spread;
+    /* Wide: on the split line — the title in columns 1–5, its short reading from
+       column 7, level with its first line;
        the agreements four abreast (two by two on a narrow desktop), each under a
        hairline; the boundary across the whole width below them. */
     @media (width > 56em) {
@@ -154,12 +154,12 @@ const agreements = data.agreements ?? [];
       }
 
       .home-frame__title {
-        grid-column: 1 / span 6;
+        grid-column: 1 / span 5;
         max-inline-size: 17ch;
       }
 
       .home-frame__intro {
-        grid-column: 8 / span 5;
+        grid-column: 7 / span 6;
         align-self: start;
         max-inline-size: 34em;
         padding-block-start: 0.2em;
