@@ -1,5 +1,6 @@
 ---
 import Breath from '../Breath.astro';
+import Contours from '../Contours.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
 import TextLink from '../ui/TextLink.astro';
@@ -18,7 +19,7 @@ interface Props {
   };
 }
 
-/** The one dark band on the page: a calm statement on the middle axis, a breath to follow, a warm glow behind. */
+/** The dark band: the statement on the middle axis over the hill country's contours, a breath to follow, a warm glow behind. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'haltung';
@@ -32,12 +33,13 @@ const lines = data.lines ?? [];
   class="overflow-clip"
   innerClass="relative grid justify-items-center gap-6 text-center"
 >
+  <Contours slot="before" />
   {/* A faint glow, faint enough that every contrast holds. */}
   <Breath slot="before" variant="glow" class="top-1/2 left-1/2 w-[min(90vw,48rem)] -translate-1/2" />
 
   {data.eyebrow && <Eyebrow>{data.eyebrow}</Eyebrow>}
 
-  <h2 id="statement-title" class="text-display-2 text-fg">
+  <h2 id="statement-title" class="text-display-1 text-fg">
     {lines.map((line, i) => (
       <span class:list={['block', i > 0 && 'text-accent']}>{line}</span>
     ))}

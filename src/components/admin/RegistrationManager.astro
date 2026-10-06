@@ -111,7 +111,7 @@ function badgeTone(s: Status): 'live' | 'wait' | 'off' {
     {registrations.map((reg) => (
       <li class:list={[card, 'grid gap-2 px-5 py-4']} data-id={reg.id} data-name={`${reg.firstName} ${reg.lastName}`}>
         <div class="flex items-center justify-between gap-3">
-          <span class="font-serif text-lg font-medium">
+          <span class="font-serif text-lg font-semibold">
             {reg.firstName} {reg.lastName}
           </span>
           <Badge tone={badgeTone(reg.status)}>{STATUS_LABEL[reg.status]}</Badge>
