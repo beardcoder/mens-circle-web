@@ -1,7 +1,7 @@
 ---
 import { primaryAction, dateStatus } from '../lib/event-status';
 import { caps, card } from '../lib/ui';
-import SeatCircle from './SeatCircle.astro';
+import SeatMeter from './SeatMeter.astro';
 import Button from './ui/Button.astro';
 
 /**
@@ -67,24 +67,17 @@ const seatsLine = next
     <p class="mt-1 text-base text-fg-soft">{meta}</p>
   </div>
 
-  <div class="flex items-center gap-4 border-t border-line pt-4">
-    {next ? (
-      <SeatCircle
-        seats={next.maxParticipants}
-        taken={next.maxParticipants - next.availableSpots}
-        ember
-        seatSize={12}
-        label={seatsLabel}
-        class="size-12 shrink-0"
-      />
-    ) : (
-      /* The circle keeps its place, but shows no seats it does not know. */
-      <SeatCircle seatSize={12} class="invisible size-12 shrink-0" />
-    )}
+  <div class="grid gap-3 border-t border-line pt-4">
     <p class="text-sm text-fg-muted">
       <strong class="block text-base font-semibold text-fg">{seatsHeadline}</strong>
       {seatsLine}
     </p>
+    {next ? (
+      <SeatMeter seats={next.maxParticipants} taken={next.maxParticipants - next.availableSpots} label={seatsLabel} />
+    ) : (
+      /* The meter keeps its place, but shows no seats it does not know. */
+      <SeatMeter class="invisible" />
+    )}
   </div>
 
   <Button
