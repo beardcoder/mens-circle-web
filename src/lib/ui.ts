@@ -9,21 +9,21 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 const BUTTON_BASE =
-  'group/btn relative inline-flex items-center justify-center rounded-full border text-center font-sans font-semibold leading-tight no-underline transition-[background-color,color,border-color,box-shadow,scale] duration-150 ease-precise active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 motion-reduce:active:scale-100';
+  'group/btn relative inline-flex items-center justify-center rounded-control border text-center font-sans font-bold uppercase tracking-label leading-tight no-underline transition-[background-color,color,border-color,box-shadow,scale] duration-150 ease-precise active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 motion-reduce:active:scale-100';
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary: 'border-accent bg-accent text-on-accent hover:border-accent-strong hover:bg-accent-strong',
-  secondary: 'border-line-bold bg-transparent text-fg hover:border-fg hover:bg-fg/5',
+  secondary: 'border-fg bg-transparent text-fg hover:bg-fg hover:text-surface',
   ghost: 'border-transparent bg-transparent text-accent hover:bg-accent-soft',
   danger: 'border-danger bg-transparent text-danger hover:bg-danger hover:text-surface',
 };
 
 const BUTTON_SIZES: Record<ButtonSize, string> = {
   /** The admin's dense row buttons: still well clear of the 24px minimum target. */
-  xs: 'min-h-9 gap-1.5 px-3.5 py-1 text-sm',
-  sm: 'min-h-11 gap-2 px-5 py-2 text-sm',
-  md: 'min-h-12 gap-2.5 px-6 py-3 text-base',
-  lg: 'min-h-14 gap-3 px-7 py-3.5 text-base',
+  xs: 'min-h-9 gap-1.5 px-3 py-1 text-xs',
+  sm: 'min-h-11 gap-2 px-4.5 py-2 text-xs',
+  md: 'min-h-12 gap-2.5 px-6 py-3 text-sm',
+  lg: 'min-h-14 gap-3 px-7 py-3.5 text-sm',
 };
 
 export const button = ({
@@ -61,8 +61,11 @@ export const fieldError =
   'mt-2 flex w-fit items-start gap-1.5 rounded-control bg-alert px-3 py-1.5 text-sm font-semibold text-on-alert before:font-bold before:content-["!"]';
 export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer rounded accent-accent';
 
+/** A label in bold capitals, spaced like a stamp: eyebrows, terms, "Nächster Termin". Add the colour. */
+export const caps = 'text-xs font-bold tracking-label uppercase';
+
 /** A card: a self-contained unit on the page (a date, a step, a quote, a form). */
-export const card = 'rounded-card border border-line bg-raised shadow-card';
+export const card = 'rounded-card border border-line-strong bg-raised';
 
 /** A card's padding, for the larger cards that hold a form or a date. */
 export const panel = `${card} p-6 sm:p-8`;

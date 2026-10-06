@@ -1,5 +1,4 @@
 ---
-import { card } from '@lib/ui';
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -20,7 +19,7 @@ interface Props {
   };
 }
 
-/** The evening in four steps, in order: one card each, numbered, so the sequence reads at a glance. */
+/** The evening in four steps, in order: each under a heavy rule with its number, so the sequence reads at a glance. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
@@ -31,14 +30,11 @@ const steps = (data.steps ?? []).slice(0, 4);
   <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="ablauf-title" lead={data.subtitle} size="display-2" />
 
   {steps.length > 0 && (
-    <ol role="list" class="mt-group grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <ol role="list" class="mt-group grid gap-x-grid gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
       {steps.map((step, i) => (
-        <li class:list={[card, 'reveal grid content-start gap-3 p-6']}>
-          <span
-            class="grid size-10 place-items-center rounded-full bg-accent-soft font-serif text-lg font-semibold text-accent"
-            aria-hidden="true"
-          >
-            {i + 1}
+        <li class="reveal grid content-start gap-3 border-t-3 border-fg pt-5">
+          <span class="font-serif text-display-3 leading-none font-semibold text-accent" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
           </span>
           {step.title && <h3 class="mt-2 text-2xl text-fg">{step.title}</h3>}
           {step.description && <p class="text-base text-fg-soft">{step.description}</p>}

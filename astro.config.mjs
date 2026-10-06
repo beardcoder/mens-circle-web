@@ -66,9 +66,8 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   fonts: [
-    // Fraunces — a soft, warm old-style serif with an organic wobble — speaks:
-    // headlines (regular, large; 500 for small serif lines) and the quiet lines
-    // (italic). Instrument Sans explains: text, UI and the date line. The admin
+    // Fraunces speaks: headlines and serif lines at 600 (sturdy, carved), the
+    // quiet lines (quotes, questions) in its italic at 400. Instrument Sans explains: text, UI and the date line. The admin
     // uses the same two. Tailwind maps them to `font-serif` and `font-sans`.
     {
       name: 'Instrument Sans',
@@ -83,7 +82,7 @@ export default defineConfig({
       name: 'Fraunces',
       cssVariable: '--font-fraunces',
       provider: fontProviders.fontsource(),
-      weights: ['400', '500'],
+      weights: ['400', '600'],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
