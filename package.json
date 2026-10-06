@@ -33,6 +33,7 @@
     "@astrojs/sitemap": "^3.7.4",
     "@eslint/js": "^10.0.1",
     "@mens-circle/astro-bun": "workspace:*",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/bun": "^1.4.2",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^26.6.4",
@@ -49,6 +50,7 @@
     "leaflet": "^1.9.4",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.0",
+    "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.71.0"
   }

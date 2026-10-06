@@ -1,8 +1,10 @@
 ---
 import site from '@data/site.json';
 import { type NextEventSummary, summarizeNextEvent } from '@lib/event-status';
+import Section from '../ui/Section.astro';
+import Split from '../ui/Split.astro';
 
-/** Quick facts, shared by home and /event. Never more precise than the city. */
+/** Quick facts, shared by home and /event: the four answers a cautious reader looks for first. Never more precise than the city. */
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string };
@@ -26,206 +28,67 @@ const facts = [
   },
   // Non-breaking space: the only acceptable break is before "Wochen" — between
   // the 2 and the 4 it reads as a stray hyphen.
-  { label: 'Wie oft', value: 'Alle\u00A02–4 Wochen', sub: 'Ohne Mitgliedschaft – du kommst, wann es für dich passt' },
+  { label: 'Wie oft', value: 'Alle 2–4 Wochen', sub: 'Ohne Mitgliedschaft – du kommst, wann es für dich passt' },
   {
     label: 'Dauer',
     value: '2–3 Stunden',
     // Word joiners keep "19:00–21:30" on one line.
     sub: next?.timeRange
-      ? `Nächster Termin: ${next.timeRange.replace('–', '\u2060–\u2060')}`
+      ? `Nächster Termin: ${next.timeRange.replace('–', '⁠–⁠')}`
       : 'Ein Abend, kein Wochenendseminar',
   },
   // The event's own fee text wins: it may name an amount "Spendenbasis" swallows.
   { label: 'Beitrag', value: next?.costBasis || 'Spendenbasis', sub: 'Du gibst, was für dich machbar ist' },
 ];
 const anchor = data.anchor ?? 'praktisches';
+const band = variant === 'band';
+
+// Two by two with hairlines between; on the band four abreast from `lg`, each behind its own hairline.
+const item = (i: number) => [
+  '@container grid grid-rows-[auto_auto_1fr] gap-1 border-line py-4 pr-4',
+  i % 2 === 1 && 'border-l pl-4',
+  i >= 2 && 'border-t',
+  band && 'lg:border-t-0 lg:border-l lg:px-6',
+];
 ---
 
-{variant === 'list' ? (
-  <section class="section section--ruled event-landing-facts" aria-labelledby="fakten-title">
-    <div class="container">
-      <div class="spine">
-        <h2 class="rail-heading" id="fakten-title">
-          Gut zu wissen
-        </h2>
-
-        <dl class="facts-grid spine__body--wide">
-          {facts.map((fact) => (
-            <div class="facts-grid__item" data-reveal>
-              <dt class="facts-grid__label">{fact.label}</dt>
-              <dd class="facts-grid__value">{fact.value}</dd>
-              <dd class="facts-grid__note">{fact.sub}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </div>
-  </section>
-) : (
-  <section class="surface-sand home-facts" id={anchor} aria-labelledby="praktisches-title">
-    <div class="container home-facts__inner">
-      <h2 class="home-facts__title" id="praktisches-title">
+{band ? (
+  <Section id={anchor} ground="sand" space="compact" labelledby="praktisches-title">
+    <div class="grid gap-x-group gap-y-2 xl:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] xl:items-start">
+      <h2 id="praktisches-title" class="font-serif text-xl text-accent italic xl:pt-4">
         {data.eyebrow ?? 'Auf einen Blick'}
       </h2>
-
-      <dl class="facts-grid">
-        {facts.map((fact) => (
-          <div class="facts-grid__item">
-            <dt class="facts-grid__label">{fact.label}</dt>
-            <dd class="facts-grid__value">{fact.value}</dd>
-            <dd class="facts-grid__note">{fact.sub}</dd>
+      <dl class="grid grid-cols-2 lg:grid-cols-4">
+        {facts.map((fact, i) => (
+          <div class:list={item(i)}>
+            <dt class="text-xs font-semibold tracking-label text-fg-muted uppercase">{fact.label}</dt>
+            {/* Every value on one line at one size: "Alle 2–4 Wochen", the longest, is 7.6em. */}
+            <dd class="font-serif text-[length:min(var(--text-xl),12.8cqi)] leading-[1.1] tracking-[-0.015em] whitespace-nowrap text-fg">
+              {fact.value}
+            </dd>
+            <dd class="mt-1 text-sm leading-normal text-fg-muted">{fact.sub}</dd>
           </div>
         ))}
       </dl>
     </div>
-  </section>
+  </Section>
+) : (
+  <Section labelledby="fakten-title" defer>
+    <Split>
+      <h2 slot="head" id="fakten-title" class="text-display-3 text-fg">
+        Gut zu wissen
+      </h2>
+      <dl class="grid grid-cols-2">
+        {facts.map((fact, i) => (
+          <div class:list={[item(i), 'reveal']}>
+            <dt class="text-xs font-semibold tracking-label text-fg-muted uppercase">{fact.label}</dt>
+            <dd class="font-serif text-[length:min(var(--text-xl),12.8cqi)] leading-[1.1] tracking-[-0.015em] whitespace-nowrap text-fg">
+              {fact.value}
+            </dd>
+            <dd class="mt-1 text-sm leading-normal text-fg-muted">{fact.sub}</dd>
+          </div>
+        ))}
+      </dl>
+    </Split>
+  </Section>
 )}
-
-<style is:global>
-  @layer sections {
-    /* A ledger strip directly under the hero: the four answers a cautious
-       reader looks for before anything else. */
-    .home-facts {
-      padding-block: var(--space-lg);
-    }
-
-    @media (width > 72em) {
-      .home-facts {
-        padding-block: var(--space-xl);
-      }
-    }
-
-    .home-facts__inner {
-      display: grid;
-      grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
-      gap: var(--space-md) var(--space-xl);
-      align-items: start;
-    }
-
-    .home-facts__title {
-      padding-block-start: var(--space-sm);
-      font-size: var(--text-xl);
-      font-family: var(--font-quote);
-      font-style: italic;
-      color: var(--accent);
-    }
-
-    .facts-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      margin: 0;
-    }
-
-    .facts-grid__item {
-      container-type: inline-size;
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      gap: var(--space-3xs);
-      padding: var(--space-sm) var(--space-md) var(--space-sm) 0;
-    }
-
-    .facts-grid__item + .facts-grid__item {
-      padding-inline-start: var(--space-md);
-      border-inline-start: 1px solid var(--border-light);
-    }
-
-    .facts-grid__label {
-      font-size: var(--text-marker);
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-marker);
-    }
-
-    .facts-grid__value {
-      margin: 0;
-      font-family: var(--font-display);
-      /* Capped by the column, so one long word ("Spendenbasis") never runs out. */
-      font-size: min(var(--text-2xl), 14cqi);
-      line-height: 1.1;
-      color: var(--text-primary);
-      letter-spacing: -0.015em;
-      text-wrap: balance;
-    }
-
-    .facts-grid__note {
-      margin: var(--space-3xs) 0 0;
-      font-size: var(--text-caption);
-      line-height: 1.5;
-      color: var(--text-muted);
-      text-wrap: pretty;
-    }
-
-    @media (width <= 72em) {
-      .home-facts__inner {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 0;
-      }
-
-      .home-facts__title {
-        padding-block-start: 0;
-      }
-    }
-
-    /* Two by two once the row is narrow: on a phone or tablet, and always in the
-       content column of the list variant. */
-    @media (width <= 62em) {
-      .facts-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .facts-grid__item:nth-child(3) {
-        padding-inline-start: 0;
-        border-inline-start: 0;
-      }
-
-      .facts-grid__item:nth-child(n + 3) {
-        border-block-start: 1px solid var(--border-light);
-      }
-    }
-
-    /* Every value on one line at one size: "Alle 2–4 Wochen", the longest, is
-       7.6em, so 12.8cqi fits it in any column. */
-    .facts-grid .facts-grid__value {
-      font-size: min(var(--text-xl), 12.8cqi);
-      white-space: nowrap;
-    }
-
-    /* Wide, four abreast: every fact behind the same hairline. */
-    @media (width > 62em) {
-      .home-facts .facts-grid__item,
-      .home-facts .facts-grid__item + .facts-grid__item {
-        padding-inline: var(--space-md);
-        border-inline-start: 1px solid var(--border-light);
-      }
-    }
-
-    .event-landing-facts .facts-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .event-landing-facts .facts-grid__item:nth-child(3) {
-      padding-inline-start: 0;
-      border-inline-start: 0;
-    }
-
-    .event-landing-facts .facts-grid__item:nth-child(n + 3) {
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    @media (width <= 30em) {
-      .facts-grid__item,
-      .facts-grid__item + .facts-grid__item {
-        padding-inline: 0 var(--space-xs);
-      }
-
-      .facts-grid__item:nth-child(even) {
-        padding-inline-start: var(--space-sm);
-      }
-
-      .facts-grid__value {
-        font-size: var(--text-xl);
-      }
-    }
-  }
-</style>

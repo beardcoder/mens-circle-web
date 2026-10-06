@@ -2,6 +2,8 @@
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
 import { Icon } from 'astro-icon/components';
+import Button from './ui/Button.astro';
+import Container from './ui/Container.astro';
 
 // `mailto:` and `tel:` stay in place; external profiles open in a new tab,
 // announced as part of the accessible name. Icons: src/icons/social-<type>.svg.
@@ -20,42 +22,53 @@ interface Props {
 }
 
 const { close = true } = Astro.props;
+
+const heading = 'mb-3 font-sans text-xs font-semibold tracking-label text-fg-muted uppercase';
+const footerLink =
+  'inline-flex min-h-11 items-center gap-2 text-base text-fg underline decoration-transparent decoration-[1.5px] underline-offset-[0.3em] transition-[text-decoration-color] duration-150 hover:decoration-accent focus-visible:decoration-accent sm:min-h-10';
 ---
 
-<footer class:list={['footer', 'surface-bark', !close && 'footer--plain']}>
-  <div class="container">
+<footer class="surface-night pb-6 print:hidden">
+  <Container>
     {close && (
-      <div class="footer__close">
-        <p class="footer__line">
-          Komm so, wie du <em>gerade</em> bist.
+      <div class="flex flex-wrap items-end justify-between gap-x-12 gap-y-6 border-b border-line pt-section pb-group">
+        <p class="max-w-[14ch] font-serif text-display-2 text-fg">
+          Komm so, wie du <em class="text-accent not-italic">gerade</em> bist.
         </p>
-        <a
+        <Button
           href="/event"
-          class="btn btn--primary btn--large"
+          size="lg"
+          class="max-sm:w-full"
           data-umami-event="cta-click"
           data-umami-event-location="footer"
         >
           Termine &amp; Anmeldung
-        </a>
+        </Button>
       </div>
     )}
 
-    <div class="footer__top">
-      <div class="footer__brand">
-        <a href="/" class="footer__logo">
-          <Icon name="logo" class="footer__mark" aria-hidden="true" />
+    <div
+      class:list={[
+        'grid gap-10 py-group sm:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.2fr)]',
+        !close && 'border-t border-line',
+      ]}
+    >
+      <div class="max-w-[36ch] sm:col-span-2 xl:col-span-1">
+        <a href="/" class="mb-4 inline-flex items-center gap-3 rounded-control font-serif text-xl font-medium">
+          <Icon name="logo" aria-hidden="true" class="size-10 text-flame" />
           <span>{site.siteName}</span>
         </a>
-        <p class="footer__text">{site.footerDescription}</p>
+        <p class="text-sm text-fg-muted">{site.footerDescription}</p>
       </div>
 
-      <nav class="footer__nav" aria-label="Fußnavigation">
-        <h2 class="footer__heading">Seiten</h2>
-        <ul class="footer__links">
+      <nav aria-label="Fußnavigation">
+        <h2 class={heading}>Seiten</h2>
+        <ul role="list">
           {nav.footerPrimary.map((item) => (
             <li>
               <a
                 href={item.url}
+                class={footerLink}
                 data-umami-event="footer-link"
                 data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
               >
@@ -66,9 +79,9 @@ const { close = true } = Astro.props;
         </ul>
       </nav>
 
-      <div class="footer__contact">
-        <h2 class="footer__heading">Kontakt</h2>
-        <ul class="footer__links footer__social">
+      <div>
+        <h2 class={heading}>Kontakt</h2>
+        <ul role="list">
           {socialLinks.map((link) => (
             <li>
               <a
@@ -77,9 +90,9 @@ const { close = true } = Astro.props;
                 rel={link.internal ? undefined : 'noopener noreferrer'}
                 data-umami-event="social-click"
                 data-umami-event-platform={link.type}
-                class="social-link"
+                class={footerLink}
               >
-                <Icon name={`social-${link.type}`} class="social-link__icon" aria-hidden="true" />
+                <Icon name={`social-${link.type}`} aria-hidden="true" class="size-4.5 shrink-0 text-accent" />
                 <span>
                   {link.text}
                   {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
@@ -89,7 +102,7 @@ const { close = true } = Astro.props;
           ))}
           {nav.footerContact.map((item) => (
             <li>
-              <a href={item.url} data-umami-event="footer-link">
+              <a href={item.url} class={footerLink} data-umami-event="footer-link">
                 {item.label}
               </a>
             </li>
@@ -98,220 +111,20 @@ const { close = true } = Astro.props;
       </div>
     </div>
 
-    <div class="footer__bottom">
-      <p class="footer__copyright">{site.footerText}</p>
-      <nav class="footer__legal" aria-label="Rechtliches">
+    <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-line pt-4">
+      <p class="text-sm text-fg-muted">{site.footerText}</p>
+      <nav aria-label="Rechtliches" class="flex flex-wrap gap-x-6">
         {nav.footerLegal.map((item) => (
           <a
             href={item.url}
             data-umami-event="footer-link"
             data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
+            class="inline-flex min-h-11 items-center text-sm text-fg-muted underline decoration-transparent underline-offset-[0.3em] transition-[text-decoration-color] hover:text-fg hover:decoration-accent sm:min-h-10"
           >
             {item.label}
           </a>
         ))}
       </nav>
     </div>
-  </div>
-
-  <p class="footer__wordmark" aria-hidden="true">
-    Männerkreis
-  </p>
+  </Container>
 </footer>
-
-<style is:global>
-  @layer components {
-    .footer {
-      padding-block-start: var(--space-2xl);
-      overflow: clip;
-      background: light-dark(var(--color-night), var(--color-night-deep));
-    }
-
-    /* Without the invitation the page's own close sits right above: a hairline
-       parts it from the footer, as the invitation's rule would. */
-    .footer--plain {
-      padding-block-start: 0;
-    }
-
-    .footer--plain .footer__top {
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .footer__close {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-md) var(--space-xl);
-      align-items: end;
-      justify-content: space-between;
-      padding-block-end: var(--space-xl);
-      border-block-end: 1px solid var(--border-light);
-    }
-
-    .footer__line {
-      max-inline-size: 14ch;
-      margin: 0;
-      font-family: var(--font-display);
-      font-size: var(--display-2);
-      font-weight: var(--weight-display);
-      line-height: var(--leading-display);
-      letter-spacing: var(--tracking-display);
-    }
-
-    .footer__line em {
-      font-style: normal;
-      color: var(--accent);
-    }
-
-    .footer__top {
-      display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.2fr);
-      gap: var(--space-lg);
-      padding-block: var(--space-xl);
-    }
-
-    .footer__brand {
-      max-inline-size: 36ch;
-    }
-
-    .footer__logo {
-      display: inline-flex;
-      gap: 0.75rem;
-      align-items: center;
-      margin-block-end: var(--space-sm);
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      font-weight: var(--weight-display-small);
-      letter-spacing: 0;
-    }
-
-    .footer__mark {
-      inline-size: 2.5rem;
-      block-size: 2.5rem;
-      color: var(--color-flame);
-    }
-
-    .footer__text {
-      font-size: var(--text-caption);
-      line-height: var(--leading-relaxed);
-      color: var(--text-muted);
-    }
-
-    .footer__heading {
-      margin-block-end: var(--space-xs);
-      font-family: var(--font-body);
-      font-size: var(--text-marker);
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-marker);
-    }
-
-    .footer__links {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-
-    .footer__links a,
-    .footer__legal a {
-      display: inline-flex;
-      gap: var(--space-xs);
-      align-items: center;
-      min-block-size: 40px;
-      font-size: var(--text-body-compact);
-      color: var(--text-primary);
-      text-decoration: underline;
-      text-decoration-color: transparent;
-      text-decoration-thickness: 1.5px;
-      text-underline-offset: 0.3em;
-      transition: text-decoration-color var(--motion-quick);
-    }
-
-    .footer__links a:hover,
-    .footer__links a:focus-visible,
-    .footer__legal a:hover,
-    .footer__legal a:focus-visible {
-      text-decoration-color: var(--accent);
-    }
-
-    .social-link__icon {
-      flex: none;
-      inline-size: 18px;
-      block-size: 18px;
-      color: var(--accent);
-    }
-
-    .footer__bottom {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs) var(--space-md);
-      align-items: center;
-      justify-content: space-between;
-      padding-block: var(--space-sm);
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .footer__copyright {
-      margin: 0;
-      font-size: var(--text-caption);
-      color: var(--text-muted);
-    }
-
-    .footer__legal {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-md);
-    }
-
-    .footer__legal a {
-      font-size: var(--text-caption);
-      color: var(--text-muted);
-    }
-
-    .footer a:focus-visible {
-      outline: 2px solid var(--focus-ring);
-      outline-offset: 3px;
-      border-radius: var(--radius);
-    }
-
-    /* The name set huge and cut by the page's last edge. */
-    .footer__wordmark {
-      max-inline-size: none;
-      margin: var(--space-lg) 0 0;
-      font-family: var(--font-display);
-      font-size: 14.2vw;
-      font-weight: var(--weight-display);
-      line-height: 0.74;
-      color: var(--color-night-soft);
-      text-align: center;
-      letter-spacing: -0.02em;
-      white-space: nowrap;
-      user-select: none;
-    }
-
-    @media (width <= 62em) {
-      .footer__top {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      }
-
-      .footer__brand {
-        grid-column: 1 / -1;
-      }
-    }
-
-    @media (width <= 36em) {
-      .footer__top {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .footer__close .btn {
-        inline-size: 100%;
-      }
-
-      .footer__links a,
-      .footer__legal a {
-        min-block-size: 44px;
-      }
-    }
-  }
-</style>
