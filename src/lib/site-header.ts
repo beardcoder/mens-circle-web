@@ -1,4 +1,4 @@
-/** Site header — mobile panel and in-page anchor scrolling. */
+/** Site header — mobile panel, in-page anchor scrolling and the way back to the top. */
 
 import { prefersReducedMotion } from './helpers';
 
@@ -26,7 +26,26 @@ const scrollToAnchor = (hash: string): boolean => {
   return true;
 };
 
+/**
+ * The corner button scrolls to the very top itself instead of leaving it to the
+ * fragment: no `#top` left in the address bar, no browser quirk with an empty
+ * target, and the focus moves to the top so keyboard users continue from there.
+ * Without JS the plain `#top` link still works.
+ */
+const initScrollTop = (): void => {
+  const top = document.getElementById('top');
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-scroll-top]')) {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
+      top?.focus({ preventScroll: true });
+    });
+  }
+};
+
 export function initSiteHeader(): void {
+  initScrollTop();
+
   const header = document.getElementById('header');
   const nav = document.getElementById('nav');
   const toggle = document.getElementById('navToggle');
