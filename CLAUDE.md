@@ -117,21 +117,21 @@ mail mark from `/images/logo-flame.png` by URL, so keep that file.
   middle of the questions and counts an event's seats (taken/open); keep clear space for
   its ring, which reaches 20% of the photo's width past it. No painted/brush rings, and
   no decorative ring ever runs behind text.
-- Layout: asymmetric placement per block; `.spine` only for quiet passages and
-  sub-pages. Phones get their own order (sentence first, then the round photo breaking out to the
-  right, then the reading and the date).
-  Never reuse desktop `grid-area` names in a stacked grid without resetting them.
-  Wide screens are open, not railed: the container runs to 1680px, and each home
-  block sits on a 12-column field (`--field`, `--field-gap`). Headlines take the
-  left half in two or three lines (never a stack of single words); their reading
-  stands beside them from column 8, level with the title's first line. Groups of
-  equals (Ablauf steps, agreements, facts) stand level under hairlines; voices run
-  in two balanced columns. Every block fills its width: no half-empty rows, no
-  element left hanging alone. `.spine` (sub-pages) keeps the 5fr/7fr split
-  (`--split-columns`, `--split-gap`). Wide screens are set like a poster with
-  generous air: the `> 56em` token block in `_variables.css` raises the headlines,
-  steps the reading down and widens gutters and section rhythm. Phones
-  stay on the token floors; change desktop values only there or in `> 56em` rules.
+- Layout: one split line on every page. Wide screens (container up to 1680px) sit
+  on a 12-column field (`--field`, `--field-gap`): the head (label and title, or a
+  `.spine` rail heading set as a title) takes columns 1–5, the content runs from
+  column 7 to the edge, its first line level with the title's. A head with nothing
+  beside it may run wider (home hero, page heads without a lead). Groups of equals
+  (Ablauf steps, agreements, facts, voices) stand level below, under hairlines.
+  Sections are parted by their ground and by space, never by drawn rules. Every
+  block fills its width: no half-empty rows, no element left alone in a column.
+  Titles: the home hero sentence is the only `--display-1`; section and page
+  titles take `--display-2`, essays and rail titles `--display-3`. Phones get their
+  own order (sentence first, then the round photo breaking out to the right, then
+  the reading and the date), stack every block left-aligned, and keep boxes on the
+  page's edges (no bleed). Never reuse desktop `grid-area` names in a stacked grid
+  without resetting them. The `> 56em` token block in `_variables.css` raises the
+  headlines, steps the reading down and widens gutters and section rhythm.
 - Vertical rhythm: `--rhythm-section` > `group` > `item` > `tight`; never inverted.
   Lift reserving `min-block-size` once columns stack or an island swaps in.
 - Radius `--radius` (3px) on controls and panels; full circles only for seats and the

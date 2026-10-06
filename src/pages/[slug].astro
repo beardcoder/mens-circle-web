@@ -26,6 +26,6 @@ const { page } = Astro.props;
   description={page.meta?.description}
   robots={page.robots ?? 'noindex, nofollow'}
 >
-  <PageHero data={{ title: page.title, align: 'center' }} />
+  <PageHero data={{ title: page.title }} />
   <TextSection data={{ content: page.content, anchor: '' }} />
 </Layout>

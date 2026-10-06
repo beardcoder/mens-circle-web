@@ -71,6 +71,22 @@ const schemas = [
       align-items: start;
     }
 
+    /* Wide: on the split line — the note in columns 1–5, the form from 7. */
+    @media (width > 56em) {
+      .testimonial-form__wrapper {
+        grid-template-columns: var(--field);
+        column-gap: var(--field-gap);
+      }
+
+      .testimonial-form__wrapper > :first-child {
+        grid-column: 1 / span 5;
+      }
+
+      .testimonial-form__wrapper > :last-child {
+        grid-column: 7 / span 6;
+      }
+    }
+
     .testimonial-form__intro h2 {
       margin-block-end: var(--space-md);
     }
@@ -114,7 +130,6 @@ const schemas = [
 
       .testimonial-form {
         padding: var(--space-md);
-        margin-inline: calc(-0.5 * var(--container-gutter));
       }
     }
   }

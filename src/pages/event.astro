@@ -214,14 +214,14 @@ const socialDetails = next
       margin: 0;
     }
 
-    /* Measured in the quote's own size: a ch of the body font left a narrow strip. */
+    /* Set like the home's voices: quoted speech, not a headline. */
     .event-landing-voice__quote {
-      max-inline-size: 30ch;
+      max-inline-size: 52ch;
       margin: 0;
       font-family: var(--font-quote);
-      font-size: clamp(1.625rem, 1.4rem + 1vw, 2.125rem);
+      font-size: var(--text-lg);
       font-style: italic;
-      line-height: 1.35;
+      line-height: 1.5;
       color: var(--text-primary);
       text-wrap: pretty;
     }
@@ -234,6 +234,13 @@ const socialDetails = next
     .event-landing-voice__quote::after {
       content: '“';
       color: var(--accent);
+    }
+
+    @media (width > 56em) {
+      .event-landing-voice__quote {
+        font-size: 1.25rem;
+        line-height: 1.55;
+      }
     }
 
     .event-landing-voice__author {
