@@ -102,9 +102,9 @@ const lines = data.lines ?? [];
       color: var(--text-primary);
     }
 
-    /* Wide: a poster in two columns of equal height. The slogan stands in four
-       lines over the left half ("Aus dem", the widest, is 4.45em of capitals, so
-       10cqi fills six columns); the right side holds the label at the top and the
+    /* Wide: a poster on the split line, two columns of equal height. The slogan
+       stands in four lines over columns 1–5 ("Aus dem", the widest, is 4.45em of
+       capitals, so 8.8cqi fills them); from column 7 the label at the top and the
        reading at the foot, level with the slogan's last line. */
     @media (width > 56em) {
       .statement__inner {
@@ -117,22 +117,22 @@ const lines = data.lines ?? [];
 
       .statement__marker {
         grid-row: 1;
-        grid-column: 8 / span 5;
+        grid-column: 7 / span 6;
         align-self: start;
         margin: 0;
       }
 
       .statement__display {
         grid-row: 1 / span 2;
-        grid-column: 1 / span 6;
+        grid-column: 1 / span 5;
         align-self: start;
-        font-size: min(10cqi, 9rem);
+        font-size: min(8.8cqi, 9rem);
         line-height: 1.04;
       }
 
       .statement__foot {
         grid-row: 2;
-        grid-column: 8 / span 5;
+        grid-column: 7 / span 6;
         align-self: end;
       }
 

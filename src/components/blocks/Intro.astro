@@ -82,8 +82,8 @@ const questions = (data.questions ?? []).slice(0, 4);
       max-inline-size: 54ch;
     }
 
-    /* Wide: the title on the left half in two or three lines, the reading beside
-       it, its first line level with the title's. */
+    /* Wide: on the split line — the title in columns 1–5, the reading from
+       column 7, its first line level with the title's. */
     @media (width > 56em) {
       .home-circle__spread {
         grid-template-columns: var(--field);
@@ -91,7 +91,7 @@ const questions = (data.questions ?? []).slice(0, 4);
       }
 
       .home-circle__head {
-        grid-column: 1 / span 6;
+        grid-column: 1 / span 5;
       }
 
       .home-circle__title {
@@ -99,7 +99,7 @@ const questions = (data.questions ?? []).slice(0, 4);
       }
 
       .home-circle__text {
-        grid-column: 8 / span 5;
+        grid-column: 7 / span 6;
         max-inline-size: 36em;
         padding-block-start: calc(var(--text-marker) * 1.3 + var(--space-sm) + 0.2em);
       }
