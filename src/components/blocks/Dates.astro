@@ -1,10 +1,10 @@
 ---
 import site from '../../data/site.json';
-import { link, panel } from '@lib/ui';
+import { link } from '@lib/ui';
 import HomeEventStatus from '../HomeEventStatus.astro';
 import NewsletterForm from '../forms/NewsletterForm.astro';
-import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
   data: {
@@ -17,67 +17,51 @@ interface Props {
   };
 }
 
-/**
- * The close of the home page, set like the flyer: the invitation on the left,
- * the date in orange capitals and the way to hear about the next one on the
- * right, the date first.
- */
+/** The close of the home page: the invitation and the next date side by side, then the way to hear about the next one. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'termine';
 const whatsapp = site.whatsappCommunityLink;
-const lines = data.displayLines ?? ['Dabei sein.'];
+const title = (data.displayLines ?? ['Dabei sein.']).join(' ');
 ---
 
 <Section
   id={anchor}
-  ground="night"
+  ground="sand"
   labelledby="termine-title"
-  innerClass="grid grid-cols-1 items-start gap-y-group lg:grid-cols-12 lg:gap-x-grid"
+  innerClass="grid items-start gap-y-10 lg:grid-cols-12 lg:gap-x-grid"
 >
-  <div class="@container grid gap-6 lg:col-span-5 lg:row-span-2">
-    <Eyebrow plain tone="fg">
-      {data.eyebrow}
-    </Eyebrow>
-    {/* Capped by its column, so "Dabei" never outgrows it. */}
-    <h2
-      id="termine-title"
-      class="text-[length:min(var(--text-display-1),30cqi)] leading-[0.95] tracking-display text-fg lg:text-[length:min(var(--text-display-1),26cqi)]"
-    >
-      {lines.map((line) => (
-        <span class="block">{line}</span>
-      ))}
-    </h2>
-    {data.lede && <p class="max-w-[36ch] text-md text-fg-soft">{data.lede}</p>}
+  <div class="grid gap-8 lg:col-span-6">
+    <SectionHead eyebrow={data.eyebrow} title={title} titleId="termine-title" lead={data.lede} size="display-2" />
+
+    <div id="newsletter" class="scroll-mt-(--spacing-clearance) border-t border-line-strong pt-8">
+      <h3 class="mb-2 text-2xl text-fg">Bei neuen Terminen benachrichtigen</h3>
+      {data.newsletterText && <p class="mb-5 max-w-measure text-base text-fg-soft">{data.newsletterText}</p>}
+      <NewsletterForm context={{ location: 'home-dates' }} />
+
+      {whatsapp && (
+        <p class="mt-5 text-sm text-fg-muted" id="whatsapp-community">
+          {data.whatsappText}{' '}
+          <a
+            class={link}
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-umami-event="whatsapp-click"
+            data-umami-event-type="community-join"
+          >
+            Zur WhatsApp-Gruppe
+            <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+          </a>
+          .
+        </p>
+      )}
+    </div>
   </div>
 
-  <div class="border-t-2 border-accent pt-6 lg:col-span-6 lg:col-start-7">
+  <div class="lg:sticky lg:top-[calc(var(--spacing-clearance)+1rem)] lg:col-span-5 lg:col-start-8">
     <HomeEventStatus placement="dates" server:defer>
       <HomeEventStatus placement="dates" fallback slot="fallback" />
     </HomeEventStatus>
-  </div>
-
-  <div id="newsletter" class:list={[panel, 'scroll-mt-(--spacing-clearance) lg:col-span-6 lg:col-start-7']}>
-    <h3 class="mb-2 text-2xl text-fg">Bei neuen Terminen benachrichtigen</h3>
-    {data.newsletterText && <p class="mb-6 text-md text-fg-soft">{data.newsletterText}</p>}
-    <NewsletterForm context={{ location: 'home-dates' }} />
-
-    {whatsapp && (
-      <p class="mt-6 text-sm text-fg-muted" id="whatsapp-community">
-        {data.whatsappText}{' '}
-        <a
-          class={link}
-          href={whatsapp}
-          target="_blank"
-          rel="noopener noreferrer"
-          data-umami-event="whatsapp-click"
-          data-umami-event-type="community-join"
-        >
-          Zur WhatsApp-Gruppe
-          <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
-        </a>
-        .
-      </p>
-    )}
   </div>
 </Section>

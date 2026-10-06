@@ -1,18 +1,16 @@
 ---
-import BreathField from '../BreathField.astro';
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
 import HomeEventStatus from '../HomeEventStatus.astro';
-import SeatCircle from '../SeatCircle.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
+import TextLink from '../ui/TextLink.astro';
 
 /**
- * The home page opening on the night ground: the sentence, a short reading, the
- * next date, and the photograph inside the seat circle. Wide: the sentence runs
- * across the whole field, the reading and the date on the left, the photo on the
- * right. Phones: the sentence, then the photo breaking out to the right, then
- * the reading and the date.
+ * The home page opening: the sentence, a short reading and the way in on the left;
+ * Markus in the landscape on the right, with the next date as a card resting on
+ * the photo. Phones: the sentence, the reading, then the photo with the card
+ * overlapping its foot.
  */
 
 interface Props {
@@ -36,105 +34,71 @@ interface Props {
 const { data } = Astro.props;
 const photo = resolveAssetImage(data.image);
 
-// The sentence, word by word, so the entrance can stagger it; the emphasis
-// keeps its words together inside one <em>.
 const title = data.title ?? '';
 const emphasis = data.titleEmphasis && title.includes(data.titleEmphasis) ? data.titleEmphasis : '';
 const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
-const words = (text: string) => text.split(/\s+/).filter(Boolean);
-const segments = [
-  ...words(before).map((word) => ({ word, em: false })),
-  ...(emphasis ? [{ word: emphasis, em: true }] : []),
-  ...words(after).map((word) => ({ word, em: false })),
-];
-const word = 'inline-block entrance:animate-line-in entrance:animate-delay-[calc(80ms+var(--i)*45ms)]';
 ---
 
 <Section
-  ground="night"
   space="none"
   labelledby="hero-title"
-  class="overflow-clip pt-[calc(var(--spacing-header)+clamp(2rem,1.5rem+2vw,3.25rem))] pb-group"
-  innerClass="relative z-1 grid grid-cols-1 lg:grid-cols-12 lg:gap-x-grid"
+  class="overflow-clip pt-[calc(var(--spacing-header)+clamp(1.5rem,1rem+2vw,3.5rem))] pb-section"
+  innerClass="grid grid-cols-1 items-center gap-y-12 lg:grid-cols-12 lg:gap-x-grid"
 >
-  <BreathField slot="before" />
+  <div class="grid justify-items-start gap-6 lg:col-span-6">
+    <h1 id="hero-title" class="grid gap-5">
+      {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
+      {data.kicker && (
+        <Eyebrow as="span" class="entrance:animate-rise">
+          {data.kicker}
+        </Eyebrow>
+      )}{' '}
+      <span class="block max-w-[15ch] text-display-1 text-fg entrance:animate-rise entrance:animate-delay-60">
+        {before}
+        {emphasis && <em class="text-accent not-italic">{emphasis}</em>}
+        {after}
+      </span>{' '}
+      {data.claim && (
+        <span class="block font-serif text-xl font-normal text-fg-soft italic entrance:animate-rise entrance:animate-delay-120">
+          {data.claim}
+        </span>
+      )}
+    </h1>
 
-  <h1 id="hero-title" class="@container lg:col-span-12">
-    {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
-    {data.kicker && (
-      <Eyebrow as="span" class="mb-5 entrance:animate-rise lg:mb-4">
-        {data.kicker}
-      </Eyebrow>
-    )}{' '}
-    {/* Capped by its column: "nichts darstellen" stays on one line. Wide: two lines across the field. */}
-    <span class="block max-w-[12ch] text-[length:min(var(--text-display-1),13cqi)] leading-[0.98] tracking-display text-fg lg:max-w-none lg:text-[length:min(8.5rem,9.2cqi)]">
-      {segments.map(({ word: text, em }, i) => (
-        <>
-          {em ? (
-            <em class:list={[word, 'text-accent not-italic']} style={`--i: ${i}`}>
-              {text}
-            </em>
-          ) : (
-            <span class={word} style={`--i: ${i}`}>
-              {text}
-            </span>
-          )}{' '}
-        </>
-      ))}
-    </span>
-    {data.claim && (
-      <span class="mt-4 block font-serif text-[clamp(1.5rem,0.9rem+1.1vw,2rem)] leading-tight text-fg-soft italic">
-        {data.claim}
-      </span>
+    {data.lede && (
+      <p class="max-w-[34rem] text-lg text-fg-soft entrance:animate-rise entrance:animate-delay-160">{data.lede}</p>
     )}
-  </h1>
+
+    {data.secondaryLabel && data.secondaryLink && (
+      <TextLink href={data.secondaryLink} class="entrance:animate-rise entrance:animate-delay-200">
+        {data.secondaryLabel}
+      </TextLink>
+    )}
+  </div>
 
   {photo && (
-    <figure class="relative mt-[calc(78vw*0.2+1.5rem)] [--orbit:78vw] lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-2 lg:mt-[calc(var(--orbit)*0.16+0.5rem)] lg:self-center lg:[--orbit:min(70%,19rem,34svh)]">
-      {/* The ring reaches 20% of the photo's width past it on every side. */}
-      <div class="relative ml-auto aspect-square w-(--orbit) max-lg:-mr-[10vw] lg:mx-auto">
-        <SeatCircle class="absolute -inset-[20%]" seatSize={3.2} entrance turn />
-        <div class="absolute inset-0 overflow-clip rounded-full bg-ground-alt entrance:animate-plate-open entrance:animate-delay-120">
-          <CropPicture
-            src={photo}
-            class="block size-full object-cover"
-            breakpoint="56em"
-            narrow={{ ratio: 1, widths: [360, 540, 720, 960], sizes: '78vw' }}
-            wide={{ ratio: 1, widths: [480, 720, 960], sizes: 'min(32rem, 34vw)' }}
-            loading="eager"
-            fetchpriority="high"
-            alt={data.imageAlt ?? ''}
-          />
-        </div>
+    <figure class="relative lg:col-span-6 lg:col-start-7 entrance:animate-fade-in entrance:animate-delay-120">
+      <div class="overflow-clip rounded-card bg-ground-alt [&_picture]:block">
+        <CropPicture
+          src={photo}
+          class="block aspect-4/3 w-full object-cover object-[30%_45%] lg:aspect-4/5"
+          breakpoint="60em"
+          narrow={{ ratio: 4 / 3, widths: [400, 640, 960], sizes: 'calc(100vw - 2.5rem)' }}
+          wide={{ ratio: 4 / 5, widths: [480, 720, 960], sizes: 'min(36rem, 45vw)' }}
+          loading="eager"
+          fetchpriority="high"
+          alt={data.imageAlt ?? ''}
+        />
+      </div>
+      {/* The next date rests on the photo: below it on phones, over its lower left corner when wide. */}
+      <div class="relative mx-4 -mt-16 sm:mx-auto sm:max-w-md lg:absolute lg:bottom-8 lg:left-4 lg:m-0 lg:w-[21rem] xl:-left-8">
+        <HomeEventStatus placement="hero" server:defer>
+          <HomeEventStatus placement="hero" fallback slot="fallback" />
+        </HomeEventStatus>
       </div>
       {data.imageCaption && (
-        <figcaption class="mt-[calc(78vw*0.2+1rem)] text-sm text-fg-muted lg:mt-[calc(var(--orbit)*0.2+1rem)] lg:text-center">
-          {data.imageCaption}
-        </figcaption>
+        <figcaption class="mt-4 text-sm text-fg-muted lg:mt-3 lg:text-right">{data.imageCaption}</figcaption>
       )}
     </figure>
   )}
-
-  {data.lede && (
-    <p class="mt-group max-w-[54ch] text-lg text-fg-soft entrance:animate-rise-slow entrance:animate-delay-380 lg:col-span-6 lg:row-start-2 lg:mt-group">
-      {data.lede}
-    </p>
-  )}
-
-  <div class="mt-group entrance:animate-rise-slow entrance:animate-delay-480 lg:col-span-6 lg:row-start-3 lg:mt-8">
-    <HomeEventStatus
-      placement="hero"
-      secondaryLabel={data.secondaryLabel}
-      secondaryLink={data.secondaryLink}
-      server:defer
-    >
-      <HomeEventStatus
-        placement="hero"
-        secondaryLabel={data.secondaryLabel}
-        secondaryLink={data.secondaryLink}
-        fallback
-        slot="fallback"
-      />
-    </HomeEventStatus>
-  </div>
 </Section>

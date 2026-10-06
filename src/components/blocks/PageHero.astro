@@ -30,13 +30,7 @@ const imageAsset = resolveAssetImage(data.image);
 ---
 
 <div id={data.anchor}>
-  <PageOpening
-    eyebrow={data.eyebrow}
-    title={data.title ?? ''}
-    titleHtml
-    joined={Boolean(imageAsset)}
-    aside={Boolean(data.lead || hasButton)}
-  >
+  <PageOpening eyebrow={data.eyebrow} title={data.title ?? ''} titleHtml joined={Boolean(imageAsset)}>
     {data.lead && <Fragment slot="lead">{data.lead}</Fragment>}
     {hasButton && (
       <Button
@@ -44,7 +38,6 @@ const imageAsset = resolveAssetImage(data.image);
         size="lg"
         target={buttonExternal ? '_blank' : undefined}
         rel={buttonExternal ? 'noopener noreferrer' : undefined}
-        class="max-lg:w-full"
       >
         {data.buttonText}
       </Button>
@@ -52,25 +45,21 @@ const imageAsset = resolveAssetImage(data.image);
   </PageOpening>
 
   {imageAsset && (
-    <figure class="pb-group">
-      {/* The landscape gets the width it was taken for; phones run it edge to edge. */}
-      <div class="mx-auto max-w-page lg:px-gutter entrance:animate-fade-in entrance:animate-delay-160">
+    /* The landscape gets the width it was taken for. */
+    <Container class="pb-group">
+      <figure class="entrance:animate-fade-in entrance:animate-delay-160">
         <CropPicture
           src={imageAsset}
-          class="block aspect-4/3 w-full object-cover object-[22%_40%] lg:aspect-21/9 lg:rounded-control lg:object-[50%_4%]"
-          breakpoint="56em"
-          narrow={{ ratio: 4 / 3, widths: [420, 700, 960], sizes: '100vw' }}
-          wide={{ ratio: 21 / 9, widths: [960], sizes: 'min(100vw, 1360px)' }}
+          class="block aspect-4/3 w-full rounded-card object-cover object-[22%_40%] lg:aspect-21/9 lg:object-[50%_4%]"
+          breakpoint="60em"
+          narrow={{ ratio: 4 / 3, widths: [420, 700, 960], sizes: 'calc(100vw - 2.5rem)' }}
+          wide={{ ratio: 21 / 9, widths: [960, 1280], sizes: 'min(100vw, 78rem)' }}
           loading="eager"
           fetchpriority="high"
           alt={data.imageAlt ?? ''}
         />
-      </div>
-      {data.imageCaption && (
-        <Container>
-          <figcaption class="mt-2 text-sm text-fg-muted">{data.imageCaption}</figcaption>
-        </Container>
-      )}
-    </figure>
+        {data.imageCaption && <figcaption class="mt-3 text-sm text-fg-muted">{data.imageCaption}</figcaption>}
+      </figure>
+    </Container>
   )}
 </div>
