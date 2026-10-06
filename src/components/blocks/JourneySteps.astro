@@ -15,7 +15,7 @@ interface Props {
   };
 }
 
-/** The evening in four steps, unnumbered: each sits a little lower than the one before, so the row reads as a way through the evening, not a checklist. */
+/** The evening in four steps, unnumbered: each stands on its own hairline with a seat where it begins, read in order like the seats around the circle. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
@@ -36,8 +36,8 @@ const steps = (data.steps ?? []).slice(0, 4);
 
     {steps.length > 0 && (
       <ol class="home-evening__list" role="list">
-        {steps.map((step, i) => (
-          <li class="home-evening__step" style={`--i: ${i}; --pair: ${i % 2}`} data-reveal>
+        {steps.map((step) => (
+          <li class="home-evening__step" data-reveal>
             {step.title && <h3 class="home-evening__step-title">{step.title}</h3>}
             {step.description && <p class="home-evening__text">{step.description}</p>}
           </li>
@@ -53,14 +53,12 @@ const steps = (data.steps ?? []).slice(0, 4);
   @layer sections {
     .home-evening__head {
       display: grid;
-      grid-template-columns: var(--split-columns);
-      gap: 0 var(--split-gap);
-      align-items: start;
+      gap: var(--space-md);
       margin-block-end: var(--space-xl);
     }
 
     .home-evening__head .marker {
-      grid-column: 1 / -1;
+      margin: 0;
     }
 
     .home-evening__title {
@@ -69,92 +67,92 @@ const steps = (data.steps ?? []).slice(0, 4);
     }
 
     .home-evening__intro {
-      max-inline-size: 54ch;
-      padding-block-start: 0.4em;
+      max-inline-size: 34em;
     }
 
+    /* One step after another on a phone, two by two on a tablet, four abreast on a
+       wide screen; tops always level. */
     .home-evening__list {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: var(--space-lg);
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-xl) var(--space-lg);
       padding: 0;
       margin: 0;
       list-style: none;
     }
 
-    /* No numbers and no rules between them: the descent carries the order. */
+    /* No numbers: each step stands on its own hairline, with a seat where it
+       begins, like the seats around the circle. */
     .home-evening__step {
+      position: relative;
       container-type: inline-size;
       display: grid;
       gap: var(--space-sm);
       align-content: start;
-      margin-block-start: calc(var(--i) * var(--space-lg));
+      padding-block-start: var(--space-lg);
+      border-block-start: 1px solid var(--border-medium);
+    }
+
+    .home-evening__step::before {
+      position: absolute;
+      inset-block-start: calc(-0.4rem - 0.5px);
+      inset-inline-start: 0;
+      inline-size: 0.8rem;
+      block-size: 0.8rem;
+      content: '';
+      background: var(--surface);
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
     }
 
     .home-evening__step-title {
-      /* One word per step, four abreast: capped so the longest fits its column. */
+      /* One word per step: capped so the longest fits its column. */
       font-size: min(clamp(2rem, 1.3rem + 1.8vw, 2.75rem), 17cqi);
       line-height: 1.05;
     }
 
     .home-evening__text {
+      max-inline-size: 30em;
       margin: 0;
       font-size: var(--text-section-body);
       line-height: var(--leading-relaxed);
       color: var(--text-secondary);
     }
 
-    /* Under the last steps, on the content line. */
     .home-evening__close {
-      max-inline-size: 60ch;
-      padding-block-start: var(--space-md);
+      max-inline-size: 38em;
       margin-block-start: var(--space-xl);
-      border-block-start: 1px solid var(--border-medium);
     }
 
     .home-evening__close p {
       font-size: var(--text-section-body);
     }
 
-    @media (width <= 72em) {
+    @media (width > 36em) {
       .home-evening__list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        row-gap: var(--space-xl);
+      }
+    }
+
+    /* Wide: the title and its reading at the top left, the steps under them. */
+    @media (width > 56em) {
+      .home-evening__head {
+        grid-template-columns: var(--field);
+        column-gap: var(--field-gap);
       }
 
-      .home-evening__step {
-        margin-block-start: calc(var(--pair) * var(--space-xl));
+      .home-evening__head > * {
+        grid-column: 1 / span 6;
+      }
+
+      .home-evening__title {
+        max-inline-size: none;
       }
     }
 
     @media (width > 72em) {
-      .home-evening__close {
-        margin-inline-start: calc((100% - var(--split-gap)) * 5 / 12 + var(--split-gap));
-      }
-    }
-
-    @media (width <= 56em) {
-      .home-evening__head {
-        grid-template-columns: minmax(0, 1fr);
-        gap: var(--space-md);
-        margin-block-end: var(--space-lg);
-      }
-
-      .home-evening__intro {
-        padding-block-start: 0;
-      }
-    }
-
-    /* Phone: one after another, the descent turned into a gentle indent. */
-    @media (width <= 36em) {
       .home-evening__list {
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: var(--space-lg);
-      }
-
-      .home-evening__step {
-        margin-block-start: 0;
-        margin-inline-start: calc(var(--i) * var(--space-sm));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
   }

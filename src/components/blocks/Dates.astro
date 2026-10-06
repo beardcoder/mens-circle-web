@@ -108,7 +108,7 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       font-size: min(var(--display-1), 17cqi);
     }
 
-    /* Wide: the page's last call, set as large as the rail allows, on two lines. */
+    /* Wide: the page's last call, set as large as its five columns allow, on two lines. */
     @media (width > 62em) {
       .home-dates__display {
         font-size: min(var(--display-1), 26cqi);
@@ -161,6 +161,32 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       color: var(--text-muted);
     }
 
+    /* Wide: the date and the form stand a column clear of the invitation. After
+       the grid-area rules above, which would otherwise win. */
+    @media (width > 62em) {
+      .home-dates__inner {
+        grid-template-areas: none;
+        grid-template-columns: var(--field);
+        column-gap: var(--field-gap);
+      }
+
+      .home-dates__lead {
+        grid-row: 1 / span 2;
+        grid-column: 1 / span 5;
+      }
+
+      .home-dates__ticket {
+        grid-row: 1;
+        grid-column: 7 / span 6;
+      }
+
+      .home-dates__notify {
+        grid-row: 2;
+        grid-column: 7 / span 6;
+        max-inline-size: none;
+      }
+    }
+
     @media (width <= 62em) {
       .home-dates__inner {
         grid-template-areas:
@@ -182,23 +208,21 @@ const lines = data.displayLines ?? ['Dabei sein.'];
       }
     }
 
+    /* Phone: left-aligned like every other block; the last call in two big lines
+       across the width ("Dabei" is about 2.6em, so 30cqi), the form box on the
+       same edges as the rest. */
     @media (width <= 36em) {
       .home-dates__lead {
         grid-template-columns: minmax(0, 1fr);
-        justify-items: center;
       }
 
-      .home-dates__marker {
-        justify-self: center;
-      }
-
-      .home-dates__lede {
-        text-align: center;
+      .home-dates__display {
+        font-size: min(30cqi, var(--display-1) * 2);
+        line-height: 0.95;
       }
 
       .home-dates__notify {
         padding: var(--space-md);
-        margin-inline: calc(-0.5 * var(--container-gutter));
       }
     }
   }

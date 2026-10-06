@@ -72,9 +72,11 @@ const agreements = data.agreements ?? [];
       margin: 0;
     }
 
+    /* Short words set big: break between them, never inside ("miteinander"). */
     .home-frame__title {
       max-inline-size: 13ch;
       margin: 0;
+      hyphens: manual;
     }
 
     /* The agreements, two by two and unnumbered: none comes first. */
@@ -93,14 +95,15 @@ const agreements = data.agreements ?? [];
       display: grid;
       gap: var(--space-xs);
       align-content: start;
+      padding-block-start: var(--space-md);
+      border-block-start: 1px solid var(--border-medium);
     }
 
     .home-frame__term {
       /* Capped by the column: "Eigenverantwortung" is one word. */
       font-size: min(var(--text-2xl), 9.5cqi);
       line-height: 1.15;
-      hyphens: auto;
-      overflow-wrap: break-word;
+      hyphens: manual;
     }
 
     .home-frame__text {
@@ -139,38 +142,52 @@ const agreements = data.agreements ?? [];
       color: var(--text-secondary);
     }
 
-    /* Wide: the head holds the rail while the agreements and the boundary pass. */
+    /* Wide: the title on the left half, its short reading beside it, level with
+       its first line, as in the circle's spread;
+       the agreements four abreast (two by two on a narrow desktop), each under a
+       hairline; the boundary across the whole width below them. */
     @media (width > 56em) {
-      .home-frame__grid {
-        display: grid;
-        grid-template-columns: var(--split-columns);
-        grid-template-rows: auto 1fr;
-        column-gap: var(--split-gap);
-        align-items: start;
-      }
-
       .home-frame__head {
-        position: sticky;
-        inset-block-start: calc(var(--header-clearance) + var(--space-md));
-        grid-row: 1 / span 2;
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: var(--space-md);
-        margin: 0;
+        grid-template-columns: var(--field);
+        column-gap: var(--field-gap);
+        margin-block-end: var(--space-xl);
       }
 
-      .home-frame__head .marker {
-        margin-block-end: calc(var(--space-sm) - var(--space-md));
+      .home-frame__title {
+        grid-column: 1 / span 6;
+        max-inline-size: 17ch;
+      }
+
+      .home-frame__intro {
+        grid-column: 8 / span 5;
+        align-self: start;
+        max-inline-size: 34em;
+        padding-block-start: 0.2em;
       }
 
       .home-frame__list {
-        grid-column: 2;
-        gap: var(--space-lg) var(--space-xl);
-        padding-block-start: 0.4em;
+        gap: var(--space-xl) var(--space-lg);
+        max-inline-size: none;
       }
 
       .home-frame__boundary {
-        grid-column: 2;
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: var(--field);
+        column-gap: var(--field-gap);
+        margin-block-start: var(--space-xl);
+      }
+
+      .home-frame__boundary-title {
+        grid-column: 1 / span 4;
+      }
+
+      .home-frame__boundary-text {
+        grid-column: 5 / -1;
+      }
+    }
+
+    @media (width > 72em) {
+      .home-frame__list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
 
