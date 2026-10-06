@@ -80,19 +80,20 @@ const props = Astro.props;
 
     <main id="main">
       <slot />
+
+      {/* Fixed to the corner, but inside a landmark, on the page's own colours. */}
+      <a
+        href="#top"
+        data-llms-skip
+        aria-label="Nach oben scrollen"
+        title="Nach oben"
+        class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full border border-line-strong bg-raised text-fg transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-on-accent scroll-motion:pointer-events-none scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
+      >
+        <Icon name="chevron-up" aria-hidden="true" class="size-4.5" />
+      </a>
     </main>
 
     <Footer close={props.footerClose ?? true} />
-
-    <a
-      href="#top"
-      aria-label="Nach oben scrollen"
-      title="Nach oben"
-      class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full border border-line-strong bg-raised text-fg transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-on-accent scroll-motion:pointer-events-none scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
-    >
-      <Icon name="chevron-up" aria-hidden="true" class="size-4.5" />
-    </a>
-
     <script>
       import '../lib/client';
     </script>
