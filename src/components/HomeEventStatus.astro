@@ -203,12 +203,20 @@ const seatsLabel = next
         align-items: stretch;
       }
 
+      /* Full width: seat and words at the start, the arrow at the far end, so a
+         label that wraps stays one left-aligned block. */
       .poster-date__actions .btn {
+        justify-content: flex-start;
         inline-size: 100%;
+        text-align: start;
+      }
+
+      .poster-date__actions .btn--primary::after {
+        margin-inline-start: auto;
       }
 
       .poster-date__actions .text-link {
-        justify-content: center;
+        align-self: flex-start;
       }
     }
   }

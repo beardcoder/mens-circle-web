@@ -153,14 +153,15 @@ const segments = [
       display: inline-block;
     }
 
+    /* The claim in the quiet voice, under the sentence. */
     .home-hero__claim {
       display: block;
-      margin-block-start: var(--space-md);
-      font-family: var(--font-body);
-      font-size: var(--text-lg);
-      font-weight: 500;
+      margin-block-start: var(--space-sm);
+      font-family: var(--font-quote);
+      font-size: clamp(1.5rem, 0.9rem + 1.1vw, 2rem);
+      font-style: italic;
+      font-weight: 400;
       color: var(--text-secondary);
-      letter-spacing: 0.02em;
     }
 
     .home-hero__lede {
@@ -183,8 +184,8 @@ const segments = [
 
     /* Wide: set like a poster. The sentence runs across the whole width on two lines:
        "Ein Abend, an dem du" is 9.7em and "nichts darstellen musst." 10.5em, so at
-       9.2cqi (10.9em to the line) it breaks there at any width. The claim turns to the
-       quiet italic, the reading steps down, so no two registers meet. */
+       9.2cqi (10.9em to the line) it breaks there at any width. The reading steps
+       down, so no two registers meet. */
     @media (width > 56em) {
       .home-hero__grid {
         grid-template-areas:
@@ -199,15 +200,6 @@ const segments = [
         font-size: min(8.5rem, 9.2cqi);
         line-height: 0.98;
         text-wrap: wrap;
-      }
-
-      .home-hero__claim {
-        margin-block-start: var(--space-sm);
-        font-family: var(--font-quote);
-        font-size: clamp(1.5rem, 0.9rem + 1.1vw, 2rem);
-        font-style: italic;
-        font-weight: 400;
-        letter-spacing: 0;
       }
 
       .home-hero__lede {

@@ -153,41 +153,38 @@ const empty = testimonials.length === 0;
       color: var(--text-muted);
     }
 
-    /* Wide: the head holds the rail, the voices follow one another in the
-       content column, each at a reading measure. */
+    /* Wide: the title over the field, the voices in two balanced columns below,
+       each under its own hairline, so neither column runs out early. */
     @media (width > 56em) {
-      .testimonials__grid {
-        display: grid;
-        grid-template-columns: var(--split-columns);
-        grid-template-rows: auto 1fr;
-        column-gap: var(--split-gap);
-        align-items: start;
-      }
-
       .testimonials__head {
-        position: sticky;
-        inset-block-start: calc(var(--header-clearance) + var(--space-md));
-        grid-row: 1 / span 2;
-        margin: 0;
+        margin-block-end: var(--space-xl);
       }
 
       .testimonials__title {
+        max-inline-size: 17ch;
         font-size: var(--display-2);
       }
 
-      .testimonials__list,
-      .testimonials__note,
-      .testimonials__empty {
-        grid-column: 2;
-      }
-
       .testimonials__list {
-        grid-template-columns: minmax(0, 1fr);
-        gap: var(--space-lg);
+        display: block;
+        column-count: 2;
+        column-gap: var(--space-xl);
       }
 
+      .testimonial-item {
+        break-inside: avoid;
+        margin-block-end: var(--space-xl);
+      }
+
+      /* Quoted speech, not a headline: a little above the reading size. */
       .testimonial-item__quote {
-        max-inline-size: 56ch;
+        max-inline-size: 52ch;
+        font-size: 1.25rem;
+        line-height: 1.55;
+      }
+
+      .testimonials__note {
+        margin-block-start: var(--space-sm);
       }
     }
 
