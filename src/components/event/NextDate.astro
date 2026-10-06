@@ -3,7 +3,7 @@ import site from '@data/site.json';
 import { primaryAction, type DateStatus } from '@lib/event-status';
 import { caps, link, panel } from '@lib/ui';
 import NewsletterForm from '../forms/NewsletterForm.astro';
-import SeatCircle from '../SeatCircle.astro';
+import SeatMeter from '../SeatMeter.astro';
 import Button from '../ui/Button.astro';
 import DefList from '../ui/DefList.astro';
 import Section from '../ui/Section.astro';
@@ -57,22 +57,16 @@ const rows = next
   <div class:list={[panel, 'border-t-4 border-t-accent lg:col-span-7']}>
     {next ? (
       <>
-        <div class="flex items-start justify-between gap-6">
-          <div>
-            <p class={`${caps} text-accent`}>Nächster Termin</p>
-            <h2 id="naechster-termin-title" class="mt-1.5 text-display-3 text-fg">
-              <time datetime={next.slug}>{next.dateLabel}</time>
-            </h2>
-          </div>
-          <SeatCircle
-            seats={next.maxParticipants}
-            taken={next.maxParticipants - next.availableSpots}
-            ember
-            seatSize={10}
-            label={seatsLabel}
-            class="size-20 shrink-0 sm:size-24"
-          />
-        </div>
+        <p class={`${caps} text-accent`}>Nächster Termin</p>
+        <h2 id="naechster-termin-title" class="mt-1.5 text-display-3 text-fg">
+          <time datetime={next.slug}>{next.dateLabel}</time>
+        </h2>
+        <SeatMeter
+          seats={next.maxParticipants}
+          taken={next.maxParticipants - next.availableSpots}
+          label={seatsLabel}
+          class="mt-5"
+        />
 
         <DefList rows={rows} class="mt-6 border-t border-line pt-5" />
 
