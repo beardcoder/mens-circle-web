@@ -62,7 +62,7 @@ function fmtDate(iso: string): string {
         <a class="group/ev flex min-w-0 flex-[1_1_16rem] items-center gap-4" href={`/admin/events/${ev.id}`}>
           <CapacityRing value={ev.activeCount} max={ev.maxParticipants} />
           <span class="flex min-w-0 flex-col gap-0.5">
-            <span class="font-serif text-lg font-medium text-fg transition-colors duration-150 group-hover/ev:text-accent">
+            <span class="font-serif text-lg font-semibold text-fg transition-colors duration-150 group-hover/ev:text-accent">
               {ev.title}
             </span>
             <span class="truncate text-sm text-fg-muted tabular-nums">

@@ -1,4 +1,5 @@
 ---
+import Contours from '../Contours.astro';
 import site from '../../data/site.json';
 import { link } from '@lib/ui';
 import HomeEventStatus from '../HomeEventStatus.astro';
@@ -17,7 +18,7 @@ interface Props {
   };
 }
 
-/** The close of the home page: the invitation and the next date side by side, then the way to hear about the next one. */
+/** The close of the home page, at night over the hill country: the invitation and the next date side by side, then the way to hear about the next one. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'termine';
@@ -27,10 +28,12 @@ const title = (data.displayLines ?? ['Dabei sein.']).join(' ');
 
 <Section
   id={anchor}
-  ground="sand"
+  ground="night"
   labelledby="termine-title"
-  innerClass="grid items-start gap-y-10 lg:grid-cols-12 lg:gap-x-grid"
+  class="overflow-clip"
+  innerClass="relative grid items-start gap-y-10 lg:grid-cols-12 lg:gap-x-grid"
 >
+  <Contours slot="before" />
   <div class="grid gap-8 lg:col-span-6">
     <SectionHead eyebrow={data.eyebrow} title={title} titleId="termine-title" lead={data.lede} size="display-2" />
 

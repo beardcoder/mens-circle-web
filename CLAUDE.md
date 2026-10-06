@@ -103,43 +103,51 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Design
 
-- "Abendlicht": warm, calm, approachable — a men's circle, not a poster. Warm paper
-  by day, a warm dark by night (`data-mode`, `light-dark()` tokens). The photo of
+- "Abendlicht": warm, grounded, sturdy — a circle of men: firm and outdoorsy, never
+  macho, never a wellness retreat. Warm paper by day, a warm dark by night
+  (`data-mode`, `light-dark()` tokens). The photo of
   Markus leads the home page; the next date is a card (`HomeEventStatus`, `NextDate`)
   that every date page shows the same way.
-- Type: Fraunces (`font-serif`, weight 500) speaks — titles in sentence case, quotes
-  and questions in its italic. Instrument Sans (`font-sans`) explains: text, UI,
-  buttons. Titles stay calm: `text-display-1` is the home sentence only, page titles
-  take `display-2`, section titles `display-2`/`display-3`. Eyebrows are small accent
-  lines with a dot (`Eyebrow`), not spaced capitals. A dash in running copy is bound
+- Type: Fraunces (`font-serif`, weight 600) speaks — titles in sentence case, set
+  firm; quotes and questions in its italic at 400. Instrument Sans (`font-sans`)
+  explains: text, UI. Labels are bold capitals spaced like a stamp
+  (`tracking-label`): eyebrows (behind a short accent bar, `Eyebrow`), buttons, list
+  terms, "Nächster Termin". `text-display-1` is the home sentence and the statement,
+  page titles take `display-2`, section titles `display-2`/`display-3`. A dash in running copy is bound
   to the word before it (`\u00a0–`), so no line starts with one. Figures are lining.
 - Colours are semantic tokens (`ground`, `ground-alt`, `raised`, `surface`, `fg`,
   `fg-soft`, `fg-muted`, `accent`, `accent-strong`, `accent-soft`, `line*`); no hex in
   markup. Rust (`#a3462a`) is the accent by day, ember (`#ec7a48`) by night; flame
   (`#e4632e`) is the mark. Every text token holds ≥ 4.5:1 on every ground, control
   borders (`line-bold`) ≥ 3:1. Grounds: the page's paper, a stone band
-  (`surface-sand`) for quiet passages, at most one dark band (`surface-night`) mid
-  page, and the footer. Surfaces re-declare the semantic colours, so everything
-  inside follows.
-- Shapes: soft. Cards (`card`/`panel` in `lib/ui.ts`, `rounded-card`) for
-  self-contained units — the date, steps, agreements, voices, forms, questions —
-  never for running text. Controls `rounded-control`, buttons and seats round. One
-  shadow (`shadow-card`) on cards, `shadow-overlay` on popovers.
+  (`surface-sand`) for quiet passages, dark bands (`surface-night`) for the statement
+  and the home page's close, and the footer. Surfaces re-declare the semantic
+  colours, so everything inside follows.
+- The dark bands carry `Contours.astro`: contour lines of the hill country
+  (`public/images/contours.svg`, square) in the accent at 20%, which keeps every text
+  token above 4.5:1 even where a line runs behind it. Only on dark bands.
+- Shapes: firm. Square-cut controls, buttons and cards (`rounded-control` 3px,
+  `rounded-card` 4px), flat cards with a solid border (`card`/`panel` in
+  `lib/ui.ts`) for self-contained units — the date, agreements, voices, forms,
+  questions — never for running text. Heavy rules mark where something begins: the
+  Ablauf steps and facts stand under a 2–3px rule in `fg`, the date cards carry a
+  4px accent bar on top, quotes a 4px accent rule on the left. Circles only for
+  seats and round icon buttons; `shadow-overlay` only on popovers.
 - Layout: a 1248px container. Titles stand above their content; `Split` puts a head
   (title, note, contact line) beside its content where both earn a column (FAQ,
   Anfahrt, forms). Two-column blocks place themselves with `lg:col-*`; phones stack in
   DOM order. Groups of equals stand level in a grid (steps, agreements, voices, facts).
   Sections are parted by their ground and by space. Vertical rhythm: `section` >
   `group` > `item`; never inverted.
-- The Ablauf steps are numbered (an evening has an order); everything else is told in
-  sentences, not bullets.
+- The Ablauf steps are numbered `01`–`04` in large serif figures (an evening has an
+  order); everything else is told in sentences, not bullets.
 - `SeatCircle.astro` (hairline ring with seats) is the mark of the circle: it counts an
   event's seats (taken/open) on the date cards and sits on the questions card.
 - The header is the page's paper at all times (nothing scrolls visibly beneath it);
   its hairline fades in on scroll. No numbers in the navigation.
 - Motion: entrances on the openings (`entrance:`, never after a view transition),
   scroll-tied reveals (`reveal`, view() only, nothing hidden without timeline
-  support), the seat circle's draw-in, a breathing circle to follow in the dark band
+  support), the seat circle's draw-in, a breathing circle to follow in the statement band
   (`Breath.astro`, `breathe`: 4 s in, 0.5 hold, 5 out, 0.5 rest), and the phone menu:
   it opens as a circle from the toggle (`--nav-origin`, set by `lib/site-header.ts`),
   then each link rises; closing runs back quickly. Under reduced motion everything
