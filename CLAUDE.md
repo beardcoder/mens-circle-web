@@ -147,16 +147,24 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   order); everything else is told in sentences, not bullets.
 - Seats are counted by `SeatMeter.astro`: a row of square-cut fields, one per seat,
   taken filled, open outlined, always beside the count in words. No ring of dots.
-- The circle lives in the background: `Rings.astro`, wide concentric hairlines in
-  `line-strong` (ripples, or rings around a fire), placed by the caller behind the
-  hero photo, the questions card, an event's opening, the page openings and the 404.
-  On phones they keep to a corner or sit behind a card, never across a title.
+- The circle lives in the background and breathes: `BreathField.astro`, three soft
+  fields of warm light (flame) that widen and settle on a natural breath (`breath`:
+  a 34.6 s phrase of three breaths of different depth, in shorter than out, a short
+  hold and rest; the outer fields follow the core a moment later) and lag behind the
+  page on scroll (`breath-parallax`, view() timeline). Placed by the caller behind
+  the hero, the questions card, an event's opening, the page openings, the 404
+  (`soft`) and the statement band (`strong`). At its brightest it mixes ≤ 18% flame
+  into paper and ≤ 23% into a dark band, so every text token holds 4.5:1 behind it.
+  Its sections clip it only sideways (`overflow-x-clip`), so it fades into the next
+  block instead of ending on a hard edge. `lib/breath.ts` pauses it off screen; under
+  reduced motion it rests. No rings or wave patterns.
 - The header is the page's paper at all times (nothing scrolls visibly beneath it);
   its hairline fades in on scroll. No numbers in the navigation.
 - Motion: entrances on the openings (`entrance:`, never after a view transition),
   scroll-tied reveals (`reveal`, view() only, nothing hidden without timeline
-  support), a breathing circle to follow in the statement band
-  (`Breath.astro`, `breathe`: 4 s in, 0.5 hold, 5 out, 0.5 rest), and the phone menu:
+  support), the background breath (`BreathField`), a small circle to breathe along
+  with in the statement band (`breathe`: a steady 10 s guide, 4 in, 0.5 hold, 5 out,
+  0.5 rest), and the phone menu:
   it opens as a circle from the toggle (`--nav-origin`, set by `lib/site-header.ts`),
   then each link rises; closing runs back quickly. Under reduced motion everything
   rests; the menu only fades.

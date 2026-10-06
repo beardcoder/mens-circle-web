@@ -3,7 +3,7 @@ import { caps, card } from '@lib/ui';
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
-import Rings from '../Rings.astro';
+import BreathField from '../BreathField.astro';
 
 interface Props {
   data: {
@@ -27,11 +27,11 @@ const questions = (data.questions ?? []).slice(0, 4);
 <Section
   id={anchor}
   labelledby="ueber-title"
-  class="overflow-clip"
+  class="overflow-x-clip"
   innerClass="relative grid items-start gap-y-12 lg:grid-cols-12 lg:gap-x-grid"
 >
-  {/* The questions sit in the middle of the circle, which stays in the background. */}
-  <Rings
+  {/* The questions sit in the middle of the circle, which breathes in the background. */}
+  <BreathField
     slot="before"
     class="top-[78%] left-1/2 w-[44rem] -translate-1/2 lg:top-1/2 lg:left-[76%] lg:w-[min(60rem,70vw)]"
   />

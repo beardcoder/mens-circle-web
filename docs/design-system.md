@@ -70,11 +70,12 @@ of quotes.
 transition), `scroll-motion:` (scroll-driven, where timelines exist), `reveal`
 (scroll-tied reveal), `animate-delay-*` (staggers; `animation-delay`, from
 tailwind-animations).
-Animations: `fade-in-up`, `fade-in`, `breathe` (10 s: 4 in, 0.5 hold, 5 out, 0.5
-rest), `skeleton`, `glow`. The generic ones use the keyframes of
+Animations: `fade-in-up`, `fade-in`, `breath` (the background's natural breath, a
+34.6 s phrase of three breaths) with `breath-parallax` (its scroll depth), `breathe`
+(the steady 10 s guide: 4 in, 0.5 hold, 5 out, 0.5 rest), `skeleton`, `glow`. The generic ones use the keyframes of
 [tailwind-animations](https://tailwind-animations.com) (`fade-in-up`, `fade-in`,
-`pulse`), re-timed in `theme.css` to the theme's easing; the circle's own (`breathe`,
-`glow`) are ours. Pick further motions from its catalog (`.claude/skills/tailwind-animations`)
+`pulse`), re-timed in `theme.css` to the theme's easing; the circle's own (`breath`,
+`breath-parallax`, `breathe`, `glow`) are ours. Pick further motions from its catalog (`.claude/skills/tailwind-animations`)
 and give them a theme token instead of its default timing. Everything
 rests under `prefers-reduced-motion`.
 
@@ -94,7 +95,7 @@ rests under `prefers-reduced-motion`.
 | `Field`                                           | Label, control, hint and the error slot lib/form.ts fills               |
 | `DefList`, `LinkList`, `Quote`, `Badge`           | Facts, where-next rows, a participant's words, a status chip            |
 | `SeatMeter`                                       | An event's seats as square-cut fields (taken filled, open outlined)     |
-| `Rings`, `Breath`                                 | The circle in the background (concentric hairlines); a breath to follow |
+| `BreathField` (`strength`)                        | The circle in the background: warm light breathing, parallax on scroll  |
 | `Contours`                                        | Contour lines behind a dark band's content                              |
 
 Cards (`card`, `panel`) are for self-contained units — the date, agreements, voices,
