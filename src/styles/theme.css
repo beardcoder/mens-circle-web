@@ -199,17 +199,19 @@
   }
 }
 
-/* The scroll-to-top button appears once the reader is past the first screen. */
+/* The scroll-to-top button appears once the reader is past the first screen.
+   `visibility`, not `pointer-events`: every engine animates it, so a button that
+   shows is always one that takes a tap (WebKit may leave pointer-events static). */
 @keyframes appear-late {
   0%,
   10% {
-    pointer-events: none;
+    visibility: hidden;
     opacity: 0;
   }
 
   18%,
   100% {
-    pointer-events: auto;
+    visibility: visible;
     opacity: 1;
   }
 }
