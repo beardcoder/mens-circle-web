@@ -78,11 +78,12 @@ const schemas = [
         column-gap: var(--field-gap);
       }
 
-      .testimonial-form__wrapper > :first-child {
+      /* By class: the form component ends in a <script>, so :last-child misses. */
+      .testimonial-form__intro {
         grid-column: 1 / span 5;
       }
 
-      .testimonial-form__wrapper > :last-child {
+      .testimonial-form__wrapper > .testimonial-form {
         grid-column: 7 / span 6;
       }
     }

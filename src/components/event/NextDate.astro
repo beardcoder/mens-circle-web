@@ -258,7 +258,8 @@ const seatsLabel = next
         grid-column: 1 / span 5;
       }
 
-      .event-next__notify > :last-child {
+      /* The second child, not the last: a form component may end in a <script>. */
+      .event-next__notify > :nth-child(2) {
         grid-column: 7 / span 6;
       }
     }
