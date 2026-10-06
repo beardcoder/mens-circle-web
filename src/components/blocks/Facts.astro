@@ -55,7 +55,8 @@ const item = (i: number) => [
 {band ? (
   <Section id={anchor} ground="sand" space="compact" labelledby="praktisches-title">
     <div class="grid gap-x-group gap-y-2 xl:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] xl:items-start">
-      <h2 id="praktisches-title" class="font-serif text-xl text-accent italic xl:pt-4">
+      {/* Large text (≥ 24px): rust on sand holds 4.4:1, which large text may. */}
+      <h2 id="praktisches-title" class="font-serif text-2xl text-accent italic xl:pt-4">
         {data.eyebrow ?? 'Auf einen Blick'}
       </h2>
       <dl class="grid grid-cols-2 lg:grid-cols-4">
