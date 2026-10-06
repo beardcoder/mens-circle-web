@@ -1,68 +1,95 @@
 ---
-/** Admin shell — the public poster system, after dark. */
+/** Admin shell — the public design system, in its dark mode. */
+import '../styles/admin.css';
 import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
+import { Icon } from 'astro-icon/components';
+import { button } from '@lib/ui';
 
 interface Props {
   title: string;
-  /** Hide the nav (used by the login page). */
+  /** Hide the bar (used by the login page). */
   bare?: boolean;
 }
 const { title, bare = false } = Astro.props;
 const admin = Astro.locals.admin;
 
 const path = Astro.url.pathname;
-const onEvents = path === '/admin' || path.startsWith('/admin/events');
-const onTestimonials = path.startsWith('/admin/testimonials');
+const links = [
+  { href: '/admin', label: 'Veranstaltungen', active: path === '/admin' || path.startsWith('/admin/events') },
+  { href: '/admin/testimonials', label: 'Stimmen', active: path.startsWith('/admin/testimonials') },
+];
 ---
 
 <!doctype html>
-<html lang="de" dir="ltr">
+<html lang="de" dir="ltr" data-mode="dark" data-mode-resolved="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#1c1714" />
+    <meta name="theme-color" content="#151210" />
     <title>{title} · Admin · Männerkreis</title>
-    <Font cssVariable="--font-condensed" preload />
-    <Font cssVariable="--font-text" />
+    <Font cssVariable="--font-instrument" preload={[{ weight: '400', style: 'normal' }]} />
+    <Font cssVariable="--font-fraunces" />
     <ClientRouter />
   </head>
-  <body>
+  <body class="text-base">
     {!bare && (
-      <header class="topbar">
-        <nav class="nav">
-          <a href="/admin" class="brand">
-            <span class="brand-ring" aria-hidden="true" />
-            männerkreis
+      <header class="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line bg-ground px-[clamp(1rem,4vw,2rem)] py-2">
+        <nav class="flex flex-wrap items-center gap-x-8 gap-y-1" aria-label="Admin">
+          <a href="/admin" class="flex items-center gap-2.5 rounded-control">
+            <Icon name="logo" aria-hidden="true" class="size-7 text-flame" />
+            <span class="font-serif text-lg font-medium">Männerkreis</span>
+            <span class="text-xs font-semibold tracking-label text-fg-muted uppercase">Admin</span>
           </a>
-          <div class="nav-links">
-            <a href="/admin" class:list={['nav-link', { active: onEvents }]}>
-              Veranstaltungen
-            </a>
-            <a href="/admin/testimonials" class:list={['nav-link', { active: onTestimonials }]}>
-              Stimmen
-            </a>
+          <div class="flex items-center gap-6">
+            {links.map((link) => (
+              <a
+                href={link.href}
+                aria-current={link.active ? 'page' : undefined}
+                class="relative flex min-h-11 items-center text-sm font-semibold text-fg-muted transition-colors duration-150 after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-fg aria-[current=page]:text-fg aria-[current=page]:after:bg-accent"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
         </nav>
-        <div class="user">
-          {admin && <span class="user-name">{admin}</span>}
-          <button type="button" id="admin-logout" class="btn btn--ghost btn--sm">
+        <div class="flex min-w-0 items-center gap-3">
+          {admin && <span class="max-w-52 truncate text-sm text-fg-muted">{admin}</span>}
+          <button type="button" id="admin-logout" class={button({ variant: 'secondary', size: 'xs' })}>
             Abmelden
           </button>
         </div>
       </header>
     )}
-    <main class="main" class:list={{ 'main--bare': bare }}>
+    <main
+      class:list={[
+        'mx-auto w-full max-w-[60rem] px-[clamp(1rem,4vw,2rem)]',
+        bare ? 'grid min-h-dvh place-items-center py-10' : 'pt-[clamp(1.5rem,4vw,2.75rem)] pb-20',
+      ]}
+    >
       <slot />
     </main>
 
-    <div id="toasts" class="toasts" aria-live="polite" aria-atomic="false" transition:persist></div>
+    <div
+      id="toasts"
+      aria-live="polite"
+      aria-atomic="false"
+      transition:persist
+      class="pointer-events-none fixed bottom-5 left-1/2 z-50 flex w-[min(92vw,26rem)] -translate-x-1/2 flex-col gap-2"
+    ></div>
 
     <script>
       import { actions } from 'astro:actions';
       import type { AdminToastKind } from '@lib/admin';
+
+      const TOAST =
+        'translate-y-2 rounded-control border-2 bg-raised px-4 py-3 text-sm font-semibold opacity-0 shadow-overlay transition-[opacity,translate] duration-150 data-[in]:translate-y-0 data-[in]:opacity-100';
+      const TONES: Record<AdminToastKind, string> = {
+        ok: 'border-success text-success',
+        err: 'border-danger text-danger',
+      };
 
       // Persists on `window` across view-transition swaps; components reach it
       // through `adminToast()` in lib/admin.ts.
@@ -71,13 +98,13 @@ const onTestimonials = path.startsWith('/admin/testimonials');
           const host = document.getElementById('toasts');
           if (!host) return;
           const el = document.createElement('div');
-          el.className = `toast toast--${kind}`;
+          el.className = `${TOAST} ${TONES[kind]}`;
           el.setAttribute('role', kind === 'err' ? 'alert' : 'status');
           el.textContent = text;
           host.appendChild(el);
-          requestAnimationFrame(() => el.classList.add('in'));
+          requestAnimationFrame(() => (el.dataset.in = ''));
           setTimeout(() => {
-            el.classList.remove('in');
+            delete el.dataset.in;
             el.addEventListener('transitionend', () => el.remove(), { once: true });
           }, 3600);
         };
@@ -92,533 +119,5 @@ const onTestimonials = path.startsWith('/admin/testimonials');
         });
       });
     </script>
-    <style is:global>
-      :root {
-        /* The public site's palette, dark side. */
-        --bg: #1c1714;
-        --surface: #241e19;
-        --surface-2: #2f2721;
-        --line: rgb(242 237 227 / 12%);
-        --line-strong: rgb(242 237 227 / 24%);
-        --text: #f2ede3;
-        --muted: #a39786;
-        --faint: #948979;
-        --ember: #dd5f33;
-        --ember-bright: #e87a52;
-        --ember-soft: rgb(221 95 51 / 16%);
-        --ember-line: rgb(221 95 51 / 45%);
-        --sage: #9bb583;
-        --sage-soft: rgb(155 181 131 / 16%);
-        --danger: #e0907f;
-        --focus: rgb(221 95 51 / 55%);
-
-        /* Square, like the poster. Kept as variables so component styles that
-           already reference them need no edit. */
-        --r: 0;
-        --r-sm: 0;
-        --ease: 0.16s cubic-bezier(0.2, 0, 0, 1);
-
-        --font-display: var(--font-condensed), 'Arial Narrow', system-ui, sans-serif;
-        --font-body: var(--font-text), system-ui, sans-serif;
-        /* No third family. Data reads as data through tabular figures and a
-           little tracking, not through a mono. */
-        --font-mono: var(--font-body);
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-      /* `hidden` must win over component `display` rules. */
-      [hidden] {
-        display: none !important;
-      }
-      html {
-        -webkit-text-size-adjust: 100%;
-      }
-      body {
-        margin: 0;
-        min-height: 100dvh;
-        font-family: var(--font-body);
-        font-size: 16px;
-        line-height: 1.55;
-        color: var(--text);
-        /* Flat. The old radial ember wash in the corner was the one piece of
-           decoration on a page made entirely of data. */
-        background: var(--bg);
-        -webkit-font-smoothing: antialiased;
-      }
-      ::selection {
-        background: var(--ember-soft);
-      }
-
-      /* Topbar. */
-      .topbar {
-        position: sticky;
-        top: 0;
-        z-index: 30;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.75rem 1.25rem;
-        flex-wrap: wrap;
-        padding: 0.7rem clamp(1rem, 4vw, 2rem);
-        /* Opaque, and closed by the same 2px structural rule the public header
-           uses. No blur: the bar is a rule, not a pane of glass. */
-        background: var(--bg);
-        border-bottom: 2px solid var(--text);
-      }
-      .nav {
-        display: flex;
-        align-items: center;
-        gap: clamp(0.75rem, 3vw, 1.75rem);
-        flex-wrap: wrap;
-      }
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.55rem;
-        font-family: var(--font-display);
-        font-weight: 800;
-        font-size: 1.3rem;
-        line-height: 1;
-        letter-spacing: 0.01em;
-        text-transform: uppercase;
-        color: var(--text);
-        text-decoration: none;
-      }
-      /* The circle motif, at wordmark scale. */
-      .brand-ring {
-        width: 0.8rem;
-        height: 0.8rem;
-        border-radius: 50%;
-        border: 3px solid var(--ember);
-      }
-      .nav-links {
-        display: flex;
-        align-items: center;
-      }
-      /* Condensed uppercase, like the public nav. */
-      .nav-link {
-        position: relative;
-        padding: 0.45rem 0.1rem;
-        font-family: var(--font-display);
-        font-size: 0.95rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--muted);
-        text-decoration: none;
-        border-bottom: 3px solid transparent;
-        transition:
-          color var(--ease),
-          border-color var(--ease);
-      }
-      .nav-link + .nav-link {
-        margin-left: 1.1rem;
-      }
-      .nav-link:hover {
-        color: var(--text);
-        border-bottom-color: var(--line-strong);
-      }
-      .nav-link.active {
-        color: var(--text);
-        border-bottom-color: var(--ember);
-      }
-      .user {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-      .user-name {
-        font-size: 0.82rem;
-        color: var(--faint);
-        max-width: 13rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      /* Layout. */
-      .main {
-        max-width: 940px;
-        margin: 0 auto;
-        padding: clamp(1.5rem, 4vw, 2.75rem) clamp(1rem, 4vw, 2rem) 5rem;
-      }
-      .main--bare {
-        display: grid;
-        place-items: center;
-        min-height: calc(100dvh - 0px);
-      }
-
-      /* Type. */
-      /* The page title is the one poster-register element in the admin: condensed
-         800, uppercase, set tight. Everything below it is working text. */
-      h1 {
-        font-family: var(--font-display);
-        font-size: clamp(1.9rem, 1.2rem + 2.6vw, 2.9rem);
-        font-weight: 800;
-        letter-spacing: 0.005em;
-        line-height: 0.95;
-        text-transform: uppercase;
-        margin: 0;
-      }
-      h2 {
-        font-family: var(--font-display);
-        font-size: 1.35rem;
-        font-weight: 800;
-        letter-spacing: 0.005em;
-        line-height: 1.05;
-        margin: 0;
-      }
-      a {
-        color: var(--ember);
-      }
-      /* Data: tabular figures instead of a mono face. */
-      .mono {
-        font-variant-numeric: tabular-nums;
-        letter-spacing: 0.01em;
-      }
-      .muted {
-        color: var(--muted);
-      }
-      .faint {
-        color: var(--faint);
-      }
-      /* Section eyebrow above a heading. */
-      .eyebrow {
-        font-family: var(--font-display);
-        font-size: 0.8125rem;
-        font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--muted);
-      }
-
-      /* Page header row. */
-      .pagehead {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 1rem;
-        flex-wrap: wrap;
-        margin-bottom: 1.75rem;
-      }
-      .pagehead__titles {
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-      }
-
-      /* Card. */
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--line-strong);
-        border-radius: var(--r);
-        padding: clamp(1rem, 3vw, 1.5rem);
-      }
-
-      /* Buttons. */
-      /* Square, condensed uppercase, 2px border, ink label on orange — the public `.btn`, at back-office density. */
-      .btn {
-        --_bg: var(--ember);
-        --_fg: var(--bg);
-        --_bd: var(--ember);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.45rem;
-        min-height: 44px;
-        font-family: var(--font-display);
-        font-weight: 600;
-        font-size: 0.95rem;
-        line-height: 1;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        padding: 0.6rem 1.1rem;
-        border: 2px solid var(--_bd);
-        border-radius: var(--r-sm);
-        background: var(--_bg);
-        color: var(--_fg);
-        text-decoration: none;
-        white-space: nowrap;
-        cursor: pointer;
-        transition:
-          background var(--ease),
-          border-color var(--ease),
-          color var(--ease);
-      }
-      .btn:hover {
-        --_bg: var(--text);
-        --_fg: var(--bg);
-        --_bd: var(--text);
-      }
-      .btn:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 3px var(--focus);
-      }
-      .btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .btn:disabled:hover {
-        --_bg: var(--ember);
-        --_fg: var(--bg);
-        --_bd: var(--ember);
-      }
-      .btn--ghost {
-        --_bg: transparent;
-        --_fg: var(--text);
-        --_bd: var(--line-strong);
-      }
-      .btn--ghost:hover {
-        --_fg: var(--bg);
-        --_bg: var(--text);
-        --_bd: var(--text);
-      }
-      .btn--danger {
-        --_bg: transparent;
-        --_fg: var(--danger);
-        --_bd: var(--danger);
-      }
-      .btn--danger:hover {
-        --_bg: var(--danger);
-        --_fg: var(--bg);
-        --_bd: var(--danger);
-      }
-      /* The dense row button. Still clears the 24px minimum target by a wide
-         margin; the list rows would not survive 44px on every control. */
-      .btn--sm {
-        min-height: 34px;
-        font-size: 0.85rem;
-        letter-spacing: 0.06em;
-        padding: 0.35rem 0.7rem;
-        border-width: 1px;
-      }
-      .btn--block {
-        width: 100%;
-      }
-
-      /* Forms. */
-      .field {
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-        margin-bottom: 1.1rem;
-      }
-      /* Form labels take the public site's marker treatment. */
-      label {
-        font-family: var(--font-display);
-        font-size: 0.8125rem;
-        font-weight: 600;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--muted);
-      }
-      input[type='text'],
-      input[type='email'],
-      input[type='password'],
-      input[type='number'],
-      input[type='date'],
-      input[type='time'],
-      input[type='url'],
-      textarea,
-      select {
-        width: 100%;
-        font: inherit;
-        font-size: 0.95rem;
-        padding: 0.6rem 0.75rem;
-        color: var(--text);
-        background: var(--bg);
-        border: 1px solid var(--line-strong);
-        border-radius: var(--r-sm);
-        transition:
-          border-color var(--ease),
-          box-shadow var(--ease);
-      }
-      input[type='date'],
-      input[type='time'],
-      input[type='number'] {
-        font-family: var(--font-mono);
-      }
-      input:focus,
-      textarea:focus,
-      select:focus {
-        outline: none;
-        border-color: var(--ember);
-        box-shadow: 0 0 0 3px var(--focus);
-      }
-      input::placeholder,
-      textarea::placeholder {
-        color: var(--faint);
-      }
-      textarea {
-        min-height: 6.5rem;
-        resize: vertical;
-        line-height: 1.5;
-      }
-      /* dark-friendly native pickers */
-      input[type='date']::-webkit-calendar-picker-indicator,
-      input[type='time']::-webkit-calendar-picker-indicator {
-        filter: invert(0.8) sepia(0.3) saturate(2) hue-rotate(-10deg);
-        cursor: pointer;
-      }
-      .field-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 0 1rem;
-      }
-      /* A checkbox label is a sentence to read, not a field marker — it opts back out of the uppercase treatment above. */
-      .check {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        font-family: var(--font-body);
-        font-size: 0.95rem;
-        font-weight: 400;
-        letter-spacing: normal;
-        text-transform: none;
-        color: var(--text);
-        cursor: pointer;
-      }
-      .check input {
-        width: 1.15rem;
-        height: 1.15rem;
-        accent-color: var(--ember);
-        cursor: pointer;
-      }
-
-      /* Badges. */
-      /* Square chips with a condensed uppercase label. The status dot stays: it
-         is the fastest thing to scan down a column of sixteen rows. */
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-family: var(--font-display);
-        font-size: 0.8125rem;
-        font-weight: 600;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        padding: 0.2rem 0.55rem;
-        border-radius: 0;
-        border: 1px solid var(--line-strong);
-        color: var(--muted);
-        white-space: nowrap;
-      }
-      .badge::before {
-        content: '';
-        width: 0.45rem;
-        height: 0.45rem;
-        border-radius: 50%;
-        background: currentColor;
-      }
-      .badge--live {
-        color: var(--sage);
-        border-color: var(--sage-soft);
-        background: var(--sage-soft);
-      }
-      .badge--draft {
-        color: var(--faint);
-      }
-      /* The bright orange, not the base one: on the soft orange chip the base
-         measures 3.7:1 and this label is small text. */
-      .badge--wait {
-        color: var(--ember-bright);
-        border-color: var(--ember-line);
-        background: var(--ember-soft);
-      }
-      /* `--faint` already sits at the 4.8:1 floor on this surface; the extra 20% transparency pushed it to 3.6:1. */
-      .badge--off {
-        color: var(--faint);
-      }
-
-      /* Capacity ring. */
-      .ring {
-        display: inline-grid;
-        place-items: center;
-        position: relative;
-      }
-      .ring svg {
-        display: block;
-        transform: rotate(-90deg);
-      }
-      .ring__track {
-        stroke: var(--line-strong);
-      }
-      .ring__fill {
-        stroke: var(--ember);
-        stroke-linecap: round;
-        transition: stroke-dashoffset var(--ease);
-      }
-      .ring.is-full .ring__fill {
-        stroke: var(--sage);
-      }
-      .ring__label {
-        position: absolute;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        font-family: var(--font-mono);
-        font-variant-numeric: tabular-nums;
-        font-weight: 500;
-        color: var(--text);
-        line-height: 1;
-      }
-
-      /* Empty state. */
-      .empty {
-        text-align: center;
-        padding: 3rem 1rem;
-        border: 1px dashed var(--line-strong);
-        border-radius: var(--r);
-        color: var(--muted);
-      }
-
-      /* Toasts. */
-      .toasts {
-        position: fixed;
-        left: 50%;
-        bottom: 1.25rem;
-        transform: translateX(-50%);
-        z-index: 60;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        width: min(92vw, 26rem);
-        pointer-events: none;
-      }
-      .toast {
-        padding: 0.7rem 1rem;
-        border-radius: var(--r-sm);
-        font-size: 0.92rem;
-        font-weight: 600;
-        background: var(--surface-2);
-        border: 2px solid var(--text);
-        color: var(--text);
-        opacity: 0;
-        transform: translateY(0.5rem);
-        transition:
-          opacity var(--ease),
-          transform var(--ease);
-      }
-      .toast.in {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      .toast--ok {
-        border-color: var(--sage);
-        color: var(--sage);
-      }
-      .toast--err {
-        border-color: var(--danger);
-        color: var(--danger);
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        * {
-          transition-duration: 0.01ms !important;
-        }
-      }
-    </style>
   </body>
 </html>

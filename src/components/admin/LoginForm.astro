@@ -1,4 +1,8 @@
 ---
+import { Icon } from 'astro-icon/components';
+import { button, panel } from '@lib/ui';
+import Eyebrow from '../ui/Eyebrow.astro';
+
 interface Props {
   redirect: string;
   /** `?error=` code from /auth/*, if the last attempt failed. */
@@ -19,58 +23,26 @@ const MESSAGES: Record<string, string> = {
 const message = configured ? error && (MESSAGES[error] ?? MESSAGES.failed) : MESSAGES.config;
 ---
 
-<div class="login">
-  <div class="login__brand">
-    <span class="login__ring" aria-hidden="true"></span>
-    männerkreis
-  </div>
-  <div class="card login__card">
-    <p class="eyebrow">Back-office</p>
-    <h1>Anmeldung</h1>
+<div class="grid w-[min(92vw,24rem)] gap-6">
+  {/* The same wordmark as the bar, one size up. */}
+  <p class="flex items-center gap-3">
+    <Icon name="logo" aria-hidden="true" class="size-9 text-flame" />
+    <span class="font-serif text-2xl font-medium">Männerkreis</span>
+  </p>
+  <div class:list={[panel, 'grid gap-5']}>
+    <div class="grid gap-2">
+      <Eyebrow>Back-office</Eyebrow>
+      <h1 class="text-display-3">Anmeldung</h1>
+    </div>
     {message && (
-      <p class="login__error" role="alert">
+      <p role="alert" class="border-l-2 border-danger pl-3 text-danger">
         {message}
       </p>
     )}
     {configured && (
-      <a class="btn btn--block" href={`/auth/login?redirect=${encodeURIComponent(redirect)}`}>
+      <a class={button({ block: true })} href={`/auth/login?redirect=${encodeURIComponent(redirect)}`}>
         Mit Pocket ID anmelden
       </a>
     )}
   </div>
 </div>
-
-<style>
-  .login {
-    width: min(92vw, 24rem);
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  /* Same wordmark as the topbar's `.brand`, one size up. It was set lowercase
-     and tight while the bar above was uppercase — two spellings of one name. */
-  .login__brand {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: 1.5rem;
-    line-height: 1;
-    letter-spacing: 0.01em;
-    text-transform: uppercase;
-  }
-  .login__ring {
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    border: 3px solid var(--ember);
-  }
-  .login__card h1 {
-    margin: 0.25rem 0 1.25rem;
-  }
-  .login__error {
-    margin: 0 0 1.25rem;
-    color: var(--danger);
-  }
-</style>

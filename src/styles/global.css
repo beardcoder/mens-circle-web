@@ -1,0 +1,58 @@
+/**
+ * Public site entry: Tailwind plus the shared design system (theme.css).
+ *
+ * Layer order: `vendor` (Leaflet's stylesheet, see EventMapSection.astro) is
+ * declared first, so every utility wins over a third-party rule.
+ */
+@layer vendor;
+@import 'tailwindcss';
+@import './theme.css';
+
+/* The back office has its own entry (admin.css); its classes stay out of the
+   stylesheet every public page inlines. */
+@source not '../layouts/AdminLayout.astro';
+@source not '../components/admin';
+@source not '../pages/admin';
+
+/* ── View transitions ─────────────────────────────────────────────────────── */
+
+/* Native cross-document fade. Pseudo-elements of the transition cannot carry
+   utilities. `plus-lighter` adds the two snapshots, avoiding the grey sag of a
+   plain cross-fade — only while their opacities sum to 1, so both halves share
+   one duration and a linear curve. No view-transition-name on the header: its
+   snapshot would linger over the new page. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  mix-blend-mode: plus-lighter;
+  animation-timing-function: linear;
+}
+
+::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: vt-fade-in;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}

@@ -14,7 +14,9 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
   form.noValidate = true;
 
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-  const idleLabel = submit?.textContent ?? '';
+  // Only the words change while sending; the button's seat and arrow stay.
+  const submitLabel = submit?.querySelector<HTMLElement>('[data-label]') ?? submit;
+  const idleLabel = submitLabel?.textContent ?? '';
   const track = form.dataset.track ?? 'form';
   const context = JSON.parse(form.dataset.trackContext || '{}') as Record<string, string>;
 
@@ -43,7 +45,7 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
 
   const setBusy = (busy: boolean): void => {
     for (const control of form.elements) (control as HTMLInputElement).disabled = busy;
-    if (submit) submit.textContent = busy ? 'Wird gesendet …' : idleLabel;
+    if (submitLabel) submitLabel.textContent = busy ? 'Wird gesendet …' : idleLabel;
   };
 
   form.addEventListener('submit', async (event) => {

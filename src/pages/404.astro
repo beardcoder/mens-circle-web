@@ -2,85 +2,45 @@
 import Layout from '../layouts/Layout.astro';
 import site from '../data/site.json';
 import SeatCircle from '../components/SeatCircle.astro';
+import Button from '../components/ui/Button.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import Section from '../components/ui/Section.astro';
+import { link } from '@lib/ui';
 
 // Prerendered: no live data. The adapter reads 404.html from disk for unmatched routes.
 export const prerender = true;
 ---
 
 <Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow">
-  <section class="error-page">
-    <div class="error-page__content">
-      <SeatCircle class="error-page__mark" taken={7} ember />
-      <p class="marker error-page__code">Fehler 404</p>
-      <h1 class="display error-page__title">Diese Seite gibt es nicht.</h1>
-      <p class="error-page__text">Die Seite, die du suchst, wurde verschoben, umbenannt oder hat es nie gegeben.</p>
-      <div class="error-page__actions">
-        <a href="/" class="btn btn--primary">
-          Zur Startseite
-        </a>
-        <a href="/event" class="btn btn--secondary">
-          Termine &amp; Anmeldung
-        </a>
-      </div>
-      {site.contactEmail && (
-        <p class="error-page__contact">
-          Du vermisst hier etwas? <a href={`mailto:${site.contactEmail}`}>Schreib mir kurz.</a>
-        </p>
-      )}
+  <Section
+    space="none"
+    class="min-h-[70svh] pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section"
+    labelledby="error-title"
+  >
+    {/* One seat stays open: the circle is missing a page. */}
+    <SeatCircle taken={7} ember class="mb-8 w-[clamp(6rem,4rem+8vw,10rem)]" />
+    <div class="grid gap-5">
+      <Eyebrow>Fehler 404</Eyebrow>
+      <h1 id="error-title" class="max-w-[14ch] text-display-2 text-fg">
+        Diese Seite gibt es nicht.
+      </h1>
+      <p class="max-w-measure text-lg text-fg-soft">
+        Die Seite, die du suchst, wurde verschoben, umbenannt oder hat es nie gegeben.
+      </p>
     </div>
-  </section>
+    <div class="mt-8 flex flex-wrap gap-3 max-sm:flex-col">
+      <Button href="/">Zur Startseite</Button>
+      <Button href="/event" variant="secondary">
+        Termine &amp; Anmeldung
+      </Button>
+    </div>
+    {site.contactEmail && (
+      <p class="mt-8 max-w-measure text-sm text-fg-muted">
+        Du vermisst hier etwas?{' '}
+        <a class={link} href={`mailto:${site.contactEmail}`}>
+          Schreib mir kurz.
+        </a>
+      </p>
+    )}
+  </Section>
 </Layout>
-
-<style is:global>
-  @layer sections {
-    .error-page {
-      min-block-size: 70svh;
-      padding-block: calc(var(--header-height) + var(--space-xl)) var(--space-2xl);
-      padding-inline: var(--container-gutter);
-    }
-
-    .error-page__content {
-      max-inline-size: calc(var(--container-width) - 2 * var(--container-gutter));
-      margin-inline: auto;
-    }
-
-    .error-page__mark {
-      inline-size: clamp(6rem, 4rem + 8vw, 10rem);
-      margin-block-end: var(--space-lg);
-    }
-
-    .error-page__title {
-      max-inline-size: 14ch;
-      margin-block-end: var(--space-md);
-    }
-
-    .error-page__text {
-      max-inline-size: var(--measure);
-      margin-block-end: var(--space-lg);
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    .error-page__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs) var(--space-sm);
-    }
-
-    .error-page__contact {
-      max-inline-size: var(--measure);
-      margin-block-start: var(--space-lg);
-      font-size: var(--text-caption);
-      color: var(--text-muted);
-    }
-
-    .error-page__contact a {
-      color: var(--text-primary);
-      text-decoration: underline;
-      text-decoration-color: var(--accent);
-      text-decoration-thickness: 1.5px;
-      text-underline-offset: 0.2em;
-    }
-  }
-</style>

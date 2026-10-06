@@ -1,7 +1,15 @@
 ---
 import type { Testimonial } from '@lib/types';
+import { link } from '@lib/ui';
+import Quote from '../ui/Quote.astro';
+import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
 
-/** Submitted and moderated entries, quoted as written — nothing is added or reworded. With none published the section shrinks to an invitation. */
+/**
+ * Submitted and moderated entries, quoted as written — nothing is added or
+ * reworded. Wide: two balanced columns, so neither runs out early. With none
+ * published the section shrinks to a quiet two-line invitation.
+ */
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string; title?: string };
@@ -16,189 +24,40 @@ const anchor = data?.anchor ?? 'stimmen';
 const empty = testimonials.length === 0;
 ---
 
-<section
-  class:list={[
-    'section',
-    'testimonials-section',
-    loading && 'testimonials-section--pending',
-    empty && !loading && 'testimonials-section--empty',
-  ]}
+<Section
   id={anchor}
-  aria-labelledby="testimonials-title"
+  labelledby="testimonials-title"
+  space={empty && !loading ? 'compact' : 'default'}
+  class:list={[loading && 'min-h-96']}
+  data-llms-skip
 >
-  <div class="container testimonials__grid">
-    <div class="testimonials__head">
-      <p class="marker">{data?.eyebrow ?? 'Aus dem Kreis'}</p>
-      <h2 class="display display--sm testimonials__title" id="testimonials-title">
-        {data?.title ?? 'Was Teilnehmer geschrieben haben'}
-      </h2>
-    </div>
+  <SectionHead
+    eyebrow={data?.eyebrow ?? 'Aus dem Kreis'}
+    title={data?.title ?? 'Was Teilnehmer geschrieben haben'}
+    titleId="testimonials-title"
+    size={empty ? 'display-3' : 'display-2'}
+  />
 
-    {empty ? (
-      <p class="testimonials__empty">
-        {loading
-          ? 'Erfahrungen von Teilnehmern werden geladen.'
-          : 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'}
-      </p>
-    ) : (
-      <ul class="testimonials__list" role="list">
-        {testimonials.map((t) => (
-          <li class="testimonial-item" data-reveal>
-            <blockquote class="testimonial-item__quote">{t.quote}</blockquote>
-            {(t.author || t.role) && (
-              <p class="testimonial-item__author">
-                {t.author && <cite class="testimonial-item__name">{t.author}</cite>}
-                {t.role && <span class="testimonial-item__role">{t.role}</span>}
-              </p>
-            )}
-          </li>
-        ))}
-      </ul>
-    )}
-
-    <p class="testimonials__note">
-      {!empty && 'Die Zitate stammen von Männern, die schon dabei waren. '}
-      <a class="link" href="/teile-deine-erfahrung">
-        Du warst dabei und möchtest etwas beitragen?
-      </a>
+  {empty ? (
+    <p class="mt-4 max-w-measure text-lg text-fg-soft">
+      {loading
+        ? 'Erfahrungen von Teilnehmern werden geladen.'
+        : 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'}
     </p>
-  </div>
-</section>
+  ) : (
+    <ul role="list" class="mt-group grid gap-y-10 lg:block lg:columns-2 lg:gap-x-group">
+      {testimonials.map((t) => (
+        <li class="reveal lg:mb-group lg:break-inside-avoid">
+          <Quote quote={t.quote} author={t.author} role={t.role} />
+        </li>
+      ))}
+    </ul>
+  )}
 
-<style is:global>
-  @layer sections {
-    .testimonials-section--pending {
-      min-block-size: 24rem;
-    }
-
-    .testimonials__head {
-      margin-block-end: var(--space-xl);
-    }
-
-    .testimonials__title {
-      max-inline-size: 18ch;
-      margin: 0;
-    }
-
-    .testimonials__list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-      gap: var(--space-xl) var(--space-lg);
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-
-    /* Every voice is set alike: one size, one rule above, no voice louder than another. */
-    .testimonial-item {
-      display: grid;
-      gap: var(--space-sm);
-      align-content: start;
-      padding-block-start: var(--space-md);
-      border-block-start: 1px solid var(--rule-strong);
-    }
-
-    .testimonial-item__quote {
-      max-inline-size: 52ch;
-      margin: 0;
-      font-family: var(--font-quote);
-      font-size: var(--text-lg);
-      font-style: italic;
-      line-height: 1.5;
-      color: var(--text-primary);
-      text-wrap: pretty;
-    }
-
-    .testimonial-item__quote::before {
-      content: '„';
-      color: var(--accent);
-    }
-
-    .testimonial-item__quote::after {
-      content: '“';
-      color: var(--accent);
-    }
-
-    .testimonial-item__author {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3xs) var(--space-xs);
-      align-items: baseline;
-      margin: 0;
-    }
-
-    .testimonial-item__name {
-      font-size: var(--text-caption);
-      font-style: normal;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .testimonial-item__role {
-      font-size: var(--text-caption);
-      color: var(--text-muted);
-    }
-
-    .testimonials__empty {
-      max-inline-size: var(--measure);
-      font-size: var(--text-section-body-lg);
-      color: var(--text-secondary);
-    }
-
-    .testimonials__note {
-      max-inline-size: var(--measure);
-      margin-block-start: var(--space-lg);
-      font-size: var(--text-caption);
-      line-height: var(--leading-relaxed);
-      color: var(--text-muted);
-    }
-
-    /* Wide: the title over the field, the voices in two balanced columns below,
-       each under its own hairline, so neither column runs out early. */
-    @media (width > 56em) {
-      .testimonials__head {
-        margin-block-end: var(--space-xl);
-      }
-
-      .testimonials__title {
-        max-inline-size: 17ch;
-        font-size: var(--display-2);
-      }
-
-      .testimonials__list {
-        display: block;
-        column-count: 2;
-        column-gap: var(--space-xl);
-      }
-
-      .testimonial-item {
-        break-inside: avoid;
-        margin-block-end: var(--space-xl);
-      }
-
-      /* Quoted speech, not a headline: a little above the reading size. */
-      .testimonial-item__quote {
-        max-inline-size: 52ch;
-        font-size: 1.25rem;
-        line-height: 1.55;
-      }
-
-      .testimonials__note {
-        margin-block-start: var(--space-sm);
-      }
-    }
-
-    /* No published voices yet: a quiet two-line band, not an empty stage. */
-    .testimonials-section--empty {
-      padding-block: var(--space-xl);
-    }
-
-    .testimonials-section--empty .testimonials__head {
-      margin-block-end: var(--space-sm);
-    }
-
-    .testimonials-section--empty .testimonials__note {
-      margin-block-start: var(--space-xs);
-    }
-  }
-</style>
+  <p class:list={['max-w-measure text-sm text-fg-muted', empty ? 'mt-2' : 'mt-8']}>
+    {!empty && 'Die Zitate stammen von Männern, die schon dabei waren. '}
+    <a class={link} href="/teile-deine-erfahrung">
+      Du warst dabei und möchtest etwas beitragen?
+    </a>
+  </p>
+</Section>

@@ -1,0 +1,71 @@
+---
+import Container from './Container.astro';
+
+/**
+ * A block of the page. Blocks are parted by their ground and by space, never by
+ * drawn rules. Each ground re-declares the semantic colours (see `surface-*` in
+ * global.css), so everything inside follows it.
+ */
+
+type Ground = 'default' | 'sand' | 'night' | 'flame';
+type Space = 'default' | 'compact' | 'none';
+
+interface Props {
+  id?: string;
+  ground?: Ground;
+  /** `default` is the section rhythm; `compact` the group rhythm, for bands and strips. */
+  space?: Space;
+  labelledby?: string;
+  label?: string;
+  /** Lets the browser skip rendering until the block nears the viewport. */
+  defer?: boolean;
+  class?: string;
+  /** Classes for the inner container (grid, etc.). */
+  innerClass?: string;
+  [attribute: `data-${string}`]: string | boolean | undefined;
+}
+
+const GROUNDS: Record<Ground, string> = {
+  default: '',
+  sand: 'surface-sand',
+  night: 'surface-night',
+  flame: 'surface-flame',
+};
+
+const SPACES: Record<Space, string> = {
+  default: 'py-section',
+  compact: 'py-group',
+  none: '',
+};
+
+const {
+  id,
+  ground = 'default',
+  space = 'default',
+  labelledby,
+  label,
+  defer = false,
+  class: className,
+  innerClass,
+  ...attributes
+} = Astro.props;
+---
+
+<section
+  id={id}
+  aria-labelledby={labelledby}
+  aria-label={label}
+  class:list={[
+    'relative',
+    GROUNDS[ground],
+    SPACES[space],
+    defer && '[contain-intrinsic-block-size:auto_700px] [content-visibility:auto]',
+    className,
+  ]}
+  {...attributes}
+>
+  <slot name="before" />
+  <Container class={innerClass}>
+    <slot />
+  </Container>
+</section>

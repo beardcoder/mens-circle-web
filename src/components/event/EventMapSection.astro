@@ -1,88 +1,112 @@
 ---
 import type { EventDTO } from '@lib/types';
 import { fullAddress } from '@lib/server/format';
+import { link } from '@lib/ui';
+import Button from '../ui/Button.astro';
+import Section from '../ui/Section.astro';
+import Split from '../ui/Split.astro';
 
 interface Props {
   /** Event with non-null coordinates; the caller guards. */
   event: EventDTO;
   lat: number;
   lng: number;
+  ground?: 'default' | 'sand';
 }
 
-/** The Anfahrt block. */
+/**
+ * Anfahrt: the address, a Leaflet map that loads only when it is about to scroll
+ * into view (keyless OSM France HOT tiles, attribution kept), and the route links,
+ * which work even when the map cannot draw itself. Leaflet's own elements are
+ * styled through descendant variants on the map root.
+ */
 
-const { event, lat, lng } = Astro.props;
+const { event, lat, lng, ground = 'default' } = Astro.props;
 
 const address =
   fullAddress({ street: event.street, postalCode: event.postal_code, city: event.city }) || event.location;
+
+const leaflet = [
+  '[&_.leaflet-control-attribution]:rounded-none [&_.leaflet-control-attribution]:bg-raised [&_.leaflet-control-attribution]:font-sans [&_.leaflet-control-attribution]:text-xs [&_.leaflet-control-attribution]:text-fg-muted [&_.leaflet-control-attribution_a]:text-fg [&_.leaflet-control-attribution_a]:underline',
+  '[&_.leaflet-popup-content-wrapper]:rounded-control [&_.leaflet-popup-content-wrapper]:border [&_.leaflet-popup-content-wrapper]:border-line-strong [&_.leaflet-popup-content-wrapper]:bg-raised [&_.leaflet-popup-content-wrapper]:font-sans [&_.leaflet-popup-content-wrapper]:text-fg [&_.leaflet-popup-tip]:bg-raised',
+  '[&_.leaflet-popup-content]:mx-4 [&_.leaflet-popup-content]:my-2 [&_.leaflet-popup-content]:text-sm [&_.leaflet-popup-content]:leading-normal',
+  '[&_.leaflet-control-zoom_a]:border-line [&_.leaflet-control-zoom_a]:bg-raised [&_.leaflet-control-zoom_a]:text-fg [&_.leaflet-control-zoom_a:hover]:bg-ground-alt',
+];
 ---
 
-<section class="section section--ruled event-map-section" aria-labelledby="anfahrt-title">
-  <div class="container">
-    <div class="spine">
-      <h2 class="rail-heading" id="anfahrt-title">
-        Anfahrt
-      </h2>
+<Section ground={ground} labelledby="anfahrt-title" defer>
+  <Split>
+    <h2 slot="head" id="anfahrt-title" class="text-display-3 text-fg">
+      Anfahrt
+    </h2>
 
-      <div class="spine__body--wide">
-        <p class="event-map__address">{address}</p>
+    <div>
+      <p class="mb-4 font-serif text-xl leading-normal text-fg">{address}</p>
 
-        <div class="event-map__frame">
+      {/* A fixed frame so the map can never push the page around as it loads. */}
+      <div class="aspect-4/3 overflow-clip rounded-control border border-line-strong has-data-[state=failed]:aspect-auto sm:aspect-video">
+        <div
+          data-map
+          data-state="idle"
+          data-lat={lat}
+          data-lng={lng}
+          data-title={event.location}
+          data-address={address}
+          aria-label="Karte zum Veranstaltungsort"
+          class:list={[
+            'group/map relative isolate block h-full overflow-hidden bg-ground-alt [contain:paint]',
+            leaflet,
+          ]}
+        >
           <div
-            class="event-map"
-            data-state="idle"
-            data-lat={lat}
-            data-lng={lng}
-            data-title={event.location}
-            data-address={address}
-            aria-label="Karte zum Veranstaltungsort"
-          >
-            <div class="event-map__canvas" role="application" aria-label="Interaktive Karte"></div>
-            <p class="event-map__fallback" hidden>
-              Die Karte lässt sich gerade nicht laden. Die Adresse steht über dieser Box, und die Routen-Links darunter
-              funktionieren weiterhin.
-            </p>
-          </div>
+            data-map-canvas
+            role="application"
+            aria-label="Interaktive Karte"
+            class="relative size-full min-h-[280px] bg-ground-alt before:pointer-events-none before:absolute before:inset-0 before:z-1 before:animate-skeleton before:bg-[repeating-linear-gradient(135deg,color-mix(in_srgb,var(--color-line)_60%,transparent)_0_12px,transparent_12px_24px)] group-data-[state=failed]/map:hidden group-data-[state=ready]/map:before:hidden"
+          ></div>
+          <p data-map-fallback hidden class="p-4 text-sm text-balance text-fg-muted">
+            Die Karte lässt sich gerade nicht laden. Die Adresse steht über dieser Box, und die Routen-Links darunter
+            funktionieren weiterhin.
+          </p>
         </div>
-
-        <div class="event-map__actions">
-          <a
-            href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
-            target="_blank"
-            rel="noopener"
-            class="btn btn--secondary"
-          >
-            Route planen (Google Maps)
-          </a>
-          <a
-            href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
-            target="_blank"
-            rel="noopener"
-            class="btn btn--secondary"
-          >
-            In OpenStreetMap öffnen
-          </a>
-        </div>
-
-        {/* `{' '}` rather than a newline: Astro collapses the break between the
-            text and the link to nothing, and this rendered as
-            "Karte vonOpenStreetMap-Mitwirkenden". */}
-        <p class="event-map__attribution">
-          Karte von{' '}
-          <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">
-            OpenStreetMap
-          </a>
-          -Mitwirkenden
-        </p>
       </div>
+
+      <div class="mt-4 flex flex-wrap gap-2 max-sm:flex-col">
+        <Button
+          href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+          variant="secondary"
+          target="_blank"
+          rel="noopener"
+        >
+          Route planen (Google Maps)
+        </Button>
+        <Button
+          href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
+          variant="secondary"
+          target="_blank"
+          rel="noopener"
+        >
+          In OpenStreetMap öffnen
+        </Button>
+      </div>
+
+      {/* `{' '}` rather than a newline: Astro collapses the break between the
+          text and the link to nothing ("Karte vonOpenStreetMap-Mitwirkenden"). */}
+      <p class="mt-2 text-sm text-fg-muted">
+        Karte von{' '}
+        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" class={link}>
+          OpenStreetMap
+        </a>
+        -Mitwirkenden
+      </p>
     </div>
-  </div>
-</section>
+  </Split>
+</Section>
 
 <script>
   // Static import so Astro bundles Leaflet's CSS into the page styles; a
   // runtime CSS import 404s under `inlineStylesheets: 'always'`.
-  import 'leaflet/dist/leaflet.css';
+  import '../../styles/leaflet.css';
 
   const TILE_URL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
   const TILE_ATTRIBUTION =
@@ -93,7 +117,7 @@ const address =
   const TILE_ERROR_LIMIT = 4;
 
   async function draw(root: HTMLElement): Promise<void> {
-    const canvas = root.querySelector<HTMLElement>('.event-map__canvas');
+    const canvas = root.querySelector<HTMLElement>('[data-map-canvas]');
     if (!canvas) return;
     const { lat, lng, title = '', address = '' } = root.dataset;
     const position: [number, number] = [Number(lat), Number(lng)];
@@ -107,7 +131,7 @@ const address =
       .on('tileerror', () => {
         if (++tileErrors < TILE_ERROR_LIMIT) return;
         root.dataset.state = 'failed';
-        root.querySelector<HTMLElement>('.event-map__fallback')!.hidden = false;
+        root.querySelector<HTMLElement>('[data-map-fallback]')!.hidden = false;
       })
       .on('tileload', () => (tileErrors = 0))
       .addTo(map);
@@ -117,12 +141,17 @@ const address =
       ? `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(address || title)})`
       : `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`;
     const popup = document.createElement('div');
-    popup.append(Object.assign(document.createElement('strong'), { textContent: title }));
+    popup.append(
+      Object.assign(document.createElement('strong'), {
+        className: 'mb-1 inline-block font-serif text-md font-normal',
+        textContent: title,
+      }),
+    );
     if (address) popup.append(document.createElement('br'), address);
     popup.append(
       document.createElement('br'),
       Object.assign(document.createElement('a'), {
-        className: 'event-map__directions',
+        className: 'mt-2 inline-block font-semibold text-accent underline underline-offset-[0.2em]',
         href: directions,
         target: '_blank',
         rel: 'noopener',
@@ -131,9 +160,10 @@ const address =
     );
 
     const icon = L.divIcon({
-      className: 'event-map__marker',
+      // Replaces Leaflet's boxed `leaflet-div-icon`.
+      className: 'border-0 bg-transparent text-accent',
       html:
-        '<svg viewBox="0 0 32 44" aria-hidden="true" focusable="false">' +
+        '<svg viewBox="0 0 32 44" aria-hidden="true" focusable="false" class="size-full fill-current">' +
         '<path d="M16 0C7.2 0 0 7 0 15.5 0 27 16 44 16 44s16-17 16-28.5C32 7 24.8 0 16 0z"/>' +
         '<circle cx="16" cy="15.5" r="6" fill="#fff"/>' +
         '</svg>',
@@ -161,209 +191,5 @@ const address =
     },
     { rootMargin: '200px' },
   );
-  for (const root of document.querySelectorAll('.event-map')) observer.observe(root);
+  for (const root of document.querySelectorAll('[data-map]')) observer.observe(root);
 </script>
-
-<style is:global>
-  @layer sections {
-    .event-map__address {
-      margin-block-end: var(--space-sm);
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      line-height: var(--leading-normal);
-      color: var(--text-primary);
-    }
-
-    /* A fixed frame so the map can never push the page around as it loads. */
-    .event-map__frame {
-      aspect-ratio: 16 / 9;
-      overflow: clip;
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius);
-    }
-
-    .event-map__frame > * {
-      block-size: 100%;
-    }
-
-    @media (width <= 600px) {
-      .event-map__frame {
-        aspect-ratio: 4 / 3;
-      }
-    }
-
-    .event-map__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-xs);
-      margin-block-start: var(--space-sm);
-    }
-
-    .event-map__attribution {
-      margin-block-start: var(--space-xs);
-      font-size: var(--text-caption);
-      color: var(--text-muted);
-    }
-
-    .event-map__attribution a {
-      text-decoration: underline;
-      text-underline-offset: 0.2em;
-    }
-  }
-</style>
-
-<style is:global>
-  /* Unlayered like Leaflet's own stylesheet, so these overrides win over it. */
-  @keyframes event-map-skeleton {
-    0%,
-    100% {
-      opacity: 0.5;
-    }
-
-    50% {
-      opacity: 0.25;
-    }
-  }
-
-  .event-map {
-    position: relative;
-    display: block;
-    block-size: 100%;
-    overflow: hidden;
-    background: var(--bg-secondary);
-    contain: paint;
-    isolation: isolate;
-  }
-
-  .event-map[hidden] {
-    display: none;
-  }
-
-  .event-map__canvas {
-    inline-size: 100%;
-    /* The frame in EventMapSection.astro owns the aspect ratio; fill it. */
-    block-size: 100%;
-    min-block-size: 280px;
-    background: var(--bg-secondary);
-  }
-
-  .event-map[data-state='idle'] .event-map__canvas::before,
-  .event-map[data-state='loading'] .event-map__canvas::before {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    content: '';
-    background: repeating-linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--border-light) 60%, transparent) 0 12px,
-      transparent 12px 24px
-    );
-    animation: event-map-skeleton 2s var(--ease-ambient) infinite;
-  }
-
-  .event-map__canvas:has(.leaflet-container::before) {
-    display: none;
-  }
-
-  .event-map[data-state='failed'] .event-map__canvas {
-    display: none;
-  }
-
-  /* The frame reserves a 16/9 box so a loading map cannot shift the page. */
-  .event-map__frame:has(.event-map[data-state='failed']) {
-    aspect-ratio: auto;
-  }
-
-  .event-map__fallback {
-    padding: var(--space-sm);
-    margin: 0;
-    font-size: var(--text-caption);
-    line-height: var(--leading-normal);
-    color: var(--text-muted);
-    text-wrap: balance;
-  }
-
-  .event-map__marker {
-    border: 0;
-    background: none;
-  }
-
-  .event-map__marker svg {
-    inline-size: 100%;
-    block-size: 100%;
-    color: var(--accent-primary);
-    fill: currentcolor;
-  }
-
-  /* Leaflet's default attribution fails contrast; restyled. */
-  .event-map .leaflet-control-attribution {
-    font-family: var(--font-body);
-    font-size: var(--text-caption);
-    color: var(--text-muted);
-    background: var(--bg-elevated);
-    border-radius: 0;
-  }
-
-  .event-map .leaflet-control-attribution a {
-    color: var(--text-primary);
-    text-decoration: underline;
-  }
-
-  .event-map .leaflet-popup-content-wrapper {
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius);
-  }
-
-  .event-map .leaflet-popup-content {
-    margin: var(--space-xs) var(--space-sm);
-    font-size: var(--text-caption);
-    line-height: var(--leading-normal);
-  }
-
-  .event-map .leaflet-popup-content strong {
-    display: inline-block;
-    margin-block-end: var(--space-3xs);
-    font-family: var(--font-display);
-    font-size: var(--text-section-body);
-    font-weight: 400;
-  }
-
-  .event-map .leaflet-popup-tip {
-    background: var(--bg-elevated);
-  }
-
-  .event-map__directions {
-    display: inline-block;
-    margin-block-start: var(--space-xs);
-    font-weight: 600;
-    color: var(--accent-text);
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-  }
-
-  .event-map__directions:hover,
-  .event-map__directions:focus-visible {
-    color: var(--accent-rare);
-  }
-
-  .event-map .leaflet-control-zoom a {
-    color: var(--text-primary);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-light);
-  }
-
-  .event-map .leaflet-control-zoom a:hover,
-  .event-map .leaflet-control-zoom a:focus-visible {
-    background: var(--bg-secondary);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .event-map[data-state='idle'] .event-map__canvas::before,
-    .event-map[data-state='loading'] .event-map__canvas::before {
-      animation: none;
-    }
-  }
-</style>

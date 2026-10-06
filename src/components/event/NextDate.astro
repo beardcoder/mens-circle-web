@@ -1,10 +1,21 @@
 ---
 import site from '@data/site.json';
 import { primaryAction, type DateStatus } from '@lib/event-status';
+import { link } from '@lib/ui';
 import NewsletterForm from '../forms/NewsletterForm.astro';
 import SeatCircle from '../SeatCircle.astro';
+import Button from '../ui/Button.astro';
+import DefList from '../ui/DefList.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Section from '../ui/Section.astro';
+import Split from '../ui/Split.astro';
 
-/** The one block on /event that depends on live data. */
+/**
+ * The one block on /event that depends on live data, on the night ground right
+ * under the page opening: the date as the flyer sets it, its facts, the seats and
+ * the action; then the way to hear about the next one. Three states: scheduled,
+ * none, and a failed read, which never reads as "no date planned".
+ */
 
 interface Props {
   state: DateStatus;
@@ -21,280 +32,118 @@ const seatsLabel = next
     ? `Alle ${next.maxParticipants} Plätze vergeben`
     : `${next.availableSpots} von ${next.maxParticipants} Plätzen frei`
   : '';
+
+const rows = next
+  ? [
+      ...(next.timeRange ? [{ label: 'Uhrzeit', value: next.timeRange }] : []),
+      { label: 'Ort', value: next.place, note: 'Die genaue Adresse bekommst du mit der Anmeldebestätigung.' },
+      {
+        label: 'Plätze',
+        value: state.isFull
+          ? 'Ausgebucht – du kannst auf die Warteliste'
+          : `${next.availableSpots} von ${next.maxParticipants} frei`,
+        note: state.isFull
+          ? 'Wird ein Platz frei, rückst du automatisch nach.'
+          : 'Für die Anmeldung genügen Vor- und Nachname und eine E-Mail-Adresse.',
+      },
+      ...(next.costBasis ? [{ label: 'Beitrag', value: next.costBasis }] : []),
+    ]
+  : [];
 ---
 
-<section class="section surface-night event-next" id="naechster-termin" aria-labelledby="naechster-termin-title">
-  <div class="container">
-    {next ? (
-      <div class="event-next__grid">
-        <div class="event-next__main">
-          <p class="marker marker--plain">Nächster Termin</p>
-          <h2 class="event-next__title" id="naechster-termin-title">
-            <time datetime={next.slug}>
-              <span class="sr-only">{next.dateLabel}</span>
-              <span class="date-line event-next__date" aria-hidden="true">
-                {day ? `${weekday.slice(0, 2)} · ${day}. ${monthYear}` : next.dateLabel}
-              </span>
-            </time>
-          </h2>
-
-          <dl class="deflist event-next__meta">
-            {next.timeRange && (
-              <div class="deflist__row">
-                <dt class="deflist__term">Uhrzeit</dt>
-                <dd class="deflist__desc">{next.timeRange}</dd>
-              </div>
-            )}
-            <div class="deflist__row">
-              <dt class="deflist__term">Ort</dt>
-              <dd class="deflist__desc">
-                {next.place}
-                <span class="deflist__note">Die genaue Adresse bekommst du mit der Anmeldebestätigung.</span>
-              </dd>
-            </div>
-            <div class="deflist__row">
-              <dt class="deflist__term">Plätze</dt>
-              <dd class="deflist__desc">
-                {state.isFull
-                  ? 'Ausgebucht – du kannst auf die Warteliste'
-                  : `${next.availableSpots} von ${next.maxParticipants} frei`}
-                <span class="deflist__note">
-                  {state.isFull
-                    ? 'Wird ein Platz frei, rückst du automatisch nach.'
-                    : 'Für die Anmeldung genügen Vor- und Nachname und eine E-Mail-Adresse.'}
-                </span>
-              </dd>
-            </div>
-            {next.costBasis && (
-              <div class="deflist__row">
-                <dt class="deflist__term">Beitrag</dt>
-                <dd class="deflist__desc">{next.costBasis}</dd>
-              </div>
-            )}
-          </dl>
-
-          <p class="event-next__action">
-            <a
-              href={action.href}
-              class="btn btn--primary btn--large"
-              data-umami-event="cta-click"
-              data-umami-event-location="event-landing"
-              data-umami-event-state={state.status}
+<Section id="naechster-termin" ground="night" space="none" class="pt-8 pb-section" labelledby="naechster-termin-title">
+  {next ? (
+    <div class="grid items-center gap-group lg:grid-cols-12 lg:gap-x-grid">
+      <div class="lg:col-span-7">
+        <Eyebrow plain tone="fg">
+          Nächster Termin
+        </Eyebrow>
+        <h2 id="naechster-termin-title" class="mt-4 mb-8">
+          <time datetime={next.slug}>
+            <span class="sr-only">{next.dateLabel}</span>
+            <span
+              class="block font-sans text-[clamp(1.875rem,1rem+3.4vw,3.75rem)] leading-[1.05] font-bold tracking-[0.02em] text-accent uppercase"
+              aria-hidden="true"
             >
-              {action.label}
-            </a>
-          </p>
-        </div>
-
-        <figure class="event-next__seats">
-          <SeatCircle
-            seats={next.maxParticipants}
-            taken={next.maxParticipants - next.availableSpots}
-            ember
-            label={seatsLabel}
-          />
-          <figcaption>{seatsLabel}</figcaption>
-        </figure>
-      </div>
-    ) : (
-      <div class="event-next__empty">
-        <p class="marker">Nächster Termin</p>
-        <h2 class="display event-next__empty-title" id="naechster-termin-title">
-          {state.status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
+              {day ? `${weekday.slice(0, 2)} · ${day}. ${monthYear}` : next.dateLabel}
+            </span>
+          </time>
         </h2>
 
-        <p class="event-next__text" data-status={state.status}>
-          {state.status === 'unavailable'
-            ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
-            : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich unten ein, dann bekommst du eine kurze Nachricht.'}
-        </p>
-      </div>
-    )}
+        <DefList rows={rows} />
 
-    <div class="event-next__notify" id="benachrichtigung">
-      <div>
-        <h3 class="event-next__sub">Bei neuen Terminen benachrichtigen</h3>
-        <p class="event-next__text">
+        <Button
+          href={action.href}
+          size="lg"
+          class="mt-8 max-sm:w-full"
+          data-umami-event="cta-click"
+          data-umami-event-location="event-landing"
+          data-umami-event-state={state.status}
+        >
+          {action.label}
+        </Button>
+      </div>
+
+      <figure class="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 lg:col-span-4 lg:col-start-9 lg:grid-cols-1 lg:justify-items-center">
+        <SeatCircle
+          seats={next.maxParticipants}
+          taken={next.maxParticipants - next.availableSpots}
+          ember
+          label={seatsLabel}
+          class="w-full lg:w-[min(100%,20rem)]"
+        />
+        <figcaption class="text-lg font-bold text-fg-soft">{seatsLabel}</figcaption>
+      </figure>
+    </div>
+  ) : (
+    <Split alignToTitle>
+      <div slot="head" class="grid gap-5">
+        <Eyebrow>Nächster Termin</Eyebrow>
+        <h2 id="naechster-termin-title" class="max-w-[16ch] text-display-2 text-fg">
+          {state.status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
+        </h2>
+      </div>
+      {/* A failed read is not a calm "nothing scheduled": it is marked. */}
+      <p
+        data-status={state.status}
+        class="max-w-measure text-lg text-fg-soft data-[status=unavailable]:border-l-2 data-[status=unavailable]:border-accent data-[status=unavailable]:pl-4 data-[status=unavailable]:text-fg"
+      >
+        {state.status === 'unavailable'
+          ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
+          : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich unten ein, dann bekommst du eine kurze Nachricht.'}
+      </p>
+    </Split>
+  )}
+
+  <div id="benachrichtigung" class="mt-group scroll-mt-(--spacing-clearance) border-t border-line pt-group">
+    <Split>
+      <div slot="head" class="grid gap-3">
+        <h3 class="text-2xl text-fg">Bei neuen Terminen benachrichtigen</h3>
+        <p class="max-w-measure text-md text-fg-soft">
           Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler
           nicht verschickt.
         </p>
       </div>
 
-      <div>
-        <NewsletterForm context={{ page: 'event-landing' }} />
+      <NewsletterForm context={{ page: 'event-landing' }} />
 
-        {whatsapp && (
-          <p class="event-next__alt" id="whatsapp-community">
-            Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine{' '}
-            <a
-              class="link"
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-umami-event="whatsapp-click"
-              data-umami-event-type="community-join"
-            >
-              WhatsApp-Gruppe
-              <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
-            </a>
-            .
-          </p>
-        )}
-      </div>
-    </div>
+      {whatsapp && (
+        <p class="mt-6 max-w-measure text-sm text-fg-muted" id="whatsapp-community">
+          Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine{' '}
+          <a
+            class={link}
+            href={whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-umami-event="whatsapp-click"
+            data-umami-event-type="community-join"
+          >
+            WhatsApp-Gruppe
+            <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+          </a>
+          .
+        </p>
+      )}
+    </Split>
   </div>
-</section>
-
-<style is:global>
-  @layer sections {
-    .event-next__grid {
-      display: grid;
-      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-      gap: var(--space-xl);
-      align-items: center;
-    }
-
-    .event-next__date {
-      display: block;
-      font-size: clamp(1.875rem, 1rem + 3.4vw, 3.75rem);
-      line-height: 1.05;
-      letter-spacing: 0.02em;
-    }
-
-    .event-next__title {
-      margin-block: var(--space-sm) var(--space-lg);
-      font-size: inherit;
-      letter-spacing: normal;
-    }
-
-    .event-next__meta {
-      margin-block-end: var(--space-lg);
-    }
-
-    .event-next__action {
-      margin: 0;
-    }
-
-    .event-next__seats {
-      display: grid;
-      gap: var(--space-sm);
-      justify-items: center;
-      margin: 0;
-    }
-
-    .event-next__seats .seat-circle {
-      inline-size: min(100%, 20rem);
-    }
-
-    .event-next__seats figcaption {
-      font-size: var(--text-lg);
-      font-weight: 700;
-      color: var(--text-secondary);
-    }
-
-    /* Wide, nothing scheduled: on the split line — the title in columns 1–5,
-       the note from column 7, level with the title's first line. */
-    @media (width > 56em) {
-      .event-next__empty {
-        display: grid;
-        grid-template-columns: var(--field);
-        column-gap: var(--field-gap);
-        align-items: start;
-      }
-
-      .event-next__empty .marker {
-        grid-column: 1 / -1;
-      }
-
-      .event-next__empty-title {
-        grid-column: 1 / span 5;
-        margin: 0;
-      }
-
-      .event-next__empty .event-next__text {
-        grid-column: 7 / span 6;
-        margin: 0;
-        padding-block-start: 0.2em;
-      }
-    }
-
-    .event-next__empty-title {
-      max-inline-size: 16ch;
-      margin-block-end: var(--space-md);
-    }
-
-    .event-next__text {
-      max-inline-size: var(--measure);
-      margin-block-end: var(--space-sm);
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    /* A failed read is not a calm "nothing scheduled" — it is marked. */
-    .event-next__text[data-status='unavailable'] {
-      padding-inline-start: var(--space-sm);
-      color: var(--text-primary);
-      border-inline-start: 2px solid var(--accent);
-    }
-
-    .event-next__notify {
-      display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-      gap: var(--space-md) var(--space-xl);
-      padding-block-start: var(--space-lg);
-      margin-block-start: var(--space-xl);
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    /* Wide: on the split line — the heading in columns 1–5, the form from 7. */
-    @media (width > 56em) {
-      .event-next__notify {
-        grid-template-columns: var(--field);
-        column-gap: var(--field-gap);
-      }
-
-      .event-next__notify > :first-child {
-        grid-column: 1 / span 5;
-      }
-
-      /* The second child, not the last: a form component may end in a <script>. */
-      .event-next__notify > :nth-child(2) {
-        grid-column: 7 / span 6;
-      }
-    }
-
-    .event-next__sub {
-      margin-block-end: var(--space-xs);
-      font-size: var(--text-2xl);
-      line-height: 1.15;
-    }
-
-    .event-next__alt {
-      max-inline-size: var(--measure);
-      margin-block-start: var(--space-md);
-      font-size: var(--text-caption);
-      line-height: var(--leading-relaxed);
-      color: var(--text-muted);
-    }
-
-    @media (width <= 56em) {
-      .event-next__grid,
-      .event-next__notify {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .event-next__seats {
-        grid-template-columns: 6rem minmax(0, 1fr);
-        justify-items: start;
-        align-items: center;
-      }
-    }
-
-    @media (width <= 480px) {
-      .event-next__action .btn {
-        inline-size: 100%;
-      }
-    }
-  }
-</style>
+</Section>
