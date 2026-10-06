@@ -145,13 +145,17 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `group` > `item`; never inverted.
 - The Ablauf steps are numbered `01`–`04` in large serif figures (an evening has an
   order); everything else is told in sentences, not bullets.
-- `SeatCircle.astro` (hairline ring with seats) is the mark of the circle: it counts an
-  event's seats (taken/open) on the date cards and sits on the questions card.
+- Seats are counted by `SeatMeter.astro`: a row of square-cut fields, one per seat,
+  taken filled, open outlined, always beside the count in words. No ring of dots.
+- The circle lives in the background: `Rings.astro`, wide concentric hairlines in
+  `line-strong` (ripples, or rings around a fire), placed by the caller behind the
+  hero photo, the questions card, an event's opening, the page openings and the 404.
+  On phones they keep to a corner or sit behind a card, never across a title.
 - The header is the page's paper at all times (nothing scrolls visibly beneath it);
   its hairline fades in on scroll. No numbers in the navigation.
 - Motion: entrances on the openings (`entrance:`, never after a view transition),
   scroll-tied reveals (`reveal`, view() only, nothing hidden without timeline
-  support), the seat circle's draw-in, a breathing circle to follow in the statement band
+  support), a breathing circle to follow in the statement band
   (`Breath.astro`, `breathe`: 4 s in, 0.5 hold, 5 out, 0.5 rest), and the phone menu:
   it opens as a circle from the toggle (`--nav-origin`, set by `lib/site-header.ts`),
   then each link rises; closing runs back quickly. Under reduced motion everything

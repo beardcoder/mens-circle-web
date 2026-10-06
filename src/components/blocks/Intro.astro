@@ -1,9 +1,9 @@
 ---
-import { card } from '@lib/ui';
-import SeatCircle from '../SeatCircle.astro';
+import { caps, card } from '@lib/ui';
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
+import Rings from '../Rings.astro';
 
 interface Props {
   data: {
@@ -24,7 +24,17 @@ const anchor = data.anchor ?? 'ueber';
 const questions = (data.questions ?? []).slice(0, 4);
 ---
 
-<Section id={anchor} labelledby="ueber-title" innerClass="grid items-start gap-y-12 lg:grid-cols-12 lg:gap-x-grid">
+<Section
+  id={anchor}
+  labelledby="ueber-title"
+  class="overflow-clip"
+  innerClass="relative grid items-start gap-y-12 lg:grid-cols-12 lg:gap-x-grid"
+>
+  {/* The questions sit in the middle of the circle, which stays in the background. */}
+  <Rings
+    slot="before"
+    class="top-[78%] left-1/2 w-[44rem] -translate-1/2 lg:top-1/2 lg:left-[76%] lg:w-[min(60rem,70vw)]"
+  />
   <div class="grid gap-6 lg:col-span-6">
     <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="ueber-title" size="display-2" />
     {data.text && <Prose html={data.text} size="lg" />}
@@ -36,12 +46,9 @@ const questions = (data.questions ?? []).slice(0, 4);
       class:list={[card, 'reveal p-6 sm:p-8 lg:col-span-5 lg:col-start-8']}
       aria-labelledby="ueber-questions-label"
     >
-      <div class="mb-6 flex items-center gap-4">
-        <SeatCircle ember seatSize={9} class="size-14 shrink-0" />
-        <figcaption id="ueber-questions-label" class="text-sm font-semibold text-fg-muted">
-          {data.questionsLabel}
-        </figcaption>
-      </div>
+      <figcaption id="ueber-questions-label" class={`${caps} mb-6 text-fg-muted`}>
+        {data.questionsLabel}
+      </figcaption>
       <ul role="list" class="divide-y divide-line">
         {questions.map((question) => (
           <li class="py-4 font-serif text-xl leading-snug text-fg italic first:pt-0 last:pb-0">{question}</li>

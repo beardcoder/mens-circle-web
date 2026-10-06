@@ -1,0 +1,40 @@
+---
+/**
+ * An event's seats as a row of square-cut fields, one per seat: taken seats are
+ * filled, open ones stand as outlines. Read left to right like a tally, so the
+ * count is clear at a glance and the text beside it says it in words.
+ * Decorative unless it gets a `label`; open seats take the ground they sit on.
+ */
+interface Props {
+  seats?: number;
+  /** Seats drawn as taken (filled). */
+  taken?: number;
+  /** An accessible description; without it the meter is decorative. */
+  label?: string;
+  /** `md` in the date cards, `lg` on an event's opening. */
+  size?: 'md' | 'lg';
+  class?: string;
+}
+
+const { seats = 8, taken = 0, label, size = 'md', class: className } = Astro.props;
+
+const SIZES = {
+  md: 'h-3 gap-1',
+  lg: 'h-5 gap-1.5',
+} as const;
+
+const fields = Array.from({ length: Math.max(0, seats) }, (_, i) => i < taken);
+---
+
+<span
+  class:list={['flex w-full', SIZES[size], className]}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  {fields.map((filled) => (
+    <span
+      class:list={['min-w-1 flex-1 rounded-[1px] border-2', filled ? 'border-fg bg-fg' : 'border-line-bold bg-surface']}
+    />
+  ))}
+</span>

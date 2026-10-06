@@ -139,15 +139,12 @@
   --ease-emphasised: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Animations. The generic motions come from tailwind-animations (imported
-     before this file: its keyframes `fade-in-up`, `fade-in`, `zoom-in`,
-     `bounce-fade-in`, `pulse`); here they are re-timed to the theme's easing.
+     before this file: its keyframes `fade-in-up`, `fade-in`, `pulse`); here
+     they are re-timed to the theme's easing.
      Delays come from its `animate-delay-*` utility (`animation-delay`). The
-     circle's own motions (ring, breath, glow) keep their keyframes below. */
+     circle's own motions (breath, glow) keep their keyframes below. */
   --animate-fade-in-up: fade-in-up 520ms var(--ease-settle) both;
   --animate-fade-in: fade-in 700ms var(--ease-settle) both;
-  --animate-ring-in: ring-in 1000ms var(--ease-emphasised) both;
-  --animate-seat-in: zoom-in 420ms var(--ease-settle) both;
-  --animate-ember: bounce-fade-in 700ms var(--ease-settle) both;
   --animate-breathe: breathe 10s infinite both;
   --animate-skeleton: pulse 2s ease-in-out infinite;
   --animate-glow: glow 3.6s ease-in-out infinite;
@@ -155,14 +152,6 @@
 
 /* The circle's own keyframes live outside @theme so they are always emitted,
    whether a theme animation, an arbitrary `animate-[…]` or an @utility uses them. */
-
-/* The seat circle draws in: the ring turns into place, then the seats take theirs. */
-@keyframes ring-in {
-  from {
-    opacity: 0;
-    transform: rotate(-40deg) scale(0.92);
-  }
-}
 
 @keyframes glow {
   50% {

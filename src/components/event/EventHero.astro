@@ -2,7 +2,8 @@
 import type { EventDTO } from '@lib/types';
 import { card } from '@lib/ui';
 import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from '@lib/server/format';
-import SeatCircle from '../SeatCircle.astro';
+import Rings from '../Rings.astro';
+import SeatMeter from '../SeatMeter.astro';
 import Button from '../ui/Button.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
@@ -11,7 +12,7 @@ interface Props {
   event: EventDTO;
 }
 
-/** The opening of a single event's page: the date as the title, time, place and fee as quiet chips, the seats beside it. */
+/** The opening of a single event's page: the date as the title, time, place and fee as quiet chips, the seats beside it, rings in the background. */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);
@@ -27,9 +28,13 @@ const chips = [time, event.location, event.cost_basis, 'Ohne Vorerfahrung'].filt
 
 <Section
   space="none"
-  class="pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
-  innerClass="grid items-center gap-10 lg:grid-cols-12 lg:gap-x-grid"
+  class="overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
+  innerClass="relative grid items-center gap-10 lg:grid-cols-12 lg:gap-x-grid"
 >
+  <Rings
+    slot="before"
+    class="top-[82%] left-full w-[34rem] -translate-1/2 lg:top-1/2 lg:left-[84%] lg:w-[min(64rem,80vw)]"
+  />
   <div class="grid justify-items-start gap-5 lg:col-span-8">
     <Eyebrow class="entrance:animate-fade-in-up">
       {event.is_past ? 'Vergangenes Treffen' : 'Männerkreis · Nächstes Treffen'}
@@ -63,24 +68,15 @@ const chips = [time, event.location, event.cost_basis, 'Ohne Vorerfahrung'].filt
 
   {!event.is_past && (
     <figure
-      class:list={[
-        card,
-        'flex items-center gap-5 p-6 entrance:animate-fade-in-up entrance:animate-delay-200 lg:col-span-4 lg:flex-col lg:p-8 lg:text-center',
-      ]}
+      class:list={[card, 'grid gap-5 p-6 entrance:animate-fade-in-up entrance:animate-delay-200 lg:col-span-4 lg:p-8']}
     >
-      <SeatCircle
-        seats={event.max_participants}
-        taken={taken}
-        ember
-        label={seatsLabel}
-        class="size-24 shrink-0 lg:size-40"
-      />
       <figcaption class="grid gap-1">
         <span class="text-lg font-semibold text-fg">{seatsLabel}</span>
         <span class="text-sm text-fg-muted">
-          {event.is_full ? 'Warteliste möglich' : 'Gefüllte Punkte sind vergebene Plätze.'}
+          {event.is_full ? 'Warteliste möglich' : 'Gefüllte Felder sind vergebene Plätze.'}
         </span>
       </figcaption>
+      <SeatMeter seats={event.max_participants} taken={taken} label={seatsLabel} size="lg" />
     </figure>
   )}
 </Section>

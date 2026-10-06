@@ -70,12 +70,11 @@ of quotes.
 transition), `scroll-motion:` (scroll-driven, where timelines exist), `reveal`
 (scroll-tied reveal), `animate-delay-*` (staggers; `animation-delay`, from
 tailwind-animations).
-Animations: `fade-in-up`, `fade-in`, `ring-in` and `seat-in` (the seat circle), `ember`,
-`breathe` (10 s: 4 in, 0.5 hold, 5 out, 0.5 rest), `skeleton`, `glow`. The generic
-ones use the keyframes of [tailwind-animations](https://tailwind-animations.com)
-(`fade-in-up`, `fade-in`, `zoom-in`, `bounce-fade-in`, `pulse`), re-timed in
-`theme.css` to the theme's easing; the circle's own (`ring-in`, `breathe`, `glow`)
-are ours. Pick further motions from its catalog (`.claude/skills/tailwind-animations`)
+Animations: `fade-in-up`, `fade-in`, `breathe` (10 s: 4 in, 0.5 hold, 5 out, 0.5
+rest), `skeleton`, `glow`. The generic ones use the keyframes of
+[tailwind-animations](https://tailwind-animations.com) (`fade-in-up`, `fade-in`,
+`pulse`), re-timed in `theme.css` to the theme's easing; the circle's own (`breathe`,
+`glow`) are ours. Pick further motions from its catalog (`.claude/skills/tailwind-animations`)
 and give them a theme token instead of its default timing. Everything
 rests under `prefers-reduced-motion`.
 
@@ -94,7 +93,8 @@ rests under `prefers-reduced-motion`.
 | `Prose`                                           | Rich text from the content files                                        |
 | `Field`                                           | Label, control, hint and the error slot lib/form.ts fills               |
 | `DefList`, `LinkList`, `Quote`, `Badge`           | Facts, where-next rows, a participant's words, a status chip            |
-| `SeatCircle`, `Breath`                            | The circle's mark (seats taken/open); a breathing circle to follow      |
+| `SeatMeter`                                       | An event's seats as square-cut fields (taken filled, open outlined)     |
+| `Rings`, `Breath`                                 | The circle in the background (concentric hairlines); a breath to follow |
 | `Contours`                                        | Contour lines behind a dark band's content                              |
 
 Cards (`card`, `panel`) are for self-contained units — the date, agreements, voices,
@@ -110,8 +110,8 @@ forms, questions — never for running text.
 - Scripts find elements by `data-*` attributes and switch states with them
   (`data-open`, `data-state`, `data-tone`, `data-hiding`); styles read the same
   attributes through `data-[…]:` and `group-data-[…]:` variants.
-- Arbitrary values are for one-off geometry (the hero photo and its date card, the
-  seat circle); anything used twice becomes a token or a recipe.
+- Arbitrary values are for one-off geometry (the hero photo and its date card, where
+  the rings sit); anything used twice becomes a token or a recipe.
 - Allowed outside utilities, each with its reason in `theme.css`/`global.css`: font
   tokens, surfaces, the reduced-motion floor, the off-screen pause of breathing
   elements, the focus ring default, view-transition pseudo-elements, keyframes,
