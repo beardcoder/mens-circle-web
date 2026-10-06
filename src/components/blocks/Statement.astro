@@ -102,12 +102,42 @@ const lines = data.lines ?? [];
       color: var(--text-primary);
     }
 
-    /* Wide: the slogan as large as the field allows. "In den Körper." is about 9.5em
-       of capitals, so 7.4vw keeps it on one line inside the container. */
+    /* Wide: a poster in two columns of equal height. The slogan stands in four
+       lines over the left half ("Aus dem", the widest, is 4.45em of capitals, so
+       10cqi fills six columns); the right side holds the label at the top and the
+       reading at the foot, level with the slogan's last line. */
     @media (width > 56em) {
+      .statement__inner {
+        container-type: inline-size;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: var(--field);
+        gap: var(--space-lg) var(--field-gap);
+        align-items: stretch;
+      }
+
+      .statement__marker {
+        grid-row: 1;
+        grid-column: 8 / span 5;
+        align-self: start;
+        margin: 0;
+      }
+
       .statement__display {
-        font-size: min(7.4vw, 7.5rem);
+        grid-row: 1 / span 2;
+        grid-column: 1 / span 6;
+        align-self: start;
+        font-size: min(10cqi, 9rem);
         line-height: 1.04;
+      }
+
+      .statement__foot {
+        grid-row: 2;
+        grid-column: 8 / span 5;
+        align-self: end;
+      }
+
+      .statement__text {
+        max-inline-size: 34em;
       }
     }
 
@@ -180,9 +210,19 @@ const lines = data.lines ?? [];
       }
     }
 
+    /* Narrow: the same poster, stacked. The slogan stands in four lines across the
+       full width ("Aus dem", the widest, is 4.45em, so 21cqi fills it), the reading
+       under it. */
     @media (width <= 56em) {
       .statement__inner {
+        container-type: inline-size;
         grid-template-columns: minmax(0, 1fr);
+        row-gap: var(--space-xl);
+      }
+
+      .statement__display {
+        font-size: min(21cqi, 7.5rem);
+        line-height: 1.04;
       }
 
       .statement__foot {

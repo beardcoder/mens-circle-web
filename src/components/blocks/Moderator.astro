@@ -70,19 +70,24 @@ const photo = resolveAssetImage(data.image);
 
 <style is:global>
   @layer sections {
-    /* The portrait takes the rail, his words the content column. */
+    /* The portrait takes the left five columns, his words the right six, both
+       starting on the same line. */
     .home-person__grid {
       display: grid;
-      grid-template-columns: var(--split-columns);
-      gap: var(--space-xl) var(--split-gap);
+      grid-template-columns: var(--field);
+      gap: var(--space-xl) var(--field-gap);
       align-items: start;
     }
 
-    /* The figure hangs a little lower than the marker: it starts level with the name. */
     .home-person__figure {
       position: sticky;
       inset-block-start: calc(var(--header-clearance) + var(--space-md));
-      margin: calc(var(--text-marker) * 1.3 + var(--space-sm)) 0 0;
+      grid-column: 1 / span 5;
+      margin: 0;
+    }
+
+    .home-person__body {
+      grid-column: 7 / span 6;
     }
 
     /* The frame sits on a flame bar: the one orange stroke in this section. */
@@ -131,7 +136,7 @@ const photo = resolveAssetImage(data.image);
     }
 
     .home-person__bio {
-      max-inline-size: 58ch;
+      max-inline-size: 36em;
     }
 
     .home-person__bio p {
@@ -167,6 +172,7 @@ const photo = resolveAssetImage(data.image);
       .home-person__figure {
         position: relative;
         inset-block-start: auto;
+        grid-column: auto;
         order: -1;
         inline-size: 72%;
         margin: 0;
