@@ -15,12 +15,12 @@ const { html, size = 'md', class: className } = Astro.props;
 const PROSE = [
   'max-w-measure text-fg-soft',
   '[&_p]:mb-[1.2em] [&_p:last-child]:mb-0',
-  '[&_a]:text-fg [&_a]:underline [&_a]:decoration-accent [&_a]:decoration-[1.5px] [&_a]:underline-offset-[0.22em] [&_a:hover]:decoration-[3px]',
+  '[&_a]:text-fg [&_a]:underline [&_a]:decoration-accent/60 [&_a]:decoration-[1.5px] [&_a]:underline-offset-[0.2em] [&_a:hover]:decoration-accent',
   '[&_strong]:font-semibold [&_strong]:text-fg',
   '[&_h2]:mt-12 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:text-fg [&_h2:first-child]:mt-0',
   '[&_h3]:mt-8 [&_h3]:mb-2 [&_h3]:text-xl [&_h3]:font-medium [&_h3]:text-fg [&_h3:first-child]:mt-0',
   '[&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1.5 [&_li::marker]:text-accent',
-  '[&_blockquote]:my-6 [&_blockquote]:border-l-2 [&_blockquote]:border-accent [&_blockquote]:pl-4 [&_blockquote]:font-serif [&_blockquote]:text-xl [&_blockquote]:italic [&_blockquote]:text-fg',
+  '[&_blockquote]:my-8 [&_blockquote]:rounded-r-control [&_blockquote]:border-l-3 [&_blockquote]:border-accent [&_blockquote]:bg-accent-soft [&_blockquote]:px-5 [&_blockquote]:py-4 [&_blockquote]:font-serif [&_blockquote]:text-xl [&_blockquote]:italic [&_blockquote]:text-fg',
   '[&_table]:my-6 [&_table]:w-full [&_td]:border-b [&_td]:border-line [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm [&_th]:border-b [&_th]:border-line [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&_th]:text-fg',
 ];
 const classes = [PROSE, size === 'lg' ? 'text-lg' : 'text-md', className];

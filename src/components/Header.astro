@@ -7,9 +7,10 @@ import Container from './ui/Container.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 
 /**
- * The bar: the mark, four destinations and one action, solid night at all times.
- * Below `lg` the destinations move into a full panel that opens as a circle from
- * the toggle (lib/site-header.ts sets `data-open` and `--nav-origin`).
+ * The bar: the mark, four destinations and one action, on the page's paper at all
+ * times; a hairline fades in once the page moves. Below `lg` the destinations move
+ * into a full panel that opens as a circle from the toggle (lib/site-header.ts sets
+ * `data-open` on the header and `--nav-origin`).
  */
 
 const links = nav.header.links;
@@ -22,24 +23,22 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
 
 <header
   id="header"
-  class="group/header surface-night fixed inset-x-0 top-0 z-40 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-line scroll-motion:after:animate-[fade-in_linear_both] scroll-motion:after:[animation-range:0_80px] scroll-motion:after:[animation-timeline:scroll(root_block)] print:hidden"
+  class="group/header fixed inset-x-0 top-0 z-40 bg-ground text-fg after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-line scroll-motion:after:animate-[fade-in_linear_both] scroll-motion:after:[animation-range:0_80px] scroll-motion:after:[animation-timeline:scroll(root_block)] print:hidden"
 >
   <Container class="flex min-h-header items-center gap-3 lg:gap-8">
     <a
       href="/"
       aria-label={`${site.siteName} – Startseite`}
-      class="group/logo flex min-w-0 items-center gap-3 rounded-control focus-visible:outline-offset-6"
+      class="group/logo flex min-w-0 items-center gap-3 rounded-control focus-visible:outline-offset-4"
     >
       <Icon
         name="logo"
         aria-hidden="true"
-        class="size-7.5 shrink-0 text-flame transition-transform duration-[420ms] ease-settle group-hover/logo:rotate-[22.5deg] sm:size-9"
+        class="size-8 shrink-0 text-flame transition-transform duration-500 ease-settle group-hover/logo:rotate-[22.5deg] sm:size-9"
       />
-      <span class="grid min-w-0 leading-[1.1]">
-        <span class="font-serif text-[0.9375rem] font-medium tracking-[-0.01em] min-[22.5rem]:text-lg sm:text-[1.3125rem]">
-          Männerkreis
-        </span>
-        <span class="truncate text-[0.625rem] font-semibold tracking-[0.1em] text-fg-muted uppercase sm:text-[0.6875rem] sm:tracking-[0.2em]">
+      <span class="grid min-w-0 leading-tight">
+        <span class="font-serif text-[1.0625rem] font-semibold sm:text-xl">Männerkreis</span>
+        <span class="truncate text-xs text-fg-muted">
           Niederbayern <span class="max-sm:hidden">· {site.geo.locality}</span>
         </span>
       </span>
@@ -50,36 +49,29 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       aria-label="Hauptnavigation"
       class:list={[
         'lg:mx-auto',
-        // Phone panel: the same ground as the bar, so bar and panel are one surface.
-        'max-lg:invisible max-lg:pointer-events-none max-lg:fixed max-lg:inset-x-0 max-lg:top-header max-lg:bottom-0 max-lg:flex max-lg:flex-col max-lg:gap-10 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:bg-surface max-lg:px-gutter max-lg:pt-4 max-lg:pb-10',
+        // Phone panel: the bar's paper, so bar and panel are one surface.
+        'max-lg:invisible max-lg:pointer-events-none max-lg:fixed max-lg:inset-x-0 max-lg:top-header max-lg:bottom-0 max-lg:flex max-lg:flex-col max-lg:gap-10 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:bg-ground max-lg:px-gutter max-lg:pt-4 max-lg:pb-10',
         'max-lg:group-data-[open]/header:visible max-lg:group-data-[open]/header:pointer-events-auto',
-        // Opening, in the order of a breath: a circle from the toggle, then each link
-        // rises out of its line. Closing runs back quickly. Reduced motion: a fade.
-        'max-lg:[--nav-origin:100%_0] max-lg:motion-safe:[clip-path:circle(0_at_var(--nav-origin))] max-lg:motion-safe:[transition:clip-path_380ms_var(--ease-precise),visibility_0s_linear_380ms]',
-        'max-lg:motion-safe:group-data-[open]/header:[clip-path:circle(150vmax_at_var(--nav-origin))] max-lg:motion-safe:group-data-[open]/header:[transition:clip-path_820ms_var(--ease-emphasised),visibility_0s]',
+        // A circle from the toggle, then each link rises; closing runs back quickly. Reduced motion: a fade.
+        'max-lg:[--nav-origin:100%_0] max-lg:motion-safe:[clip-path:circle(0_at_var(--nav-origin))] max-lg:motion-safe:[transition:clip-path_360ms_var(--ease-precise),visibility_0s_linear_360ms]',
+        'max-lg:motion-safe:group-data-[open]/header:[clip-path:circle(150vmax_at_var(--nav-origin))] max-lg:motion-safe:group-data-[open]/header:[transition:clip-path_720ms_var(--ease-emphasised),visibility_0s]',
         'max-lg:motion-reduce:opacity-0 max-lg:motion-reduce:group-data-[open]/header:opacity-100',
       ]}
     >
-      <ul
-        class="max-lg:border-t max-lg:border-line lg:flex lg:items-center lg:gap-[clamp(1rem,0.5rem+1.5vw,2.25rem)]"
-        role="list"
-      >
+      <ul class="max-lg:divide-y max-lg:divide-line lg:flex lg:items-center lg:gap-1" role="list">
         {links.map((link, i) => (
-          <li
-            class="max-lg:overflow-clip max-lg:border-b max-lg:border-line max-lg:[overflow-clip-margin:4px]"
-            style={`--i: ${i}`}
-          >
+          <li class="max-lg:overflow-clip max-lg:[overflow-clip-margin:4px]" style={`--i: ${i}`}>
             <a
               href={link.url}
               data-nav-link
               data-umami-event="nav-click"
               data-umami-event-target={link.umamiTarget}
               class:list={[
-                'relative flex min-h-11 items-center rounded-control font-medium text-fg',
-                'lg:text-base lg:after:absolute lg:after:inset-x-0 lg:after:bottom-2 lg:after:h-[1.5px] lg:after:origin-left lg:after:scale-x-0 lg:after:bg-accent lg:after:transition-transform lg:after:duration-[240ms] lg:hover:after:scale-x-100',
-                'max-lg:py-4 max-lg:font-serif max-lg:text-[clamp(2rem,1.4rem+3vw,2.75rem)] max-lg:leading-[1.1] max-lg:font-normal max-lg:tracking-[-0.02em]',
-                'max-lg:motion-safe:translate-y-[110%] max-lg:motion-safe:transition-transform max-lg:motion-safe:duration-[220ms] max-lg:motion-safe:ease-precise',
-                'max-lg:motion-safe:group-data-[open]/header:translate-y-0 max-lg:motion-safe:group-data-[open]/header:delay-[calc(200ms+var(--i)*80ms)] max-lg:motion-safe:group-data-[open]/header:duration-[760ms] max-lg:motion-safe:group-data-[open]/header:ease-emphasised',
+                'flex min-h-11 items-center rounded-full text-fg transition-colors duration-150',
+                'lg:px-4 lg:text-[0.9375rem] lg:font-semibold lg:text-fg-soft lg:hover:bg-fg/5 lg:hover:text-fg',
+                'max-lg:py-4 max-lg:font-serif max-lg:text-[clamp(1.75rem,1.3rem+2.4vw,2.25rem)] max-lg:font-medium',
+                'max-lg:motion-safe:translate-y-[110%] max-lg:motion-safe:transition-transform max-lg:motion-safe:duration-200',
+                'max-lg:motion-safe:group-data-[open]/header:translate-y-0 max-lg:motion-safe:group-data-[open]/header:delay-[calc(160ms+var(--i)*70ms)] max-lg:motion-safe:group-data-[open]/header:duration-700 max-lg:motion-safe:group-data-[open]/header:ease-emphasised',
               ]}
             >
               {link.label}
@@ -90,14 +82,14 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
 
       {/* Only inside the phone panel — the bar keeps four destinations and one action. */}
       <div class="mt-auto grid gap-8 lg:hidden motion-safe:translate-y-4 motion-safe:opacity-0 motion-safe:transition-[opacity,translate] motion-safe:duration-150 motion-safe:group-data-[open]/header:translate-y-0 motion-safe:group-data-[open]/header:opacity-100 motion-safe:group-data-[open]/header:delay-500 motion-safe:group-data-[open]/header:duration-700">
-        <ul class="flex flex-wrap gap-x-6 gap-y-2" role="list">
-          {[...ctaLinks, ...secondary].map((link) => (
+        <ul class="flex flex-wrap gap-2" role="list">
+          {[...ctaLinks, ...secondary].map((link, i) => (
             <li>
               <a
                 href={link.url}
                 data-nav-link
                 data-astro-prefetch={prefetchPaths.has(link.url) ? 'hover' : undefined}
-                class="inline-flex min-h-11 items-center text-base font-medium text-fg underline decoration-accent decoration-[1.5px] underline-offset-[0.3em]"
+                class={button({ variant: i === 0 ? 'primary' : 'secondary', size: 'sm' })}
               >
                 {link.label}
               </a>
@@ -106,17 +98,14 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         </ul>
 
         <div class="grid gap-1">
-          <p class="mb-1.5 text-xs font-bold tracking-label text-fg-muted uppercase">Fragen vorab?</p>
+          <p class="mb-1 text-sm font-semibold text-fg-muted">Fragen vorab?</p>
           {site.contactEmail && (
-            <a
-              href={`mailto:${site.contactEmail}`}
-              class="inline-flex min-h-11 items-center font-serif text-xl text-fg"
-            >
+            <a href={`mailto:${site.contactEmail}`} class="inline-flex min-h-11 items-center text-lg text-fg">
               {site.contactEmail}
             </a>
           )}
           {phoneHref && (
-            <a href={phoneHref} class="inline-flex min-h-11 items-center font-serif text-xl text-fg">
+            <a href={phoneHref} class="inline-flex min-h-11 items-center text-lg text-fg">
               {site.contactPhone}
             </a>
           )}
@@ -154,15 +143,15 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         aria-controls="nav"
         aria-expanded="false"
         aria-label="Menü öffnen"
-        class="grid size-12 place-items-center rounded-full border border-line-strong text-fg transition-colors duration-150 group-data-[open]/header:border-accent lg:hidden"
+        class="grid size-11 place-items-center rounded-full border border-line-strong text-fg transition-colors duration-150 group-data-[open]/header:border-accent lg:hidden"
       >
         <span
           aria-hidden="true"
-          class="flex flex-col items-center gap-[5px] group-data-[open]/header:rotate-90 motion-safe:transition-[rotate] motion-safe:duration-[560ms] motion-safe:ease-emphasised"
+          class="flex flex-col items-center gap-[5px] group-data-[open]/header:rotate-90 motion-safe:transition-[rotate] motion-safe:duration-500 motion-safe:ease-emphasised"
         >
-          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:translate-y-[6.5px] group-data-[open]/header:rotate-45 motion-safe:transition-transform motion-safe:duration-[460ms] motion-safe:ease-emphasised"></span>
+          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:translate-y-[6.5px] group-data-[open]/header:rotate-45 motion-safe:transition-transform motion-safe:duration-[420ms] motion-safe:ease-emphasised"></span>
           <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:scale-x-0 group-data-[open]/header:opacity-0 motion-safe:transition-[transform,opacity] motion-safe:duration-200"></span>
-          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:-translate-y-[6.5px] group-data-[open]/header:-rotate-45 motion-safe:transition-transform motion-safe:duration-[460ms] motion-safe:ease-emphasised"></span>
+          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:-translate-y-[6.5px] group-data-[open]/header:-rotate-45 motion-safe:transition-transform motion-safe:duration-[420ms] motion-safe:ease-emphasised"></span>
         </span>
       </button>
     </div>

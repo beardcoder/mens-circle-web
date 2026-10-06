@@ -1,9 +1,9 @@
 ---
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
-import Eyebrow from '../ui/Eyebrow.astro';
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
 import TextLink from '../ui/TextLink.astro';
 
 interface Props {
@@ -20,11 +20,7 @@ interface Props {
   };
 }
 
-/**
- * Markus, in his own words: a closer crop than the hero, his sentence, his role in
- * the circle. Wide: the portrait holds columns 1–5 while his words pass on the
- * right. Phones: the name first, then the portrait off-centre.
- */
+/** Markus, in his own words: a closer crop than the hero beside his sentence and his role in the circle. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
@@ -35,18 +31,17 @@ const photo = resolveAssetImage(data.image);
   id={anchor}
   labelledby="person-title"
   defer
-  innerClass="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-x-grid lg:gap-y-group"
+  innerClass="grid items-start gap-y-10 lg:grid-cols-12 lg:gap-x-grid"
 >
   {photo && (
-    <figure class="reveal w-[72%] max-lg:order-[-1] lg:sticky lg:top-[calc(var(--spacing-clearance)+1.5rem)] lg:col-span-5 lg:w-auto">
-      {/* The frame sits on a flame bar: the one orange stroke in this section. */}
-      <div class="aspect-4/5 overflow-clip rounded-control border-b-[6px] border-flame lg:aspect-3/4 [&_picture]:block [&_picture]:h-full">
+    <figure class="reveal max-w-md lg:sticky lg:top-[calc(var(--spacing-clearance)+1rem)] lg:col-span-5 lg:max-w-none">
+      <div class="aspect-4/5 overflow-clip rounded-card bg-ground-alt [&_picture]:block [&_picture]:h-full">
         <CropPicture
           src={photo}
           class="block size-full origin-[22%_34%] scale-[1.45] object-cover object-[12%_50%]"
-          breakpoint="56em"
-          narrow={{ ratio: 4 / 5, widths: [320, 480, 640], sizes: '72vw' }}
-          wide={{ ratio: 3 / 4, widths: [400, 600, 800], sizes: 'min(30rem, 34vw)' }}
+          breakpoint="60em"
+          narrow={{ ratio: 4 / 5, widths: [320, 480, 640], sizes: 'min(28rem, 90vw)' }}
+          wide={{ ratio: 4 / 5, widths: [400, 600, 800], sizes: 'min(30rem, 38vw)' }}
           loading="lazy"
           alt={data.imageAlt ?? ''}
         />
@@ -54,23 +49,16 @@ const photo = resolveAssetImage(data.image);
     </figure>
   )}
 
-  <div class="grid content-start gap-8 max-lg:contents lg:col-span-6 lg:col-start-7">
-    <div class="grid gap-5 max-lg:order-[-2]">
-      {data.eyebrow && <Eyebrow>{data.eyebrow}</Eyebrow>}
-      {data.name && (
-        <h2 id="person-title" class="text-display-1 text-fg lg:text-display-2">
-          {data.name}
-        </h2>
-      )}
-    </div>
+  <div class="grid content-start gap-8 lg:col-span-6 lg:col-start-7">
+    <SectionHead eyebrow={data.eyebrow} title={data.name} titleId="person-title" size="display-2" />
 
     {data.quote && (
-      <blockquote class="reveal max-w-[24ch] font-serif text-3xl leading-[1.2] text-balance text-accent italic lg:max-w-[30ch] lg:text-[clamp(2rem,1.4rem+1.1vw,2.375rem)]">
+      <blockquote class="reveal rounded-r-control border-l-3 border-accent bg-accent-soft px-6 py-5 font-serif text-2xl leading-snug text-fg italic">
         <p>{data.quote}</p>
       </blockquote>
     )}
 
-    {data.bio && <Prose html={data.bio} size="lg" class="reveal max-w-[36em]" />}
+    {data.bio && <Prose html={data.bio} size="lg" class="reveal" />}
 
     {data.linkLabel && data.linkUrl && (
       <p>

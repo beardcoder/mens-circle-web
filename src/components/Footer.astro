@@ -23,7 +23,7 @@ interface Props {
 
 const { close = true } = Astro.props;
 
-const heading = 'mb-3 font-sans text-xs font-semibold tracking-label text-fg-muted uppercase';
+const heading = 'mb-3 font-sans text-sm font-semibold text-fg-muted';
 const footerLink =
   'inline-flex min-h-11 items-center gap-2 text-base text-fg underline decoration-transparent decoration-[1.5px] underline-offset-[0.3em] transition-[text-decoration-color] duration-150 hover:decoration-accent focus-visible:decoration-accent sm:min-h-10';
 ---
@@ -32,7 +32,7 @@ const footerLink =
   <Container>
     {close && (
       <div class="flex flex-wrap items-end justify-between gap-x-12 gap-y-6 border-b border-line pt-section pb-group">
-        <p class="max-w-[14ch] font-serif text-display-2 text-fg">
+        <p class="max-w-[18ch] font-serif text-display-3 font-medium text-fg">
           Komm so, wie du <em class="text-accent not-italic">gerade</em> bist.
         </p>
         <Button
@@ -47,12 +47,7 @@ const footerLink =
       </div>
     )}
 
-    <div
-      class:list={[
-        'grid gap-10 py-group sm:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.2fr)]',
-        !close && 'border-t border-line',
-      ]}
-    >
+    <div class="grid gap-10 py-group sm:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1.2fr)]">
       <div class="max-w-[36ch] sm:col-span-2 xl:col-span-1">
         <a href="/" class="mb-4 inline-flex items-center gap-3 rounded-control font-serif text-xl font-medium">
           <Icon name="logo" aria-hidden="true" class="size-10 text-flame" />

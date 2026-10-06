@@ -3,11 +3,12 @@ import Container from './Container.astro';
 
 /**
  * A block of the page. Blocks are parted by their ground and by space, never by
- * drawn rules. Each ground re-declares the semantic colours (see `surface-*` in
+ * drawn rules: the page's paper, a stone band (`sand`) and at most one dark band
+ * (`night`) besides the footer. Each ground re-declares the semantic colours (see `surface-*` in
  * global.css), so everything inside follows it.
  */
 
-type Ground = 'default' | 'sand' | 'night' | 'flame';
+type Ground = 'default' | 'sand' | 'night';
 type Space = 'default' | 'compact' | 'none';
 
 interface Props {
@@ -29,7 +30,6 @@ const GROUNDS: Record<Ground, string> = {
   default: '',
   sand: 'surface-sand',
   night: 'surface-night',
-  flame: 'surface-flame',
 };
 
 const SPACES: Record<Space, string> = {

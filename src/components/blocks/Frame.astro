@@ -1,4 +1,5 @@
 ---
+import { card } from '@lib/ui';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
@@ -19,10 +20,7 @@ interface Props {
   };
 }
 
-/**
- * The agreements every evening starts with — unnumbered, none comes first, each
- * under its own hairline — and the one place that says what the circle is not.
- */
+/** The agreements every evening starts with, as equal cards, and the one note that says what the circle is not. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'rahmen';
@@ -30,17 +28,14 @@ const agreements = data.agreements ?? [];
 ---
 
 <Section id={anchor} ground="sand" labelledby="rahmen-title" defer>
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="rahmen-title" lead={data.intro} layout="split" />
+  <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="rahmen-title" lead={data.intro} size="display-2" />
 
   {agreements.length > 0 && (
-    <ul role="list" class="mt-group grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 sm:gap-y-group xl:grid-cols-4">
+    <ul role="list" class="mt-group grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {agreements.map((rule) => (
-        <li class="reveal @container grid content-start gap-2 border-t border-line-strong pt-6">
-          {/* Capped by the column: "Eigenverantwortung" is one word. */}
-          <h3 class="text-[length:min(var(--text-2xl),9.5cqi)] leading-[1.15] font-medium tracking-[-0.015em] text-fg">
-            {rule.title}
-          </h3>
-          <p class="text-md text-fg-soft">{rule.text}</p>
+        <li class:list={[card, 'reveal grid content-start gap-2 p-6']}>
+          <h3 class="text-xl text-fg hyphens-auto">{rule.title}</h3>
+          <p class="text-base text-fg-soft">{rule.text}</p>
         </li>
       ))}
     </ul>
@@ -49,12 +44,12 @@ const agreements = data.agreements ?? [];
   {data.boundaryText && (
     <aside
       aria-labelledby="rahmen-boundary-title"
-      class="reveal mt-group grid gap-x-grid gap-y-3 rounded-control border border-line-strong bg-ground p-6 sm:p-8 lg:grid-cols-12 lg:items-baseline"
+      class="reveal mt-6 grid gap-2 rounded-card border border-line-strong p-6 sm:p-8 lg:grid-cols-12 lg:gap-x-grid"
     >
-      <h3 id="rahmen-boundary-title" class="font-serif text-2xl text-fg italic lg:col-span-4">
+      <h3 id="rahmen-boundary-title" class="text-xl text-fg lg:col-span-4">
         {data.boundaryTitle ?? 'Gut zu wissen'}
       </h3>
-      <p class="max-w-[58ch] text-lg text-fg-soft lg:col-span-8">{data.boundaryText}</p>
+      <p class="max-w-measure text-base text-fg-soft lg:col-span-8">{data.boundaryText}</p>
     </aside>
   )}
 </Section>

@@ -1,7 +1,7 @@
 ---
 import type { EventDTO } from '@lib/types';
-import { formatDayMonthYearDE, formatWeekdayDE, timeRange } from '@lib/server/format';
 import { buildIcs, googleCalendarUrl, type CalendarEvent } from '@lib/server/ics';
+import { panel } from '@lib/ui';
 import Button from '../ui/Button.astro';
 import DefList from '../ui/DefList.astro';
 
@@ -9,7 +9,7 @@ interface Props {
   event: EventDTO;
 }
 
-/** The event's facts as a hairline definition list, and the way into a calendar (a native popover). */
+/** What to know about the event beyond its date, and the way into a calendar (a native popover). */
 
 const { event } = Astro.props;
 
@@ -26,9 +26,8 @@ const ics = buildIcs(calendarEvent);
 const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
 const googleHref = googleCalendarUrl(calendarEvent);
 
+// Date and time stand in the page's title and chips; the card says what to know beyond them.
 const rows = [
-  { label: 'Datum', value: `${formatWeekdayDE(event.event_date)}, ${formatDayMonthYearDE(event.event_date)}` },
-  { label: 'Uhrzeit', value: timeRange(event.start_time, event.end_time) },
   { label: 'Ort', value: event.location, note: 'Die genaue Adresse bekommst du mit der Anmeldebestätigung.' },
   {
     label: 'Plätze',
@@ -42,14 +41,14 @@ const rows = [
 ].filter((row) => Boolean(row.value));
 ---
 
-<div>
-  <h2 id="termin-fakten" class="mb-6 text-display-3 text-fg">
+<div class={panel}>
+  <h2 id="termin-fakten" class="mb-5 text-2xl text-fg">
     Der Termin
   </h2>
   <DefList rows={rows} />
 
   {ics && !event.is_past && (
-    <div class="mt-6">
+    <div class="mt-6 border-t border-line pt-6">
       <Button variant="secondary" popovertarget="calendar-modal" data-umami-event="calendar-open">
         <svg
           class="size-[1.15em] shrink-0"

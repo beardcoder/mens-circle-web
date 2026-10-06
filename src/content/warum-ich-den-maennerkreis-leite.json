@@ -81,7 +81,7 @@
       "data": {
         "eyebrow": "Einladung",
         "title": "Komm so, wie du gerade bist",
-        "content": "<p>Du musst nicht wissen, was dich erwartet, und du musst nicht besonders offen oder vorbereitet sein.</p><p>Komm als der Mann, der du gerade bist. Nicht perfekt. Nicht fertig. Aber ehrlich.</p><p><a class=\"link\" href=\"/\">Zurück zur Übersicht des Männerkreises</a></p>"
+        "content": "<p>Du musst nicht wissen, was dich erwartet, und du musst nicht besonders offen oder vorbereitet sein.</p><p>Komm als der Mann, der du gerade bist. Nicht perfekt. Nicht fertig. Aber ehrlich.</p><p><a href=\"/\">Zurück zur Übersicht des Männerkreises</a></p>"
       }
     },
     {
@@ -90,7 +90,7 @@
         "anchor": "faq",
         "eyebrow": "Häufige Fragen",
         "title": "Fragen zu mir und meiner Rolle",
-        "intro": "Die allgemeinen Fragen zum Kreis beantwortet die <a class=\"link\" href=\"/#faq\">Startseite</a>. Hier geht es um meine Rolle.",
+        "intro": "Die allgemeinen Fragen zum Kreis beantwortet die <a href=\"/#faq\">Startseite</a>. Hier geht es um meine Rolle.",
         "items": [
           {
             "question": "Muss ich Markus vorher kennen?",

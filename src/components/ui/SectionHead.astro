@@ -2,9 +2,9 @@
 import Eyebrow from './Eyebrow.astro';
 
 /**
- * Label, title and lead of a block. `stack` sets them one under the other;
- * `split` puts the title on columns 1–5 and the lead from column 7, level with
- * the title's first line. A phrase in `<em>` turns to the accent.
+ * Eyebrow, title and lead of a block, stacked above its content. `center` sets
+ * them on the middle axis (statements, closes). A phrase in `<em>` turns to the
+ * accent.
  */
 
 type Size = 'display-1' | 'display-2' | 'display-3';
@@ -16,11 +16,11 @@ interface Props {
   titleHtml?: boolean;
   titleId?: string;
   lead?: string;
+  /** The lead holds trusted HTML from the content files (e.g. a link). */
+  leadHtml?: boolean;
   as?: 'h1' | 'h2';
   size?: Size;
-  layout?: 'stack' | 'split';
-  /** The eyebrow's tone; `fg` on the flame field. */
-  tone?: 'muted' | 'fg';
+  align?: 'start' | 'center';
   /** The page opening animates in. */
   entrance?: boolean;
   class?: string;
@@ -38,29 +38,30 @@ const {
   titleHtml = false,
   titleId,
   lead,
+  leadHtml = false,
   as: Heading = 'h2',
-  size = 'display-2',
-  layout = 'stack',
-  tone = 'muted',
+  size = 'display-3',
+  align = 'start',
   entrance = false,
   class: className,
 } = Astro.props;
 
-const split = layout === 'split';
+const center = align === 'center';
+const leadClass = [
+  'max-w-measure text-lg text-fg-soft [&_a]:text-fg [&_a]:underline [&_a]:decoration-accent/60 [&_a]:decoration-[1.5px] [&_a]:underline-offset-[0.2em] [&_a:hover]:decoration-accent',
+  center && 'mx-auto',
+  entrance && 'entrance:animate-rise entrance:animate-delay-120',
+];
 const titleClass = [
-  'max-w-[17ch] font-serif text-fg wrap-break-word max-sm:hyphens-auto [&_em]:text-accent [&_em]:not-italic',
+  'max-w-[24ch] text-fg wrap-break-word max-sm:hyphens-auto [&_em]:text-accent [&_em]:not-italic',
   SIZES[size],
-  split && 'lg:col-span-5',
+  center && 'mx-auto',
   entrance && 'entrance:animate-rise entrance:animate-delay-60',
 ];
 ---
 
-<div class:list={['grid gap-5', split && 'lg:grid-cols-12 lg:gap-x-grid', className]}>
-  {eyebrow && (
-    <Eyebrow tone={tone} class:list={[split && 'lg:col-span-12', entrance && 'entrance:animate-rise']}>
-      {eyebrow}
-    </Eyebrow>
-  )}
+<div class:list={['grid gap-4', center && 'justify-items-center text-center', className]}>
+  {eyebrow && <Eyebrow class:list={[entrance && 'entrance:animate-rise']}>{eyebrow}</Eyebrow>}
   {title &&
     (titleHtml ? (
       <Heading id={titleId} class:list={titleClass} set:html={title} />
@@ -69,16 +70,6 @@ const titleClass = [
         {title}
       </Heading>
     ))}
-  {lead && (
-    <p
-      class:list={[
-        'max-w-[46ch] text-lg text-fg-soft',
-        split && 'lg:col-span-6 lg:col-start-7 lg:self-start lg:pt-[0.4em]',
-        entrance && 'entrance:animate-rise entrance:animate-delay-120',
-      ]}
-    >
-      {lead}
-    </p>
-  )}
+  {lead && (leadHtml ? <p class:list={leadClass} set:html={lead} /> : <p class:list={leadClass}>{lead}</p>)}
   <slot />
 </div>
