@@ -1,6 +1,7 @@
 # Design system
 
-"Abendlicht": warm, calm, approachable — a men's circle, not a poster. Everything
+"Abendlicht": warm, grounded, sturdy — a circle of men, firm and outdoorsy, never
+macho. Everything
 visual is Tailwind CSS v4 utilities on top of the tokens in `src/styles/theme.css`.
 There are no component stylesheets.
 
@@ -36,16 +37,18 @@ Every text token holds at least 4.5:1 on every ground, `line-bold` at least 3:1.
 
 **Surfaces** (`surface-sand`, `surface-night`, via `<Section ground>`) re-declare the
 semantic colours, so text, hairlines, buttons, focus rings and inputs inside follow
-the ground. `sand` is the stone band for quiet passages; `night` is the one dark band
-mid page (the statement) and the footer.
+the ground. `sand` is the stone band for quiet passages; `night` is the dark band of
+the statement and the home page's close, and the footer. Dark bands carry
+`Contours` (contour lines of the hill country, the accent at 20%).
 
-**Type.** `font-serif` (Fraunces) speaks: headings at weight 500 in sentence case, its
-italic for questions and quotes. `font-sans` (Instrument Sans) explains: text, UI,
-buttons. Reading sizes `text-xs`, `sm` (captions, labels), `base` (compact text,
+**Type.** `font-serif` (Fraunces) speaks: headings and serif lines at weight 600 in
+sentence case, its italic (400) for questions and quotes. `font-sans` (Instrument
+Sans) explains: text, UI. Reading sizes `text-xs`, `sm` (captions, labels), `base` (compact text,
 controls), `md` (reading), `lg` (leads), `xl`, `2xl` (card titles); titles
-`text-display-1` (the home sentence only), `display-2` (page titles, large section
-titles), `display-3` (section titles, the default of `SectionHead`). Small capitals
-labels (`DefList` terms, the admin) use `tracking-label`.
+`text-display-1` (the home sentence and the statement), `display-2` (page titles,
+large section titles), `display-3` (section titles, the default of `SectionHead`).
+Labels are bold capitals with `tracking-label` (0.12em): eyebrows, buttons, list and
+fact terms, "Nächster Termin".
 
 **Space.** The rhythm `section` > `group` > `item`, plus `gutter` (container sides),
 `grid` (column gap), `header` (the 72px bar) and `clearance` (anchor offset and sticky
@@ -55,9 +58,12 @@ line).
 **Breakpoints.** `sm` 36rem, `md` 48rem, `lg` 60rem (columns side by side, the desktop
 navigation), `xl` 72rem, `2xl` 100rem (root size 18px).
 
-**Shape.** `rounded-control` (12px) on controls, `rounded-card` (20px) on cards and
-panels, `rounded-full` for buttons, chips, seats and icon buttons. `shadow-card` on
-cards, `shadow-overlay` on popovers and the phone menu.
+**Shape.** Firm: `rounded-control` (3px) on controls, buttons and chips,
+`rounded-card` (4px) on cards and panels; `rounded-full` only for seats and round icon
+buttons. Cards are flat with a solid `line-strong` border; `shadow-overlay` only on
+popovers and the phone menu. Heavy rules mark beginnings: Ablauf steps and facts under
+a 2–3px `fg` rule, a 4px accent bar on top of the date cards, a 4px accent rule left
+of quotes.
 
 **Motion.** `entrance:` (one-time entrances: motion allowed and not after a view
 transition), `scroll-motion:` (scroll-driven, where timelines exist), `reveal`
@@ -75,16 +81,17 @@ rests under `prefers-reduced-motion`.
 | `Split` (`head` slot, `sticky`)                   | Head on columns 1–4, content on 6–12 from `lg`; stacked below           |
 | `SectionHead` (`size`, `align`, `leadHtml`, …)    | Eyebrow, title, lead                                                    |
 | `PageOpening`                                     | The opening of a sub-page                                               |
-| `Eyebrow`                                         | A small accent line with a dot                                          |
+| `Eyebrow`                                         | Bold accent capitals behind a short bar                                 |
 | `Button` (`variant`, `size`, `block`, `decorate`) | Link or button; the primary carries an arrow (`data-label` on its text) |
 | `TextLink`                                        | Quiet link with a moving arrow beside a primary action                  |
 | `Prose`                                           | Rich text from the content files                                        |
 | `Field`                                           | Label, control, hint and the error slot lib/form.ts fills               |
 | `DefList`, `LinkList`, `Quote`, `Badge`           | Facts, where-next rows, a participant's words, a status chip            |
 | `SeatCircle`, `Breath`                            | The circle's mark (seats taken/open); a breathing circle to follow      |
+| `Contours`                                        | Contour lines behind a dark band's content                              |
 
-Cards (`card`, `panel`) are for self-contained units — the date, steps, agreements,
-voices, forms, questions — never for running text.
+Cards (`card`, `panel`) are for self-contained units — the date, agreements, voices,
+forms, questions — never for running text.
 
 ## Rules
 

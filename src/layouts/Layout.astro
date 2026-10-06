@@ -51,8 +51,8 @@ const props = Astro.props;
         }
       })();
     </script>
-    {/* Preload the serif headline weight (500) — the hero sentence is the LCP. Config in astro.config.mjs. */}
-    <Font cssVariable="--font-fraunces" preload={[{ weight: '500', style: 'normal' }]} />
+    {/* Preload the serif headline weight (600) — the hero sentence is the LCP. Config in astro.config.mjs. */}
+    <Font cssVariable="--font-fraunces" preload={[{ weight: '600', style: 'normal' }]} />
     {/* And the sans at the two weights of the first screen: text (400) and the
         navigation, buttons and card lines (600). A late swap rewraps them. */}
     <Font

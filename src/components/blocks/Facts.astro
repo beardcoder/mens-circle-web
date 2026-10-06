@@ -1,7 +1,7 @@
 ---
 import site from '@data/site.json';
 import { type NextEventSummary, summarizeNextEvent } from '@lib/event-status';
-import { card } from '@lib/ui';
+import { caps, card } from '@lib/ui';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -53,9 +53,9 @@ const band = variant === 'band';
     </Eyebrow>
     <dl class="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
       {facts.map((fact) => (
-        <div class="grid content-start gap-1">
-          <dt class="text-sm text-fg-muted">{fact.label}</dt>
-          <dd class="font-serif text-xl font-medium text-fg">{fact.value}</dd>
+        <div class="grid content-start gap-1 border-t-2 border-fg pt-4">
+          <dt class={`${caps} text-fg-muted`}>{fact.label}</dt>
+          <dd class="font-serif text-xl font-semibold text-fg">{fact.value}</dd>
           <dd class="text-sm text-fg-muted">{fact.sub}</dd>
         </div>
       ))}
@@ -67,8 +67,8 @@ const band = variant === 'band';
     <dl class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {facts.map((fact) => (
         <div class:list={[card, 'reveal grid content-start gap-1 p-6']}>
-          <dt class="text-sm text-fg-muted">{fact.label}</dt>
-          <dd class="font-serif text-xl font-medium text-fg">{fact.value}</dd>
+          <dt class={`${caps} text-fg-muted`}>{fact.label}</dt>
+          <dd class="font-serif text-xl font-semibold text-fg">{fact.value}</dd>
           <dd class="mt-1 text-sm text-fg-muted">{fact.sub}</dd>
         </div>
       ))}
