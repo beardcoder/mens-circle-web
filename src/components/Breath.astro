@@ -2,71 +2,38 @@
 interface Props {
   /** Rings and glow, or only the glow (for grounds where rings would cross text). */
   variant?: 'rings' | 'glow';
+  /** A light glow on the flame field instead of the accent. */
+  light?: boolean;
+  /** Placement and size from the caller. */
   class?: string;
 }
 
 /**
  * A background that breathes: a soft radial glow and, optionally, concentric
- * rings that widen and narrow on a calm breathing cycle (see `breathe` in
- * base/_keyframes.css: 4 s in, a short hold, 5 s out, a short rest — six breaths
- * a minute). Decorative only; place it where it never sits behind running text.
- * Under reduced motion it rests, still.
+ * rings that widen and narrow on a calm breathing cycle (`breathe` in
+ * global.css: 4 s in, a short hold, 5 s out, a short rest — six breaths a
+ * minute). Decorative only; never behind running text. Under reduced motion it
+ * rests, still.
  */
 
-const { variant = 'rings', class: className } = Astro.props;
+const { variant = 'rings', light = false, class: className } = Astro.props;
 const rings = variant === 'rings' ? [0.7, 0.84, 0.98] : [];
 ---
 
-<span class:list={['breath', `breath--${variant}`, className]} aria-hidden="true" data-breath>
-  <span class="breath__glow"></span>
+<span class:list={['pointer-events-none absolute block aspect-square', className]} aria-hidden="true" data-breath>
+  {/* Warm at the centre, gone at the edge — embers rather than a spotlight. */}
+  <span
+    class:list={[
+      'absolute inset-0 animate-breathe rounded-full [--alpha:1] [--rest:0.82]',
+      light
+        ? 'bg-[radial-gradient(closest-side,rgb(255_244_230/34%),rgb(255_244_230/14%)_55%,transparent)]'
+        : 'bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-accent)_22%,transparent),color-mix(in_oklab,var(--color-accent)_9%,transparent)_55%,transparent)]',
+    ]}
+  ></span>
   {rings.map((size, i) => (
     <span
-      class="breath__ring"
+      class="absolute inset-[calc((1-var(--size))*50%)] animate-breathe animate-delay-[var(--lag)] rounded-full border border-accent [--rest:0.9]"
       style={`--size: ${size}; --alpha: ${(0.55 - i * 0.15).toFixed(2)}; --lag: ${i * 120}ms`}
-    ></span>
+    />
   ))}
 </span>
-
-<style is:global>
-  @layer components {
-    .breath {
-      --breath-color: var(--accent);
-      --breath-glow: 22%;
-      --breath-cycle: 10s;
-
-      position: absolute;
-      display: block;
-      aspect-ratio: 1;
-      pointer-events: none;
-    }
-
-    .breath__glow,
-    .breath__ring {
-      position: absolute;
-      border-radius: 50%;
-      animation: breathe var(--breath-cycle) infinite both;
-    }
-
-    /* Warm at the centre, gone at the edge — embers rather than a spotlight. */
-    .breath__glow {
-      --alpha: 1;
-      --rest: 0.82;
-
-      inset: 0;
-      background: radial-gradient(
-        closest-side,
-        color-mix(in oklab, var(--breath-color) var(--breath-glow), transparent),
-        color-mix(in oklab, var(--breath-color) calc(var(--breath-glow) * 0.4), transparent) 55%,
-        transparent
-      );
-    }
-
-    .breath__ring {
-      --rest: 0.9;
-
-      inset: calc((1 - var(--size)) * 50%);
-      border: 1px solid var(--breath-color);
-      animation-delay: var(--lag);
-    }
-  }
-</style>

@@ -1,7 +1,7 @@
 # CLAUDE.md
 
-Website for the Männerkreis. Astro 7 (no UI framework), SSR on the Bun runtime,
-Drizzle on `bun:sqlite`, email via external listmonk, admin sign-in via Pocket ID.
+Website for the Männerkreis. Astro 7 (no UI framework), Tailwind CSS v4, SSR on the Bun
+runtime, Drizzle on `bun:sqlite`, email via external listmonk, admin sign-in via Pocket ID.
 Code, comments and docs are English; user-facing content is German.
 Commit messages are English too, in Conventional Commits form (`fix(seo): …`).
 
@@ -88,30 +88,43 @@ template reads a `.Tx.Data` field its payload does not send. The templates load 
 mail mark from `/images/logo-flame.png` by URL, so keep that file.
 
 **Map.** Leaflet on keyless OSM France HOT tiles (`TILE_URL`); keep the attribution.
+Leaflet's stylesheet sits in the `vendor` layer (`styles/leaflet.css`, declared first in
+`global.css`), so the utilities on the map root win over it.
+
+**Styling.** Tailwind v4 (`@tailwindcss/vite`), CSS-first. `styles/theme.css` holds the
+tokens, variants, surfaces and keyframes; `global.css` (public, inlined into every page)
+and `admin.css` are the two entries, and `global.css` keeps the admin sources out with
+`@source not`. No `<style>` blocks and no component stylesheets: utilities in the
+markup, recipes in `lib/ui.ts`, components in `components/ui/`. `docs/design-system.md`
+is the reference. Class strings are complete and static; never add a class that sets a
+property the component already sets (add a prop). Scripts hook onto `data-*`
+attributes, never onto styling classes; states are `data-*` too (`data-open`,
+`data-state`, `data-tone`).
 
 ## Design
 
-- "Feuerstelle", set like the flyer: warm, earthy, direct. Fraunces (a soft, warm
-  old-style serif with an organic wobble) speaks: headlines at its regular weight
-  (`--weight-display`, 400), set large, in sentence case; small serif lines (h3–h5,
-  names, terms) take 500 (`--weight-display-small`). Its italic is the quiet voice
-  for questions and quotes (`.quote-voice`, `--font-quote`). Instrument Sans explains: text, UI, buttons and the date line.
+- "Feuerstelle", set like the flyer: warm, earthy, direct. Fraunces (`font-serif`, a
+  soft, warm old-style serif with an organic wobble) speaks: headlines at its regular
+  weight (400), set large, in sentence case; small serif lines (h3–h5, names, terms)
+  take 500. Its italic is the quiet voice for questions and quotes. Instrument Sans
+  (`font-sans`) explains: text, UI, buttons and the date line. The admin uses the same
+  two faces.
   A single long word is capped by its column (`cqi`: hero and page titles, step
   titles, facts, frame terms, "Dabei sein.", "Anmeldung"), never left to overflow.
   A dash in running copy is bound to the word before it (`\u00a0–`), so no line
-  starts with one. Capitals
-  for wide-spaced labels (`.marker`), the date line (`.date-line`: bold orange
-  capitals) and the one poster slogan (`.display--heavy`). Figures are lining.
-  Barlow is loaded for the admin only.
+  starts with one. Capitals for wide-spaced labels (`Eyebrow`), the date line (bold
+  orange sans capitals) and the one poster slogan (the Statement block). Figures are
+  lining.
 - Colours: cream `#F4EDE1`, night `#151210`, flame `#E4632E` (5.4:1 on night; on cream
   only as fill or stroke), rust `#A84A2A` (4.9:1, the accent and button on cream).
   Grounds: night for the header, hero, Termine and footer; one flame field per page
   (night text on it); sand for quiet passages.
-- Surfaces (`.surface-sand|bark|night|flame|rust`) re-declare `--text-*`, `--accent`,
-  `--on-accent`, `--border-*`, `--surface`; a shared `:where()` block re-declares the
-  aliases that `:root` defines in terms of them (control colours, `--focus-ring`,
-  `--accent-*`). Without it inputs and focus rings keep the page's colours. Surfaces
-  keep the page's color-scheme, so their `light-dark()` grounds follow the mode.
+- Colours are semantic tokens (`ground`, `surface`, `fg`, `fg-soft`, `fg-muted`,
+  `accent`, `line`, …); no hex in markup. Surfaces (`surface-sand|night|flame`, via
+  `<Section ground>`) re-declare the semantic colours, so text, hairlines, buttons,
+  focus rings and inputs inside follow the ground. Utilities read the tokens directly,
+  so there are no alias tokens to re-declare. Surfaces keep the page's color-scheme, so
+  their `light-dark()` grounds follow the mode.
 - The mark is the original brush-stroke logo (`src/icons/logo.svg`, header and footer).
   `SeatCircle.astro` (hairline ring with seats) frames the round hero photo, sits in the
   middle of the questions and counts an event's seats (taken/open); keep clear space for
@@ -129,25 +142,29 @@ mail mark from `/images/logo-flame.png` by URL, so keep that file.
   titles take `--display-2`, essays and rail titles `--display-3`. Phones get their
   own order (sentence first, then the round photo breaking out to the right, then
   the reading and the date), stack every block left-aligned, and keep boxes on the
-  page's edges (no bleed). Never reuse desktop `grid-area` names in a stacked grid
-  without resetting them. The `> 56em` token block in `_variables.css` raises the
-  headlines, steps the reading down and widens gutters and section rhythm.
-- Vertical rhythm: `--rhythm-section` > `group` > `item` > `tight`; never inverted.
+  page's edges (no bleed). `Split` is the split line, `SectionHead layout="split"` the
+  title beside its lead; blocks place themselves with `lg:col-*` and, on phones, DOM
+  order. The `width >= 56rem` block in `theme.css` widens gutters and section rhythm;
+  the display sizes are fluid tokens (`text-display-1|2|3`).
+- Vertical rhythm: `section` > `group` > `item` (spacing tokens: `py-section`,
+  `mt-group`, …); never inverted.
   Lift reserving `min-block-size` once columns stack or an island swaps in.
-- Radius `--radius` (3px) on controls and panels; full circles only for seats and the
+- Radius `rounded-control` (3px) on controls and panels; full circles only for seats and the
   round icon buttons. Capital lines keep `line-height` ≥ 1 for umlaut dots.
 - The header is solid night at all times (nothing scrolls visibly beneath it); its
   hairline fades in on scroll. No progress bar, no numbers in the navigation.
 - Motion: hero entrance (words, photo opening, seats), scroll-driven reveals
-  (`[data-reveal]`, view() only, no JS, nothing hidden without timeline support), the
-  hero ring's turn, statement settle, reading progress, and the phone menu: it opens
-  as a circle from the toggle (`--nav-origin`, set by `lib/site-header.ts`), its
-  hairlines draw in and each link rises out of its line; closing runs back quickly.
-  Under reduced motion it only fades.
+  (`reveal`, view() only, no JS, nothing hidden without timeline support), the hero
+  ring's turn, statement settle, and the phone menu: it opens as a circle from the
+  toggle (`--nav-origin`, set by `lib/site-header.ts`), then each link rises out of
+  its line; closing runs back quickly. Under reduced motion it
+  only fades. Motion variants: `entrance:` (one-time, never after a view transition),
+  `scroll-motion:` and `reveal` (scroll-driven), `animate-delay-*` (through the
+  non-inheriting `--delay`).
 - No enumerations: nothing on the public pages is numbered or bulleted (Ablauf,
   agreements, positions, register). Steps are told by placement (the Ablauf steps
   stand level, each on a hairline with a seat where it begins), roles and how-tos are written as sentences.
-- The hero breathes (`BreathField.astro`, keyframes `breath-swell` and `breath-drift`):
+- The hero breathes (`BreathField.astro`, keyframes `breath-swell` and `breath-drift` in `theme.css`):
   three soft warm fields (flame, deep rust, amber; eased radial gradients, no blur, a
   still grain against banding) widen unevenly and shift a little on a 31 s phrase of
   three breaths — in shorter than out, a short rest, depth varying — while each turns
@@ -163,8 +180,8 @@ mail mark from `/images/logo-flame.png` by URL, so keep that file.
   circle to breathe along. Glows stay faint enough that every contrast holds.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
-- Block styles live in the component (`<style is:global>` in `@layer sections`), since
-  CSS is inlined per page.
+- Styles live in the component's markup as utilities. `global.css` is inlined into every
+  public page (`inlineStylesheets: 'always'`), so keep one-off arbitrary values few.
 
 ## Conventions
 

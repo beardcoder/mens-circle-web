@@ -1,6 +1,7 @@
 // @ts-check
 
 import sitemap from '@astrojs/sitemap';
+import tailwindcss from '@tailwindcss/vite';
 import bun, { bunImageService } from '@mens-circle/astro-bun';
 import icon from 'astro-icon';
 import llms from 'astro-llms-md';
@@ -34,6 +35,8 @@ export default defineConfig({
     endpoint: { entrypoint: './src/lib/disabled-image-endpoint.ts', route: '/_image' },
   },
   vite: {
+    // Tailwind v4: the theme lives in src/styles/global.css (CSS-first).
+    plugins: [tailwindcss()],
     // Bundle everything for the build only; in dev, CommonJS deps break Vite's module runner.
     ssr: { noExternal: process.argv.includes('build') || undefined, external: ['bun:sqlite'] },
     optimizeDeps: { exclude: ['bun:sqlite'] },
@@ -63,12 +66,13 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   fonts: [
-    // Public site: Fraunces — a soft, warm old-style serif with an organic
-    // wobble — for the headlines (regular, large; 500 for small serif lines) and
-    // the quiet lines (italic); Instrument Sans for text, UI and the date line.
+    // Fraunces — a soft, warm old-style serif with an organic wobble — speaks:
+    // headlines (regular, large; 500 for small serif lines) and the quiet lines
+    // (italic). Instrument Sans explains: text, UI and the date line. The admin
+    // uses the same two. Tailwind maps them to `font-serif` and `font-sans`.
     {
       name: 'Instrument Sans',
-      cssVariable: '--font-sans',
+      cssVariable: '--font-instrument',
       provider: fontProviders.fontsource(),
       weights: ['400', '500', '600', '700'],
       styles: ['normal'],
@@ -77,31 +81,12 @@ export default defineConfig({
     },
     {
       name: 'Fraunces',
-      cssVariable: '--font-serif',
+      cssVariable: '--font-fraunces',
       provider: fontProviders.fontsource(),
       weights: ['400', '500'],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
-    },
-    // Admin only (AdminLayout.astro).
-    {
-      name: 'Barlow Condensed',
-      cssVariable: '--font-condensed',
-      provider: fontProviders.fontsource(),
-      weights: ['600', '800'],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['Oswald', 'Arial Narrow', 'system-ui', 'sans-serif'],
-    },
-    {
-      name: 'Barlow',
-      cssVariable: '--font-text',
-      provider: fontProviders.fontsource(),
-      weights: ['400', '600'],
-      styles: ['normal', 'italic'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
     },
   ],
   integrations: [
@@ -129,8 +114,8 @@ export default defineConfig({
         'form',
         "[aria-hidden='true']",
         '[hidden]',
-        '.home-live-event',
-        '.testimonials-section',
+        // Live islands (the next date, the voices): their text changes after the build.
+        '[data-llms-skip]',
       ],
       // event/health: v3 would fetch these SSR routes from the live site at build time.
       exclude: ['admin/**', 'auth/**', 'impressum/**', 'datenschutz/**', 'teile-deine-erfahrung/**', 'event', 'health'],

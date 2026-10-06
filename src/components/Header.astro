@@ -2,9 +2,15 @@
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
 import { Icon } from 'astro-icon/components';
+import { button } from '@lib/ui';
+import Container from './ui/Container.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 
-/** A wordmark, three destinations and one action; on phones a full panel. */
+/**
+ * The bar: the mark, four destinations and one action, solid night at all times.
+ * Below `lg` the destinations move into a full panel that opens as a circle from
+ * the toggle (lib/site-header.ts sets `data-open` and `--nav-origin`).
+ */
 
 const links = nav.header.links;
 const ctaLinks = nav.header.cta;
@@ -14,45 +20,84 @@ const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
 const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]/g, '')}` : null;
 ---
 
-<header class="header surface-night" id="header">
-  <div class="container header__inner">
-    <a href="/" class="header__logo logo" aria-label={`${site.siteName} – Startseite`}>
-      <Icon name="logo" class="logo__mark" aria-hidden="true" />
-      <span class="logo__text">
-        <span class="logo__name">Männerkreis</span>
-        <span class="logo__place">
-          Niederbayern <span class="logo__region">· {site.geo.locality}</span>
+<header
+  id="header"
+  class="group/header surface-night fixed inset-x-0 top-0 z-40 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-line scroll-motion:after:animate-[fade-in_linear_both] scroll-motion:after:[animation-range:0_80px] scroll-motion:after:[animation-timeline:scroll(root_block)] print:hidden"
+>
+  <Container class="flex min-h-header items-center gap-3 lg:gap-8">
+    <a
+      href="/"
+      aria-label={`${site.siteName} – Startseite`}
+      class="group/logo flex min-w-0 items-center gap-3 rounded-control focus-visible:outline-offset-6"
+    >
+      <Icon
+        name="logo"
+        aria-hidden="true"
+        class="size-7.5 shrink-0 text-flame transition-transform duration-[420ms] ease-settle group-hover/logo:rotate-[22.5deg] sm:size-9"
+      />
+      <span class="grid min-w-0 leading-[1.1]">
+        <span class="font-serif text-[0.9375rem] font-medium tracking-[-0.01em] min-[22.5rem]:text-lg sm:text-[1.3125rem]">
+          Männerkreis
+        </span>
+        <span class="truncate text-[0.625rem] font-semibold tracking-[0.1em] text-fg-muted uppercase sm:text-[0.6875rem] sm:tracking-[0.2em]">
+          Niederbayern <span class="max-sm:hidden">· {site.geo.locality}</span>
         </span>
       </span>
     </a>
 
-    <nav class="nav" id="nav" aria-label="Hauptnavigation">
-      <ol class="nav__list">
+    <nav
+      id="nav"
+      aria-label="Hauptnavigation"
+      class:list={[
+        'lg:mx-auto',
+        // Phone panel: the same ground as the bar, so bar and panel are one surface.
+        'max-lg:invisible max-lg:pointer-events-none max-lg:fixed max-lg:inset-x-0 max-lg:top-header max-lg:bottom-0 max-lg:flex max-lg:flex-col max-lg:gap-10 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:bg-surface max-lg:px-gutter max-lg:pt-4 max-lg:pb-10',
+        'max-lg:group-data-[open]/header:visible max-lg:group-data-[open]/header:pointer-events-auto',
+        // Opening, in the order of a breath: a circle from the toggle, then each link
+        // rises out of its line. Closing runs back quickly. Reduced motion: a fade.
+        'max-lg:[--nav-origin:100%_0] max-lg:motion-safe:[clip-path:circle(0_at_var(--nav-origin))] max-lg:motion-safe:[transition:clip-path_380ms_var(--ease-precise),visibility_0s_linear_380ms]',
+        'max-lg:motion-safe:group-data-[open]/header:[clip-path:circle(150vmax_at_var(--nav-origin))] max-lg:motion-safe:group-data-[open]/header:[transition:clip-path_820ms_var(--ease-emphasised),visibility_0s]',
+        'max-lg:motion-reduce:opacity-0 max-lg:motion-reduce:group-data-[open]/header:opacity-100',
+      ]}
+    >
+      <ul
+        class="max-lg:border-t max-lg:border-line lg:flex lg:items-center lg:gap-[clamp(1rem,0.5rem+1.5vw,2.25rem)]"
+        role="list"
+      >
         {links.map((link, i) => (
-          <li class="nav__item" style={`--i: ${i}`}>
+          <li
+            class="max-lg:overflow-clip max-lg:border-b max-lg:border-line max-lg:[overflow-clip-margin:4px]"
+            style={`--i: ${i}`}
+          >
             <a
               href={link.url}
-              class="nav__link"
               data-nav-link
               data-umami-event="nav-click"
               data-umami-event-target={link.umamiTarget}
+              class:list={[
+                'relative flex min-h-11 items-center rounded-control font-medium text-fg',
+                'lg:text-base lg:after:absolute lg:after:inset-x-0 lg:after:bottom-2 lg:after:h-[1.5px] lg:after:origin-left lg:after:scale-x-0 lg:after:bg-accent lg:after:transition-transform lg:after:duration-[240ms] lg:hover:after:scale-x-100',
+                'max-lg:py-4 max-lg:font-serif max-lg:text-[clamp(2rem,1.4rem+3vw,2.75rem)] max-lg:leading-[1.1] max-lg:font-normal max-lg:tracking-[-0.02em]',
+                'max-lg:motion-safe:translate-y-[110%] max-lg:motion-safe:transition-transform max-lg:motion-safe:duration-[220ms] max-lg:motion-safe:ease-precise',
+                'max-lg:motion-safe:group-data-[open]/header:translate-y-0 max-lg:motion-safe:group-data-[open]/header:delay-[calc(200ms+var(--i)*80ms)] max-lg:motion-safe:group-data-[open]/header:duration-[760ms] max-lg:motion-safe:group-data-[open]/header:ease-emphasised',
+              ]}
             >
               {link.label}
             </a>
           </li>
         ))}
-      </ol>
+      </ul>
 
-      {/* Only rendered inside the mobile panel — the bar keeps three items. */}
-      <div class="nav__panel-extra">
-        <ul class="nav__secondary">
+      {/* Only inside the phone panel — the bar keeps four destinations and one action. */}
+      <div class="mt-auto grid gap-8 lg:hidden motion-safe:translate-y-4 motion-safe:opacity-0 motion-safe:transition-[opacity,translate] motion-safe:duration-150 motion-safe:group-data-[open]/header:translate-y-0 motion-safe:group-data-[open]/header:opacity-100 motion-safe:group-data-[open]/header:delay-500 motion-safe:group-data-[open]/header:duration-700">
+        <ul class="flex flex-wrap gap-x-6 gap-y-2" role="list">
           {[...ctaLinks, ...secondary].map((link) => (
             <li>
               <a
                 href={link.url}
-                class="nav__secondary-link"
                 data-nav-link
                 data-astro-prefetch={prefetchPaths.has(link.url) ? 'hover' : undefined}
+                class="inline-flex min-h-11 items-center text-base font-medium text-fg underline decoration-accent decoration-[1.5px] underline-offset-[0.3em]"
               >
                 {link.label}
               </a>
@@ -60,676 +105,66 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
           ))}
         </ul>
 
-        <div class="nav__contact">
-          <p class="marker">Fragen vorab?</p>
-          {site.contactEmail && <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>}
-          {phoneHref && <a href={phoneHref}>{site.contactPhone}</a>}
+        <div class="grid gap-1">
+          <p class="mb-1.5 text-xs font-bold tracking-label text-fg-muted uppercase">Fragen vorab?</p>
+          {site.contactEmail && (
+            <a
+              href={`mailto:${site.contactEmail}`}
+              class="inline-flex min-h-11 items-center font-serif text-xl text-fg"
+            >
+              {site.contactEmail}
+            </a>
+          )}
+          {phoneHref && (
+            <a href={phoneHref} class="inline-flex min-h-11 items-center font-serif text-xl text-fg">
+              {site.contactPhone}
+            </a>
+          )}
         </div>
 
-        <div class="nav__footer">
-          <span class="nav__footer-label">Darstellung</span>
-          <ThemeSwitch class="theme-switch--nav" />
+        <div class="flex items-center justify-between border-t border-line pt-4">
+          <span class="text-sm text-fg-muted">Darstellung</span>
+          <ThemeSwitch outlined />
         </div>
       </div>
     </nav>
 
-    <div class="header__actions">
-      <ThemeSwitch class="theme-switch--bar" />
+    <div class="ml-auto flex items-center gap-2 lg:ml-0">
+      <ThemeSwitch class="max-lg:hidden" />
 
       {ctaLinks.map((link) => (
         <a
           href={link.url}
-          class="btn btn--primary nav__cta"
           data-nav-link
           data-umami-event="cta-click"
           data-umami-event-location="header"
           data-umami-event-target={link.umamiTarget}
+          class:list={[
+            button({ variant: 'primary', size: 'sm' }),
+            'whitespace-nowrap max-lg:group-data-[open]/header:hidden',
+          ]}
         >
           {link.label}
         </a>
       ))}
 
       <button
-        class="nav-toggle"
         id="navToggle"
         type="button"
         aria-controls="nav"
         aria-expanded="false"
         aria-label="Menü öffnen"
+        class="grid size-12 place-items-center rounded-full border border-line-strong text-fg transition-colors duration-150 group-data-[open]/header:border-accent lg:hidden"
       >
-        <span class="nav-toggle__bars" aria-hidden="true">
-          <span class="nav-toggle__bar"></span>
-          <span class="nav-toggle__bar"></span>
-          <span class="nav-toggle__bar"></span>
+        <span
+          aria-hidden="true"
+          class="flex flex-col items-center gap-[5px] group-data-[open]/header:rotate-90 motion-safe:transition-[rotate] motion-safe:duration-[560ms] motion-safe:ease-emphasised"
+        >
+          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:translate-y-[6.5px] group-data-[open]/header:rotate-45 motion-safe:transition-transform motion-safe:duration-[460ms] motion-safe:ease-emphasised"></span>
+          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:scale-x-0 group-data-[open]/header:opacity-0 motion-safe:transition-[transform,opacity] motion-safe:duration-200"></span>
+          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:-translate-y-[6.5px] group-data-[open]/header:-rotate-45 motion-safe:transition-transform motion-safe:duration-[460ms] motion-safe:ease-emphasised"></span>
         </span>
       </button>
     </div>
-  </div>
+  </Container>
 </header>
-
-<style is:global>
-  @layer components {
-    .header {
-      position: fixed;
-      inset-block-start: 0;
-      inset-inline: 0;
-      z-index: var(--z-header);
-      color: var(--text-primary);
-    }
-
-    /* The bar's ground: the flyer's near-black, solid from the first pixel, so
-       nothing ever shows through it while the page scrolls underneath. */
-    .header::before {
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      content: '';
-      background: var(--surface);
-    }
-
-    /* The hairline under the bar. At the top of the page header and hero read as
-       one ground; the line fades in once the page moves (without scroll
-       timelines it is simply there). */
-    .header::after {
-      position: absolute;
-      inset-inline: 0;
-      inset-block-end: 0;
-      block-size: 1px;
-      content: '';
-      background: var(--border-light);
-    }
-
-    @supports (animation-timeline: scroll()) {
-      @media (prefers-reduced-motion: no-preference) {
-        .header::after {
-          animation: fade-in linear both;
-          animation-timeline: scroll(root block);
-          animation-range: 0 80px;
-        }
-      }
-    }
-
-    .header__inner {
-      display: grid;
-      grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
-      gap: var(--space-md);
-      align-items: center;
-      min-block-size: var(--header-height);
-    }
-
-    .header__actions {
-      display: flex;
-      grid-column: 3;
-      gap: var(--space-xs);
-      align-items: center;
-      justify-self: end;
-    }
-
-    /* Wordmark: the seat circle and the name, stacked over the place. */
-    .logo {
-      display: flex;
-      gap: 0.7rem;
-      align-items: center;
-      min-inline-size: 0;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .logo:focus-visible {
-      outline: 2px solid var(--focus-ring);
-      outline-offset: 6px;
-      border-radius: var(--radius);
-    }
-
-    /* The original brush-stroke logo, in the flyer's orange. */
-    .logo__mark {
-      flex: none;
-      inline-size: 2.25rem;
-      block-size: 2.25rem;
-      color: var(--color-flame);
-      transition: rotate var(--duration-slow) var(--ease-settle);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .logo:hover .logo__mark {
-        rotate: 22.5deg;
-      }
-    }
-
-    .logo__text {
-      display: grid;
-      min-inline-size: 0;
-      line-height: 1.1;
-    }
-
-    .logo__name {
-      font-family: var(--font-display);
-      font-size: 1.3125rem;
-      font-weight: var(--weight-display-small);
-      letter-spacing: -0.01em;
-    }
-
-    .logo__place {
-      overflow: hidden;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-overflow: ellipsis;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      white-space: nowrap;
-    }
-
-    /* Bar navigation. */
-    .nav__list {
-      display: flex;
-      gap: clamp(1rem, 0.5rem + 1.5vw, 2.25rem);
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-
-    .nav__link {
-      position: relative;
-      display: inline-flex;
-      gap: 0.45em;
-      align-items: baseline;
-      min-block-size: 44px;
-      align-content: center;
-      padding-block: 0.75rem;
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text-primary);
-      text-decoration: none;
-    }
-
-    .nav__link::after {
-      position: absolute;
-      inset-inline: 0;
-      inset-block-end: 0.55rem;
-      block-size: 1.5px;
-      content: '';
-      background: var(--accent);
-      transform: scaleX(0);
-      transform-origin: 0 50%;
-      transition: transform var(--motion-standard);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .nav__link:hover::after {
-        transform: scaleX(1);
-      }
-    }
-
-    .nav__link:focus-visible {
-      outline: 2px solid var(--focus-ring);
-      outline-offset: 2px;
-      border-radius: var(--radius);
-    }
-
-    .nav__panel-extra {
-      display: none;
-    }
-
-    .nav__cta {
-      --btn-padding-block: 0.55rem;
-      --btn-padding-inline: 1rem;
-      --btn-font-size: 0.9375rem;
-
-      min-block-size: 44px;
-      white-space: nowrap;
-    }
-
-    .nav-toggle {
-      display: none;
-      place-items: center;
-      inline-size: 48px;
-      block-size: 48px;
-      padding: 0;
-      color: var(--text-primary);
-      cursor: pointer;
-      background: none;
-      border: 1px solid var(--border-medium);
-      border-radius: 50%;
-      transition: border-color var(--motion-quick);
-    }
-
-    .nav-toggle:focus-visible {
-      outline: 2px solid var(--focus-ring);
-      outline-offset: 3px;
-    }
-
-    .nav-toggle.is-open {
-      border-color: var(--accent);
-    }
-
-    .nav-toggle__bars {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      align-items: center;
-    }
-
-    .nav-toggle__bar {
-      display: block;
-      inline-size: 18px;
-      block-size: 1.5px;
-      background: currentcolor;
-      transform-origin: center;
-    }
-
-    /* Open: the outer bars cross, the middle one draws in to nothing, and the
-       whole mark turns a quarter, so the cross arrives rather than snaps. */
-    .nav-toggle.is-open .nav-toggle__bar:nth-child(1) {
-      transform: translateY(6.5px) rotate(45deg);
-    }
-
-    .nav-toggle.is-open .nav-toggle__bar:nth-child(2) {
-      opacity: 0;
-      transform: scaleX(0);
-    }
-
-    .nav-toggle.is-open .nav-toggle__bar:nth-child(3) {
-      transform: translateY(-6.5px) rotate(-45deg);
-    }
-
-    .nav-toggle.is-open .nav-toggle__bars {
-      rotate: 90deg;
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .nav-toggle__bars {
-        transition: rotate 560ms var(--ease-emphasised);
-      }
-
-      .nav-toggle__bar {
-        transition:
-          transform 460ms var(--ease-emphasised),
-          opacity 200ms var(--ease-precise);
-      }
-    }
-
-    /* Theme control: a round seat with a sun or a moon. */
-    .theme-switch {
-      display: flex;
-      align-items: center;
-    }
-
-    .theme-switch__btn {
-      display: grid;
-      place-items: center;
-      inline-size: 44px;
-      block-size: 44px;
-      padding: 0;
-      color: inherit;
-      cursor: pointer;
-      background: none;
-      border: 1px solid transparent;
-      border-radius: 50%;
-      transition:
-        border-color var(--motion-quick),
-        rotate var(--duration-slow) var(--ease-settle);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .theme-switch__btn:hover {
-        border-color: var(--border-medium);
-        rotate: -20deg;
-      }
-    }
-
-    .theme-switch__btn:focus-visible {
-      outline: 2px solid var(--focus-ring);
-      outline-offset: 2px;
-    }
-
-    .theme-switch__icon {
-      inline-size: 18px;
-      block-size: 18px;
-      fill: none;
-      stroke: currentcolor;
-      stroke-width: 1.6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    :root:not([data-mode-resolved='dark']) .theme-switch__icon--dark,
-    :root[data-mode-resolved='dark'] .theme-switch__icon--light {
-      display: none;
-    }
-
-    .theme-switch--nav {
-      display: none;
-    }
-
-    /* Narrow screens: a full panel on the bark surface. */
-    @media (width <= 54em) {
-      .nav-toggle {
-        display: grid;
-      }
-
-      .theme-switch--bar {
-        display: none;
-      }
-
-      .theme-switch--nav {
-        display: flex;
-      }
-
-      .nav {
-        --text-primary: var(--color-chalk);
-        --text-secondary: #d2c6b5;
-        --text-muted: var(--color-chalk-muted);
-        --accent: var(--color-ember);
-        --border-light: var(--color-night-rule);
-        --border-medium: #4a3d34;
-
-        position: fixed;
-        inset: var(--header-height) 0 0;
-        display: flex;
-        visibility: hidden;
-        flex-direction: column;
-        gap: var(--space-lg);
-        padding-block: var(--space-md) var(--space-lg);
-        padding-inline: var(--container-gutter);
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        color: var(--text-primary);
-        pointer-events: none;
-        /* The same ground as the bar above it, so panel and bar are one surface. */
-        background: light-dark(var(--color-night), var(--color-night-deep));
-        opacity: 0;
-        transition:
-          opacity var(--motion-standard),
-          visibility 0s linear var(--duration-normal);
-      }
-
-      .nav.is-open {
-        visibility: visible;
-        pointer-events: auto;
-        opacity: 1;
-        transition:
-          opacity var(--motion-standard),
-          visibility 0s;
-      }
-
-      /* An ember low in the panel, breathing while it is open. Faint enough that
-         every line above it keeps its contrast. */
-      .nav::before {
-        position: fixed;
-        inset-block-end: -35svh;
-        inset-inline-start: -30vw;
-        z-index: -1;
-        inline-size: 130vw;
-        aspect-ratio: 1;
-        pointer-events: none;
-        content: '';
-        background: radial-gradient(
-          closest-side,
-          color-mix(in oklab, var(--color-flame) 16%, transparent),
-          color-mix(in oklab, var(--color-flame) 5%, transparent) 55%,
-          transparent
-        );
-        opacity: 0;
-      }
-
-      .nav.is-open::before {
-        opacity: 0.8;
-      }
-
-      .nav__list {
-        position: relative;
-        flex-direction: column;
-        gap: 0;
-        align-items: stretch;
-      }
-
-      /* The hairlines are drawn, not borders, so they can be drawn in. */
-      .nav__list::before,
-      .nav__item::after {
-        position: absolute;
-        inset-inline: 0;
-        block-size: 1px;
-        content: '';
-        background: var(--border-light);
-        transform-origin: 0 50%;
-      }
-
-      .nav__list::before {
-        inset-block-start: 0;
-      }
-
-      .nav__item {
-        position: relative;
-        /* Each link rises out of its own line; the margin keeps the focus ring. */
-        overflow: clip;
-        overflow-clip-margin: 4px;
-      }
-
-      .nav__item::after {
-        inset-block-end: 0;
-      }
-
-      .nav__link {
-        inline-size: 100%;
-        gap: 0.9rem;
-        padding-block: var(--space-sm);
-        font-family: var(--font-display);
-        font-size: clamp(2rem, 1.4rem + 3vw, 2.75rem);
-        font-weight: 400;
-        line-height: 1.1;
-        letter-spacing: -0.02em;
-      }
-
-      .nav__link::after {
-        display: none;
-      }
-
-      /* Opening, in the order of a breath: the panel opens as a circle from the
-         toggle (like the hero photo inside its ring), the hairlines draw in one
-         after another, each link rises out of its line, then the quieter things
-         follow. Closing runs back quickly, all at once. */
-      @media (prefers-reduced-motion: no-preference) {
-        .nav {
-          --nav-origin: calc(100% - var(--container-gutter) - 24px) calc(var(--header-height) / -2);
-
-          clip-path: circle(0 at var(--nav-origin));
-          opacity: 1;
-          transition:
-            clip-path 380ms var(--ease-precise),
-            visibility 0s linear 380ms;
-        }
-
-        .nav.is-open {
-          clip-path: circle(150vmax at var(--nav-origin));
-          transition:
-            clip-path 820ms var(--ease-emphasised),
-            visibility 0s;
-        }
-
-        .nav::before {
-          transition: opacity 200ms var(--ease-precise);
-        }
-
-        .nav.is-open::before {
-          --alpha: 0.8;
-          --rest: 0.9;
-
-          animation: breathe 10s 600ms infinite both;
-          transition: opacity 1200ms var(--ease-settle) 300ms;
-        }
-
-        .nav__list::before,
-        .nav__item::after {
-          transform: scaleX(0);
-          transition: transform 200ms var(--ease-precise);
-        }
-
-        .nav__link {
-          transform: translateY(110%);
-          transition: transform 220ms var(--ease-precise);
-        }
-
-        .nav__panel-extra {
-          opacity: 0;
-          transform: translateY(1rem);
-          transition:
-            opacity 160ms var(--ease-precise),
-            transform 160ms var(--ease-precise);
-        }
-
-        .nav.is-open .nav__list::before {
-          transform: none;
-          transition: transform 900ms var(--ease-emphasised) 140ms;
-        }
-
-        .nav.is-open .nav__item::after {
-          transform: none;
-          transition: transform 900ms var(--ease-emphasised) calc(220ms + var(--i) * 80ms);
-        }
-
-        .nav.is-open .nav__link {
-          transform: none;
-          transition: transform 760ms var(--ease-emphasised) calc(200ms + var(--i) * 80ms);
-        }
-
-        .nav.is-open .nav__panel-extra {
-          opacity: 1;
-          transform: none;
-          transition:
-            opacity 700ms var(--ease-settle) 520ms,
-            transform 900ms var(--ease-emphasised) 520ms;
-        }
-      }
-
-      .nav__panel-extra {
-        display: grid;
-        gap: var(--space-lg);
-        margin-block-start: auto;
-      }
-
-      .nav__secondary {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--space-xs) var(--space-md);
-        padding: 0;
-        margin: 0;
-        list-style: none;
-      }
-
-      .nav__secondary-link {
-        display: inline-flex;
-        align-items: center;
-        min-block-size: 44px;
-        font-size: var(--text-body-compact);
-        font-weight: 500;
-        color: var(--text-primary);
-        text-decoration: underline;
-        text-decoration-color: var(--accent);
-        text-decoration-thickness: 1.5px;
-        text-underline-offset: 0.3em;
-      }
-
-      .nav__contact {
-        display: grid;
-        gap: var(--space-3xs);
-      }
-
-      .nav__contact .marker {
-        margin-block-end: var(--space-2xs);
-      }
-
-      .nav__contact a {
-        display: inline-flex;
-        align-items: center;
-        min-block-size: 44px;
-        font-family: var(--font-display);
-        font-size: var(--text-xl);
-        color: var(--text-primary);
-      }
-
-      .nav__footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-block-start: var(--space-sm);
-        border-block-start: 1px solid var(--border-light);
-      }
-
-      .nav__footer-label {
-        font-size: var(--text-caption);
-        color: var(--text-muted);
-      }
-
-      .theme-switch--nav .theme-switch__btn {
-        border-color: var(--border-medium);
-      }
-
-      body.nav-open {
-        position: fixed;
-        inline-size: 100%;
-        min-block-size: 100%;
-        overflow: hidden;
-      }
-
-      body.nav-open .header .nav__cta {
-        display: none;
-      }
-    }
-
-    @media (width <= 30em) {
-      .header__inner {
-        gap: var(--space-xs);
-      }
-
-      .logo__mark {
-        inline-size: 1.875rem;
-        block-size: 1.875rem;
-      }
-
-      .logo__name {
-        font-size: 1.125rem;
-      }
-
-      .logo__place {
-        font-size: 0.625rem;
-        letter-spacing: 0.1em;
-      }
-
-      .nav__cta {
-        --btn-padding-inline: 0.8rem;
-      }
-
-      .nav__cta::before,
-      .nav__cta::after {
-        display: none;
-      }
-    }
-
-    @media (width <= 30em) {
-      .logo__region {
-        display: none;
-      }
-    }
-
-    /* The smallest phones: name and button step down so they never meet. */
-    @media (width <= 22.5em) {
-      .logo__name {
-        font-size: 0.9375rem;
-      }
-
-      .nav__cta {
-        --btn-padding-inline: 0.55rem;
-        --btn-font-size: 0.875rem;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .nav {
-        transition: none;
-      }
-    }
-  }
-</style>

@@ -1,0 +1,10 @@
+---
+/** Anti-spam field: off-screen rather than `display: none` (which some bots skip), hidden from assistive tech and the keyboard. */
+---
+
+<div class="absolute -left-[9999px] size-px overflow-hidden" aria-hidden="true">
+  <label>
+    Website
+    <input type="text" name="website" tabindex="-1" autocomplete="off" />
+  </label>
+</div>

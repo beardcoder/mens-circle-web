@@ -1,0 +1,34 @@
+---
+import { fieldError, fieldHint, fieldLabel } from '@lib/ui';
+
+/**
+ * A labelled form field: a visible label, the control (slot), an optional hint
+ * and the error slot that lib/form.ts writes (`<form id>-<name>-error`).
+ */
+interface Props {
+  /** The control's id. */
+  for: string;
+  label: string;
+  optional?: boolean;
+  hint?: string;
+  hintId?: string;
+  errorId?: string;
+  class?: string;
+}
+
+const { for: htmlFor, label, optional = false, hint, hintId, errorId, class: className } = Astro.props;
+---
+
+<div class={className}>
+  <label for={htmlFor} class={fieldLabel}>
+    {label}
+    {optional && <span class="font-normal tracking-normal normal-case text-fg-muted"> (optional)</span>}
+  </label>
+  <slot />
+  {hint && (
+    <span id={hintId} class={fieldHint}>
+      {hint}
+    </span>
+  )}
+  {errorId && <span id={errorId} class={fieldError} hidden />}
+</div>

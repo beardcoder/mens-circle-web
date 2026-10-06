@@ -26,35 +26,62 @@ const points = Array.from({ length: total }, (_, i) => {
   };
 });
 const full = seats.length >= capacity && capacity > 0;
+// Full turns the fire and the seats green.
+const fire = full ? 'fill-success' : 'fill-accent';
 ---
 
-<figure class="seating" class:list={{ 'is-full': full }}>
+<figure class="m-0 w-full max-w-[300px] justify-self-center">
   <svg
     viewBox={`0 0 ${SIZE} ${SIZE}`}
     role="img"
     aria-label={`Sitzkreis: ${seats.length} von ${capacity} Plätzen belegt`}
+    class="block h-auto w-full overflow-visible"
   >
-    <circle class="seating__ring" cx={C} cy={C} r={R} fill="none"></circle>
+    <circle class="stroke-line [stroke-width:1.5]" cx={C} cy={C} r={R} fill="none"></circle>
 
-    <circle class="seating__glow" cx={C} cy={C} r="46"></circle>
-    <circle class="seating__fire" cx={C} cy={C} r="30"></circle>
-    <text class="seating__count" x={C} y={C} text-anchor="middle" dominant-baseline="central">
+    <circle class:list={['origin-center animate-glow opacity-20 transform-fill', fire]} cx={C} cy={C} r="46"></circle>
+    <circle class:list={[fire]} cx={C} cy={C} r="30"></circle>
+    <text
+      class="fill-on-accent text-[19px] font-semibold tabular-nums"
+      x={C}
+      y={C}
+      text-anchor="middle"
+      dominant-baseline="central"
+    >
       {seats.length}
-      <tspan class="seating__cap">/{capacity}</tspan>
+      <tspan class="text-[13px]">/{capacity}</tspan>
     </text>
 
     {points.map((p) =>
       p.seat ? (
-        <g class="seat seat--taken">
-          <circle cx={p.x} cy={p.y} r={NODE} />
-          <text x={p.x} y={p.y} text-anchor="middle" dominant-baseline="central">
+        <g>
+          <circle class={fire} cx={p.x} cy={p.y} r={NODE} />
+          <text
+            class="fill-on-accent text-[13px] font-semibold"
+            x={p.x}
+            y={p.y}
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
             {p.seat.initials}
           </text>
         </g>
       ) : (
-        <g class="seat seat--open">
-          <circle cx={p.x} cy={p.y} r={NODE} fill="none" />
-          <text x={p.x} y={p.y} text-anchor="middle" dominant-baseline="central">
+        <g>
+          <circle
+            class="stroke-line-strong [stroke-dasharray:3_3] [stroke-width:1.5]"
+            cx={p.x}
+            cy={p.y}
+            r={NODE}
+            fill="none"
+          />
+          <text
+            class="fill-fg-muted text-[12px] tabular-nums"
+            x={p.x}
+            y={p.y}
+            text-anchor="middle"
+            dominant-baseline="central"
+          >
             {p.n}
           </text>
         </g>
@@ -62,90 +89,3 @@ const full = seats.length >= capacity && capacity > 0;
     )}
   </svg>
 </figure>
-
-<style>
-  .seating {
-    margin: 0;
-    width: 100%;
-    max-width: 300px;
-  }
-  .seating svg {
-    width: 100%;
-    height: auto;
-    display: block;
-    overflow: visible;
-  }
-  .seating__ring {
-    stroke: var(--line);
-    stroke-width: 1.5;
-  }
-
-  .seating__glow {
-    fill: var(--ember);
-    opacity: 0.18;
-    transform-origin: center;
-    animation: ember-pulse 3.6s ease-in-out infinite;
-  }
-  .seating__fire {
-    fill: var(--ember);
-    filter: drop-shadow(0 0 10px rgb(221 95 51 / 60%));
-  }
-  .is-full .seating__fire {
-    fill: var(--sage);
-    filter: drop-shadow(0 0 12px rgb(155 181 131 / 60%));
-  }
-  .is-full .seating__glow {
-    fill: var(--sage);
-  }
-  .seating__count {
-    font-family: var(--font-mono);
-    font-weight: 600;
-    font-size: 19px;
-    fill: #1c1714;
-  }
-  /* Full strength. At 70% the ink over the orange disc measured 3.2:1, and this
-     is 13px text; the size step alone is enough to subordinate it. */
-  .seating__cap {
-    font-size: 13px;
-  }
-
-  .seat--taken circle {
-    fill: var(--ember);
-  }
-  .is-full .seat--taken circle {
-    fill: var(--sage);
-  }
-  .seat--taken text {
-    font-family: var(--font-mono);
-    font-weight: 600;
-    font-size: 13px;
-    fill: #1c1714;
-  }
-  .seat--open circle {
-    stroke: var(--line-strong);
-    stroke-width: 1.5;
-    stroke-dasharray: 3 3;
-  }
-  .seat--open text {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    fill: var(--faint);
-  }
-
-  @keyframes ember-pulse {
-    0%,
-    100% {
-      opacity: 0.16;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.3;
-      transform: scale(1.12);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .seating__glow {
-      animation: none;
-    }
-  }
-</style>

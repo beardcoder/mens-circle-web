@@ -1,5 +1,10 @@
 ---
-/** Registration for one event. */
+import { checkbox, control, fieldError, link } from '@lib/ui';
+import Button from '../ui/Button.astro';
+import Field from '../ui/Field.astro';
+import Honeypot from './Honeypot.astro';
+
+/** Registration for one event: name, email, an optional phone number and the privacy consent. */
 interface Props {
   eventId: string;
   isFull: boolean;
@@ -10,23 +15,17 @@ const { eventId, isFull } = Astro.props;
 
 <form
   id="register"
-  class="event-register__form"
   autocomplete="on"
   data-form="register"
   data-track="event-registration"
   data-track-context={JSON.stringify({ event_id: eventId })}
+  class="grid gap-5"
 >
   <input type="hidden" name="event_id" value={eventId} />
-  <div class="hp-field" aria-hidden="true">
-    <label>
-      Website
-      <input type="text" name="website" tabindex="-1" autocomplete="off" />
-    </label>
-  </div>
+  <Honeypot />
 
-  <div class="form-row">
-    <div class="form-group">
-      <label for="firstName">Vorname</label>
+  <div class="grid gap-5 sm:grid-cols-2 sm:gap-4">
+    <Field for="firstName" label="Vorname" errorId="register-first_name-error">
       <input
         type="text"
         id="firstName"
@@ -35,12 +34,11 @@ const { eventId, isFull } = Astro.props;
         required
         autocomplete="given-name"
         aria-describedby="register-first_name-error"
+        class={control()}
       />
-      <span class="form-error" id="register-first_name-error" hidden></span>
-    </div>
+    </Field>
 
-    <div class="form-group">
-      <label for="lastName">Nachname</label>
+    <Field for="lastName" label="Nachname" errorId="register-last_name-error">
       <input
         type="text"
         id="lastName"
@@ -49,13 +47,12 @@ const { eventId, isFull } = Astro.props;
         required
         autocomplete="family-name"
         aria-describedby="register-last_name-error"
+        class={control()}
       />
-      <span class="form-error" id="register-last_name-error" hidden></span>
-    </div>
+    </Field>
   </div>
 
-  <div class="form-group">
-    <label for="email">E-Mail</label>
+  <Field for="email" label="E-Mail" errorId="register-email-error">
     <input
       type="email"
       id="email"
@@ -65,14 +62,17 @@ const { eventId, isFull } = Astro.props;
       autocomplete="email"
       inputmode="email"
       aria-describedby="register-email-error"
+      class={control()}
     />
-    <span class="form-error" id="register-email-error" hidden></span>
-  </div>
+  </Field>
 
-  <div class="form-group">
-    <label for="phone">
-      Handynummer <span class="form-label-optional">(optional)</span>
-    </label>
+  <Field
+    for="phone"
+    label="Handynummer"
+    optional
+    hint="Falls wir dich am Veranstaltungstag kurzfristig erreichen müssen."
+    hintId="register-phone-hint"
+  >
     <input
       type="tel"
       id="phone"
@@ -81,29 +81,27 @@ const { eventId, isFull } = Astro.props;
       autocomplete="tel"
       inputmode="tel"
       aria-describedby="register-phone-hint"
+      class={control()}
     />
-    <span class="form-helper" id="register-phone-hint">
-      Falls wir dich am Veranstaltungstag kurzfristig erreichen müssen
-    </span>
-  </div>
+  </Field>
 
-  <div class="form-group">
-    <label class="form-checkbox">
-      <input type="checkbox" name="privacy" required aria-describedby="register-privacy-error" />
-      <span>
+  <div>
+    <label class="flex cursor-pointer items-start gap-3">
+      <input type="checkbox" name="privacy" required aria-describedby="register-privacy-error" class={checkbox} />
+      <span class="text-sm text-fg-soft">
         Ich habe die{' '}
-        <a href="/datenschutz" target="_blank" rel="noopener">
+        <a href="/datenschutz" target="_blank" rel="noopener" class={link}>
           Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span>
         </a>{' '}
         gelesen und stimme der Verarbeitung meiner Daten zu.
       </span>
     </label>
-    <span class="form-error" id="register-privacy-error" hidden></span>
+    <span class={fieldError} id="register-privacy-error" hidden></span>
   </div>
 
-  <button type="submit" class="btn btn--primary btn--large event-register__submit">
+  <Button type="submit" size="lg" block class="mt-2">
     {isFull ? 'Auf Warteliste eintragen' : 'Verbindlich anmelden'}
-  </button>
+  </Button>
 </form>
 
 <script>

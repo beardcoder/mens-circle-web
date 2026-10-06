@@ -1,6 +1,9 @@
 ---
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
+import PageOpening from '../PageOpening.astro';
+import Button from '../ui/Button.astro';
+import Container from '../ui/Container.astro';
 
 interface Props {
   data: {
@@ -8,6 +11,7 @@ interface Props {
     eyebrow?: string;
     title?: string;
     lead?: string;
+    /** Kept for the content files; every opening stands on the split line now. */
     align?: 'left' | 'center';
     buttonText?: string;
     buttonLink?: string;
@@ -17,48 +21,44 @@ interface Props {
   };
 }
 
-/** The opening of a sub-page: a large title and lead, then — when there is one — the photograph as a wide band. */
+/** The opening of a content sub-page: title and lead, then — when there is one — the photograph as a wide band. */
 
 const { data } = Astro.props;
-const align = data.align === 'center' ? 'center' : 'left';
 const hasButton = Boolean(data.buttonText && data.buttonLink);
 const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
 const imageAsset = resolveAssetImage(data.image);
 ---
 
-<section class={`page-hero page-hero--${align}${imageAsset ? ' page-hero--with-image' : ''}`} id={data.anchor}>
-  <div class="container page-hero__layout">
-    <div class="page-hero__content">
-      {data.eyebrow && <p class="marker marker--plain page-hero__eyebrow">{data.eyebrow}</p>}
-      {data.title && <h1 class="display page-hero__title" set:html={data.title} />}
-    </div>
-
-    {(data.lead || hasButton) && (
-      <div class="page-hero__aside">
-        {data.lead && <p class="page-hero__lead">{data.lead}</p>}
-        {hasButton && (
-          <p class="page-hero__cta">
-            <a
-              href={data.buttonLink}
-              class="btn btn--primary btn--large"
-              target={buttonExternal ? '_blank' : undefined}
-              rel={buttonExternal ? 'noopener noreferrer' : undefined}
-            >
-              {data.buttonText}
-            </a>
-          </p>
-        )}
-      </div>
+<div id={data.anchor}>
+  <PageOpening
+    eyebrow={data.eyebrow}
+    title={data.title ?? ''}
+    titleHtml
+    joined={Boolean(imageAsset)}
+    aside={Boolean(data.lead || hasButton)}
+  >
+    {data.lead && <Fragment slot="lead">{data.lead}</Fragment>}
+    {hasButton && (
+      <Button
+        href={data.buttonLink}
+        size="lg"
+        target={buttonExternal ? '_blank' : undefined}
+        rel={buttonExternal ? 'noopener noreferrer' : undefined}
+        class="max-lg:w-full"
+      >
+        {data.buttonText}
+      </Button>
     )}
-  </div>
+  </PageOpening>
 
   {imageAsset && (
-    <figure class="page-hero__media">
-      <div class="page-hero__band">
+    <figure class="pb-group">
+      {/* The landscape gets the width it was taken for; phones run it edge to edge. */}
+      <div class="mx-auto max-w-page lg:px-gutter entrance:animate-fade-in entrance:animate-delay-160">
         <CropPicture
           src={imageAsset}
-          class="page-hero__image"
-          breakpoint="54em"
+          class="block aspect-4/3 w-full object-cover object-[22%_40%] lg:aspect-21/9 lg:rounded-control lg:object-[50%_4%]"
+          breakpoint="56em"
           narrow={{ ratio: 4 / 3, widths: [420, 700, 960], sizes: '100vw' }}
           wide={{ ratio: 21 / 9, widths: [960], sizes: 'min(100vw, 1360px)' }}
           loading="eager"
@@ -67,149 +67,10 @@ const imageAsset = resolveAssetImage(data.image);
         />
       </div>
       {data.imageCaption && (
-        <figcaption class="container">
-          <span class="caption">{data.imageCaption}</span>
-        </figcaption>
+        <Container>
+          <figcaption class="mt-2 text-sm text-fg-muted">{data.imageCaption}</figcaption>
+        </Container>
       )}
     </figure>
   )}
-</section>
-
-<style is:global>
-  @layer sections {
-    .page-hero {
-      padding-block: calc(var(--header-height) + var(--space-xl)) var(--space-xl);
-    }
-
-    .page-hero__layout {
-      display: grid;
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      gap: var(--space-lg) var(--space-xl);
-      align-items: end;
-    }
-
-    .page-hero--center .page-hero__layout {
-      grid-template-columns: minmax(0, 1fr);
-      max-inline-size: calc(var(--container-narrow) + 2 * var(--container-gutter));
-    }
-
-    .page-hero__title {
-      /* A single long word ("Datenschutzerklärung") widens the box, then breaks. */
-      max-inline-size: max(14ch, min-content);
-      margin: 0;
-      /* The section size: only the home's opening sentence is set larger. */
-      font-size: var(--display-2);
-      overflow-wrap: break-word;
-      hyphens: auto;
-    }
-
-    /* Wide: on the home's split line. The title takes the left half, the lead
-       stands from column 7, level with the title's last line; a title without a
-       lead (the legal pages) takes the whole width. The column holds every word
-       of a title ("Männerkreis", "Datenschutzerklärung"), so it breaks between
-       words, never inside one. */
-    @media (width > 56em) {
-      .page-hero:not(.page-hero--center) .page-hero__layout {
-        grid-template-columns: var(--field);
-        column-gap: var(--field-gap);
-      }
-
-      .page-hero:not(.page-hero--center) .page-hero__content {
-        grid-column: 1 / span 6;
-      }
-
-      .page-hero:not(.page-hero--center) .page-hero__content:only-child {
-        grid-column: 1 / -1;
-      }
-
-      .page-hero:not(.page-hero--center) .page-hero__aside {
-        grid-column: 7 / span 6;
-      }
-
-      .page-hero:not(.page-hero--center) .page-hero__title {
-        hyphens: manual;
-      }
-    }
-
-    .page-hero__lead {
-      max-inline-size: 44ch;
-      margin: 0;
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    .page-hero__cta {
-      margin-block: var(--space-md) 0;
-    }
-
-    /* The photograph as a band: the landscape gets the width it was taken for. */
-    .page-hero__media {
-      margin: var(--space-xl) 0 0;
-    }
-
-    .page-hero__band {
-      position: relative;
-      max-inline-size: var(--container-width);
-      margin-inline: auto;
-      padding-inline: var(--container-gutter);
-    }
-
-    .page-hero__image {
-      display: block;
-      inline-size: 100%;
-      aspect-ratio: 21 / 9;
-      object-fit: cover;
-      object-position: 50% 4%;
-      border-radius: var(--radius);
-    }
-
-    .page-hero__media figcaption {
-      margin-block-start: var(--space-xs);
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .page-hero__eyebrow,
-      .page-hero__title,
-      .page-hero__aside {
-        animation: rise var(--duration-slow) var(--ease-settle) both;
-      }
-
-      .page-hero__title {
-        animation-delay: var(--stagger-1);
-      }
-
-      .page-hero__aside {
-        animation-delay: var(--stagger-2);
-      }
-
-      .page-hero__band {
-        animation: fade-in 700ms var(--ease-settle) 160ms both;
-      }
-
-      .vt-arrival :is(.page-hero__eyebrow, .page-hero__title, .page-hero__aside, .page-hero__band) {
-        animation: none;
-      }
-    }
-
-    @media (width <= 54em) {
-      .page-hero__layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .page-hero__band {
-        padding-inline: 0;
-      }
-
-      .page-hero__image {
-        aspect-ratio: 4 / 3;
-        object-position: 22% 40%;
-        border-radius: 0;
-      }
-
-      .page-hero__cta .btn {
-        inline-size: 100%;
-      }
-    }
-  }
-</style>
+</div>

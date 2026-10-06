@@ -1,4 +1,7 @@
 ---
+import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
+
 interface Agreement {
   title?: string;
   text?: string;
@@ -16,198 +19,42 @@ interface Props {
   };
 }
 
-/** The agreements every evening starts with, and the one place that says what the circle is not. */
+/**
+ * The agreements every evening starts with — unnumbered, none comes first, each
+ * under its own hairline — and the one place that says what the circle is not.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'rahmen';
 const agreements = data.agreements ?? [];
 ---
 
-<section class="section surface-sand home-frame" id={anchor} aria-labelledby="rahmen-title">
-  <div class="container home-frame__grid">
-    <div class="home-frame__head">
-      <p class="marker">{data.eyebrow}</p>
-      {data.title && (
-        <h2 class="display home-frame__title" id="rahmen-title">
-          {data.title}
-        </h2>
-      )}
-      {data.intro && <p class="section-intro home-frame__intro">{data.intro}</p>}
-    </div>
+<Section id={anchor} ground="sand" labelledby="rahmen-title" defer>
+  <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="rahmen-title" lead={data.intro} layout="split" />
 
-    {agreements.length > 0 && (
-      <ul class="home-frame__list" role="list">
-        {agreements.map((rule) => (
-          <li class="home-frame__item" data-reveal>
-            <h3 class="home-frame__term">{rule.title}</h3>
-            <p class="home-frame__text">{rule.text}</p>
-          </li>
-        ))}
-      </ul>
-    )}
+  {agreements.length > 0 && (
+    <ul role="list" class="mt-group grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 sm:gap-y-group xl:grid-cols-4">
+      {agreements.map((rule) => (
+        <li class="reveal @container grid content-start gap-2 border-t border-line-strong pt-6">
+          {/* Capped by the column: "Eigenverantwortung" is one word. */}
+          <h3 class="text-[length:min(var(--text-2xl),9.5cqi)] leading-[1.15] font-medium tracking-[-0.015em] text-fg">
+            {rule.title}
+          </h3>
+          <p class="text-md text-fg-soft">{rule.text}</p>
+        </li>
+      ))}
+    </ul>
+  )}
 
-    {data.boundaryText && (
-      <aside class="home-frame__boundary" aria-labelledby="rahmen-boundary-title" data-reveal>
-        <h3 class="home-frame__boundary-title" id="rahmen-boundary-title">
-          {data.boundaryTitle ?? 'Gut zu wissen'}
-        </h3>
-        <p class="home-frame__boundary-text">{data.boundaryText}</p>
-      </aside>
-    )}
-  </div>
-</section>
-
-<style is:global>
-  @layer sections {
-    .home-frame__head {
-      display: grid;
-      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
-      gap: var(--space-md) var(--space-xl);
-      align-items: end;
-      margin-block-end: var(--space-xl);
-    }
-
-    .home-frame__head .marker {
-      grid-column: 1 / -1;
-      margin: 0;
-    }
-
-    /* Short words set big: break between them, never inside ("miteinander"). */
-    .home-frame__title {
-      max-inline-size: 13ch;
-      margin: 0;
-      hyphens: manual;
-    }
-
-    /* The agreements, two by two and unnumbered: none comes first. */
-    .home-frame__list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-xl) var(--space-2xl);
-      max-inline-size: 64rem;
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-
-    .home-frame__item {
-      container-type: inline-size;
-      display: grid;
-      gap: var(--space-xs);
-      align-content: start;
-      padding-block-start: var(--space-md);
-      border-block-start: 1px solid var(--border-medium);
-    }
-
-    .home-frame__term {
-      /* Capped by the column: "Eigenverantwortung" is one word. */
-      font-size: min(var(--text-2xl), 9.5cqi);
-      line-height: 1.15;
-      hyphens: manual;
-    }
-
-    .home-frame__text {
-      margin: 0;
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    .home-frame__boundary {
-      display: grid;
-      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
-      gap: var(--space-sm) var(--space-xl);
-      align-items: baseline;
-      padding: var(--space-lg);
-      margin-block-start: var(--space-xl);
-      background: var(--bg-primary);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius);
-    }
-
-    .home-frame__boundary-title {
-      display: flex;
-      gap: 0.6em;
-      align-items: baseline;
-      font-size: var(--text-2xl);
-      font-family: var(--font-quote);
-      font-style: italic;
-    }
-
-    .home-frame__boundary-text {
-      max-inline-size: 58ch;
-      margin: 0;
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    /* Wide: on the split line — the title in columns 1–5, its short reading from
-       column 7, level with its first line;
-       the agreements four abreast (two by two on a narrow desktop), each under a
-       hairline; the boundary across the whole width below them. */
-    @media (width > 56em) {
-      .home-frame__head {
-        grid-template-columns: var(--field);
-        column-gap: var(--field-gap);
-        margin-block-end: var(--space-xl);
-      }
-
-      .home-frame__title {
-        grid-column: 1 / span 5;
-        max-inline-size: 17ch;
-      }
-
-      .home-frame__intro {
-        grid-column: 7 / span 6;
-        align-self: start;
-        max-inline-size: 34em;
-        padding-block-start: 0.2em;
-      }
-
-      .home-frame__list {
-        gap: var(--space-xl) var(--space-lg);
-        max-inline-size: none;
-      }
-
-      .home-frame__boundary {
-        grid-template-columns: var(--field);
-        column-gap: var(--field-gap);
-        margin-block-start: var(--space-xl);
-      }
-
-      .home-frame__boundary-title {
-        grid-column: 1 / span 4;
-      }
-
-      .home-frame__boundary-text {
-        grid-column: 5 / -1;
-      }
-    }
-
-    @media (width > 72em) {
-      .home-frame__list {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-    }
-
-    @media (width <= 56em) {
-      .home-frame__head,
-      .home-frame__boundary {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .home-frame__boundary {
-        padding: var(--space-md);
-        margin-block-start: var(--space-2xl);
-      }
-    }
-
-    @media (width <= 36em) {
-      .home-frame__list {
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: var(--space-lg);
-      }
-    }
-  }
-</style>
+  {data.boundaryText && (
+    <aside
+      aria-labelledby="rahmen-boundary-title"
+      class="reveal mt-group grid gap-x-grid gap-y-3 rounded-control border border-line-strong bg-ground p-6 sm:p-8 lg:grid-cols-12 lg:items-baseline"
+    >
+      <h3 id="rahmen-boundary-title" class="font-serif text-2xl text-fg italic lg:col-span-4">
+        {data.boundaryTitle ?? 'Gut zu wissen'}
+      </h3>
+      <p class="max-w-[58ch] text-lg text-fg-soft lg:col-span-8">{data.boundaryText}</p>
+    </aside>
+  )}
+</Section>

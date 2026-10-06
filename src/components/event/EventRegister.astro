@@ -1,164 +1,60 @@
 ---
 import type { EventDTO } from '@lib/types';
 import { formatDateShortDE, isoDay } from '@lib/server/format';
+import { panel } from '@lib/ui';
 import RegistrationForm from '../forms/RegistrationForm.astro';
+import Button from '../ui/Button.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
 
 interface Props {
   event: EventDTO;
+  class?: string;
 }
 
-/** Registration for one event, in three states: open, waiting list, past. */
+/** Registration for one event, in three states: open, waiting list, past. The panel is the one place on the page that asks for something. */
 
-const { event } = Astro.props;
+const { event, class: className } = Astro.props;
 const dateOnly = isoDay(event.event_date);
 
 const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full ? 'Warteliste' : 'Anmeldung';
 ---
 
-<section class="section surface-sand event-register-section" id="anmeldung" aria-labelledby="anmeldung-title">
-  <div class="container event-register__grid">
-    <div class="event-register__intro">
-      <p class="marker">{event.is_past ? 'Rückblick' : 'Teilnehmen'}</p>
-      <h2 class="display event-register__title" id="anmeldung-title">
-        {heading}
-      </h2>
+<section
+  id="anmeldung"
+  class:list={[panel, 'scroll-mt-(--spacing-clearance)', className]}
+  aria-labelledby="anmeldung-title"
+>
+  <div class="mb-8 grid gap-4">
+    <Eyebrow>{event.is_past ? 'Rückblick' : 'Teilnehmen'}</Eyebrow>
+    <h2 id="anmeldung-title" class="text-display-3 text-fg">
+      {heading}
+    </h2>
 
-      {event.is_past ? (
-        <p class="event-register__text">
-          Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine Anmeldung
-          ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich benachrichtigen, sobald der
-          nächste Termin feststeht.
-        </p>
-      ) : event.is_full ? (
-        <p class="event-register__text">
-          Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch
-          nach und bekommst sofort eine E-Mail.
-        </p>
-      ) : (
-        <p class="event-register__text">
-          Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen Vor-
-          und Nachname und eine E-Mail-Adresse. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail&nbsp;–
-          am Abend musst du dann nur noch vorbeikommen.
-        </p>
-      )}
-
-      {/* Past: the one action stands under the text, not alone on a panel. */}
-      {event.is_past && (
-        <a href="/#termine" class="btn btn--primary btn--large">
-          Bei neuen Terminen benachrichtigen
-        </a>
-      )}
-    </div>
-
-    {!event.is_past && (
-      <div class="event-register__form-wrap">
-        <RegistrationForm eventId={event.id} isFull={event.is_full} />
-      </div>
+    {event.is_past ? (
+      <p class="text-md text-fg-soft">
+        Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine Anmeldung
+        ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich benachrichtigen, sobald der
+        nächste Termin feststeht.
+      </p>
+    ) : event.is_full ? (
+      <p class="text-md text-fg-soft">
+        Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch nach
+        und bekommst sofort eine E-Mail.
+      </p>
+    ) : (
+      <p class="text-md text-fg-soft">
+        Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen Vor- und
+        Nachname und eine E-Mail-Adresse. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail&nbsp;– am
+        Abend musst du dann nur noch vorbeikommen.
+      </p>
     )}
   </div>
+
+  {event.is_past ? (
+    <Button href="/event#benachrichtigung" size="lg" class="max-sm:w-full">
+      Bei neuen Terminen benachrichtigen
+    </Button>
+  ) : (
+    <RegistrationForm eventId={event.id} isFull={event.is_full} />
+  )}
 </section>
-
-<style is:global>
-  @layer sections {
-    .event-register__grid {
-      display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-      gap: var(--space-xl);
-      align-items: start;
-    }
-
-    /* Wide: on the split line — the heading in columns 1–5, the form from 7. */
-    @media (width > 56em) {
-      .event-register__grid {
-        grid-template-columns: var(--field);
-        column-gap: var(--field-gap);
-      }
-
-      .event-register__intro {
-        grid-column: 1 / span 5;
-      }
-
-      .event-register__form-wrap {
-        grid-column: 7 / span 6;
-      }
-
-      /* Past: no form, so the note and the action stand from column 7 beside
-         the title instead of leaving the right half empty. */
-      .event-register__grid:not(:has(.event-register__form-wrap)) .event-register__intro {
-        display: grid;
-        grid-template-columns: subgrid;
-        grid-column: 1 / -1;
-        align-items: start;
-      }
-
-      .event-register__grid:not(:has(.event-register__form-wrap)) .marker {
-        grid-column: 1 / -1;
-      }
-
-      .event-register__grid:not(:has(.event-register__form-wrap)) .event-register__title {
-        grid-row: 2 / span 2;
-        grid-column: 1 / span 5;
-        margin: 0;
-      }
-
-      .event-register__grid:not(:has(.event-register__form-wrap)) .event-register__text {
-        grid-row: 2;
-        grid-column: 7 / span 6;
-        margin-block-end: var(--space-md);
-        padding-block-start: 0.2em;
-      }
-
-      .event-register__grid:not(:has(.event-register__form-wrap)) .btn {
-        grid-row: 3;
-        grid-column: 7 / span 6;
-        justify-self: start;
-      }
-    }
-
-    .event-register__grid > :first-child {
-      container-type: inline-size;
-    }
-
-    .event-register__title {
-      margin-block-end: var(--rhythm-stack);
-      /* "Anmeldung" is one word: capped by its column. */
-      font-size: min(var(--display-2), 18cqi);
-    }
-
-    .event-register__text {
-      max-inline-size: 42ch;
-      margin-block-end: var(--space-lg);
-      font-size: var(--text-section-body-lg);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-
-    /* The form sits on a raised panel: the one place on the page that asks for something. */
-    .event-register__form-wrap {
-      padding: var(--space-lg);
-      background: var(--bg-primary);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius);
-    }
-
-    .event-register__form {
-      inline-size: 100%;
-    }
-
-    .event-register__submit {
-      margin-block-start: var(--space-sm);
-      inline-size: 100%;
-    }
-
-    @media (width <= 56em) {
-      .event-register__grid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: var(--space-lg);
-      }
-
-      .event-register__form-wrap {
-        padding: var(--space-md);
-      }
-    }
-  }
-</style>

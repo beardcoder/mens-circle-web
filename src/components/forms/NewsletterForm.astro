@@ -1,32 +1,31 @@
 ---
+import Button from '../ui/Button.astro';
+import Honeypot from './Honeypot.astro';
+import { control, fieldError, fieldLabel } from '@lib/ui';
+
 /** "Bei neuen Terminen benachrichtigen" — one address into the listmonk list. */
 interface Props {
   /** Analytics context sent with the Umami events. */
   context?: Record<string, string>;
-  /** Keeps ids unique when a page renders this twice. */
+  /** The form's id; also prefixes the field ids, so a page can render it twice. */
   id?: string;
 }
 
-const { context = {}, id = 'newsletter' } = Astro.props;
+const { context = {}, id = 'newsletter-form' } = Astro.props;
 ---
 
 <form
   id={id}
-  class="newsletter__form"
   data-form="newsletter"
   data-track="newsletter"
   data-track-context={JSON.stringify(context)}
+  class="flex max-w-lg flex-col items-stretch gap-x-4 gap-y-2 sm:flex-row sm:items-end"
 >
-  <div class="hp-field" aria-hidden="true">
-    <label>
-      Website
-      <input type="text" name="website" tabindex="-1" autocomplete="off" />
-    </label>
-  </div>
+  <Honeypot />
 
   {/* A real, visible <label>, not an aria-label over a placeholder. */}
-  <div class="newsletter__field">
-    <label class="form-label" for={`${id}-email`}>
+  <div class="min-w-0 flex-1">
+    <label class={fieldLabel} for={`${id}-email`}>
       E-Mail-Adresse
     </label>
     <input
@@ -35,18 +34,19 @@ const { context = {}, id = 'newsletter' } = Astro.props;
       name="email"
       placeholder="name@beispiel.de"
       required
-      class="newsletter__input"
       autocomplete="email"
       inputmode="email"
       aria-describedby={`${id}-email-error`}
+      class={control()}
     />
   </div>
 
-  <button type="submit" class="btn btn--primary">
+  <Button type="submit" decorate={false}>
     Anmelden
-  </button>
+  </Button>
 </form>
-<span class="form-error newsletter__error" id={`${id}-email-error`} hidden></span>
+{/* After the form, not inside it: a third item would compete with the input/button pair for the line. */}
+<span class={fieldError} id={`${id}-email-error`} hidden></span>
 
 <script>
   import { actions } from 'astro:actions';

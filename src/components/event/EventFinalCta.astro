@@ -1,86 +1,31 @@
 ---
 import type { EventDTO } from '@lib/types';
+import LinkList from '../ui/LinkList.astro';
+import Section from '../ui/Section.astro';
+import Split from '../ui/Split.astro';
 
 interface Props {
   event: EventDTO;
+  ground?: 'default' | 'sand';
 }
 
-/** The page's exit. */
+/** The page's exit: where someone who has read the date goes next. */
 
-const { event } = Astro.props;
+const { event, ground = 'default' } = Astro.props;
+
+const items = [
+  ...(event.is_past ? [{ href: '/event#benachrichtigung', title: 'Bei neuen Terminen benachrichtigen' }] : []),
+  { href: '/event', title: 'Alle Termine' },
+  { href: '/#ueber', title: 'Worum es an so einem Abend geht' },
+  { href: '/warum-ich-den-maennerkreis-leite', title: 'Warum ich den Männerkreis leite', prefetch: true },
+];
 ---
 
-<section class="section section--ruled event-cta-section" aria-labelledby="weiter-title">
-  <div class="container">
-    <div class="spine">
-      <h2 class="rail-heading" id="weiter-title">
-        Weiter
-      </h2>
-
-      <ul class="event-cta__list spine__body--wide" role="list">
-        {event.is_past && (
-          <li>
-            <a href="/#termine">Bei neuen Terminen benachrichtigen</a>
-          </li>
-        )}
-        <li>
-          <a href="/event">Alle Termine</a>
-        </li>
-        <li>
-          <a href="/#ueber">Worum es an so einem Abend geht</a>
-        </li>
-        <li>
-          <a href="/warum-ich-den-maennerkreis-leite">Warum ich den Männerkreis leite</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<style is:global>
-  @layer sections {
-    .event-cta__list {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .event-cta__list li {
-      border-block-end: 1px solid var(--border-light);
-    }
-
-    .event-cta__list a {
-      display: flex;
-      gap: var(--space-sm);
-      align-items: center;
-      justify-content: space-between;
-      min-block-size: 44px;
-      padding-block: var(--space-sm);
-      font-family: var(--font-display);
-      font-size: var(--text-2xl);
-      line-height: 1.2;
-      color: var(--text-primary);
-      transition: color var(--motion-quick);
-    }
-
-    .event-cta__list a::after {
-      flex: none;
-      inline-size: 1.4rem;
-      block-size: 1.4rem;
-      content: '';
-      background-color: var(--accent);
-      mask: var(--arrow-icon) center / contain no-repeat;
-      transition: translate var(--motion-standard);
-    }
-
-    .event-cta__list a:hover,
-    .event-cta__list a:focus-visible {
-      color: var(--accent);
-    }
-
-    .event-cta__list a:hover::after {
-      translate: 0.35rem 0;
-    }
-  }
-</style>
+<Section ground={ground} labelledby="weiter-title" defer>
+  <Split>
+    <h2 slot="head" id="weiter-title" class="text-display-3 text-fg">
+      Weiter
+    </h2>
+    <LinkList items={items} />
+  </Split>
+</Section>

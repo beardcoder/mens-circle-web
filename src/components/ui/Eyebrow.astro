@@ -1,0 +1,26 @@
+---
+/** The label above a title: small sans capitals, spaced wide, with an open seat in front. */
+interface Props {
+  as?: 'p' | 'span' | 'h2';
+  id?: string;
+  /** Without the seat. */
+  plain?: boolean;
+  /** `fg` on the flame field, where the muted tone would be too soft. */
+  tone?: 'muted' | 'fg';
+  class?: string;
+}
+
+const { as: Tag = 'p', id, plain = false, tone = 'muted', class: className } = Astro.props;
+---
+
+<Tag
+  id={id}
+  class:list={[
+    'flex items-center gap-[0.7em] font-sans text-xs font-bold uppercase tracking-label',
+    tone === 'fg' ? 'text-fg' : 'text-fg-muted',
+    className,
+  ]}
+>
+  {!plain && <span class="size-2.25 shrink-0 rounded-full border-[1.5px] border-accent" aria-hidden="true" />}
+  <slot />
+</Tag>
