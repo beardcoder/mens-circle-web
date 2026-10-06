@@ -1,0 +1,19 @@
+---
+import BreathField from './BreathField.astro';
+
+/**
+ * The page breathes: one fixed layer behind everything (Layout.astro), with three
+ * wide fields of warm light that breathe together, the way one breath fills a
+ * room. On scroll they drift up at different speeds (`--drift` over the whole
+ * page), so the light moves with the reader at three depths. The paper and the
+ * stone bands let it through; the dark bands carry their own (`strong`).
+ * Placed in viewport units, so a page growing (an island swapping in) never
+ * moves it.
+ */
+---
+
+<div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-clip print:hidden">
+  <BreathField parallax="page" class="top-[16vh] left-[86vw] w-[max(34rem,72vmax)] -translate-1/2 [--drift:-30vh]" />
+  <BreathField parallax="page" class="top-[64vh] left-[8vw] w-[max(30rem,60vmax)] -translate-1/2 [--drift:-75vh]" />
+  <BreathField parallax="page" class="top-[118vh] left-[62vw] w-[max(36rem,80vmax)] -translate-1/2 [--drift:-45vh]" />
+</div>
