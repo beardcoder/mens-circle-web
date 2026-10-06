@@ -1,4 +1,7 @@
 ---
+import { button, card } from '@lib/ui';
+import Badge from '../ui/Badge.astro';
+import AdminHead from './AdminHead.astro';
 import CapacityRing from './CapacityRing.astro';
 
 interface EventRow {
@@ -25,59 +28,59 @@ function fmtDate(iso: string): string {
 }
 ---
 
-<div class="pagehead">
-  <div class="pagehead__titles">
-    <p class="eyebrow">Übersicht</p>
-    <h1>Veranstaltungen</h1>
-  </div>
-  <a class="btn" href="/admin/events/new">
+<AdminHead eyebrow="Übersicht" title="Veranstaltungen">
+  <a class={button()} href="/admin/events/new">
     Neue Veranstaltung
   </a>
-</div>
+</AdminHead>
 
 {events.length > 0 && (
-  <p class="summary mono muted">
-    <span class="summary__n">{events.length}</span> Veranstaltungen · <span class="summary__n">{publishedCount}</span>{' '}
-    veröffentlicht
+  <p class="-mt-4 mb-6 text-sm text-fg-muted tabular-nums">
+    <span class="font-semibold text-accent">{events.length}</span> Veranstaltungen ·{' '}
+    <span class="font-semibold text-accent">{publishedCount}</span> veröffentlicht
   </p>
 )}
 
 {events.length === 0 ? (
-  <div class="empty">
+  <div class="grid justify-items-center gap-4 rounded-control border border-dashed border-line-strong px-4 py-12 text-center text-fg-muted">
     <p>Noch keine Veranstaltungen.</p>
-    <a class="btn btn--ghost btn--sm" href="/admin/events/new">
+    <a class={button({ variant: 'secondary', size: 'xs' })} href="/admin/events/new">
       Die erste anlegen
     </a>
   </div>
 ) : (
-  <ul id="event-list" class="events">
+  <ul id="event-list" class="flex flex-col gap-3">
     {events.map((ev) => (
-      <li class="event card" data-id={ev.id} data-title={ev.title}>
-        <a class="event__main" href={`/admin/events/${ev.id}`}>
+      <li
+        data-id={ev.id}
+        data-title={ev.title}
+        class:list={[
+          card,
+          'flex flex-wrap items-center justify-between gap-x-5 gap-y-4 px-5 py-4 transition-[border-color,opacity,translate,height,padding,margin] duration-200 hover:border-line-strong data-[removing]:-mt-3 data-[removing]:h-0! data-[removing]:-translate-x-4 data-[removing]:overflow-hidden data-[removing]:py-0 data-[removing]:opacity-0',
+        ]}
+      >
+        <a class="group/ev flex min-w-0 flex-[1_1_16rem] items-center gap-4" href={`/admin/events/${ev.id}`}>
           <CapacityRing value={ev.activeCount} max={ev.maxParticipants} />
-          <span class="event__text">
-            <span class="event__title">{ev.title}</span>
-            <span class="event__meta mono">
+          <span class="flex min-w-0 flex-col gap-0.5">
+            <span class="font-serif text-lg font-medium text-fg transition-colors duration-150 group-hover/ev:text-accent">
+              {ev.title}
+            </span>
+            <span class="truncate text-sm text-fg-muted tabular-nums">
               {fmtDate(ev.eventDate)}
-              {ev.startTime ? ` · ${ev.startTime}` : ''}
-              <span class="faint"> · /event/{ev.slug}</span>
+              {ev.startTime ? ` · ${ev.startTime}` : ''} · /event/{ev.slug}
             </span>
           </span>
         </a>
-        <div class="event__side">
-          {ev.isPublished ? (
-            <span class="badge badge--live">veröffentlicht</span>
-          ) : (
-            <span class="badge badge--draft">entwurf</span>
-          )}
-          <div class="event__actions">
-            <a class="btn btn--ghost btn--sm" href={`/admin/events/${ev.id}/registrations`}>
+        <div class="flex flex-wrap items-center justify-end gap-3 max-sm:w-full max-sm:justify-between">
+          {ev.isPublished ? <Badge tone="live">veröffentlicht</Badge> : <Badge>Entwurf</Badge>}
+          <div class="flex flex-wrap justify-end gap-1.5 max-sm:flex-[1_1_100%] max-sm:[&>*]:flex-auto">
+            <a class={button({ variant: 'secondary', size: 'xs' })} href={`/admin/events/${ev.id}/registrations`}>
               Anmeldungen
             </a>
-            <a class="btn btn--ghost btn--sm" href={`/admin/events/new?from=${ev.id}`} title="Duplizieren">
+            <a class={button({ variant: 'secondary', size: 'xs' })} href={`/admin/events/new?from=${ev.id}`}>
               Duplizieren
             </a>
-            <button class="btn btn--danger btn--sm js-del" type="button">
+            <button class={button({ variant: 'danger', size: 'xs' })} type="button" data-delete>
               Löschen
             </button>
           </div>
@@ -93,9 +96,9 @@ function fmtDate(iso: string): string {
 
   bindOnce('#event-list', (list) => {
     list.addEventListener('click', async (e) => {
-      const btn = (e.target as HTMLElement).closest('.js-del') as HTMLButtonElement | null;
+      const btn = (e.target as HTMLElement).closest('[data-delete]') as HTMLButtonElement | null;
       if (!btn) return;
-      const row = btn.closest('.event') as HTMLElement;
+      const row = btn.closest('[data-id]') as HTMLElement;
       const { id, title } = row.dataset;
       if (!id || !confirm(`„${title}" wirklich löschen?`)) return;
 
@@ -107,111 +110,8 @@ function fmtDate(iso: string): string {
 
       adminToast('ok', 'Veranstaltung gelöscht.');
       row.style.height = `${row.offsetHeight}px`;
-      requestAnimationFrame(() => row.classList.add('removing'));
+      requestAnimationFrame(() => (row.dataset.removing = ''));
       setTimeout(() => row.remove(), 220);
     });
   });
 </script>
-
-<style>
-  .summary {
-    font-size: 0.82rem;
-    margin: -0.75rem 0 1.5rem;
-  }
-  .summary__n {
-    color: var(--ember);
-    font-weight: 600;
-  }
-  .events {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  .event {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem 1.25rem;
-    flex-wrap: wrap;
-    padding: 1rem 1.15rem;
-    transition:
-      border-color var(--ease),
-      opacity 0.2s ease,
-      transform 0.2s ease,
-      height 0.2s ease,
-      padding 0.2s ease,
-      margin 0.2s ease;
-  }
-  .event:hover {
-    border-color: var(--line-strong);
-  }
-  .event.removing {
-    opacity: 0;
-    transform: translateX(-1rem);
-    height: 0 !important;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-top: -0.75rem;
-    overflow: hidden;
-  }
-  .event__main {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    text-decoration: none;
-    color: inherit;
-    min-width: 0;
-    flex: 1 1 16rem;
-  }
-  .event__text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    min-width: 0;
-  }
-  .event__title {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.05rem;
-    letter-spacing: -0.01em;
-    color: var(--text);
-  }
-  .event__main:hover .event__title {
-    color: var(--ember-bright);
-  }
-  .event__meta {
-    font-size: 0.76rem;
-    color: var(--muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .event__side {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-  .event__actions {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-  @media (max-width: 560px) {
-    .event__side {
-      width: 100%;
-      justify-content: space-between;
-    }
-    .event__actions {
-      flex: 1 1 100%;
-    }
-    .event__actions .btn {
-      flex: 1 1 auto;
-    }
-  }
-</style>

@@ -1,0 +1,65 @@
+---
+import { Icon } from 'astro-icon/components';
+import { button, type ButtonSize, type ButtonVariant } from '@lib/ui';
+
+/**
+ * A link styled as a button when it has an `href`, a real `<button>` otherwise.
+ * The primary carries the seat (a small ring that fills on hover) and the arrow.
+ */
+interface Props {
+  href?: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  /** Full width; the arrow then sits at the far end. */
+  block?: boolean;
+  /** Seat and arrow; on by default for the primary. */
+  decorate?: boolean;
+  type?: 'button' | 'submit';
+  class?: string;
+  [attribute: string]: unknown;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  block = false,
+  decorate = variant === 'primary',
+  type = 'button',
+  class: className,
+  ...attributes
+} = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  href={href}
+  type={href ? undefined : type}
+  class:list={[button({ variant, size, block }), block && 'justify-start text-start', className]}
+  {...attributes}
+>
+  {decorate && (
+    <span
+      class="size-[0.6em] shrink-0 rounded-full border-[1.5px] border-current transition-[background-color,scale] duration-200 group-hover/btn:scale-115 group-hover/btn:bg-current"
+      aria-hidden="true"
+    />
+  )}
+  {decorate ? (
+    <span data-label>
+      <slot />
+    </span>
+  ) : (
+    <slot />
+  )}
+  {decorate && (
+    <Icon
+      name="arrow"
+      aria-hidden="true"
+      class:list={[
+        'size-[1.1em] shrink-0 transition-transform duration-200 group-hover/btn:translate-x-1',
+        block && 'ms-auto',
+      ]}
+    />
+  )}
+</Tag>

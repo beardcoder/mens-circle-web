@@ -1,0 +1,29 @@
+---
+/** A participant's words, quoted as submitted: nothing added, nothing reworded. Every voice is set alike. */
+interface Props {
+  quote: string;
+  author?: string | null;
+  role?: string | null;
+  class?: string;
+}
+
+const { quote, author, role, class: className } = Astro.props;
+---
+
+<figure class:list={['grid content-start gap-4 border-t border-fg pt-6', className]}>
+  <blockquote class="max-w-[52ch] font-serif text-lg leading-normal text-fg italic">
+    <span class="text-accent" aria-hidden="true">
+      „
+    </span>
+    {quote}
+    <span class="text-accent" aria-hidden="true">
+      “
+    </span>
+  </blockquote>
+  {(author || role) && (
+    <figcaption class="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm">
+      {author && <cite class="font-semibold text-fg not-italic">{author}</cite>}
+      {role && <span class="text-fg-muted">{role}</span>}
+    </figcaption>
+  )}
+</figure>

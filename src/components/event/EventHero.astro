@@ -2,12 +2,15 @@
 import type { EventDTO } from '@lib/types';
 import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from '@lib/server/format';
 import SeatCircle from '../SeatCircle.astro';
+import Button from '../ui/Button.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Section from '../ui/Section.astro';
 
 interface Props {
   event: EventDTO;
 }
 
-/** The opening of a single event's page, set like the flyer: the date in orange capitals, then time and place. */
+/** The opening of a single event's page, set like the flyer: the date in orange capitals, then time and place, the seats, the action. */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);
@@ -20,150 +23,57 @@ const seatsLabel = event.is_full
   : `${event.available_spots} von ${event.max_participants} Plätzen frei`;
 ---
 
-<section class="hero event-hero surface-night">
-  <div class="container event-hero__grid">
-    <div class="event-hero__copy">
-      <p class="marker marker--plain hero__label">
-        {event.is_past ? 'Vergangenes Treffen' : 'Männerkreis · Nächstes Treffen'}
-      </p>
+<Section
+  ground="night"
+  space="none"
+  class="pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section"
+  innerClass="grid items-center gap-group lg:grid-cols-12 lg:gap-x-grid"
+>
+  <div class:list={['@container', event.is_past ? 'lg:col-span-12' : 'lg:col-span-8']}>
+    <Eyebrow plain tone="fg" class="entrance:animate-rise">
+      {event.is_past ? 'Vergangenes Treffen' : 'Männerkreis · Nächstes Treffen'}
+    </Eyebrow>
 
-      <h1 class="event-hero__title">
-        <time datetime={dateOnly}>
-          <span class="sr-only">
-            {weekday}, {dayMonthYear}
-          </span>
-          <span class="date-line event-hero__date" aria-hidden="true">
-            {weekday.slice(0, 2)} · {dayMonthYear}
-          </span>
-        </time>
-      </h1>
+    <h1 class="my-6">
+      <time datetime={dateOnly}>
+        <span class="sr-only">
+          {weekday}, {dayMonthYear}
+        </span>
+        <span
+          class="block font-sans text-[clamp(2.5rem,1.2rem+4.8vw,5.5rem)] leading-none font-bold tracking-[0.02em] text-accent uppercase entrance:animate-rise lg:text-[length:min(5.5rem,7cqi)]"
+          aria-hidden="true"
+        >
+          {weekday.slice(0, 2)} · {dayMonthYear}
+        </span>
+      </time>
+    </h1>
 
-      <div class="event-hero__meta">
-        {time && <p>{time}</p>}
-        {event.location && <p>{event.location}</p>}
-      </div>
-
-      <p class="event-hero__facts">Ohne Vorerfahrung{event.cost_basis ? ` · ${event.cost_basis}` : ''}</p>
-
-      {!event.is_past && (
-        <p class="event-hero__cta">
-          <a href="#anmeldung" class="btn btn--primary btn--large">
-            {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
-          </a>
-        </p>
-      )}
+    <div class="text-3xl font-medium tracking-[-0.015em] text-fg entrance:animate-rise entrance:animate-delay-120">
+      {time && <p>{time}</p>}
+      {event.location && <p>{event.location}</p>}
     </div>
 
+    <p class="mt-6 max-w-[30rem] border-t-2 border-accent pt-4 text-xs font-medium tracking-label text-fg-muted uppercase">
+      Ohne Vorerfahrung{event.cost_basis ? ` · ${event.cost_basis}` : ''}
+    </p>
+
     {!event.is_past && (
-      <figure class="event-hero__seats">
-        <SeatCircle seats={event.max_participants} taken={taken} ember label={seatsLabel} />
-        <figcaption>{seatsLabel}</figcaption>
-      </figure>
+      <Button href="#anmeldung" size="lg" class="mt-8 entrance:animate-rise entrance:animate-delay-120 max-sm:w-full">
+        {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
+      </Button>
     )}
   </div>
-</section>
 
-<style is:global>
-  @layer sections {
-    .event-hero__grid {
-      display: grid;
-      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-      gap: var(--space-xl);
-      align-items: center;
-    }
-
-    .event-hero__title {
-      margin-block: var(--space-md);
-      font-size: inherit;
-      letter-spacing: normal;
-    }
-
-    .event-hero__date {
-      display: block;
-      font-size: clamp(2.5rem, 1.2rem + 4.8vw, 5.5rem);
-      line-height: 1;
-      letter-spacing: 0.02em;
-    }
-
-    .event-hero__meta p {
-      margin: 0;
-      font-size: var(--text-3xl);
-      font-weight: 500;
-      line-height: 1.2;
-      letter-spacing: -0.015em;
-      color: var(--text-primary);
-    }
-
-    .event-hero__facts {
-      max-inline-size: 30rem;
-      padding-block-start: var(--space-sm);
-      margin: var(--space-md) 0 0;
-      font-size: var(--text-marker);
-      font-weight: 500;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-marker);
-      border-block-start: 2px solid var(--accent);
-    }
-
-    .event-hero__cta {
-      margin-block: var(--space-lg) 0;
-    }
-
-    .event-hero__seats {
-      display: grid;
-      gap: var(--space-sm);
-      justify-items: center;
-      margin: 0;
-    }
-
-    .event-hero__seats .seat-circle {
-      inline-size: min(100%, 18rem);
-    }
-
-    .event-hero__seats figcaption {
-      font-size: var(--text-lg);
-      font-weight: 700;
-      color: var(--text-secondary);
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .event-hero__date,
-      .event-hero__meta,
-      .event-hero__cta,
-      .event-hero__seats {
-        animation: rise var(--duration-slow) var(--ease-settle) both;
-      }
-
-      .event-hero__meta,
-      .event-hero__cta {
-        animation-delay: var(--stagger-2);
-      }
-
-      .event-hero__seats {
-        animation-delay: 200ms;
-      }
-
-      .vt-arrival :is(.event-hero__date, .event-hero__meta, .event-hero__cta, .event-hero__seats) {
-        animation: none;
-      }
-    }
-
-    @media (width <= 56em) {
-      .event-hero__grid {
-        grid-template-columns: minmax(0, 1fr);
-        gap: var(--space-lg);
-      }
-
-      .event-hero__seats {
-        grid-template-columns: 6rem minmax(0, 1fr);
-        justify-items: start;
-        align-items: center;
-      }
-
-      .event-hero__cta .btn {
-        inline-size: 100%;
-      }
-    }
-  }
-</style>
+  {!event.is_past && (
+    <figure class="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 entrance:animate-rise entrance:animate-delay-200 lg:col-span-3 lg:col-start-10 lg:grid-cols-1 lg:justify-items-center">
+      <SeatCircle
+        seats={event.max_participants}
+        taken={taken}
+        ember
+        label={seatsLabel}
+        class="w-full lg:w-[min(100%,18rem)]"
+      />
+      <figcaption class="text-lg font-bold text-fg-soft">{seatsLabel}</figcaption>
+    </figure>
+  )}
+</Section>

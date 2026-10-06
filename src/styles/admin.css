@@ -1,0 +1,6 @@
+/**
+ * Back-office entry: the same Tailwind setup and design system as the public site
+ * (theme.css), always in the dark mode (AdminLayout.astro pins it).
+ */
+@import 'tailwindcss';
+@import './theme.css';

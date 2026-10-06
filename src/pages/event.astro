@@ -9,6 +9,12 @@ import NextDate from '../components/event/NextDate.astro';
 import { eventSeriesSchema } from '@lib/series-schema';
 import { buildEventSchema } from '@lib/event-schema';
 import site from '@data/site.json';
+import { link } from '@lib/ui';
+import PageOpening from '../components/PageOpening.astro';
+import LinkList from '../components/ui/LinkList.astro';
+import Quote from '../components/ui/Quote.astro';
+import Section from '../components/ui/Section.astro';
+import Split from '../components/ui/Split.astro';
 
 /** Evergreen landing page for the dates; never redirects. SSR so the date is in the HTML. */
 const { status, event } = await fetchNextEventState();
@@ -70,6 +76,7 @@ const moreLinks = [
   {
     href: '/warum-ich-den-maennerkreis-leite',
     title: 'Warum ich den Männerkreis leite',
+    prefetch: true,
     text: 'Ein persönlicher Text von Markus: was ihm wichtig ist und was du von ihm erwarten kannst.',
   },
   {
@@ -132,25 +139,18 @@ const socialDetails = next
   socialDetails={socialDetails}
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  <section class="page-opening">
-    <div class="container">
-      <div class="page-opening__inner">
-        <p class="marker page-opening__eyebrow">Männerkreis · Straubing / Niederbayern</p>
-
-        <h1 class="page-opening__title">Termine und Anmeldung</h1>
-
-        <p class="page-opening__lead">
-          Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend
-          dauert zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht
-          weißt, was dich erwartet, lies zuerst,{' '}
-          <a class="link" href="/#ueber">
-            worum es an so einem Abend geht
-          </a>
-          .
-        </p>
-      </div>
-    </div>
-  </section>
+  {/* Opening and date stand on one night ground under the bar: the date is what this page is for. */}
+  <PageOpening eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung" ground="night" joined>
+    <Fragment slot="lead">
+      Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend dauert
+      zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was
+      dich erwartet, lies zuerst,{' '}
+      <a class={link} href="/#ueber">
+        worum es an so einem Abend geht
+      </a>
+      .
+    </Fragment>
+  </PageOpening>
 
   <NextDate state={state} />
   <Facts variant="list" next={next} />
@@ -158,23 +158,14 @@ const socialDetails = next
   {/* The top curated entry as a pull quote, quoted as submitted. Not a second
       testimonials grid — that would put the same quotes on two indexed URLs. */}
   {voice && (
-    <section class="section section--ruled event-landing-voice" aria-label="Stimme aus dem Kreis">
-      <div class="container">
-        <div class="spine">
-          <p class="rail-heading">Aus dem Kreis</p>
-
-          <figure class="event-landing-voice__figure spine__body" data-reveal="fade">
-            <blockquote class="event-landing-voice__quote">{voice.quote}</blockquote>
-            {(voice.author || voice.role) && (
-              <figcaption class="event-landing-voice__author">
-                {voice.author && <cite class="event-landing-voice__name">{voice.author}</cite>}
-                {voice.role && <span class="event-landing-voice__role">{voice.role}</span>}
-              </figcaption>
-            )}
-          </figure>
-        </div>
-      </div>
-    </section>
+    <Section ground="sand" label="Stimme aus dem Kreis" defer>
+      <Split>
+        <p slot="head" class="font-serif text-display-3 text-fg">
+          Aus dem Kreis
+        </p>
+        <Quote quote={voice.quote} author={voice.author} role={voice.role} class="reveal" />
+      </Split>
+    </Section>
   )}
 
   <Faq
@@ -186,142 +177,12 @@ const socialDetails = next
     }}
   />
 
-  <section class="section section--ruled event-landing-more" aria-labelledby="mehr-title">
-    <div class="container">
-      <div class="spine">
-        <h2 class="rail-heading" id="mehr-title">
-          Weiterlesen
-        </h2>
-
-        <ul class="event-landing-more__list spine__body--wide" role="list">
-          {moreLinks.map((link) => (
-            <li class="event-landing-more__item" data-reveal>
-              <a href={link.href}>
-                <span class="event-landing-more__title">{link.title}</span>
-                <span class="event-landing-more__text">{link.text}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  </section>
+  <Section ground="sand" labelledby="mehr-title" defer>
+    <Split>
+      <h2 slot="head" id="mehr-title" class="text-display-3 text-fg">
+        Weiterlesen
+      </h2>
+      <LinkList items={moreLinks} />
+    </Split>
+  </Section>
 </Layout>
-
-<style is:global>
-  @layer sections {
-    .event-landing-voice__figure {
-      margin: 0;
-    }
-
-    /* Set like the home's voices: quoted speech, not a headline. */
-    .event-landing-voice__quote {
-      max-inline-size: 52ch;
-      margin: 0;
-      font-family: var(--font-quote);
-      font-size: var(--text-lg);
-      font-style: italic;
-      line-height: 1.5;
-      color: var(--text-primary);
-      text-wrap: pretty;
-    }
-
-    .event-landing-voice__quote::before {
-      content: '„';
-      color: var(--accent);
-    }
-
-    .event-landing-voice__quote::after {
-      content: '“';
-      color: var(--accent);
-    }
-
-    @media (width > 56em) {
-      .event-landing-voice__quote {
-        font-size: 1.25rem;
-        line-height: 1.55;
-      }
-    }
-
-    .event-landing-voice__author {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3xs) var(--space-xs);
-      align-items: baseline;
-      margin-block-start: var(--space-sm);
-    }
-
-    .event-landing-voice__name {
-      font-size: var(--text-caption);
-      font-style: normal;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .event-landing-voice__role {
-      font-size: var(--text-caption);
-      color: var(--text-muted);
-    }
-
-    .event-landing-more__list {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      border-block-start: 1px solid var(--border-light);
-    }
-
-    .event-landing-more__item {
-      border-block-end: 1px solid var(--border-light);
-    }
-
-    .event-landing-more__item a {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: var(--space-3xs) var(--space-md);
-      align-items: center;
-      padding-block: var(--space-md);
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .event-landing-more__item a::after {
-      grid-row: 1 / span 2;
-      grid-column: 2;
-      inline-size: 1.4rem;
-      block-size: 1.4rem;
-      content: '';
-      background-color: var(--accent);
-      mask: var(--arrow-icon) center / contain no-repeat;
-      transition: translate var(--motion-standard);
-    }
-
-    .event-landing-more__item a:hover::after {
-      translate: 0.35rem 0;
-    }
-
-    .event-landing-more__item a:hover .event-landing-more__title,
-    .event-landing-more__item a:focus-visible .event-landing-more__title {
-      color: var(--accent);
-    }
-
-    .event-landing-more__item a:focus-visible {
-      outline: 2px solid var(--focus-ring);
-      outline-offset: 2px;
-    }
-
-    .event-landing-more__title {
-      font-family: var(--font-display);
-      font-size: var(--text-2xl);
-      line-height: 1.2;
-      color: var(--text-primary);
-      transition: color var(--motion-quick);
-    }
-
-    .event-landing-more__text {
-      max-inline-size: var(--measure);
-      font-size: var(--text-section-body);
-      line-height: var(--leading-relaxed);
-      color: var(--text-secondary);
-    }
-  }
-</style>

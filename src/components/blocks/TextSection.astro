@@ -1,4 +1,9 @@
 ---
+import Prose from '../ui/Prose.astro';
+import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import Split from '../ui/Split.astro';
+
 interface Props {
   data: {
     anchor?: string;
@@ -6,11 +11,17 @@ interface Props {
     title?: string;
     content?: string;
   };
+  /** The essay opening the page: its first paragraph starts with a dropped initial. */
+  opening?: boolean;
 }
 
-/** Prose on the spine — the essay register of the sub-pages: the label and title on the left, the text from column 7. Legal pages pass only content and read from the left edge. */
+/**
+ * Prose on the split line — the essay register of the sub-pages: label and title
+ * on the left, the text from column 7. Legal pages pass only content: the text
+ * reads from the left edge and follows its title without a section's pause.
+ */
 
-const { data } = Astro.props;
+const { data, opening = false } = Astro.props;
 const slug = (data.title ?? '')
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, '-')
@@ -19,71 +30,19 @@ const anchor = data.anchor ?? slug;
 const hasHead = Boolean(data.eyebrow || data.title);
 ---
 
-<section
-  class:list={['section', 'section--ruled', 'text-section', hasHead && 'text-section--essay']}
-  id={anchor || undefined}
->
-  <div class="container">
-    <div class="spine">
-      {hasHead && (
-        <div class="spine__head">
-          {data.eyebrow && <p class="marker">{data.eyebrow}</p>}
-          {data.title && (
-            <h2 class="display text-section__title" data-reveal>
-              {data.title}
-            </h2>
-          )}
-        </div>
-      )}
-
-      {data.content && <div class="prose text-section__prose spine__body" set:html={data.content} />}
-    </div>
-  </div>
-</section>
-
-<style is:global>
-  @layer sections {
-    .text-section__title {
-      max-inline-size: 16ch;
-      margin: 0;
-      font-size: var(--display-3);
-      line-height: 1.05;
-      hyphens: manual;
-    }
-
-    .text-section .prose {
-      max-inline-size: 60ch;
-    }
-
-    .text-section .prose p {
-      font-size: var(--text-section-body-lg);
-    }
-
-    /* Wide: the text's first line starts level with the title. The title keeps
-       the smaller display size, the quieter register of the sub-pages, so a long
-       one stays at three lines in its five columns. */
-    @media (width > 56em) {
-      .text-section--essay .prose {
-        max-inline-size: 36em;
-        padding-block-start: calc(var(--text-marker) * 1.3 + var(--space-sm) + 0.2em);
-      }
-    }
-
-    /* A legal page's text follows its title without a section's pause. */
-    .page-hero + .text-section:not(.text-section--essay) {
-      padding-block-start: 0;
-    }
-
-    /* The essay opening the page starts with a dropped initial where supported. */
-    @supports (initial-letter: 3) or (-webkit-initial-letter: 3) {
-      .page-hero + .text-section--essay .prose > p:first-child::first-letter {
-        -webkit-initial-letter: 3;
-        initial-letter: 3;
-        margin-inline-end: 0.12em;
-        font-family: var(--font-display);
-        font-weight: var(--weight-display);
-        color: var(--accent);
-      }
-    }
-  }
-</style>
+<Section id={anchor || undefined} space={hasHead ? 'default' : 'none'} class:list={[!hasHead && 'pb-section']}>
+  <Split alignToTitle={hasHead}>
+    {hasHead && <SectionHead slot="head" eyebrow={data.eyebrow} title={data.title} size="display-3" class="reveal" />}
+    {data.content && (
+      <Prose
+        html={data.content}
+        size="lg"
+        class:list={[
+          hasHead ? 'max-w-[36em]' : 'max-w-[62ch]',
+          opening &&
+            'supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:mr-[0.12em] supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:font-serif supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:text-accent supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:[-webkit-initial-letter:3] supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:[initial-letter:3]',
+        ]}
+      />
+    )}
+  </Split>
+</Section>

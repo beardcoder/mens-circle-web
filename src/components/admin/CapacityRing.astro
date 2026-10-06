@@ -1,5 +1,5 @@
 ---
-/** A ring whose arc is the share of taken places, complete when the event is full. */
+/** A ring whose arc is the share of taken places, complete (and green) when the event is full. */
 interface Props {
   value: number;
   max: number;
@@ -17,11 +17,23 @@ const offset = circ * (1 - frac);
 const labelSize = Math.round(size * 0.24);
 ---
 
-<span class:list={['ring', { 'is-full': full }]} style={`width:${size}px;height:${size}px`}>
-  <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`${value} von ${max} belegt`}>
-    <circle class="ring__track" cx={size / 2} cy={size / 2} r={r} fill="none" stroke-width={stroke}></circle>
+{/* Size and label size come from the props, so they stay inline; the box is fixed so the
+    ring never shrinks under its neighbours. */}
+<span class="relative inline-grid shrink-0 place-items-center" style={`width: ${size}px; height: ${size}px`}>
+  <svg
+    width={size}
+    height={size}
+    viewBox={`0 0 ${size} ${size}`}
+    role="img"
+    aria-label={`${value} von ${max} belegt`}
+    class="block max-w-none -rotate-90"
+  >
+    <circle class="stroke-line-strong" cx={size / 2} cy={size / 2} r={r} fill="none" stroke-width={stroke}></circle>
     <circle
-      class="ring__fill"
+      class:list={[
+        'transition-[stroke-dashoffset] duration-150 [stroke-linecap:round]',
+        full ? 'stroke-success' : 'stroke-accent',
+      ]}
       cx={size / 2}
       cy={size / 2}
       r={r}
@@ -32,9 +44,15 @@ const labelSize = Math.round(size * 0.24);
     ></circle>
   </svg>
   {showLabel && (
-    <span class="ring__label" style={`font-size:${labelSize}px`}>
-      {value}
-      <span class="faint">/{max}</span>
+    <span
+      class="absolute inset-0 grid place-items-center leading-none font-medium text-fg tabular-nums"
+      style={`font-size: ${labelSize}px`}
+      aria-hidden="true"
+    >
+      <span>
+        {value}
+        <span class="text-fg-muted">/{max}</span>
+      </span>
     </span>
   )}
 </span>

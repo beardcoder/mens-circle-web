@@ -1,5 +1,8 @@
 ---
 import Breath from '../Breath.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Section from '../ui/Section.astro';
+import TextLink from '../ui/TextLink.astro';
 
 interface Props {
   data: {
@@ -15,225 +18,72 @@ interface Props {
   };
 }
 
-/** The one orange field on the page, set like the flyer: night capitals on flame. */
+/**
+ * The one flame field on the page, set like the flyer: night capitals on flame.
+ * Wide: the slogan over columns 1–5, the label and the reading from column 7,
+ * the reading level with the slogan's last line. Narrow: the same poster, stacked.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'haltung';
 const lines = data.lines ?? [];
 ---
 
-<section class="section surface-flame section--clip statement" id={anchor} aria-labelledby="statement-title">
-  <Breath variant="glow" class="statement__breath" />
+<Section
+  id={anchor}
+  ground="flame"
+  space="none"
+  labelledby="statement-title"
+  class="overflow-clip py-section"
+  innerClass="relative @container grid grid-cols-1 gap-y-group lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-grid lg:gap-y-8"
+>
+  {/* A light breath across the field: lightening the orange behind night text only raises the contrast. */}
+  <Breath slot="before" variant="glow" light class="top-1/2 left-[30%] w-[max(70vw,40rem)] -translate-1/2" />
 
-  <div class="container statement__inner">
-    {data.eyebrow && <p class="marker marker--plain statement__marker">{data.eyebrow}</p>}
+  {data.eyebrow && (
+    <Eyebrow plain tone="fg" class="lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:self-start">
+      {data.eyebrow}
+    </Eyebrow>
+  )}
 
-    <h2 class="display display--heavy statement__display" id="statement-title">
-      {lines.map((line) => (
-        <span class="display__line statement__line">{line}</span>
-      ))}
-    </h2>
+  {/* Capitals with room for umlaut dots. "Aus dem", the widest line, is 4.45em. */}
+  <h2
+    id="statement-title"
+    class="text-[length:min(21cqi,7.5rem)] leading-[1.04] tracking-[-0.02em] text-fg uppercase lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-start lg:text-[length:min(8.8cqi,9rem)]"
+  >
+    {lines.map((line, i) => (
+      <span
+        class:list={[
+          'block',
+          'max-lg:scroll-motion:animate-[rise_linear_both] lg:scroll-motion:animate-[settle_linear_both] scroll-motion:[animation-range:entry_10%_cover_40%] scroll-motion:[animation-timeline:view()]',
+          i === 1 && '[--settle-from:12%]',
+        ]}
+      >
+        {line}
+      </span>
+    ))}
+  </h2>
 
-    {(data.text || data.linkLabel) && (
-      <div class="statement__foot">
-        {data.text && <p class="statement__text">{data.text}</p>}
-        {data.breathGuide && (
-          <p class="statement__guide">
-            <span class="statement__guide-circle" aria-hidden="true" data-breath></span>
-            {data.breathGuide}
-          </p>
-        )}
-        {data.linkLabel && data.linkUrl && (
-          <a href={data.linkUrl} class="text-link statement__link">
-            {data.linkLabel}
-          </a>
-        )}
-      </div>
-    )}
-  </div>
-</section>
-
-<style is:global>
-  @layer sections {
-    .statement {
-      padding-block: var(--space-2xl);
-    }
-
-    /* A light breath across the field. Lightening the orange behind night text
-       only raises the contrast. */
-    .statement__breath {
-      --breath-color: #fff4e6;
-      --breath-glow: 34%;
-
-      inset-block-start: 50%;
-      inset-inline-start: 30%;
-      inline-size: max(70vw, 40rem);
-      translate: -50% -50%;
-    }
-
-    /* The capitals run across the field like the flyer's slogan; the reading
-       follows below them, on the content line. */
-    .statement__inner {
-      position: relative;
-      display: grid;
-      grid-template-columns: var(--split-columns);
-      gap: var(--space-lg) var(--split-gap);
-      align-items: end;
-    }
-
-    .statement__display {
-      grid-column: 1 / -1;
-    }
-
-    .statement__foot {
-      grid-column: 2;
-    }
-
-    .statement__marker {
-      grid-column: 1 / -1;
-      color: var(--text-primary);
-    }
-
-    .statement__display {
-      margin: 0;
-      font-size: clamp(2.5rem, 1rem + 5vw, 5.5rem);
-      /* Umlaut dots rise above the cap height; this keeps them off the line above. */
-      line-height: 1.12;
-      color: var(--text-primary);
-    }
-
-    /* Wide: a poster on the split line, two columns of equal height. The slogan
-       stands in four lines over columns 1–5 ("Aus dem", the widest, is 4.45em of
-       capitals, so 8.8cqi fills them); from column 7 the label at the top and the
-       reading at the foot, level with the slogan's last line. */
-    @media (width > 56em) {
-      .statement__inner {
-        container-type: inline-size;
-        grid-template-rows: auto 1fr;
-        grid-template-columns: var(--field);
-        gap: var(--space-lg) var(--field-gap);
-        align-items: stretch;
-      }
-
-      .statement__marker {
-        grid-row: 1;
-        grid-column: 7 / span 6;
-        align-self: start;
-        margin: 0;
-      }
-
-      .statement__display {
-        grid-row: 1 / span 2;
-        grid-column: 1 / span 5;
-        align-self: start;
-        font-size: min(8.8cqi, 9rem);
-        line-height: 1.04;
-      }
-
-      .statement__foot {
-        grid-row: 2;
-        grid-column: 7 / span 6;
-        align-self: end;
-      }
-
-      .statement__text {
-        max-inline-size: 34em;
-      }
-    }
-
-    .statement__foot {
-      display: grid;
-      gap: var(--space-sm);
-      justify-items: start;
-      padding-block-start: var(--space-md);
-      border-block-start: 2px solid var(--rule-strong);
-    }
-
-    .statement__text {
-      max-inline-size: 42ch;
-      margin: 0;
-      font-size: var(--text-section-body-lg);
-      font-weight: 500;
-      line-height: var(--leading-relaxed);
-      color: var(--text-primary);
-    }
-
-    /* The breath to follow: a small circle on the same 10-second cycle. */
-    .statement__guide {
-      display: flex;
-      gap: var(--space-sm);
-      align-items: center;
-      margin: 0;
-      font-family: var(--font-quote);
-      font-size: var(--text-lg);
-      font-style: italic;
-      font-weight: 400;
-      line-height: 1.3;
-      color: var(--text-primary);
-    }
-
-    .statement__guide-circle {
-      --rest: 0.45;
-      --alpha: 1;
-
-      flex: none;
-      inline-size: 2.75rem;
-      block-size: 2.75rem;
-      border: 2px solid var(--text-primary);
-      border-radius: 50%;
-      animation: breathe 10s infinite both;
-    }
-
-    /* Still, the circle cannot guide a breath; the line goes with it. */
-    @media (prefers-reduced-motion: reduce) {
-      .statement__guide {
-        display: none;
-      }
-    }
-
-    .statement__link {
-      font-weight: 700;
-      text-decoration-color: var(--text-primary);
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .statement__line {
-          animation: statement-settle linear both;
-          animation-timeline: view();
-          animation-range: entry 10% cover 40%;
-        }
-
-        .statement__line:nth-child(2) {
-          --statement-from: 12%;
-        }
-      }
-    }
-
-    /* Narrow: the same poster, stacked. The slogan stands in four lines across the
-       full width ("Aus dem", the widest, is 4.45em, so 21cqi fills it), the reading
-       under it. */
-    @media (width <= 56em) {
-      .statement__inner {
-        container-type: inline-size;
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: var(--space-xl);
-      }
-
-      .statement__display {
-        font-size: min(21cqi, 7.5rem);
-        line-height: 1.04;
-      }
-
-      .statement__foot {
-        grid-column: auto;
-      }
-
-      @supports (animation-timeline: view()) {
-        .statement__line {
-          animation-name: rise;
-        }
-      }
-    }
-  }
-</style>
+  {(data.text || data.linkLabel) && (
+    <div class="grid justify-items-start gap-4 border-t-2 border-fg pt-6 lg:col-span-6 lg:col-start-7 lg:row-start-2 lg:self-end">
+      {data.text && <p class="max-w-[42ch] text-lg font-medium text-fg lg:max-w-[34em]">{data.text}</p>}
+      {data.breathGuide && (
+        /* The breath to follow: a small circle on the same 10-second cycle. Still,
+             the circle cannot guide a breath, so the line goes with it. */
+        <p class="flex items-center gap-4 font-serif text-lg leading-[1.3] text-fg italic motion-reduce:hidden">
+          <span
+            class="size-11 shrink-0 animate-breathe rounded-full border-2 border-fg [--alpha:1] [--rest:0.45]"
+            aria-hidden="true"
+            data-breath
+          />
+          {data.breathGuide}
+        </p>
+      )}
+      {data.linkLabel && data.linkUrl && (
+        <TextLink href={data.linkUrl} strong>
+          {data.linkLabel}
+        </TextLink>
+      )}
+    </div>
+  )}
+</Section>
