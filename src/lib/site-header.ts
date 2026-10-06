@@ -31,7 +31,6 @@ export function initSiteHeader(): void {
   const toggle = document.getElementById('navToggle');
   if (!nav || !toggle) return;
 
-  const [top, mid, bottom] = toggle.querySelectorAll<HTMLElement>('.nav-toggle__bar');
   let isOpen = false;
   let scrollPosition = 0;
 
@@ -42,16 +41,20 @@ export function initSiteHeader(): void {
     nav.classList.toggle('is-open', isOpen);
     document.body.classList.toggle('nav-open', isOpen);
     document.body.style.top = isOpen ? `-${scrollPosition}px` : '';
+  };
 
-    const duration = prefersReducedMotion() ? '0ms' : '180ms';
-    for (const bar of [top, mid, bottom]) bar.style.transition = `transform ${duration} ease, opacity ${duration} ease`;
-    top.style.transform = isOpen ? 'translateY(6.5px) rotate(45deg)' : '';
-    bottom.style.transform = isOpen ? 'translateY(-6.5px) rotate(-45deg)' : '';
-    mid.style.opacity = isOpen ? '0' : '1';
+  /** The panel opens as a circle from the toggle's centre (see `.nav` in Header.astro). */
+  const setOrigin = (): void => {
+    const button = toggle.getBoundingClientRect();
+    const panel = nav.getBoundingClientRect();
+    const x = button.left + button.width / 2 - panel.left;
+    const y = button.top + button.height / 2 - panel.top;
+    nav.style.setProperty('--nav-origin', `${x}px ${y}px`);
   };
 
   const open = (): void => {
     scrollPosition = window.scrollY;
+    setOrigin();
     isOpen = true;
     render();
   };
