@@ -139,8 +139,8 @@ const socialDetails = next
   socialDetails={socialDetails}
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  {/* Opening and date stand on one night ground under the bar: the date is what this page is for. */}
-  <PageOpening eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung" ground="night" joined>
+  {/* The date follows the opening straight on: it is what this page is for. */}
+  <PageOpening eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung" joined>
     <Fragment slot="lead">
       Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend dauert
       zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was
@@ -158,9 +158,9 @@ const socialDetails = next
   {/* The top curated entry as a pull quote, quoted as submitted. Not a second
       testimonials grid — that would put the same quotes on two indexed URLs. */}
   {voice && (
-    <Section ground="sand" label="Stimme aus dem Kreis" defer>
+    <Section label="Stimme aus dem Kreis" defer>
       <Split>
-        <p slot="head" class="font-serif text-display-3 text-fg">
+        <p slot="head" class="font-serif text-display-3 font-medium text-fg">
           Aus dem Kreis
         </p>
         <Quote quote={voice.quote} author={voice.author} role={voice.role} class="reveal" />
@@ -168,7 +168,9 @@ const socialDetails = next
     </Section>
   )}
 
+  {/* Grounds alternate whether or not a voice is published. */}
   <Faq
+    ground={voice ? 'sand' : 'default'}
     data={{
       anchor: 'fragen-zum-termin',
       eyebrow: 'Vor dem Termin',
@@ -177,7 +179,7 @@ const socialDetails = next
     }}
   />
 
-  <Section ground="sand" labelledby="mehr-title" defer>
+  <Section ground={voice ? 'default' : 'sand'} labelledby="mehr-title" defer>
     <Split>
       <h2 slot="head" id="mehr-title" class="text-display-3 text-fg">
         Weiterlesen
