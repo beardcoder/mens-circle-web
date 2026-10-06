@@ -49,28 +49,30 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
     <h1 id="hero-title" class="grid gap-5">
       {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
       {data.kicker && (
-        <Eyebrow as="span" class="entrance:animate-rise">
+        <Eyebrow as="span" class="entrance:animate-fade-in-up">
           {data.kicker}
         </Eyebrow>
       )}{' '}
-      <span class="block max-w-[15ch] text-display-1 text-fg entrance:animate-rise entrance:animate-delay-60">
+      <span class="block max-w-[15ch] text-display-1 text-fg entrance:animate-fade-in-up entrance:animate-delay-60">
         {before}
         {emphasis && <em class="text-accent not-italic">{emphasis}</em>}
         {after}
       </span>{' '}
       {data.claim && (
-        <span class="block font-serif text-xl font-normal text-fg-soft italic entrance:animate-rise entrance:animate-delay-120">
+        <span class="block font-serif text-xl font-normal text-fg-soft italic entrance:animate-fade-in-up entrance:animate-delay-120">
           {data.claim}
         </span>
       )}
     </h1>
 
     {data.lede && (
-      <p class="max-w-[34rem] text-lg text-fg-soft entrance:animate-rise entrance:animate-delay-160">{data.lede}</p>
+      <p class="max-w-[34rem] text-lg text-fg-soft entrance:animate-fade-in-up entrance:animate-delay-160">
+        {data.lede}
+      </p>
     )}
 
     {data.secondaryLabel && data.secondaryLink && (
-      <TextLink href={data.secondaryLink} class="entrance:animate-rise entrance:animate-delay-200">
+      <TextLink href={data.secondaryLink} class="entrance:animate-fade-in-up entrance:animate-delay-200">
         {data.secondaryLabel}
       </TextLink>
     )}
