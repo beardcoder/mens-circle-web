@@ -124,18 +124,26 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   markup. Rust (`#a3462a`) is the accent by day, ember (`#ec7a48`) by night; flame
   (`#e4632e`) is the mark. Every text token holds ≥ 4.5:1 on every ground, control
   borders (`line-bold`) ≥ 3:1. Grounds: the page's paper, a stone band
-  (`surface-sand`) for quiet passages, dark bands (`surface-night`) for the statement
-  and the home page's close, and the footer. Surfaces re-declare the semantic
-  colours, so everything inside follows.
-- The dark bands carry `Contours.astro`: contour lines of the hill country
+  (`surface-sand`, 80% opaque so the breathing light runs on beneath it) for quiet
+  passages, dark bands (`surface-night`) for the statement, the voices
+  (Testimonials) and the home page's close, and the footer. Surfaces re-declare the
+  semantic colours, so everything inside follows.
+- The statement and the close carry `Contours.astro`: contour lines of the hill country
   (`public/images/contours.svg`, square) in the accent at 20%, which keeps every text
   token above 4.5:1 even where a line runs behind it. Only on dark bands.
 - Shapes: firm. Square-cut controls, buttons and cards (`rounded-control` 3px,
   `rounded-card` 4px), flat cards with a solid border (`card`/`panel` in
-  `lib/ui.ts`) for self-contained units — the date, agreements, voices, forms,
-  questions — never for running text. Heavy rules mark where something begins: the
-  Ablauf steps and facts stand under a 2–3px rule in `fg`, the date cards carry a
-  4px accent bar on top, quotes a 4px accent rule on the left. Circles only for
+  `lib/ui.ts`) for self-contained units — the date, agreements, forms, the
+  questions card — never for running text. Heavy rules mark where something begins:
+  the Ablauf steps, facts and the FAQ list stand under a 2–3px rule in `fg`, the
+  date cards carry a 4px accent bar on top, the Moderator's quote a 4px accent rule
+  on the left, the smaller voices a 3px accent rule on top.
+- Voices (`Quote`) are never cards: the first is set large (`size="lg"`, a big
+  opening mark in the accent, the serif italic), the others stand level below it;
+  names and roles follow in capitals.
+- The FAQ is an index, not boxes: firm serif questions between rules, an accent bar
+  that grows down beside the open one, a plus that folds into a minus, and a large
+  faint italic "?" under the head. Circles only for
   seats and round icon buttons; `shadow-overlay` only on popovers.
 - Layout: a 1248px container. Titles stand above their content; `Split` puts a head
   (title, note, contact line) beside its content where both earn a column (FAQ,
@@ -147,17 +155,20 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   order); everything else is told in sentences, not bullets.
 - Seats are counted by `SeatMeter.astro`: a row of square-cut fields, one per seat,
   taken filled, open outlined, always beside the count in words. No ring of dots.
-- The circle lives in the background and breathes: `BreathField.astro`, three soft
-  fields of warm light (flame) that widen and settle on a natural breath (`breath`:
-  a 34.6 s phrase of three breaths of different depth, in shorter than out, a short
-  hold and rest; the outer fields follow the core a moment later) and lag behind the
-  page on scroll (`breath-parallax`, view() timeline). Placed by the caller behind
-  the hero, the questions card, an event's opening, the page openings, the 404
-  (`soft`) and the statement band (`strong`). At its brightest it mixes ≤ 18% flame
-  into paper and ≤ 23% into a dark band, so every text token holds 4.5:1 behind it.
-  Its sections clip it only sideways (`overflow-x-clip`), so it fades into the next
-  block instead of ending on a hard edge. `lib/breath.ts` pauses it off screen; under
-  reduced motion it rests. No rings or wave patterns.
+- The page breathes: `BreathBackdrop.astro` (in Layout) is one fixed layer behind
+  everything with three wide fields of warm light (`BreathField`, flame) that widen
+  and settle together on a natural breath (`breath`: a 34.6 s phrase of three
+  breaths of different depth, in shorter than out, a short hold and rest; the haze
+  follows the core a moment later) and drift up at three speeds over the whole
+  page's scroll (`breath-drift`, root scroll() timeline, `--drift`). Paper is
+  transparent and the stone band lets a fifth through, so it runs under every
+  light block; the dark bands (statement, voices, close) carry their own `strong`
+  field, which lags behind its block (`breath-parallax`, view() timeline). The light
+  is `breath-glow` (cosine falloff, even stops: no bands or rings). At its
+  brightest it mixes ~17% flame into paper and ~23% into a dark band, so every text
+  token holds 4.5:1 behind it; fields are placed apart so they never add up past
+  that. `lib/breath.ts` pauses fields off screen; under reduced motion it rests.
+  No rings or wave patterns.
 - The header is the page's paper at all times (nothing scrolls visibly beneath it);
   its hairline fades in on scroll. No numbers in the navigation.
 - Motion: entrances on the openings (`entrance:`, never after a view transition),

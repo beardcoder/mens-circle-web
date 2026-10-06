@@ -1,4 +1,5 @@
 ---
+import BreathField from '../BreathField.astro';
 import Contours from '../Contours.astro';
 import site from '../../data/site.json';
 import { link } from '@lib/ui';
@@ -34,6 +35,7 @@ const title = (data.displayLines ?? ['Dabei sein.']).join(' ');
   innerClass="relative grid items-start gap-y-10 lg:grid-cols-12 lg:gap-x-grid"
 >
   <Contours slot="before" />
+  <BreathField slot="before" strength="strong" class="top-[40%] left-[72%] w-[min(130vw,64rem)] -translate-1/2" />
   <div class="grid gap-8 lg:col-span-6">
     <SectionHead eyebrow={data.eyebrow} title={title} titleId="termine-title" lead={data.lede} size="display-2" />
 

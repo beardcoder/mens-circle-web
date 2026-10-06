@@ -1,14 +1,18 @@
 ---
 import type { Testimonial } from '@lib/types';
 import { link } from '@lib/ui';
+import BreathField from '../BreathField.astro';
 import Quote from '../ui/Quote.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
+import Split from '../ui/Split.astro';
 
 /**
  * Submitted and moderated entries, quoted as written — nothing is added or
- * reworded — as equal cards. With none published the section shrinks to a quiet
- * invitation.
+ * reworded — on a dark band with its own breathing light. The head and the way
+ * to add a voice stand beside them; the first voice leads, set large, the others
+ * stand level below it under accent rules. With none published the band shrinks
+ * to a quiet invitation.
  */
 
 interface Props {
@@ -22,42 +26,66 @@ const testimonials =
   Astro.props.testimonials ?? (await (await import('../../lib/server/testimonials')).fetchTestimonials());
 const anchor = data?.anchor ?? 'stimmen';
 const empty = testimonials.length === 0;
+const [lead, ...others] = testimonials;
 ---
 
 <Section
   id={anchor}
+  ground="night"
   labelledby="testimonials-title"
   space={empty && !loading ? 'compact' : 'default'}
-  class:list={[loading && 'min-h-96']}
+  class:list={['overflow-clip', loading && 'min-h-96']}
+  innerClass="relative"
   data-llms-skip
 >
-  <SectionHead
-    eyebrow={data?.eyebrow ?? 'Aus dem Kreis'}
-    title={data?.title ?? 'Was Teilnehmer geschrieben haben'}
-    titleId="testimonials-title"
-    size={empty ? 'display-3' : 'display-2'}
-  />
+  <BreathField slot="before" strength="strong" class="top-[38%] left-[22%] w-[min(130vw,60rem)] -translate-1/2" />
 
   {empty ? (
-    <p class="mt-4 max-w-measure text-lg text-fg-soft">
-      {loading
-        ? 'Erfahrungen von Teilnehmern werden geladen.'
-        : 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'}
-    </p>
+    <>
+      <SectionHead
+        eyebrow={data?.eyebrow ?? 'Aus dem Kreis'}
+        title={data?.title ?? 'Was Teilnehmer geschrieben haben'}
+        titleId="testimonials-title"
+        size="display-3"
+      />
+      <p class="mt-4 max-w-measure text-lg text-fg-soft">
+        {loading
+          ? 'Erfahrungen von Teilnehmern werden geladen.'
+          : 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'}
+      </p>
+      <p class="mt-2 max-w-measure text-sm text-fg-muted">
+        <a class={link} href="/teile-deine-erfahrung">
+          Du warst dabei und möchtest etwas beitragen?
+        </a>
+      </p>
+    </>
   ) : (
-    <ul role="list" class="mt-group grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {testimonials.map((t) => (
-        <li class="reveal">
-          <Quote quote={t.quote} author={t.author} role={t.role} />
-        </li>
-      ))}
-    </ul>
-  )}
+    <Split>
+      <div slot="head" class="grid justify-items-start gap-6">
+        <SectionHead
+          eyebrow={data?.eyebrow ?? 'Aus dem Kreis'}
+          title={data?.title ?? 'Was Teilnehmer geschrieben haben'}
+          titleId="testimonials-title"
+          size="display-3"
+        />
+        <p class="max-w-measure text-sm text-fg-muted">
+          Die Zitate stammen von Männern, die schon dabei waren.{' '}
+          <a class={link} href="/teile-deine-erfahrung">
+            Du warst dabei und möchtest etwas beitragen?
+          </a>
+        </p>
+      </div>
 
-  <p class:list={['max-w-measure text-sm text-fg-muted', empty ? 'mt-2' : 'mt-8']}>
-    {!empty && 'Die Zitate stammen von Männern, die schon dabei waren. '}
-    <a class={link} href="/teile-deine-erfahrung">
-      Du warst dabei und möchtest etwas beitragen?
-    </a>
-  </p>
+      <Quote quote={lead!.quote} author={lead!.author} role={lead!.role} size="lg" class="reveal" />
+      {others.length > 0 && (
+        <ul role="list" class="mt-group grid gap-x-grid gap-y-10 sm:grid-cols-2">
+          {others.map((t) => (
+            <li class="reveal">
+              <Quote quote={t.quote} author={t.author} role={t.role} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </Split>
+  )}
 </Section>

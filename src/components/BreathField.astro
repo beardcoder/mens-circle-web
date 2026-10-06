@@ -1,43 +1,43 @@
 ---
 /**
- * The circle, kept in the background, breathing: three soft fields of warm light
- * that widen and settle on a natural breath (`breath` in theme.css: three breaths
- * of different depth, in shorter than out, a short hold and rest, so it never
- * ticks like a metronome). The outer fields follow the core a moment later, as a
- * chest fills after the belly. Scrolling gives depth: the light lags behind the
- * page (`breath-parallax` on a view() timeline).
+ * A field of warm light that breathes: a core and a haze (flame) that widen and
+ * settle on a natural breath (`breath` in theme.css: three breaths of different
+ * depth, in shorter than out, a short hold and rest, so it never ticks like a
+ * metronome); the haze follows the core a moment later, as a chest fills after
+ * the belly.
  *
- * Placed by the caller (absolute, centre and size) in a `relative`, clipped
- * block. At its brightest the light mixes at most ~18% flame into the paper
- * (`soft`) or ~23% into a dark band (`strong`), which keeps every text token
- * above 4.5:1 where it runs behind text. lib/breath.ts pauses it off screen;
- * under reduced motion it rests, still.
+ * Depth on scroll: `view` lags behind its own block (`breath-parallax`, view()
+ * timeline); `page` drifts with the whole page's scroll (`breath-drift`, root
+ * scroll() timeline, by `--drift` from the caller) — the mode BreathBackdrop uses.
+ *
+ * Placed by the caller (absolute, centre and size). At its brightest the light
+ * mixes ~17% flame into the ground (`soft`) or ~23% into a dark band (`strong`),
+ * which keeps every text token above 4.5:1 where it runs behind text.
+ * lib/breath.ts pauses it off screen; under reduced motion it rests, still.
  */
 interface Props {
   /** `soft` on paper, `strong` on a dark band. */
   strength?: 'soft' | 'strong';
+  parallax?: 'view' | 'page';
   class?: string;
 }
 
-const { strength = 'soft', class: className } = Astro.props;
+const { strength = 'soft', parallax = 'view', class: className } = Astro.props;
 
-// Core, halo, haze: each a radial field, full to 30%, about half at 65%, gone at its edge.
+// Core and haze, each a `breath-glow` field (theme.css) at its peak percentage.
 const LAYERS = {
-  soft: [
-    'inset-[30%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_8%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_4%,transparent)_65%,transparent)]',
-    'inset-[14%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_6%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_3%,transparent)_65%,transparent)] animate-delay-[350ms]',
-    'inset-0 bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_5%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_3%,transparent)_65%,transparent)] animate-delay-[700ms]',
-  ],
-  strong: [
-    'inset-[30%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_11%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_6%,transparent)_65%,transparent)]',
-    'inset-[14%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_8%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_4%,transparent)_65%,transparent)] animate-delay-[350ms]',
-    'inset-0 bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_6%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_3%,transparent)_65%,transparent)] animate-delay-[700ms]',
-  ],
+  soft: ['inset-[22%] breath-glow [--glow:10]', 'inset-0 breath-glow [--glow:8] animate-delay-[500ms]'],
+  strong: ['inset-[22%] breath-glow [--glow:13]', 'inset-0 breath-glow [--glow:11] animate-delay-[500ms]'],
+} as const;
+
+const PARALLAX = {
+  view: 'scroll-motion:animate-[breath-parallax_linear_both] scroll-motion:[animation-timeline:view()]',
+  page: 'scroll-motion:animate-[breath-drift_linear_both] scroll-motion:[animation-timeline:scroll(root)]',
 } as const;
 ---
 
 <span class:list={['pointer-events-none absolute block aspect-square', className]} aria-hidden="true" data-breath>
-  <span class="absolute inset-0 block scroll-motion:animate-[breath-parallax_linear_both] scroll-motion:[animation-timeline:view()]">
+  <span class:list={['absolute inset-0 block', PARALLAX[parallax]]}>
     {LAYERS[strength].map((layer) => (
       <span class:list={['absolute block animate-breath rounded-full', layer]} />
     ))}
