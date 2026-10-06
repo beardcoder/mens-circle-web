@@ -89,6 +89,12 @@ const anchor = data.anchor ?? 'praktisches';
       padding-block: var(--space-lg);
     }
 
+    @media (width > 72em) {
+      .home-facts {
+        padding-block: var(--space-xl);
+      }
+    }
+
     .home-facts__inner {
       display: grid;
       grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
@@ -175,6 +181,22 @@ const anchor = data.anchor ?? 'praktisches';
 
       .facts-grid__item:nth-child(n + 3) {
         border-block-start: 1px solid var(--border-light);
+      }
+    }
+
+    /* Every value on one line at one size: "Alle 2–4 Wochen", the longest, is
+       7.6em, so 12.8cqi fits it in any column. */
+    .home-facts .facts-grid__value {
+      font-size: min(var(--text-xl), 12.8cqi);
+      white-space: nowrap;
+    }
+
+    /* Wide, four abreast: every fact behind the same hairline. */
+    @media (width > 62em) {
+      .home-facts .facts-grid__item,
+      .home-facts .facts-grid__item + .facts-grid__item {
+        padding-inline: var(--space-md);
+        border-inline-start: 1px solid var(--border-light);
       }
     }
 

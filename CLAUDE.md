@@ -117,14 +117,21 @@ mail mark from `/images/logo-flame.png` by URL, so keep that file.
   middle of the questions and counts an event's seats (taken/open); keep clear space for
   its ring, which reaches 20% of the photo's width past it. No painted/brush rings, and
   no decorative ring ever runs behind text.
-- Layout: asymmetric two-column grids per block; `.spine` only for quiet passages and
+- Layout: asymmetric placement per block; `.spine` only for quiet passages and
   sub-pages. Phones get their own order (sentence first, then the round photo breaking out to the
   right, then the reading and the date).
   Never reuse desktop `grid-area` names in a stacked grid without resetting them.
-  Wide screens keep one split line (`--split-columns` 5fr rail / 7fr content,
-  `--split-gap`) for every home block and `.spine`, and are set like a poster: the
-  `> 56em` token block in `_variables.css` raises the headlines and steps the reading
-  down. Phones stay on the token floors; change desktop type only there or in `> 56em` rules.
+  Wide screens are open, not railed: the container runs to 1680px, and each home
+  block sits on a 12-column field (`--field`, `--field-gap`). Headlines take the
+  left half in two or three lines (never a stack of single words); their reading
+  stands beside them from column 8, level with the title's first line. Groups of
+  equals (Ablauf steps, agreements, facts) stand level under hairlines; voices run
+  in two balanced columns. Every block fills its width: no half-empty rows, no
+  element left hanging alone. `.spine` (sub-pages) keeps the 5fr/7fr split
+  (`--split-columns`, `--split-gap`). Wide screens are set like a poster with
+  generous air: the `> 56em` token block in `_variables.css` raises the headlines,
+  steps the reading down and widens gutters and section rhythm. Phones
+  stay on the token floors; change desktop values only there or in `> 56em` rules.
 - Vertical rhythm: `--rhythm-section` > `group` > `item` > `tight`; never inverted.
   Lift reserving `min-block-size` once columns stack or an island swaps in.
 - Radius `--radius` (3px) on controls and panels; full circles only for seats and the
@@ -133,10 +140,13 @@ mail mark from `/images/logo-flame.png` by URL, so keep that file.
   hairline fades in on scroll. No progress bar, no numbers in the navigation.
 - Motion: hero entrance (words, photo opening, seats), scroll-driven reveals
   (`[data-reveal]`, view() only, no JS, nothing hidden without timeline support), the
-  hero ring's turn, statement settle, reading progress.
+  hero ring's turn, statement settle, reading progress, and the phone menu: it opens
+  as a circle from the toggle (`--nav-origin`, set by `lib/site-header.ts`), its
+  hairlines draw in and each link rises out of its line; closing runs back quickly.
+  Under reduced motion it only fades.
 - No enumerations: nothing on the public pages is numbered or bulleted (Ablauf,
   agreements, positions, register). Steps are told by placement (the Ablauf steps
-  each sit a little lower), roles and how-tos are written as sentences.
+  stand level, each on a hairline with a seat where it begins), roles and how-tos are written as sentences.
 - The hero breathes (`BreathField.astro`, keyframes `breath-swell` and `breath-drift`):
   three soft warm fields (flame, deep rust, amber; eased radial gradients, no blur, a
   still grain against banding) widen unevenly and shift a little on a 31 s phrase of

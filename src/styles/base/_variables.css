@@ -154,7 +154,7 @@
   --space-3xl: clamp(5rem, 3rem + 8vw, 11rem);
 
   /* Vertical rhythm, largest to smallest; never let an inner gap exceed an outer one. */
-  --rhythm-section: clamp(4.5rem, 3rem + 6vw, 7rem);
+  --rhythm-section: clamp(5.5rem, 3.5rem + 6vw, 7rem);
   --rhythm-group: clamp(2rem, 1.5rem + 2vw, 3.5rem);
   --rhythm-item: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
   --rhythm-tight: var(--space-xs);
@@ -177,14 +177,18 @@
   --stagger-2: 120ms;
 
   /* Layout */
-  --container-width: 1360px;
+  --container-width: 1680px;
   --container-narrow: 780px;
   --container-gutter: clamp(1rem, 0.6rem + 2.6vw, 3.5rem);
   --col-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
-  /* The one line every home block keeps on a wide screen: a rail for its head
-     (marker, title), a column for its content. Stacked below 56em. */
+  /* Sub-pages keep one line on a wide screen: a rail for the head, a column for
+     the content (`.spine`). Stacked below 56em. */
   --split-columns: minmax(0, 5fr) minmax(0, 7fr);
   --split-gap: clamp(2rem, 6.6vw, 6rem);
+  /* The home's open field: twelve columns each block places itself on, so heads
+     run wide and the content sits offset, never the same rail twice. */
+  --field: repeat(12, minmax(0, 1fr));
+  --field-gap: clamp(1.25rem, 2vw, 2.5rem);
 
   /* The fixed header's height, plus a little air. */
   --header-height: 68px;
@@ -206,6 +210,14 @@
     --text-4xl: var(--display-2);
     --text-section-body: 1.0625rem; /* 17px */
     --text-section-body-lg: 1.1875rem; /* 19px */
+
+    /* Air: wider gutters and longer pauses between blocks, so a wide screen
+       holds the page loosely instead of filling every inch. */
+    --container-gutter: clamp(3.5rem, 6.5vw, 9rem);
+    --rhythm-section: clamp(7rem, 4rem + 6vw, 12rem);
+    --rhythm-group: clamp(3rem, 1.5rem + 3vw, 5.5rem);
+    --space-xl: clamp(4rem, 1.5rem + 3.6vw, 6.5rem);
+    --space-2xl: clamp(5.5rem, 2rem + 5vw, 9rem);
   }
 }
 

@@ -69,8 +69,7 @@ const questions = (data.questions ?? []).slice(0, 4);
   @layer sections {
     .home-circle__spread {
       display: grid;
-      grid-template-columns: var(--split-columns);
-      gap: var(--space-lg) var(--split-gap);
+      gap: var(--space-lg);
       align-items: start;
     }
 
@@ -83,24 +82,26 @@ const questions = (data.questions ?? []).slice(0, 4);
       max-inline-size: 54ch;
     }
 
-    /* Wide: the marker runs over both columns, the title sits in the rail and the
-       reading starts level with it. */
+    /* Wide: the title on the left half in two or three lines, the reading beside
+       it, its first line level with the title's. */
     @media (width > 56em) {
       .home-circle__spread {
-        row-gap: var(--space-sm);
+        grid-template-columns: var(--field);
+        gap: var(--space-lg) var(--field-gap);
       }
 
       .home-circle__head {
-        display: contents;
+        grid-column: 1 / span 6;
       }
 
-      .home-circle__head .marker {
-        grid-column: 1 / -1;
-        margin: 0;
+      .home-circle__title {
+        max-inline-size: 17ch;
       }
 
       .home-circle__text {
-        padding-block-start: 0.4em;
+        grid-column: 8 / span 5;
+        max-inline-size: 36em;
+        padding-block-start: calc(var(--text-marker) * 1.3 + var(--space-sm) + 0.2em);
       }
     }
 
@@ -121,6 +122,14 @@ const questions = (data.questions ?? []).slice(0, 4);
       gap: var(--space-md) var(--space-lg);
       align-items: center;
       margin-block: var(--space-2xl) 0;
+    }
+
+    @media (width > 56em) {
+      .home-circle__questions {
+        grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem) minmax(0, 1fr);
+        gap: var(--space-lg) var(--space-xl);
+        margin-block-start: var(--rhythm-section);
+      }
     }
 
     .home-circle__label {
