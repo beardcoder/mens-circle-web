@@ -1,10 +1,9 @@
 ---
-import Breath from '../Breath.astro';
+import { card } from '@lib/ui';
 import SeatCircle from '../SeatCircle.astro';
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
-import Split from '../ui/Split.astro';
 
 interface Props {
   data: {
@@ -18,66 +17,36 @@ interface Props {
   };
 }
 
-/**
- * What an evening is about: the title beside the reading, then the questions
- * seated around the circle — north, east, south, west, read clockwise in DOM
- * order. Phones: the circle becomes a small mark and the questions a ladder that
- * hangs from it, each starting at a seat.
- */
+/** What an evening is about: the reading on the left, the questions it often turns on beside it, on a card around the seat circle. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'ueber';
 const questions = (data.questions ?? []).slice(0, 4);
-
-const PLACES = [
-  'lg:col-start-2 lg:row-start-2 lg:text-center',
-  'lg:col-start-3 lg:row-start-3 lg:max-w-[16ch]',
-  'lg:col-start-2 lg:row-start-4 lg:text-center',
-  'lg:col-start-1 lg:row-start-3 lg:max-w-[16ch] lg:justify-self-end lg:text-right',
-];
 ---
 
-<Section id={anchor} labelledby="ueber-title">
-  <Split alignToTitle>
-    <SectionHead slot="head" eyebrow={data.eyebrow} title={data.title} titleId="ueber-title" class="reveal" />
-    {data.text && <Prose html={data.text} size="lg" class="reveal" />}
-  </Split>
+<Section id={anchor} labelledby="ueber-title" innerClass="grid items-start gap-y-12 lg:grid-cols-12 lg:gap-x-grid">
+  <div class="grid gap-6 lg:col-span-6">
+    <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="ueber-title" size="display-2" />
+    {data.text && <Prose html={data.text} size="lg" />}
+    {data.close && <p class="max-w-measure font-serif text-xl text-fg italic">{data.close}</p>}
+  </div>
 
   {questions.length > 0 && (
     <figure
+      class:list={[card, 'reveal p-6 sm:p-8 lg:col-span-5 lg:col-start-8']}
       aria-labelledby="ueber-questions-label"
-      class="mt-group grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-6 lg:mt-section lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)_minmax(0,1fr)] lg:gap-x-group lg:gap-y-8"
     >
-      <figcaption
-        id="ueber-questions-label"
-        class="col-start-2 row-start-1 text-xs font-semibold tracking-label text-fg-muted uppercase lg:col-span-3 lg:col-start-1 lg:text-center"
-      >
-        {data.questionsLabel}
-      </figcaption>
-
-      {/* The empty middle of the circle breathes; the breath stays inside the stroke. */}
-      <div class="relative col-start-1 row-start-1 lg:col-start-2 lg:row-start-3" aria-hidden="true">
-        <SeatCircle ember seatSize={5} class="w-full" />
-        <Breath class="inset-[16%]" />
+      <div class="mb-6 flex items-center gap-4">
+        <SeatCircle ember seatSize={9} class="size-14 shrink-0" />
+        <figcaption id="ueber-questions-label" class="text-sm font-semibold text-fg-muted">
+          {data.questionsLabel}
+        </figcaption>
       </div>
-
-      <ul role="list" class="col-span-2 grid border-t border-line lg:contents">
-        {questions.map((question, i) => (
-          <li
-            class:list={[
-              'reveal flex items-baseline gap-4 border-b border-line py-4 font-serif text-xl leading-[1.2] text-fg italic before:size-2.25 before:shrink-0 before:-translate-y-[0.15em] before:rounded-full before:bg-accent',
-              'lg:block lg:border-0 lg:py-0 lg:text-[clamp(1.75rem,0.9rem+1.5vw,2.5rem)] lg:text-balance lg:before:hidden',
-              PLACES[i],
-            ]}
-          >
-            {question}
-          </li>
+      <ul role="list" class="divide-y divide-line">
+        {questions.map((question) => (
+          <li class="py-4 font-serif text-xl leading-snug text-fg italic first:pt-0 last:pb-0">{question}</li>
         ))}
       </ul>
     </figure>
-  )}
-
-  {data.close && (
-    <p class="reveal mt-group max-w-[36ch] text-lg text-fg-soft lg:mx-auto lg:text-center">{data.close}</p>
   )}
 </Section>

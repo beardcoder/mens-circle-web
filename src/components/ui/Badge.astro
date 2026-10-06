@@ -18,7 +18,7 @@ const { tone = 'off', class: className, ...attributes } = Astro.props;
   {...attributes}
   data-tone={tone}
   class:list={[
-    'inline-flex items-center gap-1.5 rounded-control border border-line-strong px-2 py-0.5 text-xs font-semibold tracking-[0.1em] whitespace-nowrap text-fg-muted uppercase before:size-1.75 before:rounded-full before:bg-current',
+    'inline-flex items-center gap-1.5 rounded-full border border-line-strong px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap text-fg-muted before:size-1.5 before:rounded-full before:bg-current',
     'data-[tone=live]:border-success/30 data-[tone=live]:bg-success/15 data-[tone=live]:text-success',
     // No fill for the waiting tone: the accent on a tinted chip would fall under 4.5:1.
     'data-[tone=wait]:border-accent/60 data-[tone=wait]:text-accent',

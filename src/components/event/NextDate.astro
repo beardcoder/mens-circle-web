@@ -1,20 +1,18 @@
 ---
 import site from '@data/site.json';
 import { primaryAction, type DateStatus } from '@lib/event-status';
-import { link } from '@lib/ui';
+import { link, panel } from '@lib/ui';
 import NewsletterForm from '../forms/NewsletterForm.astro';
 import SeatCircle from '../SeatCircle.astro';
 import Button from '../ui/Button.astro';
 import DefList from '../ui/DefList.astro';
-import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
-import Split from '../ui/Split.astro';
 
 /**
- * The one block on /event that depends on live data, on the night ground right
- * under the page opening: the date as the flyer sets it, its facts, the seats and
- * the action; then the way to hear about the next one. Three states: scheduled,
- * none, and a failed read, which never reads as "no date planned".
+ * The one block on /event that depends on live data: the next date as a large
+ * card (when, where, seats, the action) beside the way to hear about the next
+ * one. Three states: scheduled, none, and a failed read, which never reads as
+ * "no date planned".
  */
 
 interface Props {
@@ -25,8 +23,6 @@ const { state } = Astro.props;
 const { next } = state;
 const action = primaryAction(state, '#benachrichtigung');
 const whatsapp = site.whatsappCommunityLink;
-// "Freitag, 23. Oktober 2026" → weekday, day, month and year, for the poster layout only.
-const [, weekday = '', day = '', monthYear = ''] = next?.dateLabel.match(/^(.+?),\s*(\d+)\.\s*(.+)$/) ?? [];
 const seatsLabel = next
   ? state.isFull
     ? `Alle ${next.maxParticipants} Plätze vergeben`
@@ -51,26 +47,34 @@ const rows = next
   : [];
 ---
 
-<Section id="naechster-termin" ground="night" space="none" class="pt-8 pb-section" labelledby="naechster-termin-title">
-  {next ? (
-    <div class="grid items-center gap-group lg:grid-cols-12 lg:gap-x-grid">
-      <div class="lg:col-span-7">
-        <Eyebrow plain tone="fg">
-          Nächster Termin
-        </Eyebrow>
-        <h2 id="naechster-termin-title" class="mt-4 mb-8">
-          <time datetime={next.slug}>
-            <span class="sr-only">{next.dateLabel}</span>
-            <span
-              class="block font-sans text-[clamp(1.875rem,1rem+3.4vw,3.75rem)] leading-[1.05] font-bold tracking-[0.02em] text-accent uppercase"
-              aria-hidden="true"
-            >
-              {day ? `${weekday.slice(0, 2)} · ${day}. ${monthYear}` : next.dateLabel}
-            </span>
-          </time>
-        </h2>
+<Section
+  id="naechster-termin"
+  space="none"
+  class="pb-section"
+  labelledby="naechster-termin-title"
+  innerClass="grid items-start gap-6 lg:grid-cols-12 lg:gap-x-grid"
+>
+  <div class:list={[panel, 'lg:col-span-7']}>
+    {next ? (
+      <>
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <p class="text-sm font-semibold text-accent">Nächster Termin</p>
+            <h2 id="naechster-termin-title" class="mt-1.5 text-display-3 text-fg">
+              <time datetime={next.slug}>{next.dateLabel}</time>
+            </h2>
+          </div>
+          <SeatCircle
+            seats={next.maxParticipants}
+            taken={next.maxParticipants - next.availableSpots}
+            ember
+            seatSize={10}
+            label={seatsLabel}
+            class="size-20 shrink-0 sm:size-24"
+          />
+        </div>
 
-        <DefList rows={rows} />
+        <DefList rows={rows} class="mt-6 border-t border-line pt-5" />
 
         <Button
           href={action.href}
@@ -82,68 +86,51 @@ const rows = next
         >
           {action.label}
         </Button>
-      </div>
-
-      <figure class="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-4 lg:col-span-4 lg:col-start-9 lg:grid-cols-1 lg:justify-items-center">
-        <SeatCircle
-          seats={next.maxParticipants}
-          taken={next.maxParticipants - next.availableSpots}
-          ember
-          label={seatsLabel}
-          class="w-full lg:w-[min(100%,20rem)]"
-        />
-        <figcaption class="text-lg font-bold text-fg-soft">{seatsLabel}</figcaption>
-      </figure>
-    </div>
-  ) : (
-    <Split alignToTitle>
-      <div slot="head" class="grid gap-5">
-        <Eyebrow>Nächster Termin</Eyebrow>
-        <h2 id="naechster-termin-title" class="max-w-[16ch] text-display-2 text-fg">
+      </>
+    ) : (
+      <>
+        <p class="text-sm font-semibold text-accent">Nächster Termin</p>
+        <h2 id="naechster-termin-title" class="mt-1.5 text-display-3 text-fg">
           {state.status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
         </h2>
-      </div>
-      {/* A failed read is not a calm "nothing scheduled": it is marked. */}
-      <p
-        data-status={state.status}
-        class="max-w-measure text-lg text-fg-soft data-[status=unavailable]:border-l-2 data-[status=unavailable]:border-accent data-[status=unavailable]:pl-4 data-[status=unavailable]:text-fg"
-      >
-        {state.status === 'unavailable'
-          ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
-          : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich unten ein, dann bekommst du eine kurze Nachricht.'}
+        {/* A failed read is not a calm "nothing scheduled": it is marked. */}
+        <p
+          data-status={state.status}
+          class="mt-4 max-w-measure text-lg text-fg-soft data-[status=unavailable]:rounded-r-control data-[status=unavailable]:border-l-3 data-[status=unavailable]:border-accent data-[status=unavailable]:bg-accent-soft data-[status=unavailable]:px-4 data-[status=unavailable]:py-3 data-[status=unavailable]:text-fg"
+        >
+          {state.status === 'unavailable'
+            ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
+            : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich ein, dann bekommst du eine kurze Nachricht.'}
+        </p>
+      </>
+    )}
+  </div>
+
+  <div id="benachrichtigung" class:list={[panel, 'scroll-mt-(--spacing-clearance) lg:col-span-5']}>
+    <h3 class="text-2xl text-fg">Bei neuen Terminen benachrichtigen</h3>
+    <p class="mt-2 mb-6 text-base text-fg-soft">
+      Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler nicht
+      verschickt.
+    </p>
+
+    <NewsletterForm context={{ page: 'event-landing' }} />
+
+    {whatsapp && (
+      <p class="mt-5 text-sm text-fg-muted" id="whatsapp-community">
+        Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine{' '}
+        <a
+          class={link}
+          href={whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-umami-event="whatsapp-click"
+          data-umami-event-type="community-join"
+        >
+          WhatsApp-Gruppe
+          <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+        </a>
+        .
       </p>
-    </Split>
-  )}
-
-  <div id="benachrichtigung" class="mt-group scroll-mt-(--spacing-clearance) border-t border-line pt-group">
-    <Split>
-      <div slot="head" class="grid gap-3">
-        <h3 class="text-2xl text-fg">Bei neuen Terminen benachrichtigen</h3>
-        <p class="max-w-measure text-md text-fg-soft">
-          Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler
-          nicht verschickt.
-        </p>
-      </div>
-
-      <NewsletterForm context={{ page: 'event-landing' }} />
-
-      {whatsapp && (
-        <p class="mt-6 max-w-measure text-sm text-fg-muted" id="whatsapp-community">
-          Wenn du dich lieber zwischendurch austauschen möchtest, gibt es außerdem eine{' '}
-          <a
-            class={link}
-            href={whatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-umami-event="whatsapp-click"
-            data-umami-event-type="community-join"
-          >
-            WhatsApp-Gruppe
-            <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
-          </a>
-          .
-        </p>
-      )}
-    </Split>
+    )}
   </div>
 </Section>

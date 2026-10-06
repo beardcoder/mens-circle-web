@@ -103,81 +103,49 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Design
 
-- "Feuerstelle", set like the flyer: warm, earthy, direct. Fraunces (`font-serif`, a
-  soft, warm old-style serif with an organic wobble) speaks: headlines at its regular
-  weight (400), set large, in sentence case; small serif lines (h3–h5, names, terms)
-  take 500. Its italic is the quiet voice for questions and quotes. Instrument Sans
-  (`font-sans`) explains: text, UI, buttons and the date line. The admin uses the same
-  two faces.
-  A single long word is capped by its column (`cqi`: hero and page titles, step
-  titles, facts, frame terms, "Dabei sein.", "Anmeldung"), never left to overflow.
-  A dash in running copy is bound to the word before it (`\u00a0–`), so no line
-  starts with one. Capitals for wide-spaced labels (`Eyebrow`), the date line (bold
-  orange sans capitals) and the one poster slogan (the Statement block). Figures are
-  lining.
-- Colours: cream `#F4EDE1`, night `#151210`, flame `#E4632E` (5.4:1 on night; on cream
-  only as fill or stroke), rust `#A84A2A` (4.9:1, the accent and button on cream).
-  Grounds: night for the header, hero, Termine and footer; one flame field per page
-  (night text on it); sand for quiet passages.
-- Colours are semantic tokens (`ground`, `surface`, `fg`, `fg-soft`, `fg-muted`,
-  `accent`, `line`, …); no hex in markup. Surfaces (`surface-sand|night|flame`, via
-  `<Section ground>`) re-declare the semantic colours, so text, hairlines, buttons,
-  focus rings and inputs inside follow the ground. Utilities read the tokens directly,
-  so there are no alias tokens to re-declare. Surfaces keep the page's color-scheme, so
-  their `light-dark()` grounds follow the mode.
-- The mark is the original brush-stroke logo (`src/icons/logo.svg`, header and footer).
-  `SeatCircle.astro` (hairline ring with seats) frames the round hero photo, sits in the
-  middle of the questions and counts an event's seats (taken/open); keep clear space for
-  its ring, which reaches 20% of the photo's width past it. No painted/brush rings, and
-  no decorative ring ever runs behind text.
-- Layout: one split line on every page. Wide screens (container up to 1680px) sit
-  on a 12-column field (`--field`, `--field-gap`): the head (label and title, or a
-  `.spine` rail heading set as a title) takes columns 1–5, the content runs from
-  column 7 to the edge, its first line level with the title's. A head with nothing
-  beside it may run wider (home hero, page heads without a lead). Groups of equals
-  (Ablauf steps, agreements, facts, voices) stand level below, under hairlines.
-  Sections are parted by their ground and by space, never by drawn rules. Every
-  block fills its width: no half-empty rows, no element left alone in a column.
-  Titles: the home hero sentence is the only `--display-1`; section and page
-  titles take `--display-2`, essays and rail titles `--display-3`. Phones get their
-  own order (sentence first, then the round photo breaking out to the right, then
-  the reading and the date), stack every block left-aligned, and keep boxes on the
-  page's edges (no bleed). `Split` is the split line, `SectionHead layout="split"` the
-  title beside its lead; blocks place themselves with `lg:col-*` and, on phones, DOM
-  order. The `width >= 56rem` block in `theme.css` widens gutters and section rhythm;
-  the display sizes are fluid tokens (`text-display-1|2|3`).
-- Vertical rhythm: `section` > `group` > `item` (spacing tokens: `py-section`,
-  `mt-group`, …); never inverted.
-  Lift reserving `min-block-size` once columns stack or an island swaps in.
-- Radius `rounded-control` (3px) on controls and panels; full circles only for seats and the
-  round icon buttons. Capital lines keep `line-height` ≥ 1 for umlaut dots.
-- The header is solid night at all times (nothing scrolls visibly beneath it); its
-  hairline fades in on scroll. No progress bar, no numbers in the navigation.
-- Motion: hero entrance (words, photo opening, seats), scroll-driven reveals
-  (`reveal`, view() only, no JS, nothing hidden without timeline support), the hero
-  ring's turn, statement settle, and the phone menu: it opens as a circle from the
-  toggle (`--nav-origin`, set by `lib/site-header.ts`), then each link rises out of
-  its line; closing runs back quickly. Under reduced motion it
-  only fades. Motion variants: `entrance:` (one-time, never after a view transition),
-  `scroll-motion:` and `reveal` (scroll-driven), `animate-delay-*` (through the
-  non-inheriting `--delay`).
-- No enumerations: nothing on the public pages is numbered or bulleted (Ablauf,
-  agreements, positions, register). Steps are told by placement (the Ablauf steps
-  stand level, each on a hairline with a seat where it begins), roles and how-tos are written as sentences.
-- The hero breathes (`BreathField.astro`, keyframes `breath-swell` and `breath-drift` in `theme.css`):
-  three soft warm fields (flame, deep rust, amber; eased radial gradients, no blur, a
-  still grain against banding) widen unevenly and shift a little on a 31 s phrase of
-  three breaths — in shorter than out, a short rest, depth varying — while each turns
-  slowly on its own period, so the form never repeats or restarts. Scrolling gives
-  depth (`breath-parallax` on `translate`, scroll() timeline over the first screen):
-  rust lags most, amber least. The fields are placed in `svh`, never in % of the hero:
-  the hero grows when the date island swaps in, and a field moving with it is a
-  layout shift. The field starts below the header (mask), so bar and
-  hero stay one surface. `lib/breath.ts` pauses every `[data-breath]` element off
-  screen; under reduced motion it rests, still, and does not move with scroll.
-- Smaller breath (`Breath.astro`, keyframes `breathe`, 10 s: 4 in, 0.5 hold, 5 out, 0.5
-  rest): rings inside the questions' circle, a light glow on the flame field and a small
-  circle to breathe along. Glows stay faint enough that every contrast holds.
+- "Abendlicht": warm, calm, approachable — a men's circle, not a poster. Warm paper
+  by day, a warm dark by night (`data-mode`, `light-dark()` tokens). The photo of
+  Markus leads the home page; the next date is a card (`HomeEventStatus`, `NextDate`)
+  that every date page shows the same way.
+- Type: Fraunces (`font-serif`, weight 500) speaks — titles in sentence case, quotes
+  and questions in its italic. Instrument Sans (`font-sans`) explains: text, UI,
+  buttons. Titles stay calm: `text-display-1` is the home sentence only, page titles
+  take `display-2`, section titles `display-2`/`display-3`. Eyebrows are small accent
+  lines with a dot (`Eyebrow`), not spaced capitals. A dash in running copy is bound
+  to the word before it (`\u00a0–`), so no line starts with one. Figures are lining.
+- Colours are semantic tokens (`ground`, `ground-alt`, `raised`, `surface`, `fg`,
+  `fg-soft`, `fg-muted`, `accent`, `accent-strong`, `accent-soft`, `line*`); no hex in
+  markup. Rust (`#a3462a`) is the accent by day, ember (`#ec7a48`) by night; flame
+  (`#e4632e`) is the mark. Every text token holds ≥ 4.5:1 on every ground, control
+  borders (`line-bold`) ≥ 3:1. Grounds: the page's paper, a stone band
+  (`surface-sand`) for quiet passages, at most one dark band (`surface-night`) mid
+  page, and the footer. Surfaces re-declare the semantic colours, so everything
+  inside follows.
+- Shapes: soft. Cards (`card`/`panel` in `lib/ui.ts`, `rounded-card`) for
+  self-contained units — the date, steps, agreements, voices, forms, questions —
+  never for running text. Controls `rounded-control`, buttons and seats round. One
+  shadow (`shadow-card`) on cards, `shadow-overlay` on popovers.
+- Layout: a 1248px container. Titles stand above their content; `Split` puts a head
+  (title, note, contact line) beside its content where both earn a column (FAQ,
+  Anfahrt, forms). Two-column blocks place themselves with `lg:col-*`; phones stack in
+  DOM order. Groups of equals stand level in a grid (steps, agreements, voices, facts).
+  Sections are parted by their ground and by space. Vertical rhythm: `section` >
+  `group` > `item`; never inverted.
+- The Ablauf steps are numbered (an evening has an order); everything else is told in
+  sentences, not bullets.
+- `SeatCircle.astro` (hairline ring with seats) is the mark of the circle: it counts an
+  event's seats (taken/open) on the date cards and sits on the questions card.
+- The header is the page's paper at all times (nothing scrolls visibly beneath it);
+  its hairline fades in on scroll. No numbers in the navigation.
+- Motion: entrances on the openings (`entrance:`, never after a view transition),
+  scroll-tied reveals (`reveal`, view() only, nothing hidden without timeline
+  support), the seat circle's draw-in, a breathing circle to follow in the dark band
+  (`Breath.astro`, `breathe`: 4 s in, 0.5 hold, 5 out, 0.5 rest), and the phone menu:
+  it opens as a circle from the toggle (`--nav-origin`, set by `lib/site-header.ts`),
+  then each link rises; closing runs back quickly. Under reduced motion everything
+  rests; the menu only fades.
+- No layout shift: an island's fallback sets the same lines as its loaded state; the
+  hero date card rests on the photo (absolute) from `lg`.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Styles live in the component's markup as utilities. `global.css` is inlined into every
