@@ -7,8 +7,8 @@ import SectionHead from '../ui/SectionHead.astro';
 
 /**
  * Submitted and moderated entries, quoted as written — nothing is added or
- * reworded. Wide: two balanced columns, so neither runs out early. With none
- * published the section shrinks to a quiet two-line invitation.
+ * reworded — as equal cards. With none published the section shrinks to a quiet
+ * invitation.
  */
 
 interface Props {
@@ -45,9 +45,9 @@ const empty = testimonials.length === 0;
         : 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'}
     </p>
   ) : (
-    <ul role="list" class="mt-group grid gap-y-10 lg:block lg:columns-2 lg:gap-x-group">
+    <ul role="list" class="mt-group grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {testimonials.map((t) => (
-        <li class="reveal lg:mb-group lg:break-inside-avoid">
+        <li class="reveal">
           <Quote quote={t.quote} author={t.author} role={t.role} />
         </li>
       ))}

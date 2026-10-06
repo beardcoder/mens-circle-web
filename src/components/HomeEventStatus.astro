@@ -1,121 +1,95 @@
 ---
 import { primaryAction, dateStatus } from '../lib/event-status';
+import { card } from '../lib/ui';
 import SeatCircle from './SeatCircle.astro';
 import Button from './ui/Button.astro';
-import TextLink from './ui/TextLink.astro';
 
 /**
- * The next date as the flyer sets it — bold orange capitals, then the plain facts —
- * with the one action. A server island in the hero and in the Termine block; the
- * fallback sets the same lines with static words, so the swap changes text, not
- * height. A failed read is marked as such, never as "no date planned".
+ * The next date as a card: when, where, how many seats, and the one action. A
+ * server island in the hero and in the Termine block; the fallback sets the same
+ * lines with static words, so the swap changes text, not height. A failed read is
+ * said as such, never as "no date planned".
  */
 
 interface Props {
   placement: 'hero' | 'dates';
-  secondaryLabel?: string;
-  secondaryLink?: string;
   fallback?: boolean;
+  class?: string;
 }
-const { placement, secondaryLabel, secondaryLink, fallback = false } = Astro.props;
+const { placement, fallback = false, class: className } = Astro.props;
 // The static fallback never opens SQLite. Only the server-island request reads live data.
 const result = fallback ? null : await (await import('../lib/server/events')).fetchNextEventState();
 const state = dateStatus(result?.status ?? 'unavailable', result?.event ?? null);
 const status = fallback ? 'loading' : state.status;
 const action = fallback
-  ? {
-      note: 'Aktuelle Termine und Anmeldung findest du auf der Terminseite.',
-      label: 'Termine ansehen',
-      href: '/event',
-    }
+  ? { note: '', label: 'Termine ansehen', href: '/event' }
   : primaryAction(state, placement === 'dates' ? '#newsletter' : '#termine');
 
 const next = !fallback && state.status === 'scheduled' ? state.next : null;
-// The flyer's date line: "Freitag, 23. Oktober 2026" → "Fr · 23. Oktober 2026".
-const [weekday = '', date = ''] = next?.dateLabel.split(/,\s*/) ?? [];
-const dateLine = weekday && date ? `${weekday.slice(0, 2)} · ${date}` : (next?.dateLabel ?? '');
-const meta = next ? [next.timeRange, next.place].filter(Boolean).join(' · ') : '';
 const seatsLabel = next
   ? state.isFull
-    ? `Ausgebucht – Warteliste möglich`
+    ? 'Ausgebucht – Warteliste möglich'
     : `${next.availableSpots} von ${next.maxParticipants} Plätzen frei`
   : '';
-const seatsNote =
-  next && state.isFull
-    ? 'Wird ein Platz frei, rückst du automatisch nach.'
-    : 'Für die Anmeldung genügen Name und E-Mail-Adresse.';
 
-const dateLineClass =
-  'font-sans text-[clamp(1.375rem,1rem+1.5vw,2.125rem)] leading-[1.15] font-bold tracking-[0.1em] text-accent uppercase';
-const metaClass = 'mt-1.5 text-xl font-medium text-fg';
-const factsClass = 'mt-4 text-xs font-medium tracking-label text-fg-muted uppercase';
-const showDate = Boolean(next) || fallback;
+// The same lines in every state: a title, a line under it, a line about the seats.
+const title = next
+  ? next.dateLabel
+  : fallback
+    ? 'Termine & Anmeldung'
+    : status === 'unavailable'
+      ? 'Termine gerade nicht abrufbar'
+      : 'Zurzeit kein Termin geplant';
+const meta = next
+  ? [next.timeRange, next.place].filter(Boolean).join(' · ')
+  : fallback
+    ? 'Datum, Ort und freie Plätze'
+    : status === 'unavailable'
+      ? 'Auf der Terminseite steht der aktuelle Stand.'
+      : 'Lass dich benachrichtigen, sobald er feststeht.';
+// Two lines in every state, so the fallback holds the loaded card's height.
+const seatsHeadline = next ? seatsLabel : 'Ohne Vorerfahrung';
+const seatsLine = next
+  ? state.isFull
+    ? 'Wird ein Platz frei, rückst du automatisch nach.'
+    : 'Für die Anmeldung genügen Name und E-Mail-Adresse.'
+  : 'Auf Spendenbasis, alle zwei bis vier Wochen.';
 ---
 
-<div data-llms-skip>
-  {showDate ? (
-    <div>
-      <p>
-        {next ? (
-          <>
-            <span class="sr-only">Nächster Termin: {next.dateLabel}</span>
-            <span class={dateLineClass} aria-hidden="true">
-              {dateLine}
-            </span>
-          </>
-        ) : (
-          <span class={dateLineClass}>Nächster Termin</span>
-        )}
-      </p>
-      <p class={metaClass}>{next ? meta : 'Alles auf der Terminseite'}</p>
-      {placement === 'hero' ? (
-        /* Fixed words, as in the fallback: an event's fee text can run to two lines
-             (the recommendation stands in the facts strip below), and the swap must not grow. */
-        <p class={factsClass}>Ohne Vorerfahrung · Spendenbasis</p>
-      ) : (
-        <div class="mt-6 grid grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-6">
-          {next ? (
-            <SeatCircle
-              seats={next.maxParticipants}
-              taken={next.maxParticipants - next.availableSpots}
-              ember
-              label={seatsLabel}
-            />
-          ) : (
-            /* The circle keeps its place while the seats load, but shows none. */
-            <SeatCircle class="invisible" />
-          )}
-          <p class="grid gap-1 text-lg font-bold text-fg">
-            {next ? seatsLabel : 'Anmeldung'}
-            <span class="text-sm font-normal text-fg-muted">{seatsNote}</span>
-          </p>
-        </div>
-      )}
-    </div>
-  ) : (
-    <p
-      data-status={status}
-      class="flex max-w-[44ch] items-baseline gap-[0.65em] text-lg font-medium text-fg before:size-2.5 before:shrink-0 before:translate-y-[-0.05em] before:rounded-full before:border-[1.5px] before:border-accent data-[status=none]:before:bg-accent"
-    >
-      {/* A failed read is marked by an open seat, never by a calm "nothing planned". */}
-      {action.note}
-    </p>
-  )}
-
-  <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 max-sm:flex-col max-sm:items-stretch">
-    <Button
-      href={action.href}
-      size="lg"
-      data-umami-event="cta-click"
-      data-umami-event-location={placement === 'hero' ? 'home-hero' : 'home-dates'}
-      data-umami-event-state={status}
-    >
-      {action.label}
-    </Button>
-    {secondaryLabel && secondaryLink && (
-      <TextLink href={secondaryLink} class="max-sm:self-start">
-        {secondaryLabel}
-      </TextLink>
-    )}
+<div data-llms-skip data-status={status} class:list={[card, 'grid gap-5 p-6 sm:p-7', className]}>
+  <div class="min-w-0">
+    <p class="text-sm font-semibold text-accent">Nächster Termin</p>
+    <p class="mt-1.5 font-serif text-2xl font-medium text-fg">{title}</p>
+    <p class="mt-1 text-base text-fg-soft">{meta}</p>
   </div>
+
+  <div class="flex items-center gap-4 border-t border-line pt-4">
+    {next ? (
+      <SeatCircle
+        seats={next.maxParticipants}
+        taken={next.maxParticipants - next.availableSpots}
+        ember
+        seatSize={12}
+        label={seatsLabel}
+        class="size-12 shrink-0"
+      />
+    ) : (
+      /* The circle keeps its place, but shows no seats it does not know. */
+      <SeatCircle seatSize={12} class="invisible size-12 shrink-0" />
+    )}
+    <p class="text-sm text-fg-muted">
+      <strong class="block text-base font-semibold text-fg">{seatsHeadline}</strong>
+      {seatsLine}
+    </p>
+  </div>
+
+  <Button
+    href={action.href}
+    block
+    data-umami-event="cta-click"
+    data-umami-event-location={placement === 'hero' ? 'home-hero' : 'home-dates'}
+    data-umami-event-state={status}
+  >
+    {action.label}
+  </Button>
 </div>

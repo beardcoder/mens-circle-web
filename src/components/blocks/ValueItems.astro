@@ -1,4 +1,5 @@
 ---
+import { card } from '@lib/ui';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
@@ -19,8 +20,7 @@ interface Props {
 
 /**
  * Positions set as pairs: "Ehrlichkeit statt Fassade" becomes the word that
- * counts, large, and what it replaces, quiet beside it. On the night ground, so
- * the essay page has one turn of colour. Unnumbered, held apart by hairlines.
+ * counts and, quieter, what it replaces — one card each, on the stone band.
  */
 
 const { data } = Astro.props;
@@ -30,25 +30,20 @@ const items = (data.items ?? []).map((item) => {
 });
 ---
 
-<Section id={data.anchor} ground="night" defer>
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml lead={data.intro} layout="split" />
+<Section id={data.anchor} ground="sand" defer>
+  <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml lead={data.intro} size="display-2" />
 
   {items.length > 0 && (
-    <ul role="list" class="mt-group border-t border-line">
+    <ul role="list" class="mt-group grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <li class="reveal grid items-baseline gap-x-grid gap-y-2 border-b border-line py-6 lg:grid-cols-12">
-          <h3 class="text-display-3 text-fg lg:col-span-6">
-            {item.keep}
+        <li class:list={[card, 'reveal grid content-start gap-2 p-6']}>
+          <h3 class="text-2xl text-fg">
+            {item.keep}{' '}
             {item.instead && (
-              <span class="font-serif text-[0.5em] tracking-normal whitespace-nowrap text-fg-muted italic">
-                {' '}
-                statt {item.instead}
-              </span>
+              <span class="block font-sans text-sm font-normal text-fg-muted">statt {item.instead}</span>
             )}
           </h3>
-          {item.description && (
-            <p class="max-w-[38ch] text-md text-fg-soft lg:col-span-6 lg:col-start-7">{item.description}</p>
-          )}
+          {item.description && <p class="text-base text-fg-soft">{item.description}</p>}
         </li>
       ))}
     </ul>

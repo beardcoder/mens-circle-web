@@ -1,4 +1,5 @@
 ---
+import { panel } from '@lib/ui';
 import Button from '../ui/Button.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -17,33 +18,33 @@ interface Props {
   };
 }
 
-/** A closing invitation on a sub-page, on the flame field: one action, one optional quiet link. */
+/** A closing invitation on a sub-page: one card on the stone band, one action, one optional quiet link. */
 
 const { data } = Astro.props;
 ---
 
-<Section id={data.anchor} ground="flame">
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml tone="fg" class="max-w-[46rem]" />
+<Section id={data.anchor} ground="sand">
+  <div class:list={[panel, 'grid justify-items-center gap-6 text-center sm:p-12']}>
+    <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml align="center" size="display-2" />
 
-  {data.text && <p class="mt-6 max-w-[46ch] text-lg font-medium text-fg">{data.text}</p>}
+    {data.text && <p class="max-w-[40rem] text-lg text-fg-soft">{data.text}</p>}
 
-  {data.buttonText && data.buttonLink && (
-    <p class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 max-sm:flex-col max-sm:items-stretch">
-      <Button
-        href={data.buttonLink}
-        size="lg"
-        data-umami-event="cta-click"
-        data-umami-event-location="cta-block"
-        data-umami-event-text={data.buttonText}
-      >
-        {data.buttonText}
-      </Button>
+    {data.buttonText && data.buttonLink && (
+      <p class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+        <Button
+          href={data.buttonLink}
+          size="lg"
+          data-umami-event="cta-click"
+          data-umami-event-location="cta-block"
+          data-umami-event-text={data.buttonText}
+        >
+          {data.buttonText}
+        </Button>
 
-      {data.secondaryLabel && data.secondaryLink && (
-        <TextLink href={data.secondaryLink} class="max-sm:self-start">
-          {data.secondaryLabel}
-        </TextLink>
-      )}
-    </p>
-  )}
+        {data.secondaryLabel && data.secondaryLink && (
+          <TextLink href={data.secondaryLink}>{data.secondaryLabel}</TextLink>
+        )}
+      </p>
+    )}
+  </div>
 </Section>

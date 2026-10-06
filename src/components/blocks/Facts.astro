@@ -1,8 +1,10 @@
 ---
 import site from '@data/site.json';
 import { type NextEventSummary, summarizeNextEvent } from '@lib/event-status';
+import { card } from '@lib/ui';
+import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
-import Split from '../ui/Split.astro';
+import SectionHead from '../ui/SectionHead.astro';
 
 /** Quick facts, shared by home and /event: the four answers a cautious reader looks for first. Never more precise than the city. */
 
@@ -42,54 +44,34 @@ const facts = [
 ];
 const anchor = data.anchor ?? 'praktisches';
 const band = variant === 'band';
-
-// Two by two with hairlines between; on the band four abreast from `lg`, each behind its own hairline.
-const item = (i: number) => [
-  '@container grid grid-rows-[auto_auto_1fr] gap-1 border-line py-4 pr-4',
-  i % 2 === 1 && 'border-l pl-4',
-  i >= 2 && 'border-t',
-  band && 'lg:border-t-0 lg:border-l lg:px-6',
-];
 ---
 
 {band ? (
   <Section id={anchor} ground="sand" space="compact" labelledby="praktisches-title">
-    <div class="grid gap-x-group gap-y-2 xl:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] xl:items-start">
-      {/* Large text (≥ 24px): rust on sand holds 4.4:1, which large text may. */}
-      <h2 id="praktisches-title" class="font-serif text-2xl text-accent italic xl:pt-4">
-        {data.eyebrow ?? 'Auf einen Blick'}
-      </h2>
-      <dl class="grid grid-cols-2 lg:grid-cols-4">
-        {facts.map((fact, i) => (
-          <div class:list={item(i)}>
-            <dt class="text-xs font-semibold tracking-label text-fg-muted uppercase">{fact.label}</dt>
-            {/* Every value on one line at one size: "Alle 2–4 Wochen", the longest, is 7.6em. */}
-            <dd class="font-serif text-[length:min(var(--text-xl),12.8cqi)] leading-[1.1] tracking-[-0.015em] whitespace-nowrap text-fg">
-              {fact.value}
-            </dd>
-            <dd class="mt-1 text-sm leading-normal text-fg-muted">{fact.sub}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+    <Eyebrow as="h2" id="praktisches-title" class="mb-6">
+      {data.eyebrow ?? 'Auf einen Blick'}
+    </Eyebrow>
+    <dl class="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+      {facts.map((fact) => (
+        <div class="grid content-start gap-1">
+          <dt class="text-sm text-fg-muted">{fact.label}</dt>
+          <dd class="font-serif text-xl font-medium text-fg">{fact.value}</dd>
+          <dd class="text-sm text-fg-muted">{fact.sub}</dd>
+        </div>
+      ))}
+    </dl>
   </Section>
 ) : (
-  <Section labelledby="fakten-title" defer>
-    <Split>
-      <h2 slot="head" id="fakten-title" class="text-display-3 text-fg">
-        Gut zu wissen
-      </h2>
-      <dl class="grid grid-cols-2">
-        {facts.map((fact, i) => (
-          <div class:list={[item(i), 'reveal']}>
-            <dt class="text-xs font-semibold tracking-label text-fg-muted uppercase">{fact.label}</dt>
-            <dd class="font-serif text-[length:min(var(--text-xl),12.8cqi)] leading-[1.1] tracking-[-0.015em] whitespace-nowrap text-fg">
-              {fact.value}
-            </dd>
-            <dd class="mt-1 text-sm leading-normal text-fg-muted">{fact.sub}</dd>
-          </div>
-        ))}
-      </dl>
-    </Split>
+  <Section ground="sand" labelledby="fakten-title" defer>
+    <SectionHead title="Gut zu wissen" titleId="fakten-title" />
+    <dl class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {facts.map((fact) => (
+        <div class:list={[card, 'reveal grid content-start gap-1 p-6']}>
+          <dt class="text-sm text-fg-muted">{fact.label}</dt>
+          <dd class="font-serif text-xl font-medium text-fg">{fact.value}</dd>
+          <dd class="mt-1 text-sm text-fg-muted">{fact.sub}</dd>
+        </div>
+      ))}
+    </dl>
   </Section>
 )}

@@ -3,47 +3,42 @@ import Eyebrow from './ui/Eyebrow.astro';
 import Section from './ui/Section.astro';
 
 /**
- * The opening of a sub-page: label and title on the left half, the lead (slot
- * `lead`) and any action (default slot) from column 7, level with the title's
- * last line. A title without a lead takes the whole width. The title is capped
- * by its column, so a single long word ("Datenschutzerklärung", "Anmeldung")
- * never overflows.
+ * The opening of a sub-page: eyebrow, title, the lead (slot `lead`) and any action
+ * (default slot), stacked on one reading line. A single long word in the title
+ * ("Datenschutzerklärung") breaks rather than overflows.
  */
 interface Props {
   eyebrow?: string;
   title: string;
   /** Trusted HTML from the content files. */
   titleHtml?: boolean;
-  ground?: 'default' | 'night';
-  /** Tighter at the foot when the next block continues the same ground. */
+  /** Tighter at the foot when the next block continues straight on. */
   joined?: boolean;
-  /** Whether the right column has content; defaults to whether a lead was passed. */
-  aside?: boolean;
   id?: string;
 }
 
-const { eyebrow, title, titleHtml = false, ground = 'default', joined = false, id } = Astro.props;
-const hasAside = Astro.props.aside ?? Astro.slots.has('lead');
+const { eyebrow, title, titleHtml = false, joined = false, id } = Astro.props;
 const titleClass =
-  'max-w-[max(14ch,min-content)] text-[length:min(var(--text-display-2),max(9.4cqi,2.5rem))] leading-[1.02] tracking-display text-fg wrap-break-word max-sm:hyphens-auto entrance:animate-rise entrance:animate-delay-60';
+  'max-w-[22ch] text-display-2 text-fg wrap-break-word max-sm:hyphens-auto entrance:animate-rise entrance:animate-delay-60';
+const hasLead = Astro.slots.has('lead');
+const hasAction = Astro.slots.has('default');
 ---
 
 <Section
   id={id}
-  ground={ground}
   space="none"
   class:list={['pt-[calc(var(--spacing-header)+var(--spacing-group))]', joined ? 'pb-8' : 'pb-group']}
-  innerClass="grid gap-x-grid gap-y-6 lg:grid-cols-12 lg:items-end"
+  innerClass="grid justify-items-start gap-5"
 >
-  <div class:list={['@container grid gap-5', hasAside ? 'lg:col-span-6' : 'lg:col-span-12']}>
-    {eyebrow && <Eyebrow class="entrance:animate-rise">{eyebrow}</Eyebrow>}
-    {titleHtml ? <h1 class={titleClass} set:html={title} /> : <h1 class={titleClass}>{title}</h1>}
-  </div>
-  {hasAside && (
-    <div class="grid justify-items-start gap-6 entrance:animate-rise entrance:animate-delay-120 lg:col-span-6 lg:col-start-7">
-      <div class="max-w-[46ch] text-lg text-fg-soft">
-        <slot name="lead" />
-      </div>
+  {eyebrow && <Eyebrow class="entrance:animate-rise">{eyebrow}</Eyebrow>}
+  {titleHtml ? <h1 class={titleClass} set:html={title} /> : <h1 class={titleClass}>{title}</h1>}
+  {hasLead && (
+    <div class="max-w-measure text-lg text-fg-soft entrance:animate-rise entrance:animate-delay-120">
+      <slot name="lead" />
+    </div>
+  )}
+  {hasAction && (
+    <div class="mt-2 flex flex-wrap gap-3 entrance:animate-rise entrance:animate-delay-160">
       <slot />
     </div>
   )}

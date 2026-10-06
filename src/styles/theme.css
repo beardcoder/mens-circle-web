@@ -1,6 +1,6 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
- * utilities cannot express ("Feuerstelle"). Shared by the two entry files:
+ * utilities cannot express ("Abendlicht": warm, calm, approachable). Shared by the two entry files:
  * global.css (public site) and admin.css (back office). docs/design-system.md
  * describes the system.
  */
@@ -42,116 +42,108 @@
   --shadow-*: initial;
   --breakpoint-*: initial;
 
-  /* Breakpoints. `lg` is the split line: from there every block stands on the
-     12-column field and the bar shows its navigation. */
+  /* Breakpoints. From `lg` the bar shows its navigation and blocks sit side by side. */
   --breakpoint-sm: 36rem;
   --breakpoint-md: 48rem;
-  --breakpoint-lg: 56rem;
+  --breakpoint-lg: 60rem;
   --breakpoint-xl: 72rem;
   --breakpoint-2xl: 100rem;
 
-  /* Brand constants — the same in both modes. Ratios are against the ground
-     each colour sits on. */
-  --color-flame: #e4632e; /* 5.4:1 on night; on cream only as fill or stroke */
-  --color-rust: #a84a2a; /* 4.9:1 on cream: the accent and button on cream */
-  --color-night: #151210;
-  --color-cream: #f4ede1;
+  /* Brand constants — the same in both modes. */
+  --color-flame: #e4632e; /* the mark */
+  --color-night: #1c1714;
 
-  /* Semantic colours. `light-dark()` follows the page's color-scheme; the
-     surfaces below re-declare them, so everything inside follows the ground. */
-  --color-ground: light-dark(#f4ede1, #151210); /* the page */
-  --color-ground-alt: light-dark(#eae1d2, #201b18); /* sand: quiet passages */
-  --color-raised: light-dark(#faf6ee, #241e19); /* panels, popovers, toasts; flame text 4.8:1 on it */
-  --color-surface: light-dark(#f4ede1, #151210); /* the ground of the current block */
-  --color-fg: light-dark(#241c17, #f1e9db); /* 14.4:1 */
-  --color-fg-soft: light-dark(#5a4e44, #d2c6b5); /* running text, 6.9:1 */
-  --color-fg-muted: light-dark(#6b5e52, #a79a8a); /* captions, labels, ≥ 4.9:1 */
-  --color-accent: light-dark(#a84a2a, #e4632e); /* rust on cream, flame at night */
-  --color-on-accent: light-dark(#f4ede1, #151210);
-  --color-line: light-dark(#ddd2bf, #3a322b); /* hairlines */
-  --color-line-strong: light-dark(#c4b49b, #4a3d34); /* control borders, step rules */
-  --color-line-bold: light-dark(#6b5e52, #66584c); /* outlined buttons */
-  --color-field: light-dark(#faf6ee, #201b18); /* form controls */
-  --color-field-focus: light-dark(#fffdf8, #2a241f);
-  --color-overlay: light-dark(rgb(36 28 23 / 55%), rgb(8 6 5 / 72%));
+  /* Semantic colours ("Abendlicht"): warm paper by day, a warm dark by night.
+     `light-dark()` follows the page's color-scheme; the surfaces below re-declare
+     them. Ratios: fg ≥ 13:1, fg-soft ≥ 8:1, fg-muted and accent ≥ 4.6:1 on every
+     ground; line-bold (control borders) ≥ 3:1. */
+  --color-ground: light-dark(#fbf8f3, #171310); /* the page */
+  --color-ground-alt: light-dark(#f3ede3, #1f1a16); /* stone: quiet bands */
+  --color-raised: light-dark(#ffffff, #26201b); /* cards, panels, popovers */
+  --color-surface: light-dark(#fbf8f3, #171310); /* the ground of the current block */
+  --color-fg: light-dark(#221c17, #f2ebe1);
+  --color-fg-soft: light-dark(#4d443c, #d3c8ba); /* running text */
+  --color-fg-muted: light-dark(#6b6158, #a89c8e); /* captions, labels */
+  --color-accent: light-dark(#a3462a, #ec7a48); /* rust by day, ember by night */
+  --color-accent-strong: light-dark(#853720, #f39a6f); /* the accent's hover */
+  --color-accent-soft: light-dark(#f6e7dd, #3a261b); /* a tint behind the accent */
+  --color-on-accent: light-dark(#fff8f0, #171310);
+  --color-line: light-dark(#e8e0d4, #362e28); /* hairlines, card borders */
+  --color-line-strong: light-dark(#d6cbbb, #4a4038); /* dividers that must show */
+  --color-line-bold: light-dark(#8b7f72, #7a6e62); /* control borders */
+  --color-field: light-dark(#ffffff, #1f1a16);
+  --color-overlay: light-dark(rgb(34 28 23 / 45%), rgb(8 6 5 / 70%));
   --color-success: light-dark(#2f6b4a, #8cc7a2);
   --color-danger: light-dark(#9c3a2c, #ec9a87);
   /* A field message carries its own ground, so it reads on every surface. */
   --color-alert: #f7e0d9;
   --color-on-alert: #6e2416;
 
-  /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). Fraunces speaks,
-     Instrument Sans explains. */
+  /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). Fraunces speaks
+     (headings, quotes), Instrument Sans explains (text, UI). */
   --font-sans: var(--font-instrument);
   --font-serif: var(--font-fraunces);
 
-  /* Type scale. Reading sizes, then the serif voice: display-1 is the home
-     sentence only, display-2 section and page titles, display-3 essays and
-     rail titles. Phones sit on the floors, wide screens on the ceilings. */
-  --text-xs: 0.8125rem; /* labels in capitals */
-  --text-xs--line-height: 1.3;
-  --text-sm: 0.9375rem; /* captions and notes */
+  /* Type scale. Calm: the largest title (`display-1`) is the home sentence, page
+     titles take `display-2`, section titles `display-3`. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.4;
+  --text-sm: 0.9375rem; /* captions, notes, labels */
   --text-sm--line-height: 1.55;
   --text-base: 1.0625rem; /* compact text, controls */
   --text-base--line-height: 1.6;
   --text-md: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem); /* reading */
-  --text-md--line-height: 1.65;
-  --text-lg: clamp(1.1875rem, 1.1rem + 0.4vw, 1.375rem); /* leads */
+  --text-md--line-height: 1.7;
+  --text-lg: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem); /* leads */
   --text-lg--line-height: 1.6;
-  --text-xl: clamp(1.375rem, 1.25rem + 0.55vw, 1.75rem);
-  --text-xl--line-height: 1.3;
-  --text-2xl: clamp(1.625rem, 1.4rem + 1vw, 2.25rem);
-  --text-2xl--line-height: 1.15;
-  --text-3xl: clamp(2rem, 1.5rem + 2vw, 2.75rem);
-  --text-3xl--line-height: 1.1;
-  --text-display-3: clamp(1.875rem, 1.3rem + 2.4vw, 3rem);
-  --text-display-3--line-height: 1.05;
-  --text-display-3--letter-spacing: -0.02em;
-  --text-display-2: clamp(2.5rem, 1.5rem + 3.9vw, 4.5rem);
-  --text-display-2--line-height: 1.02;
-  --text-display-2--letter-spacing: -0.025em;
-  --text-display-1: clamp(2.875rem, 1.2rem + 6.4vw, 7rem);
-  --text-display-1--line-height: 0.98;
-  --text-display-1--letter-spacing: -0.025em;
+  --text-xl: clamp(1.25rem, 1.16rem + 0.4vw, 1.5rem);
+  --text-xl--line-height: 1.35;
+  --text-2xl: clamp(1.5rem, 1.32rem + 0.8vw, 1.875rem);
+  --text-2xl--line-height: 1.25;
+  --text-display-3: clamp(1.75rem, 1.45rem + 1.3vw, 2.5rem);
+  --text-display-3--line-height: 1.15;
+  --text-display-3--letter-spacing: -0.012em;
+  --text-display-2: clamp(2.125rem, 1.65rem + 2.1vw, 3.375rem);
+  --text-display-2--line-height: 1.1;
+  --text-display-2--letter-spacing: -0.018em;
+  --text-display-1: clamp(2.5rem, 1.75rem + 3.4vw, 4.625rem);
+  --text-display-1--line-height: 1.05;
+  --text-display-1--letter-spacing: -0.022em;
 
-  --tracking-label: 0.18em;
-  --tracking-display: -0.025em;
+  /* Small labels in capitals (DefList terms, admin), spaced a little. */
+  --tracking-label: 0.08em;
 
-  /* Spacing: the rhythm, largest to smallest — never let an inner gap exceed
-     an outer one. Wide screens get more air (see the base layer). */
-  --spacing-section: clamp(5rem, 3.5rem + 5vw, 7rem);
+  /* Spacing: the rhythm, largest to smallest — never let an inner gap exceed an
+     outer one. */
+  --spacing-section: clamp(4.5rem, 3rem + 5vw, 8rem);
   --spacing-group: clamp(2rem, 1.5rem + 2vw, 3.5rem);
   --spacing-item: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
-  --spacing-gutter: clamp(1rem, 0.6rem + 2.6vw, 3.5rem);
-  --spacing-grid: clamp(1.25rem, 2vw, 2.5rem); /* column gap of the 12-column field */
-  --spacing-header: 68px; /* the fixed bar */
-  --spacing-clearance: 84px; /* the bar plus air, for anchors and sticky heads */
+  --spacing-gutter: clamp(1.25rem, 0.75rem + 2.2vw, 3rem);
+  --spacing-grid: clamp(1.25rem, 0.75rem + 2vw, 3rem); /* column gap */
+  --spacing-header: 72px; /* the fixed bar */
+  --spacing-clearance: 96px; /* the bar plus air, for anchors and sticky columns */
 
-  --container-page: 105rem; /* 1680px */
-  --container-measure: 38rem; /* a comfortable reading line, about 62ch */
+  --container-page: 78rem; /* 1248px of content */
+  --container-measure: 40rem; /* a comfortable reading line */
 
-  /* One radius for controls and panels; full circles only for seats and round
-     icon buttons (`rounded-full`). */
-  --radius-control: 3px;
+  /* Soft shapes: controls 12px, cards 20px, buttons and seats round. */
+  --radius-control: 0.75rem;
+  --radius-card: 1.25rem;
 
-  --shadow-overlay: 0 30px 60px -30px rgb(20 14 10 / 50%);
-  --shadow-toast: 0 18px 40px -24px rgb(36 28 23 / 45%);
+  --shadow-card: 0 1px 2px rgb(34 28 23 / 4%), 0 12px 32px -18px rgb(34 28 23 / 22%);
+  --shadow-overlay: 0 24px 64px -24px rgb(20 14 10 / 45%);
 
   /* Motion */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-emphasised: cubic-bezier(0.16, 1, 0.3, 1);
 
-  --animate-rise: rise 420ms var(--ease-settle) var(--delay) both;
-  --animate-rise-slow: rise 600ms var(--ease-settle) var(--delay) both;
-  --animate-line-in: line-in 680ms var(--ease-emphasised) var(--delay) both;
+  --animate-rise: rise 520ms var(--ease-settle) var(--delay) both;
   --animate-fade-in: fade-in 700ms var(--ease-settle) var(--delay) both;
-  --animate-plate-open: plate-open 1100ms var(--ease-emphasised) var(--delay) both;
   --animate-ring-in: ring-in 1000ms var(--ease-emphasised) var(--delay) both;
   --animate-seat-in: seat-in 420ms var(--ease-settle) var(--delay) both;
   --animate-ember: ember-glow 700ms var(--ease-settle) var(--delay) both;
   --animate-breathe: breathe 10s var(--delay) infinite both;
-  --animate-breath-swell: breath-swell 31s var(--delay) infinite both;
   --animate-skeleton: skeleton 2s ease-in-out infinite;
   --animate-glow: glow 3.6s ease-in-out infinite;
 }
@@ -159,18 +151,10 @@
 /* Keyframes live outside @theme so they are always emitted, whether a theme
    animation, an arbitrary `animate-[…]` or an @utility uses them. */
 
-/* Entrances */
 @keyframes rise {
   from {
     opacity: 0;
     transform: translate3d(0, 1rem, 0);
-  }
-}
-
-@keyframes line-in {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 0.4em, 0);
   }
 }
 
@@ -180,18 +164,7 @@
   }
 }
 
-/* The photograph opens from the circle's centre outward. */
-@keyframes plate-open {
-  from {
-    clip-path: circle(18% at 30% 45%);
-  }
-
-  to {
-    clip-path: circle(150% at 30% 45%);
-  }
-}
-
-/* The ring turns into place, then the seats take theirs. */
+/* The seat circle draws in: the ring turns into place, then the seats take theirs. */
 @keyframes ring-in {
   from {
     opacity: 0;
@@ -254,79 +227,6 @@
   }
 }
 
-/* The breathing ground of the hero (BreathField.astro): one 31 s phrase of three
-   breaths (10 s, 11 s, 10 s) with depths 1, 0.82 and 1.12, so no two are alike.
-   It starts and ends at rest, so the loop never shows. Per element: --dx/--dy
-   (drift), --sx/--sy (uneven widening), --o0/--o1 (opacity at rest / full). */
-@keyframes breath-swell {
-  0% {
-    opacity: var(--o0);
-    transform: none;
-    animation-timing-function: cubic-bezier(0.33, 0, 0.4, 1);
-  }
-
-  12.26% {
-    opacity: var(--o1);
-    transform: translate(var(--dx), var(--dy)) scale(calc(1 + var(--sx)), calc(1 + var(--sy)));
-    animation-timing-function: linear;
-  }
-
-  14.19% {
-    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 1.03);
-    transform: translate(calc(var(--dx) * 1.03), calc(var(--dy) * 1.03))
-      scale(calc(1 + var(--sx) * 1.03), calc(1 + var(--sy) * 1.03));
-    animation-timing-function: cubic-bezier(0.45, 0, 0.3, 1);
-  }
-
-  30.97%,
-  32.26% {
-    opacity: var(--o0);
-    transform: none;
-    animation-timing-function: cubic-bezier(0.33, 0, 0.4, 1);
-  }
-
-  45.81% {
-    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 0.82);
-    transform: translate(calc(var(--dx) * 0.82), calc(var(--dy) * 0.82))
-      scale(calc(1 + var(--sx) * 0.82), calc(1 + var(--sy) * 0.82));
-    animation-timing-function: linear;
-  }
-
-  47.42% {
-    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 0.845);
-    transform: translate(calc(var(--dx) * 0.845), calc(var(--dy) * 0.845))
-      scale(calc(1 + var(--sx) * 0.845), calc(1 + var(--sy) * 0.845));
-    animation-timing-function: cubic-bezier(0.45, 0, 0.3, 1);
-  }
-
-  66.13%,
-  67.74% {
-    opacity: var(--o0);
-    transform: none;
-    animation-timing-function: cubic-bezier(0.33, 0, 0.4, 1);
-  }
-
-  80.32% {
-    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 1.12);
-    transform: translate(calc(var(--dx) * 1.12), calc(var(--dy) * 1.12))
-      scale(calc(1 + var(--sx) * 1.12), calc(1 + var(--sy) * 1.12));
-    animation-timing-function: linear;
-  }
-
-  81.61% {
-    opacity: calc(var(--o0) + (var(--o1) - var(--o0)) * 1.154);
-    transform: translate(calc(var(--dx) * 1.154), calc(var(--dy) * 1.154))
-      scale(calc(1 + var(--sx) * 1.154), calc(1 + var(--sy) * 1.154));
-    animation-timing-function: cubic-bezier(0.45, 0, 0.3, 1);
-  }
-
-  98.71%,
-  100% {
-    opacity: var(--o0);
-    transform: none;
-  }
-}
-
 @keyframes reveal {
   from {
     opacity: 0.001;
@@ -349,79 +249,34 @@
   }
 }
 
-@keyframes ring-turn {
-  from {
-    transform: rotate(-14deg);
-  }
-
-  to {
-    transform: rotate(14deg);
-  }
-}
-
-@keyframes settle {
-  from {
-    transform: translate3d(var(--settle-from, 6%), 0, 0);
-  }
-}
-
-@keyframes breath-drift {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* On `translate`, so it composes with the drift's `transform`. */
-@keyframes breath-parallax {
-  to {
-    translate: var(--px, 0) var(--py, 0);
-  }
-}
-
 /* ── Surfaces ─────────────────────────────────────────────────────────────── */
 
 /* A ground re-declares the semantic colours, so text, hairlines, buttons, focus
    rings and form controls inside follow it. Surfaces keep the page's
    color-scheme, so their own light-dark() grounds follow the mode. */
 @utility surface-sand {
-  --color-surface: light-dark(#eae1d2, #201b18);
-  --color-line: light-dark(#c4b49b, #4a3d34);
+  --color-surface: light-dark(#f3ede3, #1f1a16);
   color: var(--color-fg);
   background-color: var(--color-surface);
 }
 
-/* The poster ground: the flyer's near-black, a shade deeper in dark mode. */
+/* The one dark band in the middle of a page, and the footer. */
 @utility surface-night {
-  --color-surface: light-dark(#151210, #0e0c0a);
-  --color-raised: #201b18;
-  --color-fg: #f1e9db;
-  --color-fg-soft: #d6cbbb;
-  --color-fg-muted: #a79a8a;
-  --color-accent: #e4632e;
-  --color-on-accent: #151210;
-  --color-line: #3a322b;
+  --color-surface: light-dark(#1c1714, #110e0c);
+  --color-raised: #26201b;
+  --color-fg: #f2ebe1;
+  --color-fg-soft: #d3c8ba;
+  --color-fg-muted: #a89c8e;
+  --color-accent: #ec7a48;
+  --color-accent-strong: #f39a6f;
+  --color-accent-soft: #3a261b;
+  --color-on-accent: #171310;
+  --color-line: #362e28;
   --color-line-strong: #4a4038;
-  --color-line-bold: #6a5e53;
-  --color-field: rgb(241 233 219 / 6%);
-  --color-field-focus: rgb(241 233 219 / 11%);
+  --color-line-bold: #7a6e62;
+  --color-field: #1f1a16;
   --color-success: #8cc7a2;
   --color-danger: #ec9a87;
-  color: var(--color-fg);
-  background-color: var(--color-surface);
-}
-
-/* The one flame field per page: night text on flame (5.4:1). */
-@utility surface-flame {
-  /* The same flame in both modes: the deeper one would hold night text under 4.5:1. */
-  --color-surface: #e4632e;
-  --color-fg: #151210;
-  --color-fg-soft: #2b1d15;
-  --color-fg-muted: #2b1d15;
-  --color-accent: #151210;
-  --color-on-accent: #e4632e;
-  --color-line: rgb(21 18 16 / 25%);
-  --color-line-strong: rgb(21 18 16 / 40%);
-  --color-line-bold: #151210;
   color: var(--color-fg);
   background-color: var(--color-surface);
 }
@@ -472,15 +327,6 @@
     color-scheme: dark;
   }
 
-  /* Wide screens get more air: wider gutters, longer pauses between blocks. */
-  @media (width >= 56rem) {
-    :root {
-      --spacing-gutter: clamp(3.5rem, 6vw, 8rem);
-      --spacing-section: clamp(7rem, 4rem + 5vw, 10rem);
-      --spacing-group: clamp(3rem, 1.5rem + 3vw, 5rem);
-    }
-  }
-
   html {
     /* Anchors clear the fixed bar. */
     scroll-padding-top: var(--spacing-clearance);
@@ -517,11 +363,10 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Headings speak in the serif at its regular weight; sizes come from the
-     components. */
+  /* Headings speak in the serif at 500; sizes come from the components. */
   :where(h1, h2, h3, h4, h5, h6) {
     font-family: var(--font-serif);
-    font-weight: 400;
+    font-weight: 500;
     text-wrap: balance;
   }
 
@@ -538,9 +383,9 @@
     cursor: pointer;
   }
 
-  /* The focus ring follows the text colour of whatever ground it is on. */
+  /* The focus ring: the accent, offset, on every ground. */
   :focus-visible {
-    outline: 2px solid var(--color-fg);
+    outline: 2px solid var(--color-accent);
     outline-offset: 3px;
   }
 

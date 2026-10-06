@@ -92,7 +92,7 @@ export function initSiteHeader(): void {
 
   // Widening past the panel breakpoint while open would leave the body locked
   // with no visible panel.
-  matchMedia('(width >= 56rem)').addEventListener('change', (event) => {
+  matchMedia('(width >= 60rem)').addEventListener('change', (event) => {
     if (event.matches) close();
   });
 

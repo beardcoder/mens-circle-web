@@ -1,5 +1,5 @@
 ---
-/** Facts as a hairline-separated definition list: the term in capitals, the value in the serif. */
+/** Facts as a quiet definition list: the term small and muted, the value set firm, rows parted by hairlines. */
 interface Row {
   label: string;
   value: string;
@@ -14,15 +14,13 @@ interface Props {
 const { rows, class: className } = Astro.props;
 ---
 
-<dl class:list={['border-t border-line', className]}>
+<dl class:list={['divide-y divide-line', className]}>
   {rows.map((row) => (
-    <div class="grid gap-x-6 gap-y-1 border-b border-line py-4 sm:grid-cols-[minmax(6rem,10rem)_minmax(0,1fr)]">
-      <dt class="pt-[0.3em] text-xs font-semibold tracking-label text-fg-muted uppercase">{row.label}</dt>
-      <dd class="font-serif text-lg leading-snug font-medium text-fg">
+    <div class="grid gap-x-6 gap-y-0.5 py-3.5 first:pt-0 last:pb-0 sm:grid-cols-[8rem_minmax(0,1fr)]">
+      <dt class="text-sm text-fg-muted">{row.label}</dt>
+      <dd class="text-base font-semibold text-fg">
         {row.value}
-        {row.note && (
-          <span class="mt-1 block font-sans text-sm leading-normal font-normal text-fg-muted">{row.note}</span>
-        )}
+        {row.note && <span class="mt-0.5 block text-sm font-normal text-fg-muted">{row.note}</span>}
       </dd>
     </div>
   ))}
