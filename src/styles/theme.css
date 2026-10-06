@@ -146,6 +146,7 @@
   --animate-fade-in-up: fade-in-up 520ms var(--ease-settle) both;
   --animate-fade-in: fade-in 700ms var(--ease-settle) both;
   --animate-breathe: breathe 10s infinite both;
+  --animate-breath: breath 34.6s infinite both;
   --animate-skeleton: pulse 2s ease-in-out infinite;
   --animate-glow: glow 3.6s ease-in-out infinite;
 }
@@ -157,6 +158,90 @@
   50% {
     opacity: 0.3;
     transform: scale(1.12);
+  }
+}
+
+/* A natural breath for the background light (BreathField): a 34.6 s phrase of
+   three breaths, each deeper or shallower than the last (peaks 0.97, 0.92, 1),
+   in shorter than out (4 / 3.4 / 4.6 s in, 6 / 5 / 6.6 s out), a short hold at
+   the top and a rest at the bottom, so it never ticks like a metronome. `scale`
+   and `opacity` only, which the compositor runs. */
+@keyframes breath {
+  0% {
+    opacity: 0.55;
+    scale: var(--rest, 0.8);
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+  11.56% {
+    opacity: 0.9;
+    scale: 0.97;
+    animation-timing-function: linear;
+  }
+  13.29% {
+    opacity: 0.9;
+    scale: 0.97;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.4, 1);
+  }
+  30.64% {
+    opacity: 0.55;
+    scale: var(--rest, 0.8);
+    animation-timing-function: linear;
+  }
+  34.68% {
+    opacity: 0.55;
+    scale: var(--rest, 0.8);
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+  44.51% {
+    opacity: 0.78;
+    scale: 0.92;
+    animation-timing-function: linear;
+  }
+  45.38% {
+    opacity: 0.78;
+    scale: 0.92;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.4, 1);
+  }
+  59.83% {
+    opacity: 0.55;
+    scale: var(--rest, 0.8);
+    animation-timing-function: linear;
+  }
+  62.43% {
+    opacity: 0.55;
+    scale: var(--rest, 0.8);
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+  75.72% {
+    opacity: 1;
+    scale: 1;
+    animation-timing-function: linear;
+  }
+  78.03% {
+    opacity: 1;
+    scale: 1;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.4, 1);
+  }
+  97.11% {
+    opacity: 0.55;
+    scale: var(--rest, 0.8);
+    animation-timing-function: linear;
+  }
+  100% {
+    opacity: 0.55;
+    scale: var(--rest, 0.8);
+  }
+}
+
+/* Depth on scroll: the light lags behind the page (translate, not transform, so
+   it composes with the breath's scale). */
+@keyframes breath-parallax {
+  from {
+    translate: 0 -14%;
+  }
+
+  to {
+    translate: 0 14%;
   }
 }
 

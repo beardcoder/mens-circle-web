@@ -1,13 +1,13 @@
 ---
-import Rings from './Rings.astro';
+import BreathField from './BreathField.astro';
 import Eyebrow from './ui/Eyebrow.astro';
 import Section from './ui/Section.astro';
 
 /**
  * The opening of a sub-page: eyebrow, title, the lead (slot `lead`) and any action
  * (default slot), stacked on one reading line. A single long word in the title
- * ("Datenschutzerklärung") breaks rather than overflows. Rings at the right edge
- * keep the circle in the background.
+ * ("Datenschutzerklärung") breaks rather than overflows. A breathing light at the
+ * right edge keeps the circle in the background.
  */
 interface Props {
   eyebrow?: string;
@@ -29,10 +29,10 @@ const hasAction = Astro.slots.has('default');
 <Section
   id={id}
   space="none"
-  class:list={['overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))]', joined ? 'pb-8' : 'pb-group']}
+  class:list={['overflow-x-clip pt-[calc(var(--spacing-header)+var(--spacing-group))]', joined ? 'pb-8' : 'pb-group']}
   innerClass="relative grid justify-items-start gap-5"
 >
-  <Rings
+  <BreathField
     slot="before"
     class="top-full left-full w-[26rem] -translate-1/2 lg:top-1/2 lg:left-[90%] lg:w-[min(60rem,75vw)]"
   />
