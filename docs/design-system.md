@@ -12,6 +12,7 @@ There are no component stylesheets.
 | `src/styles/theme.css`   | Tokens (`@theme`), variants, surfaces, the few custom utilities, keyframes, base rules. Shared.                       |
 | `src/styles/global.css`  | Public entry: `@layer vendor`, Tailwind, theme, view transitions. Excludes the admin sources (`@source not`).         |
 | `src/styles/admin.css`   | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                                      |
+| `tailwind-animations`    | Animation utilities and keyframes (CSS only), imported by both entries before `theme.css`.                            |
 | `src/styles/leaflet.css` | Leaflet's stylesheet in the `vendor` layer, imported by the map only, so utilities win over it.                       |
 | `src/lib/ui.ts`          | Class recipes: `button()`, `control()`, `link`, `fieldLabel`, `fieldHint`, `fieldError`, `checkbox`, `card`, `panel`. |
 | `src/components/ui/`     | The components built on them.                                                                                         |
@@ -67,9 +68,15 @@ of quotes.
 
 **Motion.** `entrance:` (one-time entrances: motion allowed and not after a view
 transition), `scroll-motion:` (scroll-driven, where timelines exist), `reveal`
-(scroll-tied reveal), `animate-delay-*` (staggers through a non-inheriting `--delay`).
-Animations: `rise`, `fade-in`, `ring-in` and `seat-in` (the seat circle), `ember`,
-`breathe` (10 s: 4 in, 0.5 hold, 5 out, 0.5 rest), `skeleton`, `glow`. Everything
+(scroll-tied reveal), `animate-delay-*` (staggers; `animation-delay`, from
+tailwind-animations).
+Animations: `fade-in-up`, `fade-in`, `ring-in` and `seat-in` (the seat circle), `ember`,
+`breathe` (10 s: 4 in, 0.5 hold, 5 out, 0.5 rest), `skeleton`, `glow`. The generic
+ones use the keyframes of [tailwind-animations](https://tailwind-animations.com)
+(`fade-in-up`, `fade-in`, `zoom-in`, `bounce-fade-in`, `pulse`), re-timed in
+`theme.css` to the theme's easing; the circle's own (`ring-in`, `breathe`, `glow`)
+are ours. Pick further motions from its catalog (`.claude/skills/tailwind-animations`)
+and give them a theme token instead of its default timing. Everything
 rests under `prefers-reduced-motion`.
 
 ## Components

@@ -94,7 +94,11 @@ Leaflet's stylesheet sits in the `vendor` layer (`styles/leaflet.css`, declared 
 **Styling.** Tailwind v4 (`@tailwindcss/vite`), CSS-first. `styles/theme.css` holds the
 tokens, variants, surfaces and keyframes; `global.css` (public, inlined into every page)
 and `admin.css` are the two entries, and `global.css` keeps the admin sources out with
-`@source not`. No `<style>` blocks and no component stylesheets: utilities in the
+`@source not`. Animations come from `tailwind-animations` (CSS only, imported before
+`theme.css`, which re-times the ones in use to the theme's easing; its skill is in
+`.claude/skills/`, which both entries keep out with `@source not`, or its example
+classes would ship). Its `.animate-dialog` block is always emitted (~1 KB inlined).
+No `<style>` blocks and no component stylesheets: utilities in the
 markup, recipes in `lib/ui.ts`, components in `components/ui/`. `docs/design-system.md`
 is the reference. Class strings are complete and static; never add a class that sets a
 property the component already sets (add a prop). Scripts hook onto `data-*`

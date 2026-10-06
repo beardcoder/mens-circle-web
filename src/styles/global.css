@@ -6,6 +6,8 @@
  */
 @layer vendor;
 @import 'tailwindcss';
+/* Animation utilities and keyframes; theme.css re-times the ones it uses. */
+@import 'tailwind-animations';
 @import './theme.css';
 
 /* The back office has its own entry (admin.css); its classes stay out of the
@@ -13,6 +15,8 @@
 @source not '../layouts/AdminLayout.astro';
 @source not '../components/admin';
 @source not '../pages/admin';
+/* Agent skills quote example classes (`animate-tada`, …); none of them is ours. */
+@source not '../../.claude';
 
 /* ── View transitions ─────────────────────────────────────────────────────── */
 
