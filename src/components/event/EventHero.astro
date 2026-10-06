@@ -2,7 +2,6 @@
 import type { EventDTO } from '@lib/types';
 import { card } from '@lib/ui';
 import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from '@lib/server/format';
-import BreathField from '../BreathField.astro';
 import SeatMeter from '../SeatMeter.astro';
 import Button from '../ui/Button.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
@@ -12,7 +11,7 @@ interface Props {
   event: EventDTO;
 }
 
-/** The opening of a single event's page: the date as the title, time, place and fee as quiet chips, the seats beside it, a breathing light in the background. */
+/** The opening of a single event's page: the date as the title, time, place and fee as quiet chips, the seats beside it. */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);
@@ -28,13 +27,9 @@ const chips = [time, event.location, event.cost_basis, 'Ohne Vorerfahrung'].filt
 
 <Section
   space="none"
-  class="overflow-x-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
-  innerClass="relative grid items-center gap-10 lg:grid-cols-12 lg:gap-x-grid"
+  class="pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
+  innerClass="grid items-center gap-10 lg:grid-cols-12 lg:gap-x-grid"
 >
-  <BreathField
-    slot="before"
-    class="top-[82%] left-full w-[34rem] -translate-1/2 lg:top-1/2 lg:left-[84%] lg:w-[min(64rem,80vw)]"
-  />
   <div class="grid justify-items-start gap-5 lg:col-span-8">
     <Eyebrow class="entrance:animate-fade-in-up">
       {event.is_past ? 'Vergangenes Treffen' : 'Männerkreis · Nächstes Treffen'}

@@ -233,6 +233,14 @@
   }
 }
 
+/* The backdrop's drift over the whole page (BreathField `page`): each field moves
+   by its own `--drift`, so the light sits at different depths. */
+@keyframes breath-drift {
+  to {
+    translate: 0 var(--drift, -40vh);
+  }
+}
+
 /* Depth on scroll: the light lags behind the page (translate, not transform, so
    it composes with the breath's scale). */
 @keyframes breath-parallax {
@@ -298,7 +306,10 @@
 @utility surface-sand {
   --color-surface: light-dark(#eee5d7, #1f1a16);
   color: var(--color-fg);
-  background-color: var(--color-surface);
+  /* A fifth of the page shows through, so the breathing backdrop (BreathBackdrop)
+     runs on under the stone band. Only lighter in light mode and darker in dark
+     mode than the opaque band: every contrast holds. */
+  background-color: color-mix(in oklab, var(--color-surface) 80%, transparent);
 }
 
 /* The one dark band in the middle of a page, and the footer. */
@@ -323,6 +334,24 @@
 }
 
 /* ── Utilities Tailwind has no name for ───────────────────────────────────── */
+
+/* The breathing light (BreathField): a radial field of flame at `--glow` percent
+   in the middle, falling off on a cosine curve. Even stops with no kink in the
+   curve, so the light shows no bands or rings. */
+@utility breath-glow {
+  background-image: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--color-flame) calc(var(--glow) * 1%), transparent) 0%,
+    color-mix(in oklab, var(--color-flame) calc(var(--glow) * 0.965%), transparent) 12%,
+    color-mix(in oklab, var(--color-flame) calc(var(--glow) * 0.864%), transparent) 24%,
+    color-mix(in oklab, var(--color-flame) calc(var(--glow) * 0.713%), transparent) 36%,
+    color-mix(in oklab, var(--color-flame) calc(var(--glow) * 0.531%), transparent) 48%,
+    color-mix(in oklab, var(--color-flame) calc(var(--glow) * 0.345%), transparent) 60%,
+    color-mix(in oklab, var(--color-flame) calc(var(--glow) * 0.181%), transparent) 72%,
+    color-mix(in oklab, var(--color-flame) calc(var(--glow) * 0.062%), transparent) 84%,
+    transparent 100%
+  );
+}
 
 /* Revealed as it scrolls into view: tied to the scroll position, so an element
    already on screen is already complete and nothing waits on a script. The
