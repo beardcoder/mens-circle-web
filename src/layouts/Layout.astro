@@ -66,8 +66,9 @@ const props = Astro.props;
   </head>
   <body class="max-lg:data-[nav-open]:fixed max-lg:data-[nav-open]:min-h-full max-lg:data-[nav-open]:w-full max-lg:data-[nav-open]:overflow-hidden">
     {/* lib/site-header.ts sets `data-nav-open` while the phone panel is open: the page holds still. */}
-    {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top. */}
-    <span id="top" aria-hidden="true"></span>
+    {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top; it
+        takes the focus there, so the next Tab starts at the top (lib/site-header.ts). */}
+    <span id="top" tabindex="-1"></span>
 
     <a
       href="#main"
@@ -84,10 +85,11 @@ const props = Astro.props;
       {/* Fixed to the corner, but inside a landmark, on the page's own colours. */}
       <a
         href="#top"
+        data-scroll-top
         data-llms-skip
         aria-label="Nach oben scrollen"
         title="Nach oben"
-        class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full border border-line-strong bg-raised text-fg transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-on-accent scroll-motion:pointer-events-none scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
+        class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full border border-line-strong bg-raised text-fg transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-on-accent scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
       >
         <Icon name="chevron-up" aria-hidden="true" class="size-4.5" />
       </a>
