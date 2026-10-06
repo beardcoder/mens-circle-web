@@ -138,57 +138,29 @@
   --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-emphasised: cubic-bezier(0.16, 1, 0.3, 1);
 
-  --animate-rise: rise 520ms var(--ease-settle) var(--delay) both;
-  --animate-fade-in: fade-in 700ms var(--ease-settle) var(--delay) both;
-  --animate-ring-in: ring-in 1000ms var(--ease-emphasised) var(--delay) both;
-  --animate-seat-in: seat-in 420ms var(--ease-settle) var(--delay) both;
-  --animate-ember: ember-glow 700ms var(--ease-settle) var(--delay) both;
-  --animate-breathe: breathe 10s var(--delay) infinite both;
-  --animate-skeleton: skeleton 2s ease-in-out infinite;
+  /* Animations. The generic motions come from tailwind-animations (imported
+     before this file: its keyframes `fade-in-up`, `fade-in`, `zoom-in`,
+     `bounce-fade-in`, `pulse`); here they are re-timed to the theme's easing.
+     Delays come from its `animate-delay-*` utility (`animation-delay`). The
+     circle's own motions (ring, breath, glow) keep their keyframes below. */
+  --animate-fade-in-up: fade-in-up 520ms var(--ease-settle) both;
+  --animate-fade-in: fade-in 700ms var(--ease-settle) both;
+  --animate-ring-in: ring-in 1000ms var(--ease-emphasised) both;
+  --animate-seat-in: zoom-in 420ms var(--ease-settle) both;
+  --animate-ember: bounce-fade-in 700ms var(--ease-settle) both;
+  --animate-breathe: breathe 10s infinite both;
+  --animate-skeleton: pulse 2s ease-in-out infinite;
   --animate-glow: glow 3.6s ease-in-out infinite;
 }
 
-/* Keyframes live outside @theme so they are always emitted, whether a theme
-   animation, an arbitrary `animate-[…]` or an @utility uses them. */
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 1rem, 0);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-}
+/* The circle's own keyframes live outside @theme so they are always emitted,
+   whether a theme animation, an arbitrary `animate-[…]` or an @utility uses them. */
 
 /* The seat circle draws in: the ring turns into place, then the seats take theirs. */
 @keyframes ring-in {
   from {
     opacity: 0;
     transform: rotate(-40deg) scale(0.92);
-  }
-}
-
-@keyframes seat-in {
-  from {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-}
-
-@keyframes ember-glow {
-  from {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-}
-
-@keyframes skeleton {
-  50% {
-    opacity: 0.45;
   }
 }
 
@@ -224,13 +196,6 @@
   100% {
     opacity: calc(var(--alpha, 1) * 0.4);
     transform: scale(var(--rest, 0.88));
-  }
-}
-
-@keyframes reveal {
-  from {
-    opacity: 0.001;
-    transform: translate3d(0, 1.5rem, 0);
   }
 }
 
@@ -283,27 +248,15 @@
 
 /* ── Utilities Tailwind has no name for ───────────────────────────────────── */
 
-/* Staggers the theme's entrances: `animate-delay-120`, or an arbitrary
-   `animate-delay-[calc(80ms+var(--i)*45ms)]`. It sets `--delay`, which every
-   entrance animation reads, so it never depends on utility order; `--delay` does
-   not inherit, so a staggered block never delays what sits inside it. */
-@property --delay {
-  syntax: '<time>';
-  inherits: false;
-  initial-value: 0s;
-}
-
-@utility animate-delay-* {
-  --delay: calc(--value(integer) * 1ms);
-  --delay: --value([*]);
-}
-
 /* Revealed as it scrolls into view: tied to the scroll position, so an element
-   already on screen is already complete and nothing waits on a script. */
+   already on screen is already complete and nothing waits on a script. The
+   motion is tailwind-animations' `fade-in-up` on a view() timeline, gated so
+   nothing is hidden where timelines or motion are unavailable (its own
+   `timeline-view` utility is not gated). */
 @utility reveal {
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
-      animation: reveal linear both;
+      animation: fade-in-up linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 55%;
     }
