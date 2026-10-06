@@ -19,7 +19,7 @@ interface Props {
 
 const { eyebrow, title, titleHtml = false, joined = false, id } = Astro.props;
 const titleClass =
-  'max-w-[22ch] text-display-2 text-fg wrap-break-word max-sm:hyphens-auto entrance:animate-rise entrance:animate-delay-60';
+  'max-w-[22ch] text-display-2 text-fg wrap-break-word max-sm:hyphens-auto entrance:animate-fade-in-up entrance:animate-delay-60';
 const hasLead = Astro.slots.has('lead');
 const hasAction = Astro.slots.has('default');
 ---
@@ -30,15 +30,15 @@ const hasAction = Astro.slots.has('default');
   class:list={['pt-[calc(var(--spacing-header)+var(--spacing-group))]', joined ? 'pb-8' : 'pb-group']}
   innerClass="grid justify-items-start gap-5"
 >
-  {eyebrow && <Eyebrow class="entrance:animate-rise">{eyebrow}</Eyebrow>}
+  {eyebrow && <Eyebrow class="entrance:animate-fade-in-up">{eyebrow}</Eyebrow>}
   {titleHtml ? <h1 class={titleClass} set:html={title} /> : <h1 class={titleClass}>{title}</h1>}
   {hasLead && (
-    <div class="max-w-measure text-lg text-fg-soft entrance:animate-rise entrance:animate-delay-120">
+    <div class="max-w-measure text-lg text-fg-soft entrance:animate-fade-in-up entrance:animate-delay-120">
       <slot name="lead" />
     </div>
   )}
   {hasAction && (
-    <div class="mt-2 flex flex-wrap gap-3 entrance:animate-rise entrance:animate-delay-160">
+    <div class="mt-2 flex flex-wrap gap-3 entrance:animate-fade-in-up entrance:animate-delay-160">
       <slot />
     </div>
   )}

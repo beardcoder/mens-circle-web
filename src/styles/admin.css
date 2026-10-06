@@ -3,4 +3,9 @@
  * (theme.css), always in the dark mode (AdminLayout.astro pins it).
  */
 @import 'tailwindcss';
+/* Animation utilities and keyframes; theme.css re-times the ones it uses. */
+@import 'tailwind-animations';
 @import './theme.css';
+
+/* Agent skills quote example classes (`animate-tada`, …); none of them is ours. */
+@source not '../../.claude';
