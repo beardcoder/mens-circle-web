@@ -1,5 +1,5 @@
 ---
-import Breath from '../Breath.astro';
+import BreathField from '../BreathField.astro';
 import Contours from '../Contours.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
@@ -34,8 +34,8 @@ const lines = data.lines ?? [];
   innerClass="relative grid justify-items-center gap-6 text-center"
 >
   <Contours slot="before" />
-  {/* A faint glow, faint enough that every contrast holds. */}
-  <Breath slot="before" variant="glow" class="top-1/2 left-1/2 w-[min(90vw,48rem)] -translate-1/2" />
+  {/* The breathing light, faint enough that every contrast holds. */}
+  <BreathField slot="before" strength="strong" class="top-1/2 left-1/2 w-[min(120vw,60rem)] -translate-1/2" />
 
   {data.eyebrow && <Eyebrow>{data.eyebrow}</Eyebrow>}
 

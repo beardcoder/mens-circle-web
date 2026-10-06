@@ -1,0 +1,45 @@
+---
+/**
+ * The circle, kept in the background, breathing: three soft fields of warm light
+ * that widen and settle on a natural breath (`breath` in theme.css: three breaths
+ * of different depth, in shorter than out, a short hold and rest, so it never
+ * ticks like a metronome). The outer fields follow the core a moment later, as a
+ * chest fills after the belly. Scrolling gives depth: the light lags behind the
+ * page (`breath-parallax` on a view() timeline).
+ *
+ * Placed by the caller (absolute, centre and size) in a `relative`, clipped
+ * block. At its brightest the light mixes at most ~18% flame into the paper
+ * (`soft`) or ~23% into a dark band (`strong`), which keeps every text token
+ * above 4.5:1 where it runs behind text. lib/breath.ts pauses it off screen;
+ * under reduced motion it rests, still.
+ */
+interface Props {
+  /** `soft` on paper, `strong` on a dark band. */
+  strength?: 'soft' | 'strong';
+  class?: string;
+}
+
+const { strength = 'soft', class: className } = Astro.props;
+
+// Core, halo, haze: each a radial field, full to 30%, about half at 65%, gone at its edge.
+const LAYERS = {
+  soft: [
+    'inset-[30%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_8%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_4%,transparent)_65%,transparent)]',
+    'inset-[14%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_6%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_3%,transparent)_65%,transparent)] animate-delay-[350ms]',
+    'inset-0 bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_5%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_3%,transparent)_65%,transparent)] animate-delay-[700ms]',
+  ],
+  strong: [
+    'inset-[30%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_11%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_6%,transparent)_65%,transparent)]',
+    'inset-[14%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_8%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_4%,transparent)_65%,transparent)] animate-delay-[350ms]',
+    'inset-0 bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-flame)_6%,transparent)_30%,color-mix(in_oklab,var(--color-flame)_3%,transparent)_65%,transparent)] animate-delay-[700ms]',
+  ],
+} as const;
+---
+
+<span class:list={['pointer-events-none absolute block aspect-square', className]} aria-hidden="true" data-breath>
+  <span class="absolute inset-0 block scroll-motion:animate-[breath-parallax_linear_both] scroll-motion:[animation-timeline:view()]">
+    {LAYERS[strength].map((layer) => (
+      <span class:list={['absolute block animate-breath rounded-full', layer]} />
+    ))}
+  </span>
+</span>

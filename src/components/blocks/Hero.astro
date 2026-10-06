@@ -2,7 +2,7 @@
 import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
 import HomeEventStatus from '../HomeEventStatus.astro';
-import Rings from '../Rings.astro';
+import BreathField from '../BreathField.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
 import TextLink from '../ui/TextLink.astro';
@@ -11,7 +11,7 @@ import TextLink from '../ui/TextLink.astro';
  * The home page opening: the sentence, a short reading and the way in on the left;
  * Markus in the landscape on the right, with the next date as a card resting on
  * the photo. Phones: the sentence, the reading, then the photo with the card
- * overlapping its foot. The circle stays in the background: rings around the photo.
+ * overlapping its foot. The circle stays in the background: a light breathing around the photo.
  */
 
 interface Props {
@@ -43,13 +43,13 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
 <Section
   space="none"
   labelledby="hero-title"
-  class="overflow-clip pt-[calc(var(--spacing-header)+clamp(1.5rem,1rem+2vw,3.5rem))] pb-section"
+  class="overflow-x-clip pt-[calc(var(--spacing-header)+clamp(1.5rem,1rem+2vw,3.5rem))] pb-section"
   innerClass="relative grid grid-cols-1 items-center gap-y-12 lg:grid-cols-12 lg:gap-x-grid"
 >
-  {/* Centred on the photo: below the reading on phones, the right column when wide. */}
-  <Rings
+  {/* Between the reading and the photo, so the light shows around both. */}
+  <BreathField
     slot="before"
-    class="top-[72%] left-1/2 w-[max(46rem,150vw)] -translate-1/2 lg:top-1/2 lg:left-[72%] lg:w-[min(72rem,90vw)]"
+    class="top-[30%] left-[70%] w-[max(36rem,150vw)] -translate-1/2 lg:top-[46%] lg:left-[56%] lg:w-[min(76rem,95vw)]"
   />
   <div class="grid justify-items-start gap-6 lg:col-span-6">
     <h1 id="hero-title" class="grid gap-5">
