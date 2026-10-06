@@ -23,9 +23,9 @@ const { items, class: className } = Astro.props;
       <a
         href={item.href}
         data-astro-prefetch={item.prefetch ? 'hover' : undefined}
-        class="group/row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1 rounded-card border border-line bg-raised px-6 py-5 shadow-card transition-[border-color,translate] duration-200 hover:-translate-y-0.5 hover:border-accent/50 motion-reduce:hover:translate-y-0"
+        class="group/row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1 rounded-card border border-line-strong bg-raised px-6 py-5 transition-[border-color,translate] duration-200 hover:-translate-y-0.5 hover:border-accent/50 motion-reduce:hover:translate-y-0"
       >
-        <span class="font-serif text-xl font-medium text-fg transition-colors duration-150 group-hover/row:text-accent">
+        <span class="font-serif text-xl font-semibold text-fg transition-colors duration-150 group-hover/row:text-accent">
           {item.title}
         </span>
         <Icon

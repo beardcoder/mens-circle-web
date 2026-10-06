@@ -1,6 +1,6 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
- * utilities cannot express ("Abendlicht": warm, calm, approachable). Shared by the two entry files:
+ * utilities cannot express ("Abendlicht": warm, grounded, sturdy). Shared by the two entry files:
  * global.css (public site) and admin.css (back office). docs/design-system.md
  * describes the system.
  */
@@ -58,15 +58,15 @@
      them. Ratios: fg ≥ 13:1, fg-soft ≥ 8:1, fg-muted and accent ≥ 4.6:1 on every
      ground; line-bold (control borders) ≥ 3:1. */
   --color-ground: light-dark(#fbf8f3, #171310); /* the page */
-  --color-ground-alt: light-dark(#f3ede3, #1f1a16); /* stone: quiet bands */
+  --color-ground-alt: light-dark(#eee5d7, #1f1a16); /* stone: quiet bands */
   --color-raised: light-dark(#ffffff, #26201b); /* cards, panels, popovers */
   --color-surface: light-dark(#fbf8f3, #171310); /* the ground of the current block */
-  --color-fg: light-dark(#221c17, #f2ebe1);
+  --color-fg: light-dark(#1c1713, #f2ebe1);
   --color-fg-soft: light-dark(#4d443c, #d3c8ba); /* running text */
   --color-fg-muted: light-dark(#6b6158, #a89c8e); /* captions, labels */
   --color-accent: light-dark(#a3462a, #ec7a48); /* rust by day, ember by night */
   --color-accent-strong: light-dark(#853720, #f39a6f); /* the accent's hover */
-  --color-accent-soft: light-dark(#f6e7dd, #3a261b); /* a tint behind the accent */
+  --color-accent-soft: light-dark(#ecdfcc, #3a261b); /* a tint behind the accent */
   --color-on-accent: light-dark(#fff8f0, #171310);
   --color-line: light-dark(#e8e0d4, #362e28); /* hairlines, card borders */
   --color-line-strong: light-dark(#d6cbbb, #4a4038); /* dividers that must show */
@@ -110,8 +110,8 @@
   --text-display-1--line-height: 1.05;
   --text-display-1--letter-spacing: -0.022em;
 
-  /* Small labels in capitals (DefList terms, admin), spaced a little. */
-  --tracking-label: 0.08em;
+  /* Labels in capitals (eyebrows, buttons, DefList terms), spaced like a stamp. */
+  --tracking-label: 0.12em;
 
   /* Spacing: the rhythm, largest to smallest — never let an inner gap exceed an
      outer one. */
@@ -126,11 +126,11 @@
   --container-page: 78rem; /* 1248px of content */
   --container-measure: 40rem; /* a comfortable reading line */
 
-  /* Soft shapes: controls 12px, cards 20px, buttons and seats round. */
-  --radius-control: 0.75rem;
-  --radius-card: 1.25rem;
+  /* Firm shapes: square-cut controls, buttons and cards; only seats and round
+     icon buttons are circles. */
+  --radius-control: 0.1875rem;
+  --radius-card: 0.25rem;
 
-  --shadow-card: 0 1px 2px rgb(34 28 23 / 4%), 0 12px 32px -18px rgb(34 28 23 / 22%);
   --shadow-overlay: 0 24px 64px -24px rgb(20 14 10 / 45%);
 
   /* Motion */
@@ -255,7 +255,7 @@
    rings and form controls inside follow it. Surfaces keep the page's
    color-scheme, so their own light-dark() grounds follow the mode. */
 @utility surface-sand {
-  --color-surface: light-dark(#f3ede3, #1f1a16);
+  --color-surface: light-dark(#eee5d7, #1f1a16);
   color: var(--color-fg);
   background-color: var(--color-surface);
 }
@@ -363,10 +363,17 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Headings speak in the serif at 500; sizes come from the components. */
-  :where(h1, h2, h3, h4, h5, h6) {
+  /* Headings speak in the serif at 600; sizes come from the components. Plain
+     selectors, not :where(): preflight's `font-weight: inherit` on headings has
+     element specificity and would win over a zero-specificity rule. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-serif);
-    font-weight: 500;
+    font-weight: 600;
     text-wrap: balance;
   }
 
