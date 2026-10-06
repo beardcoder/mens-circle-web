@@ -8,7 +8,7 @@ interface Props {
   };
 }
 
-/** Prose with a marginal heading, on the spine — the essay register of the sub-pages. */
+/** Prose on the spine — the essay register of the sub-pages: the label and title on the left, the text from column 7. Legal pages pass only content and read from the left edge. */
 
 const { data } = Astro.props;
 const slug = (data.title ?? '')
@@ -16,22 +16,27 @@ const slug = (data.title ?? '')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '');
 const anchor = data.anchor ?? slug;
+const hasHead = Boolean(data.eyebrow || data.title);
 ---
 
-<section class="section section--ruled text-section" id={anchor || undefined}>
+<section
+  class:list={['section', 'section--ruled', 'text-section', hasHead && 'text-section--essay']}
+  id={anchor || undefined}
+>
   <div class="container">
     <div class="spine">
-      {data.eyebrow ? <p class="rail-heading">{data.eyebrow}</p> : <span aria-hidden="true"></span>}
+      {hasHead && (
+        <div class="spine__head">
+          {data.eyebrow && <p class="marker">{data.eyebrow}</p>}
+          {data.title && (
+            <h2 class="display text-section__title" data-reveal>
+              {data.title}
+            </h2>
+          )}
+        </div>
+      )}
 
-      <div class="spine__body">
-        {data.title && (
-          <h2 class="text-section__title" data-reveal>
-            {data.title}
-          </h2>
-        )}
-
-        {data.content && <div class="prose text-section__prose" set:html={data.content} />}
-      </div>
+      {data.content && <div class="prose text-section__prose spine__body" set:html={data.content} />}
     </div>
   </div>
 </section>
@@ -39,11 +44,11 @@ const anchor = data.anchor ?? slug;
 <style is:global>
   @layer sections {
     .text-section__title {
-      max-inline-size: 20ch;
-      margin-block-end: var(--rhythm-stack);
+      max-inline-size: 16ch;
+      margin: 0;
       font-size: var(--display-3);
-      line-height: 1.08;
-      letter-spacing: -0.02em;
+      line-height: 1.05;
+      hyphens: manual;
     }
 
     .text-section .prose {
@@ -54,9 +59,24 @@ const anchor = data.anchor ?? slug;
       font-size: var(--text-section-body-lg);
     }
 
-    /* The essay's first paragraph opens with a dropped initial where supported. */
+    /* Wide: the text's first line starts level with the title. The title keeps
+       the smaller display size, the quieter register of the sub-pages, so a long
+       one stays at three lines in its five columns. */
+    @media (width > 56em) {
+      .text-section--essay .prose {
+        max-inline-size: 36em;
+        padding-block-start: calc(var(--text-marker) * 1.3 + var(--space-sm) + 0.2em);
+      }
+    }
+
+    /* A legal page's text follows its title without a section's pause. */
+    .page-hero + .text-section:not(.text-section--essay) {
+      padding-block-start: 0;
+    }
+
+    /* The essay opening the page starts with a dropped initial where supported. */
     @supports (initial-letter: 3) or (-webkit-initial-letter: 3) {
-      .page-hero + .text-section .prose > p:first-child::first-letter {
+      .page-hero + .text-section--essay .prose > p:first-child::first-letter {
         -webkit-initial-letter: 3;
         initial-letter: 3;
         margin-inline-end: 0.12em;

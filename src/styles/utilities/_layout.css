@@ -49,18 +49,10 @@
   padding-block: var(--rhythm-section);
 }
 
-/* A hairline set inside the container, not edge to edge. */
+/* Kept as a hook: sections are parted by their ground and by space, as on the
+   home page, never by a drawn rule. */
 .section--ruled {
   border-block-start: 0;
-}
-
-.section--ruled::before {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: max(var(--container-gutter), calc((100% - var(--container-width)) / 2 + var(--container-gutter)));
-  block-size: 1px;
-  content: '';
-  background: var(--border-light);
 }
 
 .section--clip {
@@ -171,19 +163,15 @@
   --accent-rare: var(--accent);
 }
 
-/* The prose spine — marker column + text column (quiet passages, sub-pages). It keeps
-   the home's split line, so a sub-page's text starts where the home's does. */
+/* The spine — the sub-pages' block, set like the home's: the head (a section
+   title, or a label with a title) on the left, the content from column 7, the
+   split line every home block keeps. A head holds its place while the content
+   passes. Without a head the content starts at the left edge. */
 .spine {
   display: grid;
-  grid-template-columns: var(--split-columns);
-  gap: var(--space-sm) var(--split-gap);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
   align-items: start;
-}
-
-.spine > .rail-heading {
-  position: sticky;
-  inset-block-start: calc(var(--header-clearance) + var(--space-sm));
-  padding-block-start: 0.6em;
 }
 
 .spine__body,
@@ -191,14 +179,44 @@
   min-inline-size: 0;
 }
 
-@media (width <= 56em) {
+/* A section named by its rail heading alone ("Der Termin", "Anfahrt") is titled
+   with it: the serif voice, not a small label beside an empty column. */
+.spine > .rail-heading {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--display-3);
+  font-weight: var(--weight-display);
+  line-height: 1.05;
+  color: var(--text-primary);
+  text-transform: none;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+.spine > .rail-heading::before {
+  display: none;
+}
+
+@media (width > 56em) {
   .spine {
-    grid-template-columns: 1fr;
-    gap: var(--space-sm);
+    grid-template-columns: var(--field);
+    column-gap: var(--field-gap);
   }
 
-  .spine > .rail-heading {
-    position: static;
+  .spine > .rail-heading,
+  .spine > .spine__head {
+    position: sticky;
+    inset-block-start: calc(var(--header-clearance) + var(--space-md));
+    grid-column: 1 / span 5;
+  }
+
+  .spine > .spine__body,
+  .spine > .spine__body--wide {
+    grid-column: 7 / span 6;
+  }
+
+  .spine > .spine__body:only-child {
+    grid-column: 1 / span 8;
   }
 }
 

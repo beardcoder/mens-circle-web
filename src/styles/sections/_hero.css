@@ -26,8 +26,9 @@
   max-inline-size: max(14ch, min-content);
   margin: 0;
   font-family: var(--font-display);
-  /* Seven twelfths of the row: "Anmeldung" must fit; stacked, the floor holds. */
-  font-size: min(var(--display-1), max(10cqi, 2.875rem));
+  /* The section size, as on every sub-page; capped by half the row so
+     "Anmeldung" (about 4.9em) always fits. */
+  font-size: min(var(--display-2), max(9.4cqi, 2.5rem));
   font-weight: var(--weight-display);
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-display);
@@ -74,6 +75,26 @@
       .page-opening__lead
     ) {
     animation: none;
+  }
+}
+
+/* Wide: on the home's split line — the title on the left half, the lead from
+   column 7, level with the title's last line. */
+@media (width > 56em) {
+  .hero__content,
+  .page-opening__inner {
+    grid-template-columns: var(--field);
+    column-gap: var(--field-gap);
+  }
+
+  .hero__title,
+  .page-opening__title {
+    grid-column: 1 / span 6;
+  }
+
+  .hero__subtitle,
+  .page-opening__lead {
+    grid-column: 7 / span 6;
   }
 }
 

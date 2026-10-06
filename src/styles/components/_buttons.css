@@ -153,6 +153,19 @@
   min-block-size: 56px;
 }
 
+/* Phones: a large button that wraps keeps its seat and words at the start and
+   the arrow at the far end, one left-aligned block, never a centred stack. */
+@media (width <= 30em) {
+  .btn--large {
+    justify-content: flex-start;
+    text-align: start;
+  }
+
+  .btn--large.btn--primary::after {
+    margin-inline-start: auto;
+  }
+}
+
 .btn--block {
   inline-size: 100%;
 }
