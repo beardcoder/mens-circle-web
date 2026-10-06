@@ -301,6 +301,10 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       outline-offset: 3px;
     }
 
+    .nav-toggle.is-open {
+      border-color: var(--accent);
+    }
+
     .nav-toggle__bars {
       display: flex;
       flex-direction: column;
@@ -314,6 +318,37 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
       block-size: 1.5px;
       background: currentcolor;
       transform-origin: center;
+    }
+
+    /* Open: the outer bars cross, the middle one draws in to nothing, and the
+       whole mark turns a quarter, so the cross arrives rather than snaps. */
+    .nav-toggle.is-open .nav-toggle__bar:nth-child(1) {
+      transform: translateY(6.5px) rotate(45deg);
+    }
+
+    .nav-toggle.is-open .nav-toggle__bar:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .nav-toggle.is-open .nav-toggle__bar:nth-child(3) {
+      transform: translateY(-6.5px) rotate(-45deg);
+    }
+
+    .nav-toggle.is-open .nav-toggle__bars {
+      rotate: 90deg;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .nav-toggle__bars {
+        transition: rotate 560ms var(--ease-emphasised);
+      }
+
+      .nav-toggle__bar {
+        transition:
+          transform 460ms var(--ease-emphasised),
+          opacity 200ms var(--ease-precise);
+      }
     }
 
     /* Theme control: a round seat with a sun or a moon. */
@@ -408,24 +443,73 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         opacity: 0;
         transition:
           opacity var(--motion-standard),
-          visibility var(--motion-standard);
+          visibility 0s linear var(--duration-normal);
       }
 
       .nav.is-open {
         visibility: visible;
         pointer-events: auto;
         opacity: 1;
+        transition:
+          opacity var(--motion-standard),
+          visibility 0s;
+      }
+
+      /* An ember low in the panel, breathing while it is open. Faint enough that
+         every line above it keeps its contrast. */
+      .nav::before {
+        position: fixed;
+        inset-block-end: -35svh;
+        inset-inline-start: -30vw;
+        z-index: -1;
+        inline-size: 130vw;
+        aspect-ratio: 1;
+        pointer-events: none;
+        content: '';
+        background: radial-gradient(
+          closest-side,
+          color-mix(in oklab, var(--color-flame) 16%, transparent),
+          color-mix(in oklab, var(--color-flame) 5%, transparent) 55%,
+          transparent
+        );
+        opacity: 0;
+      }
+
+      .nav.is-open::before {
+        opacity: 0.8;
       }
 
       .nav__list {
+        position: relative;
         flex-direction: column;
         gap: 0;
         align-items: stretch;
-        border-block-start: 1px solid var(--border-light);
+      }
+
+      /* The hairlines are drawn, not borders, so they can be drawn in. */
+      .nav__list::before,
+      .nav__item::after {
+        position: absolute;
+        inset-inline: 0;
+        block-size: 1px;
+        content: '';
+        background: var(--border-light);
+        transform-origin: 0 50%;
+      }
+
+      .nav__list::before {
+        inset-block-start: 0;
       }
 
       .nav__item {
-        border-block-end: 1px solid var(--border-light);
+        position: relative;
+        /* Each link rises out of its own line; the margin keeps the focus ring. */
+        overflow: clip;
+        overflow-clip-margin: 4px;
+      }
+
+      .nav__item::after {
+        inset-block-end: 0;
       }
 
       .nav__link {
@@ -443,20 +527,80 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         display: none;
       }
 
-      /* The links settle in one after another as the panel opens. */
+      /* Opening, in the order of a breath: the panel opens as a circle from the
+         toggle (like the hero photo inside its ring), the hairlines draw in one
+         after another, each link rises out of its line, then the quieter things
+         follow. Closing runs back quickly, all at once. */
       @media (prefers-reduced-motion: no-preference) {
-        .nav__item {
-          opacity: 0;
-          transform: translateY(0.75rem);
+        .nav {
+          --nav-origin: calc(100% - var(--container-gutter) - 24px) calc(var(--header-height) / -2);
+
+          clip-path: circle(0 at var(--nav-origin));
+          opacity: 1;
           transition:
-            opacity var(--duration-slow) var(--ease-settle),
-            transform var(--duration-slow) var(--ease-settle);
-          transition-delay: calc(var(--i) * 50ms + 60ms);
+            clip-path 380ms var(--ease-precise),
+            visibility 0s linear 380ms;
         }
 
-        .nav.is-open .nav__item {
+        .nav.is-open {
+          clip-path: circle(150vmax at var(--nav-origin));
+          transition:
+            clip-path 820ms var(--ease-emphasised),
+            visibility 0s;
+        }
+
+        .nav::before {
+          transition: opacity 200ms var(--ease-precise);
+        }
+
+        .nav.is-open::before {
+          --alpha: 0.8;
+          --rest: 0.9;
+
+          animation: breathe 10s 600ms infinite both;
+          transition: opacity 1200ms var(--ease-settle) 300ms;
+        }
+
+        .nav__list::before,
+        .nav__item::after {
+          transform: scaleX(0);
+          transition: transform 200ms var(--ease-precise);
+        }
+
+        .nav__link {
+          transform: translateY(110%);
+          transition: transform 220ms var(--ease-precise);
+        }
+
+        .nav__panel-extra {
+          opacity: 0;
+          transform: translateY(1rem);
+          transition:
+            opacity 160ms var(--ease-precise),
+            transform 160ms var(--ease-precise);
+        }
+
+        .nav.is-open .nav__list::before {
+          transform: none;
+          transition: transform 900ms var(--ease-emphasised) 140ms;
+        }
+
+        .nav.is-open .nav__item::after {
+          transform: none;
+          transition: transform 900ms var(--ease-emphasised) calc(220ms + var(--i) * 80ms);
+        }
+
+        .nav.is-open .nav__link {
+          transform: none;
+          transition: transform 760ms var(--ease-emphasised) calc(200ms + var(--i) * 80ms);
+        }
+
+        .nav.is-open .nav__panel-extra {
           opacity: 1;
           transform: none;
+          transition:
+            opacity 700ms var(--ease-settle) 520ms,
+            transform 900ms var(--ease-emphasised) 520ms;
         }
       }
 
