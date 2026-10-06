@@ -38,8 +38,9 @@ Every text token holds at least 4.5:1 on every ground, `line-bold` at least 3:1.
 
 **Surfaces** (`surface-sand`, `surface-night`, via `<Section ground>`) re-declare the
 semantic colours, so text, hairlines, buttons, focus rings and inputs inside follow
-the ground. `sand` is the stone band for quiet passages; `night` is the dark band of
-the statement and the home page's close, and the footer. Dark bands carry
+the ground. `sand` is the stone band for quiet passages (80% opaque, so the page's
+breathing light runs on beneath it); `night` is the dark band of the statement, the
+voices and the home page's close, and the footer. The statement and the close carry
 `Contours` (contour lines of the hill country, the accent at 20%).
 
 **Type.** `font-serif` (Fraunces) speaks: headings and serif lines at weight 600 in
@@ -71,7 +72,7 @@ transition), `scroll-motion:` (scroll-driven, where timelines exist), `reveal`
 (scroll-tied reveal), `animate-delay-*` (staggers; `animation-delay`, from
 tailwind-animations).
 Animations: `fade-in-up`, `fade-in`, `breath` (the background's natural breath, a
-34.6 s phrase of three breaths) with `breath-parallax` (its scroll depth), `breathe`
+34.6 s phrase of three breaths) with `breath-drift` and `breath-parallax` (its scroll depth), `breathe`
 (the steady 10 s guide: 4 in, 0.5 hold, 5 out, 0.5 rest), `skeleton`, `glow`. The generic ones use the keyframes of
 [tailwind-animations](https://tailwind-animations.com) (`fade-in-up`, `fade-in`,
 `pulse`), re-timed in `theme.css` to the theme's easing; the circle's own (`breath`,
@@ -93,13 +94,15 @@ rests under `prefers-reduced-motion`.
 | `TextLink`                                        | Quiet link with a moving arrow beside a primary action                  |
 | `Prose`                                           | Rich text from the content files                                        |
 | `Field`                                           | Label, control, hint and the error slot lib/form.ts fills               |
-| `DefList`, `LinkList`, `Quote`, `Badge`           | Facts, where-next rows, a participant's words, a status chip            |
+| `DefList`, `LinkList`, `Badge`                    | Facts, where-next rows, a status chip                                   |
+| `Quote` (`size`)                                  | A participant's words: `lg` leads (big mark, large italic), `md` level  |
 | `SeatMeter`                                       | An event's seats as square-cut fields (taken filled, open outlined)     |
-| `BreathField` (`strength`)                        | The circle in the background: warm light breathing, parallax on scroll  |
+| `BreathBackdrop`                                  | The page's breath: a fixed layer of three fields behind everything      |
+| `BreathField` (`strength`, `parallax`)            | One field of warm light breathing (`breath-glow`), parallax on scroll   |
 | `Contours`                                        | Contour lines behind a dark band's content                              |
 
-Cards (`card`, `panel`) are for self-contained units — the date, agreements, voices,
-forms, questions — never for running text.
+Cards (`card`, `panel`) are for self-contained units — the date, agreements, forms,
+the questions card — never for running text. Voices and the FAQ are not cards.
 
 ## Rules
 
