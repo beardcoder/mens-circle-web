@@ -139,7 +139,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   copy is bound to the word before it (`\u00a0–`), so no line starts with one.
 - Shapes: pill buttons (`rounded-full`, lift and glow on hover), soft cards
   (`rounded-card` 12px, `shadow-card`) for self-contained units — the date, forms —
-  never for running text; the date cards carry a 4px `fill` bar on the left. Groups
+  never for running text; a date or form card carries a 4px `fill` cap on top
+  (`capCard`), never a side bar. On a dark opening the date and the seats stand
+  open behind a hairline, not in a card. Groups
   of equals stand in hairline grids (facts with a faint watermark word, agreements,
   values, voices, link rows). The Ablauf steps are numbered `01`–`04` in large serif
   figures on the dark band; everything else is told in sentences.

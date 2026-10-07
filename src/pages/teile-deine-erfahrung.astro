@@ -4,7 +4,7 @@ import PageOpening from '../components/PageOpening.astro';
 import TestimonialForm from '../components/forms/TestimonialForm.astro';
 import Section from '../components/ui/Section.astro';
 import Split from '../components/ui/Split.astro';
-import { panel } from '@lib/ui';
+import { capPanel } from '@lib/ui';
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import site from '@data/site.json';
 
@@ -54,7 +54,7 @@ const schemas = [
           unverändert&nbsp;– auf die Website. Du entscheidest, welchen Namen du angibst.
         </p>
       </div>
-      <div class:list={[panel, 'border-l-4 border-l-fill']}>
+      <div class={capPanel}>
         <TestimonialForm />
       </div>
     </Split>

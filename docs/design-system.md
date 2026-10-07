@@ -8,15 +8,15 @@ rings), rebuilt on Tailwind CSS v4 utilities over the tokens in
 
 ## Files
 
-| File                     | Role                                                                                                                  |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `src/styles/theme.css`   | Tokens (`@theme`), palette primitives, variants, surfaces, the few custom utilities, keyframes, base rules. Shared.   |
-| `src/styles/global.css`  | Public entry: `@layer vendor`, Tailwind, theme, view transitions. Excludes the admin sources (`@source not`).         |
-| `src/styles/admin.css`   | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                                      |
-| `tailwind-animations`    | Animation utilities and keyframes (CSS only), imported by both entries before `theme.css`.                            |
-| `src/styles/leaflet.css` | Leaflet's stylesheet in the `vendor` layer, imported by the map only, so utilities win over it.                       |
-| `src/lib/ui.ts`          | Class recipes: `button()`, `control()`, `link`, `fieldLabel`, `fieldHint`, `fieldError`, `checkbox`, `card`, `panel`. |
-| `src/components/ui/`     | The components built on them.                                                                                         |
+| File                     | Role                                                                                                                                         |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/styles/theme.css`   | Tokens (`@theme`), palette primitives, variants, surfaces, the few custom utilities, keyframes, base rules. Shared.                          |
+| `src/styles/global.css`  | Public entry: `@layer vendor`, Tailwind, theme, view transitions. Excludes the admin sources (`@source not`).                                |
+| `src/styles/admin.css`   | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                                                             |
+| `tailwind-animations`    | Animation utilities and keyframes (CSS only), imported by both entries before `theme.css`.                                                   |
+| `src/styles/leaflet.css` | Leaflet's stylesheet in the `vendor` layer, imported by the map only, so utilities win over it.                                              |
+| `src/lib/ui.ts`          | Class recipes: `button()`, `control()`, `link`, `fieldLabel`, `fieldHint`, `fieldError`, `checkbox`, `card`, `panel`, `capCard`, `capPanel`. |
+| `src/components/ui/`     | The components built on them.                                                                                                                |
 
 ## Tokens
 
@@ -87,8 +87,11 @@ size 18px).
 **Shape.** Soft but sure: `rounded-control` (8px) on fields, `rounded-card` (12px)
 on cards; buttons are pills (`rounded-full`), as are the seats, the round icon
 buttons and the address field beside its button (`control('md', true)`). Cards are
-raised on `shadow-card` with a hairline border; the date cards carry a 4px `fill`
-bar on the left. Groups of equals stand in hairline grids (facts, agreements,
+raised on `shadow-card` with a hairline border; a card that holds a date or a form
+carries a 4px `fill` cap across its top (`capCard`, `capPanel`), cut straight by
+the card's corners — never a side bar, which bends around a rounded corner. On a
+dark opening a date is never a card: it stands open on the ground behind a
+hairline (above it on phones, beside it from `lg`), like the seats of an event. Groups of equals stand in hairline grids (facts, agreements,
 values, voices, link rows), never in boxes: hairlines above and below the group and
 between its cells, no frame around it.
 
