@@ -1,12 +1,18 @@
 ---
-/** The line above a title: tiny bold capitals spaced wide, in the accent, behind a fading rule. */
+/**
+ * The line above a title: tiny bold capitals spaced wide, in the accent, behind a
+ * fading rule. `center` gives it a rule on each side, mirrored, so a centred head's
+ * label sits on the axis instead of leaning left.
+ */
 interface Props {
   as?: 'p' | 'span' | 'h2';
   id?: string;
+  center?: boolean;
   class?: string;
 }
 
-const { as: Tag = 'p', id, class: className } = Astro.props;
+const { as: Tag = 'p', id, center = false, class: className } = Astro.props;
+const rule = 'h-[1.5px] w-[clamp(2.5rem,5vw,5rem)] shrink-0 from-transparent via-current/70 via-25% to-current/70';
 ---
 
 <Tag
@@ -16,9 +22,10 @@ const { as: Tag = 'p', id, class: className } = Astro.props;
     className,
   ]}
 >
-  <span
-    class="h-[1.5px] w-[clamp(2.5rem,5vw,5rem)] shrink-0 bg-linear-to-r from-transparent via-current/70 via-25% to-current/70"
-    aria-hidden="true"
-  ></span>
-  <slot />
+  <span class:list={[rule, 'bg-linear-to-r']} aria-hidden="true"></span>
+  {/* The spaced capitals carry trailing tracking; a negative margin takes it back so the text sits centred. */}
+  <span class:list={[center && '-mr-[0.32em]']}>
+    <slot />
+  </span>
+  {center && <span class:list={[rule, 'bg-linear-to-l']} aria-hidden="true"></span>}
 </Tag>

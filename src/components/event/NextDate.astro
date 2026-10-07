@@ -23,6 +23,8 @@ interface Props {
 const { state } = Astro.props;
 const { next } = state;
 const action = primaryAction(state, '#benachrichtigung');
+const [weekday, ...rest] = next ? next.dateLabel.split(', ') : [''];
+const dayMonthYear = rest.join(', ');
 const whatsapp = site.whatsappCommunityLink;
 const seatsLabel = next
   ? state.isFull
@@ -58,7 +60,12 @@ const rows = next
       <>
         <Eyebrow>Nächster Termin</Eyebrow>
         <h2 id="naechster-termin-title" class="mt-4 text-display-3 text-fg">
-          <time datetime={next.slug}>{next.dateLabel}</time>
+          {/* The weekday in the italic accent on its own line, as in an event's opening. */}
+          <time datetime={next.slug}>
+            <em>{weekday},</em>
+            <br />
+            {dayMonthYear}
+          </time>
         </h2>
         <SeatMeter
           seats={next.maxParticipants}

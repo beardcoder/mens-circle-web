@@ -66,7 +66,11 @@ const titleClass = [
 ---
 
 <div class:list={['grid justify-items-start gap-4', center && 'justify-items-center text-center', className]}>
-  {eyebrow && <Eyebrow class:list={[entrance && 'entrance:animate-fade-in-up']}>{eyebrow}</Eyebrow>}
+  {eyebrow && (
+    <Eyebrow center={center} class:list={[entrance && 'entrance:animate-fade-in-up']}>
+      {eyebrow}
+    </Eyebrow>
+  )}
   {title &&
     (titleHtml ? (
       <Heading id={titleId} class:list={titleClass} set:html={title} />

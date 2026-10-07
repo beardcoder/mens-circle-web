@@ -44,51 +44,39 @@ const facts = [
 const anchor = data.anchor ?? 'praktisches';
 const band = variant === 'band';
 
-const row = 'relative grid border-y border-line sm:grid-cols-2 lg:grid-cols-4';
+const row = 'grid border-y border-line sm:grid-cols-2 lg:grid-cols-4';
 const cell =
   'grid content-start gap-2 border-line px-1 py-8 max-sm:not-first:border-t sm:px-8 sm:max-lg:nth-[n+3]:border-t sm:even:border-l lg:not-first:border-l lg:first:pl-0';
 const term = 'text-xs font-bold tracking-[0.2em] text-fg-muted uppercase';
-const watermark =
-  'pointer-events-none absolute -bottom-[0.32em] left-1/2 -translate-x-1/2 font-serif text-[clamp(6rem,16vw,16rem)] leading-none tracking-[-0.05em] text-fg/[0.04] uppercase select-none';
 ---
 
-{/* The row: four cells parted by hairlines, a large faint word set behind them. */}
+{/* The row: four cells parted by hairlines. */}
 {band ? (
-  <Section id={anchor} ground="alt" space="compact" labelledby="praktisches-title" class="overflow-clip">
+  <Section id={anchor} ground="alt" space="compact" labelledby="praktisches-title">
     <Eyebrow as="h2" id="praktisches-title" class="mb-8">
       {data.eyebrow ?? 'Auf einen Blick'}
     </Eyebrow>
-    <div class="relative">
-      <span aria-hidden="true" data-llms-skip class={watermark}>
-        Abend
-      </span>
-      <dl class={row}>
-        {facts.map((fact) => (
-          <div class={cell}>
-            <dt class={term}>{fact.label}</dt>
-            <dd class="font-serif text-xl text-fg">{fact.value}</dd>
-            <dd class="text-sm text-fg-muted">{fact.sub}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+    <dl class={row}>
+      {facts.map((fact) => (
+        <div class={cell}>
+          <dt class={term}>{fact.label}</dt>
+          <dd class="font-serif text-xl text-fg">{fact.value}</dd>
+          <dd class="text-sm text-fg-muted">{fact.sub}</dd>
+        </div>
+      ))}
+    </dl>
   </Section>
 ) : (
-  <Section labelledby="fakten-title" class="overflow-clip" defer>
-    <SectionHead title="Gut zu wissen" titleId="fakten-title" />
-    <div class="relative mt-group">
-      <span aria-hidden="true" data-llms-skip class={watermark}>
-        Termin
-      </span>
-      <dl class={row}>
-        {facts.map((fact) => (
-          <div class:list={[cell, 'reveal']}>
-            <dt class={term}>{fact.label}</dt>
-            <dd class="font-serif text-xl text-fg">{fact.value}</dd>
-            <dd class="text-sm text-fg-muted">{fact.sub}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+  <Section labelledby="fakten-title" defer>
+    <SectionHead eyebrow="Auf einen Blick" title="Gut zu wissen" titleEmphasis="wissen" titleId="fakten-title" />
+    <dl class:list={[row, 'mt-group']}>
+      {facts.map((fact) => (
+        <div class:list={[cell, 'reveal']}>
+          <dt class={term}>{fact.label}</dt>
+          <dd class="font-serif text-xl text-fg">{fact.value}</dd>
+          <dd class="text-sm text-fg-muted">{fact.sub}</dd>
+        </div>
+      ))}
+    </dl>
   </Section>
 )}
