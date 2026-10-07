@@ -59,7 +59,9 @@ so text, hairlines, buttons, focus rings and inputs inside follow the ground:
 | `forest` | `surface-forest grain` | the WhatsApp band (its own green fill)                                 |
 | `ink`    | `surface-ink`          | the footer                                                             |
 
-`grain` lays a faint noise over a dark ground. Light bands are 88% opaque, so the
+`grain` lays a faint noise over a dark ground. On the sand band the hairlines go
+one step darker (`surface-sand` re-declares `line`), since the page's hairline is the
+stone's own colour. Light bands are 88% opaque, so the
 page's breathing light (`BreathBackdrop`) runs on beneath them.
 
 **Type.** `font-serif` (Playfair Display, variable) speaks: titles at weight 400,
@@ -69,11 +71,15 @@ italic and terracotta; quotes and questions in the italic. The serif also names
 every row of a list — fact values, agreements, values, FAQ questions, link rows,
 card titles — so a list reads as a set of short titles. `font-sans` (DM Sans,
 variable) explains: running text, labels, UI. The Ablauf steps carry large faint
-serif figures `01`–`04`; nothing else is numbered. Sizes `text-xs` … `lg` for reading, `xl`, `2xl` for
-card titles; `text-display-1` (the home sentence), `display-2` (page and large
+serif figures `01`–`04`; nothing else is numbered. Sizes `text-xs` … `lg` for reading
+(`sm` 15px, `base` 17px, `md` 18px for running text, `lg` 19px for leads: a step above
+the usual, since DM Sans runs small), `xl`, `2xl` for card titles; `text-display-1` (the home sentence), `display-2` (page and large
 section titles), `display-3` (section titles, `SectionHead`'s default). Labels are
 bold capitals: `tracking-label` (0.12em) on buttons and field labels,
-`tracking-eyebrow` (0.32em) on eyebrows behind their long fading rule.
+`tracking-eyebrow` (0.32em) on eyebrows behind their long fading rule; a centred
+head's eyebrow takes a rule on each side (`Eyebrow center`, set by `SectionHead
+align="center"`), so it sits on the axis. The italic accent keeps the word space
+before it (no negative margin); Playfair's italic leans into it on its own.
 
 **Space.** The rhythm `section` > `group` > `item`, plus `gutter` (container sides),
 `grid` (column gap), `header` (the 80px bar) and `clearance` (anchor offset and
@@ -118,7 +124,7 @@ rings drift down), `float` (the moderator's photo), `breath` with
 | `Split` (`head` slot, `sticky`)                   | Head on columns 1–4, content on 6–12 from `lg`; stacked below                                                       |
 | `SectionHead` (`size`, `align`, `titleEmphasis`)  | Eyebrow, title (an italic accent phrase), lead                                                                      |
 | `PageOpening` (`titleEmphasis`, `media` slot)     | The opening of a sub-page, on `HeroFrame`                                                                           |
-| `Eyebrow`                                         | Spaced accent capitals behind a long fading rule                                                                    |
+| `Eyebrow` (`center`)                              | Spaced accent capitals behind a long fading rule; `center` mirrors the rule after it                                |
 | `Button` (`variant`, `size`, `block`, `decorate`) | Pill link or button: `primary`, `secondary`, `outline` (dark grounds), …                                            |
 | `TextLink`                                        | Quiet capitals with a moving arrow beside a primary action                                                          |
 | `Prose`                                           | Rich text from the content files                                                                                    |

@@ -135,15 +135,16 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Type: Playfair Display (`font-serif`, weight 400, tracked in) speaks — titles in
   sentence case; a phrase of a title in the italic accent (`<em>`, via
   `titleEmphasis`); quotes and questions in the italic. DM Sans (`font-sans`)
-  explains: text, UI. Eyebrows are spaced capitals (`tracking-eyebrow`) behind a long
-  fading rule; buttons and labels bold capitals (`tracking-label`). A dash in running
+  explains: text, UI, a size step above the usual (DM Sans runs small). Eyebrows are
+  spaced capitals (`tracking-eyebrow`) behind a long fading rule, with a rule on each
+  side over a centred head (`Eyebrow center`); buttons and labels bold capitals (`tracking-label`). A dash in running
   copy is bound to the word before it (`\u00a0–`), so no line starts with one.
 - Shapes: pill buttons (`rounded-full`, lift and glow on hover), soft cards
   (`rounded-card` 12px, `shadow-card`) for self-contained units — the date, forms —
   never for running text; a date or form card carries a 4px `fill` cap on top
   (`capCard`), never a side bar. On a dark opening the date and the seats stand
   open behind a hairline, not in a card. Groups
-  of equals stand in hairline grids (facts with a faint watermark word, agreements,
+  of equals stand in hairline grids (facts, agreements,
   values, voices, link rows). The Ablauf steps are numbered `01`–`04` in large serif
   figures on the dark band; everything else is told in sentences.
 - `HalfBleed` puts the reading on the paper beside a brown panel to the screen's edge

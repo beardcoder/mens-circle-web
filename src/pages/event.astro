@@ -12,6 +12,8 @@ import site from '@data/site.json';
 import { link } from '@lib/ui';
 import PageOpening from '../components/PageOpening.astro';
 import LinkList from '../components/ui/LinkList.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
 import Quote from '../components/ui/Quote.astro';
 import Section from '../components/ui/Section.astro';
 import Split from '../components/ui/Split.astro';
@@ -145,10 +147,11 @@ const socialDetails = next
       Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend dauert
       zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was
       dich erwartet, lies zuerst,{' '}
+      {/* The period follows the link directly: on its own line Astro sets a space before it. */}
       <a class={link} href="/#ueber">
         worum es an so einem Abend geht
       </a>
-      .
+      {'.'}
     </Fragment>
   </PageOpening>
 
@@ -160,9 +163,12 @@ const socialDetails = next
   {voice && (
     <Section label="Stimme aus dem Kreis" defer>
       <Split>
-        <p slot="head" class="font-serif text-display-3 text-fg">
-          Aus dem Kreis
-        </p>
+        <div slot="head" class="grid justify-items-start gap-4">
+          <Eyebrow>Eine Stimme</Eyebrow>
+          <p class="font-serif text-display-3 text-fg">
+            Aus dem <em class="text-accent">Kreis</em>
+          </p>
+        </div>
         <Quote quote={voice.quote} author={voice.author} role={voice.role} size="lg" class="reveal" />
       </Split>
     </Section>
@@ -181,9 +187,7 @@ const socialDetails = next
 
   <Section ground={voice ? 'default' : 'sand'} labelledby="mehr-title" defer>
     <Split>
-      <h2 slot="head" id="mehr-title" class="text-display-3 text-fg">
-        Weiterlesen
-      </h2>
+      <SectionHead slot="head" eyebrow="Mehr über den Kreis" title="Weiterlesen" titleId="mehr-title" />
       <LinkList items={moreLinks} />
     </Split>
   </Section>

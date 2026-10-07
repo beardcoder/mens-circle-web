@@ -33,7 +33,7 @@ const lines = data.lines ?? [];
 >
   <Rings slot="before" set="close" class="text-sand" />
 
-  {data.eyebrow && <Eyebrow>{data.eyebrow}</Eyebrow>}
+  {data.eyebrow && <Eyebrow center>{data.eyebrow}</Eyebrow>}
 
   <h2 id="statement-title" class="text-display-2 text-fg">
     {lines.map((line, i) => (i > 0 ? <em class="block">{line}</em> : <span class="block">{line}</span>))}
