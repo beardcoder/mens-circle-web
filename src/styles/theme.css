@@ -186,7 +186,6 @@
   --animate-breathe: breathe 10s infinite both;
   --animate-breath: breath 34.6s infinite both;
   --animate-float: float 7s var(--ease-ambient) infinite;
-  --animate-scroll-line: scroll-line 2s var(--ease-settle) infinite;
   --animate-skeleton: pulse 2s ease-in-out infinite;
   --animate-glow: glow 3.6s ease-in-out infinite;
 }
@@ -232,32 +231,6 @@
 @keyframes hero-rings-drift {
   to {
     translate: 0 3rem;
-  }
-}
-
-/* The hero's "Entdecken" line sweeps downward in a loop. */
-@keyframes scroll-line {
-  0% {
-    opacity: 1;
-    scale: 1 0;
-    transform-origin: top;
-  }
-
-  45%,
-  55% {
-    opacity: 1;
-    scale: 1 1;
-    transform-origin: top;
-  }
-
-  56% {
-    transform-origin: bottom;
-  }
-
-  100% {
-    opacity: 0.3;
-    scale: 1 0;
-    transform-origin: bottom;
   }
 }
 
