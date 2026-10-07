@@ -13,7 +13,8 @@ interface Props {
 /**
  * The opening of a single event's page, on the dark frame: the date set large as
  * the title (the weekday in the italic accent), time, place and fee as one line
- * parted by dots (stacked on phones), the action; the seats as a glass card beside it.
+ * parted by dots (stacked on phones), the action; the seats beside it, open on
+ * the dark ground behind a hairline.
  */
 
 const { event } = Astro.props;
@@ -65,11 +66,23 @@ const meta = [time, event.location, event.cost_basis, 'Ohne Vorerfahrung'].filte
   </div>
 
   {!event.is_past && (
-    <figure class="grid gap-5 rounded-card border border-line border-l-4 border-l-fill bg-raised/80 p-6 shadow-card backdrop-blur-md entrance:animate-fade-in-up entrance:animate-delay-320 lg:col-span-4 lg:p-8">
-      <figcaption class="grid gap-1">
-        <span class="font-serif text-2xl text-fg">{seatsLabel}</span>
-        <span class="text-sm text-fg-muted">
-          {event.is_full ? 'Warteliste möglich' : 'Gefüllte Felder sind vergebene Plätze.'}
+    /* The seats stand open on the dark ground, set off by a hairline (above them on
+       phones, beside them from `lg`): the count large, the fields under it. */
+    <figure class="grid content-end gap-5 border-line-strong entrance:animate-fade-in-up entrance:animate-delay-320 max-lg:border-t max-lg:pt-8 lg:col-span-4 lg:col-start-9 lg:border-l lg:pl-10">
+      <Eyebrow as="span">Plätze</Eyebrow>
+      <figcaption class="grid gap-2">
+        {event.is_full ? (
+          <span class="font-serif text-display-3 text-bone">Ausgebucht</span>
+        ) : (
+          <span class="flex items-baseline gap-3 font-serif text-bone">
+            <span class="text-display-2">{event.available_spots}</span>
+            <span class="text-2xl text-sand">von {event.max_participants} frei</span>
+          </span>
+        )}
+        <span class="text-sm text-sand">
+          {event.is_full
+            ? 'Warteliste möglich: Wird ein Platz frei, rückst du nach.'
+            : 'Gefüllte Felder sind vergebene Plätze.'}
         </span>
       </figcaption>
       <SeatMeter seats={event.max_participants} taken={taken} label={seatsLabel} size="lg" />

@@ -75,5 +75,11 @@ export const caps = 'text-xs font-bold tracking-label uppercase';
 /** A card: a self-contained unit on the page (a date, a form), raised on a soft shadow. */
 export const card = 'rounded-card border border-line bg-raised shadow-card';
 
+/** A card that holds a date or a form: a 4px fill cap across its top, cut straight by the card's corners. */
+export const capCard = `${card} relative overflow-clip before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-fill`;
+
 /** A card's padding, for the larger cards that hold a form or a date. */
 export const panel = `${card} p-6 sm:p-10`;
+
+/** A panel under the fill cap: the next date, the testimonial form. */
+export const capPanel = `${capCard} p-6 sm:p-10`;

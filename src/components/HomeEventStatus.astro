@@ -1,12 +1,12 @@
 ---
 import { primaryAction, dateStatus } from '../lib/event-status';
-import { card } from '../lib/ui';
+import { capCard } from '../lib/ui';
 import SeatMeter from './SeatMeter.astro';
 import Button from './ui/Button.astro';
 
 /**
- * The next date as a card: when, where, how many seats, and the one action. A
- * server island in the hero and in the Termine block; the fallback sets the same
+ * The next date: when, where, how many seats, and the one action — open on the
+ * hero's dark ground, a card in the Termine block. A server island in both; the fallback sets the same
  * lines with static words, so the swap changes text, not height. A failed read is
  * said as such, never as "no date planned".
  */
@@ -62,9 +62,12 @@ const seatsLine = next
   data-llms-skip
   data-status={status}
   class:list={[
-    // In the hero the card is glass on the dark opening.
-    placement === 'hero' ? 'rounded-card border border-line bg-raised/80 shadow-card backdrop-blur-md' : card,
-    'grid gap-6 border-l-4 border-l-fill p-6 sm:p-8',
+    // In the hero the date stands open on the dark ground, set off by a hairline
+    // (above it on phones, beside it from `lg`); in the Termine block it is a card.
+    placement === 'hero'
+      ? 'border-line-strong max-lg:border-t max-lg:pt-8 lg:border-l lg:pl-10'
+      : `${capCard} p-6 sm:p-8`,
+    'grid gap-6',
     className,
   ]}
 >
