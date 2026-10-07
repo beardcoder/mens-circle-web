@@ -81,7 +81,7 @@ sticky columns). Containers: `max-w-page` (1400px), `max-w-prose` (centred text)
 `max-w-measure` (a reading line).
 
 **Breakpoints.** `sm` 36rem, `md` 48rem, `lg` 56.25rem (columns side by side), `xl`
-72rem (the side labels and the scroll line of the openings), `2xl` 100rem (root
+72rem, `2xl` 100rem (root
 size 18px).
 
 **Shape.** Soft but sure: `rounded-control` (8px) on fields, `rounded-card` (12px)
@@ -101,7 +101,7 @@ transition), `scroll-motion:` (scroll-driven, where timelines exist), `reveal`
 Animations: `fade-in-up`, `fade-in` (tailwind-animations, re-timed to the theme's
 easing); ours: `ring` / `ring-slow` (the rings widen and settle, 18–30 s, out of
 phase), `hero-leave` and `hero-rings-drift` (an opening lifts away on scroll, its
-rings drift down), `scroll-line`, `float` (the moderator's photo), `breath` with
+rings drift down), `float` (the moderator's photo), `breath` with
 `breath-drift` and `breath-parallax` (the page's background light), `breathe` (the
 10 s guide in the statement), `skeleton`, `glow`. Everything rests under
 `prefers-reduced-motion`.
@@ -112,7 +112,7 @@ rings drift down), `scroll-line`, `float` (the moderator's photo), `breath` with
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `Section` (`ground`, `space`, `defer`)            | A block: its ground, its rhythm, the container                                                                      |
 | `Container`                                       | Page width and gutters                                                                                              |
-| `HeroFrame` (`height`)                            | The dark opening: glows, rings, frame lines, side labels; `data-hero`                                               |
+| `HeroFrame` (`height`)                            | The dark opening: two glows and the rings, nothing at its sides; `data-hero`                                        |
 | `HalfBleed`                                       | Reading on the paper beside a brown panel that runs to the screen's edge                                            |
 | `Rings` (`set`)                                   | Breathing hairline rings behind a block: `hero`, `panel`, `close`                                                   |
 | `Split` (`head` slot, `sticky`)                   | Head on columns 1–4, content on 6–12 from `lg`; stacked below                                                       |

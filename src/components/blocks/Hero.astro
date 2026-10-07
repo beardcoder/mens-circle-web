@@ -6,9 +6,8 @@ import TextLink from '../ui/TextLink.astro';
 /**
  * The home page opening, on the dark frame (HeroFrame): the label behind its
  * rule, the sentence set large with its phrase in the italic accent, the three
- * words under it; at the foot the reading on the left and the next date as a card
- * on the right, with the line down to the content. Phones stack it: sentence,
- * reading, card.
+ * words under it; at the foot the reading on the left and the next date on the
+ * right, open behind a hairline. Phones stack it: sentence, reading, date.
  */
 
 interface Props {
@@ -71,20 +70,10 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
       )}
     </div>
 
-    <div class="flex items-end gap-8 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
-      <div class="min-w-0 flex-1 entrance:animate-fade-in-up entrance:animate-delay-560">
-        <HomeEventStatus placement="hero" server:defer>
-          <HomeEventStatus placement="hero" fallback slot="fallback" />
-        </HomeEventStatus>
-      </div>
-      {/* The way down: a line that sweeps toward the content. */}
-      <span
-        aria-hidden="true"
-        class="flex flex-col items-center gap-2 text-[0.625rem] tracking-[0.2em] text-sand uppercase [writing-mode:vertical-rl] max-xl:hidden"
-      >
-        Entdecken
-        <span class="block h-20 w-px bg-linear-to-b from-fill to-transparent motion-safe:animate-scroll-line"></span>
-      </span>
+    <div class="min-w-0 entrance:animate-fade-in-up entrance:animate-delay-560 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
+      <HomeEventStatus placement="hero" server:defer>
+        <HomeEventStatus placement="hero" fallback slot="fallback" />
+      </HomeEventStatus>
     </div>
   </div>
 </HeroFrame>

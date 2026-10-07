@@ -1,13 +1,11 @@
 ---
-import site from '../data/site.json';
 import Rings from './Rings.astro';
 import Container from './ui/Container.astro';
 
 /**
  * The dark opening of a page: deep earth with a fine grain, two warm glows,
- * hairline rings breathing in from the corners, the container's edges drawn as
- * faint frame lines and a set-on-end label down each side. `data-hero` turns the
- * header light over it (`over-hero:` in theme.css). On scroll the content lifts
+ * hairline rings breathing in from the corners. `data-hero` turns the header
+ * light over it (`over-hero:` in theme.css). On scroll the content lifts
  * and fades while the rings drift down (`hero-leave`, `hero-rings-drift`).
  *
  * `full` fills the first screen and sets the content at its foot (home); `tall`
@@ -29,8 +27,6 @@ const HEIGHTS = {
   tall: 'min-h-[70svh] items-end pt-[calc(var(--spacing-header)+var(--spacing-section))] pb-section',
   auto: 'items-end pt-[calc(var(--spacing-header)+var(--spacing-section))] pb-section',
 } as const;
-const side =
-  'absolute top-[calc(var(--spacing-header)+5rem)] text-[0.625rem] tracking-[0.3em] text-sand/60 uppercase [writing-mode:vertical-rl] max-xl:hidden';
 ---
 
 <section
@@ -45,14 +41,6 @@ const side =
     class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_30%,color-mix(in_oklch,var(--color-fill)_22%,transparent),transparent_50%),radial-gradient(ellipse_60%_50%_at_20%_80%,color-mix(in_oklch,var(--color-fill)_12%,transparent),transparent_40%)]"
   ></div>
   <Rings set="hero" class="text-sand" />
-
-  {/* The container's edges as faint frame lines, with a label set on end in each. */}
-  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
-    <div class="relative mx-auto h-full max-w-page border-x border-sand/10 max-lg:border-transparent">
-      <span class:list={[side, '-left-px -translate-x-[150%] rotate-180']}>Männerkreis · Niederbayern</span>
-      <span class:list={[side, '-right-px translate-x-[150%]']}>{site.geo.locality} · Bayern</span>
-    </div>
-  </div>
 
   <Container
     class:list={[
