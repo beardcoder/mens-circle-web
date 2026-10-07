@@ -30,8 +30,8 @@ const links = [
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#151210" />
     <title>{title} · Admin · Männerkreis</title>
-    <Font cssVariable="--font-instrument" preload={[{ weight: '400', style: 'normal' }]} />
-    <Font cssVariable="--font-fraunces" />
+    <Font cssVariable="--font-dm-sans" preload={[{ weight: '100 1000', style: 'normal' }]} />
+    <Font cssVariable="--font-playfair" />
     <ClientRouter />
   </head>
   <body class="text-base">
@@ -40,7 +40,7 @@ const links = [
         <nav class="flex flex-wrap items-center gap-x-8 gap-y-1" aria-label="Admin">
           <a href="/admin" class="flex items-center gap-2.5 rounded-control">
             <Icon name="logo" aria-hidden="true" class="size-7 text-flame" />
-            <span class="font-serif text-lg font-semibold">Männerkreis</span>
+            <span class="font-serif text-lg">Männerkreis</span>
             <span class="text-xs font-semibold tracking-label text-fg-muted uppercase">Admin</span>
           </a>
           <div class="flex items-center gap-6">

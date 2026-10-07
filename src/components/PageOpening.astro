@@ -1,10 +1,12 @@
 ---
+import HeroFrame from './HeroFrame.astro';
 import Eyebrow from './ui/Eyebrow.astro';
-import Section from './ui/Section.astro';
 
 /**
- * The opening of a sub-page: eyebrow, title, the lead (slot `lead`) and any action
- * (default slot), stacked on one reading line. A single long word in the title
+ * The opening of a sub-page, on the dark frame (HeroFrame): eyebrow, title (a
+ * phrase in the italic accent), the lead (slot `lead`) and any action (default
+ * slot) on one reading line; a photograph (slot `media`) stands beside them from
+ * `lg`, below them on phones. A single long word in the title
  * ("Datenschutzerklärung") breaks rather than overflows.
  */
 interface Props {
@@ -12,34 +14,51 @@ interface Props {
   title: string;
   /** Trusted HTML from the content files. */
   titleHtml?: boolean;
-  /** Tighter at the foot when the next block continues straight on. */
-  joined?: boolean;
+  /** A phrase of the title set in the italic accent. */
+  titleEmphasis?: string;
   id?: string;
 }
 
-const { eyebrow, title, titleHtml = false, joined = false, id } = Astro.props;
+const { eyebrow, title, titleHtml = false, titleEmphasis, id } = Astro.props;
+const emphasis = !titleHtml && titleEmphasis && title.includes(titleEmphasis) ? titleEmphasis : '';
+const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
 const titleClass =
-  'max-w-[22ch] text-display-2 text-fg wrap-break-word max-sm:hyphens-auto entrance:animate-fade-in-up entrance:animate-delay-60';
+  'max-w-[18ch] text-display-2 text-bone wrap-break-word max-sm:hyphens-auto entrance:animate-fade-in-up entrance:animate-delay-80';
 const hasLead = Astro.slots.has('lead');
 const hasAction = Astro.slots.has('default');
+const hasMedia = Astro.slots.has('media');
 ---
 
-<Section
+<HeroFrame
   id={id}
-  space="none"
-  class:list={['pt-[calc(var(--spacing-header)+var(--spacing-group))]', joined ? 'pb-8' : 'pb-group']}
-  innerClass="grid justify-items-start gap-5"
+  height="auto"
+  innerClass={hasMedia ? 'grid items-center gap-x-grid gap-y-12 lg:grid-cols-12' : 'grid'}
 >
-  {eyebrow && <Eyebrow class="entrance:animate-fade-in-up">{eyebrow}</Eyebrow>}
-  {titleHtml ? <h1 class={titleClass} set:html={title} /> : <h1 class={titleClass}>{title}</h1>}
-  {hasLead && (
-    <div class="max-w-measure text-lg text-fg-soft entrance:animate-fade-in-up entrance:animate-delay-120">
-      <slot name="lead" />
+  <div class:list={['grid justify-items-start gap-6', hasMedia && 'lg:col-span-7']}>
+    {eyebrow && <Eyebrow class="entrance:animate-fade-in-up">{eyebrow}</Eyebrow>}
+    {titleHtml ? (
+      <h1 class={titleClass} set:html={title} />
+    ) : (
+      <h1 class={titleClass}>
+        {before}
+        {emphasis && <em>{emphasis}</em>}
+        {after}
+      </h1>
+    )}
+    {hasLead && (
+      <div class="max-w-prose text-lg leading-[1.9] text-sand entrance:animate-fade-in-up entrance:animate-delay-160">
+        <slot name="lead" />
+      </div>
+    )}
+    {hasAction && (
+      <div class="mt-2 flex flex-wrap gap-3 entrance:animate-fade-in-up entrance:animate-delay-280">
+        <slot />
+      </div>
+    )}
+  </div>
+  {hasMedia && (
+    <div class="entrance:animate-fade-in-up entrance:animate-delay-200 lg:col-span-5">
+      <slot name="media" />
     </div>
   )}
-  {hasAction && (
-    <div class="mt-2 flex flex-wrap gap-3 entrance:animate-fade-in-up entrance:animate-delay-160">
-      <slot />
-    </div>
-  )}
-</Section>
+</HeroFrame>

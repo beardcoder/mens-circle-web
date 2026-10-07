@@ -13,35 +13,56 @@ interface Props {
     anchor?: string;
     eyebrow?: string;
     title?: string;
+    titleEmphasis?: string;
     subtitle?: string;
     steps?: Step[];
     close?: string;
   };
 }
 
-/** The evening in four steps, in order: each under a heavy rule with its number, so the sequence reads at a glance. */
+/** The evening in four steps, in order, on the dark ground: a thread drawn across as they enter, then four columns parted by hairlines, each under a large quiet numeral. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
 const steps = (data.steps ?? []).slice(0, 4);
 ---
 
-<Section id={anchor} ground="sand" labelledby="ablauf-title">
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="ablauf-title" lead={data.subtitle} size="display-2" />
-
-  {steps.length > 0 && (
-    <ol role="list" class="mt-group grid gap-x-grid gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
-      {steps.map((step, i) => (
-        <li class="reveal grid content-start gap-3 border-t-3 border-fg pt-5">
-          <span class="font-serif text-display-3 leading-none font-semibold text-accent" aria-hidden="true">
-            {String(i + 1).padStart(2, '0')}
-          </span>
-          {step.title && <h3 class="mt-2 text-2xl text-fg">{step.title}</h3>}
-          {step.description && <p class="text-base text-fg-soft">{step.description}</p>}
-        </li>
-      ))}
-    </ol>
+<Section id={anchor} ground="night" labelledby="ablauf-title" class="overflow-clip" defer>
+  <SectionHead
+    eyebrow={data.eyebrow}
+    title={data.title}
+    titleEmphasis={data.titleEmphasis}
+    titleId="ablauf-title"
+    size="display-3"
+    align="center"
+    class="mx-auto max-w-prose"
+  />
+  {data.subtitle && (
+    <p class="mx-auto mt-5 max-w-prose text-center font-serif text-xl leading-relaxed text-fg-soft italic">
+      {data.subtitle}
+    </p>
   )}
 
-  {data.close && <Prose html={data.close} class="mt-group" />}
+  {steps.length > 0 && (
+    <div class="relative mt-group">
+      {/* The thread: drawn across as the steps come into view. */}
+      <span
+        aria-hidden="true"
+        class="absolute inset-x-0 top-0 h-px origin-left bg-linear-to-r from-transparent via-accent/60 to-transparent scroll-motion:animate-[expand-horizontally_linear_both] scroll-motion:[animation-range:entry_10%_cover_35%] scroll-motion:[animation-timeline:view()]"
+      ></span>
+      <ol role="list" class="grid sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((step, i) => (
+          <li class="reveal grid content-start gap-4 border-line px-1 pt-10 pb-6 max-sm:not-first:border-t sm:px-8 sm:even:border-l lg:not-first:border-l">
+            <span class="font-serif text-[clamp(4rem,3rem+3vw,6rem)] leading-[0.9] text-accent/45" aria-hidden="true">
+              {i + 1}
+            </span>
+            {step.title && <h3 class="text-2xl text-fg">{step.title}</h3>}
+            {step.description && <p class="text-sm leading-relaxed text-fg-soft">{step.description}</p>}
+          </li>
+        ))}
+      </ol>
+    </div>
+  )}
+
+  {data.close && <Prose html={data.close} class="mx-auto mt-group text-center" />}
 </Section>

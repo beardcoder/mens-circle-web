@@ -38,10 +38,11 @@ const props = Astro.props;
       addEventListener('pagereveal', (event) => {
         if (event.viewTransition) document.documentElement.classList.add('vt-arrival');
       });
-      // Resolve the mode before first paint so nothing flashes.
+      // Resolve the palette and the mode before first paint so nothing flashes.
       (() => {
         try {
           const root = document.documentElement;
+          if (localStorage.getItem('mc-theme') === 'cool') root.setAttribute('data-theme', 'cool');
           const stored = localStorage.getItem('mc-mode');
           const mode = stored === 'light' || stored === 'dark' ? stored : null;
           const resolved = mode || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -52,21 +53,20 @@ const props = Astro.props;
         }
       })();
     </script>
-    {/* Preload the serif headline weight (600) — the hero sentence is the LCP. Config in astro.config.mjs. */}
-    <Font cssVariable="--font-fraunces" preload={[{ weight: '600', style: 'normal' }]} />
-    {/* And the sans at the two weights of the first screen: text (400) and the
-        navigation, buttons and card lines (600). A late swap rewraps them. */}
+    {/* Both faces are variable (astro.config.mjs): one file per style. The serif
+        upright and italic set the hero title (the LCP), the sans upright the first screen. */}
     <Font
-      cssVariable="--font-instrument"
+      cssVariable="--font-playfair"
       preload={[
-        { weight: '400', style: 'normal' },
-        { weight: '600', style: 'normal' },
+        { weight: '400 900', style: 'normal' },
+        { weight: '400 900', style: 'italic' },
       ]}
     />
+    <Font cssVariable="--font-dm-sans" preload={[{ weight: '100 1000', style: 'normal' }]} />
     <SeoHead {...props} />
   </head>
-  <body class="max-lg:data-[nav-open]:fixed max-lg:data-[nav-open]:min-h-full max-lg:data-[nav-open]:w-full max-lg:data-[nav-open]:overflow-hidden">
-    {/* lib/site-header.ts sets `data-nav-open` while the phone panel is open: the page holds still. */}
+  <body class="data-[nav-open]:fixed data-[nav-open]:min-h-full data-[nav-open]:w-full data-[nav-open]:overflow-hidden">
+    {/* lib/site-header.ts sets `data-nav-open` while the menu is open: the page holds still. */}
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top; it
         takes the focus there, so the next Tab starts at the top (lib/site-header.ts). */}
     <span id="top" tabindex="-1"></span>
@@ -76,7 +76,7 @@ const props = Astro.props;
 
     <a
       href="#main"
-      class="fixed -top-full left-4 z-50 rounded-control bg-accent px-5 py-3 text-sm font-semibold text-on-accent transition-[top] duration-150 focus:top-2 print:hidden"
+      class="fixed -top-full left-4 z-50 rounded-full bg-fill px-6 py-3 text-sm font-semibold text-on-fill transition-[top] duration-150 focus:top-2 print:hidden"
     >
       Zum Inhalt springen
     </a>
@@ -93,7 +93,7 @@ const props = Astro.props;
         data-llms-skip
         aria-label="Nach oben scrollen"
         title="Nach oben"
-        class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full border border-line-strong bg-raised text-fg transition-colors duration-150 hover:border-accent hover:bg-accent hover:text-on-accent scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
+        class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full bg-fill text-on-fill shadow-card transition-[background-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-fill-strong hover:shadow-[var(--shadow-lift),var(--shadow-glow)] motion-reduce:hover:translate-y-0 scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden sm:right-6 sm:bottom-6"
       >
         <Icon name="chevron-up" aria-hidden="true" class="size-4.5" />
       </a>

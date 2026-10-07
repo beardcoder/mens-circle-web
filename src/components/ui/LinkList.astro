@@ -1,7 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 
-/** Where to go next: whole rows as links, a title, an optional line, an arrow that moves. */
+/** Where to go next: whole rows between hairlines as links, a title, an optional line, an arrow that moves. */
 interface Item {
   href: string;
   title: string;
@@ -17,21 +17,21 @@ interface Props {
 const { items, class: className } = Astro.props;
 ---
 
-<ul class:list={['grid gap-3', className]} role="list">
+<ul class:list={['grid divide-y divide-line border-y border-line', className]} role="list">
   {items.map((item) => (
     <li>
       <a
         href={item.href}
         data-astro-prefetch={item.prefetch ? 'hover' : undefined}
-        class="group/row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1 rounded-card border border-line-strong bg-raised px-6 py-5 transition-[border-color,translate] duration-200 hover:-translate-y-0.5 hover:border-accent/50 motion-reduce:hover:translate-y-0"
+        class="group/row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1 px-1 py-6 transition-[padding] duration-300 ease-settle hover:pl-3 motion-reduce:hover:pl-1"
       >
-        <span class="font-serif text-xl font-semibold text-fg transition-colors duration-150 group-hover/row:text-accent">
+        <span class="font-serif text-2xl text-fg transition-colors duration-150 group-hover/row:text-accent">
           {item.title}
         </span>
         <Icon
           name="arrow"
           aria-hidden="true"
-          class="col-start-2 row-span-2 row-start-1 size-5 text-accent transition-transform duration-200 group-hover/row:translate-x-1"
+          class="col-start-2 row-span-2 row-start-1 size-6 text-accent transition-transform duration-200 group-hover/row:translate-x-1"
         />
         {item.text && <span class="text-sm text-fg-soft">{item.text}</span>}
       </a>

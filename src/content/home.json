@@ -32,6 +32,7 @@
         "anchor": "ueber",
         "eyebrow": "Der Kreis",
         "title": "Worum es an so einem Abend geht",
+        "titleEmphasis": "Abend",
         "text": "<p>Im Alltag läuft viel: Arbeit, Familie, Beziehung, Verantwortung. Das meiste davon machen wir mit uns selbst aus\u00a0– und Gespräche unter Männern landen oft schnell bei Job, Sport oder dem nächsten Ratschlag.</p><p>Im Kreis ist Platz für das, was darunter liegt. Fertige Antworten brauchst du dafür nicht. Es reicht, dass du den anderen zuhörst und ehrlich bist, wenn du dran bist.</p>",
         "questionsLabel": "Fragen, um die ein Abend oft kreist",
         "questions": [
@@ -49,6 +50,7 @@
         "anchor": "reise",
         "eyebrow": "Ablauf",
         "title": "Wie ein Abend abläuft",
+        "titleEmphasis": "abläuft",
         "subtitle": "Kein Minutenplan, aber eine verlässliche Reihenfolge. Wir sitzen im Kreis, auf Augenhöhe\u00a0– keiner steht über dem anderen.",
         "steps": [
           {
@@ -89,6 +91,7 @@
         "anchor": "moderator",
         "eyebrow": "Wer den Kreis leitet",
         "name": "Ich bin Markus.",
+        "titleEmphasis": "Markus.",
         "quote": "Ich gebe dir keine Ratschläge. Ich sorge dafür, dass du in Ruhe reden kannst\u00a0– und gehört wirst.",
         "bio": "<p>Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.</p><p>Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit\u00a0– einfach, ruhig und ohne große Worte.</p><p>Zu Beginn jedes Abends erkläre ich die Absprachen und achte darauf, dass sie gelten. Jeder kann zu Wort kommen, keiner muss. Und wenn wir eine Übung mit Atem oder Körperwahrnehmung machen, leite ich sie an\u00a0– als Angebot, nicht als Pflicht.</p>",
         "image": "/images/markus-sommer.jpg",
@@ -103,6 +106,7 @@
         "anchor": "rahmen",
         "eyebrow": "Der Rahmen",
         "title": "Was wir miteinander vereinbaren",
+        "titleEmphasis": "miteinander",
         "intro": "Zu Beginn jedes Abends benennen wir ein paar Absprachen. Niemand kontrolliert sie\u00a0– sie machen es leichter, ehrlich zu sein.",
         "agreements": [
           {
@@ -131,7 +135,8 @@
       "data": {
         "anchor": "stimmen",
         "eyebrow": "Aus dem Kreis",
-        "title": "Was Teilnehmer geschrieben haben"
+        "title": "Was Teilnehmer geschrieben haben",
+        "titleEmphasis": "Teilnehmer"
       }
     },
     {
@@ -140,6 +145,7 @@
         "anchor": "faq",
         "eyebrow": "Häufige Fragen",
         "title": "Was Männer vorher wissen wollen",
+        "titleEmphasis": "wissen wollen",
         "items": [
           {
             "question": "Was ist ein Männerkreis?",
@@ -174,6 +180,7 @@
         "anchor": "termine",
         "eyebrow": "Nächster Schritt",
         "displayLines": ["Dabei sein."],
+        "titleEmphasis": "sein.",
         "lede": "Du meldest dich auf der Seite des jeweiligen Termins an. Dafür brauchst du nur Name und E-Mail-Adresse\u00a0– den genauen Treffpunkt bekommst du mit der Bestätigung.",
         "newsletterText": "Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler nicht verschickt.",
         "whatsappText": "Für den Austausch zwischen den Abenden gibt es außerdem eine WhatsApp-Gruppe."

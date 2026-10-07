@@ -1,6 +1,6 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
- * utilities cannot express ("Abendlicht": warm, grounded, sturdy). Shared by the two entry files:
+ * utilities cannot express ("Abendlicht": earth, terracotta and parchment, set in Playfair). Shared by the two entry files:
  * global.css (public site) and admin.css (back office). docs/design-system.md
  * describes the system.
  */
@@ -20,6 +20,10 @@
     }
   }
 }
+
+/* Under a page whose opening is a dark ground (`data-hero` on it): the header
+   starts transparent with light text over it. */
+@custom-variant over-hero (&:where(body:has([data-hero]) *));
 
 /* Scroll-driven motion: only where view()/scroll() timelines exist and motion is
    allowed. Without support the content simply stands. */
@@ -42,113 +46,258 @@
   --shadow-*: initial;
   --breakpoint-*: initial;
 
-  /* Breakpoints. From `lg` the bar shows its navigation and blocks sit side by side. */
+  /* Breakpoints. From `lg` (900px) blocks sit side by side. */
   --breakpoint-sm: 36rem;
   --breakpoint-md: 48rem;
-  --breakpoint-lg: 60rem;
+  --breakpoint-lg: 56.25rem;
   --breakpoint-xl: 72rem;
   --breakpoint-2xl: 100rem;
 
-  /* Brand constants — the same in both modes. */
-  --color-flame: #e4632e; /* the mark */
-  --color-night: #1c1714;
-
-  /* Semantic colours ("Abendlicht"): warm paper by day, a warm dark by night.
-     `light-dark()` follows the page's color-scheme; the surfaces below re-declare
-     them. Ratios: fg ≥ 13:1, fg-soft ≥ 8:1, fg-muted and accent ≥ 4.6:1 on every
-     ground; line-bold (control borders) ≥ 3:1. */
-  --color-ground: light-dark(#fbf8f3, #171310); /* the page */
-  --color-ground-alt: light-dark(#eee5d7, #1f1a16); /* stone: quiet bands */
-  --color-raised: light-dark(#ffffff, #26201b); /* cards, panels, popovers */
-  --color-surface: light-dark(#fbf8f3, #171310); /* the ground of the current block */
-  --color-fg: light-dark(#1c1713, #f2ebe1);
-  --color-fg-soft: light-dark(#4d443c, #d3c8ba); /* running text */
-  --color-fg-muted: light-dark(#6b6158, #a89c8e); /* captions, labels */
-  --color-accent: light-dark(#a3462a, #ec7a48); /* rust by day, ember by night */
-  --color-accent-strong: light-dark(#853720, #f39a6f); /* the accent's hover */
-  --color-accent-soft: light-dark(#ecdfcc, #3a261b); /* a tint behind the accent */
-  --color-on-accent: light-dark(#fff8f0, #171310);
-  --color-line: light-dark(#e8e0d4, #362e28); /* hairlines, card borders */
-  --color-line-strong: light-dark(#d6cbbb, #4a4038); /* dividers that must show */
-  --color-line-bold: light-dark(#8b7f72, #7a6e62); /* control borders */
-  --color-field: light-dark(#ffffff, #1f1a16);
-  --color-overlay: light-dark(rgb(34 28 23 / 45%), rgb(8 6 5 / 70%));
-  --color-success: light-dark(#2f6b4a, #8cc7a2);
-  --color-danger: light-dark(#9c3a2c, #ec9a87);
+  /* Semantic colours, built from the palette's primitives (`--p-*`, base layer
+     below): `[data-theme='cool']` re-pitches only the primitives, so one swap
+     re-themes everything in both modes. `light-dark()` follows the page's
+     color-scheme; the surfaces re-declare what changes on their ground. */
+  --color-ground: light-dark(var(--p-bone), var(--p-ink)); /* the page */
+  --color-ground-alt: light-dark(var(--p-parchment), var(--p-earth-deep)); /* quiet bands */
+  --color-raised: light-dark(var(--p-parchment), var(--p-earth-deep)); /* cards, panels */
+  --color-surface: light-dark(var(--p-bone), var(--p-ink)); /* the ground of the current block */
+  --color-fg: light-dark(var(--p-ink), var(--p-parchment));
+  --color-fg-soft: light-dark(var(--p-ink-soft), var(--p-text-soft-dark)); /* running text */
+  --color-fg-muted: light-dark(var(--p-muted-light), var(--p-muted-dark)); /* captions */
+  /* Accent text (body size and the italic in titles): deep terracotta on light
+     grounds, light terracotta on dark ones. */
+  --color-accent: light-dark(var(--p-terra-deep), var(--p-terra-light));
+  /* The fill: buttons, badges, the scroll-to-top; bone on it in both modes. */
+  --color-fill: var(--p-terra);
+  --color-fill-strong: color-mix(in oklch, var(--p-terra) 75%, var(--p-ink));
+  --color-on-fill: var(--p-bone);
+  --color-accent-strong: light-dark(color-mix(in oklch, var(--p-terra-deep) 80%, var(--p-ink)), var(--p-bone));
+  --color-accent-soft: light-dark(var(--p-sand-light), var(--p-earth-dark)); /* a tint */
+  --color-on-accent: light-dark(var(--p-bone), var(--p-ink));
+  --color-line: light-dark(var(--p-sand-light), color-mix(in oklch, var(--p-earth-mid) 55%, transparent));
+  --color-line-strong: light-dark(color-mix(in oklch, var(--p-sand) 70%, var(--p-bone)), var(--p-earth-mid));
+  --color-line-bold: light-dark(var(--p-line-bold-light), var(--p-line-bold-dark)); /* controls, 3:1 */
+  --color-field: light-dark(var(--p-bone), var(--p-earth-dark));
+  --color-overlay: light-dark(
+    color-mix(in oklch, var(--p-ink) 60%, transparent),
+    color-mix(in oklch, black 75%, transparent)
+  );
+  --color-success: light-dark(oklch(45% 0.12 145deg), oklch(76% 0.12 145deg));
+  --color-danger: light-dark(oklch(48% 0.16 30deg), oklch(76% 0.11 30deg));
   /* A field message carries its own ground, so it reads on every surface. */
-  --color-alert: #f7e0d9;
-  --color-on-alert: #6e2416;
+  --color-alert: oklch(93% 0.035 40deg);
+  --color-on-alert: oklch(38% 0.13 35deg);
+  /* The warm light of the breathing fields and rings. */
+  --color-flame: var(--p-terra);
+  /* Constants for the dark surfaces (the same in both modes). */
+  --color-bone: var(--p-bone);
+  --color-parchment: var(--p-parchment);
+  --color-sand: var(--p-sand);
+  --color-earth: var(--p-earth-mid);
+  --color-ink: var(--p-ink);
 
-  /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). Fraunces speaks
-     (headings, quotes), Instrument Sans explains (text, UI). */
-  --font-sans: var(--font-instrument);
-  --font-serif: var(--font-fraunces);
+  /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). Playfair Display
+     speaks (titles, quotes, the italic accent), DM Sans explains (text, UI). */
+  --font-sans: var(--font-dm-sans);
+  --font-serif: var(--font-playfair);
 
-  /* Type scale. Calm: the largest title (`display-1`) is the home sentence, page
-     titles take `display-2`, section titles `display-3`. */
-  --text-xs: 0.8125rem;
-  --text-xs--line-height: 1.4;
-  --text-sm: 0.9375rem; /* captions, notes, labels */
-  --text-sm--line-height: 1.55;
-  --text-base: 1.0625rem; /* compact text, controls */
-  --text-base--line-height: 1.6;
-  --text-md: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem); /* reading */
-  --text-md--line-height: 1.7;
-  --text-lg: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem); /* leads */
-  --text-lg--line-height: 1.6;
-  --text-xl: clamp(1.25rem, 1.16rem + 0.4vw, 1.5rem);
-  --text-xl--line-height: 1.35;
-  --text-2xl: clamp(1.5rem, 1.32rem + 0.8vw, 1.875rem);
-  --text-2xl--line-height: 1.25;
-  --text-display-3: clamp(1.75rem, 1.45rem + 1.3vw, 2.5rem);
-  --text-display-3--line-height: 1.15;
-  --text-display-3--letter-spacing: -0.012em;
-  --text-display-2: clamp(2.125rem, 1.65rem + 2.1vw, 3.375rem);
-  --text-display-2--line-height: 1.1;
-  --text-display-2--letter-spacing: -0.018em;
-  --text-display-1: clamp(2.5rem, 1.75rem + 3.4vw, 4.625rem);
-  --text-display-1--line-height: 1.05;
-  --text-display-1--letter-spacing: -0.022em;
+  /* Type scale. Reading sizes, then the display voice: `display-1` the hero,
+     `display-2` large section titles, `display-3` section titles. Display lines
+     sit tight (Playfair at 400, negative tracking). */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.45;
+  --text-sm: 0.875rem; /* captions, notes */
+  --text-sm--line-height: 1.6;
+  --text-base: 1rem; /* compact text, controls */
+  --text-base--line-height: 1.7;
+  --text-md: 1.0625rem; /* reading */
+  --text-md--line-height: 1.8;
+  --text-lg: 1.125rem; /* leads */
+  --text-lg--line-height: 1.8;
+  --text-xl: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  --text-xl--line-height: 1.3;
+  --text-2xl: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  --text-2xl--line-height: 1.1;
+  --text-2xl--letter-spacing: -0.02em;
+  --text-display-3: clamp(2.25rem, 5.5vw, 4.5rem);
+  --text-display-3--line-height: 1.05;
+  --text-display-3--letter-spacing: -0.04em;
+  --text-display-2: clamp(2.75rem, 7vw, 6rem);
+  --text-display-2--line-height: 1;
+  --text-display-2--letter-spacing: -0.045em;
+  --text-display-1: clamp(3rem, 1rem + 8vw, 11rem);
+  --text-display-1--line-height: 0.88;
+  --text-display-1--letter-spacing: -0.05em;
 
-  /* Labels in capitals (eyebrows, buttons, DefList terms), spaced like a stamp. */
+  /* Labels in small capitals, spaced wide: eyebrows (0.32em), buttons (0.12em). */
   --tracking-label: 0.12em;
+  --tracking-eyebrow: 0.32em;
 
   /* Spacing: the rhythm, largest to smallest — never let an inner gap exceed an
      outer one. */
-  --spacing-section: clamp(4.5rem, 3rem + 5vw, 8rem);
-  --spacing-group: clamp(2rem, 1.5rem + 2vw, 3.5rem);
-  --spacing-item: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
-  --spacing-gutter: clamp(1.25rem, 0.75rem + 2.2vw, 3rem);
-  --spacing-grid: clamp(1.25rem, 0.75rem + 2vw, 3rem); /* column gap */
-  --spacing-header: 72px; /* the fixed bar */
-  --spacing-clearance: 96px; /* the bar plus air, for anchors and sticky columns */
+  --spacing-section: clamp(4.5rem, 2rem + 6vw, 9rem);
+  --spacing-group: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  --spacing-item: clamp(1.5rem, 1rem + 1.5vw, 2rem);
+  --spacing-gutter: clamp(1.5rem, 1rem + 1.5vw, 2rem);
+  --spacing-grid: clamp(1.5rem, 0.5rem + 3vw, 4.5rem); /* column gap */
+  --spacing-header: 80px; /* the fixed bar */
+  --spacing-clearance: 112px; /* the bar plus air, for anchors and sticky columns */
 
-  --container-page: 78rem; /* 1248px of content */
-  --container-measure: 40rem; /* a comfortable reading line */
+  --container-page: 87.5rem; /* 1400px */
+  --container-prose: 47.5rem; /* centred text blocks */
+  --container-measure: 37.5rem; /* a reading line */
 
-  /* Firm shapes: square-cut controls, buttons and cards; only seats and round
-     icon buttons are circles. */
-  --radius-control: 0.1875rem;
-  --radius-card: 0.25rem;
+  /* Soft shapes: controls 8px, cards 12px; buttons, chips and icon buttons are pills. */
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
 
-  --shadow-overlay: 0 24px 64px -24px rgb(20 14 10 / 45%);
+  /* Layered shadows; deeper casts in the dark. */
+  --shadow-card:
+    0 2px 6px light-dark(color-mix(in oklch, var(--p-ink) 5%, transparent), color-mix(in oklch, black 25%, transparent)),
+    0 12px 24px -6px
+      light-dark(color-mix(in oklch, var(--p-ink) 10%, transparent), color-mix(in oklch, black 35%, transparent));
+  --shadow-lift:
+    0 4px 8px light-dark(color-mix(in oklch, var(--p-ink) 5%, transparent), color-mix(in oklch, black 25%, transparent)),
+    0 20px 40px -10px
+      light-dark(color-mix(in oklch, var(--p-ink) 12%, transparent), color-mix(in oklch, black 40%, transparent));
+  --shadow-overlay:
+    0 6px 12px
+      light-dark(color-mix(in oklch, var(--p-ink) 6%, transparent), color-mix(in oklch, black 30%, transparent)),
+    0 28px 56px -14px
+      light-dark(color-mix(in oklch, var(--p-ink) 22%, transparent), color-mix(in oklch, black 55%, transparent));
+  --shadow-glow: 0 8px 32px color-mix(in oklch, var(--p-terra) 22%, transparent);
 
-  /* Motion */
+  /* Motion — settled weight: no spring, no bounce. */
   --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-precise: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-emphasised: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-ambient: cubic-bezier(0.43, 0.13, 0.23, 0.96);
 
   /* Animations. The generic motions come from tailwind-animations (imported
      before this file: its keyframes `fade-in-up`, `fade-in`, `pulse`); here
-     they are re-timed to the theme's easing.
-     Delays come from its `animate-delay-*` utility (`animation-delay`). The
-     circle's own motions (breath, glow) keep their keyframes below. */
-  --animate-fade-in-up: fade-in-up 520ms var(--ease-settle) both;
-  --animate-fade-in: fade-in 700ms var(--ease-settle) both;
+     they are re-timed to the theme's easing. Delays come from its
+     `animate-delay-*` utility (`animation-delay`). The circle's own motions —
+     the breathing rings, the breath, the hero's scroll line — keep their
+     keyframes below. */
+  --animate-fade-in-up: fade-in-up 700ms var(--ease-settle) both;
+  --animate-fade-in: fade-in 900ms var(--ease-settle) both;
+  --animate-ring: ring-breathe 18s var(--ease-ambient) infinite;
+  --animate-ring-slow: ring-breathe-slow 24s var(--ease-ambient) infinite;
   --animate-breathe: breathe 10s infinite both;
   --animate-breath: breath 34.6s infinite both;
+  --animate-float: float 7s var(--ease-ambient) infinite;
+  --animate-scroll-line: scroll-line 2s var(--ease-settle) infinite;
   --animate-skeleton: pulse 2s ease-in-out infinite;
   --animate-glow: glow 3.6s ease-in-out infinite;
+}
+
+/* The circle's rings breathe: a slow widening and settling, out of phase with
+   each other (callers stagger them with negative delays). */
+@keyframes ring-breathe {
+  0%,
+  100% {
+    opacity: 0.16;
+    scale: 0.92;
+  }
+
+  50% {
+    opacity: 0.34;
+    scale: 1.12;
+  }
+}
+
+@keyframes ring-breathe-slow {
+  0%,
+  100% {
+    opacity: 0.1;
+    scale: 0.94;
+    rotate: -0.4deg;
+  }
+
+  50% {
+    opacity: 0.28;
+    scale: 1.06;
+    rotate: 0.6deg;
+  }
+}
+
+/* The hero on scroll: its content lifts and fades while the rings drift down. */
+@keyframes hero-leave {
+  to {
+    opacity: 0.3;
+    translate: 0 -4rem;
+  }
+}
+
+@keyframes hero-rings-drift {
+  to {
+    translate: 0 3rem;
+  }
+}
+
+/* The hero's "Entdecken" line sweeps downward in a loop. */
+@keyframes scroll-line {
+  0% {
+    opacity: 1;
+    scale: 1 0;
+    transform-origin: top;
+  }
+
+  45%,
+  55% {
+    opacity: 1;
+    scale: 1 1;
+    transform-origin: top;
+  }
+
+  56% {
+    transform-origin: bottom;
+  }
+
+  100% {
+    opacity: 0.3;
+    scale: 1 0;
+    transform-origin: bottom;
+  }
+}
+
+/* The closed menu toggle breathes a faint ring; the menu's meta dot glows. */
+@keyframes toggle-breath {
+  0%,
+  100% {
+    opacity: 0;
+    scale: 0.7;
+  }
+
+  50% {
+    opacity: 0.9;
+    scale: 1.12;
+  }
+}
+
+@keyframes ember-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-accent) 45%, transparent);
+    opacity: 0.5;
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+    opacity: 1;
+  }
+}
+
+/* Gentle levitation — the moderator's photo. */
+@keyframes float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -0.625rem;
+  }
 }
 
 /* The circle's own keyframes live outside @theme so they are always emitted,
@@ -301,39 +450,124 @@
 /* ── Surfaces ─────────────────────────────────────────────────────────────── */
 
 /* A ground re-declares the semantic colours, so text, hairlines, buttons, focus
-   rings and form controls inside follow it. Surfaces keep the page's
-   color-scheme, so their own light-dark() grounds follow the mode. */
+   rings and form controls inside follow it. */
+
+/* Sand: the quiet warm band (moderator, closing call). Mostly opaque, so the
+   page's breathing light still shows through a little. */
 @utility surface-sand {
-  --color-surface: light-dark(#eee5d7, #1f1a16);
+  --color-surface: light-dark(var(--p-sand-light), var(--p-earth-dark));
+  --color-raised: light-dark(var(--p-parchment), var(--p-earth-deep));
   color: var(--color-fg);
-  /* A fifth of the page shows through, so the breathing backdrop (BreathBackdrop)
-     runs on under the stone band. Only lighter in light mode and darker in dark
-     mode than the opaque band: every contrast holds. */
-  background-color: color-mix(in oklab, var(--color-surface) 80%, transparent);
+  background-color: color-mix(in oklch, var(--color-surface) 88%, transparent);
 }
 
-/* The one dark band in the middle of a page, and the footer. */
+/* Parchment: a lighter quiet band (voices, the date's facts). */
+@utility surface-alt {
+  --color-surface: light-dark(var(--p-parchment), var(--p-earth-deep));
+  color: var(--color-fg);
+  background-color: color-mix(in oklch, var(--color-surface) 88%, transparent);
+}
+
+/* The dark ground of every opening, the journey and the registration: deep earth
+   with parchment text and light terracotta, the same in both modes. */
 @utility surface-night {
-  --color-surface: light-dark(#1c1714, #110e0c);
-  --color-raised: #26201b;
-  --color-fg: #f2ebe1;
-  --color-fg-soft: #d3c8ba;
-  --color-fg-muted: #a89c8e;
-  --color-accent: #ec7a48;
-  --color-accent-strong: #f39a6f;
-  --color-accent-soft: #3a261b;
-  --color-on-accent: #171310;
-  --color-line: #362e28;
-  --color-line-strong: #4a4038;
-  --color-line-bold: #7a6e62;
-  --color-field: #1f1a16;
-  --color-success: #8cc7a2;
-  --color-danger: #ec9a87;
+  --color-surface: var(--p-earth-deep);
+  --color-raised: var(--p-earth-dark);
+  --color-fg: var(--p-parchment);
+  --color-fg-soft: var(--p-text-soft-dark);
+  --color-fg-muted: var(--p-sand);
+  --color-accent: var(--p-terra-light);
+  --color-accent-strong: var(--p-bone);
+  --color-accent-soft: var(--p-earth-dark);
+  --color-on-accent: var(--p-ink);
+  --color-line: color-mix(in oklch, var(--p-sand) 18%, transparent);
+  --color-line-strong: color-mix(in oklch, var(--p-sand) 30%, transparent);
+  --color-line-bold: var(--p-line-bold-dark);
+  --color-field: color-mix(in oklch, var(--p-earth-dark) 80%, transparent);
+  --color-success: oklch(76% 0.12 145deg);
+  --color-danger: oklch(76% 0.11 30deg);
+  color: var(--color-fg);
+  background-color: var(--color-surface);
+  background-image: linear-gradient(180deg, var(--p-earth-deep), var(--p-earth-dark));
+}
+
+/* Earth: the brown panel beside a split (a quote, the questions, the newsletter). */
+@utility surface-earth {
+  --color-surface: light-dark(var(--p-earth-mid), var(--p-earth-deep));
+  --color-raised: light-dark(var(--p-earth-dark), var(--p-earth-dark));
+  --color-fg: var(--p-parchment);
+  --color-fg-soft: var(--p-sand-light);
+  --color-fg-muted: var(--p-sand-light);
+  /* Lifted toward bone: plain terra-light reaches only 4.5:1 on the mid earth. */
+  --color-accent: color-mix(in oklch, var(--p-terra-light) 80%, var(--p-bone));
+  --color-accent-strong: var(--p-bone);
+  --color-accent-soft: var(--p-earth-dark);
+  --color-on-accent: var(--p-ink);
+  --color-line: color-mix(in oklch, var(--p-sand) 22%, transparent);
+  --color-line-strong: color-mix(in oklch, var(--p-sand) 36%, transparent);
+  --color-line-bold: var(--p-sand);
+  --color-field: color-mix(in oklch, var(--p-earth-dark) 70%, transparent);
   color: var(--color-fg);
   background-color: var(--color-surface);
 }
 
+/* Ink: the footer. */
+@utility surface-ink {
+  --color-surface: var(--p-ink);
+  --color-raised: var(--p-earth-deep);
+  --color-fg: var(--p-parchment);
+  --color-fg-soft: var(--p-sand-light);
+  --color-fg-muted: var(--p-sand);
+  --color-accent: var(--p-terra-light);
+  --color-accent-strong: var(--p-bone);
+  --color-on-accent: var(--p-ink);
+  --color-line: color-mix(in oklch, var(--p-sand) 14%, transparent);
+  --color-line-strong: color-mix(in oklch, var(--p-sand) 24%, transparent);
+  --color-line-bold: var(--p-line-bold-dark);
+  --color-field: var(--p-earth-deep);
+  color: var(--color-fg);
+  background-color: var(--color-surface);
+}
+
+/* Forest: the community band (WhatsApp), green in either palette. */
+@utility surface-forest {
+  --color-surface: oklch(31% 0.07 148deg);
+  --color-fg: oklch(96% 0.01 145deg);
+  --color-fg-soft: oklch(86% 0.03 145deg);
+  --color-fg-muted: oklch(78% 0.05 145deg);
+  --color-accent: oklch(80% 0.13 145deg);
+  --color-accent-strong: oklch(96% 0.01 145deg);
+  --color-on-accent: oklch(20% 0.04 148deg);
+  --color-fill: oklch(50% 0.15 145deg);
+  --color-fill-strong: oklch(45% 0.16 145deg);
+  --color-on-fill: oklch(98% 0.005 145deg);
+  --color-line: color-mix(in oklch, oklch(86% 0.03 145deg) 18%, transparent);
+  --color-line-strong: color-mix(in oklch, oklch(86% 0.03 145deg) 30%, transparent);
+  color: var(--color-fg);
+  background-color: var(--color-surface);
+  background-image: linear-gradient(135deg, oklch(35% 0.08 145deg), oklch(28% 0.06 150deg));
+}
+
 /* ── Utilities Tailwind has no name for ───────────────────────────────────── */
+
+/* A fine grain over a dark ground, as on paper: a fractal-noise tile at 3.5%,
+   blended in, so the large flat earth tones do not band. Sits on ::before; the
+   ground's content stacks above it. */
+@utility grain {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    content: '';
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+  }
+}
 
 /* The breathing light (BreathField): a radial field of flame at `--glow` percent
    in the middle, falling off on a cosine curve. Even stops with no kink in the
@@ -375,6 +609,53 @@
     /* `data-mode` absent follows the OS; "light"/"dark" pins it (Layout.astro). */
     color-scheme: light dark;
     interpolate-size: allow-keywords;
+
+    /* The warm palette (default): earth, terracotta, sand, parchment, ink in
+       OKLCH. Terracotta has three lightnesses because no single one clears AA in
+       all three jobs: deep for body-size accent text on light grounds, the base
+       for fills under a bone label, light for accent text on dark grounds. */
+    --p-earth-deep: oklch(18% 0.026 68deg);
+    --p-earth-dark: oklch(24% 0.033 68deg);
+    --p-earth-mid: oklch(35% 0.04 68deg);
+    --p-earth-warm: oklch(46% 0.05 68deg);
+    --p-terra-deep: oklch(49% 0.16 44deg);
+    --p-terra: oklch(54% 0.16 44deg);
+    --p-terra-light: oklch(75% 0.14 45deg);
+    --p-sand: oklch(76% 0.04 75deg);
+    --p-sand-light: oklch(89% 0.02 75deg);
+    --p-parchment: oklch(95% 0.01 75deg);
+    --p-bone: oklch(98% 0.005 75deg);
+    --p-ink: oklch(13% 0.01 68deg);
+    --p-ink-soft: oklch(24% 0.02 68deg);
+    --p-text-soft-dark: oklch(82% 0.02 75deg);
+    --p-muted-light: oklch(46% 0.02 68deg);
+    --p-muted-dark: oklch(68% 0.02 75deg);
+    --p-line-bold-light: oklch(58% 0.03 68deg);
+    --p-line-bold-dark: oklch(58% 0.03 75deg);
+  }
+
+  /* The cool palette ("kühle Sommervariante"): spruce instead of earth, fern
+     instead of terracotta. Lightness and chroma mirror the warm palette, so
+     every contrast holds. Set by the palette switch (lib/theme.ts). */
+  :root[data-theme='cool'] {
+    --p-earth-deep: oklch(20% 0.028 178deg);
+    --p-earth-dark: oklch(26% 0.034 172deg);
+    --p-earth-mid: oklch(37% 0.042 165deg);
+    --p-earth-warm: oklch(48% 0.05 160deg);
+    --p-terra-deep: oklch(46% 0.14 156deg);
+    --p-terra: oklch(50% 0.14 156deg);
+    --p-terra-light: oklch(73% 0.12 154deg);
+    --p-sand: oklch(76% 0.025 165deg);
+    --p-sand-light: oklch(89% 0.014 168deg);
+    --p-parchment: oklch(95% 0.008 172deg);
+    --p-bone: oklch(98% 0.004 174deg);
+    --p-ink: oklch(14% 0.012 185deg);
+    --p-ink-soft: oklch(25% 0.018 180deg);
+    --p-text-soft-dark: oklch(82% 0.018 168deg);
+    --p-muted-light: oklch(46% 0.018 168deg);
+    --p-muted-dark: oklch(68% 0.018 168deg);
+    --p-line-bold-light: oklch(58% 0.03 168deg);
+    --p-line-bold-dark: oklch(58% 0.03 168deg);
   }
 
   :root[data-mode='light'] {
@@ -411,7 +692,7 @@
     overflow-x: clip;
     font-family: var(--font-sans);
     font-size: var(--text-md);
-    line-height: 1.65;
+    line-height: 1.8;
     color: var(--color-fg);
     background-color: var(--color-ground);
     font-kerning: normal;
@@ -421,9 +702,10 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Headings speak in the serif at 600; sizes come from the components. Plain
-     selectors, not :where(): preflight's `font-weight: inherit` on headings has
-     element specificity and would win over a zero-specificity rule. */
+  /* Headings speak in the serif at its regular weight, tracked in; sizes come
+     from the components. Plain selectors, not :where(): preflight's
+     `font-weight: inherit` on headings has element specificity and would win
+     over a zero-specificity rule. */
   h1,
   h2,
   h3,
@@ -431,8 +713,16 @@
   h5,
   h6 {
     font-family: var(--font-serif);
-    font-weight: 600;
+    font-weight: 400;
+    letter-spacing: -0.02em;
     text-wrap: balance;
+  }
+
+  /* The italic accent inside a title: Playfair's italic in the accent. */
+  :where(h1, h2, h3) em {
+    margin-inline: -0.04em 0.06em;
+    font-style: italic;
+    color: var(--color-accent);
   }
 
   p {
@@ -448,7 +738,7 @@
     cursor: pointer;
   }
 
-  /* The focus ring: the accent, offset, on every ground. */
+  /* The focus ring: the fill, offset, on every ground. */
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
