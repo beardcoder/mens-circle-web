@@ -129,8 +129,8 @@ rings drift down), `float` (the moderator's photo), `breath` with
 | `ThemeSwitch`                                     | Palette (flame / leaf) and day/night                                                                                |
 | `BreathBackdrop` / `BreathField`                  | The page's breath: fixed fields of warm light behind everything                                                     |
 
-The header is glass over the paper; over a `HeroFrame` (`over-hero:`) it turns light
-and clear until the page scrolls (`data-scrolled`, `lib/site-header.ts`). The menu
+The header is the page's opaque paper — never glass, the hero's title would show
+through; over a `HeroFrame` (`over-hero:`) it is light and clear until the page scrolls (`data-scrolled`, `lib/site-header.ts`). The menu
 is a full-screen dark overlay that opens as a circle from its toggle.
 
 ## Rules
