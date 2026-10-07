@@ -1,5 +1,5 @@
 ---
-import { panel } from '@lib/ui';
+import Rings from '../Rings.astro';
 import Button from '../ui/Button.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -18,13 +18,14 @@ interface Props {
   };
 }
 
-/** A closing invitation on a sub-page: one card on the stone band, one action, one optional quiet link. */
+/** A closing invitation on a sub-page: centred on the stone band with rings rising behind it, one action, one optional quiet link. */
 
 const { data } = Astro.props;
 ---
 
-<Section id={data.anchor} ground="sand">
-  <div class:list={[panel, 'grid justify-items-center gap-6 text-center sm:p-12']}>
+<Section id={data.anchor} ground="sand" class="overflow-clip" innerClass="relative">
+  <Rings slot="before" set="close" class="text-earth" />
+  <div class="grid justify-items-center gap-8 text-center">
     <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml align="center" size="display-2" />
 
     {data.text && <p class="max-w-[40rem] text-lg text-fg-soft">{data.text}</p>}

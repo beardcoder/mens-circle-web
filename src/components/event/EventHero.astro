@@ -1,17 +1,20 @@
 ---
 import type { EventDTO } from '@lib/types';
-import { card } from '@lib/ui';
 import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from '@lib/server/format';
+import HeroFrame from '../HeroFrame.astro';
 import SeatMeter from '../SeatMeter.astro';
 import Button from '../ui/Button.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
-import Section from '../ui/Section.astro';
 
 interface Props {
   event: EventDTO;
 }
 
-/** The opening of a single event's page: the date as the title, time, place and fee as quiet chips, the seats beside it. */
+/**
+ * The opening of a single event's page, on the dark frame: the date set large as
+ * the title (the weekday in the italic accent), time, place and fee as one line
+ * parted by dots (stacked on phones), the action; the seats as a glass card beside it.
+ */
 
 const { event } = Astro.props;
 const dateOnly = isoDay(event.event_date);
@@ -22,30 +25,30 @@ const taken = Math.max(0, event.max_participants - event.available_spots);
 const seatsLabel = event.is_full
   ? `Alle ${event.max_participants} Plätze vergeben`
   : `${event.available_spots} von ${event.max_participants} Plätzen frei`;
-const chips = [time, event.location, event.cost_basis, 'Ohne Vorerfahrung'].filter(Boolean);
+const meta = [time, event.location, event.cost_basis, 'Ohne Vorerfahrung'].filter(Boolean);
 ---
 
-<Section
-  space="none"
-  class="pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
-  innerClass="grid items-center gap-10 lg:grid-cols-12 lg:gap-x-grid"
->
-  <div class="grid justify-items-start gap-5 lg:col-span-8">
+<HeroFrame height="tall" innerClass="grid items-end gap-x-grid gap-y-12 lg:grid-cols-12">
+  <div class="grid justify-items-start gap-6 lg:col-span-8">
     <Eyebrow class="entrance:animate-fade-in-up">
       {event.is_past ? 'Vergangenes Treffen' : 'Männerkreis · Nächstes Treffen'}
     </Eyebrow>
 
-    <h1 class="text-display-2 text-fg entrance:animate-fade-in-up entrance:animate-delay-60">
+    <h1 class="text-display-2 text-bone entrance:animate-fade-in-up entrance:animate-delay-80">
       <time datetime={dateOnly}>
-        {weekday},<br />
+        <em>{weekday},</em>
+        <br />
         {dayMonthYear}
       </time>
     </h1>
 
-    <ul role="list" class="flex flex-wrap gap-2 entrance:animate-fade-in-up entrance:animate-delay-120">
-      {chips.map((chip) => (
-        <li class="rounded-control border border-line-strong bg-raised px-3.5 py-1.5 text-sm font-semibold text-fg-soft">
-          {chip}
+    <ul
+      role="list"
+      class="flex flex-wrap items-center gap-x-4 gap-y-2 text-base text-sand max-sm:flex-col max-sm:items-start entrance:animate-fade-in-up entrance:animate-delay-160"
+    >
+      {meta.map((item) => (
+        <li class="flex items-center gap-4 sm:not-first:before:size-1 sm:not-first:before:rounded-full sm:not-first:before:bg-fill">
+          {item}
         </li>
       ))}
     </ul>
@@ -54,19 +57,17 @@ const chips = [time, event.location, event.cost_basis, 'Ohne Vorerfahrung'].filt
       <Button
         href="#anmeldung"
         size="lg"
-        class="mt-3 entrance:animate-fade-in-up entrance:animate-delay-160 max-sm:w-full"
+        class="mt-2 entrance:animate-fade-in-up entrance:animate-delay-240 max-sm:w-full"
       >
-        {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
+        {event.is_full ? 'Zur Warteliste' : 'Jetzt anmelden'}
       </Button>
     )}
   </div>
 
   {!event.is_past && (
-    <figure
-      class:list={[card, 'grid gap-5 p-6 entrance:animate-fade-in-up entrance:animate-delay-200 lg:col-span-4 lg:p-8']}
-    >
+    <figure class="grid gap-5 rounded-card border border-line border-l-4 border-l-fill bg-raised/80 p-6 shadow-card backdrop-blur-md entrance:animate-fade-in-up entrance:animate-delay-320 lg:col-span-4 lg:p-8">
       <figcaption class="grid gap-1">
-        <span class="text-lg font-semibold text-fg">{seatsLabel}</span>
+        <span class="font-serif text-2xl text-fg">{seatsLabel}</span>
         <span class="text-sm text-fg-muted">
           {event.is_full ? 'Warteliste möglich' : 'Gefüllte Felder sind vergebene Plätze.'}
         </span>
@@ -74,4 +75,4 @@ const chips = [time, event.location, event.cost_basis, 'Ohne Vorerfahrung'].filt
       <SeatMeter seats={event.max_participants} taken={taken} label={seatsLabel} size="lg" />
     </figure>
   )}
-</Section>
+</HeroFrame>

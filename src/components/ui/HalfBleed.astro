@@ -1,0 +1,39 @@
+---
+import Rings from '../Rings.astro';
+
+/**
+ * A block in two halves: the reading on the page's paper (slot `start`, its edge
+ * level with the container's), and a brown `earth` panel that runs to the edge
+ * of the screen (default slot), with breathing rings behind its content. Phones
+ * stack them, reading first.
+ */
+interface Props {
+  id?: string;
+  labelledby?: string;
+  /** Lets the browser skip rendering until the block nears the viewport. */
+  defer?: boolean;
+  class?: string;
+}
+
+const { id, labelledby, defer = false, class: className } = Astro.props;
+---
+
+<section
+  id={id}
+  aria-labelledby={labelledby}
+  class:list={[
+    'relative grid lg:grid-cols-2',
+    defer && '[contain-intrinsic-block-size:auto_800px] [content-visibility:auto]',
+    className,
+  ]}
+>
+  <div class="px-gutter py-section lg:pr-grid lg:pl-[max(var(--spacing-gutter),calc((100vw-var(--container-page))/2+var(--spacing-gutter)))]">
+    <slot name="start" />
+  </div>
+  <div class="surface-earth grain relative grid place-items-center overflow-clip px-gutter py-section lg:px-grid">
+    <Rings set="panel" class="text-sand" />
+    <div class="relative w-full max-w-[34rem]">
+      <slot />
+    </div>
+  </div>
+</section>

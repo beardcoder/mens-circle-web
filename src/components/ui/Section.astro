@@ -2,13 +2,15 @@
 import Container from './Container.astro';
 
 /**
- * A block of the page. Blocks are parted by their ground and by space, never by
- * drawn rules: the page's paper, a stone band (`sand`) and at most one dark band
- * (`night`) besides the footer. Each ground re-declares the semantic colours (see `surface-*` in
- * global.css), so everything inside follows it.
+ * A block of the page. Blocks are parted by their ground and by space: the
+ * page's paper, quiet bands (`alt` parchment, `sand`), the dark earth (`night`)
+ * of openings and the journey, the brown `earth` panel, the `forest` band of the
+ * community and the `ink` of the footer. Each ground re-declares the semantic
+ * colours (`surface-*` in theme.css), so everything inside follows it; the dark
+ * grounds carry a fine grain.
  */
 
-type Ground = 'default' | 'sand' | 'night';
+type Ground = 'default' | 'alt' | 'sand' | 'night' | 'earth' | 'forest' | 'ink';
 type Space = 'default' | 'compact' | 'none';
 
 interface Props {
@@ -28,8 +30,12 @@ interface Props {
 
 const GROUNDS: Record<Ground, string> = {
   default: '',
+  alt: 'surface-alt',
   sand: 'surface-sand',
-  night: 'surface-night',
+  night: 'surface-night grain',
+  earth: 'surface-earth grain',
+  forest: 'surface-forest grain',
+  ink: 'surface-ink',
 };
 
 const SPACES: Record<Space, string> = {

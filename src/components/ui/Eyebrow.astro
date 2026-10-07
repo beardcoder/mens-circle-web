@@ -1,6 +1,5 @@
 ---
-import { caps } from '@lib/ui';
-/** The line above a title: small capitals in the accent, spaced like a stamp, behind a short bar. */
+/** The line above a title: tiny bold capitals spaced wide, in the accent, behind a fading rule. */
 interface Props {
   as?: 'p' | 'span' | 'h2';
   id?: string;
@@ -10,7 +9,16 @@ interface Props {
 const { as: Tag = 'p', id, class: className } = Astro.props;
 ---
 
-<Tag id={id} class:list={[caps, 'flex items-center gap-3 font-sans text-accent', className]}>
-  <span class="h-0.5 w-6 shrink-0 bg-accent" aria-hidden="true"></span>
+<Tag
+  id={id}
+  class:list={[
+    'inline-flex items-center gap-3 font-sans text-[0.7rem] leading-normal font-bold tracking-eyebrow text-accent uppercase',
+    className,
+  ]}
+>
+  <span
+    class="h-[1.5px] w-[clamp(2.5rem,5vw,5rem)] shrink-0 bg-linear-to-r from-transparent via-current/70 via-25% to-current/70"
+    aria-hidden="true"
+  ></span>
   <slot />
 </Tag>

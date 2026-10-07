@@ -1,4 +1,4 @@
-/** Site header — mobile panel, in-page anchor scrolling and the way back to the top. */
+/** Site header — its tone over a dark opening, the full-screen menu, in-page anchor scrolling and the way back to the top. */
 
 import { prefersReducedMotion } from './helpers';
 
@@ -43,6 +43,28 @@ const initScrollTop = (): void => {
   }
 };
 
+/**
+ * Over a dark opening (`[data-hero]`) the bar starts transparent with light text
+ * and turns to glass with the page's text once the page moves (`data-scrolled`,
+ * styled in Header.astro). A script, not a scroll timeline, so every engine gets
+ * a readable bar.
+ */
+const initHeaderTone = (header: HTMLElement): void => {
+  let frame = 0;
+  const update = (): void => {
+    frame = 0;
+    header.toggleAttribute('data-scrolled', window.scrollY > 40);
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    },
+    { passive: true },
+  );
+  update();
+};
+
 export function initSiteHeader(): void {
   initScrollTop();
 
@@ -50,6 +72,7 @@ export function initSiteHeader(): void {
   const nav = document.getElementById('nav');
   const toggle = document.getElementById('navToggle');
   if (!header || !nav || !toggle) return;
+  initHeaderTone(header);
 
   let isOpen = false;
   let scrollPosition = 0;
@@ -57,14 +80,14 @@ export function initSiteHeader(): void {
   const render = (): void => {
     toggle.setAttribute('aria-expanded', String(isOpen));
     toggle.setAttribute('aria-label', isOpen ? 'Menü schließen' : 'Menü öffnen');
-    // The header's `data-open` drives the panel, the toggle and the bar's button
+    // The header's `data-open` drives the menu, the toggle and the bar's tone
     // (`group-data-[open]/header:` in Header.astro); the body's locks the page.
     header.toggleAttribute('data-open', isOpen);
     document.body.toggleAttribute('data-nav-open', isOpen);
     document.body.style.top = isOpen ? `-${scrollPosition}px` : '';
   };
 
-  /** The panel opens as a circle from the toggle's centre (see `#nav` in Header.astro). */
+  /** The menu opens as a circle from the toggle's centre (see `#nav` in Header.astro). */
   const setOrigin = (): void => {
     const button = toggle.getBoundingClientRect();
     const panel = nav.getBoundingClientRect();
@@ -107,12 +130,6 @@ export function initSiteHeader(): void {
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') close();
-  });
-
-  // Widening past the panel breakpoint while open would leave the body locked
-  // with no visible panel.
-  matchMedia('(width >= 60rem)').addEventListener('change', (event) => {
-    if (event.matches) close();
   });
 
   render();

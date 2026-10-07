@@ -15,6 +15,7 @@ interface Props {
     anchor?: string;
     eyebrow?: string;
     title?: string;
+    titleEmphasis?: string;
     intro?: string;
     items?: FaqItem[];
   };
@@ -22,11 +23,10 @@ interface Props {
 }
 
 /**
- * Questions people ask before they come, set like an index: each question a firm
- * serif line between rules, the list opened by a heavy one. An answer opens on
- * demand (`<details>`, keyboard-operable); the open question takes the accent and
- * an accent bar grows down beside it. The head holds its place beside the list,
- * with a large question mark and the way to ask what is not there.
+ * Questions people ask before they come, as a keyboard-operable `<details>` list
+ * between hairlines: the questions scan quickly, an answer opens on demand behind
+ * a round plus that folds into a minus. The head holds its place beside them,
+ * with the way to ask what is not there.
  */
 
 const { data, ground = 'default' } = Astro.props;
@@ -37,7 +37,15 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
 <Section id={anchor} ground={ground} labelledby="faq-title" defer>
   <Split sticky>
     <div slot="head" class="grid justify-items-start gap-6">
-      <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml titleId="faq-title" lead={data.intro} leadHtml />
+      <SectionHead
+        eyebrow={data.eyebrow}
+        title={data.title}
+        titleHtml={/<[a-z]/i.test(data.title ?? '')}
+        titleEmphasis={data.titleEmphasis}
+        titleId="faq-title"
+        lead={data.intro}
+        leadHtml
+      />
       {site.contactEmail && (
         <p class="text-base text-fg-soft">
           Deine Frage ist nicht dabei? Schreib mir an{' '}
@@ -47,35 +55,28 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
           .
         </p>
       )}
-      {/* The sign of the block, in the quiet italic: large, faint, decorative. */}
-      <span
-        aria-hidden="true"
-        class="-mb-8 hidden font-serif text-[clamp(9rem,6rem+8vw,15rem)] leading-[0.8] text-accent/15 italic select-none lg:block"
-      >
-        ?
-      </span>
     </div>
 
     {items.length > 0 && (
-      <div class="border-t-3 border-fg">
+      <div class="border-t border-line">
         {items.map((item) => (
-          <details class="group/item relative border-b border-line-strong before:absolute before:top-0 before:-left-4 before:h-full before:w-1 before:origin-top before:scale-y-0 before:bg-accent before:transition-transform before:duration-300 before:ease-settle open:before:scale-y-100 sm:before:-left-6 [&::details-content]:h-0 [&::details-content]:overflow-clip [&::details-content]:opacity-0 [&::details-content]:transition-[height,content-visibility,opacity] [&::details-content]:duration-300 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto open:[&::details-content]:opacity-100 motion-reduce:before:transition-none">
+          <details class="group/item border-b border-line [&::details-content]:h-0 [&::details-content]:overflow-clip [&::details-content]:opacity-0 [&::details-content]:transition-[height,content-visibility,opacity] [&::details-content]:duration-300 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto open:[&::details-content]:opacity-100">
             <summary
-              class="group/q flex min-h-11 list-none items-start justify-between gap-6 py-6 text-left [&::-webkit-details-marker]:hidden"
+              class="group/q flex min-h-11 list-none items-center justify-between gap-6 px-2 py-6 text-left [&::-webkit-details-marker]:hidden"
               data-umami-event="faq-expand"
               data-umami-event-question={item.question!.slice(0, 50)}
             >
-              <span class="font-serif text-xl font-semibold text-pretty text-fg transition-[color,translate] duration-200 group-open/item:text-accent group-hover/q:translate-x-1 group-hover/q:text-accent sm:text-2xl motion-reduce:group-hover/q:translate-x-0">
+              <span class="text-lg leading-snug text-pretty text-fg transition-colors duration-200 group-hover/q:text-accent">
                 {item.question}
               </span>
-              {/* A plus that turns into a minus: two bars, the upright one folds away. */}
+              {/* A round plus: the upright bar folds away into a minus when open. */}
               <span
                 aria-hidden="true"
-                class="relative mt-1.5 size-6 shrink-0 text-accent transition-[rotate] duration-300 ease-settle group-open/item:rotate-180 before:absolute before:top-1/2 before:left-0 before:h-[3px] before:w-full before:-translate-y-1/2 before:bg-current after:absolute after:top-0 after:left-1/2 after:h-full after:w-[3px] after:-translate-x-1/2 after:bg-current after:transition-[scale] after:duration-300 group-open/item:after:scale-y-0 sm:mt-2"
+                class="relative grid size-8 shrink-0 place-items-center rounded-full border border-line-strong bg-accent-soft text-fg transition-[background-color,border-color,color,rotate] duration-300 ease-settle group-open/item:rotate-180 group-open/item:border-fill group-open/item:bg-fill group-open/item:text-on-fill group-hover/q:border-fill before:absolute before:h-[1.5px] before:w-3 before:bg-current after:absolute after:h-3 after:w-[1.5px] after:bg-current after:transition-[scale] after:duration-300 group-open/item:after:scale-y-0"
               />
             </summary>
             <div
-              class="max-w-measure pb-8 text-lg text-fg-soft [&_a]:text-fg [&_a]:underline [&_a]:decoration-accent/60 [&_a]:underline-offset-[0.2em]"
+              class="max-w-measure px-2 pb-8 text-base text-fg-soft [&_a]:text-accent [&_a]:underline"
               set:html={item.answer}
             />
           </details>

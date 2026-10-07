@@ -1,0 +1,52 @@
+---
+/**
+ * The circle in the background: wide hairline rings that breathe — widen and
+ * settle, each on its own slow period and out of phase (`ring-breathe`,
+ * `ring-breathe-slow`), so the set never pulses as one. Absolute, behind the
+ * block's content; the caller's block is `relative` and clipped.
+ *
+ * `hero` reaches in from the top right and the bottom left of an opening (and
+ * drifts down a little as the page scrolls); `panel` rings a brown panel or a
+ * photo; `close` rises behind a centred closing call. Under reduced motion the
+ * rings rest at a faint opacity.
+ */
+interface Props {
+  set?: 'hero' | 'panel' | 'close';
+  class?: string;
+}
+
+const { set = 'hero', class: className } = Astro.props;
+
+const RINGS = {
+  hero: [
+    '-top-[15vw] -right-[25vw] w-[70vw] animate-ring',
+    '-top-[5vw] -right-[15vw] w-[50vw] animate-ring-slow [animation-duration:22s] animate-delay-[-5s]',
+    'top-[2vw] -right-[8vw] w-[35vw] animate-ring [animation-duration:25s] animate-delay-[-10s]',
+    '-bottom-[45vw] -left-[45vw] w-[90vw] animate-ring-slow [animation-duration:30s] animate-delay-[-3s]',
+  ],
+  panel: [
+    '-top-[20%] -left-[20%] w-[140%] animate-ring-slow [animation-duration:26s]',
+    'top-1/2 left-1/2 w-[80%] -translate-1/2 animate-ring [animation-duration:22s] animate-delay-[-6s]',
+  ],
+  close: [
+    '-bottom-1/2 left-1/2 w-[min(46rem,120vw)] -translate-x-1/2 animate-ring-slow',
+    '-bottom-[40%] left-1/2 w-[min(32rem,90vw)] -translate-x-1/2 animate-ring [animation-duration:22s] animate-delay-[-8s]',
+  ],
+} as const;
+
+const DRIFT = {
+  hero: 'scroll-motion:animate-[hero-rings-drift_linear_both] scroll-motion:[animation-range:0_92vh] scroll-motion:[animation-timeline:scroll(root)]',
+  panel: '',
+  close: '',
+} as const;
+---
+
+<div
+  aria-hidden="true"
+  data-breath
+  class:list={['pointer-events-none absolute inset-0 overflow-clip', DRIFT[set], className]}
+>
+  {RINGS[set].map((ring) => (
+    <span class:list={['absolute aspect-square rounded-full border border-current opacity-20', ring]} />
+  ))}
+</div>

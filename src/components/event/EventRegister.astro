@@ -1,48 +1,61 @@
 ---
 import type { EventDTO } from '@lib/types';
 import { formatDateShortDE, isoDay } from '@lib/server/format';
-import { panel } from '@lib/ui';
 import RegistrationForm from '../forms/RegistrationForm.astro';
 import Button from '../ui/Button.astro';
+import Rings from '../Rings.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
+import Section from '../ui/Section.astro';
 
 interface Props {
   event: EventDTO;
   class?: string;
 }
 
-/** Registration for one event, in three states: open, waiting list, past. The panel is the one place on the page that asks for something. */
+/**
+ * Registration for one event, in three states: open, waiting list, past. The dark
+ * band is the one place on the page that asks for something: the head on the
+ * left, the form on the right, rings breathing behind.
+ */
 
 const { event, class: className } = Astro.props;
 const dateOnly = isoDay(event.event_date);
 
-const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full ? 'Warteliste' : 'Anmeldung';
+const heading = event.is_past
+  ? { before: 'Dieser Abend hat ', em: 'stattgefunden' }
+  : event.is_full
+    ? { before: 'Trag dich auf die ', em: 'Warteliste' }
+    : { before: 'Sichere dir ', em: 'deinen Platz' };
 ---
 
-<section
+<Section
   id="anmeldung"
-  class:list={[panel, 'scroll-mt-(--spacing-clearance)', className]}
-  aria-labelledby="anmeldung-title"
+  ground="night"
+  labelledby="anmeldung-title"
+  class:list={['scroll-mt-(--spacing-header) overflow-clip', className]}
+  innerClass="relative grid items-start gap-x-grid gap-y-10 lg:grid-cols-12"
 >
-  <div class="mb-8 grid gap-4">
+  <Rings slot="before" set="panel" class="text-sand" />
+  <div class="grid justify-items-start gap-5 lg:col-span-5">
     <Eyebrow>{event.is_past ? 'Rückblick' : 'Teilnehmen'}</Eyebrow>
     <h2 id="anmeldung-title" class="text-display-3 text-fg">
-      {heading}
+      {heading.before}
+      <em>{heading.em}</em>
     </h2>
 
     {event.is_past ? (
-      <p class="text-md text-fg-soft">
+      <p class="max-w-measure text-lg leading-[1.9] text-fg-soft">
         Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine Anmeldung
         ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich benachrichtigen, sobald der
         nächste Termin feststeht.
       </p>
     ) : event.is_full ? (
-      <p class="text-md text-fg-soft">
+      <p class="max-w-measure text-lg leading-[1.9] text-fg-soft">
         Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch nach
         und bekommst sofort eine E-Mail.
       </p>
     ) : (
-      <p class="text-md text-fg-soft">
+      <p class="max-w-measure text-lg leading-[1.9] text-fg-soft">
         Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen Vor- und
         Nachname und eine E-Mail-Adresse. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail&nbsp;– am
         Abend musst du dann nur noch vorbeikommen.
@@ -50,11 +63,13 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
     )}
   </div>
 
-  {event.is_past ? (
-    <Button href="/event#benachrichtigung" size="lg" class="max-sm:w-full">
-      Bei neuen Terminen benachrichtigen
-    </Button>
-  ) : (
-    <RegistrationForm eventId={event.id} isFull={event.is_full} />
-  )}
-</section>
+  <div class="lg:col-span-6 lg:col-start-7">
+    {event.is_past ? (
+      <Button href="/event#benachrichtigung" size="lg" class="max-sm:w-full">
+        Bei neuen Terminen benachrichtigen
+      </Button>
+    ) : (
+      <RegistrationForm eventId={event.id} isFull={event.is_full} />
+    )}
+  </div>
+</Section>

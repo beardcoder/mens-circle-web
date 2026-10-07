@@ -4,7 +4,7 @@ import { fullAddress } from '@lib/server/format';
 import { link } from '@lib/ui';
 import Button from '../ui/Button.astro';
 import Section from '../ui/Section.astro';
-import Split from '../ui/Split.astro';
+import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
   /** Event with non-null coordinates; the caller guards. */
@@ -34,73 +34,72 @@ const leaflet = [
 ];
 ---
 
-<Section ground={ground} labelledby="anfahrt-title" defer>
-  <Split>
-    <h2 slot="head" id="anfahrt-title" class="text-display-3 text-fg">
-      Anfahrt
-    </h2>
+<Section ground={ground} labelledby="anfahrt-title" innerClass="grid justify-items-center gap-group" defer>
+  <SectionHead
+    eyebrow="Anfahrt"
+    title="So findest du zu uns"
+    titleEmphasis="zu uns"
+    titleId="anfahrt-title"
+    align="center"
+  >
+    <p class="font-serif text-xl text-fg-soft italic">{address}</p>
+  </SectionHead>
 
-    <div>
-      <p class="mb-4 font-serif text-xl leading-normal text-fg">{address}</p>
-
-      {/* A fixed frame so the map can never push the page around as it loads. */}
-      <div class="aspect-4/3 overflow-clip rounded-card border border-line has-data-[state=failed]:aspect-auto sm:aspect-video">
+  <div class="w-full max-w-5xl">
+    {/* A fixed frame so the map can never push the page around as it loads. */}
+    <div class="aspect-4/3 overflow-clip rounded-card border border-line has-data-[state=failed]:aspect-auto sm:aspect-video">
+      <div
+        data-map
+        data-state="idle"
+        data-lat={lat}
+        data-lng={lng}
+        data-title={event.location}
+        data-address={address}
+        aria-label="Karte zum Veranstaltungsort"
+        class:list={['group/map relative isolate block h-full overflow-hidden bg-ground-alt [contain:paint]', leaflet]}
+      >
         <div
-          data-map
-          data-state="idle"
-          data-lat={lat}
-          data-lng={lng}
-          data-title={event.location}
-          data-address={address}
-          aria-label="Karte zum Veranstaltungsort"
-          class:list={[
-            'group/map relative isolate block h-full overflow-hidden bg-ground-alt [contain:paint]',
-            leaflet,
-          ]}
-        >
-          <div
-            data-map-canvas
-            role="application"
-            aria-label="Interaktive Karte"
-            class="relative size-full min-h-[280px] bg-ground-alt before:pointer-events-none before:absolute before:inset-0 before:z-1 before:animate-skeleton before:bg-[repeating-linear-gradient(135deg,color-mix(in_srgb,var(--color-line)_60%,transparent)_0_12px,transparent_12px_24px)] group-data-[state=failed]/map:hidden group-data-[state=ready]/map:before:hidden"
-          ></div>
-          <p data-map-fallback hidden class="p-4 text-sm text-balance text-fg-muted">
-            Die Karte lässt sich gerade nicht laden. Die Adresse steht über dieser Box, und die Routen-Links darunter
-            funktionieren weiterhin.
-          </p>
-        </div>
+          data-map-canvas
+          role="application"
+          aria-label="Interaktive Karte"
+          class="relative size-full min-h-[280px] bg-ground-alt before:pointer-events-none before:absolute before:inset-0 before:z-1 before:animate-skeleton before:bg-[repeating-linear-gradient(135deg,color-mix(in_srgb,var(--color-line)_60%,transparent)_0_12px,transparent_12px_24px)] group-data-[state=failed]/map:hidden group-data-[state=ready]/map:before:hidden"
+        ></div>
+        <p data-map-fallback hidden class="p-4 text-sm text-balance text-fg-muted">
+          Die Karte lässt sich gerade nicht laden. Die Adresse steht über dieser Box, und die Routen-Links darunter
+          funktionieren weiterhin.
+        </p>
       </div>
-
-      <div class="mt-4 flex flex-wrap gap-2 max-sm:flex-col">
-        <Button
-          href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
-          variant="secondary"
-          target="_blank"
-          rel="noopener"
-        >
-          Route planen (Google Maps)
-        </Button>
-        <Button
-          href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
-          variant="secondary"
-          target="_blank"
-          rel="noopener"
-        >
-          In OpenStreetMap öffnen
-        </Button>
-      </div>
-
-      {/* `{' '}` rather than a newline: Astro collapses the break between the
-          text and the link to nothing ("Karte vonOpenStreetMap-Mitwirkenden"). */}
-      <p class="mt-2 text-sm text-fg-muted">
-        Karte von{' '}
-        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" class={link}>
-          OpenStreetMap
-        </a>
-        -Mitwirkenden
-      </p>
     </div>
-  </Split>
+
+    <div class="mt-6 flex flex-wrap justify-center gap-3 max-sm:flex-col">
+      <Button
+        href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+        variant="secondary"
+        target="_blank"
+        rel="noopener"
+      >
+        Route planen (Google Maps)
+      </Button>
+      <Button
+        href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
+        variant="secondary"
+        target="_blank"
+        rel="noopener"
+      >
+        In OpenStreetMap öffnen
+      </Button>
+    </div>
+
+    {/* `{' '}` rather than a newline: Astro collapses the break between the
+          text and the link to nothing ("Karte vonOpenStreetMap-Mitwirkenden"). */}
+    <p class="mt-3 text-center text-sm text-fg-muted">
+      Karte von{' '}
+      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" class={link}>
+        OpenStreetMap
+      </a>
+      -Mitwirkenden
+    </p>
+  </div>
 </Section>
 
 <script>

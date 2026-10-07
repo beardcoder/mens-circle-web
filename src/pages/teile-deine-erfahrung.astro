@@ -36,7 +36,7 @@ const schemas = [
   robots="noindex, follow"
   schemas={schemas}
 >
-  <PageOpening eyebrow="Aus dem Kreis" title="Teile deine Erfahrung">
+  <PageOpening eyebrow="Aus dem Kreis" title="Teile deine Erfahrung" titleEmphasis="Erfahrung">
     <Fragment slot="lead">
       Wenn du beim Männerkreis warst und etwas dazu sagen möchtest: Dein Text hilft anderen Männern einzuschätzen,
       worauf sie sich einlassen.
@@ -47,14 +47,14 @@ const schemas = [
     <Split sticky>
       <div slot="head" class="grid gap-5">
         <h2 id="teilen-title" class="max-w-[17ch] text-display-3 text-fg">
-          Was du schreibst, lese ich zuerst
+          Was du schreibst, lese ich <em>zuerst</em>
         </h2>
         <p class="max-w-[42ch] text-lg text-fg-soft">
           Dein Text wird nicht automatisch veröffentlicht. Ich sehe ihn mir vorher an und stelle ihn dann&nbsp;–
           unverändert&nbsp;– auf die Website. Du entscheidest, welchen Namen du angibst.
         </p>
       </div>
-      <div class={panel}>
+      <div class:list={[panel, 'border-l-4 border-l-fill']}>
         <TestimonialForm />
       </div>
     </Split>

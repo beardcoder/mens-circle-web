@@ -1,28 +1,44 @@
 ---
 import { Icon } from 'astro-icon/components';
 
-/** A round seat with a sun or a moon. Rendered twice (bar and phone panel); lib/theme.ts keeps both in sync. */
+/**
+ * Two round buttons: the palette (a flame for the warm earth, a leaf for the cool
+ * forest) and the mode (sun or moon). Rendered twice (bar and menu); lib/theme.ts
+ * keeps every instance in sync.
+ */
 interface Props {
   /** Placement classes from the caller (which instance shows where). */
   class?: string;
-  /** A visible outline, for the phone panel. */
-  outlined?: boolean;
 }
 
-const { class: className, outlined = false } = Astro.props;
+const { class: className } = Astro.props;
+const round =
+  'grid size-[42px] place-items-center rounded-full border border-current/20 text-current transition-[background-color,border-color,scale] duration-300 hover:border-current/40 hover:bg-current/8 active:scale-[0.92]';
 ---
 
-<button
-  type="button"
-  data-mode-toggle
-  aria-label="Hell- oder Dunkelmodus wechseln"
-  title="Hell- oder Dunkelmodus wechseln"
-  class:list={[
-    'grid size-11 place-items-center rounded-full border text-current transition-[border-color,rotate] duration-[420ms] ease-settle hover:-rotate-20 hover:border-line-strong',
-    outlined ? 'border-line-strong' : 'border-transparent',
-    className,
-  ]}
->
-  <Icon name="theme-light" aria-hidden="true" class="size-4.5 dark:hidden" />
-  <Icon name="theme-dark" aria-hidden="true" class="hidden size-4.5 dark:block" />
-</button>
+<div role="group" aria-label="Darstellung" class:list={['flex items-center gap-1.5', className]}>
+  <button
+    type="button"
+    data-theme-toggle
+    aria-label="Farbwelt wechseln (warm / kühl)"
+    title="Farbwelt wechseln"
+    class={round}
+  >
+    <Icon name="theme-warm" aria-hidden="true" class="size-5 fill-current in-data-[theme=cool]:hidden" />
+    <Icon
+      name="theme-cool"
+      aria-hidden="true"
+      class="hidden size-5 fill-none stroke-current stroke-[1.9] in-data-[theme=cool]:block"
+    />
+  </button>
+  <button
+    type="button"
+    data-mode-toggle
+    aria-label="Hell- oder Dunkelmodus wechseln"
+    title="Hell- oder Dunkelmodus wechseln"
+    class={round}
+  >
+    <Icon name="theme-light" aria-hidden="true" class="size-5 dark:hidden" />
+    <Icon name="theme-dark" aria-hidden="true" class="hidden size-5 dark:block" />
+  </button>
+</div>

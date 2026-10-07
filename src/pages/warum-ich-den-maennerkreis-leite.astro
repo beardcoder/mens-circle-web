@@ -85,6 +85,8 @@ const OG_IMAGE = { width: 1200, height: 630 };
   publishedTime={page.meta.datePublished}
   modifiedTime={page.meta.dateModified}
   schemas={schemas}
+  footerClose={false}
 >
+  {/* The page closes on its own invitation (the `cta` block), so the footer drops its own. */}
   <PageContent blocks={blocks} />
 </Layout>

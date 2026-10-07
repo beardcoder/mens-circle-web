@@ -3,41 +3,37 @@ import Layout from '../layouts/Layout.astro';
 import site from '../data/site.json';
 import Button from '../components/ui/Button.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
-import Section from '../components/ui/Section.astro';
+import HeroFrame from '../components/HeroFrame.astro';
 import { link } from '@lib/ui';
 
 // Prerendered: no live data. The adapter reads 404.html from disk for unmatched routes.
 export const prerender = true;
 ---
 
-<Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow">
-  <Section
-    space="none"
-    class="min-h-[70svh] pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section"
-    labelledby="error-title"
-  >
-    <div class="grid gap-5">
+<Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow" footerClose={false}>
+  <HeroFrame height="tall" labelledby="error-title">
+    <div class="grid justify-items-start gap-6">
       <Eyebrow>Fehler 404</Eyebrow>
-      <h1 id="error-title" class="max-w-[14ch] text-display-2 text-fg">
-        Diese Seite gibt es nicht.
+      <h1 id="error-title" class="max-w-[14ch] text-display-2 text-bone">
+        Diese Seite gibt es <em>nicht.</em>
       </h1>
-      <p class="max-w-measure text-lg text-fg-soft">
+      <p class="max-w-measure text-lg leading-[1.9] text-sand">
         Die Seite, die du suchst, wurde verschoben, umbenannt oder hat es nie gegeben.
       </p>
     </div>
     <div class="mt-8 flex flex-wrap gap-3 max-sm:flex-col">
       <Button href="/">Zur Startseite</Button>
-      <Button href="/event" variant="secondary">
+      <Button href="/event" variant="outline">
         Termine &amp; Anmeldung
       </Button>
     </div>
     {site.contactEmail && (
-      <p class="mt-8 max-w-measure text-sm text-fg-muted">
+      <p class="mt-8 max-w-measure text-sm text-sand">
         Du vermisst hier etwas?{' '}
         <a class={link} href={`mailto:${site.contactEmail}`}>
           Schreib mir kurz.
         </a>
       </p>
     )}
-  </Section>
+  </HeroFrame>
 </Layout>

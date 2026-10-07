@@ -14,7 +14,7 @@ const { href, class: className, ...attributes } = Astro.props;
 <a
   href={href}
   class:list={[
-    'group/link inline-flex min-h-11 items-center gap-1.5 font-sans text-base font-semibold text-accent transition-colors duration-150 hover:text-accent-strong',
+    'group/link inline-flex min-h-11 items-center gap-2 font-sans text-xs font-bold tracking-label text-accent uppercase transition-colors duration-150 hover:text-fg',
     className,
   ]}
   {...attributes}

@@ -3,8 +3,8 @@ import { Icon } from 'astro-icon/components';
 import { button, type ButtonSize, type ButtonVariant } from '@lib/ui';
 
 /**
- * A link styled as a button when it has an `href`, a real `<button>` otherwise.
- * The primary carries an arrow that moves on hover.
+ * A link styled as a button when it has an `href`, a real `<button>` otherwise:
+ * a pill in small capitals. `decorate` adds an arrow that moves on hover.
  */
 interface Props {
   href?: string;
@@ -12,7 +12,7 @@ interface Props {
   size?: ButtonSize;
   /** Full width. */
   block?: boolean;
-  /** The arrow; on by default for the primary. */
+  /** An arrow after the label. */
   decorate?: boolean;
   type?: 'button' | 'submit';
   class?: string;
@@ -24,7 +24,7 @@ const {
   variant = 'primary',
   size = 'md',
   block = false,
-  decorate = variant === 'primary',
+  decorate = false,
   type = 'button',
   class: className,
   ...attributes

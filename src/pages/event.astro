@@ -139,8 +139,8 @@ const socialDetails = next
   socialDetails={socialDetails}
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  {/* The date follows the opening straight on: it is what this page is for. */}
-  <PageOpening eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung" joined>
+  {/* The date follows the opening: it is what this page is for. */}
+  <PageOpening eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung" titleEmphasis="Anmeldung">
     <Fragment slot="lead">
       Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend dauert
       zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was
@@ -160,7 +160,7 @@ const socialDetails = next
   {voice && (
     <Section label="Stimme aus dem Kreis" defer>
       <Split>
-        <p slot="head" class="font-serif text-display-3 font-semibold text-fg">
+        <p slot="head" class="font-serif text-display-3 text-fg">
           Aus dem Kreis
         </p>
         <Quote quote={voice.quote} author={voice.author} role={voice.role} size="lg" class="reveal" />

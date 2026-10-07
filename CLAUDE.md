@@ -107,84 +107,63 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Design
 
-- "Abendlicht": warm, grounded, sturdy — a circle of men: firm and outdoorsy, never
-  macho, never a wellness retreat. Warm paper by day, a warm dark by night
-  (`data-mode`, `light-dark()` tokens). The photo of
-  Markus leads the home page; the next date is a card (`HomeEventStatus`, `NextDate`)
-  that every date page shows the same way.
-- Type: Fraunces (`font-serif`, weight 600) speaks — titles in sentence case, set
-  firm; quotes and questions in its italic at 400. Instrument Sans (`font-sans`)
-  explains: text, UI. Labels are bold capitals spaced like a stamp
-  (`tracking-label`): eyebrows (behind a short accent bar, `Eyebrow`), buttons, list
-  terms, "Nächster Termin". `text-display-1` is the home sentence and the statement,
-  page titles take `display-2`, section titles `display-2`/`display-3`. A dash in running copy is bound
-  to the word before it (`\u00a0–`), so no line starts with one. Figures are lining.
+- The look of the earlier hand-written design (commit b286281), rebuilt on Tailwind:
+  warm earth and terracotta, a fire just out of sight — a circle of men, grounded and
+  calm, never macho, never a wellness retreat. `docs/design-system.md` is the
+  reference.
+- Palettes: OKLCH primitives (`--p-*`) on `:root`; `warm` (earth, terracotta) is the
+  default, `cool` (`:root[data-theme='cool']`, spruce and fern) re-pitches only the
+  primitives. Day and night are `data-mode` (`light-dark()` tokens). Both are set
+  before first paint and switched by `ThemeSwitch` (flame/leaf, sun/moon).
 - Colours are semantic tokens (`ground`, `ground-alt`, `raised`, `surface`, `fg`,
-  `fg-soft`, `fg-muted`, `accent`, `accent-strong`, `accent-soft`, `line*`); no hex in
-  markup. Rust (`#a3462a`) is the accent by day, ember (`#ec7a48`) by night; flame
-  (`#e4632e`) is the mark. Every text token holds ≥ 4.5:1 on every ground, control
-  borders (`line-bold`) ≥ 3:1. Grounds: the page's paper, a stone band
-  (`surface-sand`, 80% opaque so the breathing light runs on beneath it) for quiet
-  passages, dark bands (`surface-night`) for the statement, the voices
-  (Testimonials) and the home page's close, and the footer. Surfaces re-declare the
-  semantic colours, so everything inside follows.
-- The statement and the close carry `Contours.astro`: contour lines of the hill country
-  (`public/images/contours.svg`, square) in the accent at 20%, which keeps every text
-  token above 4.5:1 even where a line runs behind it. Only on dark bands.
-- Shapes: firm. Square-cut controls, buttons and cards (`rounded-control` 3px,
-  `rounded-card` 4px), flat cards with a solid border (`card`/`panel` in
-  `lib/ui.ts`) for self-contained units — the date, agreements, forms, the
-  questions card — never for running text. Heavy rules mark where something begins:
-  the Ablauf steps, facts and the FAQ list stand under a 2–3px rule in `fg`, the
-  date cards carry a 4px accent bar on top, the Moderator's quote a 4px accent rule
-  on the left, the smaller voices a 3px accent rule on top.
-- Voices (`Quote`) are never cards: the first is set large (`size="lg"`, a big
-  opening mark in the accent, the serif italic), the others stand level below it;
-  names and roles follow in capitals.
-- The FAQ is an index, not boxes: firm serif questions between rules, an accent bar
-  that grows down beside the open one, a plus that folds into a minus, and a large
-  faint italic "?" under the head. Circles only for
-  seats and round icon buttons; `shadow-overlay` only on popovers.
-- Layout: a 1248px container. Titles stand above their content; `Split` puts a head
-  (title, note, contact line) beside its content where both earn a column (FAQ,
-  Anfahrt, forms). Two-column blocks place themselves with `lg:col-*`; phones stack in
-  DOM order. Groups of equals stand level in a grid (steps, agreements, voices, facts).
-  Sections are parted by their ground and by space. Vertical rhythm: `section` >
-  `group` > `item`; never inverted.
-- The Ablauf steps are numbered `01`–`04` in large serif figures (an evening has an
-  order); everything else is told in sentences, not bullets.
-- Seats are counted by `SeatMeter.astro`: a row of square-cut fields, one per seat,
-  taken filled, open outlined, always beside the count in words. No ring of dots.
-- The page breathes: `BreathBackdrop.astro` (in Layout) is one fixed layer behind
-  everything with three wide fields of warm light (`BreathField`, flame) that widen
-  and settle together on a natural breath (`breath`: a 34.6 s phrase of three
-  breaths of different depth, in shorter than out, a short hold and rest; the haze
-  follows the core a moment later) and drift up at three speeds over the whole
-  page's scroll (`breath-drift`, root scroll() timeline, `--drift`). Paper is
-  transparent and the stone band lets a fifth through, so it runs under every
-  light block; the dark bands (statement, voices, close) carry their own `strong`
-  field, which lags behind its block (`breath-parallax`, view() timeline). The light
-  is `breath-glow` (cosine falloff, even stops: no bands or rings). At its
-  brightest it mixes ~17% flame into paper and ~23% into a dark band, so every text
-  token holds 4.5:1 behind it; fields are placed apart so they never add up past
-  that. `lib/breath.ts` pauses fields off screen; under reduced motion it rests.
-  No rings or wave patterns.
-- The header is the page's paper at all times (nothing scrolls visibly beneath it);
-  its hairline fades in on scroll. No numbers in the navigation.
+  `fg-soft`, `fg-muted`, `accent*`, `fill*`/`on-fill`, `line*`); no hex in markup.
+  `accent` is terracotta as text, `fill` the terracotta of buttons, seats and bars.
+  Every text token holds ≥ 4.5:1 on every ground, control borders (`line-bold`)
+  ≥ 3:1; check new pairs in both palettes and both modes.
+- Grounds (`Section ground`): paper; `alt` parchment; `sand` the stone band (88%
+  opaque, so the breathing light runs on beneath it); `night` deep earth with grain
+  (openings, the journey, registration); `earth` the brown panel; `forest` the
+  WhatsApp band; `ink` the footer. Surfaces re-declare the semantic colours, so
+  everything inside follows.
+- Openings are dark: `HeroFrame` (two warm glows, breathing hairline `Rings`, the
+  container's edges as faint frame lines with a label set on end in each, `data-hero`).
+  Home fills the first screen, an event takes `tall`, sub-pages (`PageOpening`)
+  `auto`, with a photo beside the text where there is one. On scroll the content
+  lifts away and the rings drift down. The header is glass on the paper and light
+  and clear over an opening (`over-hero:`, `data-scrolled`).
+- Type: Playfair Display (`font-serif`, weight 400, tracked in) speaks — titles in
+  sentence case; a phrase of a title in the italic accent (`<em>`, via
+  `titleEmphasis`); quotes and questions in the italic. DM Sans (`font-sans`)
+  explains: text, UI. Eyebrows are spaced capitals (`tracking-eyebrow`) behind a long
+  fading rule; buttons and labels bold capitals (`tracking-label`). A dash in running
+  copy is bound to the word before it (`\u00a0–`), so no line starts with one.
+- Shapes: pill buttons (`rounded-full`, lift and glow on hover), soft cards
+  (`rounded-card` 12px, `shadow-card`) for self-contained units — the date, forms —
+  never for running text; the date cards carry a 4px `fill` bar on the left. Groups
+  of equals stand in hairline grids (facts with a faint watermark word, agreements,
+  values, voices, link rows). The Ablauf steps are numbered `01`–`04` in large serif
+  figures on the dark band; everything else is told in sentences.
+- `HalfBleed` puts the reading on the paper beside a brown panel to the screen's edge
+  (Intro). The FAQ is a list between hairlines with a round plus that turns. Voices
+  (`Quote`) are never cards. Seats are counted by `SeatMeter` (a row of bars, taken
+  filled) beside the count in words.
+- Layout: a 1400px container. Titles stand above their content; `Split` puts a head
+  beside its content where both earn a column. Phones stack in DOM order. Vertical
+  rhythm: `section` > `group` > `item`; never inverted.
 - Motion: entrances on the openings (`entrance:`, never after a view transition),
-  scroll-tied reveals (`reveal`, view() only, nothing hidden without timeline
-  support), the background breath (`BreathField`), a small circle to breathe along
-  with in the statement band (`breathe`: a steady 10 s guide, 4 in, 0.5 hold, 5 out,
-  0.5 rest), and the phone menu:
-  it opens as a circle from the toggle (`--nav-origin`, set by `lib/site-header.ts`),
-  then each link rises; closing runs back quickly. Under reduced motion everything
-  rests; the menu only fades.
+  scroll-tied reveals (`reveal`, view() only), the rings breathing out of phase
+  (`ring`, `ring-slow`), the page's background breath (`BreathBackdrop`), the 10 s
+  guide in the statement (`breathe`), the menu: a full-screen dark overlay that opens
+  as a circle from its toggle (`--nav-origin`), links rising. No numbers in the
+  navigation. Under reduced motion everything rests.
 - No layout shift: an island's fallback sets the same lines as its loaded state; the
-  hero date card rests on the photo (absolute) from `lg`.
+  date card's lines are each one fixed line (`truncate`). Both Playfair styles are
+  preloaded (the hero title's accent is italic); dropping one brings the shift back.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
-- Styles live in the component's markup as utilities. `global.css` is inlined into every
-  public page (`inlineStylesheets: 'always'`), so keep one-off arbitrary values few.
+- Styles live in the component's markup as utilities. `global.css` is inlined into
+  every public page (`inlineStylesheets: 'always'`), so keep one-off arbitrary values
+  few.
 
 ## Conventions
 
