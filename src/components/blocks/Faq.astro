@@ -66,7 +66,7 @@ const items = (data.items ?? []).filter((i) => i.question && i.answer);
               data-umami-event="faq-expand"
               data-umami-event-question={item.question!.slice(0, 50)}
             >
-              <span class="text-lg leading-snug text-pretty text-fg transition-colors duration-200 group-hover/q:text-accent">
+              <span class="font-serif text-xl text-pretty text-fg transition-colors duration-200 group-hover/q:text-accent">
                 {item.question}
               </span>
               {/* A round plus: the upright bar folds away into a minus when open. */}

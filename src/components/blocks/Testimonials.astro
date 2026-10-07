@@ -1,9 +1,9 @@
 ---
 import type { Testimonial } from '@lib/types';
-import { link } from '@lib/ui';
 import Quote from '../ui/Quote.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
+import TextLink from '../ui/TextLink.astro';
 
 /**
  * Submitted and moderated entries, quoted as written — nothing is added or
@@ -54,9 +54,9 @@ const empty = testimonials.length === 0;
       <p class="mx-auto mt-4 max-w-prose text-center text-base text-fg-muted italic">
         Die Zitate stammen von Männern, die schon dabei waren.
       </p>
-      <ul role="list" class="mt-group grid border border-line md:grid-cols-2">
+      <ul role="list" class="mt-group grid border-y border-line md:grid-cols-2">
         {testimonials.map((t) => (
-          <li class="reveal border-line p-8 max-md:not-first:border-t sm:p-10 md:even:border-l md:nth-[n+3]:border-t md:last:odd:col-span-2">
+          <li class="reveal border-line px-1 py-10 max-md:not-first:border-t md:px-10 md:even:border-l md:nth-[n+3]:border-t md:last:odd:col-span-2 lg:px-14">
             <Quote quote={t.quote} author={t.author} role={t.role} />
           </li>
         ))}
@@ -64,9 +64,7 @@ const empty = testimonials.length === 0;
     </>
   )}
 
-  <p class:list={['text-center text-sm', empty ? 'mt-2' : 'mt-10']}>
-    <a class={link} href="/teile-deine-erfahrung">
-      Du warst dabei und möchtest etwas beitragen?
-    </a>
+  <p class:list={['text-center', empty ? 'mt-4' : 'mt-10']}>
+    <TextLink href="/teile-deine-erfahrung">Du warst dabei? Teile deine Erfahrung</TextLink>
   </p>
 </Section>

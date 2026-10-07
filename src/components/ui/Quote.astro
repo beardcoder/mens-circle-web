@@ -1,9 +1,9 @@
 ---
 /**
  * A participant's words, quoted as submitted: nothing added, nothing reworded.
- * `md` is a voice among voices: a small opening mark in the accent, the words in
- * the sans italic, a hairline, then the name and role. `lg` is a pull quote: the
- * serif's italic, set large beside an accent rule.
+ * `md` is a voice among voices: a large opening mark in the accent, the words in
+ * the serif's italic, then the name in small capitals and the role. `lg` is a
+ * pull quote: the serif's italic, set large beside an accent rule.
  */
 interface Props {
   quote: string;
@@ -30,15 +30,16 @@ const lg = size === 'lg';
     )}
   </figure>
 ) : (
-  <figure class:list={['grid h-full grid-cols-[auto_minmax(0,1fr)] content-start gap-x-4', className]}>
-    <span aria-hidden="true" class="font-serif text-2xl leading-none text-accent select-none">
-      ”
+  <figure class:list={['flex h-full flex-col gap-5', className]}>
+    {/* A decorative mark: the high “ reads as one at this size; the words keep none. */}
+    <span aria-hidden="true" class="block h-9 font-serif text-[4.5rem] leading-none text-accent select-none">
+      “
     </span>
-    <blockquote class="text-md leading-relaxed text-fg italic">{quote}</blockquote>
+    <blockquote class="font-serif text-xl leading-[1.4] text-fg italic">{quote}</blockquote>
     {(author || role) && (
-      <figcaption class="col-span-2 mt-8 grid gap-1 border-t border-line pt-5 text-sm">
-        {author && <cite class="font-semibold text-fg not-italic">{author}</cite>}
-        {role && <span class="text-fg-muted">{role}</span>}
+      <figcaption class="mt-auto grid gap-1 pt-2">
+        {author && <cite class="text-xs font-bold tracking-label text-fg not-italic uppercase">{author}</cite>}
+        {role && <span class="text-sm text-fg-muted">{role}</span>}
       </figcaption>
     )}
   </figure>
