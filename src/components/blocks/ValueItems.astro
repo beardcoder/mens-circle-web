@@ -1,5 +1,4 @@
 ---
-import { card } from '@lib/ui';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
@@ -20,7 +19,8 @@ interface Props {
 
 /**
  * Positions set as pairs: "Ehrlichkeit statt Fassade" becomes the word that
- * counts and, quieter, what it replaces — one card each, on the stone band.
+ * counts and, in the italic, what it replaces — a field of equal cells parted by
+ * hairlines, on the stone band.
  */
 
 const { data } = Astro.props;
@@ -34,14 +34,11 @@ const items = (data.items ?? []).map((item) => {
   <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml lead={data.intro} size="display-2" />
 
   {items.length > 0 && (
-    <ul role="list" class="mt-group grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul role="list" class="mt-group grid border-t border-line sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <li class:list={[card, 'reveal grid content-start gap-2 p-6']}>
+        <li class="reveal grid content-start gap-3 border-b border-line px-1 py-10 sm:px-8 sm:max-lg:even:border-l lg:not-nth-[3n+1]:border-l">
           <h3 class="text-2xl text-fg">
-            {item.keep}{' '}
-            {item.instead && (
-              <span class="block font-sans text-sm font-normal text-fg-muted">statt {item.instead}</span>
-            )}
+            {item.keep} {item.instead && <span class="block text-lg text-fg-muted italic">statt {item.instead}</span>}
           </h3>
           {item.description && <p class="text-base text-fg-soft">{item.description}</p>}
         </li>

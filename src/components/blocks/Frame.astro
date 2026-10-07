@@ -1,5 +1,4 @@
 ---
-import { card } from '@lib/ui';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
@@ -13,6 +12,7 @@ interface Props {
     anchor?: string;
     eyebrow?: string;
     title?: string;
+    titleEmphasis?: string;
     intro?: string;
     agreements?: Agreement[];
     boundaryTitle?: string;
@@ -20,22 +20,31 @@ interface Props {
   };
 }
 
-/** The agreements every evening starts with, as equal cards, and the one note that says what the circle is not. */
+/** The agreements every evening starts with, as a field of equal cells parted by hairlines, and the one note that says what the circle is not, across its foot. */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'rahmen';
 const agreements = data.agreements ?? [];
 ---
 
-<Section id={anchor} ground="sand" labelledby="rahmen-title" defer>
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="rahmen-title" lead={data.intro} size="display-2" />
+<Section id={anchor} labelledby="rahmen-title" defer>
+  <SectionHead
+    eyebrow={data.eyebrow}
+    title={data.title}
+    titleEmphasis={data.titleEmphasis}
+    titleId="rahmen-title"
+    lead={data.intro}
+    size="display-3"
+    align="center"
+    class="mx-auto max-w-prose"
+  />
 
   {agreements.length > 0 && (
-    <ul role="list" class="mt-group grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <ul role="list" class="mt-group grid border-y border-line sm:grid-cols-2">
       {agreements.map((rule) => (
-        <li class:list={[card, 'reveal grid content-start gap-2 p-6']}>
-          <h3 class="text-xl text-fg hyphens-auto">{rule.title}</h3>
-          <p class="text-base text-fg-soft">{rule.text}</p>
+        <li class="reveal grid content-start gap-3 border-line px-1 py-10 max-sm:not-first:border-t sm:px-10 sm:even:border-l sm:nth-[n+3]:border-t lg:px-14">
+          <h3 class="text-2xl text-fg hyphens-auto">{rule.title}</h3>
+          <p class="max-w-measure text-base text-fg-soft">{rule.text}</p>
         </li>
       ))}
     </ul>
@@ -44,9 +53,9 @@ const agreements = data.agreements ?? [];
   {data.boundaryText && (
     <aside
       aria-labelledby="rahmen-boundary-title"
-      class="reveal mt-6 grid gap-2 rounded-card border border-line-strong p-6 sm:p-8 lg:grid-cols-12 lg:gap-x-grid"
+      class="reveal grid gap-3 border-b border-line px-1 py-10 sm:px-10 lg:grid-cols-12 lg:gap-x-grid lg:px-14"
     >
-      <h3 id="rahmen-boundary-title" class="text-xl text-fg lg:col-span-4">
+      <h3 id="rahmen-boundary-title" class="font-serif text-2xl text-accent italic lg:col-span-4">
         {data.boundaryTitle ?? 'Gut zu wissen'}
       </h3>
       <p class="max-w-measure text-base text-fg-soft lg:col-span-8">{data.boundaryText}</p>

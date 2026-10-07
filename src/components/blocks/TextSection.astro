@@ -15,9 +15,9 @@ interface Props {
 }
 
 /**
- * Prose on one reading line — the essay register of the sub-pages: eyebrow and
- * title above the text. Legal pages pass only content: the text follows the page
- * title without a section's pause.
+ * Prose on one reading column in the middle of the page — the essay register of
+ * the sub-pages: eyebrow and title above the text. Legal pages pass only content,
+ * which stands on the page title's edge.
  */
 
 const { data, opening = false } = Astro.props;
@@ -29,22 +29,18 @@ const anchor = data.anchor ?? slug;
 const hasHead = Boolean(data.eyebrow || data.title);
 ---
 
-<Section
-  id={anchor || undefined}
-  space={hasHead ? 'compact' : 'none'}
-  class:list={[!hasHead && 'pb-section']}
-  innerClass="grid gap-6"
->
-  {hasHead && <SectionHead eyebrow={data.eyebrow} title={data.title} class="reveal" />}
-  {data.content && (
-    <Prose
-      html={data.content}
-      size="lg"
-      class:list={[
-        'max-w-[42rem]',
-        opening &&
-          'supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:mr-[0.12em] supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:font-serif supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:font-semibold supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:text-accent supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:[-webkit-initial-letter:3] supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:[initial-letter:3]',
-      ]}
-    />
-  )}
+<Section id={anchor || undefined} space={hasHead ? 'compact' : 'default'}>
+  <div class:list={['grid max-w-[42rem] gap-8', hasHead && 'mx-auto']}>
+    {hasHead && <SectionHead eyebrow={data.eyebrow} title={data.title} class="reveal" />}
+    {data.content && (
+      <Prose
+        html={data.content}
+        size="lg"
+        class:list={[
+          opening &&
+            'supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:mr-[0.12em] supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:font-serif supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:text-accent supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:[-webkit-initial-letter:3] supports-[(initial-letter:3)_or_(-webkit-initial-letter:3)]:[&>p:first-child]:first-letter:[initial-letter:3]',
+        ]}
+      />
+    )}
+  </div>
 </Section>

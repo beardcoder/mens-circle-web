@@ -2,6 +2,7 @@
 import type { EventDTO } from '@lib/types';
 import LinkList from '../ui/LinkList.astro';
 import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
 import Split from '../ui/Split.astro';
 
 interface Props {
@@ -23,9 +24,13 @@ const items = [
 
 <Section ground={ground} labelledby="weiter-title" defer>
   <Split>
-    <h2 slot="head" id="weiter-title" class="text-display-3 text-fg">
-      Weiter
-    </h2>
+    <SectionHead
+      slot="head"
+      eyebrow="Weiter"
+      title="Wohin als Nächstes"
+      titleEmphasis="Nächstes"
+      titleId="weiter-title"
+    />
     <LinkList items={items} />
   </Split>
 </Section>

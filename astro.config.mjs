@@ -66,26 +66,27 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   fonts: [
-    // Fraunces speaks: headlines and serif lines at 600 (sturdy, carved), the
-    // quiet lines (quotes, questions) in its italic at 400. Instrument Sans explains: text, UI and the date line. The admin
-    // uses the same two. Tailwind maps them to `font-serif` and `font-sans`.
+    // Playfair Display speaks: titles at its regular weight, tracked in, with
+    // the italic as the accent; quotes in the italic. DM Sans explains: text,
+    // UI, labels. Both variable. Tailwind maps them to `font-serif` and
+    // `font-sans`; the admin uses the same two.
     {
-      name: 'Instrument Sans',
-      cssVariable: '--font-instrument',
+      name: 'Playfair Display',
+      cssVariable: '--font-playfair',
       provider: fontProviders.fontsource(),
-      weights: ['400', '500', '600', '700'],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-    },
-    {
-      name: 'Fraunces',
-      cssVariable: '--font-fraunces',
-      provider: fontProviders.fontsource(),
-      weights: ['400', '600'],
+      weights: ['400 900'],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
+    },
+    {
+      name: 'DM Sans',
+      cssVariable: '--font-dm-sans',
+      provider: fontProviders.fontsource(),
+      weights: ['100 1000'],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
     },
   ],
   integrations: [

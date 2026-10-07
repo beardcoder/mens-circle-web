@@ -3,7 +3,6 @@ import CropPicture from '../CropPicture.astro';
 import { resolveAssetImage } from '../../lib/images';
 import PageOpening from '../PageOpening.astro';
 import Button from '../ui/Button.astro';
-import Container from '../ui/Container.astro';
 
 interface Props {
   data: {
@@ -11,7 +10,7 @@ interface Props {
     eyebrow?: string;
     title?: string;
     lead?: string;
-    /** Kept for the content files; every opening stands on the split line now. */
+    /** Kept for the content files; every opening stands on the reading line now. */
     align?: 'left' | 'center';
     buttonText?: string;
     buttonLink?: string;
@@ -21,7 +20,7 @@ interface Props {
   };
 }
 
-/** The opening of a content sub-page: title and lead, then — when there is one — the photograph as a wide band. */
+/** The opening of a content sub-page on the dark frame: title and lead, and — when there is one — the photograph beside them. */
 
 const { data } = Astro.props;
 const hasButton = Boolean(data.buttonText && data.buttonLink);
@@ -29,37 +28,33 @@ const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
 const imageAsset = resolveAssetImage(data.image);
 ---
 
-<div id={data.anchor}>
-  <PageOpening eyebrow={data.eyebrow} title={data.title ?? ''} titleHtml joined={Boolean(imageAsset)}>
-    {data.lead && <Fragment slot="lead">{data.lead}</Fragment>}
-    {hasButton && (
-      <Button
-        href={data.buttonLink}
-        size="lg"
-        target={buttonExternal ? '_blank' : undefined}
-        rel={buttonExternal ? 'noopener noreferrer' : undefined}
-      >
-        {data.buttonText}
-      </Button>
-    )}
-  </PageOpening>
-
-  {imageAsset && (
-    /* The landscape gets the width it was taken for. */
-    <Container class="pb-group">
-      <figure class="entrance:animate-fade-in entrance:animate-delay-160">
-        <CropPicture
-          src={imageAsset}
-          class="block aspect-4/3 w-full rounded-card object-cover object-[22%_40%] lg:aspect-21/9 lg:object-[50%_4%]"
-          breakpoint="60em"
-          narrow={{ ratio: 4 / 3, widths: [420, 700, 960], sizes: 'calc(100vw - 2.5rem)' }}
-          wide={{ ratio: 21 / 9, widths: [960, 1280], sizes: 'min(100vw, 78rem)' }}
-          loading="eager"
-          fetchpriority="high"
-          alt={data.imageAlt ?? ''}
-        />
-        {data.imageCaption && <figcaption class="mt-3 text-sm text-fg-muted">{data.imageCaption}</figcaption>}
-      </figure>
-    </Container>
+<PageOpening id={data.anchor} eyebrow={data.eyebrow} title={data.title ?? ''} titleHtml>
+  {data.lead && <Fragment slot="lead">{data.lead}</Fragment>}
+  {hasButton && (
+    <Button
+      href={data.buttonLink}
+      size="lg"
+      target={buttonExternal ? '_blank' : undefined}
+      rel={buttonExternal ? 'noopener noreferrer' : undefined}
+    >
+      {data.buttonText}
+    </Button>
   )}
-</div>
+  {imageAsset && (
+    <figure slot="media" class="relative">
+      {/* A hairline frame set off the photo. */}
+      <span aria-hidden="true" class="absolute -inset-3 rounded-card border border-sand/20 max-lg:hidden"></span>
+      <CropPicture
+        src={imageAsset}
+        class="relative block aspect-4/3 w-full rounded-card object-cover object-[22%_40%] shadow-lift lg:aspect-4/5"
+        breakpoint="56.25em"
+        narrow={{ ratio: 4 / 3, widths: [420, 700, 960], sizes: 'calc(100vw - 2.5rem)' }}
+        wide={{ ratio: 4 / 5, widths: [480, 720, 960], sizes: 'min(36vw, 32rem)' }}
+        loading="eager"
+        fetchpriority="high"
+        alt={data.imageAlt ?? ''}
+      />
+      {data.imageCaption && <figcaption class="mt-4 text-sm text-sand">{data.imageCaption}</figcaption>}
+    </figure>
+  )}
+</PageOpening>

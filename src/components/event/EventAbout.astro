@@ -1,12 +1,13 @@
 ---
 import type { EventDTO } from '@lib/types';
 import { escapeHtml } from '@lib/server/format';
+import Split from '../ui/Split.astro';
 
 interface Props {
   event: EventDTO;
 }
 
-/** The admin's own text about this event, and nothing else. Renders nothing when the event has no description. */
+/** The admin's own text about this event, and nothing else: a head beside the text. Renders nothing when the event has no description. */
 
 const { event } = Astro.props;
 
@@ -16,10 +17,10 @@ const descriptionHtml = escapeHtml(description).replace(/\r\n|\r|\n/g, '<br />')
 ---
 
 {description && (
-  <div class="reveal px-1">
-    <h2 id="ueber-den-abend" class="mb-3 text-2xl text-fg">
-      Zu diesem Abend
+  <Split class="reveal">
+    <h2 slot="head" id="ueber-den-abend" class="text-display-3 text-fg">
+      Zu diesem <em>Abend</em>
     </h2>
-    <p class="max-w-measure text-lg text-fg-soft" set:html={descriptionHtml} />
-  </div>
+    <p class="max-w-measure text-lg leading-[1.9] text-fg-soft" set:html={descriptionHtml} />
+  </Split>
 )}
