@@ -222,10 +222,10 @@
   }
 }
 
-/* The hero on scroll: its content lifts and fades while the rings drift down. */
+/* The hero on scroll: its content lifts a little while the rings drift down. It
+   never fades: the reader is still reading it. */
 @keyframes hero-leave {
   to {
-    opacity: 0.3;
     translate: 0 -4rem;
   }
 }
