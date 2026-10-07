@@ -106,8 +106,8 @@ transition), `scroll-motion:` (scroll-driven, where timelines exist), `reveal`
 (scroll-tied reveal), `animate-delay-*` (staggers, from tailwind-animations).
 Animations: `fade-in-up`, `fade-in` (tailwind-animations, re-timed to the theme's
 easing); ours: `ring` / `ring-slow` (the rings widen and settle, 18–30 s, out of
-phase), `hero-leave` and `hero-rings-drift` (an opening lifts away on scroll, its
-rings drift down), `float` (the moderator's photo), `breath` with
+phase), `hero-leave` and `hero-rings-drift` (an opening's content lifts a little on
+scroll, never fading; its rings drift down), `float` (the moderator's photo), `breath` with
 `breath-drift` and `breath-parallax` (the page's background light), `breathe` (the
 10 s guide in the statement), `skeleton`, `glow`. Everything rests under
 `prefers-reduced-motion`.
@@ -136,7 +136,8 @@ rings drift down), `float` (the moderator's photo), `breath` with
 | `BreathBackdrop` / `BreathField`                  | The page's breath: fixed fields of warm light behind everything                                                     |
 
 The header is the page's opaque paper — never glass, the hero's title would show
-through; over a `HeroFrame` (`over-hero:`) it is light and clear until the page scrolls (`data-scrolled`, `lib/site-header.ts`). The menu
+through; over a `HeroFrame` (`over-hero:`) it is light and clear until the page scrolls (`data-scrolled`, `lib/site-header.ts`),
+then switches at once — no cross-fade, which passes through a grey half-clear bar. The menu
 is a full-screen dark overlay that opens as a circle from its toggle.
 
 ## Rules
