@@ -106,13 +106,15 @@
      sit tight (Playfair at 400, negative tracking). */
   --text-xs: 0.75rem;
   --text-xs--line-height: 1.45;
-  --text-sm: 0.875rem; /* captions, notes */
+  /* DM Sans runs small (a low x-height): every reading size sits a step above the
+     usual 14/16/17/18px, so running text reads at a comfortable size. */
+  --text-sm: 0.9375rem; /* captions, notes */
   --text-sm--line-height: 1.6;
-  --text-base: 1rem; /* compact text, controls */
+  --text-base: 1.0625rem; /* compact text, controls */
   --text-base--line-height: 1.7;
-  --text-md: 1.0625rem; /* reading */
+  --text-md: 1.125rem; /* reading */
   --text-md--line-height: 1.8;
-  --text-lg: 1.125rem; /* leads */
+  --text-lg: 1.1875rem; /* leads */
   --text-lg--line-height: 1.8;
   --text-xl: clamp(1.25rem, 1rem + 1vw, 1.75rem);
   --text-xl--line-height: 1.3;
@@ -430,6 +432,12 @@
 @utility surface-sand {
   --color-surface: light-dark(var(--p-sand-light), var(--p-earth-dark));
   --color-raised: light-dark(var(--p-parchment), var(--p-earth-deep));
+  /* The page's hairline is the stone's own colour by day: one step darker here. */
+  --color-line: light-dark(
+    color-mix(in oklch, var(--p-sand) 70%, var(--p-bone)),
+    color-mix(in oklch, var(--p-earth-mid) 80%, transparent)
+  );
+  --color-line-strong: light-dark(var(--p-sand), var(--p-earth-mid));
   color: var(--color-fg);
   background-color: color-mix(in oklch, var(--color-surface) 88%, transparent);
 }
@@ -693,7 +701,7 @@
 
   /* The italic accent inside a title: Playfair's italic in the accent. */
   :where(h1, h2, h3) em {
-    margin-inline: -0.04em 0.06em;
+    margin-inline-end: 0.06em;
     font-style: italic;
     color: var(--color-accent);
   }

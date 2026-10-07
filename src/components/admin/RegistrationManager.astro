@@ -59,7 +59,8 @@ function badgeTone(s: Status): 'live' | 'wait' | 'off' {
   <CapacityRing value={activeCount} max={maxParticipants} size={76} stroke={6} />
   <div class="grid gap-1">
     <p>
-      <span class="text-lg font-semibold text-accent tabular-nums">{activeCount}</span> von
+      {/* `{' '}`: a line break after "von" collapses to nothing ("von8"). */}
+      <span class="text-lg font-semibold text-accent tabular-nums">{activeCount}</span> von{' '}
       <span class="tabular-nums">{maxParticipants}</span> Plätzen belegt
     </p>
     <p class="text-fg-muted">
