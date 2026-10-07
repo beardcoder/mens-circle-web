@@ -129,9 +129,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `data-hero`); nothing stands at its sides — no frame lines, no labels set on end.
   Home fills the first screen, an event takes `tall`, sub-pages (`PageOpening`)
   `auto`, with a photo beside the text where there is one. On scroll the content
-  lifts away and the rings drift down. The header is the page's opaque paper (never
-  glass: the hero title would show through), light and clear over an opening until
-  the page moves (`over-hero:`, `data-scrolled`).
+  lifts a little (never fades) and the rings drift down. The header is the page's
+  opaque paper (never glass: the hero title would show through), light and clear over
+  an opening until the page moves (`over-hero:`, `data-scrolled`), then switches at
+  once: no cross-fade, which passes through a grey half-clear bar.
 - Type: Playfair Display (`font-serif`, weight 400, tracked in) speaks — titles in
   sentence case; a phrase of a title in the italic accent (`<em>`, via
   `titleEmphasis`); quotes and questions in the italic. DM Sans (`font-sans`)
