@@ -125,8 +125,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   (openings, the journey, registration); `earth` the brown panel; `forest` the
   WhatsApp band; `ink` the footer. Surfaces re-declare the semantic colours, so
   everything inside follows.
-- Openings are dark: `HeroFrame` (two warm glows, breathing hairline `Rings`, the
-  container's edges as faint frame lines with a label set on end in each, `data-hero`).
+- Openings are dark: `HeroFrame` (two warm glows, breathing hairline `Rings`,
+  `data-hero`); nothing stands at its sides — no frame lines, no labels set on end.
   Home fills the first screen, an event takes `tall`, sub-pages (`PageOpening`)
   `auto`, with a photo beside the text where there is one. On scroll the content
   lifts away and the rings drift down. The header is glass on the paper and light
