@@ -20,7 +20,7 @@ interface Props {
   };
 }
 
-/** The evening in four steps, in order, on the dark ground: a thread drawn across as they enter, then four columns parted by hairlines, each under a large quiet numeral. */
+/** The evening in four steps, in order, on the dark ground: a thread drawn across as they enter, then four columns parted by hairlines, each under a large quiet numeral (`01`–`04`: an evening has an order). */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'reise';
@@ -52,12 +52,12 @@ const steps = (data.steps ?? []).slice(0, 4);
       ></span>
       <ol role="list" class="grid sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((step, i) => (
-          <li class="reveal grid content-start gap-4 border-line px-1 pt-10 pb-6 max-sm:not-first:border-t sm:px-8 sm:even:border-l lg:not-first:border-l">
+          <li class="reveal grid content-start gap-4 border-line px-1 pt-10 pb-6 max-sm:not-first:border-t sm:px-8 sm:even:border-l sm:max-lg:nth-[n+3]:border-t lg:not-first:border-l">
             <span class="font-serif text-[clamp(4rem,3rem+3vw,6rem)] leading-[0.9] text-accent/45" aria-hidden="true">
-              {i + 1}
+              {String(i + 1).padStart(2, '0')}
             </span>
             {step.title && <h3 class="text-2xl text-fg">{step.title}</h3>}
-            {step.description && <p class="text-sm leading-relaxed text-fg-soft">{step.description}</p>}
+            {step.description && <p class="text-base text-fg-soft">{step.description}</p>}
           </li>
         ))}
       </ol>

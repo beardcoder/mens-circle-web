@@ -65,8 +65,11 @@ page's breathing light (`BreathBackdrop`) runs on beneath them.
 **Type.** `font-serif` (Playfair Display, variable) speaks: titles at weight 400,
 tracked in, in sentence case; the italic is the accent — a phrase of a title in
 `<em>` (set by `titleEmphasis` on `SectionHead`, `PageOpening`, the hero) turns
-italic and terracotta; quotes and questions in the italic. `font-sans` (DM Sans,
-variable) explains: text, UI. Sizes `text-xs` … `lg` for reading, `xl`, `2xl` for
+italic and terracotta; quotes and questions in the italic. The serif also names
+every row of a list — fact values, agreements, values, FAQ questions, link rows,
+card titles — so a list reads as a set of short titles. `font-sans` (DM Sans,
+variable) explains: running text, labels, UI. The Ablauf steps carry large faint
+serif figures `01`–`04`; nothing else is numbered. Sizes `text-xs` … `lg` for reading, `xl`, `2xl` for
 card titles; `text-display-1` (the home sentence), `display-2` (page and large
 section titles), `display-3` (section titles, `SectionHead`'s default). Labels are
 bold capitals: `tracking-label` (0.12em) on buttons and field labels,
@@ -86,7 +89,8 @@ on cards; buttons are pills (`rounded-full`), as are the seats, the round icon
 buttons and the address field beside its button (`control('md', true)`). Cards are
 raised on `shadow-card` with a hairline border; the date cards carry a 4px `fill`
 bar on the left. Groups of equals stand in hairline grids (facts, agreements,
-values, voices, link rows), never in boxes.
+values, voices, link rows), never in boxes: hairlines above and below the group and
+between its cells, no frame around it.
 
 **Motion.** `entrance:` (one-time entrances: motion allowed and not after a view
 transition), `scroll-motion:` (scroll-driven, where timelines exist), `reveal`
@@ -101,26 +105,26 @@ rings drift down), `scroll-line`, `float` (the moderator's photo), `breath` with
 
 ## Components
 
-| Component                                         | Purpose                                                                    |
-| ------------------------------------------------- | -------------------------------------------------------------------------- |
-| `Section` (`ground`, `space`, `defer`)            | A block: its ground, its rhythm, the container                             |
-| `Container`                                       | Page width and gutters                                                     |
-| `HeroFrame` (`height`)                            | The dark opening: glows, rings, frame lines, side labels; `data-hero`      |
-| `HalfBleed`                                       | Reading on the paper beside a brown panel that runs to the screen's edge   |
-| `Rings` (`set`)                                   | Breathing hairline rings behind a block: `hero`, `panel`, `close`          |
-| `Split` (`head` slot, `sticky`)                   | Head on columns 1–4, content on 6–12 from `lg`; stacked below              |
-| `SectionHead` (`size`, `align`, `titleEmphasis`)  | Eyebrow, title (an italic accent phrase), lead                             |
-| `PageOpening` (`titleEmphasis`, `media` slot)     | The opening of a sub-page, on `HeroFrame`                                  |
-| `Eyebrow`                                         | Spaced accent capitals behind a long fading rule                           |
-| `Button` (`variant`, `size`, `block`, `decorate`) | Pill link or button: `primary`, `secondary`, `outline` (dark grounds), …   |
-| `TextLink`                                        | Quiet capitals with a moving arrow beside a primary action                 |
-| `Prose`                                           | Rich text from the content files                                           |
-| `Field`                                           | Label, control, hint and the error slot lib/form.ts fills                  |
-| `DefList`, `LinkList`, `Badge`                    | Facts, where-next rows between hairlines, a status chip                    |
-| `Quote` (`size`)                                  | A participant's words: `lg` a serif italic beside a rule, `md` in the grid |
-| `SeatMeter`                                       | An event's seats as a row of bars (taken filled, open faint)               |
-| `ThemeSwitch`                                     | Palette (flame / leaf) and day/night                                       |
-| `BreathBackdrop` / `BreathField`                  | The page's breath: fixed fields of warm light behind everything            |
+| Component                                         | Purpose                                                                                                             |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `Section` (`ground`, `space`, `defer`)            | A block: its ground, its rhythm, the container                                                                      |
+| `Container`                                       | Page width and gutters                                                                                              |
+| `HeroFrame` (`height`)                            | The dark opening: glows, rings, frame lines, side labels; `data-hero`                                               |
+| `HalfBleed`                                       | Reading on the paper beside a brown panel that runs to the screen's edge                                            |
+| `Rings` (`set`)                                   | Breathing hairline rings behind a block: `hero`, `panel`, `close`                                                   |
+| `Split` (`head` slot, `sticky`)                   | Head on columns 1–4, content on 6–12 from `lg`; stacked below                                                       |
+| `SectionHead` (`size`, `align`, `titleEmphasis`)  | Eyebrow, title (an italic accent phrase), lead                                                                      |
+| `PageOpening` (`titleEmphasis`, `media` slot)     | The opening of a sub-page, on `HeroFrame`                                                                           |
+| `Eyebrow`                                         | Spaced accent capitals behind a long fading rule                                                                    |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Pill link or button: `primary`, `secondary`, `outline` (dark grounds), …                                            |
+| `TextLink`                                        | Quiet capitals with a moving arrow beside a primary action                                                          |
+| `Prose`                                           | Rich text from the content files                                                                                    |
+| `Field`                                           | Label, control, hint and the error slot lib/form.ts fills                                                           |
+| `DefList`, `LinkList`, `Badge`                    | Facts, where-next rows between hairlines, a status chip                                                             |
+| `Quote` (`size`)                                  | A participant's words in the serif italic: `lg` beside a rule, `md` under a large accent mark, the name in capitals |
+| `SeatMeter`                                       | An event's seats as a row of bars (taken filled, open faint)                                                        |
+| `ThemeSwitch`                                     | Palette (flame / leaf) and day/night                                                                                |
+| `BreathBackdrop` / `BreathField`                  | The page's breath: fixed fields of warm light behind everything                                                     |
 
 The header is glass over the paper; over a `HeroFrame` (`over-hero:`) it turns light
 and clear until the page scrolls (`data-scrolled`, `lib/site-header.ts`). The menu

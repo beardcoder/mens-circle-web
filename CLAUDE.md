@@ -144,9 +144,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   values, voices, link rows). The Ablauf steps are numbered `01`–`04` in large serif
   figures on the dark band; everything else is told in sentences.
 - `HalfBleed` puts the reading on the paper beside a brown panel to the screen's edge
-  (Intro). The FAQ is a list between hairlines with a round plus that turns. Voices
-  (`Quote`) are never cards. Seats are counted by `SeatMeter` (a row of bars, taken
-  filled) beside the count in words.
+  (Intro). The FAQ is a list of serif questions between hairlines with a round plus
+  that turns. Voices (`Quote`) are never cards: serif italic under a large accent
+  mark, in the hairline grid, the name in capitals. Seats are counted by
+  `SeatMeter` (a row of bars, taken filled) beside the count in words.
 - Layout: a 1400px container. Titles stand above their content; `Split` puts a head
   beside its content where both earn a column. Phones stack in DOM order. Vertical
   rhythm: `section` > `group` > `item`; never inverted.
