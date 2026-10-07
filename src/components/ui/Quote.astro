@@ -1,11 +1,9 @@
 ---
-import { caps } from '@lib/ui';
-
 /**
  * A participant's words, quoted as submitted: nothing added, nothing reworded.
- * `lg` is the voice a block leads with: a large opening mark in the accent and
- * the words set big in the serif's italic. `md` stands under a heavy accent rule,
- * level with its neighbours. The name and role follow in capitals.
+ * `md` is a voice among voices: a small opening mark in the accent, the words in
+ * the sans italic, a hairline, then the name and role. `lg` is a pull quote: the
+ * serif's italic, set large beside an accent rule.
  */
 interface Props {
   quote: string;
@@ -17,30 +15,31 @@ interface Props {
 
 const { quote, author, role, size = 'md', class: className } = Astro.props;
 const lg = size === 'lg';
-const by = [author, role].filter(Boolean).join(' · ');
 ---
 
-<figure class:list={['grid content-start', lg ? 'gap-6' : 'h-full gap-5 border-t-3 border-accent pt-6', className]}>
-  {lg && (
-    <span
-      aria-hidden="true"
-      class="-mb-6 block h-[0.55em] font-serif text-[clamp(6rem,4.5rem+6vw,10rem)] leading-[0.8] text-accent select-none"
-    >
-      “
+{lg ? (
+  <figure class:list={['grid gap-5 border-l-2 border-fill pl-6 sm:pl-8', className]}>
+    <blockquote class="font-serif text-[clamp(1.5rem,1rem+2vw,2.5rem)] leading-[1.25] text-fg italic">
+      „{quote}“
+    </blockquote>
+    {(author || role) && (
+      <figcaption class="flex flex-wrap items-baseline gap-x-2 text-sm">
+        {author && <cite class="font-semibold text-fg not-italic">{author}</cite>}
+        {role && <span class="text-fg-muted">{role}</span>}
+      </figcaption>
+    )}
+  </figure>
+) : (
+  <figure class:list={['grid h-full grid-cols-[auto_minmax(0,1fr)] content-start gap-x-4', className]}>
+    <span aria-hidden="true" class="font-serif text-2xl leading-none text-accent select-none">
+      ”
     </span>
-  )}
-  <blockquote
-    class:list={[
-      'font-serif text-fg italic',
-      lg ? 'max-w-[30ch] text-[clamp(1.625rem,1.2rem+1.9vw,2.75rem)] leading-[1.2]' : 'text-xl leading-snug',
-    ]}
-  >
-    {quote}
-  </blockquote>
-  {by && (
-    <figcaption class={`${caps} flex items-center gap-3 text-fg-muted`}>
-      <span class="h-0.5 w-6 shrink-0 bg-accent" aria-hidden="true"></span>
-      <cite class="not-italic">{by}</cite>
-    </figcaption>
-  )}
-</figure>
+    <blockquote class="text-md leading-relaxed text-fg italic">{quote}</blockquote>
+    {(author || role) && (
+      <figcaption class="col-span-2 mt-8 grid gap-1 border-t border-line pt-5 text-sm">
+        {author && <cite class="font-semibold text-fg not-italic">{author}</cite>}
+        {role && <span class="text-fg-muted">{role}</span>}
+      </figcaption>
+    )}
+  </figure>
+)}

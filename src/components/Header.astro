@@ -7,119 +7,54 @@ import Container from './ui/Container.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 
 /**
- * The bar: the mark, four destinations and one action, on the page's paper at all
- * times; a hairline fades in once the page moves. Below `lg` the destinations move
- * into a full panel that opens as a circle from the toggle (lib/site-header.ts sets
- * `data-open` on the header and `--nav-origin`).
+ * The bar: the mark, the display switches, one action and the menu toggle. Over a
+ * dark opening (`over-hero:`) it starts transparent with light text and turns to
+ * glass with the page's text once the page moves (`data-scrolled`, set by
+ * lib/site-header.ts); elsewhere it is glass from the start. The menu is a full
+ * screen of deep earth that opens as a circle from the toggle (`data-open` on the
+ * header, `--nav-origin` on the menu), with three rings breathing behind the
+ * destinations.
  */
 
-const links = nav.header.links;
+const links = [...nav.header.links, ...nav.header.secondary, ...nav.header.cta];
 const ctaLinks = nav.header.cta;
-const secondary = nav.header.secondary;
 // Explicit allowlist, so new entries do not silently become speculative.
 const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
-const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]/g, '')}` : null;
+const RINGS = [
+  'w-[min(78vmin,38rem)] border-sand/20',
+  'w-[min(54vmin,26rem)] border-fill/30 animate-delay-[-0.9s]',
+  'w-[min(32vmin,16rem)] border-fill/20 bg-radial from-fill/15 to-transparent to-70% animate-delay-[-1.8s]',
+];
 ---
 
 <header
   id="header"
-  class="group/header fixed inset-x-0 top-0 z-40 bg-ground text-fg after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-line scroll-motion:after:animate-[fade-in_linear_both] scroll-motion:after:[animation-range:0_80px] scroll-motion:after:[animation-timeline:scroll(root_block)] print:hidden"
+  class:list={[
+    'group/header fixed inset-x-0 top-0 z-40 py-[clamp(0.875rem,0.65rem+0.7vw,1.25rem)] text-fg transition-colors duration-300 print:hidden',
+    // The glass: light paper, a hairline and a soft cast, blurred behind.
+    'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:border-b before:border-line/50 before:bg-ground/60 before:shadow-[0_10px_24px_-10px] before:shadow-ink/10 before:backdrop-blur-xl before:backdrop-saturate-150 before:transition-opacity before:duration-300 [@media(pointer:coarse)]:before:bg-ground',
+    // Over a dark opening: transparent with light text until the page moves.
+    'over-hero:text-bone over-hero:before:opacity-0 over-hero:data-[scrolled]:text-fg over-hero:data-[scrolled]:before:opacity-100',
+    // With the menu open the bar sits on the menu's dark ground.
+    'data-[open]:text-bone! data-[open]:before:opacity-0!',
+  ]}
 >
-  <Container class="flex min-h-header items-center gap-3 lg:gap-8">
+  <Container class="relative z-10 flex items-center gap-3">
     <a
       href="/"
       aria-label={`${site.siteName} – Startseite`}
-      class="group/logo flex min-w-0 items-center gap-3 rounded-control focus-visible:outline-offset-4"
+      class="group/logo flex min-w-0 items-center gap-4 rounded-control font-serif text-xl tracking-[-0.02em] transition-opacity duration-300 hover:opacity-90 focus-visible:outline-offset-6"
     >
       <Icon
         name="logo"
         aria-hidden="true"
-        class="size-8 shrink-0 text-flame transition-transform duration-500 ease-settle group-hover/logo:rotate-[22.5deg] sm:size-9"
+        class="size-[42px] shrink-0 transition-transform duration-500 ease-settle group-hover/logo:rotate-[22.5deg]"
       />
-      <span class="grid min-w-0 leading-tight">
-        <span class="font-serif text-[1.0625rem] font-semibold sm:text-xl">Männerkreis</span>
-        <span class="truncate text-xs text-fg-muted">
-          Niederbayern <span class="max-sm:hidden">· {site.geo.locality}</span>
-        </span>
-      </span>
+      <span class="max-[35rem]:sr-only">Männerkreis</span>
     </a>
 
-    <nav
-      id="nav"
-      aria-label="Hauptnavigation"
-      class:list={[
-        'lg:mx-auto',
-        // Phone panel: the bar's paper, so bar and panel are one surface.
-        'max-lg:invisible max-lg:pointer-events-none max-lg:fixed max-lg:inset-x-0 max-lg:top-header max-lg:bottom-0 max-lg:flex max-lg:flex-col max-lg:gap-10 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:bg-ground max-lg:px-gutter max-lg:pt-4 max-lg:pb-10',
-        'max-lg:group-data-[open]/header:visible max-lg:group-data-[open]/header:pointer-events-auto',
-        // A circle from the toggle, then each link rises; closing runs back quickly. Reduced motion: a fade.
-        'max-lg:[--nav-origin:100%_0] max-lg:motion-safe:[clip-path:circle(0_at_var(--nav-origin))] max-lg:motion-safe:[transition:clip-path_360ms_var(--ease-precise),visibility_0s_linear_360ms]',
-        'max-lg:motion-safe:group-data-[open]/header:[clip-path:circle(150vmax_at_var(--nav-origin))] max-lg:motion-safe:group-data-[open]/header:[transition:clip-path_720ms_var(--ease-emphasised),visibility_0s]',
-        'max-lg:motion-reduce:opacity-0 max-lg:motion-reduce:group-data-[open]/header:opacity-100',
-      ]}
-    >
-      <ul class="max-lg:divide-y max-lg:divide-line lg:flex lg:items-center lg:gap-1" role="list">
-        {links.map((link, i) => (
-          <li class="max-lg:overflow-clip max-lg:[overflow-clip-margin:4px]" style={`--i: ${i}`}>
-            <a
-              href={link.url}
-              data-nav-link
-              data-umami-event="nav-click"
-              data-umami-event-target={link.umamiTarget}
-              class:list={[
-                'flex min-h-11 items-center rounded-full text-fg transition-colors duration-150',
-                'lg:px-4 lg:text-[0.9375rem] lg:font-semibold lg:text-fg-soft lg:hover:bg-fg/5 lg:hover:text-fg',
-                'max-lg:py-4 max-lg:font-serif max-lg:text-[clamp(1.75rem,1.3rem+2.4vw,2.25rem)] max-lg:font-semibold',
-                'max-lg:motion-safe:translate-y-[110%] max-lg:motion-safe:transition-transform max-lg:motion-safe:duration-200',
-                'max-lg:motion-safe:group-data-[open]/header:translate-y-0 max-lg:motion-safe:group-data-[open]/header:delay-[calc(160ms+var(--i)*70ms)] max-lg:motion-safe:group-data-[open]/header:duration-700 max-lg:motion-safe:group-data-[open]/header:ease-emphasised',
-              ]}
-            >
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-
-      {/* Only inside the phone panel — the bar keeps four destinations and one action. */}
-      <div class="mt-auto grid gap-8 lg:hidden motion-safe:translate-y-4 motion-safe:opacity-0 motion-safe:transition-[opacity,translate] motion-safe:duration-150 motion-safe:group-data-[open]/header:translate-y-0 motion-safe:group-data-[open]/header:opacity-100 motion-safe:group-data-[open]/header:delay-500 motion-safe:group-data-[open]/header:duration-700">
-        <ul class="flex flex-wrap gap-2" role="list">
-          {[...ctaLinks, ...secondary].map((link, i) => (
-            <li>
-              <a
-                href={link.url}
-                data-nav-link
-                data-astro-prefetch={prefetchPaths.has(link.url) ? 'hover' : undefined}
-                class={button({ variant: i === 0 ? 'primary' : 'secondary', size: 'sm' })}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <div class="grid gap-1">
-          <p class="mb-1 text-sm font-semibold text-fg-muted">Fragen vorab?</p>
-          {site.contactEmail && (
-            <a href={`mailto:${site.contactEmail}`} class="inline-flex min-h-11 items-center text-lg text-fg">
-              {site.contactEmail}
-            </a>
-          )}
-          {phoneHref && (
-            <a href={phoneHref} class="inline-flex min-h-11 items-center text-lg text-fg">
-              {site.contactPhone}
-            </a>
-          )}
-        </div>
-
-        <div class="flex items-center justify-between border-t border-line pt-4">
-          <span class="text-sm text-fg-muted">Darstellung</span>
-          <ThemeSwitch outlined />
-        </div>
-      </div>
-    </nav>
-
-    <div class="ml-auto flex items-center gap-2 lg:ml-0">
-      <ThemeSwitch class="max-lg:hidden" />
+    <div class="ml-auto flex items-center gap-2 sm:gap-3">
+      <ThemeSwitch class="max-md:hidden" />
 
       {ctaLinks.map((link) => (
         <a
@@ -128,10 +63,7 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
           data-umami-event="cta-click"
           data-umami-event-location="header"
           data-umami-event-target={link.umamiTarget}
-          class:list={[
-            button({ variant: 'primary', size: 'sm' }),
-            'whitespace-nowrap max-lg:group-data-[open]/header:hidden',
-          ]}
+          class:list={[button({ variant: 'primary', size: 'sm' }), 'group-data-[open]/header:invisible']}
         >
           {link.label}
         </a>
@@ -143,17 +75,84 @@ const phoneHref = site.contactPhone ? `tel:${site.contactPhone.replace(/[\s\-()]
         aria-controls="nav"
         aria-expanded="false"
         aria-label="Menü öffnen"
-        class="grid size-11 place-items-center rounded-full border border-line-strong text-fg transition-colors duration-150 group-data-[open]/header:border-accent lg:hidden"
+        class="relative grid size-12 place-items-center rounded-full border border-current/20 text-current transition-[background-color,border-color] duration-300 hover:border-current/40 hover:bg-current/8"
       >
+        {/* A breath around the closed toggle. */}
         <span
           aria-hidden="true"
-          class="flex flex-col items-center gap-[5px] group-data-[open]/header:rotate-90 motion-safe:transition-[rotate] motion-safe:duration-500 motion-safe:ease-emphasised"
+          class="pointer-events-none absolute -inset-0.5 rounded-full border border-current/35 opacity-0 motion-safe:animate-[toggle-breath_4.5s_var(--ease-ambient)_infinite] group-data-[open]/header:hidden"
+        ></span>
+        <span
+          aria-hidden="true"
+          class="flex flex-col items-center gap-1.5 group-data-[open]/header:rotate-90 motion-safe:transition-[rotate] motion-safe:duration-500 motion-safe:ease-emphasised"
         >
-          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:translate-y-[6.5px] group-data-[open]/header:rotate-45 motion-safe:transition-transform motion-safe:duration-[420ms] motion-safe:ease-emphasised"></span>
-          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:scale-x-0 group-data-[open]/header:opacity-0 motion-safe:transition-[transform,opacity] motion-safe:duration-200"></span>
-          <span class="block h-[1.5px] w-4.5 bg-current group-data-[open]/header:-translate-y-[6.5px] group-data-[open]/header:-rotate-45 motion-safe:transition-transform motion-safe:duration-[420ms] motion-safe:ease-emphasised"></span>
+          <span class="block h-0.5 w-6 rounded-full bg-current group-data-[open]/header:translate-y-2 group-data-[open]/header:rotate-45 motion-safe:transition-transform motion-safe:duration-[420ms] motion-safe:ease-emphasised"></span>
+          <span class="block h-0.5 w-6 rounded-full bg-current group-data-[open]/header:scale-x-0 group-data-[open]/header:opacity-0 motion-safe:transition-[transform,opacity] motion-safe:duration-200"></span>
+          <span class="block h-0.5 w-6 rounded-full bg-current group-data-[open]/header:-translate-y-2 group-data-[open]/header:-rotate-45 motion-safe:transition-transform motion-safe:duration-[420ms] motion-safe:ease-emphasised"></span>
         </span>
       </button>
     </div>
   </Container>
+
+  <nav
+    id="nav"
+    aria-label="Hauptnavigation"
+    class:list={[
+      'surface-night fixed inset-0 grid min-h-dvh grid-rows-[1fr_auto] place-items-center overflow-y-auto overscroll-contain px-gutter pt-[calc(var(--spacing-clearance)+1.5rem)] pb-section',
+      'invisible pointer-events-none group-data-[open]/header:visible group-data-[open]/header:pointer-events-auto',
+      // A warm light behind the destinations.
+      'bg-[radial-gradient(ellipse_at_50%_32%,color-mix(in_oklch,var(--color-fill)_20%,transparent),transparent_58%),linear-gradient(155deg,var(--p-earth-deep),var(--p-earth-dark)_58%,var(--p-earth-mid))]',
+      // A circle from the toggle; closing runs back quickly. Reduced motion: a fade.
+      '[--nav-origin:100%_0] motion-safe:[clip-path:circle(0_at_var(--nav-origin))] motion-safe:[transition:clip-path_420ms_var(--ease-precise),visibility_0s_linear_420ms]',
+      'motion-safe:group-data-[open]/header:[clip-path:circle(150vmax_at_var(--nav-origin))] motion-safe:group-data-[open]/header:[transition:clip-path_820ms_var(--ease-emphasised),visibility_0s]',
+      'motion-reduce:opacity-0 motion-reduce:transition-opacity motion-reduce:group-data-[open]/header:opacity-100',
+    ]}
+  >
+    <span aria-hidden="true" class="pointer-events-none absolute inset-0 grid place-items-center">
+      {RINGS.map((ring) => (
+        <span
+          class:list={[
+            'col-start-1 row-start-1 aspect-square rounded-full border motion-safe:group-data-[open]/header:animate-[ring-breathe_7s_var(--ease-ambient)_infinite]',
+            ring,
+          ]}
+        />
+      ))}
+    </span>
+
+    <ul class="relative grid gap-[clamp(1.1rem,3vh,2.25rem)] text-center" role="list">
+      {links.map((link, i) => (
+        <li class="overflow-clip [overflow-clip-margin:0.4em]" style={`--i: ${i}`}>
+          <a
+            href={link.url}
+            data-nav-link
+            data-umami-event="nav-click"
+            data-umami-event-target={(link as { umamiTarget?: string }).umamiTarget}
+            data-astro-prefetch={prefetchPaths.has(link.url) ? 'hover' : undefined}
+            class:list={[
+              'group/link relative inline-block rounded-control font-serif text-[clamp(1.7rem,1rem+3.6vw,3.5rem)] leading-none tracking-[-0.02em] text-fg/90 transition-colors duration-300 hover:text-fg focus-visible:outline-offset-8',
+              'motion-safe:translate-y-[115%] motion-safe:transition-[translate,color] motion-safe:duration-200',
+              'motion-safe:group-data-[open]/header:translate-y-0 motion-safe:group-data-[open]/header:delay-[calc(220ms+var(--i)*70ms)] motion-safe:group-data-[open]/header:duration-700 motion-safe:group-data-[open]/header:ease-emphasised',
+            ]}
+          >
+            {link.label}
+            <span
+              aria-hidden="true"
+              class="absolute inset-x-0 -bottom-[0.22em] h-0.5 scale-x-0 rounded-full bg-fill transition-transform duration-300 ease-precise group-hover/link:scale-x-100 group-focus-visible/link:scale-x-100"
+            ></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="relative grid justify-items-center gap-6 motion-safe:opacity-0 motion-safe:transition-opacity motion-safe:duration-150 motion-safe:group-data-[open]/header:opacity-100 motion-safe:group-data-[open]/header:delay-500 motion-safe:group-data-[open]/header:duration-700">
+      <ThemeSwitch class="md:hidden" />
+      <p class="flex flex-col items-center gap-4 text-xs tracking-[0.16em] text-fg-muted uppercase">
+        <span
+          class="size-1.5 rounded-full bg-accent motion-safe:animate-[ember-pulse_4.5s_var(--ease-ambient)_infinite]"
+          aria-hidden="true"
+        ></span>
+        Männerkreis · {site.geo.locality} / Niederbayern
+      </p>
+    </div>
+  </nav>
 </header>

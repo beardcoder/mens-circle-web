@@ -1,15 +1,16 @@
 ---
 import type { EventDTO } from '@lib/types';
 import { buildIcs, googleCalendarUrl, type CalendarEvent } from '@lib/server/ics';
-import { panel } from '@lib/ui';
 import Button from '../ui/Button.astro';
-import DefList from '../ui/DefList.astro';
 
 interface Props {
   event: EventDTO;
 }
 
-/** What to know about the event beyond its date, and the way into a calendar (a native popover). */
+/**
+ * What to know about the event beyond its date, as a row of facts parted by
+ * hairlines, and the way into a calendar (a native popover).
+ */
 
 const { event } = Astro.props;
 
@@ -26,7 +27,7 @@ const ics = buildIcs(calendarEvent);
 const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
 const googleHref = googleCalendarUrl(calendarEvent);
 
-// Date and time stand in the page's title and chips; the card says what to know beyond them.
+// Date and time stand in the page's title and meta line; the row says what to know beyond them.
 const rows = [
   { label: 'Ort', value: event.location, note: 'Die genaue Adresse bekommst du mit der Anmeldebestätigung.' },
   {
@@ -41,85 +42,95 @@ const rows = [
 ].filter((row) => Boolean(row.value));
 ---
 
-<div class={panel}>
-  <h2 id="termin-fakten" class="mb-5 text-2xl text-fg">
-    Der Termin
-  </h2>
-  <DefList rows={rows} />
-
-  {ics && !event.is_past && (
-    <div class="mt-6 border-t border-line pt-6">
-      <Button variant="secondary" popovertarget="calendar-modal" data-umami-event="calendar-open">
-        <svg
-          class="size-[1.15em] shrink-0"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-          <line x1="12" y1="14" x2="12" y2="18" />
-          <line x1="10" y1="16" x2="14" y2="16" />
-        </svg>
-        In Kalender speichern
-      </Button>
-
-      {/* The popover is the card: centred in the top layer, rising in and out. */}
-      <div
-        id="calendar-modal"
-        popover
-        aria-labelledby="calendar-modal-title"
-        class="fixed inset-0 m-auto max-h-[calc(100dvh-3rem)] w-[min(380px,calc(100vw-3rem))] translate-y-3 rounded-control border border-line-strong bg-ground p-0 text-fg opacity-0 shadow-overlay transition-[opacity,translate,overlay,display] transition-discrete duration-[240ms] backdrop:bg-transparent backdrop:transition-[background-color,overlay,display] backdrop:transition-discrete backdrop:duration-[240ms] open:translate-y-0 open:opacity-100 open:backdrop:bg-overlay starting:open:translate-y-3 starting:open:opacity-0 starting:open:backdrop:bg-transparent motion-reduce:translate-y-0"
-      >
-        <div class="relative p-8 text-center">
-          <button
-            type="button"
-            aria-label="Schließen"
-            popovertarget="calendar-modal"
-            popovertargetaction="hide"
-            class="absolute top-2 right-2 grid size-11 place-items-center rounded-full text-fg-muted transition-colors duration-150 hover:bg-fg/8 hover:text-fg"
+<div class="grid gap-8">
+  <div class="flex flex-wrap items-end justify-between gap-6">
+    <h2 id="termin-fakten" class="text-display-3 text-fg">
+      Der <em>Termin</em>
+    </h2>
+    {ics && !event.is_past && (
+      <div>
+        <Button variant="secondary" popovertarget="calendar-modal" data-umami-event="calendar-open">
+          <svg
+            class="size-[1.15em] shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+            focusable="false"
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="size-5">
-              <path
-                d="M6 6l12 12M18 6L6 18"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
-          </button>
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <line x1="12" y1="14" x2="12" y2="18" />
+            <line x1="10" y1="16" x2="14" y2="16" />
+          </svg>
+          In Kalender speichern
+        </Button>
 
-          <h3 id="calendar-modal-title" class="mb-3 text-2xl text-fg">
-            In Kalender speichern
-          </h3>
-          <p class="mb-6 text-base text-fg-soft">Wähle deinen Kalender:</p>
-          <div class="flex flex-col gap-2.5">
-            <Button
-              href={googleHref}
-              variant="secondary"
-              target="_blank"
-              rel="noopener"
-              data-umami-event="calendar-download-google"
+        {/* The popover is the card: centred in the top layer, rising in and out. */}
+        <div
+          id="calendar-modal"
+          popover
+          aria-labelledby="calendar-modal-title"
+          class="fixed inset-0 m-auto max-h-[calc(100dvh-3rem)] w-[min(380px,calc(100vw-3rem))] translate-y-3 rounded-control border border-line-strong bg-ground p-0 text-fg opacity-0 shadow-overlay transition-[opacity,translate,overlay,display] transition-discrete duration-[240ms] backdrop:bg-transparent backdrop:transition-[background-color,overlay,display] backdrop:transition-discrete backdrop:duration-[240ms] open:translate-y-0 open:opacity-100 open:backdrop:bg-overlay starting:open:translate-y-3 starting:open:opacity-0 starting:open:backdrop:bg-transparent motion-reduce:translate-y-0"
+        >
+          <div class="relative p-8 text-center">
+            <button
+              type="button"
+              aria-label="Schließen"
+              popovertarget="calendar-modal"
+              popovertargetaction="hide"
+              class="absolute top-2 right-2 grid size-11 place-items-center rounded-full text-fg-muted transition-colors duration-150 hover:bg-fg/8 hover:text-fg"
             >
-              Google Calendar
-            </Button>
-            <Button
-              href={icsHref}
-              variant="secondary"
-              download="maennerkreis-straubing.ics"
-              data-umami-event="calendar-download-ics"
-            >
-              Apple/Outlook (.ics)
-            </Button>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="size-5">
+                <path
+                  d="M6 6l12 12M18 6L6 18"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+
+            <h3 id="calendar-modal-title" class="mb-3 text-2xl text-fg">
+              In Kalender speichern
+            </h3>
+            <p class="mb-6 text-base text-fg-soft">Wähle deinen Kalender:</p>
+            <div class="flex flex-col gap-2.5">
+              <Button
+                href={googleHref}
+                variant="secondary"
+                target="_blank"
+                rel="noopener"
+                data-umami-event="calendar-download-google"
+              >
+                Google Calendar
+              </Button>
+              <Button
+                href={icsHref}
+                variant="secondary"
+                download="maennerkreis-straubing.ics"
+                data-umami-event="calendar-download-ics"
+              >
+                Apple/Outlook (.ics)
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  )}
+    )}
+  </div>
+
+  <dl class="grid border-y border-line sm:grid-cols-3">
+    {rows.map((row) => (
+      <div class="grid content-start gap-2 border-line py-6 max-sm:not-first:border-t sm:px-8 sm:not-first:border-l sm:first:pl-0">
+        <dt class="text-xs font-bold tracking-[0.2em] text-fg-muted uppercase">{row.label}</dt>
+        <dd class="font-serif text-xl text-fg">{row.value}</dd>
+        {row.note && <dd class="text-sm text-fg-muted">{row.note}</dd>}
+      </div>
+    ))}
+  </dl>
 </div>

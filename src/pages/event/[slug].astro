@@ -56,24 +56,14 @@ const breadcrumbs = {
 >
   <EventHero event={event} />
 
-  {/* What the evening is beside the one thing the page asks for: facts and the
-      admin's text on the left, the registration panel on the right, holding its
-      place while the facts pass. Phones read the facts first. */}
-  <Section
-    ground="sand"
-    labelledby="termin-fakten"
-    innerClass="grid items-start gap-group lg:grid-cols-12 lg:gap-x-grid"
-  >
-    <div class="grid gap-group lg:col-span-5">
-      <EventInfo event={event} />
-      <EventAbout event={event} />
-    </div>
-    <EventRegister
-      event={event}
-      class="lg:sticky lg:top-[calc(var(--spacing-clearance)+1.5rem)] lg:col-span-6 lg:col-start-7"
-    />
+  {/* What to know beyond the date, the admin's own text, then the one thing the
+      page asks for on the dark band. */}
+  <Section labelledby="termin-fakten" innerClass="grid gap-section">
+    <EventInfo event={event} />
+    <EventAbout event={event} />
   </Section>
+  <EventRegister event={event} />
 
-  {hasMap && <EventMapSection event={event} lat={event.latitude!} lng={event.longitude!} />}
-  <EventFinalCta event={event} ground={hasMap ? 'sand' : 'default'} />
+  {hasMap && <EventMapSection event={event} lat={event.latitude!} lng={event.longitude!} ground="sand" />}
+  <EventFinalCta event={event} />
 </Layout>

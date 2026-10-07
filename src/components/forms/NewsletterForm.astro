@@ -19,7 +19,7 @@ const { context = {}, id = 'newsletter-form' } = Astro.props;
   data-form="newsletter"
   data-track="newsletter"
   data-track-context={JSON.stringify(context)}
-  class="flex max-w-lg flex-col items-stretch gap-x-4 gap-y-2 sm:flex-row sm:items-end"
+  class="flex max-w-xl flex-col items-stretch gap-x-3 gap-y-3 sm:flex-row sm:items-end"
 >
   <Honeypot />
 
@@ -37,7 +37,7 @@ const { context = {}, id = 'newsletter-form' } = Astro.props;
       autocomplete="email"
       inputmode="email"
       aria-describedby={`${id}-email-error`}
-      class={control()}
+      class={control('md', true)}
     />
   </div>
 

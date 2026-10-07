@@ -3,8 +3,8 @@ import Eyebrow from './Eyebrow.astro';
 
 /**
  * Eyebrow, title and lead of a block, stacked above its content. `center` sets
- * them on the middle axis (statements, closes). A phrase in `<em>` turns to the
- * accent.
+ * them on the middle axis. The title's accent is Playfair's italic in the accent
+ * colour: a phrase named by `titleEmphasis`, or an `<em>` in trusted HTML.
  */
 
 type Size = 'display-1' | 'display-2' | 'display-3';
@@ -14,6 +14,8 @@ interface Props {
   title?: string;
   /** The title holds trusted HTML from the content files (e.g. `<em>`). */
   titleHtml?: boolean;
+  /** A phrase of the title set in the italic accent. */
+  titleEmphasis?: string;
   titleId?: string;
   lead?: string;
   /** The lead holds trusted HTML from the content files (e.g. a link). */
@@ -36,6 +38,7 @@ const {
   eyebrow,
   title,
   titleHtml = false,
+  titleEmphasis,
   titleId,
   lead,
   leadHtml = false,
@@ -47,27 +50,31 @@ const {
 } = Astro.props;
 
 const center = align === 'center';
+const emphasis = !titleHtml && title && titleEmphasis && title.includes(titleEmphasis) ? titleEmphasis : '';
+const [before, after] = emphasis ? title!.split(emphasis) : [title, ''];
 const leadClass = [
-  'max-w-measure text-lg text-fg-soft [&_a]:text-fg [&_a]:underline [&_a]:decoration-accent/60 [&_a]:decoration-[1.5px] [&_a]:underline-offset-[0.2em] [&_a:hover]:decoration-accent',
+  'max-w-measure text-lg text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-fg',
   center && 'mx-auto',
   entrance && 'entrance:animate-fade-in-up entrance:animate-delay-120',
 ];
 const titleClass = [
-  'max-w-[24ch] text-fg wrap-break-word max-sm:hyphens-auto [&_em]:text-accent [&_em]:not-italic',
+  'max-w-[22ch] text-fg wrap-break-word max-sm:hyphens-auto',
   SIZES[size],
   center && 'mx-auto',
   entrance && 'entrance:animate-fade-in-up entrance:animate-delay-60',
 ];
 ---
 
-<div class:list={['grid gap-4', center && 'justify-items-center text-center', className]}>
+<div class:list={['grid justify-items-start gap-4', center && 'justify-items-center text-center', className]}>
   {eyebrow && <Eyebrow class:list={[entrance && 'entrance:animate-fade-in-up']}>{eyebrow}</Eyebrow>}
   {title &&
     (titleHtml ? (
       <Heading id={titleId} class:list={titleClass} set:html={title} />
     ) : (
       <Heading id={titleId} class:list={titleClass}>
-        {title}
+        {before}
+        {emphasis && <em>{emphasis}</em>}
+        {after}
       </Heading>
     ))}
   {lead && (leadHtml ? <p class:list={leadClass} set:html={lead} /> : <p class:list={leadClass}>{lead}</p>)}

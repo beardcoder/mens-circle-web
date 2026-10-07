@@ -1,10 +1,11 @@
 ---
-import BreathField from '../BreathField.astro';
-import Contours from '../Contours.astro';
 import site from '../../data/site.json';
-import { link } from '@lib/ui';
+import { Icon } from 'astro-icon/components';
 import HomeEventStatus from '../HomeEventStatus.astro';
+import Rings from '../Rings.astro';
 import NewsletterForm from '../forms/NewsletterForm.astro';
+import Button from '../ui/Button.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
@@ -13,13 +14,19 @@ interface Props {
     anchor?: string;
     eyebrow?: string;
     displayLines?: string[];
+    /** A phrase of the title set in the italic accent. */
+    titleEmphasis?: string;
     lede?: string;
     newsletterText?: string;
     whatsappText?: string;
   };
 }
 
-/** The close of the home page, at night over the hill country: the invitation and the next date side by side, then the way to hear about the next one. */
+/**
+ * The close of the home page, in three bands: the community (forest), the way to
+ * hear about the next date (earth), and the invitation with the next date as a
+ * card on the sand, rings rising behind it.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'termine';
@@ -27,44 +34,84 @@ const whatsapp = site.whatsappCommunityLink;
 const title = (data.displayLines ?? ['Dabei sein.']).join(' ');
 ---
 
+{whatsapp && data.whatsappText && (
+  <Section
+    ground="forest"
+    space="compact"
+    label="WhatsApp-Gruppe"
+    class="overflow-clip"
+    innerClass="relative grid items-center gap-x-grid gap-y-8 py-4 lg:grid-cols-12"
+    defer
+  >
+    <div class="grid justify-items-start gap-4 lg:col-span-7">
+      <Eyebrow>Zwischen den Abenden</Eyebrow>
+      <p class="max-w-prose font-serif text-2xl text-fg">{data.whatsappText}</p>
+    </div>
+    <div class="grid justify-items-start gap-3 lg:col-span-4 lg:col-start-9 lg:justify-items-end">
+      <Button
+        href={whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-umami-event="whatsapp-click"
+        data-umami-event-type="community-join"
+      >
+        <Icon name="social-whatsapp" aria-hidden="true" class="size-5" />
+        Zur WhatsApp-Gruppe
+        <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
+      </Button>
+      <p class="text-sm text-fg-muted">Kostenlos und unverbindlich</p>
+    </div>
+  </Section>
+)}
+
+<Section
+  id="newsletter"
+  ground="earth"
+  labelledby="newsletter-title"
+  class="overflow-clip"
+  innerClass="relative grid items-center gap-x-grid gap-y-8 lg:grid-cols-12"
+>
+  {/* A warm glow breathing in from the side. */}
+  <div
+    slot="before"
+    aria-hidden="true"
+    data-breath
+    class="pointer-events-none absolute -top-[30%] -right-[20%] h-[160%] w-[70%] bg-radial from-fill/16 to-transparent to-50% motion-safe:animate-ring-slow motion-safe:[animation-duration:20s]"
+  ></div>
+  <div class="grid justify-items-start gap-4 lg:col-span-6">
+    <SectionHead
+      eyebrow="In Verbindung bleiben"
+      title="Bei neuen Terminen benachrichtigen"
+      titleEmphasis="benachrichtigen"
+      titleId="newsletter-title"
+      size="display-3"
+    />
+    {data.newsletterText && <p class="max-w-measure text-base text-fg-soft">{data.newsletterText}</p>}
+  </div>
+  <div class="lg:col-span-6">
+    <NewsletterForm context={{ location: 'home-dates' }} />
+  </div>
+</Section>
+
 <Section
   id={anchor}
-  ground="night"
+  ground="sand"
   labelledby="termine-title"
   class="overflow-clip"
-  innerClass="relative grid items-start gap-y-10 lg:grid-cols-12 lg:gap-x-grid"
+  innerClass="relative grid justify-items-center gap-group text-center"
 >
-  <Contours slot="before" />
-  <BreathField slot="before" strength="strong" class="top-[40%] left-[72%] w-[min(130vw,64rem)] -translate-1/2" />
-  <div class="grid gap-8 lg:col-span-6">
-    <SectionHead eyebrow={data.eyebrow} title={title} titleId="termine-title" lead={data.lede} size="display-2" />
-
-    <div id="newsletter" class="scroll-mt-(--spacing-clearance) border-t border-line-strong pt-8">
-      <h3 class="mb-2 text-2xl text-fg">Bei neuen Terminen benachrichtigen</h3>
-      {data.newsletterText && <p class="mb-5 max-w-measure text-base text-fg-soft">{data.newsletterText}</p>}
-      <NewsletterForm context={{ location: 'home-dates' }} />
-
-      {whatsapp && (
-        <p class="mt-5 text-sm text-fg-muted" id="whatsapp-community">
-          {data.whatsappText}{' '}
-          <a
-            class={link}
-            href={whatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-umami-event="whatsapp-click"
-            data-umami-event-type="community-join"
-          >
-            Zur WhatsApp-Gruppe
-            <span class="sr-only"> (öffnet WhatsApp in einem neuen Tab)</span>
-          </a>
-          .
-        </p>
-      )}
-    </div>
-  </div>
-
-  <div class="lg:sticky lg:top-[calc(var(--spacing-clearance)+1rem)] lg:col-span-5 lg:col-start-8">
+  <Rings slot="before" set="close" class="text-earth" />
+  <SectionHead
+    eyebrow={data.eyebrow}
+    title={title}
+    titleEmphasis={data.titleEmphasis}
+    titleId="termine-title"
+    lead={data.lede}
+    size="display-2"
+    align="center"
+    class="max-w-prose"
+  />
+  <div class="w-full max-w-md text-left">
     <HomeEventStatus placement="dates" server:defer>
       <HomeEventStatus placement="dates" fallback slot="fallback" />
     </HomeEventStatus>

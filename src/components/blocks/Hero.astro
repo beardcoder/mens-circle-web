@@ -1,16 +1,14 @@
 ---
-import CropPicture from '../CropPicture.astro';
-import { resolveAssetImage } from '../../lib/images';
+import HeroFrame from '../HeroFrame.astro';
 import HomeEventStatus from '../HomeEventStatus.astro';
-import Eyebrow from '../ui/Eyebrow.astro';
-import Section from '../ui/Section.astro';
 import TextLink from '../ui/TextLink.astro';
 
 /**
- * The home page opening: the sentence, a short reading and the way in on the left;
- * Markus in the landscape on the right, with the next date as a card resting on
- * the photo. Phones: the sentence, the reading, then the photo with the card
- * overlapping its foot.
+ * The home page opening, on the dark frame (HeroFrame): the label behind its
+ * rule, the sentence set large with its phrase in the italic accent, the three
+ * words under it; at the foot the reading on the left and the next date as a card
+ * on the right, with the line down to the content. Phones stack it: sentence,
+ * reading, card.
  */
 
 interface Props {
@@ -18,89 +16,75 @@ interface Props {
     kicker?: string;
     /** The central sentence. */
     title?: string;
-    /** A phrase inside `title` set in the accent. */
+    /** A phrase inside `title` set in the italic accent. */
     titleEmphasis?: string;
     /** Three short words under the sentence. */
     claim?: string;
     lede?: string;
     secondaryLabel?: string;
     secondaryLink?: string;
-    image?: string;
-    imageAlt?: string;
-    imageCaption?: string;
   };
 }
 
 const { data } = Astro.props;
-const photo = resolveAssetImage(data.image);
 
 const title = data.title ?? '';
 const emphasis = data.titleEmphasis && title.includes(data.titleEmphasis) ? data.titleEmphasis : '';
 const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
 ---
 
-<Section
-  space="none"
-  labelledby="hero-title"
-  class="overflow-clip pt-[calc(var(--spacing-header)+clamp(1.5rem,1rem+2vw,3.5rem))] pb-section"
-  innerClass="grid grid-cols-1 items-center gap-y-12 lg:grid-cols-12 lg:gap-x-grid"
->
-  <div class="grid justify-items-start gap-6 lg:col-span-6">
-    <h1 id="hero-title" class="grid gap-5">
-      {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
-      {data.kicker && (
-        <Eyebrow as="span" class="entrance:animate-fade-in-up">
-          {data.kicker}
-        </Eyebrow>
-      )}{' '}
-      <span class="block max-w-[15ch] text-display-1 text-fg entrance:animate-fade-in-up entrance:animate-delay-60">
-        {before}
-        {emphasis && <em class="text-accent not-italic">{emphasis}</em>}
-        {after}
-      </span>{' '}
-      {data.claim && (
-        <span class="block font-serif text-xl font-normal text-fg-soft italic entrance:animate-fade-in-up entrance:animate-delay-120">
-          {data.claim}
-        </span>
+<HeroFrame labelledby="hero-title">
+  <h1 id="hero-title" class="grid justify-items-start gap-6">
+    {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
+    {data.kicker && (
+      <span class="flex items-center gap-4 font-sans text-xs font-semibold tracking-[0.25em] text-accent uppercase entrance:animate-fade-in-up">
+        <span
+          class="h-px w-[clamp(2.5rem,6vw,5rem)] bg-linear-to-r from-transparent via-current/70 via-25% to-current/70"
+          aria-hidden="true"
+        ></span>
+        {data.kicker}
+      </span>
+    )}{' '}
+    <span class="block max-w-[15ch] text-display-1 text-bone hyphens-auto wrap-break-word entrance:animate-fade-in-up entrance:animate-delay-80">
+      {before}
+      {emphasis && <em>{emphasis}</em>}
+      {after}
+    </span>{' '}
+    {data.claim && (
+      <span class="block font-serif text-xl text-fg-soft italic entrance:animate-fade-in-up entrance:animate-delay-160">
+        {data.claim}
+      </span>
+    )}
+  </h1>
+
+  <div class="mt-group grid items-end gap-x-grid gap-y-10 lg:grid-cols-12">
+    <div class="grid justify-items-start gap-6 lg:col-span-6 xl:col-span-5">
+      {data.lede && (
+        <p class="max-w-[34rem] text-lg leading-[1.9] text-sand entrance:animate-fade-in-up entrance:animate-delay-280">
+          {data.lede}
+        </p>
       )}
-    </h1>
+      {data.secondaryLabel && data.secondaryLink && (
+        <TextLink href={data.secondaryLink} class="entrance:animate-fade-in-up entrance:animate-delay-420">
+          {data.secondaryLabel}
+        </TextLink>
+      )}
+    </div>
 
-    {data.lede && (
-      <p class="max-w-[34rem] text-lg text-fg-soft entrance:animate-fade-in-up entrance:animate-delay-160">
-        {data.lede}
-      </p>
-    )}
-
-    {data.secondaryLabel && data.secondaryLink && (
-      <TextLink href={data.secondaryLink} class="entrance:animate-fade-in-up entrance:animate-delay-200">
-        {data.secondaryLabel}
-      </TextLink>
-    )}
-  </div>
-
-  {photo && (
-    <figure class="relative lg:col-span-6 lg:col-start-7 entrance:animate-fade-in entrance:animate-delay-120">
-      <div class="overflow-clip rounded-card bg-ground-alt [&_picture]:block">
-        <CropPicture
-          src={photo}
-          class="block aspect-4/3 w-full object-cover object-[30%_45%] lg:aspect-4/5"
-          breakpoint="60em"
-          narrow={{ ratio: 4 / 3, widths: [400, 640, 960], sizes: 'calc(100vw - 2.5rem)' }}
-          wide={{ ratio: 4 / 5, widths: [480, 720, 960], sizes: 'min(36rem, 45vw)' }}
-          loading="eager"
-          fetchpriority="high"
-          alt={data.imageAlt ?? ''}
-        />
-      </div>
-      {/* The next date rests on the photo: below it on phones, over its lower left corner when wide. */}
-      <div class="relative mx-4 -mt-16 sm:mx-auto sm:max-w-md lg:absolute lg:bottom-8 lg:left-4 lg:m-0 lg:w-[21rem] xl:-left-8">
+    <div class="flex items-end gap-8 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
+      <div class="min-w-0 flex-1 entrance:animate-fade-in-up entrance:animate-delay-560">
         <HomeEventStatus placement="hero" server:defer>
           <HomeEventStatus placement="hero" fallback slot="fallback" />
         </HomeEventStatus>
       </div>
-      {data.imageCaption && (
-        <figcaption class="mt-4 text-sm text-fg-muted lg:mt-3 lg:text-right">{data.imageCaption}</figcaption>
-      )}
-    </figure>
-  )}
-</Section>
+      {/* The way down: a line that sweeps toward the content. */}
+      <span
+        aria-hidden="true"
+        class="flex flex-col items-center gap-2 text-[0.625rem] tracking-[0.2em] text-sand uppercase [writing-mode:vertical-rl] max-xl:hidden"
+      >
+        Entdecken
+        <span class="block h-20 w-px bg-linear-to-b from-fill to-transparent motion-safe:animate-scroll-line"></span>
+      </span>
+    </div>
+  </div>
+</HeroFrame>

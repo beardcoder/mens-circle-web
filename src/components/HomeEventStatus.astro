@@ -1,6 +1,6 @@
 ---
 import { primaryAction, dateStatus } from '../lib/event-status';
-import { caps, card } from '../lib/ui';
+import { card } from '../lib/ui';
 import SeatMeter from './SeatMeter.astro';
 import Button from './ui/Button.astro';
 
@@ -32,45 +32,58 @@ const seatsLabel = next
     : `${next.availableSpots} von ${next.maxParticipants} Plätzen frei`
   : '';
 
-// The same lines in every state: a title, a line under it, a line about the seats.
-const title = next
-  ? next.dateLabel
+// The same lines in every state: a title on two fixed lines, a line under it, a
+// line about the seats. Every line is one line at every width, so the swap from
+// the fallback changes text, never height.
+const [titleLead, titleRest] = next
+  ? [next.dateLabel.split(', ')[0], next.dateLabel.split(', ').slice(1).join(', ')]
   : fallback
-    ? 'Termine & Anmeldung'
+    ? ['Termine', 'und Anmeldung']
     : status === 'unavailable'
-      ? 'Termine gerade nicht abrufbar'
-      : 'Zurzeit kein Termin geplant';
+      ? ['Termine gerade', 'nicht abrufbar']
+      : ['Zurzeit kein', 'Termin geplant'];
 const meta = next
   ? [next.timeRange, next.place].filter(Boolean).join(' · ')
   : fallback
     ? 'Datum, Ort und freie Plätze'
     : status === 'unavailable'
-      ? 'Auf der Terminseite steht der aktuelle Stand.'
-      : 'Lass dich benachrichtigen, sobald er feststeht.';
+      ? 'Die Terminseite zeigt den Stand.'
+      : 'Lass dich benachrichtigen.';
 // Two lines in every state, so the fallback holds the loaded card's height.
 const seatsHeadline = next ? seatsLabel : 'Ohne Vorerfahrung';
 const seatsLine = next
   ? state.isFull
-    ? 'Wird ein Platz frei, rückst du automatisch nach.'
-    : 'Für die Anmeldung genügen Name und E-Mail-Adresse.'
-  : 'Auf Spendenbasis, alle zwei bis vier Wochen.';
+    ? 'Wird ein Platz frei, rückst du nach.'
+    : 'Anmelden mit Name und E-Mail.'
+  : 'Auf Spendenbasis, alle 2–4 Wochen.';
 ---
 
 <div
   data-llms-skip
   data-status={status}
-  class:list={[card, 'grid gap-5 border-t-4 border-t-accent p-6 sm:p-7', className]}
+  class:list={[
+    // In the hero the card is glass on the dark opening.
+    placement === 'hero' ? 'rounded-card border border-line bg-raised/80 shadow-card backdrop-blur-md' : card,
+    'grid gap-6 border-l-4 border-l-fill p-6 sm:p-8',
+    className,
+  ]}
 >
   <div class="min-w-0">
-    <p class={`${caps} text-accent`}>Nächster Termin</p>
-    <p class="mt-1.5 font-serif text-2xl font-semibold text-fg">{title}</p>
-    <p class="mt-1 text-base text-fg-soft">{meta}</p>
+    <p class="flex items-center gap-3 text-[0.7rem] font-bold tracking-eyebrow text-accent uppercase">
+      <span class="h-px w-8 shrink-0 bg-current/70" aria-hidden="true"></span>
+      Nächster Termin
+    </p>
+    <p class="mt-3 font-serif text-xl text-fg">
+      <span class="block truncate">{titleLead}</span>
+      <span class="block truncate">{titleRest}</span>
+    </p>
+    <p class="mt-2 truncate text-base text-fg-soft">{meta}</p>
   </div>
 
-  <div class="grid gap-3 border-t border-line pt-4">
+  <div class="grid gap-3 border-t border-line pt-5">
     <p class="text-sm text-fg-muted">
-      <strong class="block text-base font-semibold text-fg">{seatsHeadline}</strong>
-      {seatsLine}
+      <strong class="block truncate text-base font-semibold text-fg">{seatsHeadline}</strong>
+      <span class="block truncate">{seatsLine}</span>
     </p>
     {next ? (
       <SeatMeter seats={next.maxParticipants} taken={next.maxParticipants - next.availableSpots} label={seatsLabel} />
