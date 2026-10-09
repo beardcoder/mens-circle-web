@@ -87,9 +87,10 @@ there, then paste into listmonk. The `template-contract` email test fails when a
 template reads a `.Tx.Data` field its payload does not send. The templates load the
 mail mark from `/images/logo-flame.png` by URL, so keep that file.
 
-**Map.** Leaflet on keyless OSM France HOT tiles (`TILE_URL`); keep the attribution.
-Leaflet's stylesheet sits in the `vendor` layer (`styles/leaflet.css`, declared first in
-`global.css`), so the utilities on the map root win over it.
+**Map.** The BayernAtlas web component (`<bayern-atlas>`, `atlas.bayern.de/wc.js`,
+an iframe; keyless). Its script loads only near the viewport; it reads its attributes
+once, on connect, and takes commands (`addMarker`) only after `baLoad`. `c` is lon,lat.
+Keep the attribution line under the map.
 
 **Styling.** Tailwind v4 (`@tailwindcss/vite`), CSS-first. `styles/theme.css` holds the
 tokens, variants, surfaces and keyframes; `global.css` (public, inlined into every page)
