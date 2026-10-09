@@ -5,7 +5,7 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "allowJs": true,
-    "types": ["leaflet", "bun"],
+    "types": ["bun"],
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {

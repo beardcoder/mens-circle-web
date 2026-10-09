@@ -1,10 +1,6 @@
 /**
  * Public site entry: Tailwind plus the shared design system (theme.css).
- *
- * Layer order: `vendor` (Leaflet's stylesheet, see EventMapSection.astro) is
- * declared first, so every utility wins over a third-party rule.
  */
-@layer vendor;
 @import 'tailwindcss';
 /* Animation utilities and keyframes; theme.css re-times the ones it uses. */
 @import 'tailwind-animations';

@@ -8,15 +8,14 @@ rings), rebuilt on Tailwind CSS v4 utilities over the tokens in
 
 ## Files
 
-| File                     | Role                                                                                                                                         |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/styles/theme.css`   | Tokens (`@theme`), palette primitives, variants, surfaces, the few custom utilities, keyframes, base rules. Shared.                          |
-| `src/styles/global.css`  | Public entry: `@layer vendor`, Tailwind, theme, view transitions. Excludes the admin sources (`@source not`).                                |
-| `src/styles/admin.css`   | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                                                             |
-| `tailwind-animations`    | Animation utilities and keyframes (CSS only), imported by both entries before `theme.css`.                                                   |
-| `src/styles/leaflet.css` | Leaflet's stylesheet in the `vendor` layer, imported by the map only, so utilities win over it.                                              |
-| `src/lib/ui.ts`          | Class recipes: `button()`, `control()`, `link`, `fieldLabel`, `fieldHint`, `fieldError`, `checkbox`, `card`, `panel`, `capCard`, `capPanel`. |
-| `src/components/ui/`     | The components built on them.                                                                                                                |
+| File                    | Role                                                                                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/styles/theme.css`  | Tokens (`@theme`), palette primitives, variants, surfaces, the few custom utilities, keyframes, base rules. Shared.                          |
+| `src/styles/global.css` | Public entry: Tailwind, theme, view transitions. Excludes the admin sources (`@source not`).                                                 |
+| `src/styles/admin.css`  | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                                                             |
+| `tailwind-animations`   | Animation utilities and keyframes (CSS only), imported by both entries before `theme.css`.                                                   |
+| `src/lib/ui.ts`         | Class recipes: `button()`, `control()`, `link`, `fieldLabel`, `fieldHint`, `fieldError`, `checkbox`, `card`, `panel`, `capCard`, `capPanel`. |
+| `src/components/ui/`    | The components built on them.                                                                                                                |
 
 ## Tokens
 
@@ -155,8 +154,7 @@ is a full-screen dark overlay that opens as a circle from its toggle.
 - Allowed outside utilities, each with its reason in `theme.css`/`global.css`: font
   tokens, palette primitives, surfaces, `grain`, the reduced-motion floor, the
   off-screen pause of breathing elements, the focus ring default, view-transition
-  pseudo-elements, keyframes, Leaflet's own elements (descendant variants on the map
-  root).
+  pseudo-elements, keyframes.
 - No layout shift: an island's fallback sets the same lines as its loaded state, and
   every line of the date card is one fixed line. Both serif styles are preloaded:
   the home title sets its accent in the italic.
