@@ -15,23 +15,16 @@ interface Props {
 }
 
 /**
- * Anfahrt: the address, a Leaflet map that loads only when it is about to scroll
- * into view (keyless OSM France HOT tiles, attribution kept), and the route links,
- * which work even when the map cannot draw itself. Leaflet's own elements are
- * styled through descendant variants on the map root.
+ * Anfahrt: the address, the BayernAtlas web component (`<bayern-atlas>`, an iframe of
+ * the Bavarian survey's map, which carries its own attribution) whose script loads
+ * only when the map is about to scroll into view, and the route links, which work
+ * even when the map cannot draw itself.
  */
 
 const { event, lat, lng, ground = 'default' } = Astro.props;
 
 const address =
   fullAddress({ street: event.street, postalCode: event.postal_code, city: event.city }) || event.location;
-
-const leaflet = [
-  '[&_.leaflet-control-attribution]:rounded-none [&_.leaflet-control-attribution]:bg-raised [&_.leaflet-control-attribution]:font-sans [&_.leaflet-control-attribution]:text-xs [&_.leaflet-control-attribution]:text-fg-muted [&_.leaflet-control-attribution_a]:text-fg [&_.leaflet-control-attribution_a]:underline',
-  '[&_.leaflet-popup-content-wrapper]:rounded-control [&_.leaflet-popup-content-wrapper]:border [&_.leaflet-popup-content-wrapper]:border-line-strong [&_.leaflet-popup-content-wrapper]:bg-raised [&_.leaflet-popup-content-wrapper]:font-sans [&_.leaflet-popup-content-wrapper]:text-fg [&_.leaflet-popup-tip]:bg-raised',
-  '[&_.leaflet-popup-content]:mx-4 [&_.leaflet-popup-content]:my-2 [&_.leaflet-popup-content]:text-sm [&_.leaflet-popup-content]:leading-normal',
-  '[&_.leaflet-control-zoom_a]:border-line [&_.leaflet-control-zoom_a]:bg-raised [&_.leaflet-control-zoom_a]:text-fg [&_.leaflet-control-zoom_a:hover]:bg-ground-alt',
-];
 ---
 
 <Section ground={ground} labelledby="anfahrt-title" innerClass="grid justify-items-center gap-group" defer>
@@ -54,16 +47,22 @@ const leaflet = [
         data-lat={lat}
         data-lng={lng}
         data-title={event.location}
-        data-address={address}
         aria-label="Karte zum Veranstaltungsort"
-        class:list={['group/map relative isolate block h-full overflow-hidden bg-ground-alt [contain:paint]', leaflet]}
+        class="group/map relative isolate block h-full overflow-hidden bg-ground-alt [contain:paint]"
       >
-        <div
-          data-map-canvas
-          role="application"
-          aria-label="Interaktive Karte"
-          class="relative size-full min-h-[280px] bg-ground-alt before:pointer-events-none before:absolute before:inset-0 before:z-1 before:animate-skeleton before:bg-[repeating-linear-gradient(135deg,color-mix(in_srgb,var(--color-line)_60%,transparent)_0_12px,transparent_12px_24px)] group-data-[state=failed]/map:hidden group-data-[state=ready]/map:before:hidden"
-        ></div>
+        <div class="relative size-full min-h-[280px] bg-ground-alt before:pointer-events-none before:absolute before:inset-0 before:z-1 before:animate-skeleton before:bg-[repeating-linear-gradient(135deg,color-mix(in_srgb,var(--color-line)_60%,transparent)_0_12px,transparent_12px_24px)] group-data-[state=failed]/map:hidden group-data-[state=ready]/map:before:hidden">
+          {/* Inert until the script defines it; reads its attributes once, on connect.
+                `c` is lon,lat (EPSG:4326). The map stays still until the reader
+                activates it, so it never swallows the page's scroll. */}
+          <bayern-atlas
+            data-map-canvas
+            c={`${lng},${lat}`}
+            z="16"
+            ec_map_activation="true"
+            ec_link_to_app="true"
+            class="absolute inset-0 block size-full"
+          ></bayern-atlas>
+        </div>
         <p data-map-fallback hidden class="p-4 text-sm text-balance text-fg-muted">
           Die Karte lässt sich gerade nicht laden. Die Adresse steht über dieser Box, und die Routen-Links darunter
           funktionieren weiterhin.
@@ -81,105 +80,76 @@ const leaflet = [
         Route planen (Google Maps)
       </Button>
       <Button
-        href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=17/${lat}/${lng}`}
+        href={`https://atlas.bayern.de/?c=${lng},${lat}&z=16&crh=true`}
         variant="secondary"
         target="_blank"
         rel="noopener"
       >
-        In OpenStreetMap öffnen
+        Im BayernAtlas öffnen
       </Button>
     </div>
 
-    {/* `{' '}` rather than a newline: Astro collapses the break between the
-          text and the link to nothing ("Karte vonOpenStreetMap-Mitwirkenden"). */}
     <p class="mt-3 text-center text-sm text-fg-muted">
-      Karte von{' '}
-      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener" class={link}>
-        OpenStreetMap
+      Karte:{' '}
+      <a href="https://atlas.bayern.de" target="_blank" rel="noopener" class={link}>
+        BayernAtlas
       </a>
-      -Mitwirkenden
+      , Bayerische Vermessungsverwaltung
     </p>
   </div>
 </Section>
 
 <script>
-  // Static import so Astro bundles Leaflet's CSS into the page styles; a
-  // runtime CSS import 404s under `inlineStylesheets: 'always'`.
-  import '../../styles/leaflet.css';
+  /** The BayernAtlas web component; it defines `<bayern-atlas>`. */
+  const SCRIPT_URL = 'https://atlas.bayern.de/wc.js';
 
-  const TILE_URL = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
-  const TILE_ATTRIBUTION =
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' +
-    ' &middot; Kacheln: <a href="https://www.hotosm.org/">HOT</a>' +
-    ' / <a href="https://openstreetmap.fr/">OSM France</a>';
-  /** How many tiles may fail before the map admits it cannot draw itself. */
-  const TILE_ERROR_LIMIT = 4;
-
-  async function draw(root: HTMLElement): Promise<void> {
-    const canvas = root.querySelector<HTMLElement>('[data-map-canvas]');
-    if (!canvas) return;
-    const { lat, lng, title = '', address = '' } = root.dataset;
-    const position: [number, number] = [Number(lat), Number(lng)];
-    root.dataset.state = 'loading';
-
-    const { default: L } = await import('leaflet');
-    const map = L.map(canvas, { scrollWheelZoom: false }).setView(position, 16);
-
-    let tileErrors = 0;
-    L.tileLayer(TILE_URL, { maxZoom: 20, subdomains: 'abc', attribution: TILE_ATTRIBUTION })
-      .on('tileerror', () => {
-        if (++tileErrors < TILE_ERROR_LIMIT) return;
-        root.dataset.state = 'failed';
-        root.querySelector<HTMLElement>('[data-map-fallback]')!.hidden = false;
-      })
-      .on('tileload', () => (tileErrors = 0))
-      .addTo(map);
-
-    // Phones hand the route to the native maps app.
-    const directions = matchMedia('(pointer: coarse)').matches
-      ? `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(address || title)})`
-      : `https://www.openstreetmap.org/directions?to=${lat}%2C${lng}`;
-    const popup = document.createElement('div');
-    popup.append(
-      Object.assign(document.createElement('strong'), {
-        className: 'mb-1 inline-block font-serif text-md font-normal',
-        textContent: title,
-      }),
-    );
-    if (address) popup.append(document.createElement('br'), address);
-    popup.append(
-      document.createElement('br'),
-      Object.assign(document.createElement('a'), {
-        className: 'mt-2 inline-block font-semibold text-accent underline underline-offset-[0.2em]',
-        href: directions,
-        target: '_blank',
-        rel: 'noopener',
-        textContent: 'Route planen',
-      }),
-    );
-
-    const icon = L.divIcon({
-      // Replaces Leaflet's boxed `leaflet-div-icon`.
-      className: 'border-0 bg-transparent text-accent',
-      html:
-        '<svg viewBox="0 0 32 44" aria-hidden="true" focusable="false" class="size-full fill-current">' +
-        '<path d="M16 0C7.2 0 0 7 0 15.5 0 27 16 44 16 44s16-17 16-28.5C32 7 24.8 0 16 0z"/>' +
-        '<circle cx="16" cy="15.5" r="6" fill="#fff"/>' +
-        '</svg>',
-      iconSize: [32, 44],
-      iconAnchor: [16, 44],
-      popupAnchor: [0, -40],
-    });
-    L.marker(position, { icon }).addTo(map).bindPopup(popup);
-
-    // Scroll-zoom only once the reader has clicked into the map.
-    canvas.addEventListener('click', () => map.scrollWheelZoom.enable());
-    canvas.addEventListener('mouseleave', () => map.scrollWheelZoom.disable());
-
-    if (root.dataset.state !== 'failed') root.dataset.state = 'ready';
+  interface BayernAtlas extends HTMLElement {
+    addMarker(coordinate: [number, number], options?: { id?: string; label?: string }): string;
   }
 
-  // Leaflet loads only when the map is about to scroll into view.
+  let script: Promise<void> | undefined;
+
+  /** Loads the component script once, however many maps a page has. */
+  function loadScript(): Promise<void> {
+    script ??= new Promise((resolve, reject) => {
+      const element = Object.assign(document.createElement('script'), { type: 'module', src: SCRIPT_URL });
+      element.addEventListener('load', () => resolve());
+      element.addEventListener('error', () => reject(new Error(`Could not load ${SCRIPT_URL}`)));
+      document.head.append(element);
+    });
+    return script;
+  }
+
+  function fail(root: HTMLElement): void {
+    root.dataset.state = 'failed';
+    root.querySelector<HTMLElement>('[data-map-fallback]')!.hidden = false;
+  }
+
+  async function draw(root: HTMLElement): Promise<void> {
+    const map = root.querySelector<BayernAtlas>('[data-map-canvas]');
+    if (!map) return;
+    const { lat, lng, title = '' } = root.dataset;
+    root.dataset.state = 'loading';
+
+    // The iframe answers with `baLoad`; commands sent before it would be lost.
+    map.addEventListener(
+      'baLoad',
+      () => {
+        // A label makes the marker selectable, which shows the place's name.
+        map.addMarker([Number(lng), Number(lat)], { label: title });
+        root.dataset.state = 'ready';
+      },
+      { once: true },
+    );
+
+    try {
+      await loadScript();
+    } catch {
+      fail(root);
+    }
+  }
+
+  // The component loads only when the map is about to scroll into view.
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {

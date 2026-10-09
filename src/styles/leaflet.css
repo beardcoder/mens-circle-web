@@ -1,4 +1,0 @@
-/* Leaflet's own stylesheet, put into the `vendor` layer that global.css declares
-   first, so the utilities on the map (EventMapSection.astro) win over it. Imported
-   by that component only, so no other page carries it. */
-@import 'leaflet/dist/leaflet.css' layer(vendor);
