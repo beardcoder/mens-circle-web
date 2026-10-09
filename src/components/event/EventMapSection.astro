@@ -100,7 +100,11 @@ const address =
 </Section>
 
 <script>
-  /** The BayernAtlas web component; it defines `<bayern-atlas>`. */
+  /**
+   * The BayernAtlas web component; it defines `<bayern-atlas>`. A classic script, not
+   * `type="module"` as its docs show: a module is fetched with CORS, and atlas.bayern.de
+   * allows only a few origins. The file is a plain bundle, so it runs either way.
+   */
   const SCRIPT_URL = 'https://atlas.bayern.de/wc.js';
 
   interface BayernAtlas extends HTMLElement {
@@ -112,7 +116,7 @@ const address =
   /** Loads the component script once, however many maps a page has. */
   function loadScript(): Promise<void> {
     script ??= new Promise((resolve, reject) => {
-      const element = Object.assign(document.createElement('script'), { type: 'module', src: SCRIPT_URL });
+      const element = Object.assign(document.createElement('script'), { src: SCRIPT_URL });
       element.addEventListener('load', () => resolve());
       element.addEventListener('error', () => reject(new Error(`Could not load ${SCRIPT_URL}`)));
       document.head.append(element);

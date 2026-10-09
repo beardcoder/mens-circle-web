@@ -88,7 +88,9 @@ template reads a `.Tx.Data` field its payload does not send. The templates load 
 mail mark from `/images/logo-flame.png` by URL, so keep that file.
 
 **Map.** The BayernAtlas web component (`<bayern-atlas>`, `atlas.bayern.de/wc.js`,
-an iframe; keyless). Its script loads only near the viewport; it reads its attributes
+an iframe; keyless). Its script loads only near the viewport, as a classic script:
+`type="module"` needs CORS, which atlas.bayern.de grants only to localhost and a few
+origins, so it worked locally and failed live; it reads its attributes
 once, on connect, and takes commands (`addMarker`) only after `baLoad`. `c` is lon,lat.
 Keep the attribution line under the map.
 
