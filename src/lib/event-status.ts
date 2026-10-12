@@ -1,7 +1,8 @@
-/** The next-date state for every surface; `unavailable` must never read as "no date planned". */
+/** The next-date state and the one view every event summary renders; `unavailable` must never read as "no date planned". */
 
+import site from '../data/site.json';
 import { eventPlace } from './event-meta';
-import { formatDayMonthYearDE, formatWeekdayDE, timeRange } from './server/format';
+import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from './server/format';
 import type { EventDTO } from './types';
 
 export type NextEventStatus = 'scheduled' | 'none' | 'unavailable';
@@ -45,47 +46,132 @@ export const dateStatus = (status: NextEventStatus, event: EventDTO | null): Dat
   return { status, next, isFull: Boolean(next?.isFull) };
 };
 
-export interface PrimaryAction {
+/**
+ * A fee as a short main value and a note: "Auf Spendenbasis (Empfehlung 15–25 €)"
+ * becomes "Auf Spendenbasis" and "Empfehlung 15–25 €", so a long fee never blows
+ * up a row of facts. Without a fee: the circle's standing rule.
+ */
+export const splitFee = (costBasis = ''): { main: string; note: string } => {
+  const fee = costBasis.trim();
+  if (!fee) return { main: 'Spendenbasis', note: 'Du gibst, was für dich machbar ist' };
+  const bracketed = /^(.+?)\s*\((.+)\)\s*$/.exec(fee);
+  if (bracketed) return { main: bracketed[1].trim(), note: bracketed[2].trim() };
+  const parted = /^(.{4,28}?)\s*[,;–]\s+(.+)$/.exec(fee);
+  if (parted) return { main: parted[1].trim(), note: parted[2].trim() };
+  return { main: fee, note: '' };
+};
+
+/** One row of an event summary: a term and its value, each one line. */
+interface SummaryRow {
   label: string;
-  href: string;
-  /** Orientation shown above the action. Never a claim we cannot back: a failed
-   *  read says so rather than inventing an empty calendar. */
-  note: string;
+  value: string;
 }
 
-/** `fallbackHref` is where "get notified" points; each page has its own block. */
-export const primaryAction = (state: DateStatus, fallbackHref = '#termine'): PrimaryAction => {
-  const { status, next, isFull } = state;
+/**
+ * Everything an event summary shows, in every state. Scheduled and past dates
+ * name time, place, fee and seats; the other states keep the same four rows with
+ * what is always true (rhythm, place, fee), so a loading summary and a loaded one
+ * stand the same height.
+ */
+export interface SummaryView {
+  state: 'loading' | 'open' | 'full' | 'past' | 'none' | 'unavailable';
+  /** The label above the date: "Nächster Termin", "Termin", … */
+  kicker: string;
+  /** Two fixed lines: the weekday and the date ("Freitag," / "16. Oktober 2026"), or the state in words. */
+  title: [string, string];
+  /** ISO day for `<time>`, when the title is a date. */
+  datetime: string;
+  rows: SummaryRow[];
+  /** The situational action; `null` where the page already offers it. */
+  action: { label: string; href: string } | null;
+}
 
-  if (status === 'unavailable') {
+/** "Freitag, 16. Oktober 2026" → ["Freitag,", "16. Oktober 2026"]. */
+const dateLines = (dateLabel: string): [string, string] => {
+  const [weekday, ...rest] = dateLabel.split(', ');
+  return rest.length ? [`${weekday},`, rest.join(', ')] : [dateLabel, ''];
+};
+
+const RHYTHM_ROWS = (place = site.geo.locality): SummaryRow[] => [
+  { label: 'Rhythmus', value: 'Alle 2–4 Wochen' },
+  { label: 'Ort', value: place },
+  { label: 'Beitrag', value: 'Auf Spendenbasis' },
+];
+
+const seatsText = (event: { isFull: boolean; availableSpots: number; maxParticipants: number }): string =>
+  event.isFull ? 'Ausgebucht · Warteliste' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`;
+
+const OVERVIEW = { label: 'Termine ansehen', href: '/event' };
+
+/** No date to show: none planned, or none readable. The rows keep what is always true. */
+const noDateView = (unavailable: boolean, whenNone: 'overview' | 'notify', kicker: string): SummaryView => ({
+  state: unavailable ? 'unavailable' : 'none',
+  kicker,
+  title: unavailable ? ['Termine gerade', 'nicht abrufbar'] : ['Zurzeit kein', 'Termin geplant'],
+  datetime: '',
+  rows: [...RHYTHM_ROWS(), { label: 'Status', value: unavailable ? 'Siehe Terminseite' : 'Neuer Termin folgt' }],
+  action:
+    unavailable || whenNone === 'overview' ? OVERVIEW : { label: 'Termine per E-Mail erhalten', href: '#newsletter' },
+});
+
+/**
+ * The summary of the next date, for the home page: its action points to the event;
+ * with none planned to the overview (`overview`, the hero) or to the e-mail
+ * notification (`notify`, beside the form). `null` is the island's fallback.
+ */
+export const nextDateView = (
+  state: DateStatus | null,
+  whenNone: 'overview' | 'notify' = 'overview',
+  kicker = 'Nächster Termin',
+): SummaryView => {
+  if (!state) {
     return {
-      label: 'Termine ansehen',
-      href: '/event',
-      note: 'Die Termine lassen sich gerade nicht laden. Auf der Terminseite steht der aktuelle Stand.',
+      state: 'loading',
+      kicker,
+      title: ['Termine', 'und Anmeldung'],
+      datetime: '',
+      rows: [...RHYTHM_ROWS(), { label: 'Status', value: 'Siehe Terminseite' }],
+      action: OVERVIEW,
     };
   }
-
-  if (status === 'none' || !next) {
-    return {
-      label: 'Bei neuen Terminen benachrichtigen',
-      href: fallbackHref,
-      note: 'Zurzeit steht kein neuer Termin fest.',
-    };
-  }
-
-  const when = [next.dateLabel, next.timeRange].filter(Boolean).join(', ');
-
-  if (isFull) {
-    return {
-      label: 'Auf die Warteliste',
-      href: `/event/${next.slug}`,
-      note: `Der Termin am ${when} in ${next.place} ist ausgebucht.`,
-    };
-  }
-
+  const { status, next } = state;
+  if (status === 'unavailable' || !next) return noDateView(status === 'unavailable', whenNone, kicker);
   return {
-    label: 'Zur Anmeldung',
-    href: `/event/${next.slug}`,
-    note: `Nächster Termin: ${when} in ${next.place}.`,
+    state: next.isFull ? 'full' : 'open',
+    kicker,
+    title: dateLines(next.dateLabel),
+    datetime: next.slug,
+    rows: [
+      { label: 'Zeit', value: next.timeRange || 'Abends' },
+      { label: 'Ort', value: next.place },
+      { label: 'Beitrag', value: splitFee(next.costBasis).main },
+      { label: 'Plätze', value: seatsText(next) },
+    ],
+    action: { label: next.isFull ? 'Auf die Warteliste' : 'Zum nächsten Termin', href: `/event/${next.slug}` },
+  };
+};
+
+/** The summary of one event, as listed on /event or opening its own page. */
+export const eventView = (event: EventDTO, kicker: string, withAction = true): SummaryView => {
+  const next = summarizeNextEvent(event)!;
+  const state = event.is_past ? 'past' : event.is_full ? 'full' : 'open';
+  return {
+    state,
+    kicker: state === 'full' ? `${kicker} · ausgebucht` : kicker,
+    title: dateLines(next.dateLabel),
+    datetime: isoDay(event.event_date),
+    rows: [
+      { label: 'Zeit', value: next.timeRange || 'Abends' },
+      { label: 'Ort', value: next.place },
+      { label: 'Beitrag', value: splitFee(next.costBasis).main },
+      {
+        label: 'Plätze',
+        value: event.is_past ? 'Hat stattgefunden' : seatsText(next),
+      },
+    ],
+    action:
+      withAction && !event.is_past
+        ? { label: event.is_full ? 'Auf die Warteliste' : 'Zur Anmeldung', href: `/event/${event.slug}` }
+        : null,
   };
 };

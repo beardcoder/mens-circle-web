@@ -22,19 +22,11 @@
         "umamiTarget": "faq"
       }
     ],
-    "cta": [
-      {
-        "label": "Termine",
-        "url": "/event",
-        "umamiTarget": "termine"
-      }
-    ],
-    "secondary": [
-      {
-        "label": "Meine Haltung",
-        "url": "/warum-ich-den-maennerkreis-leite"
-      }
-    ]
+    "cta": {
+      "label": "Termine",
+      "url": "/event",
+      "umamiTarget": "termine"
+    }
   },
   "footerPrimary": [
     {
@@ -64,8 +56,8 @@
   ],
   "footerContact": [
     {
-      "label": "Bei neuen Terminen benachrichtigen",
-      "url": "/#termine"
+      "label": "Termine per E-Mail erhalten",
+      "url": "/#newsletter"
     }
   ],
   "footerLegal": [

@@ -7,30 +7,23 @@ import Split from '../ui/Split.astro';
 
 interface Props {
   event: EventDTO;
-  ground?: 'default' | 'sand';
 }
 
-/** The page's exit: where someone who has read the date goes next. */
+/** The page's exit, as a compact band: where someone who has read the date goes next. */
 
-const { event, ground = 'default' } = Astro.props;
+const { event } = Astro.props;
 
 const items = [
-  ...(event.is_past ? [{ href: '/event#benachrichtigung', title: 'Bei neuen Terminen benachrichtigen' }] : []),
+  ...(event.is_past ? [{ href: '/event#benachrichtigung', title: 'Termine per E-Mail erhalten' }] : []),
   { href: '/event', title: 'Alle Termine' },
   { href: '/#ueber', title: 'Worum es an so einem Abend geht' },
   { href: '/warum-ich-den-maennerkreis-leite', title: 'Warum ich den Männerkreis leite', prefetch: true },
 ];
 ---
 
-<Section ground={ground} labelledby="weiter-title" defer>
+<Section ground="alt" space="band" labelledby="weiter-title">
   <Split>
-    <SectionHead
-      slot="head"
-      eyebrow="Weiter"
-      title="Wohin als Nächstes"
-      titleEmphasis="Nächstes"
-      titleId="weiter-title"
-    />
+    <SectionHead slot="head" eyebrow="Weiter" title="Wohin als Nächstes" titleId="weiter-title" size="sub" />
     <LinkList items={items} />
   </Split>
 </Section>
