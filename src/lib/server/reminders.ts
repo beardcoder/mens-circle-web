@@ -1,4 +1,5 @@
 import { and, asc, eq, gte, inArray, isNull, lt } from 'drizzle-orm';
+
 import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import { ACTIVE_REGISTRATION_STATUSES, events, participants, registrations } from './db/schema';
@@ -12,6 +13,7 @@ const createWindow = () => {
   const now = new Date();
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   const tomorrow = new Date(today.getTime() + 86_400_000);
+
   return {
     from: today.toISOString(),
     to: new Date(tomorrow.getTime() + 86_400_000).toISOString(),
@@ -45,10 +47,13 @@ const queryPending = (from: string, to: string) =>
 
 const dispatch = async (row: PendingRow, { isToday, stamp }: Window) => {
   const date = toDate(row.event.eventDate);
+
   if (!date) return;
 
   const accepted = await sendEventReminder(row.event, row.participant, isToday(date));
+
   if (!accepted) return;
+
   await db.update(registrations).set({ reminderSentAt: stamp }).where(eq(registrations.id, row.regId));
 };
 

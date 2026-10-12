@@ -1,5 +1,6 @@
 ---
 import { button, card } from '@lib/ui';
+
 import Badge from '../ui/Badge.astro';
 import AdminHead from './AdminHead.astro';
 import CapacityRing from './CapacityRing.astro';
@@ -23,7 +24,9 @@ const publishedCount = events.filter((e) => e.isPublished).length;
 
 function fmtDate(iso: string): string {
   const d = new Date(iso);
+
   if (Number.isNaN(d.getTime())) return iso;
+
   return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
 }
 ---
@@ -92,19 +95,25 @@ function fmtDate(iso: string): string {
 
 <script>
   import { actions } from 'astro:actions';
+
   import { adminToast, bindOnce, ok } from '@lib/admin';
 
   bindOnce('#event-list', (list) => {
     list.addEventListener('click', async (e) => {
       const btn = (e.target as HTMLElement).closest('[data-delete]') as HTMLButtonElement | null;
+
       if (!btn) return;
+
       const row = btn.closest('[data-id]') as HTMLElement;
       const { id, title } = row.dataset;
+
       if (!id || !confirm(`„${title}" wirklich löschen?`)) return;
 
       btn.disabled = true;
+
       if (!ok(await actions.deleteEvent({ id }))) {
         btn.disabled = false;
+
         return;
       }
 

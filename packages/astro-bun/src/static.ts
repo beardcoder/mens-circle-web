@@ -9,6 +9,7 @@
  * - Large files become file routes: streamed with sendfile, Last-Modified natively.
  */
 import { join } from 'node:path';
+
 import { pageRoute, type RuntimeConfig, type StaticHeaders } from './shared';
 
 export interface StaticRouteOptions extends Pick<RuntimeConfig, 'assets' | 'staticCacheControl' | 'trailingSlash'> {
@@ -39,9 +40,13 @@ const ERROR_PAGE = /^\/(?:404|500)(?:\.html|\/index\.html)$/;
  */
 export function urlPathsFor(file: string, trailingSlash: RuntimeConfig['trailingSlash']): string[] {
   const route = pageRoute(file);
+
   if (!route) return [file];
+
   if (route === '/' || trailingSlash === 'never') return [file, route];
+
   if (trailingSlash === 'always') return [file, `${route}/`];
+
   return [file, route, `${route}/`];
 }
 
@@ -50,12 +55,16 @@ function headersFor(file: string, type: string, options: StaticRouteOptions): He
     'content-type': type,
     'cache-control': file.startsWith(`/${options.assets}/`) ? IMMUTABLE : options.staticCacheControl,
   });
+
   for (const [name, value] of Object.entries(options.headers[file] ?? {})) headers.set(name, value);
+
   // Text types get an explicit charset, also when an override names the type without one.
   const contentType = headers.get('content-type') ?? type;
+
   if (contentType.startsWith('text/') && !contentType.includes('charset')) {
     headers.set('content-type', `${contentType};charset=utf-8`);
   }
+
   return headers;
 }
 
@@ -63,6 +72,7 @@ async function responseFor(file: string, options: StaticRouteOptions): Promise<R
   const blob = Bun.file(join(options.clientDir, file));
   const headers = headersFor(file, blob.type, options);
   const buffered = blob.size <= (options.maxBufferedSize ?? MAX_BUFFERED_SIZE);
+
   return new Response(buffered ? await blob.bytes() : blob, { headers });
 }
 
@@ -72,20 +82,26 @@ export async function createStaticRoutes(options: StaticRouteOptions): Promise<S
     new Bun.Glob('**/*').scan({ cwd: options.clientDir, onlyFiles: true, dot: true }),
     (file) => `/${file.replaceAll('\\', '/')}`,
   );
+
   const routes: StaticRoutes = {};
   const errorPages: StaticFiles['errorPages'] = {};
+
   await Promise.all(
     files
       // `:` and `*` would turn a file name into a route pattern.
       .filter((file) => !/[:*]/.test(file))
       .map(async (file) => {
         const response = await responseFor(file, options);
+
         if (ERROR_PAGE.test(file)) {
           errorPages[file] = response;
+
           return;
         }
+
         for (const path of urlPathsFor(file, options.trailingSlash)) routes[path] = { GET: response };
       }),
   );
+
   return { routes, errorPages };
 }

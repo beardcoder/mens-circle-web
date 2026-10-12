@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 import { and, asc, desc, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
+
 import type { EventDTO } from '../types';
+import { config, listmonkApiConfigured } from './config';
 import { db } from './db';
 import type { Event, NewEvent } from './db/schema';
 import { ACTIVE_REGISTRATION_STATUSES, events, registrations } from './db/schema';
-import { config, listmonkApiConfigured } from './config';
 import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
 import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
 
@@ -17,18 +18,23 @@ export const countActiveRegistrations = async (eventId: string): Promise<number>
     .select({ c: sql<number>`count(*)` })
     .from(registrations)
     .where(and(eq(registrations.eventId, eventId), holdsASeat()));
+
   return rows[0]?.c ?? 0;
 };
 
 export const isEventPast = (ev: Pick<Event, 'eventDate'>): boolean => {
   const d = toDate(ev.eventDate);
+
   if (!d) return false;
+
   const endOfDay = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 23, 59, 59));
+
   return endOfDay.getTime() < Date.now();
 };
 
 const eventDtoWithCount = (ev: Event, activeCount: number): EventDTO => {
   const available = Math.max(0, ev.maxParticipants - activeCount);
+
   return {
     id: ev.id,
     title: ev.title,
@@ -69,6 +75,7 @@ const eventWithCapacityQuery = () =>
 
 const startOfTodayIso = (): string => {
   const now = new Date();
+
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0)).toISOString();
 };
 
@@ -77,6 +84,7 @@ const getNextEventWithCapacity = async (): Promise<EventWithCapacity | null> => 
     .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, startOfTodayIso())))
     .orderBy(asc(events.eventDate))
     .limit(1);
+
   return rows[0] ?? null;
 };
 
@@ -86,6 +94,7 @@ export const getPublishedEventBySlug = async (slug: string): Promise<Event | nul
     .from(events)
     .where(and(eq(events.slug, slug), eq(events.isPublished, true), isNull(events.deleted)))
     .limit(1);
+
   return rows[0] ?? null;
 };
 
@@ -106,15 +115,18 @@ export const listPublishedEventsForSitemap = async (): Promise<SitemapEvent[]> =
 
 export const getEventById = async (id: string): Promise<Event | null> => {
   const rows = await db.select().from(events).where(eq(events.id, id)).limit(1);
+
   return rows[0] ?? null;
 };
 
 const tryEventDto = async (fetch: () => Promise<EventWithCapacity | null>, label: string): Promise<EventDTO | null> => {
   try {
     const row = await fetch();
+
     return row ? eventDtoWithCount(row.event, row.activeCount) : null;
   } catch (err) {
     console.error(`[events] ${label} failed`, String(err));
+
     return null;
   }
 };
@@ -146,10 +158,13 @@ export const fetchUpcomingEventsState = async (
       .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, startOfTodayIso())))
       .orderBy(asc(events.eventDate))
       .limit(limit);
+
     const list = rows.map((row) => eventDtoWithCount(row.event, row.activeCount));
+
     return { status: list.length > 0 ? 'scheduled' : 'none', events: list };
   } catch (err) {
     console.error('[events] fetchUpcomingEventsState failed', String(err));
+
     return { status: 'unavailable', events: [] };
   }
 };
@@ -159,37 +174,49 @@ export const getEventBySlug = (slug: string): Promise<EventDTO | null> =>
     const rows = await eventWithCapacityQuery()
       .where(and(eq(events.slug, slug), eq(events.isPublished, true), isNull(events.deleted)))
       .limit(1);
+
     return rows[0] ?? null;
   }, 'getEventBySlug');
 
 const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
   const base = String(eventDate).slice(0, 10);
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(base)) {
     return `event-${Date.now().toString(36)}`;
   }
+
   let candidate = base;
   let n = 2;
+
   for (;;) {
     const rows = await db.select({ id: events.id }).from(events).where(eq(events.slug, candidate)).limit(1);
     const hit = rows[0];
+
     if (!hit || (excludeId && hit.id === excludeId)) break;
+
     candidate = `${base}-${n}`;
     n++;
   }
+
   return candidate;
 };
 
 export const ensureEventList = async (ev: Event): Promise<number> => {
   if (!listmonkApiConfigured()) return 0;
+
   if (ev.listmonkListId && ev.listmonkListId > 0) return ev.listmonkListId;
+
   const id = await createList(eventListName(ev.title, formatDateShortDE(ev.eventDate)));
+
   if (!id) return 0;
+
   try {
     await db.update(events).set({ listmonkListId: id }).where(eq(events.id, ev.id));
     ev.listmonkListId = id;
   } catch (err) {
     console.error('[events] failed to persist listmonk_list_id', ev.id, String(err));
   }
+
   return id;
 };
 
@@ -266,9 +293,11 @@ export const sendEventNewsletter = async (
   intro: string,
 ): Promise<{ ok: boolean; campaignId: number; error?: string }> => {
   const ev = await getEventById(eventId);
+
   if (!ev) return { ok: false, campaignId: 0, error: 'Veranstaltung nicht gefunden.' };
 
   const dateShort = formatDateShortDE(ev.eventDate);
+
   return sendNewsletterCampaign({
     name: `Event-Newsletter: ${ev.title}${dateShort ? ` (${dateShort})` : ''}`,
     subject: subject.trim(),
@@ -337,35 +366,45 @@ const inputToColumns = (input: EventInput): Partial<NewEvent> => ({
 
 export const createEvent = async (input: EventInput): Promise<Event> => {
   const slug = input.slug?.trim() || (await generateSlug(input.eventDate));
+
   const rows = await db
     .insert(events)
     .values({ ...(inputToColumns(input) as NewEvent), slug })
     .returning();
+
   const created = rows[0];
+
   void ensureEventList(created).catch(() => {});
+
   return created;
 };
 
 export const updateEvent = async (id: string, input: EventInput): Promise<Event | null> => {
   const existing = await getEventById(id);
+
   if (!existing) return null;
+
   const slug = input.slug?.trim() || existing.slug || (await generateSlug(input.eventDate, id));
+
   const rows = await db
     .update(events)
     .set({ ...inputToColumns(input), slug })
     .where(eq(events.id, id))
     .returning();
+
   const updated = rows[0] ?? null;
 
   if (updated && updated.listmonkListId > 0) {
     const titleChanged = existing.title !== updated.title;
     const dateChanged = existing.eventDate !== updated.eventDate;
+
     if (titleChanged || dateChanged) {
       void renameList(updated.listmonkListId, eventListName(updated.title, formatDateShortDE(updated.eventDate))).catch(
         () => {},
       );
     }
   }
+
   return updated;
 };
 

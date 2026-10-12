@@ -1,9 +1,11 @@
 ---
 /** Admin shell — the public design system, in its dark mode. */
 import '../styles/admin.css';
+
 import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import { Icon } from 'astro-icon/components';
+
 import { button } from '@lib/ui';
 
 interface Props {
@@ -15,6 +17,7 @@ const { title, bare = false } = Astro.props;
 const admin = Astro.locals.admin;
 
 const path = Astro.url.pathname;
+
 const links = [
   { href: '/admin', label: 'Veranstaltungen', active: path === '/admin' || path.startsWith('/admin/events') },
   { href: '/admin/testimonials', label: 'Stimmen', active: path.startsWith('/admin/testimonials') },
@@ -82,10 +85,12 @@ const links = [
 
     <script>
       import { actions } from 'astro:actions';
+
       import type { AdminToastKind } from '@lib/admin';
 
       const TOAST =
         'translate-y-2 border-2 bg-raised px-4 py-3 text-sm font-semibold opacity-0 shadow-overlay transition-[opacity,translate] duration-150 data-[in]:translate-y-0 data-[in]:opacity-100';
+
       const TONES: Record<AdminToastKind, string> = {
         ok: 'border-success text-success',
         err: 'border-danger text-danger',
@@ -96,8 +101,11 @@ const links = [
       if (!window.adminToast) {
         window.adminToast = (kind: AdminToastKind, text: string) => {
           const host = document.getElementById('toasts');
+
           if (!host) return;
+
           const el = document.createElement('div');
+
           el.className = `${TOAST} ${TONES[kind]}`;
           el.setAttribute('role', kind === 'err' ? 'alert' : 'status');
           el.textContent = text;
@@ -113,6 +121,7 @@ const links = [
       // The button is a fresh node after each swap, so re-bind every time.
       document.addEventListener('astro:page-load', () => {
         const btn = document.getElementById('admin-logout');
+
         btn?.addEventListener('click', async () => {
           await actions.logout();
           window.location.href = '/admin/login';

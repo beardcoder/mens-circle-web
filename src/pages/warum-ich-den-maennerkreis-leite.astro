@@ -1,13 +1,15 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import type { Block } from '../components/PageContent.astro';
-import PageContent from '../components/PageContent.astro';
-import page from '../content/warum-ich-den-maennerkreis-leite.json';
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import { canonicalUrl } from '@lib/canonical';
 
+import type { Block } from '../components/PageContent.astro';
+import PageContent from '../components/PageContent.astro';
+import page from '../content/warum-ich-den-maennerkreis-leite.json';
+import Layout from '../layouts/Layout.astro';
+
 // Prerendered: content only, no live data.
 export const prerender = true;
+
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 const blocks = page.blocks as Block[];
@@ -22,6 +24,7 @@ const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 const schemas: Record<string, unknown>[] = [];
 
 const faq = blocks.find((b) => b.type === 'faq');
+
 if (faq?.data?.items?.length) {
   schemas.push({
     '@context': 'https://schema.org',

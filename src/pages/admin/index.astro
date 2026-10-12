@@ -1,9 +1,10 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro';
-import EventList from '../../components/admin/EventList.astro';
-import NextEvent from '../../components/admin/NextEvent.astro';
 import { listEventsForAdmin } from '@lib/server/events';
 import { listRegistrationsForEvent } from '@lib/server/registrations';
+
+import EventList from '../../components/admin/EventList.astro';
+import NextEvent from '../../components/admin/NextEvent.astro';
+import AdminLayout from '../../layouts/AdminLayout.astro';
 
 export const prerender = false;
 
@@ -22,6 +23,7 @@ const events = all.map((e) => ({
 
 // Next upcoming event (today or later, soonest first) for the planning panel.
 const todayYmd = new Date().toISOString().slice(0, 10);
+
 const next = all
   .filter((e) => String(e.eventDate).slice(0, 10) >= todayYmd)
   .sort((a, b) => (a.eventDate < b.eventDate ? -1 : 1))[0];

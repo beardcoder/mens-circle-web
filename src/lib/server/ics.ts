@@ -27,23 +27,30 @@ const icsLocal = (d: Date): string =>
 
 const combineDateTime = (eventDateValue: unknown, timeStr: string): Date | null => {
   const base = toDate(eventDateValue);
+
   if (!base) return null;
+
   const [h, m] = /^\d{1,2}:\d{2}/.test(timeStr ?? '')
     ? timeStr.split(':').map(Number)
     : [base.getUTCHours(), base.getUTCMinutes()];
+
   return new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), h, m, 0));
 };
 
 /** Start and end in Berlin wall-clock time; a missing end time means 90 minutes. */
 const eventSpan = (ev: CalendarEvent): { start: string; end: string } | null => {
   const start = combineDateTime(ev.eventDate, ev.startTime);
+
   if (!start) return null;
+
   const end = combineDateTime(ev.eventDate, ev.endTime) ?? new Date(start.getTime() + 90 * 60 * 1000);
+
   return { start: icsLocal(start), end: icsLocal(end) };
 };
 
 export const buildIcs = (ev: CalendarEvent): string => {
   const span = eventSpan(ev);
+
   if (!span) return '';
 
   return [
@@ -85,7 +92,9 @@ export const buildIcs = (ev: CalendarEvent): string => {
 /** The same entry as a Google Calendar template link, or empty without a date. */
 export const googleCalendarUrl = (ev: CalendarEvent): string => {
   const span = eventSpan(ev);
+
   if (!span) return '';
+
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: ev.title,
@@ -94,5 +103,6 @@ export const googleCalendarUrl = (ev: CalendarEvent): string => {
     location: ev.location,
     ctz: 'Europe/Berlin',
   });
+
   return `https://calendar.google.com/calendar/render?${params}`;
 };

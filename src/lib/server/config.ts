@@ -1,5 +1,6 @@
 const env = (key: string, fallback = ''): string => {
   const v = process.env[key];
+
   return v && v.length > 0 ? v : fallback;
 };
 
@@ -11,15 +12,20 @@ const parseIntList = (raw: string): number[] =>
         .split(',')
         .flatMap((part) => {
           const token = part.trim();
+
           if (!token) return [];
+
           const n = Number.parseInt(token, 10);
+
           if (Number.isNaN(n) || String(n) !== token) {
             // eslint-disable-next-line no-console
             console.warn(
               `[config] ignoring non-numeric listmonk list id "${token}" — expected the numeric ID, not a UUID`,
             );
+
             return [];
           }
+
           return [n];
         })
     : [];

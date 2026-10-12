@@ -1,12 +1,14 @@
 ---
-import AdminLayout from '../../../layouts/AdminLayout.astro';
-import EventForm from '../../../components/admin/EventForm.astro';
 import { getEventById } from '@lib/server/events';
+
+import EventForm from '../../../components/admin/EventForm.astro';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
 
 export const prerender = false;
 
 const { id } = Astro.params;
 const event = id ? await getEventById(id) : null;
+
 if (!event) return Astro.redirect('/admin', 302);
 
 const data = {

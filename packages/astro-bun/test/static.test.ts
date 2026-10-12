@@ -1,7 +1,8 @@
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
+
 import { createStaticRoutes, urlPathsFor } from '../src/static';
 
 test('pages answer to their clean URL in the configured trailing-slash form', () => {
@@ -47,6 +48,7 @@ describe('served over HTTP', () => {
       },
       maxBufferedSize: 16 * 1024,
     });
+
     errorPages = files.errorPages;
     server = Bun.serve({ port: 0, routes: files.routes, fetch: () => new Response('astro', { status: 418 }) });
   });
@@ -58,6 +60,7 @@ describe('served over HTTP', () => {
 
   test('pages are served as is, with their clean URL and a charset', async () => {
     const response = await fetch(url('/impressum'), { headers: { 'accept-encoding': 'gzip, zstd' } });
+
     expect(response.headers.get('content-encoding')).toBeNull();
     expect(response.headers.get('content-type')).toBe('text/html;charset=utf-8');
     expect(await response.text()).toBe(html);
@@ -72,8 +75,10 @@ describe('served over HTTP', () => {
 
   test('static responses get native ETags and the manifest headers', async () => {
     const response = await fetch(url('/robots.txt'));
+
     expect(response.headers.get('cache-control')).toBe('no-cache');
     const etag = response.headers.get('etag')!;
+
     expect(etag).toBeTruthy();
     expect((await fetch(url('/robots.txt'), { headers: { 'if-none-match': etag } })).status).toBe(304);
   });
@@ -87,6 +92,7 @@ describe('served over HTTP', () => {
 
   test('large files are streamed from disk', async () => {
     const response = await fetch(url('/big.bin'));
+
     // Last-Modified instead of an ETag marks Bun's file route.
     expect(response.headers.get('last-modified')).toBeTruthy();
     expect((await response.bytes()).byteLength).toBe(64 * 1024);
@@ -103,6 +109,7 @@ describe('served over HTTP', () => {
     expect((await fetch(url('/404'))).status).toBe(418);
     expect((await fetch(url('/404.html'))).status).toBe(418);
     const page = errorPages['/404.html'];
+
     expect(await page.clone().text()).toBe('<h1>404</h1>');
   });
 });

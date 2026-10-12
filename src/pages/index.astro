@@ -1,13 +1,15 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import type { Block } from '../components/PageContent.astro';
-import PageContent from '../components/PageContent.astro';
-import home from '../content/home.json';
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import { eventSeriesSchema } from '@lib/series-schema';
 
+import type { Block } from '../components/PageContent.astro';
+import PageContent from '../components/PageContent.astro';
+import home from '../content/home.json';
+import Layout from '../layouts/Layout.astro';
+
 // Static shell and native <Picture> assets; live content uses server:defer.
 export const prerender = true;
+
 // Everything live on this page arrives through a server island, so the document itself may be cached.
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
@@ -19,6 +21,7 @@ const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const schemas: Record<string, unknown>[] = [];
 
 const faq = blocks.find((b) => b.type === 'faq');
+
 if (faq?.data?.items?.length) {
   schemas.push({
     '@context': 'https://schema.org',
@@ -37,6 +40,7 @@ if (faq?.data?.items?.length) {
 // ItemList, not HowTo: the steps describe how an evening runs rather than an
 // actionable procedure, and Google retired HowTo rich results in 2023.
 const evening = blocks.find((b) => b.type === 'journey-steps');
+
 if (evening?.data?.steps?.length) {
   schemas.push({
     '@context': 'https://schema.org',
