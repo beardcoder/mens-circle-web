@@ -1,10 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import PageOpening from '../components/PageOpening.astro';
+import PageIntro from '../components/PageIntro.astro';
 import TestimonialForm from '../components/forms/TestimonialForm.astro';
-import Section from '../components/ui/Section.astro';
-import Split from '../components/ui/Split.astro';
-import { capPanel } from '@lib/ui';
+import Container from '../components/ui/Container.astro';
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import site from '@data/site.json';
 
@@ -36,27 +34,26 @@ const schemas = [
   robots="noindex, follow"
   schemas={schemas}
 >
-  <PageOpening eyebrow="Aus dem Kreis" title="Teile deine Erfahrung" titleEmphasis="Erfahrung">
+  <PageIntro eyebrow="Aus dem Kreis" title="Teile deine Erfahrung">
     <Fragment slot="lead">
       Wenn du beim Männerkreis warst und etwas dazu sagen möchtest: Dein Text hilft anderen Männern einzuschätzen,
       worauf sie sich einlassen.
     </Fragment>
-  </PageOpening>
+  </PageIntro>
 
-  <Section ground="sand" labelledby="teilen-title">
-    <Split sticky>
-      <div slot="head" class="grid gap-5">
-        <h2 id="teilen-title" class="max-w-[17ch] text-display-3 text-fg">
-          Was du schreibst, lese ich <em>zuerst</em>
+  {/* One column of a readable width: the notes stand at the form, not beside it. */}
+  <section aria-labelledby="teilen-title" class="pb-section">
+    <Container>
+      <div class="max-w-form">
+        <h2 id="teilen-title" class="text-sub text-fg">
+          Was du schreibst, lese ich zuerst
         </h2>
-        <p class="max-w-[42ch] text-lg text-fg-soft">
+        <p class="mt-3 text-md text-fg-soft">
           Dein Text wird nicht automatisch veröffentlicht. Ich sehe ihn mir vorher an und stelle ihn dann&nbsp;–
           unverändert&nbsp;– auf die Website. Du entscheidest, welchen Namen du angibst.
         </p>
+        <TestimonialForm class="mt-8" />
       </div>
-      <div class={capPanel}>
-        <TestimonialForm />
-      </div>
-    </Split>
-  </Section>
+    </Container>
+  </section>
 </Layout>

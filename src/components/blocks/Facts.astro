@@ -1,82 +1,57 @@
 ---
 import site from '@data/site.json';
-import { type NextEventSummary, summarizeNextEvent } from '@lib/event-status';
-import Eyebrow from '../ui/Eyebrow.astro';
+import { type NextEventSummary, splitFee, summarizeNextEvent } from '@lib/event-status';
+import { label } from '@lib/ui';
 import Section from '../ui/Section.astro';
-import SectionHead from '../ui/SectionHead.astro';
 
-/** Quick facts, shared by home and /event: the four answers a cautious reader looks for first. Never more precise than the city. */
+/**
+ * The four answers a cautious reader looks for first, as a compact band on the
+ * secondary ground: four equal cells (four columns on the desktop, two on the
+ * tablet, one on phones), each a label, a short value and one line of detail. A
+ * long fee keeps its value short; the rest goes to the detail. Never more
+ * precise than the city.
+ */
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string };
-  variant?: 'band' | 'list';
   /** The next scheduled event, when there is one. Read live when omitted. */
   next?: NextEventSummary | null;
 }
 
-const { data = {}, variant = 'band' } = Astro.props;
+const { data = {} } = Astro.props;
 const next =
   Astro.props.next !== undefined
     ? Astro.props.next
     : // Dynamic, so the static fallback never opens SQLite.
       summarizeNextEvent((await (await import('../../lib/server/events')).fetchNextEventState()).event);
 
+const fee = splitFee(next?.costBasis);
 const facts = [
-  {
-    label: 'Wo',
-    value: next?.place || site.geo.locality,
-    sub: 'Die genaue Adresse bekommst du mit der Anmeldebestätigung',
-  },
-  // Non-breaking space: the only acceptable break is before "Wochen" — between
-  // the 2 and the 4 it reads as a stray hyphen.
-  { label: 'Wie oft', value: 'Alle 2–4 Wochen', sub: 'Ohne Mitgliedschaft – du kommst, wann es für dich passt' },
+  { label: 'Wo', value: next?.place || site.geo.locality, sub: 'Die genaue Adresse kommt mit der Bestätigung' },
+  // Non-breaking space: the only acceptable break is before "Wochen".
+  { label: 'Wie oft', value: 'Alle 2–4 Wochen', sub: 'Ohne Mitgliedschaft – du kommst, wann es passt' },
   {
     label: 'Dauer',
     value: '2–3 Stunden',
     // Word joiners keep "19:00–21:30" on one line.
-    sub: next?.timeRange
-      ? `Nächster Termin: ${next.timeRange.replace('–', '⁠–⁠')}`
-      : 'Ein Abend, kein Wochenendseminar',
+    sub: next?.timeRange ? `Nächster Termin: ${next.timeRange.replace('–', '⁠–⁠')}` : 'Ein Abend, kein Seminar',
   },
-  // The event's own fee text wins: it may name an amount "Spendenbasis" swallows.
-  { label: 'Beitrag', value: next?.costBasis || 'Spendenbasis', sub: 'Du gibst, was für dich machbar ist' },
+  { label: 'Beitrag', value: fee.main, sub: fee.note || 'Du gibst, was für dich machbar ist' },
 ];
 const anchor = data.anchor ?? 'praktisches';
-const band = variant === 'band';
-
-const row = 'grid border-y border-line sm:grid-cols-2 lg:grid-cols-4';
-const cell =
-  'grid content-start gap-2 border-line px-1 py-8 max-sm:not-first:border-t sm:px-8 sm:max-lg:nth-[n+3]:border-t sm:even:border-l lg:not-first:border-l lg:first:pl-0';
-const term = 'text-xs font-bold tracking-[0.2em] text-fg-muted uppercase';
 ---
 
-{/* The row: four cells parted by hairlines. */}
-{band ? (
-  <Section id={anchor} ground="alt" space="compact" labelledby="praktisches-title">
-    <Eyebrow as="h2" id="praktisches-title" class="mb-8">
-      {data.eyebrow ?? 'Auf einen Blick'}
-    </Eyebrow>
-    <dl class={row}>
-      {facts.map((fact) => (
-        <div class={cell}>
-          <dt class={term}>{fact.label}</dt>
-          <dd class="font-serif text-xl text-fg">{fact.value}</dd>
-          <dd class="text-sm text-fg-muted">{fact.sub}</dd>
-        </div>
-      ))}
-    </dl>
-  </Section>
-) : (
-  <Section labelledby="fakten-title" defer>
-    <SectionHead eyebrow="Auf einen Blick" title="Gut zu wissen" titleEmphasis="wissen" titleId="fakten-title" />
-    <dl class:list={[row, 'mt-group']}>
-      {facts.map((fact) => (
-        <div class:list={[cell, 'reveal']}>
-          <dt class={term}>{fact.label}</dt>
-          <dd class="font-serif text-xl text-fg">{fact.value}</dd>
-          <dd class="text-sm text-fg-muted">{fact.sub}</dd>
-        </div>
-      ))}
-    </dl>
-  </Section>
-)}
+<Section id={anchor} ground="alt" space="band" labelledby="praktisches-title">
+  <h2 id="praktisches-title" class:list={[label, 'mb-6']}>
+    {data.eyebrow ?? 'Auf einen Blick'}
+  </h2>
+  <dl class="grid gap-x-grid gap-y-6 md:grid-cols-2 lg:grid-cols-4">
+    {facts.map((fact) => (
+      <div class="grid content-start gap-1 border-t border-line-strong pt-4">
+        <dt class="text-sm text-fg-muted">{fact.label}</dt>
+        <dd class="text-xl font-semibold text-fg">{fact.value}</dd>
+        <dd class="text-sm text-fg-muted">{fact.sub}</dd>
+      </div>
+    ))}
+  </dl>
+</Section>

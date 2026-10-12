@@ -3,13 +3,10 @@ import Layout from '../../layouts/Layout.astro';
 import { getEventBySlug } from '@lib/server/events';
 import { buildEventMeta } from '@lib/event-meta';
 import { buildEventSchema } from '@lib/event-schema';
-import EventAbout from '../../components/event/EventAbout.astro';
 import EventFinalCta from '../../components/event/EventFinalCta.astro';
-import EventHero from '../../components/event/EventHero.astro';
-import EventInfo from '../../components/event/EventInfo.astro';
+import EventIntro from '../../components/event/EventIntro.astro';
 import EventMapSection from '../../components/event/EventMapSection.astro';
 import EventRegister from '../../components/event/EventRegister.astro';
-import Section from '../../components/ui/Section.astro';
 
 // One SSR page per event, read per request, so a new or edited event is live with no rebuild.
 const { slug } = Astro.params;
@@ -54,16 +51,10 @@ const breadcrumbs = {
   socialDetails={meta.details}
   schemas={[eventSchema, breadcrumbs]}
 >
-  <EventHero event={event} />
-
-  {/* What to know beyond the date, the admin's own text, then the one thing the
-      page asks for on the dark band. */}
-  <Section labelledby="termin-fakten" innerClass="grid gap-section">
-    <EventInfo event={event} />
-    <EventAbout event={event} />
-  </Section>
+  {/* The date and its facts, then what the page is for: the description beside the registration. */}
+  <EventIntro event={event} />
   <EventRegister event={event} />
 
-  {hasMap && <EventMapSection event={event} lat={event.latitude!} lng={event.longitude!} ground="sand" />}
+  {hasMap && <EventMapSection event={event} lat={event.latitude!} lng={event.longitude!} />}
   <EventFinalCta event={event} />
 </Layout>
