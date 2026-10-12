@@ -7,8 +7,10 @@ import Eyebrow from '../ui/Eyebrow.astro';
  * The home opening on the dark focus ground: the statement (its phrase in the
  * italic accent), the short explanation, the main action with the quiet link to
  * the course of an evening, and beside them the next date. Phones stack it:
- * statement, explanation, date, action. One quiet ring stands in the right
- * background. It sizes to its content: no forced screen height.
+ * statement, explanation, date, action. The circle stands in the right
+ * background: three rings breathing out of phase that drift down as the page
+ * scrolls away. The words rise in, one after the other. It sizes to its
+ * content: no forced screen height.
  */
 
 interface Props {
@@ -36,21 +38,32 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
   aria-labelledby="hero-title"
   class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section lg:pt-[calc(var(--spacing-header)+var(--spacing-section))]"
 >
-  {/* The one circle: a ring in the right background, breathing slowly. */}
-  <span
+  {/* The circle: three rings, out of phase, drifting down on scroll. */}
+  <div
     aria-hidden="true"
-    class="pointer-events-none absolute top-1/2 right-[-18rem] aspect-square w-[44rem] -translate-y-1/2 rounded-full border border-line-strong motion-safe:animate-ring max-lg:top-auto max-lg:right-[-14rem] max-lg:bottom-[-16rem] max-lg:w-[30rem] max-lg:translate-y-0"
-  ></span>
+    class="pointer-events-none absolute right-[-14rem] bottom-[-15rem] aspect-square w-[30rem] scroll-motion:animate-[ring-drift_linear_both] scroll-motion:[animation-range:0_100vh] scroll-motion:[animation-timeline:scroll(root)] lg:top-[calc(50%-22rem)] lg:right-[-16rem] lg:bottom-auto lg:w-[44rem]"
+  >
+    <span class="absolute inset-0 rounded-full border border-line-strong motion-safe:animate-ring"></span>
+    <span class="absolute inset-[13%] rounded-full border border-line motion-safe:animate-ring-slow motion-safe:animate-delay-[-7s]"></span>
+    <span class="absolute inset-[29%] rounded-full border border-accent/45 motion-safe:animate-ring motion-safe:animate-delay-[-11s]"></span>
+  </div>
 
   <Container class="relative grid gap-x-grid gap-y-8 lg:grid-cols-12">
-    <div class="grid min-w-0 justify-items-start lg:col-span-7 lg:row-start-1 entrance:animate-fade-in">
-      {data.kicker && <Eyebrow class="mb-4">{data.kicker}</Eyebrow>}
-      <h1 id="hero-title" class="max-w-[14ch] text-hero text-fg wrap-anywhere hyphens-auto">
+    <div class="grid min-w-0 justify-items-start lg:col-span-7 lg:row-start-1">
+      {data.kicker && <Eyebrow class="mb-4 entrance:animate-rise">{data.kicker}</Eyebrow>}
+      <h1
+        id="hero-title"
+        class="max-w-[14ch] text-hero text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-[90ms]"
+      >
         {before}
         {emphasis && <em class="text-accent">{emphasis}</em>}
         {after}
       </h1>
-      {data.lede && <p class="mt-6 max-w-measure text-lg text-fg-muted">{data.lede}</p>}
+      {data.lede && (
+        <p class="mt-6 max-w-measure text-lg text-fg-muted entrance:animate-rise entrance:animate-delay-[180ms]">
+          {data.lede}
+        </p>
+      )}
     </div>
 
     <HomeEventStatus

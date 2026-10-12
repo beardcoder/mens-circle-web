@@ -33,7 +33,7 @@ const shown = items.filter((i) => i.question && i.answer);
         {/* A plus whose upright bar folds away into a minus when open. */}
         <span
           aria-hidden="true"
-          class="relative grid size-8 shrink-0 place-items-center rounded-full border border-line-bold text-fg transition-[background-color,border-color,color] duration-180 group-hover/q:border-fg group-open/item:border-fg group-open/item:bg-fg group-open/item:text-surface before:absolute before:h-[1.5px] before:w-3 before:bg-current after:absolute after:h-3 after:w-[1.5px] after:bg-current after:transition-[scale] after:duration-180 group-open/item:after:scale-y-0"
+          class="relative grid size-8 shrink-0 place-items-center rounded-full border border-line-bold text-fg transition-[background-color,border-color,color,rotate] duration-200 ease-out group-hover/q:border-fg group-open/item:border-fg group-open/item:bg-fg group-open/item:rotate-180 group-open/item:text-surface before:absolute before:h-[1.5px] before:w-3 before:bg-current after:absolute after:h-3 after:w-[1.5px] after:bg-current after:transition-[scale] after:duration-180 group-open/item:after:scale-y-0"
         />
       </summary>
       <div
