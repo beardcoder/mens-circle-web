@@ -4,158 +4,135 @@ import site from '../data/site.json';
 import { Icon } from 'astro-icon/components';
 import { button } from '@lib/ui';
 import Container from './ui/Container.astro';
-import ThemeSwitch from './ThemeSwitch.astro';
+import ModeToggle from './ModeToggle.astro';
 
 /**
- * The bar: the mark, the display switches, one action and the menu toggle. Over a
- * dark opening (`over-hero:`) it starts transparent with light text and turns to
- * the page's opaque paper with its text once the page moves (`data-scrolled`, set
- * by lib/site-header.ts); elsewhere it is paper from the start. Opaque, never glass:
- * the hero's large title would show through. The menu is a full
- * screen of deep earth that opens as a circle from the toggle (`data-open` on the
- * header, `--nav-origin` on the menu), with three rings breathing behind the
- * destinations.
+ * The bar, 72px: the mark on the left; from `nav` (1100px) the four content links
+ * and the one filled action on the right, below that the action and a menu
+ * button. Over the home opening (`over-hero:`) it starts clear with light text
+ * and turns to the page's opaque paper once the page moves (`data-scrolled`, set
+ * by lib/site-header.ts); elsewhere it is paper from the start. The phone menu is
+ * a native modal `<dialog>`: Escape closes it, the focus returns to the button.
  */
 
-const links = [...nav.header.links, ...nav.header.secondary, ...nav.header.cta];
-const ctaLinks = nav.header.cta;
-// Explicit allowlist, so new entries do not silently become speculative.
-const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite']);
-const RINGS = [
-  'w-[min(78vmin,38rem)] border-sand/20',
-  'w-[min(54vmin,26rem)] border-fill/30 animate-delay-[-0.9s]',
-  'w-[min(32vmin,16rem)] border-fill/20 bg-radial from-fill/15 to-transparent to-70% animate-delay-[-1.8s]',
-];
+const links = nav.header.links;
+const cta = nav.header.cta;
+const linkClass =
+  'inline-flex min-h-11 items-center rounded-control px-3 text-base font-medium underline-offset-[6px] decoration-1 transition-colors duration-180 hover:underline';
 ---
 
 <header
   id="header"
   class:list={[
-    'group/header fixed inset-x-0 top-0 z-40 py-[clamp(0.875rem,0.65rem+0.7vw,1.25rem)] text-fg print:hidden',
-    // The bar's ground: the page's paper, opaque, with a hairline and a soft cast.
-    // It switches at once, ground and text together: a cross-fade passes through a
-    // grey, half-clear bar with faint text over the dark opening.
-    'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:border-b before:border-line/50 before:bg-ground before:shadow-[0_10px_24px_-10px] before:shadow-ink/10',
-    // Over a dark opening: transparent with light text until the page moves.
+    'group/header fixed inset-x-0 top-0 z-40 h-header text-fg print:hidden',
+    // The bar's ground: the page's paper, opaque, with a thin line. It switches
+    // at once, ground and text together.
+    'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:border-b before:border-line before:bg-ground',
+    // Over the dark opening: clear with light text until the page moves.
     'over-hero:text-bone over-hero:before:opacity-0 over-hero:data-[scrolled]:text-fg over-hero:data-[scrolled]:before:opacity-100',
-    // With the menu open the bar sits on the menu's dark ground.
-    'data-[open]:text-bone! data-[open]:before:opacity-0!',
   ]}
 >
-  <Container class="relative z-10 flex items-center gap-3">
+  <Container class="flex h-full items-center gap-4">
     <a
       href="/"
       aria-label={`${site.siteName} – Startseite`}
-      class="group/logo flex min-w-0 items-center gap-4 rounded-control font-serif text-xl tracking-[-0.02em] transition-opacity duration-300 hover:opacity-90 focus-visible:outline-offset-6"
+      class="flex min-h-11 min-w-0 items-center gap-3 rounded-control font-serif text-xl"
     >
-      <Icon
-        name="logo"
-        aria-hidden="true"
-        class="size-[42px] shrink-0 transition-transform duration-500 ease-settle group-hover/logo:rotate-[22.5deg]"
-      />
-      <span class="max-[35rem]:sr-only">Männerkreis</span>
+      <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+      <span class="max-[22.5rem]:sr-only">Männerkreis</span>
     </a>
 
-    <div class="ml-auto flex items-center gap-2 sm:gap-3">
-      <ThemeSwitch class="max-md:hidden" />
+    <nav aria-label="Hauptnavigation" class="ml-auto max-nav:hidden">
+      <ul role="list" class="flex items-center gap-1">
+        {links.map((link) => (
+          <li>
+            <a
+              href={link.url}
+              data-nav-link
+              data-umami-event="nav-click"
+              data-umami-event-target={link.umamiTarget}
+              class={linkClass}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
 
-      {ctaLinks.map((link) => (
-        <a
-          href={link.url}
-          data-nav-link
-          data-umami-event="cta-click"
-          data-umami-event-location="header"
-          data-umami-event-target={link.umamiTarget}
-          class:list={[button({ variant: 'primary', size: 'sm' }), 'group-data-[open]/header:invisible']}
-        >
-          {link.label}
-        </a>
-      ))}
+    <a
+      href={cta.url}
+      data-umami-event="cta-click"
+      data-umami-event-location="header"
+      data-umami-event-target={cta.umamiTarget}
+      class:list={[button({ variant: 'primary', size: 'sm' }), 'max-nav:ml-auto']}
+    >
+      {cta.label}
+    </a>
 
-      <button
-        id="navToggle"
-        type="button"
-        aria-controls="nav"
-        aria-expanded="false"
-        aria-label="Menü öffnen"
-        class="relative grid size-12 place-items-center rounded-full border border-current/20 text-current transition-[background-color,border-color] duration-300 hover:border-current/40 hover:bg-current/8"
-      >
-        {/* A breath around the closed toggle. */}
-        <span
-          aria-hidden="true"
-          class="pointer-events-none absolute -inset-0.5 rounded-full border border-current/35 opacity-0 motion-safe:animate-[toggle-breath_4.5s_var(--ease-ambient)_infinite] group-data-[open]/header:hidden"
-        ></span>
-        <span
-          aria-hidden="true"
-          class="flex flex-col items-center gap-1.5 group-data-[open]/header:rotate-90 motion-safe:transition-[rotate] motion-safe:duration-500 motion-safe:ease-emphasised"
-        >
-          <span class="block h-0.5 w-6 rounded-full bg-current group-data-[open]/header:translate-y-2 group-data-[open]/header:rotate-45 motion-safe:transition-transform motion-safe:duration-[420ms] motion-safe:ease-emphasised"></span>
-          <span class="block h-0.5 w-6 rounded-full bg-current group-data-[open]/header:scale-x-0 group-data-[open]/header:opacity-0 motion-safe:transition-[transform,opacity] motion-safe:duration-200"></span>
-          <span class="block h-0.5 w-6 rounded-full bg-current group-data-[open]/header:-translate-y-2 group-data-[open]/header:-rotate-45 motion-safe:transition-transform motion-safe:duration-[420ms] motion-safe:ease-emphasised"></span>
-        </span>
-      </button>
-    </div>
+    <button
+      type="button"
+      data-nav-open
+      aria-controls="nav"
+      aria-haspopup="dialog"
+      class="inline-flex min-h-11 items-center gap-2 rounded-control px-2 text-base font-medium nav:hidden"
+    >
+      <Icon name="menu" aria-hidden="true" class="size-6" />
+      <span class="max-[26rem]:sr-only">Menü</span>
+    </button>
   </Container>
 
-  <nav
+  {/* The phone menu: the content links, the action, then the display option. */}
+  <dialog
     id="nav"
-    aria-label="Hauptnavigation"
+    aria-label="Menü"
     class:list={[
-      'surface-night fixed inset-0 grid min-h-dvh grid-rows-[1fr_auto] place-items-center overflow-y-auto overscroll-contain px-gutter pt-[calc(var(--spacing-clearance)+1.5rem)] pb-section',
-      'invisible pointer-events-none group-data-[open]/header:visible group-data-[open]/header:pointer-events-auto',
-      // A warm light behind the destinations.
-      'bg-[radial-gradient(ellipse_at_50%_32%,color-mix(in_oklch,var(--color-fill)_20%,transparent),transparent_58%),linear-gradient(155deg,var(--p-earth-deep),var(--p-earth-dark)_58%,var(--p-earth-mid))]',
-      // A circle from the toggle; closing runs back quickly. Reduced motion: a fade.
-      '[--nav-origin:100%_0] motion-safe:[clip-path:circle(0_at_var(--nav-origin))] motion-safe:[transition:clip-path_420ms_var(--ease-precise),visibility_0s_linear_420ms]',
-      'motion-safe:group-data-[open]/header:[clip-path:circle(150vmax_at_var(--nav-origin))] motion-safe:group-data-[open]/header:[transition:clip-path_820ms_var(--ease-emphasised),visibility_0s]',
-      'motion-reduce:opacity-0 motion-reduce:transition-opacity motion-reduce:group-data-[open]/header:opacity-100',
+      'm-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain bg-ground p-0 text-fg nav:hidden',
+      'opacity-0 transition-[opacity,display,overlay] transition-discrete duration-200 open:opacity-100 starting:open:opacity-0 backdrop:bg-transparent',
     ]}
   >
-    <span aria-hidden="true" class="pointer-events-none absolute inset-0 grid place-items-center">
-      {RINGS.map((ring) => (
-        <span
-          class:list={[
-            'col-start-1 row-start-1 aspect-square rounded-full border motion-safe:group-data-[open]/header:animate-[ring-breathe_7s_var(--ease-ambient)_infinite]',
-            ring,
-          ]}
-        />
-      ))}
-    </span>
-
-    <ul class="relative grid gap-[clamp(1.1rem,3vh,2.25rem)] text-center" role="list">
-      {links.map((link, i) => (
-        <li class="overflow-clip [overflow-clip-margin:0.4em]" style={`--i: ${i}`}>
-          <a
-            href={link.url}
-            data-nav-link
-            data-umami-event="nav-click"
-            data-umami-event-target={(link as { umamiTarget?: string }).umamiTarget}
-            data-astro-prefetch={prefetchPaths.has(link.url) ? 'hover' : undefined}
-            class:list={[
-              'group/link relative inline-block rounded-control font-serif text-[clamp(1.7rem,1rem+3.6vw,3.5rem)] leading-none tracking-[-0.02em] text-fg/90 transition-colors duration-300 hover:text-fg focus-visible:outline-offset-8',
-              'motion-safe:translate-y-[115%] motion-safe:transition-[translate,color] motion-safe:duration-200',
-              'motion-safe:group-data-[open]/header:translate-y-0 motion-safe:group-data-[open]/header:delay-[calc(220ms+var(--i)*70ms)] motion-safe:group-data-[open]/header:duration-700 motion-safe:group-data-[open]/header:ease-emphasised',
-            ]}
-          >
-            {link.label}
-            <span
-              aria-hidden="true"
-              class="absolute inset-x-0 -bottom-[0.22em] h-0.5 scale-x-0 rounded-full bg-fill transition-transform duration-300 ease-precise group-hover/link:scale-x-100 group-focus-visible/link:scale-x-100"
-            ></span>
-          </a>
-        </li>
-      ))}
-    </ul>
-
-    <div class="relative grid justify-items-center gap-6 motion-safe:opacity-0 motion-safe:transition-opacity motion-safe:duration-150 motion-safe:group-data-[open]/header:opacity-100 motion-safe:group-data-[open]/header:delay-500 motion-safe:group-data-[open]/header:duration-700">
-      <ThemeSwitch class="md:hidden" />
-      <p class="flex flex-col items-center gap-4 text-xs tracking-[0.16em] text-fg-muted uppercase">
-        <span
-          class="size-1.5 rounded-full bg-accent motion-safe:animate-[ember-pulse_4.5s_var(--ease-ambient)_infinite]"
-          aria-hidden="true"
-        ></span>
-        Männerkreis · {site.geo.locality} / Niederbayern
-      </p>
-    </div>
-  </nav>
+    <Container class="flex h-header items-center gap-4 border-b border-line">
+      <a href="/" class="flex min-h-11 min-w-0 items-center gap-3 rounded-control font-serif text-xl" data-nav-link>
+        <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+        <span>Männerkreis</span>
+      </a>
+      <button
+        type="button"
+        data-nav-close
+        class="ml-auto inline-flex min-h-11 items-center gap-2 rounded-control px-2 text-base font-medium"
+      >
+        <Icon name="close" aria-hidden="true" class="size-6" />
+        <span>Schließen</span>
+      </button>
+    </Container>
+    <Container class="grid gap-8 py-8">
+      <nav aria-label="Hauptnavigation">
+        <ul role="list" class="grid border-t border-line">
+          {links.map((link) => (
+            <li class="border-b border-line">
+              <a
+                href={link.url}
+                data-nav-link
+                data-umami-event="nav-click"
+                data-umami-event-target={link.umamiTarget}
+                class="flex min-h-14 items-center text-xl font-medium transition-colors duration-180 hover:text-accent"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <a
+        href={cta.url}
+        data-nav-link
+        data-umami-event="cta-click"
+        data-umami-event-location="menu"
+        class={button({ variant: 'primary', size: 'lg', block: true })}
+      >
+        Termine &amp; Anmeldung
+      </a>
+      <ModeToggle class="justify-self-start" />
+    </Container>
+  </dialog>
 </header>

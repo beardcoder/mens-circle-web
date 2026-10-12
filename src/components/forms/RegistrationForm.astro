@@ -2,6 +2,7 @@
 import { checkbox, control, fieldError, link } from '@lib/ui';
 import Button from '../ui/Button.astro';
 import Field from '../ui/Field.astro';
+import FormStatus from './FormStatus.astro';
 import Honeypot from './Honeypot.astro';
 
 /** Registration for one event: name, email, an optional phone number and the privacy consent. */
@@ -19,12 +20,12 @@ const { eventId, isFull } = Astro.props;
   data-form="register"
   data-track="event-registration"
   data-track-context={JSON.stringify({ event_id: eventId })}
-  class="grid gap-5"
+  class="grid gap-6"
 >
   <input type="hidden" name="event_id" value={eventId} />
   <Honeypot />
 
-  <div class="grid gap-5 sm:grid-cols-2 sm:gap-4">
+  <div class="grid gap-6 sm:grid-cols-2 sm:gap-4">
     <Field for="firstName" label="Vorname" errorId="register-first_name-error">
       <input
         type="text"
@@ -88,7 +89,7 @@ const { eventId, isFull } = Astro.props;
   <div>
     <label class="flex cursor-pointer items-start gap-3">
       <input type="checkbox" name="privacy" required aria-describedby="register-privacy-error" class={checkbox} />
-      <span class="text-sm text-fg-soft">
+      <span class="text-base text-fg">
         Ich habe die{' '}
         <a href="/datenschutz" target="_blank" rel="noopener" class={link}>
           Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span>
@@ -100,8 +101,9 @@ const { eventId, isFull } = Astro.props;
   </div>
 
   <Button type="submit" size="lg" block class="mt-2">
-    {isFull ? 'Auf Warteliste eintragen' : 'Verbindlich anmelden'}
+    {isFull ? 'Auf die Warteliste eintragen' : 'Verbindlich anmelden'}
   </Button>
+  <FormStatus form="register" />
 </form>
 
 <script>

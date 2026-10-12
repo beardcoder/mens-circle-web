@@ -1,7 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 
-/** A quiet, self-contained link beside a primary action: the accent, with an arrow that moves. */
+/** A quiet link beside a primary action or under a block: the accent, underlined, with a small arrow. */
 interface Props {
   href: string;
   class?: string;
@@ -14,7 +14,7 @@ const { href, class: className, ...attributes } = Astro.props;
 <a
   href={href}
   class:list={[
-    'group/link inline-flex min-h-11 items-center gap-2 font-sans text-xs font-bold tracking-label text-accent uppercase transition-colors duration-150 hover:text-fg',
+    'group/link inline-flex min-h-11 items-center gap-1.5 font-sans text-base font-semibold text-accent underline decoration-1 underline-offset-4 transition-colors duration-180 hover:text-accent-strong',
     className,
   ]}
   {...attributes}
@@ -23,6 +23,6 @@ const { href, class: className, ...attributes } = Astro.props;
   <Icon
     name="arrow"
     aria-hidden="true"
-    class="size-[1.05em] shrink-0 transition-transform duration-200 group-hover/link:translate-x-1"
+    class="size-[1em] shrink-0 transition-transform duration-180 group-hover/link:translate-x-0.5"
   />
 </a>

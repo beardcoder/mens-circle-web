@@ -3,8 +3,8 @@ import { Icon } from 'astro-icon/components';
 import { button, type ButtonSize, type ButtonVariant } from '@lib/ui';
 
 /**
- * A link styled as a button when it has an `href`, a real `<button>` otherwise:
- * a pill in small capitals. `decorate` adds an arrow that moves on hover.
+ * A link styled as a button when it has an `href`, a real `<button>` otherwise.
+ * `decorate` adds an arrow after the label.
  */
 interface Props {
   href?: string;
@@ -39,18 +39,14 @@ const Tag = href ? 'a' : 'button';
   class:list={[button({ variant, size, block }), className]}
   {...attributes}
 >
-  {decorate ? (
-    <span data-label>
-      <slot />
-    </span>
-  ) : (
+  <span data-label>
     <slot />
-  )}
+  </span>
   {decorate && (
     <Icon
       name="arrow"
       aria-hidden="true"
-      class="size-[1.1em] shrink-0 transition-transform duration-200 group-hover/btn:translate-x-1"
+      class="size-[1.1em] shrink-0 transition-transform duration-180 group-hover/btn:translate-x-0.5"
     />
   )}
 </Tag>

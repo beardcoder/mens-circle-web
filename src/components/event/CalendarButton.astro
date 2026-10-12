@@ -1,0 +1,86 @@
+---
+import type { EventDTO } from '@lib/types';
+import { buildIcs, googleCalendarUrl, type CalendarEvent } from '@lib/server/ics';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  event: EventDTO;
+}
+
+/** "In Kalender speichern": a secondary button that opens a native popover with the two ways into a calendar. */
+
+const { event } = Astro.props;
+
+const calendarEvent: CalendarEvent = {
+  id: event.id,
+  title: event.title,
+  description: event.description,
+  eventDate: event.event_date,
+  startTime: event.start_time,
+  endTime: event.end_time,
+  location: event.location,
+};
+const ics = buildIcs(calendarEvent);
+const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
+const googleHref = googleCalendarUrl(calendarEvent);
+---
+
+{ics && (
+  <>
+    <Button
+      variant="secondary"
+      size="lg"
+      popovertarget="calendar-modal"
+      data-umami-event="calendar-open"
+      class="max-sm:w-full"
+    >
+      In Kalender speichern
+    </Button>
+
+    {/* The popover is the card: centred in the top layer. */}
+    <div
+      id="calendar-modal"
+      popover
+      aria-labelledby="calendar-modal-title"
+      class="fixed inset-0 m-auto max-h-[calc(100dvh-3rem)] w-[min(380px,calc(100vw-2.5rem))] rounded-card border border-line bg-raised p-0 text-fg opacity-0 shadow-overlay transition-[opacity,overlay,display] transition-discrete duration-200 backdrop:bg-transparent backdrop:transition-[background-color,overlay,display] backdrop:transition-discrete backdrop:duration-200 open:opacity-100 open:backdrop:bg-overlay starting:open:opacity-0 starting:open:backdrop:bg-transparent"
+    >
+      <div class="relative p-6 sm:p-8">
+        <button
+          type="button"
+          aria-label="Schließen"
+          popovertarget="calendar-modal"
+          popovertargetaction="hide"
+          class="absolute top-2 right-2 grid size-11 place-items-center rounded-full text-fg-muted transition-colors duration-180 hover:bg-fg/6 hover:text-fg"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="size-5">
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <h2 id="calendar-modal-title" class="pr-10 text-sub text-fg">
+          In Kalender speichern
+        </h2>
+        <p class="mt-2 mb-6 text-base text-fg-soft">Wähle deinen Kalender:</p>
+        <div class="grid gap-3">
+          <Button
+            href={googleHref}
+            variant="secondary"
+            target="_blank"
+            rel="noopener"
+            data-umami-event="calendar-download-google"
+          >
+            Google Calendar
+          </Button>
+          <Button
+            href={icsHref}
+            variant="secondary"
+            download="maennerkreis-straubing.ics"
+            data-umami-event="calendar-download-ics"
+          >
+            Apple/Outlook (.ics)
+          </Button>
+        </div>
+      </div>
+    </div>
+  </>
+)}

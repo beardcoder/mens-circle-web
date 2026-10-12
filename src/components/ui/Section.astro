@@ -2,26 +2,23 @@
 import Container from './Container.astro';
 
 /**
- * A block of the page. Blocks are parted by their ground and by space: the
- * page's paper, quiet bands (`alt` parchment, `sand`), the dark earth (`night`)
- * of openings and the journey, the brown `earth` panel, the `forest` band of the
- * community and the `ink` of the footer. Each ground re-declares the semantic
- * colours (`surface-*` in theme.css), so everything inside follows it; the dark
- * grounds carry a fine grain.
+ * A block of the page. Blocks are parted by space, and by their ground only
+ * where it means something: the page's paper, the quiet secondary ground
+ * (`alt`: information that belongs together), the dark focus ground (`dark`:
+ * the home opening and the footer). Each ground re-declares the colour roles
+ * (`surface-*` in theme.css), so everything inside follows it.
  */
 
-type Ground = 'default' | 'alt' | 'sand' | 'night' | 'earth' | 'forest' | 'ink';
-type Space = 'default' | 'compact' | 'none';
+type Ground = 'default' | 'alt' | 'dark';
+type Space = 'default' | 'band' | 'none';
 
 interface Props {
   id?: string;
   ground?: Ground;
-  /** `default` is the section rhythm; `compact` the group rhythm, for bands and strips. */
+  /** `default` is a section's space (64 / 96px); `band` the compact space of a band (40 / 56px). */
   space?: Space;
   labelledby?: string;
   label?: string;
-  /** Lets the browser skip rendering until the block nears the viewport. */
-  defer?: boolean;
   class?: string;
   /** Classes for the inner container (grid, etc.). */
   innerClass?: string;
@@ -31,16 +28,12 @@ interface Props {
 const GROUNDS: Record<Ground, string> = {
   default: '',
   alt: 'surface-alt',
-  sand: 'surface-sand',
-  night: 'surface-night grain',
-  earth: 'surface-earth grain',
-  forest: 'surface-forest grain',
-  ink: 'surface-ink',
+  dark: 'surface-dark',
 };
 
 const SPACES: Record<Space, string> = {
   default: 'py-section',
-  compact: 'py-group',
+  band: 'py-band',
   none: '',
 };
 
@@ -50,7 +43,6 @@ const {
   space = 'default',
   labelledby,
   label,
-  defer = false,
   class: className,
   innerClass,
   ...attributes
@@ -61,16 +53,9 @@ const {
   id={id}
   aria-labelledby={labelledby}
   aria-label={label}
-  class:list={[
-    'relative',
-    GROUNDS[ground],
-    SPACES[space],
-    defer && '[contain-intrinsic-block-size:auto_700px] [content-visibility:auto]',
-    className,
-  ]}
+  class:list={['relative', GROUNDS[ground], SPACES[space], className]}
   {...attributes}
 >
-  <slot name="before" />
   <Container class={innerClass}>
     <slot />
   </Container>

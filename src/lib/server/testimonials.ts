@@ -34,7 +34,10 @@ export async function submitTestimonial(payload: TestimonialInput): Promise<Form
 }
 
 /** Published testimonials, sorted by sortOrder then newest. */
-export async function fetchTestimonials(limit = 200): Promise<TestimonialDTO[]> {
+/** Published entries in the curated order, and whether they could be read at all. */
+export async function fetchTestimonialsState(
+  limit = 200,
+): Promise<{ status: 'ok' | 'unavailable'; testimonials: TestimonialDTO[] }> {
   try {
     const rows = await db
       .select({ quote: testimonials.quote, authorName: testimonials.authorName, role: testimonials.role })
@@ -42,16 +45,20 @@ export async function fetchTestimonials(limit = 200): Promise<TestimonialDTO[]> 
       .where(and(eq(testimonials.isPublished, true), isNull(testimonials.deleted)))
       .orderBy(asc(testimonials.sortOrder), desc(testimonials.createdAt))
       .limit(limit);
-    return rows.map((r) => ({
-      quote: r.quote,
-      author: r.authorName || null,
-      role: r.role || null,
-    }));
+    return {
+      status: 'ok',
+      testimonials: rows.map((r) => ({ quote: r.quote, author: r.authorName || null, role: r.role || null })),
+    };
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('[testimonials] fetchTestimonials failed', String(err));
-    return [];
+    return { status: 'unavailable', testimonials: [] };
   }
+}
+
+/** Published entries; empty when none are published or they cannot be read. */
+export async function fetchTestimonials(limit = 200): Promise<TestimonialDTO[]> {
+  return (await fetchTestimonialsState(limit)).testimonials;
 }
 
 /** All non-deleted testimonials (admin), newest first. */

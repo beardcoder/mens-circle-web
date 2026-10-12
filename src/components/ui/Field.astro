@@ -2,8 +2,9 @@
 import { fieldError, fieldHint, fieldLabel } from '@lib/ui';
 
 /**
- * A labelled form field: a visible label, the control (slot), an optional hint
- * and the error slot that lib/form.ts writes (`<form id>-<name>-error`).
+ * A form field: the visible label, the control (slot), an optional hint and the
+ * error line that lib/form.ts writes (`<form id>-<name>-error`). The same family
+ * on every form.
  */
 interface Props {
   /** The control's id. */
@@ -22,7 +23,7 @@ const { for: htmlFor, label, optional = false, hint, hintId, errorId, class: cla
 <div class={className}>
   <label for={htmlFor} class={fieldLabel}>
     {label}
-    {optional && <span class="font-normal tracking-normal normal-case text-fg-muted"> (optional)</span>}
+    {optional && <span class="font-normal text-fg-muted"> (optional)</span>}
   </label>
   <slot />
   {hint && (

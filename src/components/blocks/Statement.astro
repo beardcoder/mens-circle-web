@@ -1,62 +1,61 @@
 ---
-import Rings from '../Rings.astro';
-import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
 import TextLink from '../ui/TextLink.astro';
 
 interface Props {
   data: {
     anchor?: string;
     eyebrow?: string;
-    /** The statement, one line each. */
+    /** The statement, one line each; the second in the italic accent. */
     lines?: string[];
     text?: string;
     linkLabel?: string;
     linkUrl?: string;
-    /** A short line beside the small breathing circle. */
+    /** A short line beside the breathing circle. */
     breathGuide?: string;
   };
 }
 
-/** A pause on the paper: the statement on the middle axis, its second line in the italic accent, a breath to follow, rings breathing up from below. */
+/**
+ * The invitation to breathe, as a compact part of the course of an evening: a
+ * panel on the secondary ground right under the phases, the short statement
+ * (its second line in the italic accent), a few sentences, and the circle that
+ * breathes on the cycle its guide names (4 s in, 5 s out: `breathe` in
+ * theme.css). Under reduced motion the circle rests and the timed guide goes.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'haltung';
 const lines = data.lines ?? [];
 ---
 
-<Section
-  id={anchor}
-  labelledby="statement-title"
-  class="overflow-clip"
-  innerClass="relative grid justify-items-center gap-7 text-center"
->
-  <Rings slot="before" set="close" class="text-sand" />
+<Section id={anchor} space="none" labelledby="statement-title" class="pb-section">
+  <div class="surface-alt grid items-center gap-x-grid gap-y-8 rounded-card p-6 sm:p-10 lg:grid-cols-12 lg:p-12">
+    <div class="grid justify-items-start lg:col-span-7">
+      {data.eyebrow && <Eyebrow class="mb-3">{data.eyebrow}</Eyebrow>}
+      <h2 id="statement-title" class="text-section text-fg">
+        {lines.map((line, i) =>
+          i > 0 ? <em class="block text-accent">{line}</em> : <span class="block">{line}</span>,
+        )}
+      </h2>
+      {data.text && <p class="mt-6 max-w-measure text-md text-fg-soft">{data.text}</p>}
+      {data.linkLabel && data.linkUrl && (
+        <TextLink href={data.linkUrl} class="mt-4">
+          {data.linkLabel}
+        </TextLink>
+      )}
+    </div>
 
-  {data.eyebrow && <Eyebrow center>{data.eyebrow}</Eyebrow>}
-
-  <h2 id="statement-title" class="text-display-2 text-fg">
-    {lines.map((line, i) => (i > 0 ? <em class="block">{line}</em> : <span class="block">{line}</span>))}
-  </h2>
-
-  {data.text && <p class="max-w-prose text-lg text-fg-soft">{data.text}</p>}
-
-  {data.breathGuide && (
-    /* The breath to follow: rings on the same steady 10-second cycle. Still, they
-         cannot guide a breath, so the line goes with them under reduced motion. */
-    <p class="mt-4 flex items-center gap-5 text-left font-serif text-xl text-fg italic motion-reduce:hidden">
-      <span class="relative grid size-16 shrink-0 place-items-center" aria-hidden="true" data-breath>
-        <span class="absolute inset-0 animate-breathe rounded-full border border-fill/50 [--alpha:1] [--rest:0.55]"></span>
-        <span class="absolute inset-3 animate-breathe rounded-full bg-fill/15 animate-delay-[300ms] [--alpha:1] [--rest:0.4]"></span>
-        <span class="size-1.5 rounded-full bg-fill"></span>
-      </span>
-      {data.breathGuide}
-    </p>
-  )}
-
-  {data.linkLabel && data.linkUrl && (
-    <TextLink href={data.linkUrl} class="mt-2">
-      {data.linkLabel}
-    </TextLink>
-  )}
+    {data.breathGuide && (
+      <div class="flex items-center gap-6 lg:col-span-4 lg:col-start-9 lg:flex-col lg:text-center">
+        <span class="relative grid size-24 shrink-0 place-items-center lg:size-36" aria-hidden="true">
+          <span class="absolute inset-0 animate-breathe rounded-full border border-fill/60 [--alpha:1] [--rest:0.6]"></span>
+          <span class="absolute inset-[18%] animate-breathe rounded-full bg-fill/15 animate-delay-[300ms] [--alpha:1] [--rest:0.5]"></span>
+          <span class="size-2 rounded-full bg-fill"></span>
+        </span>
+        <p class="font-serif text-xl text-fg motion-reduce:hidden">{data.breathGuide}</p>
+      </div>
+    )}
+  </div>
 </Section>

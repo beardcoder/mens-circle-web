@@ -1,33 +1,26 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { fetchNextEventState } from '@lib/server/events';
-import { fetchTestimonials } from '@lib/server/testimonials';
+import { fetchUpcomingEventsState } from '@lib/server/events';
 import { dateStatus } from '@lib/event-status';
 import Faq from '../components/blocks/Faq.astro';
-import Facts from '../components/blocks/Facts.astro';
-import NextDate from '../components/event/NextDate.astro';
+import EventList from '../components/event/EventList.astro';
 import { eventSeriesSchema } from '@lib/series-schema';
 import { buildEventSchema } from '@lib/event-schema';
 import site from '@data/site.json';
 import { link } from '@lib/ui';
-import PageOpening from '../components/PageOpening.astro';
+import PageIntro from '../components/PageIntro.astro';
 import LinkList from '../components/ui/LinkList.astro';
-import Eyebrow from '../components/ui/Eyebrow.astro';
 import SectionHead from '../components/ui/SectionHead.astro';
-import Quote from '../components/ui/Quote.astro';
 import Section from '../components/ui/Section.astro';
 import Split from '../components/ui/Split.astro';
 
-/** Evergreen landing page for the dates; never redirects. SSR so the date is in the HTML. */
-const { status, event } = await fetchNextEventState();
-// One object for the whole page, so the date block, the FAQ and the metadata
-// cannot disagree. A failed read is its own state, never "kein Termin geplant".
-const state = dateStatus(status, event);
+/** Evergreen landing page for the dates; never redirects. SSR so the dates are in the HTML. */
+const upcoming = await fetchUpcomingEventsState();
+const event = upcoming.events[0] ?? null;
+// One object for the whole page, so the list, the FAQ and the metadata cannot
+// disagree. A failed read is its own state, never "kein Termin geplant".
+const state = dateStatus(upcoming.status, event);
 const { next } = state;
-
-// One published voice for the pull quote — the top of the curated order, not a
-// second copy of the home page's grid. `null` renders no section.
-const [voice = null] = await fetchTestimonials(1);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = new URL('/event', siteUrl).href;
@@ -38,7 +31,7 @@ const faqItems = [
     question: 'Wann findet der nächste Männerkreis statt?',
     answer: next
       ? `Der nächste Termin ist ${next.dateLabel}${next.timeRange ? ` um ${next.timeRange}` : ''} in ${next.place}. Alle Details und die Anmeldung findest du auf der Seite zu diesem Termin.`
-      : 'Der nächste Termin steht noch nicht fest. Sobald er geplant ist, erfährst du es über die Benachrichtigung auf dieser Seite oder über die WhatsApp-Gruppe.',
+      : 'Der nächste Termin steht noch nicht fest. Sobald er geplant ist, erfährst du es per E-Mail über die Benachrichtigung auf dieser Seite oder über die WhatsApp-Gruppe.',
   },
   {
     question: 'Wie melde ich mich an?',
@@ -141,8 +134,7 @@ const socialDetails = next
   socialDetails={socialDetails}
   schemas={[eventSeries, faqPage, breadcrumbs]}
 >
-  {/* The date follows the opening: it is what this page is for. */}
-  <PageOpening eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung" titleEmphasis="Anmeldung">
+  <PageIntro eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung">
     <Fragment slot="lead">
       Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend dauert
       zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was
@@ -153,30 +145,12 @@ const socialDetails = next
       </a>
       {'.'}
     </Fragment>
-  </PageOpening>
+  </PageIntro>
 
-  <NextDate state={state} />
-  <Facts variant="list" next={next} />
+  {/* The dates are what this page is for; the notification stands beside them, smaller. */}
+  <EventList status={upcoming.status} events={upcoming.events} />
 
-  {/* The top curated entry as a pull quote, quoted as submitted. Not a second
-      testimonials grid — that would put the same quotes on two indexed URLs. */}
-  {voice && (
-    <Section label="Stimme aus dem Kreis" defer>
-      <Split>
-        <div slot="head" class="grid justify-items-start gap-4">
-          <Eyebrow>Eine Stimme</Eyebrow>
-          <p class="font-serif text-display-3 text-fg">
-            Aus dem <em class="text-accent">Kreis</em>
-          </p>
-        </div>
-        <Quote quote={voice.quote} author={voice.author} role={voice.role} size="lg" class="reveal" />
-      </Split>
-    </Section>
-  )}
-
-  {/* Grounds alternate whether or not a voice is published. */}
   <Faq
-    ground={voice ? 'sand' : 'default'}
     data={{
       anchor: 'fragen-zum-termin',
       eyebrow: 'Vor dem Termin',
@@ -185,9 +159,9 @@ const socialDetails = next
     }}
   />
 
-  <Section ground={voice ? 'default' : 'sand'} labelledby="mehr-title" defer>
+  <Section ground="alt" space="band" labelledby="mehr-title">
     <Split>
-      <SectionHead slot="head" eyebrow="Mehr über den Kreis" title="Weiterlesen" titleId="mehr-title" />
+      <SectionHead slot="head" eyebrow="Mehr über den Kreis" title="Weiterlesen" titleId="mehr-title" size="sub" />
       <LinkList items={moreLinks} />
     </Split>
   </Section>

@@ -2,8 +2,15 @@
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
 import { Icon } from 'astro-icon/components';
-import Button from './ui/Button.astro';
 import Container from './ui/Container.astro';
+import ModeToggle from './ModeToggle.astro';
+
+/**
+ * The compact footer on the dark focus ground, the same on every page: the mark
+ * and one line about the circle, the navigation, the contact, then the legal
+ * links and the display option. No invitation of its own: a page that ends on
+ * one sets it itself.
+ */
 
 // `mailto:` and `tel:` stay in place; external profiles open in a new tab,
 // announced as part of the accessible name. Icons: src/icons/social-<type>.svg.
@@ -16,44 +23,20 @@ const socialLinks = site.socialLinks.map((link) => {
 // Only these prerendered pages are safe to fetch before a click.
 const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum', '/datenschutz']);
 
-interface Props {
-  /** The invitation with its button. Off where the page already closes on one (home: "Dabei sein."). */
-  close?: boolean;
-}
-
-const { close = true } = Astro.props;
-
-const heading = 'mb-6 font-sans text-xs font-bold tracking-[0.16em] text-accent uppercase';
+const heading = 'mb-3 font-sans text-xs font-semibold tracking-label text-fg-muted uppercase';
 const footerLink =
-  'inline-flex min-h-10 items-center gap-3 text-sm text-fg-soft transition-[color,translate] duration-300 hover:translate-x-1 hover:text-fg motion-reduce:hover:translate-x-0';
+  'inline-flex min-h-11 items-center gap-3 text-base text-fg transition-colors duration-180 hover:text-accent sm:min-h-10';
 ---
 
-<footer class="surface-ink pb-8 print:hidden">
+<footer class="surface-dark pt-section pb-8 print:hidden">
   <Container>
-    {close && (
-      <div class="grid justify-items-center gap-8 border-b border-line py-section text-center">
-        <p class="max-w-[16ch] font-serif text-display-3 text-fg">
-          Komm so, wie du <em class="text-accent">gerade</em> bist.
-        </p>
-        <Button href="/event" size="lg" data-umami-event="cta-click" data-umami-event-location="footer">
-          Termine &amp; Anmeldung
-        </Button>
-      </div>
-    )}
-
-    {/* Without its invitation the footer meets the page's dark close: a hairline parts them. */}
-    <div
-      class:list={[
-        'grid gap-12 pt-section pb-group sm:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)]',
-        !close && 'border-t border-line',
-      ]}
-    >
-      <div class="max-w-[40ch] sm:col-span-2 lg:col-span-1">
-        <a href="/" class="mb-6 inline-flex items-center gap-4 rounded-control font-serif text-2xl leading-tight">
-          <Icon name="logo" aria-hidden="true" class="size-11 shrink-0 text-accent" />
-          <span class="max-w-[12ch]">{site.siteName}</span>
+    <div class="grid gap-x-grid gap-y-10 pb-group sm:grid-cols-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]">
+      <div class="max-w-[38ch] sm:col-span-2 lg:col-span-1">
+        <a href="/" class="mb-4 inline-flex min-h-11 items-center gap-3 rounded-control font-serif text-sub">
+          <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+          <span>{site.siteName}</span>
         </a>
-        <p class="text-sm text-fg-muted">{site.footerDescription}</p>
+        <p class="text-base text-fg-muted">{site.footerDescription}</p>
       </div>
 
       <nav aria-label="Fußnavigation">
@@ -87,7 +70,7 @@ const footerLink =
                 data-umami-event-platform={link.type}
                 class={footerLink}
               >
-                <Icon name={`social-${link.type}`} aria-hidden="true" class="size-4.5 shrink-0 text-accent" />
+                <Icon name={`social-${link.type}`} aria-hidden="true" class="size-4.5 shrink-0 text-fg-muted" />
                 <span>
                   {link.text}
                   {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
@@ -107,19 +90,22 @@ const footerLink =
     </div>
 
     <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-line pt-6">
-      <p class="text-xs text-fg-muted">{site.footerText}</p>
-      <nav aria-label="Rechtliches" class="flex flex-wrap gap-x-6">
-        {nav.footerLegal.map((item) => (
-          <a
-            href={item.url}
-            data-umami-event="footer-link"
-            data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
-            class="inline-flex min-h-11 items-center text-xs text-fg-muted transition-colors duration-150 hover:text-fg sm:min-h-10"
-          >
-            {item.label}
-          </a>
-        ))}
-      </nav>
+      <p class="text-sm text-fg-muted">{site.footerText}</p>
+      <div class="flex flex-wrap items-center gap-x-6">
+        <nav aria-label="Rechtliches" class="flex flex-wrap gap-x-6">
+          {nav.footerLegal.map((item) => (
+            <a
+              href={item.url}
+              data-umami-event="footer-link"
+              data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
+              class="inline-flex min-h-11 items-center text-sm text-fg-muted transition-colors duration-180 hover:text-fg"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+        <ModeToggle />
+      </div>
     </div>
   </Container>
 </footer>

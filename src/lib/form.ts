@@ -1,7 +1,10 @@
-/** Client side of the three public forms (registration, newsletter, testimonial). */
+/**
+ * Client side of the three public forms (registration, newsletter, testimonial).
+ * Every answer stays at the form: a field's message under the field, the form's
+ * own result under its button (`<form id>-status`). Entries survive an error.
+ */
 import { isInputError } from 'astro:actions';
 import { prefersReducedMotion } from './helpers';
-import { showToast } from './toast';
 import { trackEvent } from './umami';
 
 type ActionCall = (input: FormData) => Promise<{ data?: { message: string }; error?: Error }>;
@@ -19,6 +22,16 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
   const idleLabel = submitLabel?.textContent ?? '';
   const track = form.dataset.track ?? 'form';
   const context = JSON.parse(form.dataset.trackContext || '{}') as Record<string, string>;
+
+  const status = document.getElementById(`${form.id}-status`);
+  /** The form's own line: what happened, or nothing. */
+  const say = (tone: 'success' | 'error' | null, message = ''): void => {
+    if (!status) return;
+    status.textContent = message;
+    status.hidden = tone === null;
+    if (tone) status.dataset.tone = tone;
+    else delete status.dataset.tone;
+  };
 
   /** Field name → message; empty means valid. */
   let errors: Record<string, string> = {};
@@ -54,6 +67,7 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
 
     // Read before disabling: disabled controls are left out of FormData.
     const body = new FormData(form);
+    say(null);
     setBusy(true);
     const { data, error } = await action(body).catch(() => ({ data: undefined, error: new Error(FAILED) }));
     setBusy(false);
@@ -64,7 +78,7 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
     render();
 
     if (data) {
-      showToast('success', data.message);
+      say('success', data.message);
       trackEvent(`${track}-success`, context);
       form.reset();
       return;
@@ -73,7 +87,7 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
     // DOM order, not schema order: the topmost problem, not the first rule checked.
     const first = form.querySelector<HTMLElement>('[aria-invalid="true"]');
     const message = (first && errors[first.getAttribute('name') ?? '']) || error?.message || FAILED;
-    showToast('error', message);
+    say('error', first ? 'Bitte prüfe die markierten Angaben.' : message);
     trackEvent(`${track}-error`, { ...context, error: message });
     first?.focus({ preventScroll: true });
     first?.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'instant' : 'smooth' });

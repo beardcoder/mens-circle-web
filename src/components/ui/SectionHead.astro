@@ -2,83 +2,64 @@
 import Eyebrow from './Eyebrow.astro';
 
 /**
- * Eyebrow, title and lead of a block, stacked above its content. `center` sets
- * them on the middle axis. The title's accent is Playfair's italic in the accent
- * colour: a phrase named by `titleEmphasis`, or an `<em>` in trusted HTML.
+ * Label, title and optional lead of a block, stacked above its content: 12px from
+ * label to title, 24px from title to lead. Titles are one colour; `size` names
+ * the role (`section` a section's title, `page` a sub-page's title, `sub` a
+ * subheading). `center` only for a short invitation.
  */
 
-type Size = 'display-1' | 'display-2' | 'display-3';
+type Size = 'section' | 'page' | 'sub';
 
 interface Props {
   eyebrow?: string;
   title?: string;
-  /** The title holds trusted HTML from the content files (e.g. `<em>`). */
+  /** The title holds trusted HTML from the content files. */
   titleHtml?: boolean;
-  /** A phrase of the title set in the italic accent. */
-  titleEmphasis?: string;
   titleId?: string;
   lead?: string;
   /** The lead holds trusted HTML from the content files (e.g. a link). */
   leadHtml?: boolean;
-  as?: 'h1' | 'h2';
+  as?: 'h1' | 'h2' | 'h3';
   size?: Size;
   align?: 'start' | 'center';
-  /** The page opening animates in. */
-  entrance?: boolean;
   class?: string;
 }
 
 const SIZES: Record<Size, string> = {
-  'display-1': 'text-display-1',
-  'display-2': 'text-display-2',
-  'display-3': 'text-display-3',
+  section: 'text-section',
+  page: 'text-page',
+  sub: 'text-sub',
 };
 
 const {
   eyebrow,
   title,
   titleHtml = false,
-  titleEmphasis,
   titleId,
   lead,
   leadHtml = false,
   as: Heading = 'h2',
-  size = 'display-3',
+  size = 'section',
   align = 'start',
-  entrance = false,
   class: className,
-} = Astro.props;
+}: Props = Astro.props;
 
 const center = align === 'center';
-const emphasis = !titleHtml && title && titleEmphasis && title.includes(titleEmphasis) ? titleEmphasis : '';
-const [before, after] = emphasis ? title!.split(emphasis) : [title, ''];
 const leadClass = [
-  'max-w-measure text-lg text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-fg',
+  'mt-6 max-w-measure text-lg text-fg-muted [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong',
   center && 'mx-auto',
-  entrance && 'entrance:animate-fade-in-up entrance:animate-delay-120',
 ];
-const titleClass = [
-  'max-w-[22ch] text-fg wrap-break-word max-sm:hyphens-auto',
-  SIZES[size],
-  center && 'mx-auto',
-  entrance && 'entrance:animate-fade-in-up entrance:animate-delay-60',
-];
+const titleClass = ['max-w-[24ch] text-fg wrap-anywhere hyphens-auto', SIZES[size], center && 'mx-auto'];
 ---
 
-<div class:list={['grid justify-items-start gap-4', center && 'justify-items-center text-center', className]}>
-  {eyebrow && (
-    <Eyebrow center={center} class:list={[entrance && 'entrance:animate-fade-in-up']}>
-      {eyebrow}
-    </Eyebrow>
-  )}
+<div class:list={['grid justify-items-start', center && 'justify-items-center text-center', className]}>
+  {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
   {title &&
     (titleHtml ? (
       <Heading id={titleId} class:list={titleClass} set:html={title} />
     ) : (
       <Heading id={titleId} class:list={titleClass}>
-        {before}
-        {emphasis && <em>{emphasis}</em>}
-        {after}
+        {title}
       </Heading>
     ))}
   {lead && (leadHtml ? <p class:list={leadClass} set:html={lead} /> : <p class:list={leadClass}>{lead}</p>)}

@@ -1,75 +1,75 @@
 ---
 import type { EventDTO } from '@lib/types';
-import { formatDateShortDE, isoDay } from '@lib/server/format';
+import { plainTextToHtml } from '@lib/server/format';
+import { card } from '@lib/ui';
 import RegistrationForm from '../forms/RegistrationForm.astro';
 import Button from '../ui/Button.astro';
-import Rings from '../Rings.astro';
-import Eyebrow from '../ui/Eyebrow.astro';
+import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 
 interface Props {
   event: EventDTO;
-  class?: string;
 }
 
 /**
- * Registration for one event, in three states: open, waiting list, past. The dark
- * band is the one place on the page that asks for something: the head on the
- * left, the form on the right, rings breathing behind.
+ * What the page is for, as one composition on the paper: the evening's own
+ * description (paragraphs and real lists) beside the registration — open,
+ * waiting list or past. The form sits in a quiet card; nothing decorates it.
  */
 
-const { event, class: className } = Astro.props;
-const dateOnly = isoDay(event.event_date);
+const { event } = Astro.props;
+const description = event.description?.trim() ?? '';
 
-const heading = event.is_past
-  ? { before: 'Dieser Abend hat ', em: 'stattgefunden' }
-  : event.is_full
-    ? { before: 'Trag dich auf die ', em: 'Warteliste' }
-    : { before: 'Sichere dir ', em: 'deinen Platz' };
+const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full ? 'Auf die Warteliste' : 'Anmeldung';
 ---
 
 <Section
   id="anmeldung"
-  ground="night"
   labelledby="anmeldung-title"
-  class:list={['scroll-mt-(--spacing-header) overflow-clip', className]}
-  innerClass="relative grid items-start gap-x-grid gap-y-10 lg:grid-cols-12"
+  class="scroll-mt-(--spacing-header)"
+  innerClass="grid items-start gap-x-grid gap-y-12 lg:grid-cols-12"
 >
-  <Rings slot="before" set="panel" class="text-sand" />
-  <div class="grid justify-items-start gap-5 lg:col-span-5">
-    <Eyebrow>{event.is_past ? 'Rückblick' : 'Teilnehmen'}</Eyebrow>
-    <h2 id="anmeldung-title" class="text-display-3 text-fg">
-      {heading.before}
-      <em>{heading.em}</em>
+  <div class="min-w-0 lg:col-span-5">
+    <h2 id="ueber-den-abend" class="text-sub text-fg">
+      Zu diesem Abend
     </h2>
-
-    {event.is_past ? (
-      <p class="max-w-measure text-lg leading-[1.9] text-fg-soft">
-        Der Abend am <time datetime={dateOnly}>{formatDateShortDE(event.event_date)}</time> ist vorbei, eine Anmeldung
-        ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich benachrichtigen, sobald der
-        nächste Termin feststeht.
-      </p>
-    ) : event.is_full ? (
-      <p class="max-w-measure text-lg leading-[1.9] text-fg-soft">
-        Dieser Abend ist ausgebucht. Du kannst dich trotzdem eintragen: Wird ein Platz frei, rückst du automatisch nach
-        und bekommst sofort eine E-Mail.
-      </p>
+    {description ? (
+      <Prose html={plainTextToHtml(description)} class="mt-5" />
     ) : (
-      <p class="max-w-measure text-lg leading-[1.9] text-fg-soft">
-        Von {event.max_participants} Plätzen sind noch {event.available_spots} frei. Für die Anmeldung genügen Vor- und
-        Nachname und eine E-Mail-Adresse. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail&nbsp;– am
-        Abend musst du dann nur noch vorbeikommen.
+      <p class="mt-5 max-w-measure text-md text-fg-soft">
+        Wir sitzen im Kreis, hören einander zu und sprechen über das, was gerade da ist.
+      </p>
+    )}
+    {!event.is_past && (
+      <p class="mt-6 max-w-measure text-base text-fg-muted">
+        Die genaue Adresse bekommst du mit der Anmeldebestätigung per E-Mail.
       </p>
     )}
   </div>
 
-  <div class="lg:col-span-6 lg:col-start-7">
+  <div class:list={[card, 'min-w-0 p-6 sm:p-8 lg:col-span-6 lg:col-start-7']}>
+    <h2 id="anmeldung-title" class="text-sub text-fg">
+      {heading}
+    </h2>
     {event.is_past ? (
-      <Button href="/event#benachrichtigung" size="lg" class="max-sm:w-full">
-        Bei neuen Terminen benachrichtigen
-      </Button>
+      <>
+        <p class="mt-3 max-w-measure text-md text-fg-soft">
+          Eine Anmeldung ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich
+          benachrichtigen, sobald ein neuer Termin feststeht.
+        </p>
+        <Button href="/event#benachrichtigung" size="lg" class="mt-6 max-sm:w-full">
+          Termine per E-Mail erhalten
+        </Button>
+      </>
     ) : (
-      <RegistrationForm eventId={event.id} isFull={event.is_full} />
+      <>
+        <p class="mt-3 mb-6 max-w-measure text-md text-fg-soft">
+          {event.is_full
+            ? 'Dieser Abend ist ausgebucht. Trag dich trotzdem ein: Wird ein Platz frei, rückst du automatisch nach und bekommst sofort eine E-Mail.'
+            : `Von ${event.max_participants} Plätzen sind noch ${event.available_spots} frei. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail.`}
+        </p>
+        <RegistrationForm eventId={event.id} isFull={event.is_full} />
+      </>
     )}
   </div>
 </Section>

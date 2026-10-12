@@ -1,46 +1,56 @@
 ---
 /**
  * A participant's words, quoted as submitted: nothing added, nothing reworded.
- * `md` is a voice among voices: a large opening mark in the accent, the words in
- * the serif's italic, then the name in small capitals and the role. `lg` is a
- * pull quote: the serif's italic, set large beside an accent rule.
+ * `short` is the one highlighted voice: the serif at the quote size. `text` reads
+ * like running text, so a long voice stays easy to read; past `COLLAPSE_AT`
+ * characters it opens folded to a few lines, with "Vollständige Erfahrung lesen"
+ * (the whole text is always in the page; without JS it simply stands in full).
+ * Name and role follow at one fixed distance in one fixed style.
  */
 interface Props {
   quote: string;
   author?: string | null;
   role?: string | null;
-  size?: 'md' | 'lg';
+  variant?: 'short' | 'text';
   class?: string;
 }
 
-const { quote, author, role, size = 'md', class: className } = Astro.props;
-const lg = size === 'lg';
+const COLLAPSE_AT = 360;
+
+const { quote, author, role, variant = 'text', class: className } = Astro.props;
+const short = variant === 'short';
+const collapsible = !short && quote.length > COLLAPSE_AT;
 ---
 
-{lg ? (
-  <figure class:list={['grid gap-5 border-l-2 border-fill pl-6 sm:pl-8', className]}>
-    <blockquote class="font-serif text-[clamp(1.5rem,1rem+2vw,2.5rem)] leading-[1.25] text-fg italic">
-      „{quote}“
-    </blockquote>
-    {(author || role) && (
-      <figcaption class="flex flex-wrap items-baseline gap-x-2 text-sm">
-        {author && <cite class="font-semibold text-fg not-italic">{author}</cite>}
-        {role && <span class="text-fg-muted">{role}</span>}
-      </figcaption>
-    )}
-  </figure>
-) : (
-  <figure class:list={['flex h-full flex-col gap-5', className]}>
-    {/* A decorative mark: the high “ reads as one at this size; the words keep none. */}
-    <span aria-hidden="true" class="block h-9 font-serif text-[4.5rem] leading-none text-accent select-none">
-      “
-    </span>
-    <blockquote class="font-serif text-xl leading-[1.4] text-fg italic">{quote}</blockquote>
-    {(author || role) && (
-      <figcaption class="mt-auto grid gap-1 pt-2">
-        {author && <cite class="text-xs font-bold tracking-label text-fg not-italic uppercase">{author}</cite>}
-        {role && <span class="text-sm text-fg-muted">{role}</span>}
-      </figcaption>
-    )}
-  </figure>
-)}
+<figure
+  data-quote
+  data-collapsible={collapsible || undefined}
+  class:list={['group/quote grid content-start', className]}
+>
+  <blockquote
+    class:list={[
+      short ? 'font-serif text-quote text-fg' : 'max-w-measure text-md text-fg-soft',
+      'group-data-[collapsed]/quote:line-clamp-6',
+    ]}
+  >
+    „{quote}“
+  </blockquote>
+  {(author || role) && (
+    <figcaption class="mt-4 text-sm text-fg-muted">
+      {author && <cite class="font-semibold text-fg not-italic">{author}</cite>}
+      {author && role && <span aria-hidden="true"> · </span>}
+      {role && <span>{role}</span>}
+    </figcaption>
+  )}
+  {collapsible && (
+    <button
+      type="button"
+      data-quote-toggle
+      aria-expanded="true"
+      hidden
+      class="mt-1 inline-flex min-h-11 w-fit items-center text-base font-semibold text-accent underline decoration-1 underline-offset-4 transition-colors duration-180 hover:text-accent-strong"
+    >
+      Weniger anzeigen
+    </button>
+  )}
+</figure>

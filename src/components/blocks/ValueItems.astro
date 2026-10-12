@@ -19,8 +19,8 @@ interface Props {
 
 /**
  * Positions set as pairs: "Ehrlichkeit statt Fassade" becomes the word that
- * counts and, in the italic, what it replaces — a field of equal cells parted by
- * hairlines, on the stone band.
+ * counts and, quieter, what it replaces — an ordered list in two columns under
+ * thin lines, like the agreements on the home page.
  */
 
 const { data } = Astro.props;
@@ -30,17 +30,18 @@ const items = (data.items ?? []).map((item) => {
 });
 ---
 
-<Section id={data.anchor} ground="sand" defer>
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml lead={data.intro} size="display-2" />
+<Section id={data.anchor} space="band">
+  <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml lead={data.intro} size="sub" />
 
   {items.length > 0 && (
-    <ul role="list" class="mt-group grid border-t border-line sm:grid-cols-2 lg:grid-cols-3">
+    <ul role="list" class="mt-8 grid gap-x-grid gap-y-6 md:grid-cols-2">
       {items.map((item) => (
-        <li class="reveal grid content-start gap-3 border-b border-line px-1 py-10 sm:px-8 sm:max-lg:even:border-l lg:not-nth-[3n+1]:border-l">
-          <h3 class="text-2xl text-fg">
-            {item.keep} {item.instead && <span class="block text-lg text-fg-muted italic">statt {item.instead}</span>}
+        <li class="grid content-start gap-2 border-t border-line-strong pt-5">
+          <h3 class="font-sans text-xl font-semibold text-fg">
+            {item.keep}
+            {item.instead && <span class="block text-base font-normal text-fg-muted">statt {item.instead}</span>}
           </h3>
-          {item.description && <p class="text-base text-fg-soft">{item.description}</p>}
+          {item.description && <p class="max-w-measure text-md text-fg-soft">{item.description}</p>}
         </li>
       ))}
     </ul>
