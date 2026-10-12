@@ -8,17 +8,22 @@ Commit messages are English too, in Conventional Commits form (`fix(seo): …`).
 ## Commands
 
 ```bash
-bun run dev            # daemonizes; bunx astro dev status|logs|stop
+bun run dev            # under an agent it daemonizes; bunx astro dev status|logs|stop
 bun run build          # bun --bun astro build: Astro runs on Bun (≥ 1.4) for Bun.Image
 bun run check          # astro check
 bun run lint           # eslint; complexity ≤ 12, max-depth ≤ 4 are enforced
 bun run format         # prettier; also run after db:generate (drizzle/meta is formatted)
+bun run format:check   # what CI runs; CLAUDE.md and docs/ are formatted too
 bun test               # each *.fixture.ts case runs in its own Bun process
 bun run db:generate    # after editing src/lib/server/db/schema.ts
+bun run knip           # unused files, exports and dependencies
+bun run images:verify  # a running build (default :18092): 4 islands, image variants, /_image 404
 ```
 
-Verify with `check` + `lint` + `test`. TypeScript stays on 6.x: `astro check` and
-typescript-eslint refuse TS 7.
+Verify with `check` + `lint` + `format:check` + `test`; CI (`.github/workflows/ci.yml`)
+runs those and `build`. TypeScript stays on 6.x: `astro check` and typescript-eslint
+refuse TS 7. Dependabot auto-merges minor and patch bumps. For Astro questions, use the
+`astro-docs` MCP server (`.mcp.json`).
 
 ## Rules
 
@@ -29,14 +34,20 @@ compression in the app: the Coolify proxy and Cloudflare do it. `404.astro` is
 prerendered; the adapter hands it to Astro from memory, so every 404, `/404` included,
 keeps its status. The adapter stays generic: site policy goes in through its options in
 `astro.config.mjs`. Migrations run on boot. `src/lib/server/*`
-is server-only; never import it into client scripts.
+is server-only; never import it into client scripts. Deployed as one Docker image on
+Coolify (port 8090, SQLite on the `/data` volume); env vars are in `.env.example` and
+the README. Retired URLs redirect in `astro.config.mjs` (`redirects`) or, when they go
+to `/`, in `src/middleware.ts`; `trailingSlash: 'never'`.
 
 **Tests.** A test that reads config must spawn a fixture with `--no-env-file` and an
 explicit env; config is read at module load, so an in-process import measures `.env`.
 
 **Actions.** Everything is an Astro Action (`src/actions/*`), merged flat in `index.ts`.
 Public forms validate only in their Zod schema; `lib/form.ts` owns submit and field
-errors (forms need JS). Admin scripts use `bindOnce` + `ok` from `lib/admin.ts`
+errors (forms need JS). They go through `publicForm()` in `actions/forms.ts`: an
+in-process per-IP rate limit (`lib/server/ratelimit.ts`, one more reason for a single
+replica), a honeypot field (`website`) answered with a fake success, German messages,
+and no internal error ever shown. Admin scripts use `bindOnce` + `ok` from `lib/admin.ts`
 (the admin runs `<ClientRouter />`). Mutating admin actions call `requireAdmin`.
 Other endpoints: `/health`, `/sitemap-events.xml`, `/auth/*`, `/api/public/events/<slug>/ics`.
 
@@ -58,13 +69,17 @@ replica on the same SQLite file is not supported.
 (`HomeEventStatus` ×2, `Facts`, `Testimonials`); fallbacks never read the DB, islands
 get no images. The `HomeEventStatus` fallback sets the same lines as a scheduled date
 (static words, same length or shorter), so the swap changes text, not height: no
-layout shift. Text in the first screen that an island fills stays one fixed line. Event pages are SSR. `lib/event-status.ts` has three states; a failed
-read (`unavailable`) must never render as "no date planned".
+layout shift. Text in the first screen that an island fills stays one fixed line.
+Event pages are SSR. `lib/event-status.ts` has three states; a failed read
+(`unavailable`) must never render as "no date planned".
 
 **Caching.** `lib/cache-policy.ts` is the one table (middleware + the adapter's `staticHeaders`);
-routes with their own header are left alone. The four prerendered documents use
+routes with their own header are left alone. The prerendered pages (home, the legal
+pages, `/warum-ich-den-maennerkreis-leite`, `/teile-deine-erfahrung`) use
 `PRERENDERED_CACHE_CONTROL` (`lib/cache.ts`, `s-maxage=300`), which is only safe with a
-stable build-time `ASTRO_KEY`; without it, revert to `no-cache`.
+stable build-time `ASTRO_KEY`; without it, revert to `no-cache`. `public/sw.js` only
+retires the removed breathing app's service worker and is served `no-cache`; it can go
+once old installs have updated.
 
 **Generated files.** `publish-generated-files.mjs` must run after `sitemap()` and `llms()`:
 it adds `/sitemap-events.xml` and `/event`. The adapter serves whatever is on disk at startup.
@@ -77,7 +92,12 @@ source ratio (`fit: 'outside'`), and the block crops them with `aspect-ratio`,
 use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; tasks
-declare their own cron. No in-process timer and no `Bun.cron` (throws at boot).
+declare their own cron, on the UTC clock (reminders every 15 min, the S3 backup at
+03:00 when `BACKUP_S3_*` is set). No in-process timer and no `Bun.cron` (throws at
+boot). Beside `dist/` and `drizzle/`, the Docker image keeps only the three scheduled
+scripts, `scripts/lib/`, `src/lib/server/` and the production `dependencies` (the build
+bundles the rest): what those scripts and the server lib import at runtime must be in
+there (other `src/lib` files as types only).
 
 **Email.** listmonk is external; this repo only integrates it. `lib/server/email.ts` is
 the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) stable.
@@ -123,11 +143,11 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `accent` is terracotta as text, `fill` the terracotta of buttons, seats and bars.
   Every text token holds ≥ 4.5:1 on every ground, control borders (`line-bold`)
   ≥ 3:1; check new pairs in both palettes and both modes.
-- Grounds (`Section ground`): paper; `alt` parchment; `sand` the stone band (88%
-  opaque, so the breathing light runs on beneath it); `night` deep earth with grain
-  (openings, the journey, registration); `earth` the brown panel; `forest` the
-  WhatsApp band; `ink` the footer. Surfaces re-declare the semantic colours, so
-  everything inside follows.
+- Grounds (`Section ground`): `default` paper; `alt` parchment; `sand` the stone band
+  (88% opaque, so the breathing light runs on beneath it); `night` deep earth with
+  grain (openings, the journey, registration, the menu); `earth` the brown panel
+  (`HalfBleed`, the newsletter band); `forest` the WhatsApp band; `ink` the footer.
+  Surfaces (`surface-*`) re-declare the semantic colours, so everything inside follows.
 - Openings are dark: `HeroFrame` (two warm glows, breathing hairline `Rings`,
   `data-hero`); nothing stands at its sides — no frame lines, no labels set on end.
   Home fills the first screen, an event takes `tall`, sub-pages (`PageOpening`)
@@ -141,16 +161,17 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `titleEmphasis`); quotes and questions in the italic. DM Sans (`font-sans`)
   explains: text, UI, a size step above the usual (DM Sans runs small). Eyebrows are
   spaced capitals (`tracking-eyebrow`) behind a long fading rule, with a rule on each
-  side over a centred head (`Eyebrow center`); buttons and labels bold capitals (`tracking-label`). A dash in running
-  copy is bound to the word before it (`\u00a0–`), so no line starts with one.
+  side over a centred head (`Eyebrow center`); buttons and labels bold capitals
+  (`tracking-label`). A dash in running copy is bound to the word before it
+  (`\u00a0–`), so no line starts with one.
 - Shapes: pill buttons (`rounded-full`, lift and glow on hover), soft cards
   (`rounded-card` 12px, `shadow-card`) for self-contained units — the date, forms —
   never for running text; a date or form card carries a 4px `fill` cap on top
   (`capCard`), never a side bar. On a dark opening the date and the seats stand
-  open behind a hairline, not in a card. Groups
-  of equals stand in hairline grids (facts, agreements,
-  values, voices, link rows). The Ablauf steps are numbered `01`–`04` in large serif
-  figures on the dark band; everything else is told in sentences.
+  open behind a hairline, not in a card. Groups of equals stand in hairline grids
+  (facts, agreements, values, voices, link rows). The Ablauf steps are numbered
+  `01`–`04` in large serif figures on the dark band; everything else is told in
+  sentences.
 - `HalfBleed` puts the reading on the paper beside a brown panel to the screen's edge
   (Intro). The FAQ is a list of serif questions between hairlines with a round plus
   that turns. Voices (`Quote`) are never cards: serif italic under a large accent
