@@ -121,15 +121,14 @@ thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
   `view()` timeline: what is already on screen is already complete, and without
   timeline support or with reduced motion the content simply stands.
 - The circles breathe: the hero's three rings out of phase (`animate-ring`,
-  `animate-ring-slow`), drifting down as the page scrolls away (`ring-drift`); the
-  breath guide (`animate-breathe`, 4 s in, 5 s out — the words beside it say the
-  same). Markus's photograph moves a touch slower than the page (`drift-slow`).
+  `animate-ring-slow`); the breath guide (`animate-breathe`, 4 s in, 5 s out — the
+  words beside it say the same).
 - The phone menu opens as a circle from its button (`clip-path`, `--nav-origin`),
   its links rising in; the scroll-to-top button appears past the first screen
   (`scroll-motion:`).
-- No scroll-tied size changes, no `content-visibility` (anchors land where they
-  should). Under `prefers-reduced-motion` everything rests and the timed breath
-  guide hides.
+- No parallax (nothing moves at its own speed against the page), no scroll-tied
+  size changes, no `content-visibility` (anchors land where they should). Under
+  `prefers-reduced-motion` everything rests and the timed breath guide hides.
 
 ## Components
 

@@ -183,7 +183,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   a line); openings rise in staggered (`entrance:animate-rise`, ≤ 260ms); blocks
   rise into view (`reveal`) and list lines draw across (`draw`), both on `view()`
   timelines, so what is on screen is complete and nothing waits on a script; the
-  hero's rings breathe and drift on scroll; the breath circle's 10 s cycle matches
+  hero's rings breathe (no parallax); the breath circle's 10 s cycle matches
   its words (4 s in, 5 s out); the phone menu opens as a circle from its button.
   Island content does not animate (its swap must not flash). No `content-visibility`.
   Under reduced motion everything rests and the timed guide hides.

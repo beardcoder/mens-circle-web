@@ -255,24 +255,6 @@
   }
 }
 
-/* The hero's rings drift down a little as the page scrolls away from them. */
-@keyframes ring-drift {
-  to {
-    translate: 0 var(--drift, 6rem);
-  }
-}
-
-/* A photograph moves a touch slower than the page: depth without decoration. */
-@keyframes drift-slow {
-  from {
-    translate: 0 -1.5rem;
-  }
-
-  to {
-    translate: 0 1.5rem;
-  }
-}
-
 /* ── Surfaces ─────────────────────────────────────────────────────────────── */
 
 /* A ground re-declares the colour roles, so text, lines, buttons, focus rings
