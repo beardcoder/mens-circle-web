@@ -64,6 +64,9 @@ const initMenu = (menu: HTMLDialogElement): void => {
 
       menu.style.setProperty('--nav-origin', `${left + width / 2}px ${top + height / 2}px`);
       menu.showModal();
+      // `showModal()` focuses the first link, the mark, and Safari rings it even
+      // after a tap: the dialog itself takes the focus, Tab moves on from there.
+      menu.focus();
     });
   }
 
