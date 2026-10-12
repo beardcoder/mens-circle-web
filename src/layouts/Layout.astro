@@ -71,7 +71,7 @@ const props = Astro.props;
 
     <a
       href="#main"
-      class="fixed -top-full left-4 z-50 rounded-control bg-fill px-5 py-3 text-base font-semibold text-on-fill transition-[top] duration-180 focus:top-2 print:hidden"
+      class="fixed -top-full left-4 z-50 rounded-full bg-fill px-5 py-3 text-base font-semibold text-on-fill transition-[top] duration-180 focus:top-2 print:hidden"
     >
       Zum Inhalt springen
     </a>
@@ -88,7 +88,7 @@ const props = Astro.props;
         data-llms-skip
         aria-label="Nach oben scrollen"
         title="Nach oben"
-        class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full border border-line-bold bg-raised text-fg shadow-card transition-colors duration-180 hover:border-fg scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden sm:right-6 sm:bottom-6"
+        class="fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full bg-fill text-on-fill transition-[background-color,translate] duration-180 hover:-translate-y-0.5 hover:bg-fill-strong motion-reduce:hover:translate-y-0 scroll-motion:animate-[appear-late_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden sm:right-6 sm:bottom-6"
       >
         <Icon name="chevron-up" aria-hidden="true" class="size-4.5" />
       </a>

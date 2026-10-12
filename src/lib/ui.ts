@@ -8,9 +8,9 @@
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
-/** One shape for every button: 8px corners, the label in normal case at weight 600. Hover changes colour only. */
+/** One shape for every button: fully round, the label in normal case at weight 600. On hover it changes colour and rises 2px; pressed, it settles. */
 const BUTTON_BASE =
-  'group/btn relative inline-flex items-center justify-center rounded-control border text-center font-sans font-semibold leading-tight no-underline transition-[background-color,color,border-color] duration-180 ease-out disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50';
+  'group/btn relative inline-flex items-center justify-center rounded-full border text-center font-sans font-semibold leading-tight no-underline transition-[background-color,color,border-color,translate,scale] duration-180 ease-out active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [@media(hover:hover)]:hover:-translate-y-0.5 motion-reduce:active:scale-100 motion-reduce:[@media(hover:hover)]:hover:translate-y-0';
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   /** The one main action of a module: rust under a light label. */
@@ -25,9 +25,9 @@ const BUTTON_SIZES: Record<ButtonSize, string> = {
   /** The admin's dense row buttons: still well clear of the 24px minimum target. */
   xs: 'min-h-9 gap-1.5 px-3 py-1.5 text-sm',
   /** The header's action. */
-  sm: 'min-h-11 gap-2 px-4 py-2 text-[0.9375rem]',
-  md: 'min-h-12 gap-2 px-6 py-3 text-base',
-  lg: 'min-h-13 gap-2.5 px-7 py-3.5 text-base',
+  sm: 'min-h-11 gap-2 px-5 py-2 text-[0.9375rem]',
+  md: 'min-h-12 gap-2 px-7 py-3 text-base',
+  lg: 'min-h-13 gap-2.5 px-8 py-3.5 text-base',
 };
 
 export const button = ({
@@ -43,8 +43,9 @@ export const link =
 
 export type ControlSize = 'md' | 'sm' | 'xs';
 
+/** Square: fields hold, they are not pressed. */
 const CONTROL_BASE =
-  'rounded-control border border-line-bold bg-field font-sans text-fg placeholder:text-fg-muted transition-[border-color,box-shadow] duration-180 ease-out hover:not-focus:not-disabled:border-fg-muted focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-1 aria-invalid:ring-danger';
+  'border border-line-bold bg-field font-sans text-fg placeholder:text-fg-muted transition-[border-color,box-shadow] duration-180 ease-out hover:not-focus:not-disabled:border-fg-muted focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-1 aria-invalid:ring-danger';
 
 /** 16px at least on the public forms: anything smaller makes iOS zoom on focus. */
 const CONTROL_SIZES: Record<ControlSize, string> = {
@@ -67,13 +68,13 @@ export const fieldError =
 /** A form's own answer under its button, written by lib/form.ts: what actually happened, in words, with a mark. */
 export const formStatus =
   'flex items-start gap-2 text-base font-medium before:mt-0.5 before:grid before:size-5 before:shrink-0 before:place-items-center before:rounded-full before:text-xs before:leading-none before:font-bold before:text-surface data-[tone=error]:text-danger data-[tone=error]:before:bg-danger data-[tone=error]:before:content-["!"] data-[tone=success]:text-success data-[tone=success]:before:bg-success data-[tone=success]:before:content-["✓"]';
-export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer rounded accent-fill';
+export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer accent-fill';
 
 /** A short section label: small spaced capitals in the secondary text colour. */
 export const label = 'font-sans text-xs font-semibold tracking-label text-fg-muted uppercase';
 
-/** A card: a self-contained module (a date, a form) on the raised ground. */
-export const card = 'rounded-card border border-line bg-raised';
+/** A card: a self-contained module (a date, a form). Square and flat: a thin line, no shadow. */
+export const card = 'border border-line-strong bg-raised';
 
 /** A card's padding, for the cards that hold a form (the admin's panels). */
 export const panel = `${card} p-6 sm:p-8`;

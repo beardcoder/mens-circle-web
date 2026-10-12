@@ -8,14 +8,13 @@ import Button from '../ui/Button.astro';
  * the date on two fixed lines, time, place, fee and seats as four rows, and the
  * action that fits the state. Every line is one line at every width (below 360px
  * a row stacks its label over its value), so a loading summary and a loaded one
- * stand the same height. A card; `raised` lifts it on the shared shadow.
+ * stand the same height. A flat, square card.
  */
 interface Props {
   view: SummaryView;
   /** The date's element: a heading where the summary heads its own block. */
   as?: 'p' | 'h2' | 'h3';
   titleId?: string;
-  raised?: boolean;
   /** Off where the date already stands as the page's title: the label and the rows only. */
   showTitle?: boolean;
   /** Analytics: where the action sits. */
@@ -23,24 +22,12 @@ interface Props {
   class?: string;
 }
 
-const {
-  view,
-  as: Title = 'p',
-  titleId,
-  raised = false,
-  showTitle = true,
-  location,
-  class: className,
-}: Props = Astro.props;
+const { view, as: Title = 'p', titleId, showTitle = true, location, class: className }: Props = Astro.props;
 const [lead, rest] = view.title;
 const isDate = Boolean(view.datetime);
 ---
 
-<div
-  data-summary
-  data-state={view.state}
-  class:list={[card, raised && 'shadow-card', 'grid content-start p-6 sm:p-8', className]}
->
+<div data-summary data-state={view.state} class:list={[card, 'grid content-start p-6 sm:p-8', className]}>
   <p class="text-xs font-semibold tracking-label text-fg-muted uppercase">{view.kicker}</p>
   {showTitle && (
     <Title id={titleId} class="mt-3 font-serif text-sub text-fg">
@@ -75,6 +62,7 @@ const isDate = Boolean(view.datetime);
       href={view.action.href}
       variant={view.state === 'full' ? 'secondary' : 'primary'}
       block
+      decorate
       class="mt-6"
       data-umami-event="cta-click"
       data-umami-event-location={location}

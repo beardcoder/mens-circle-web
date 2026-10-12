@@ -42,7 +42,7 @@ function fmtDate(iso: string): string {
 )}
 
 {events.length === 0 ? (
-  <div class="grid justify-items-center gap-4 rounded-control border border-dashed border-line-strong px-4 py-12 text-center text-fg-muted">
+  <div class="grid justify-items-center gap-4 border border-dashed border-line-strong px-4 py-12 text-center text-fg-muted">
     <p>Noch keine Veranstaltungen.</p>
     <a class={button({ variant: 'secondary', size: 'xs' })} href="/admin/events/new">
       Die erste anlegen

@@ -5,7 +5,8 @@ import Eyebrow from './Eyebrow.astro';
  * Label, title and optional lead of a block, stacked above its content: 12px from
  * label to title, 24px from title to lead. Titles are one colour; `size` names
  * the role (`section` a section's title, `page` a sub-page's title, `sub` a
- * subheading). `center` only for a short invitation.
+ * subheading). `center` only for a short invitation. It rises into view as it
+ * scrolls in (`reveal`).
  */
 
 type Size = 'section' | 'page' | 'sub';
@@ -52,7 +53,7 @@ const leadClass = [
 const titleClass = ['max-w-[24ch] text-fg wrap-anywhere hyphens-auto', SIZES[size], center && 'mx-auto'];
 ---
 
-<div class:list={['grid justify-items-start', center && 'justify-items-center text-center', className]}>
+<div class:list={['reveal grid justify-items-start', center && 'justify-items-center text-center', className]}>
   {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
   {title &&
     (titleHtml ? (

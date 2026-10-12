@@ -36,7 +36,8 @@ const items = (data.items ?? []).map((item) => {
   {items.length > 0 && (
     <ul role="list" class="mt-8 grid gap-x-grid gap-y-6 md:grid-cols-2">
       {items.map((item) => (
-        <li class="grid content-start gap-2 border-t border-line-strong pt-5">
+        <li class="reveal grid content-start gap-2">
+          <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
           <h3 class="font-sans text-xl font-semibold text-fg">
             {item.keep}
             {item.instead && <span class="block text-base font-normal text-fg-muted">statt {item.instead}</span>}

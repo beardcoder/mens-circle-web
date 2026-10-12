@@ -104,7 +104,7 @@ function badgeTone(s: Status): 'live' | 'wait' | 'off' {
 </section>
 
 {registrations.length === 0 ? (
-  <div class="mb-10 rounded-control border border-dashed border-line-strong px-4 py-12 text-center text-fg-muted">
+  <div class="mb-10 border border-dashed border-line-strong px-4 py-12 text-center text-fg-muted">
     Noch keine Anmeldungen.
   </div>
 ) : (
@@ -172,8 +172,8 @@ function badgeTone(s: Status): 'live' | 'wait' | 'off' {
   <h2 class="mb-2 text-2xl">Nachricht an Teilnehmer:innen</h2>
   <p class="mb-4 text-sm text-fg-muted">
     Geht per E-Mail an alle <strong class="text-fg">angemeldeten</strong> Teilnehmer:innen. Platzhalter
-    <code class="rounded-control bg-ground px-1.5 py-0.5 text-[0.9em] text-accent">{'{first_name}'}</code> wird durch
-    den Vornamen ersetzt.
+    <code class="bg-ground px-1.5 py-0.5 text-[0.9em] text-accent">{'{first_name}'}</code> wird durch den Vornamen
+    ersetzt.
   </p>
   <form id="broadcast-form" class:list={[panel, 'grid gap-5']} data-event={eventId}>
     <Field for="msg-subject" label="Betreff">
