@@ -45,9 +45,16 @@ function proxiedPostBehaviour(host: string): void {
   // Without allowedDomains the forwarded protocol is ignored — the shipped bug.
   assert.equal(rejects(host, { origin: `https://${host}`, ...proxied }, []), true);
 
-  // A genuine cross-site POST is still forbidden.
+  // A genuine cross-site POST is still forbidden: by its Origin, and in modern
+  // browsers by Sec-Fetch-Site, which Astro reads first (since 7.3.6).
   assert.equal(rejects(host, { origin: 'https://evil.example', ...proxied }), true);
-  assert.equal(rejects(host, { ...proxied }), true);
+  assert.equal(rejects(host, { 'sec-fetch-site': 'cross-site', origin: 'https://evil.example', ...proxied }), true);
+  assert.equal(rejects(host, { 'sec-fetch-site': 'cross-site', ...proxied }), true);
+  // A modern browser's own form POST passes on Sec-Fetch-Site.
+  assert.equal(rejects(host, { 'sec-fetch-site': 'same-origin', origin: `https://${host}`, ...proxied }), false);
+  // Neither header: not a browser, so no cross-site forgery to stop; Astro lets
+  // it through since 7.3.6, and so may this app.
+  assert.equal(rejects(host, { ...proxied }), false);
 
   // A spoofed x-forwarded-host is ignored, not trusted — this is what keeps
   // host-header injection out once allowedDomains is in play.
