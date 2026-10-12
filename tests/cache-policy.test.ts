@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test';
+
 import { cacheControlForFile, cacheControlForRoute } from '../src/lib/cache-policy';
 
 // Pure string assertions: no server, no database, no build output.
@@ -29,6 +30,7 @@ test('a path that merely starts with the same letters is not back-office', () =>
 test('public HTML is stored but revalidated, never served stale', () => {
   for (const pathname of ['/', '/event', '/event/2026-09-18', '/impressum', '/warum-ich-den-maennerkreis-leite']) {
     const value = cacheControlForRoute(pathname);
+
     expect(value).toBe('public, max-age=0, must-revalidate');
     // The seat count on an event page must never come out of a shared cache.
     expect(value).toContain('max-age=0');
@@ -57,6 +59,7 @@ test('unhashed files from public/ are cached for a week, refreshed in the backgr
     '/images/logo-color.png',
   ]) {
     const value = cacheControlForFile(pathname, 'assets');
+
     expect(value).toBe('public, max-age=604800, stale-while-revalidate=2592000');
     // Not `immutable`: these names carry no hash, so a replaced file has to be
     // able to reach a cache that already holds the old bytes.

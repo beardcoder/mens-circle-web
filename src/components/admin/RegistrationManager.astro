@@ -1,5 +1,6 @@
 ---
 import { button, card, control, panel } from '@lib/ui';
+
 import Badge from '../ui/Badge.astro';
 import Field from '../ui/Field.astro';
 import AdminHead from './AdminHead.astro';
@@ -30,8 +31,10 @@ const STATUS_LABEL: Record<Status, string> = {
   cancelled: 'Storniert',
   attended: 'Teilgenommen',
 };
+
 const activeCount = registrations.filter((r) => r.status === 'registered' || r.status === 'attended').length;
 const waitlistCount = registrations.filter((r) => r.status === 'waitlist').length;
+
 /** Seats that should hold a confirmation but do not — the "fehlende" target. */
 const missingConfirmation = registrations.filter(
   (r) => (r.status === 'registered' || r.status === 'waitlist') && !r.confirmationSentAt,
@@ -39,12 +42,16 @@ const missingConfirmation = registrations.filter(
 
 function fmt(iso: string | null): string {
   if (!iso) return '–';
+
   const d = new Date(iso);
+
   return Number.isNaN(d.getTime()) ? '–' : d.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
 }
 function badgeTone(s: Status): 'live' | 'wait' | 'off' {
   if (s === 'registered' || s === 'attended') return 'live';
+
   if (s === 'waitlist') return 'wait';
+
   return 'off';
 }
 ---
@@ -190,53 +197,70 @@ function badgeTone(s: Status): 'live' | 'wait' | 'off' {
 
 <script>
   import { actions } from 'astro:actions';
+
   import { adminToast, bindOnce, ok } from '@lib/admin';
 
   bindOnce('#reg-list', (list) => {
     list.addEventListener('change', async (e) => {
       const sel = (e.target as HTMLElement).closest('[data-status-select]') as HTMLSelectElement | null;
+
       if (!sel) return;
+
       const row = sel.closest('[data-id]') as HTMLElement;
       const status = sel.value as 'registered' | 'waitlist' | 'cancelled' | 'attended';
 
       sel.disabled = true;
       const result = await actions.setRegistrationStatus({ id: row.dataset.id!, status });
+
       sel.disabled = false;
+
       if (!ok(result)) return;
 
       adminToast('ok', 'Status aktualisiert.');
+
       // A cancellation can promote someone from the waitlist.
       if (status === 'cancelled') setTimeout(() => window.location.reload(), 700);
     });
 
     list.addEventListener('click', async (e) => {
       const btn = (e.target as HTMLElement).closest('[data-resend-one]') as HTMLButtonElement | null;
+
       if (!btn) return;
+
       const row = btn.closest('[data-id]') as HTMLElement;
       const { id, name } = row.dataset;
+
       if (!id || !confirm(`Anmeldebestätigung an ${name} senden?`)) return;
 
       btn.disabled = true;
       btn.textContent = 'Senden…';
       const result = await actions.resendConfirmations({ eventId: list.dataset.event!, ids: [id] });
+
       btn.disabled = false;
       btn.textContent = 'Bestätigung senden';
+
       if (!ok(result)) return;
 
       adminToast(result.data.sent > 0 ? 'ok' : 'err', result.data.message);
+
       if (result.data.sent > 0) setTimeout(() => window.location.reload(), 700);
     });
 
     list.addEventListener('click', async (e) => {
       const btn = (e.target as HTMLElement).closest('[data-delete]') as HTMLButtonElement | null;
+
       if (!btn) return;
+
       const row = btn.closest('[data-id]') as HTMLElement;
       const { id, name } = row.dataset;
+
       if (!id || !confirm(`Anmeldung von ${name} entfernen?`)) return;
 
       btn.disabled = true;
+
       if (!ok(await actions.deleteRegistration({ id }))) {
         btn.disabled = false;
+
         return;
       }
 
@@ -250,28 +274,37 @@ function badgeTone(s: Status): 'live' | 'wait' | 'off' {
 
     const run = async (btn: HTMLButtonElement, onlyMissing: boolean) => {
       const label = btn.textContent;
+
       btn.disabled = true;
       btn.textContent = 'Senden…';
       const result = await actions.resendConfirmations({ eventId, onlyMissing });
+
       btn.disabled = false;
       btn.textContent = label;
+
       if (!ok(result)) return;
 
       adminToast(result.data.failed > 0 ? 'err' : 'ok', result.data.message);
+
       if (result.data.sent > 0) setTimeout(() => window.location.reload(), 1200);
     };
 
     confirmBar.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       const missing = target.closest('[data-resend-missing]') as HTMLButtonElement | null;
+
       if (missing) {
         void run(missing, true);
+
         return;
       }
 
       const all = target.closest('[data-resend-all]') as HTMLButtonElement | null;
+
       if (!all) return;
+
       if (!confirm('Bestätigung an ALLE angemeldeten und wartenden Teilnehmer:innen erneut senden?')) return;
+
       void run(all, false);
     });
   });
@@ -290,8 +323,10 @@ function badgeTone(s: Status): 'live' | 'wait' | 'off' {
         subject: String(fd.get('subject') ?? ''),
         content: String(fd.get('content') ?? ''),
       });
+
       btn.disabled = false;
       btn.textContent = 'Nachricht senden';
+
       if (!ok(result)) return;
 
       adminToast('ok', result.data.message);

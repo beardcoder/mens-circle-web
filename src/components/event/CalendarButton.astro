@@ -1,6 +1,7 @@
 ---
+import { buildIcs, type CalendarEvent, googleCalendarUrl } from '@lib/server/ics';
 import type { EventDTO } from '@lib/types';
-import { buildIcs, googleCalendarUrl, type CalendarEvent } from '@lib/server/ics';
+
 import Button from '../ui/Button.astro';
 
 interface Props {
@@ -20,6 +21,7 @@ const calendarEvent: CalendarEvent = {
   endTime: event.end_time,
   location: event.location,
 };
+
 const ics = buildIcs(calendarEvent);
 const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
 const googleHref = googleCalendarUrl(calendarEvent);

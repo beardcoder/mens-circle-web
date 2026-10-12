@@ -61,13 +61,16 @@ export const control = (size: ControlSize = 'md'): string => `${CONTROL_BASE} ${
 /** A field's label: always visible, above its control. */
 export const fieldLabel = 'mb-2 block text-sm font-semibold text-fg';
 export const fieldHint = 'mt-2 block text-sm text-fg-muted';
+
 /** Written by lib/form.ts; `hidden` until the action rejects the field. Colour is
  *  never the only signal: the message carries a mark of its own. */
 export const fieldError =
   'mt-2 flex items-start gap-2 text-sm font-medium text-danger before:mt-px before:grid before:size-4.5 before:shrink-0 before:place-items-center before:rounded-full before:bg-danger before:text-[0.6875rem] before:leading-none before:font-bold before:text-surface before:content-["!"]';
+
 /** A form's own answer under its button, written by lib/form.ts: what actually happened, in words, with a mark. */
 export const formStatus =
   'flex items-start gap-2 text-base font-medium before:mt-0.5 before:grid before:size-5 before:shrink-0 before:place-items-center before:rounded-full before:text-xs before:leading-none before:font-bold before:text-surface data-[tone=error]:text-danger data-[tone=error]:before:bg-danger data-[tone=error]:before:content-["!"] data-[tone=success]:text-success data-[tone=success]:before:bg-success data-[tone=success]:before:content-["✓"]';
+
 export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer accent-fill';
 
 /** A short section label: small spaced capitals in the secondary text colour. */

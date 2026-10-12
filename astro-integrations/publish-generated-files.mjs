@@ -24,8 +24,10 @@ export function publishGeneratedFiles({ sitemaps, llmsPages }) {
       },
       'astro:build:done': async ({ dir, logger }) => {
         const site = config.site ?? 'https://mens-circle.de';
+
         const patch = async (/** @type {string} */ file, /** @type {(text: string) => string} */ edit) => {
           const path = fileURLToPath(new URL(file, dir));
+
           try {
             await writeFile(path, edit(await readFile(path, 'utf-8')));
           } catch {
@@ -45,8 +47,10 @@ export function publishGeneratedFiles({ sitemaps, llmsPages }) {
           const lines = llmsPages.map(
             ({ path, title, description }) => `- [${title}](${new URL(path, site).href}): ${description}`,
           );
+
           const block = `## Der Männerkreis\n\n${lines.join('\n')}\n`;
           const firstSection = text.indexOf('\n## ');
+
           return firstSection === -1
             ? `${text.trimEnd()}\n\n${block}`
             : `${text.slice(0, firstSection + 1)}${block}\n${text.slice(firstSection + 1)}`;

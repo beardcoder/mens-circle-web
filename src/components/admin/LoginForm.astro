@@ -1,6 +1,8 @@
 ---
 import { Icon } from 'astro-icon/components';
+
 import { button, panel } from '@lib/ui';
+
 import Eyebrow from '../ui/Eyebrow.astro';
 
 interface Props {
@@ -20,6 +22,7 @@ const MESSAGES: Record<string, string> = {
   failed: 'Die Anmeldung ist fehlgeschlagen. Bitte erneut versuchen.',
   config: 'Die Anmeldung ist auf dem Server nicht eingerichtet.',
 };
+
 const message = configured ? error && (MESSAGES[error] ?? MESSAGES.failed) : MESSAGES.config;
 ---
 

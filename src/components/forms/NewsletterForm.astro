@@ -1,8 +1,9 @@
 ---
+import { control, fieldError, fieldLabel } from '@lib/ui';
+
 import Button from '../ui/Button.astro';
 import FormStatus from './FormStatus.astro';
 import Honeypot from './Honeypot.astro';
-import { control, fieldError, fieldLabel } from '@lib/ui';
 
 /** "Termine per E-Mail erhalten" — one address into the listmonk list. */
 interface Props {
@@ -54,6 +55,7 @@ const { context = {}, id = 'newsletter-form', class: className } = Astro.props;
 
 <script>
   import { actions } from 'astro:actions';
+
   import { enhanceForms } from '@lib/form';
 
   enhanceForms('newsletter', actions.subscribeNewsletter);

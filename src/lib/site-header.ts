@@ -6,6 +6,7 @@ import { prefersReducedMotion } from './helpers';
 const samePageHash = (link: HTMLAnchorElement): string | null => {
   const url = new URL(link.href, location.href);
   const samePage = url.origin === location.origin && url.pathname === location.pathname;
+
   return samePage && url.hash.length > 1 ? url.hash : null;
 };
 
@@ -16,6 +17,7 @@ const samePageHash = (link: HTMLAnchorElement): string | null => {
  */
 const initScrollTop = (): void => {
   const top = document.getElementById('top');
+
   for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-scroll-top]')) {
     link.addEventListener('click', (event) => {
       event.preventDefault();
@@ -32,10 +34,12 @@ const initScrollTop = (): void => {
  */
 const initHeaderTone = (header: HTMLElement): void => {
   let frame = 0;
+
   const update = (): void => {
     frame = 0;
     header.toggleAttribute('data-scrolled', window.scrollY > 24);
   };
+
   window.addEventListener(
     'scroll',
     () => {
@@ -57,19 +61,24 @@ const initMenu = (menu: HTMLDialogElement): void => {
     opener.addEventListener('click', () => {
       // The menu opens as a circle from the button's centre (`--nav-origin` in Header.astro).
       const { left, top, width, height } = opener.getBoundingClientRect();
+
       menu.style.setProperty('--nav-origin', `${left + width / 2}px ${top + height / 2}px`);
       menu.showModal();
     });
   }
+
   menu.querySelector('[data-nav-close]')?.addEventListener('click', () => menu.close());
 
   for (const link of menu.querySelectorAll<HTMLAnchorElement>('a[data-nav-link]')) {
     link.addEventListener('click', (event) => {
       const hash = samePageHash(link);
+
       if (hash === null) return;
+
       event.preventDefault();
       menu.close();
       const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+
       target?.scrollIntoView({ behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
       history.pushState(null, '', hash);
     });
@@ -79,7 +88,10 @@ const initMenu = (menu: HTMLDialogElement): void => {
 export function initSiteHeader(): void {
   initScrollTop();
   const header = document.getElementById('header');
+
   if (header) initHeaderTone(header);
+
   const menu = document.getElementById('nav');
+
   if (menu instanceof HTMLDialogElement) initMenu(menu);
 }

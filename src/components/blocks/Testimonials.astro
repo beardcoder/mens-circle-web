@@ -1,5 +1,6 @@
 ---
 import type { Testimonial } from '@lib/types';
+
 import Quote from '../ui/Quote.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -25,14 +26,17 @@ interface Props {
 const SHORT = 160;
 
 const { data, loading = false } = Astro.props;
+
 const result = Astro.props.testimonials
   ? { status: 'ok' as const, testimonials: Astro.props.testimonials }
   : await (await import('../../lib/server/testimonials')).fetchTestimonialsState();
+
 const { testimonials } = result;
 const anchor = data?.anchor ?? 'stimmen';
 const [first, ...others] = testimonials;
 const featured = first && first.quote.length <= SHORT ? first : null;
 const rest = featured ? others : testimonials;
+
 const note = loading
   ? ''
   : result.status === 'unavailable'

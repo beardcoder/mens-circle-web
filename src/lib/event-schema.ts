@@ -9,23 +9,30 @@ function berlinOffset(date: Date): string {
     timeZone: 'Europe/Berlin',
     timeZoneName: 'longOffset',
   }).formatToParts(date);
+
   const tz = parts.find((p) => p.type === 'timeZoneName')?.value ?? 'GMT+01:00';
   const match = tz.match(/GMT([+-]\d{2}:\d{2})/);
+
   return match ? match[1] : '+01:00';
 }
 
 /** Combine an ISO date + "HH:MM" into a local ISO datetime with Berlin offset. */
 function localDateTime(isoDate: string, time: string): string {
   const d = new Date(isoDate);
+
   if (Number.isNaN(d.getTime())) return isoDate;
+
   const datePart = d.toISOString().slice(0, 10);
+
   if (!/^\d{2}:\d{2}$/.test(time)) return datePart;
+
   return `${datePart}T${time}:00${berlinOffset(d)}`;
 }
 
 /** Locality, region and country fall back to the circle's home town so the address is never half-stated; street and postal code are left out instead. */
 function buildPlace(event: EventDTO): Record<string, unknown> {
   const hasCoordinates = event.latitude != null && event.longitude != null;
+
   return {
     '@type': 'Place',
     name: event.location || site.siteName,
@@ -46,8 +53,11 @@ function buildPlace(event: EventDTO): Record<string, unknown> {
 /** Seat numbers, but only where the page states them: a past or full event shows no count, and sold-out is already carried by `offers.availability`. */
 function capacity(event: EventDTO): Record<string, number> {
   if (event.max_participants <= 0) return {};
+
   const max = { maximumAttendeeCapacity: event.max_participants };
+
   if (event.is_past || event.is_full) return max;
+
   return { ...max, remainingAttendeeCapacity: Math.max(0, event.available_spots) };
 }
 

@@ -46,10 +46,12 @@ const {
 }: Props = Astro.props;
 
 const center = align === 'center';
+
 const leadClass = [
   'mt-6 max-w-measure text-lg text-fg-muted [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong',
   center && 'mx-auto',
 ];
+
 const titleClass = ['max-w-[24ch] text-fg wrap-anywhere hyphens-auto', SIZES[size], center && 'mx-auto'];
 ---
 

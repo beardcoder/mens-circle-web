@@ -1,6 +1,6 @@
-import { expect, test } from 'bun:test';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { expect, test } from 'bun:test';
 
 // The Pocket ID sign-in, against a fake provider. Each case is its own Bun
 // process: config is read at module load, and the discovery cache is module state.
@@ -39,11 +39,13 @@ for (const scenario of cases) {
         timeout: 10_000,
       },
     );
+
     const [code, stdout, stderr] = await Promise.all([
       child.exited,
       new Response(child.stdout).text(),
       new Response(child.stderr).text(),
     ]);
+
     expect({ code, output: code === 0 ? '' : stdout + stderr }).toEqual({ code: 0, output: '' });
     expect(stdout).toContain(`PASS ${scenario}`);
   }, 15_000);

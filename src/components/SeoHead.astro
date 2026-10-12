@@ -73,6 +73,7 @@ const MIME_BY_EXTENSION: Record<string, string> = {
   gif: 'image/gif',
   avif: 'image/avif',
 };
+
 // From the path, not the href: a `?v=` cache token would read as the extension.
 const imageType = MIME_BY_EXTENSION[new URL(ogImageUrl).pathname.split('.').pop()?.toLowerCase() ?? ''];
 

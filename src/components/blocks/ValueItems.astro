@@ -24,8 +24,10 @@ interface Props {
  */
 
 const { data } = Astro.props;
+
 const items = (data.items ?? []).map((item) => {
   const [keep, ...rest] = (item.title ?? '').split(' statt ');
+
   return { ...item, keep, instead: rest.join(' statt ') };
 });
 ---

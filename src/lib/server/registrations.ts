@@ -1,12 +1,13 @@
 /* eslint-disable no-console */
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
+
 import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import type { Event, Participant, Registration, RegistrationStatus } from './db/schema';
 import { participants, registrations } from './db/schema';
-import { accepted, type FormResult, isHoneypotFilled, rejected } from './form-submission';
 import { sendEventMessage, sendRegistrationConfirmation, sendRegistrationEmails, sendWaitlistPromotion } from './email';
 import { countActiveRegistrations, ensureEventList, getEventById, holdsASeat, isEventPast } from './events';
+import { accepted, type FormResult, isHoneypotFilled, rejected } from './form-submission';
 import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
 
 /** Alias for the existing call sites; the union lives with the column. */
@@ -25,16 +26,21 @@ const upsertParticipant = async (
 ): Promise<Participant> => {
   const existing = (await db.select().from(participants).where(eq(participants.email, email)).limit(1))[0];
   const patch: Partial<Participant> = {};
+
   if (fields.firstName) patch.firstName = fields.firstName;
+
   if (fields.lastName) patch.lastName = fields.lastName;
+
   if (fields.phone) patch.phone = fields.phone;
 
   if (existing) {
     if (Object.keys(patch).length > 0) {
       return (await db.update(participants).set(patch).where(eq(participants.id, existing.id)).returning())[0];
     }
+
     return existing;
   }
+
   return (
     await db
       .insert(participants)
@@ -76,14 +82,17 @@ const confirmationMessage = (firstName: string): string =>
 /** The event this registration may still join, or the answer explaining why it may not. */
 const openEvent = async (eventId: string): Promise<{ event: Event } | { error: FormResult }> => {
   const event = await getEventById(eventId);
+
   if (!event || !event.isPublished || event.deleted) {
     return { error: rejected(404, 'Diese Veranstaltung ist nicht verfügbar.') };
   }
+
   if (isEventPast(event)) {
     return {
       error: rejected(410, 'Diese Veranstaltung hat bereits stattgefunden. Eine Anmeldung ist nicht mehr möglich.'),
     };
   }
+
   return { event };
 };
 
@@ -121,6 +130,7 @@ const claimSeat = (
           .from(registrations)
           .where(and(eq(registrations.eventId, event.id), holdsASeat()))
           .get()?.c ?? 0;
+
       const status: IntakeStatus = activeCount >= event.maxParticipants ? 'waitlist' : 'registered';
       const registeredAt = new Date().toISOString();
 
@@ -130,13 +140,16 @@ const claimSeat = (
           .set({ status, registeredAt, cancelledAt: null, deleted: null, confirmationSentAt: null })
           .where(eq(registrations.id, existing.id))
           .run();
+
         return { registrationId: existing.id, status };
       }
+
       const inserted = tx
         .insert(registrations)
         .values({ participantId, eventId: event.id, status, registeredAt })
         .returning()
         .get();
+
       return { registrationId: inserted.id, status };
     },
     { behavior: 'immediate' },
@@ -152,8 +165,11 @@ const markConfirmationSent = async (registrationId: string): Promise<void> => {
 
 const assignToEventList = async (event: Event, fields: RegistrationFields): Promise<void> => {
   const listId = await ensureEventList(event);
+
   if (!listId) return;
+
   const result = await addToLists(fields.email, `${fields.firstName} ${fields.lastName}`.trim(), [listId], true);
+
   if (!result.ok) throw new Error('listmonk assignment rejected');
 };
 
@@ -171,13 +187,17 @@ const dispatchSideEffects = (
     withSubscriberScope(async () => {
       const mails = sendRegistrationEmails(event, participant, status, activeCount).then(async (userSent) => {
         if (userSent) await markConfirmationSent(registrationId);
+
         return userSent;
       });
+
       const tasks: Array<[string, Promise<unknown>]> = [
         ['emails', mails],
         ['listmonk assignment', assignToEventList(event, fields)],
       ];
+
       const results = await Promise.allSettled(tasks.map(([, task]) => task));
+
       results.forEach((result, i) => {
         if (result.status === 'rejected') {
           console.error(`[registrations] ${tasks[i][0]} failed`, String(result.reason));
@@ -194,12 +214,16 @@ export const register = async (payload: RegistrationInput): Promise<FormResult> 
   if (isHoneypotFilled(payload.website)) return accepted(confirmation);
 
   const found = await openEvent(fields.eventId);
+
   if ('error' in found) return found.error;
+
   const { event } = found;
 
   const participant = await upsertParticipant(fields.email, fields);
   const seat = claimSeat(participant.id, event);
+
   if ('error' in seat) return seat.error;
+
   const { status, registrationId } = seat;
 
   dispatchSideEffects(event, participant, fields, status, await countActiveRegistrations(event.id), registrationId);
@@ -242,6 +266,7 @@ export const listRegistrationsForEvent = async (eventId: string): Promise<Regist
     .innerJoin(participants, eq(registrations.participantId, participants.id))
     .where(and(eq(registrations.eventId, eventId), isNull(registrations.deleted)))
     .orderBy(asc(registrations.registeredAt));
+
   return rows;
 };
 
@@ -256,6 +281,7 @@ const promoteNextWaitlisted = async (event: Event): Promise<void> => {
       .orderBy(asc(registrations.registeredAt))
       .limit(1)
   )[0];
+
   if (!next) return;
 
   await db
@@ -264,6 +290,7 @@ const promoteNextWaitlisted = async (event: Event): Promise<void> => {
     .where(eq(registrations.id, next.id));
 
   const participant = (await db.select().from(participants).where(eq(participants.id, next.participantId)).limit(1))[0];
+
   if (participant) {
     fireAndForget('[registrations] promotion email failed', sendWaitlistPromotion(event, participant));
   }
@@ -271,28 +298,36 @@ const promoteNextWaitlisted = async (event: Event): Promise<void> => {
 
 export const changeRegistrationStatus = async (regId: string, newStatus: RegStatus): Promise<Registration | null> => {
   const reg = (await db.select().from(registrations).where(eq(registrations.id, regId)).limit(1))[0];
+
   if (!reg) return null;
+
   const oldStatus = reg.status;
 
   const patch: Partial<Registration> = { status: newStatus };
+
   if (newStatus === 'cancelled') patch.cancelledAt = new Date().toISOString();
+
   const updated = (await db.update(registrations).set(patch).where(eq(registrations.id, regId)).returning())[0];
 
   if (oldStatus !== 'cancelled' && newStatus === 'cancelled') {
     const event = await getEventById(reg.eventId);
+
     if (event) {
       if (event.listmonkListId > 0) {
         const participant = (
           await db.select().from(participants).where(eq(participants.id, reg.participantId)).limit(1)
         )[0];
+
         if (participant) void removeFromList(participant.email, event.listmonkListId).catch(() => {});
       }
+
       // Only a seat-holding status frees a seat; a cancelled waitlist entry promotes no one.
       if (oldStatus === 'registered' || oldStatus === 'attended') {
         await promoteNextWaitlisted(event);
       }
     }
   }
+
   return updated;
 };
 
@@ -306,6 +341,7 @@ export const broadcastEventMessage = async (
   content: string,
 ): Promise<{ sent: number; total: number }> => {
   const event = await getEventById(eventId);
+
   if (!event) return { sent: 0, total: 0 };
 
   const recipients = await db
@@ -319,7 +355,9 @@ export const broadcastEventMessage = async (
   const results = await settleWithConcurrency(recipients, ({ participant }) =>
     sendEventMessage(event, participant, subject, content),
   );
+
   const sent = results.filter((r) => r.status === 'fulfilled' && r.value).length;
+
   return { sent, total: recipients.length };
 };
 
@@ -335,9 +373,11 @@ export const resendRegistrationConfirmations = async (
   opts: { ids?: string[]; onlyMissing?: boolean } = {},
 ): Promise<ResendResult> => {
   const event = await getEventById(eventId);
+
   if (!event) return { sent: 0, failed: 0, skipped: 0 };
 
   const wanted = opts.ids?.length ? new Set(opts.ids) : null;
+
   const rows = await db
     .select({ registration: registrations, participant: participants })
     .from(registrations)
@@ -346,22 +386,29 @@ export const resendRegistrationConfirmations = async (
     .orderBy(asc(registrations.registeredAt));
 
   const selected = rows.filter(({ registration }) => !wanted || wanted.has(registration.id));
+
   // flatMap, not filter: the guard narrows `status` to what the mailer accepts.
   const eligible = selected.flatMap(({ registration, participant }) => {
     const { id, status, confirmationSentAt } = registration;
+
     if (status !== 'registered' && status !== 'waitlist') return [];
+
     if (opts.onlyMissing && confirmationSentAt) return [];
+
     return [{ id, status, participant }];
   });
 
   const results = await withSubscriberScope(() =>
     settleWithConcurrency(eligible, async ({ id, status, participant }) => {
       const ok = await sendRegistrationConfirmation(event, participant, status);
+
       if (ok) await markConfirmationSent(id);
+
       return ok;
     }),
   );
 
   const sent = results.filter((r) => r.status === 'fulfilled' && r.value).length;
+
   return { sent, failed: results.length - sent, skipped: selected.length - eligible.length };
 };

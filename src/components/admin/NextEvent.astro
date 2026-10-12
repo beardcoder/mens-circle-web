@@ -1,5 +1,6 @@
 ---
 import { button } from '@lib/ui';
+
 import Badge from '../ui/Badge.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import CircleSeating from './CircleSeating.astro';
@@ -35,7 +36,9 @@ const seats = registered.map((p) => ({ initials: initials(p), name: name(p) }));
 
 const dateLong = (() => {
   const d = new Date(event.eventDate);
+
   if (Number.isNaN(d.getTime())) return event.eventDate;
+
   return d.toLocaleDateString('de-DE', {
     weekday: 'long',
     day: '2-digit',
@@ -44,6 +47,7 @@ const dateLong = (() => {
     timeZone: 'UTC',
   });
 })();
+
 const timeStr = event.startTime ? `${event.startTime}${event.endTime ? `–${event.endTime}` : ''} Uhr` : '';
 ---
 

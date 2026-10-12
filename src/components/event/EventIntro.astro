@@ -1,10 +1,11 @@
 ---
-import type { EventDTO } from '@lib/types';
 import { eventView } from '@lib/event-status';
 import { formatDayMonthYearDE, formatWeekdayDE, isoDay } from '@lib/server/format';
+import type { EventDTO } from '@lib/types';
+
+import Button from '../ui/Button.astro';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
-import Button from '../ui/Button.astro';
 import CalendarButton from './CalendarButton.astro';
 import EventSummary from './EventSummary.astro';
 

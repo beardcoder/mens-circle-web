@@ -1,18 +1,19 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { fetchUpcomingEventsState } from '@lib/server/events';
+import site from '@data/site.json';
+import { buildEventSchema } from '@lib/event-schema';
 import { dateStatus } from '@lib/event-status';
+import { eventSeriesSchema } from '@lib/series-schema';
+import { fetchUpcomingEventsState } from '@lib/server/events';
+import { link } from '@lib/ui';
+
 import Faq from '../components/blocks/Faq.astro';
 import EventList from '../components/event/EventList.astro';
-import { eventSeriesSchema } from '@lib/series-schema';
-import { buildEventSchema } from '@lib/event-schema';
-import site from '@data/site.json';
-import { link } from '@lib/ui';
 import PageIntro from '../components/PageIntro.astro';
 import LinkList from '../components/ui/LinkList.astro';
-import SectionHead from '../components/ui/SectionHead.astro';
 import Section from '../components/ui/Section.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
 import Split from '../components/ui/Split.astro';
+import Layout from '../layouts/Layout.astro';
 
 /** Evergreen landing page for the dates; never redirects. SSR so the dates are in the HTML. */
 const upcoming = await fetchUpcomingEventsState();
@@ -83,10 +84,12 @@ const moreLinks = [
 
 /** The series is built once in lib/series-schema.ts and shared with the home page, so both describe one entity under one `@id`. */
 const eventSeries = eventSeriesSchema(siteUrl);
+
 if (event) {
   // Google validates every Event node as a rich result, so a stub with only `@id`/`url`
   // is flagged invalid: embed the full Event, minus what the series already states.
   const { '@context': _context, superEvent: _superEvent, ...subEvent } = buildEventSchema(event, siteUrl);
+
   eventSeries.subEvent = subEvent;
 }
 

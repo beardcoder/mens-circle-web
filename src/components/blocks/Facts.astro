@@ -2,6 +2,7 @@
 import site from '@data/site.json';
 import { type NextEventSummary, splitFee, summarizeNextEvent } from '@lib/event-status';
 import { label } from '@lib/ui';
+
 import Section from '../ui/Section.astro';
 
 /**
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const { data = {} } = Astro.props;
+
 const next =
   Astro.props.next !== undefined
     ? Astro.props.next
@@ -26,6 +28,7 @@ const next =
       summarizeNextEvent((await (await import('../../lib/server/events')).fetchNextEventState()).event);
 
 const fee = splitFee(next?.costBasis);
+
 const facts = [
   { label: 'Wo', value: next?.place || site.geo.locality, sub: 'Die genaue Adresse kommt mit der Bestätigung' },
   // Non-breaking space: the only acceptable break is before "Wochen".
@@ -38,6 +41,7 @@ const facts = [
   },
   { label: 'Beitrag', value: fee.main, sub: fee.note || 'Du gibst, was für dich machbar ist' },
 ];
+
 const anchor = data.anchor ?? 'praktisches';
 ---
 

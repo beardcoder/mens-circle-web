@@ -45,6 +45,7 @@ const covering = (spec: Crop, format: Format, width: number) =>
  */
 async function srcset(spec: Crop, format: Format): Promise<string> {
   const images = await Promise.all(spec.widths.map((width) => covering(spec, format, width)));
+
   return images.map((image, i) => `${image.src} ${spec.widths[i]}w`).join(', ');
 }
 

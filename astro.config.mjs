@@ -1,14 +1,15 @@
 // @ts-check
 
 import sitemap from '@astrojs/sitemap';
-import tailwindcss from '@tailwindcss/vite';
 import bun, { bunImageService } from '@mens-circle/astro-bun';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig, fontProviders } from 'astro/config';
 import icon from 'astro-icon';
 import llms from 'astro-llms-md';
-import { defineConfig, fontProviders } from 'astro/config';
+
 import { publishGeneratedFiles } from './astro-integrations/publish-generated-files.mjs';
-import { cacheControlForFile } from './src/lib/cache-policy.ts';
 import site from './src/data/site.json' with { type: 'json' };
+import { cacheControlForFile } from './src/lib/cache-policy.ts';
 
 const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
 const { hostname: siteHostname, protocol: siteProtocol } = new URL(siteUrl);
@@ -25,6 +26,7 @@ export default defineConfig({
     // The cache policy for files on disk; HTML keeps what the page set at prerender time.
     staticHeaders: (pathname, { assets }) => {
       const cacheControl = cacheControlForFile(pathname, assets);
+
       return cacheControl ? { 'cache-control': cacheControl } : null;
     },
   }),
@@ -98,7 +100,9 @@ export default defineConfig({
       // Slash-less, matching the canonicals.
       serialize(item) {
         const url = new URL(item.url);
+
         if (url.pathname !== '/') url.pathname = url.pathname.replace(/\/+$/, '');
+
         return { ...item, url: url.href };
       },
     }),

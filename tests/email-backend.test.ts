@@ -1,8 +1,8 @@
-import { expect, test } from 'bun:test';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { expect, test } from 'bun:test';
 
 // No server imports or global/module mocks in the suite process. Each case owns its HTTP fake and DB.
 const cases = [
@@ -26,6 +26,7 @@ const cases = [
 for (const scenario of cases) {
   test(`email backend (isolated): ${scenario}`, async () => {
     const dir = await mkdtemp(join(tmpdir(), 'mens-circle-email-'));
+
     try {
       const child = Bun.spawn(
         [
@@ -61,11 +62,13 @@ for (const scenario of cases) {
           timeout: 10_000,
         },
       );
+
       const [code, stdout, stderr] = await Promise.all([
         child.exited,
         new Response(child.stdout).text(),
         new Response(child.stderr).text(),
       ]);
+
       expect({ code, output: code === 0 ? '' : stdout + stderr }).toEqual({ code: 0, output: '' });
       expect(stdout).toContain(`PASS ${scenario}`);
     } finally {

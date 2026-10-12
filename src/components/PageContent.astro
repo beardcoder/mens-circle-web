@@ -8,8 +8,8 @@ import Hero from './blocks/Hero.astro';
 import Intro from './blocks/Intro.astro';
 import JourneySteps from './blocks/JourneySteps.astro';
 import Moderator from './blocks/Moderator.astro';
-import Statement from './blocks/Statement.astro';
 import PageHero from './blocks/PageHero.astro';
+import Statement from './blocks/Statement.astro';
 import Testimonials from './blocks/Testimonials.astro';
 import TextSection from './blocks/TextSection.astro';
 import ValueItems from './blocks/ValueItems.astro';
@@ -28,6 +28,7 @@ const { blocks } = Astro.props;
 
 {blocks.map((block) => {
   const data = block.data ?? {};
+
   switch (block.type) {
     case 'hero':
       return <Hero data={data} />;

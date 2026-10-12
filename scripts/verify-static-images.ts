@@ -1,16 +1,20 @@
 /** Verifies the built server over HTTP. Images are decoded with Bun.Image. */
 import assert from 'node:assert/strict';
-import { PRERENDERED_CACHE_CONTROL } from '../src/lib/cache';
 import { createHash } from 'node:crypto';
+
+import { PRERENDERED_CACHE_CONTROL } from '../src/lib/cache';
 
 const origin = new URL(process.argv[2] || 'http://127.0.0.1:18092');
 const eventSlug = process.argv[3];
 const images = new Map<string, number | undefined>();
 const digest = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
 const attribute = (tag: string, name: string) => tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
+
 const get = async (path: string) => {
   const response = await fetch(new URL(path.replaceAll('&amp;', '&'), origin));
+
   assert.equal(response.status, 200, path);
+
   return response;
 };
 
@@ -22,28 +26,40 @@ for (const path of [
   ...(eventSlug ? [`/event/${eventSlug}`] : []),
 ]) {
   const response = await get(path);
+
   if (path === '/') assert.equal(response.headers.get('cache-control'), PRERENDERED_CACHE_CONTROL);
+
   const html = await response.text();
+
   assert.ok(!html.includes('/_image?'), path);
+
   for (const [tag] of html.matchAll(/<(?:img|source)\b[^>]*>/g)) {
     const src = attribute(tag, 'src');
+
     if (src?.startsWith('/')) images.set(src, images.get(src));
+
     for (const candidate of (attribute(tag, 'srcset') || '').split(',').filter(Boolean)) {
       const [url, descriptor] = candidate.trim().split(/\s+/);
+
       if (url.startsWith('/')) images.set(url, descriptor?.endsWith('w') ? Number.parseInt(descriptor) : undefined);
     }
   }
+
   if (path === '/') {
     const islands = [
       ...html.matchAll(/let response = await fetch\("([^"\n]+\/_server-islands\/[^"\n]+|\/_server-islands\/[^"\n]+)"/g),
     ];
+
     assert.equal(islands.length, 4, 'Expected four native server islands');
+
     for (const [, url] of islands) {
       const fragment = await (await get(url)).text();
+
       assert.ok(!fragment.includes('data-status="loading"'), 'Island must resolve live state');
       assert.ok(!fragment.includes('/_image?'));
     }
   }
+
   if (eventSlug && path === `/event/${eventSlug}`) {
     assert.ok(
       html.includes('property="og:image" content="https://mens-circle.de/images/og-default.png"') ||
@@ -51,20 +67,27 @@ for (const path of [
     );
   }
 }
+
 // WebP per crop and width, JPEG for the wide crop; the moderator's portrait and the
 // personal page share the wide variants.
 assert.ok(images.size >= 10, 'Native Picture variants missing');
 images.set('/images/og-default.png', 1200);
+
 for (const [path, width] of images) {
   const response = await get(path);
+
   assert.match(response.headers.get('content-type') || '', /^image\//);
   const bytes = new Uint8Array(await response.arrayBuffer());
   const metadata = await new Bun.Image(bytes).metadata();
+
   // A full decode (re-encode to PNG), not just the header.
   await new Bun.Image(bytes).png().bytes();
+
   // `w` names the box a variant covers; the variant is at least that wide.
   if (width) assert.ok(metadata.width >= width, path);
+
   const changed = new Uint8Array(await (await get(`${path}?w=1&h=2&f=png&q=1`)).arrayBuffer());
+
   assert.equal(digest(changed), digest(bytes), 'Static bytes changed with parameters');
 }
 
@@ -80,17 +103,21 @@ for (const query of [
       method,
       headers: { origin: origin.origin, 'content-type': 'application/json' },
     });
+
     assert.equal(response.status, 404, `${method} ${query}`);
     assert.ok(!(response.headers.get('content-type') || '').startsWith('image/'));
   }
 }
+
 for (const slug of [eventSlug || 'unknown', 'missing-event']) {
   for (const query of ['', '?v=old&w=1&f=avif', '?href=https://example.invalid/new.png&q=1']) {
     const response = await fetch(new URL(`/event/${slug}/card.png${query}`, origin), { redirect: 'manual' });
+
     assert.equal(response.status, 404);
     assert.equal(response.headers.get('location'), null);
   }
 }
+
 console.log(
   `Production verification passed: ${images.size} static images, native server islands, pages and retired image URLs (404).`,
 );

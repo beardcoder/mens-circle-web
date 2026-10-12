@@ -1,5 +1,6 @@
 ---
 import { button, card, control } from '@lib/ui';
+
 import Badge from '../ui/Badge.astro';
 import Field from '../ui/Field.astro';
 import AdminHead from './AdminHead.astro';
@@ -96,6 +97,7 @@ const { testimonials } = Astro.props;
 
 <script>
   import { actions } from 'astro:actions';
+
   import { adminToast, bindOnce, ok } from '@lib/admin';
 
   function setEditing(card: HTMLElement, on: boolean) {
@@ -106,14 +108,18 @@ const { testimonials } = Astro.props;
 
   async function togglePublish(card: HTMLElement, toggle: HTMLButtonElement) {
     const publish = !card.dataset.published;
+
     toggle.disabled = true;
     const result = await actions.moderateTestimonial({ id: card.dataset.id!, publish });
+
     toggle.disabled = false;
+
     if (!ok(result)) return;
 
     card.dataset.published = publish ? '1' : '';
     toggle.textContent = publish ? 'Verbergen' : 'Veröffentlichen';
     const badge = card.querySelector('[data-badge]') as HTMLElement;
+
     badge.textContent = publish ? 'veröffentlicht' : 'unsichtbar';
     badge.dataset.tone = publish ? 'live' : 'off';
     adminToast('ok', publish ? 'Veröffentlicht.' : 'Verborgen.');
@@ -121,7 +127,9 @@ const { testimonials } = Astro.props;
 
   async function removeCard(card: HTMLElement) {
     if (!confirm('Diese Stimme wirklich löschen?')) return;
+
     if (!ok(await actions.deleteTestimonial({ id: card.dataset.id! }))) return;
+
     adminToast('ok', 'Gelöscht.');
     card.remove();
   }
@@ -129,20 +137,27 @@ const { testimonials } = Astro.props;
   bindOnce('#testi-list', (list) => {
     list.addEventListener('change', async (e) => {
       const input = (e.target as HTMLElement).closest('[data-order]') as HTMLInputElement | null;
+
       if (!input) return;
+
       const id = (input.closest('[data-id]') as HTMLElement).dataset.id!;
+
       if (!ok(await actions.moderateTestimonial({ id, sortOrder: Number(input.value) || 0 }))) return;
+
       adminToast('ok', 'Reihenfolge gespeichert.');
     });
 
     list.addEventListener('submit', async (e) => {
       const form = (e.target as HTMLElement).closest('[data-edit]') as HTMLFormElement | null;
+
       if (!form) return;
+
       e.preventDefault();
       const card = form.closest('[data-id]') as HTMLElement;
       const fd = new FormData(form);
       const get = (k: string) => String(fd.get(k) ?? '');
       const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
       const payload = {
         id: card.dataset.id!,
         quote: get('quote'),
@@ -153,7 +168,9 @@ const { testimonials } = Astro.props;
 
       btn.disabled = true;
       const result = await actions.updateTestimonial(payload);
+
       btn.disabled = false;
+
       if (!ok(result)) return;
 
       (card.querySelector('[data-quote]') as HTMLElement).textContent = payload.quote;
@@ -168,24 +185,31 @@ const { testimonials } = Astro.props;
     list.addEventListener('click', async (e) => {
       const target = e.target as HTMLElement;
       const card = target.closest('[data-id]') as HTMLElement | null;
+
       if (!card) return;
 
       if (target.closest('[data-edit-button]')) {
         setEditing(card, true);
         (card.querySelector('[data-edit] textarea') as HTMLTextAreaElement)?.focus();
+
         return;
       }
+
       if (target.closest('[data-cancel]')) {
         (card.querySelector('[data-edit]') as HTMLFormElement).reset();
         setEditing(card, false);
+
         return;
       }
 
       const toggle = target.closest('[data-toggle]') as HTMLButtonElement | null;
+
       if (toggle) {
         await togglePublish(card, toggle);
+
         return;
       }
+
       if (target.closest('[data-delete]')) await removeCard(card);
     });
   });

@@ -4,6 +4,7 @@
  * own result under its button (`<form id>-status`). Entries survive an error.
  */
 import { isInputError } from 'astro:actions';
+
 import { prefersReducedMotion } from './helpers';
 import { trackEvent } from './umami';
 
@@ -24,25 +25,31 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
   const context = JSON.parse(form.dataset.trackContext || '{}') as Record<string, string>;
 
   const status = document.getElementById(`${form.id}-status`);
+
   /** The form's own line: what happened, or nothing. */
   const say = (tone: 'success' | 'error' | null, message = ''): void => {
     if (!status) return;
+
     status.textContent = message;
     status.hidden = tone === null;
+
     if (tone) status.dataset.tone = tone;
     else delete status.dataset.tone;
   };
 
   /** Field name → message; empty means valid. */
   let errors: Record<string, string> = {};
+
   const render = (): void => {
     for (const control of form.querySelectorAll<HTMLInputElement>('[name]')) {
       const message = errors[control.name] ?? '';
       const slot = document.getElementById(`${form.id}-${control.name}-error`);
+
       if (slot) {
         slot.textContent = message;
         slot.hidden = !message;
       }
+
       if (message) control.setAttribute('aria-invalid', 'true');
       else control.removeAttribute('aria-invalid');
     }
@@ -51,13 +58,16 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
   // A field's message clears as soon as it is being corrected.
   form.addEventListener('input', (event) => {
     const { name } = event.target as HTMLInputElement;
+
     if (!errors[name]) return;
+
     errors = { ...errors, [name]: '' };
     render();
   });
 
   const setBusy = (busy: boolean): void => {
     for (const control of form.elements) (control as HTMLInputElement).disabled = busy;
+
     if (submitLabel) submitLabel.textContent = busy ? 'Wird gesendet …' : idleLabel;
   };
 
@@ -67,9 +77,11 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
 
     // Read before disabling: disabled controls are left out of FormData.
     const body = new FormData(form);
+
     say(null);
     setBusy(true);
     const { data, error } = await action(body).catch(() => ({ data: undefined, error: new Error(FAILED) }));
+
     setBusy(false);
 
     errors = isInputError(error)
@@ -81,12 +93,14 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
       say('success', data.message);
       trackEvent(`${track}-success`, context);
       form.reset();
+
       return;
     }
 
     // DOM order, not schema order: the topmost problem, not the first rule checked.
     const first = form.querySelector<HTMLElement>('[aria-invalid="true"]');
     const message = (first && errors[first.getAttribute('name') ?? '']) || error?.message || FAILED;
+
     say('error', first ? 'Bitte prüfe die markierten Angaben.' : message);
     trackEvent(`${track}-error`, { ...context, error: message });
     first?.focus({ preventScroll: true });

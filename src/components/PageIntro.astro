@@ -18,8 +18,10 @@ interface Props {
 }
 
 const { eyebrow, title, titleHtml = false, id, titleId } = Astro.props;
+
 const titleClass =
   'max-w-[20ch] text-page text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-[90ms]';
+
 const hasLead = Astro.slots.has('lead');
 const hasAction = Astro.slots.has('default');
 const hasMedia = Astro.slots.has('media');

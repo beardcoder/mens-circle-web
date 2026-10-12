@@ -2,11 +2,13 @@
  * The server entry Astro bundles into dist/server/entry.mjs. Importing it starts the
  * server. HOST and PORT override the Astro config at runtime.
  */
-import { createApp } from 'astro/app/entrypoint';
-import { setGetEnv } from 'astro/env/setup';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import config from 'virtual:@mens-circle/astro-bun/config';
+import { createApp } from 'astro/app/entrypoint';
+import { setGetEnv } from 'astro/env/setup';
+
 import { MANIFEST_FILE, type StaticHeaders } from './shared';
 import { createStaticRoutes } from './static';
 
@@ -30,7 +32,9 @@ const { routes, errorPages } = await createStaticRoutes({
 async function errorPage(url: string): Promise<Response> {
   const base = new URL(url, 'http://localhost').pathname.replace(/(?:\/index)?\.html$|\/$/, '');
   const page = errorPages[`${base}.html`] ?? errorPages[`${base}/index.html`];
+
   if (!page) return new Response(null, { status: 404 });
+
   return page.clone();
 }
 
@@ -48,6 +52,7 @@ const server = Bun.serve({
     }),
   error(error) {
     logger.error(error.stack ?? String(error));
+
     return new Response('Internal Server Error', { status: 500 });
   },
 });

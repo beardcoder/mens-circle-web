@@ -4,10 +4,11 @@ import { copyFileSync, mkdirSync, readFileSync, realpathSync, writeFileSync } fr
 import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { Database, type SQLQueryBindings } from 'bun:sqlite';
+
 import { and, asc, desc, eq, gte, isNull } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/bun-sqlite';
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
-import { NoopLogger, type Logger } from 'drizzle-orm/logger';
+import { type Logger, NoopLogger } from 'drizzle-orm/logger';
 
 // Fail closed before importing the app's DB singleton. Never accept :memory:
 // (config resolves it as a file) or a caller's real database path.
@@ -17,6 +18,7 @@ assert.equal(process.env.DATABASE_PATH, join(process.cwd(), 'disposable.sqlite')
 assert.ok(process.env.MIGRATIONS_DIR);
 assert.equal(process.env.LISTMONK_URL, undefined);
 let networkCalls = 0;
+
 Object.defineProperty(globalThis, 'fetch', {
   value: () => {
     networkCalls++;
@@ -26,6 +28,7 @@ Object.defineProperty(globalThis, 'fetch', {
 
 const { db } = await import('../src/lib/server/db');
 const { events, participants, registrations, testimonials } = await import('../src/lib/server/db/schema');
+
 const {
   countActiveRegistrations,
   fetchNextEventState,
@@ -34,10 +37,12 @@ const {
   isEventPast,
   listEventsForAdmin,
 } = await import('../src/lib/server/events');
+
 const { fetchTestimonials } = await import('../src/lib/server/testimonials');
 
 type Query = { sql: string; params: SQLQueryBindings[] };
 const queries: Query[] = [];
+
 // Instrument Drizzle's actual execution logger in this child only. Capture the
 // parameterized SQL and its bindings, not a reconstructed/inlined substitute.
 (NoopLogger.prototype as Logger).logQuery = (sql: string, params: unknown[]) => {
@@ -47,12 +52,15 @@ const queries: Query[] = [];
 async function capture<T>(operation: () => Promise<T>, count: number) {
   queries.length = 0;
   const value = await operation();
+
   assert.equal(queries.length, count, JSON.stringify(queries));
+
   return { value, statements: [...queries] };
 }
 
 function explain(query: Query): string {
   const statement = db.$client.prepare<{ detail: string }, SQLQueryBindings[]>(`EXPLAIN QUERY PLAN ${query.sql}`);
+
   try {
     return statement
       .all(...query.params)
@@ -66,6 +74,7 @@ function explain(query: Query): string {
 /** Independent two-query baseline the combined query must match. */
 function legacyStartOfTodayIso(): string {
   const now = new Date();
+
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
 }
 
@@ -76,12 +85,14 @@ async function legacyGetNextEvent(): Promise<typeof events.$inferSelect | null> 
     .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, legacyStartOfTodayIso())))
     .orderBy(asc(events.eventDate))
     .limit(1);
+
   return rows[0] ?? null;
 }
 
 async function legacyEventDto(ev: typeof events.$inferSelect) {
   const activeCount = await countActiveRegistrations(ev.id);
   const available = Math.max(0, ev.maxParticipants - activeCount);
+
   return {
     id: ev.id,
     title: ev.title,
@@ -111,6 +122,7 @@ async function legacyEventDto(ev: typeof events.$inferSelect) {
 const nextEventOrNull = async () => (await fetchNextEventState()).event;
 
 const today = new Date();
+
 const date = (offset: number) =>
   new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + offset)).toISOString();
 
@@ -152,11 +164,13 @@ function seedEvents() {
       },
     ])
     .run();
+
   for (const eventId of ['today', 'full', 'overflow', 'past']) {
     for (const [i, status] of (
       ['registered', 'attended', 'waitlist', 'cancelled', 'registered', 'attended'] as const
     ).entries()) {
       const id = `${eventId}-${i}`;
+
       db.insert(participants)
         .values({ id, email: `${id}@example.invalid` })
         .run();
@@ -171,6 +185,7 @@ async function checkEvents() {
   seedEvents();
   // The two-query baseline (see legacyGetNextEvent/legacyEventDto above).
   const baseline = await capture(async () => legacyEventDto((await legacyGetNextEvent())!), 2);
+
   assert.deepEqual(baseline.value, {
     id: 'today',
     title: 'Today',
@@ -194,8 +209,10 @@ async function checkEvents() {
     is_past: false,
   });
   const next = await capture(nextEventOrNull, 1);
+
   assert.deepEqual(next.value, baseline.value);
   const state = await capture(fetchNextEventState, 1);
+
   assert.deepEqual(state.value, { status: 'scheduled', event: baseline.value });
   assert.match(next.statements[0].sql, /"registrations"\."event_id" = "events"\."id"/);
   assert.match(explain(next.statements[0]), /CORRELATED SCALAR SUBQUERY/);
@@ -213,21 +230,27 @@ async function checkEvents() {
   ] as const) {
     const legacy = await capture(async () => legacyEventDto((await getPublishedEventBySlug(slug))!), 2);
     const current = await capture(() => getEventBySlug(slug), 1);
+
     assert.deepEqual(current.value, legacy.value);
     assert.equal(current.value?.available_spots, available);
     assert.equal(current.value?.is_full, available === 0);
     assert.equal(current.value?.is_past, slug === 'past');
     const plan = explain(current.statements[0]);
+
     assert.match(plan, /idx_events_slug/);
     assert.match(plan, /idx_registrations_event/);
   }
+
   for (const slug of ['draft', 'deleted', 'missing', "' OR 1=1 --"]) {
     assert.equal((await capture(() => getEventBySlug(slug), 1)).value, null);
   }
+
   const raw = await capture(() => getPublishedEventBySlug('today'), 1);
+
   assert.doesNotMatch(raw.statements[0].sql, /count\(|registrations/i);
   assert.equal(raw.value?.isPublished, true);
   const admin = await listEventsForAdmin();
+
   assert.equal(admin.find((row) => row.id === 'today')?.activeCount, await countActiveRegistrations('today'));
 
   // Exact DB helper compositions used by home and /event (no HTTP/network).
@@ -238,6 +261,7 @@ async function checkEvents() {
       3,
     );
   }
+
   // No cross-request cache: a new seat must affect the very next read.
   db.update(registrations).set({ status: 'registered' }).where(eq(registrations.id, 'today-2')).run();
   assert.equal((await capture(nextEventOrNull, 1)).value?.available_spots, 1);
@@ -299,7 +323,9 @@ async function checkTestimonials() {
       .where(and(eq(testimonials.isPublished, true), isNull(testimonials.deleted)))
       .orderBy(asc(testimonials.sortOrder), desc(testimonials.createdAt))
       .limit(limit);
+
     const current = await capture(() => fetchTestimonials(limit), 1);
+
     assert.deepEqual(
       current.value,
       baseline.map((row) => ({
@@ -309,15 +335,19 @@ async function checkTestimonials() {
       })),
     );
     const query = current.statements[0];
+
     assert.match(query.sql, /^select "quote", "author_name", "role" from/);
     assert.doesNotMatch(query.sql, /"email"|"published_at"|"updated_at"/);
     assert.deepEqual(query.params, [1, limit]);
+
     if (limit > 0) {
       const plan = explain(query);
+
       assert.match(plan, /SEARCH testimonials USING INDEX idx_testimonials_public_order/);
       assert.doesNotMatch(plan, /TEMP B-TREE|SCAN testimonials/);
     }
   }
+
   assert.equal((await fetchTestimonials()).length, 200);
   db.$client.run('DROP TABLE testimonials');
   assert.deepEqual(await fetchTestimonials(), []);
@@ -327,16 +357,20 @@ function checkMigration() {
   const migrations = process.env.MIGRATIONS_DIR!;
   const journal = JSON.parse(readFileSync(join(migrations, 'meta/_journal.json'), 'utf8'));
   const baseline = join(process.cwd(), 'baseline');
+
   mkdirSync(join(baseline, 'meta'), { recursive: true });
   writeFileSync(
     join(baseline, 'meta/_journal.json'),
     JSON.stringify({ ...journal, entries: journal.entries.slice(0, 1) }),
   );
   const original = `${journal.entries[0].tag}.sql`;
+
   copyFileSync(join(migrations, original), join(baseline, original));
   const sqlite = new Database(join(process.cwd(), 'upgrade.sqlite'));
+
   try {
     const upgrade = drizzle(sqlite);
+
     migrate(upgrade, { migrationsFolder: baseline });
     sqlite.run(
       "INSERT INTO testimonials (id, quote, created_at, updated_at) VALUES ('kept', 'Keep me', '2026-01-01', '2026-01-01')",
@@ -347,6 +381,7 @@ function checkMigration() {
     const index = sqlite
       .query<{ sql: string }, []>("SELECT sql FROM sqlite_master WHERE name = 'idx_testimonials_public_order'")
       .get();
+
     assert.ok(index);
     assert.match(index.sql, /is_published.*sort_order.*created_at.*desc/i);
     assert.match(index.sql, /where.*deleted.*is null/i);
@@ -373,6 +408,7 @@ try {
     default:
       throw new Error('Unknown database test scenario');
   }
+
   assert.equal(networkCalls, 0);
 } finally {
   db.$client.close();

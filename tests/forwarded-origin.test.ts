@@ -1,8 +1,8 @@
 /** Regression guard for the 403 that broke every Anmeldung in production: "Cross-site POST form submissions are forbidden". */
-import { expect, test } from 'bun:test';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { expect, test } from 'bun:test';
 
 const fixture = fileURLToPath(new URL('./forwarded-origin.fixture.ts', import.meta.url));
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -27,6 +27,7 @@ for (const [scenario, siteUrl] of scenarios) {
       encoding: 'utf8',
       timeout: 15_000,
     });
+
     expect(result.error).toBeUndefined();
     expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
   }, 20_000);

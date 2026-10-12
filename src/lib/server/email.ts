@@ -80,6 +80,7 @@ export const sendRegistrationEmails = async (
   });
 
   const [userSent] = await Promise.all([userSend, adminSend]);
+
   return userSent;
 };
 
@@ -116,6 +117,7 @@ export const sendEventMessage = async (
   content: string,
 ): Promise<boolean> => {
   const personalised = content.replace(/\{first_name\}/g, participant.firstName || '');
+
   return sendTransactional(config.TX_EVENT_MESSAGE, participant.email, fullName(participant), {
     subject,
     content: personalised,

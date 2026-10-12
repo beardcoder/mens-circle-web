@@ -16,21 +16,29 @@ export const rateLimit = (key: string, ip: string, maxRequests: number, windowSe
     for (const [bucketId, bucket] of buckets) {
       if (bucket.resetAt < now) buckets.delete(bucketId);
     }
+
     nextSweepAt = now + SWEEP_INTERVAL_MS;
   }
 
   const bucket = buckets.get(id);
+
   if (!bucket || bucket.resetAt < now) {
     buckets.set(id, { count: 1, resetAt: now + windowSeconds * 1000 });
+
     return true;
   }
+
   if (bucket.count >= maxRequests) return false;
+
   bucket.count++;
+
   return true;
 };
 
 export const clientIp = (request: Request, fallback = 'unknown'): string => {
   const xff = request.headers.get('x-forwarded-for');
+
   if (xff) return xff.split(',')[0].trim();
+
   return request.headers.get('x-real-ip') || fallback;
 };

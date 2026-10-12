@@ -1,13 +1,15 @@
 ---
-import AdminLayout from '../../../../layouts/AdminLayout.astro';
-import RegistrationManager from '../../../../components/admin/RegistrationManager.astro';
 import { getEventById } from '@lib/server/events';
 import { listRegistrationsForEvent } from '@lib/server/registrations';
+
+import RegistrationManager from '../../../../components/admin/RegistrationManager.astro';
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
 
 export const prerender = false;
 
 const { id } = Astro.params;
 const event = id ? await getEventById(id) : null;
+
 if (!event) return Astro.redirect('/admin', 302);
 
 const registrations = await listRegistrationsForEvent(event.id);

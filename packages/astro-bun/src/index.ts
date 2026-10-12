@@ -2,10 +2,12 @@
  * Astro adapter for Bun. This file uses node:* only, so the integration also works when
  * Astro itself runs on Node; everything Bun-specific lives in the other modules.
  */
-import type { AstroConfig, AstroIntegration, RouteToHeaders, ViteUserConfig } from 'astro';
 import { readdir, writeFile } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import type { AstroConfig, AstroIntegration, RouteToHeaders, ViteUserConfig } from 'astro';
+
 import { MANIFEST_FILE, pageRoute, type RuntimeConfig, type StaticHeaders } from './shared';
 
 export interface BunAdapterOptions {
@@ -38,6 +40,7 @@ function configPlugin(getConfig: () => RuntimeConfig): Plugin {
 
 async function listFiles(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { recursive: true, withFileTypes: true });
+
   return entries
     .filter((entry) => entry.isFile())
     .map((entry) => `/${relative(dir, join(entry.parentPath, entry.name)).split(sep).join('/')}`);
@@ -50,14 +53,18 @@ async function writeManifest(
 ): Promise<number> {
   const clientDir = fileURLToPath(config.build.client);
   const manifest: StaticHeaders = {};
+
   for (const pathname of await listFiles(clientDir)) {
     const headers = {
       ...staticHeaders?.(pathname, { assets: config.build.assets }),
       ...Object.fromEntries(routeHeaders?.get(pageRoute(pathname) ?? pathname)?.headers ?? []),
     };
+
     if (Object.keys(headers).length > 0) manifest[pathname] = headers;
   }
+
   await writeFile(new URL(MANIFEST_FILE, config.build.server), JSON.stringify(manifest));
+
   return Object.keys(manifest).length;
 }
 
@@ -70,7 +77,9 @@ export default function bun(options: BunAdapterOptions = {}): AstroIntegration {
 
   const runtimeConfig = (): RuntimeConfig => {
     if (!config) throw new Error(`${NAME}: config requested before astro:config:done`);
+
     const { host, port } = config.server;
+
     return {
       host: typeof host === 'string' ? host : host ? '0.0.0.0' : 'localhost',
       port,
@@ -87,7 +96,9 @@ export default function bun(options: BunAdapterOptions = {}): AstroIntegration {
     hooks: {
       'astro:build:done': async ({ logger }) => {
         if (config.output === 'static') return;
+
         const count = await writeManifest(config, routeHeaders, options.staticHeaders);
+
         logger.info(`Static headers written for ${count} file(s)`);
       },
     },

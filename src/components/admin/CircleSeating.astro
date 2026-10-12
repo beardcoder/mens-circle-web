@@ -18,6 +18,7 @@ const NODE = 19; // seat radius
 
 const points = Array.from({ length: total }, (_, i) => {
   const a = ((-90 + (i * 360) / total) * Math.PI) / 180;
+
   return {
     x: C + R * Math.cos(a),
     y: C + R * Math.sin(a),
@@ -25,6 +26,7 @@ const points = Array.from({ length: total }, (_, i) => {
     n: i + 1,
   };
 });
+
 const full = seats.length >= capacity && capacity > 0;
 // Full turns the fire and the seats green.
 const fire = full ? 'fill-success' : 'fill-accent';
