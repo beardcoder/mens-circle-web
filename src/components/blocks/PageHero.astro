@@ -20,7 +20,7 @@ interface Props {
   };
 }
 
-/** The opening of a content sub-page: the compact PageIntro, with the photograph beside it where there is one (12px corners, no frame). */
+/** The opening of a content sub-page: the compact PageIntro, with the photograph beside it where there is one (square, no frame). */
 
 const { data } = Astro.props;
 const hasButton = Boolean(data.buttonText && data.buttonLink);
@@ -44,7 +44,7 @@ const imageAsset = resolveAssetImage(data.image);
     <figure slot="media">
       <CropPicture
         src={imageAsset}
-        class="block aspect-4/3 w-full rounded-card object-cover object-[22%_40%] lg:aspect-4/5"
+        class="block aspect-4/3 w-full object-cover object-[22%_40%] lg:aspect-4/5"
         breakpoint="64em"
         narrow={{ ratio: 4 / 3, widths: [420, 700, 960], sizes: 'calc(100vw - 2.5rem)' }}
         wide={{ ratio: 4 / 5, widths: [400, 560, 800], sizes: 'min(30rem, 38vw)' }}

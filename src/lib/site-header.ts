@@ -49,11 +49,17 @@ const initHeaderTone = (header: HTMLElement): void => {
 /**
  * The phone menu. `showModal()` gives the focus trap, Escape and the return of
  * the focus to the menu button; a link to a place on this page closes the menu
- * first, then scrolls there (the CSS scroll padding clears the bar).
+ * first, then scrolls there (the CSS scroll padding clears the bar). It opens
+ * and closes as a circle from the menu button.
  */
 const initMenu = (menu: HTMLDialogElement): void => {
   for (const opener of document.querySelectorAll<HTMLButtonElement>('[data-nav-open]')) {
-    opener.addEventListener('click', () => menu.showModal());
+    opener.addEventListener('click', () => {
+      // The menu opens as a circle from the button's centre (`--nav-origin` in Header.astro).
+      const { left, top, width, height } = opener.getBoundingClientRect();
+      menu.style.setProperty('--nav-origin', `${left + width / 2}px ${top + height / 2}px`);
+      menu.showModal();
+    });
   }
   menu.querySelector('[data-nav-close]')?.addEventListener('click', () => menu.close());
 
