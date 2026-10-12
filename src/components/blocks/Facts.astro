@@ -47,7 +47,8 @@ const anchor = data.anchor ?? 'praktisches';
   </h2>
   <dl class="grid gap-x-grid gap-y-6 md:grid-cols-2 lg:grid-cols-4">
     {facts.map((fact) => (
-      <div class="grid content-start gap-1 border-t border-line-strong pt-4">
+      <div class="reveal grid content-start gap-1">
+        <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
         <dt class="text-sm text-fg-muted">{fact.label}</dt>
         <dd class="text-xl font-semibold text-fg">{fact.value}</dd>
         <dd class="text-sm text-fg-muted">{fact.sub}</dd>

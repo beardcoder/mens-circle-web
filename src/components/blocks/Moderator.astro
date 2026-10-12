@@ -21,7 +21,8 @@ interface Props {
 }
 
 /**
- * Markus: his photograph and his words at about 5 : 7 on the shared grid. On
+ * Markus: his square photograph (a touch slower than the page as it scrolls)
+ * and his words at about 5 : 7 on the shared grid. On
  * phones the title comes first, then a photo of moderate height, then the text,
  * so the photo never pushes the orientation down by screens. His sentence stays
  * below the size of the section's title.
@@ -41,10 +42,10 @@ const photo = resolveAssetImage(data.image);
   />
 
   {photo && (
-    <figure class="lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-start">
+    <figure class="aspect-4/3 overflow-clip lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-4/5 lg:self-start [&_picture]:block [&_picture]:h-full">
       <CropPicture
         src={photo}
-        class="block aspect-4/3 w-full rounded-card object-cover object-[30%_45%] lg:aspect-4/5"
+        class="block size-full scale-110 object-cover object-[30%_45%] scroll-motion:animate-[drift-slow_linear_both] scroll-motion:[animation-timeline:view()]"
         breakpoint="64em"
         narrow={{ ratio: 4 / 3, widths: [400, 640, 960], sizes: 'calc(100vw - 2.5rem)' }}
         wide={{ ratio: 4 / 5, widths: [400, 560, 800], sizes: 'min(30rem, 38vw)' }}

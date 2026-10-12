@@ -17,8 +17,12 @@ import ModeToggle from './ModeToggle.astro';
 
 const links = nav.header.links;
 const cta = nav.header.cta;
+// A line slides in under a link from its start edge on hover and focus.
 const linkClass =
-  'inline-flex min-h-11 items-center rounded-control px-3 text-base font-medium underline-offset-[6px] decoration-1 transition-colors duration-180 hover:underline';
+  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100';
+/** What you press is round. */
+const roundButton =
+  'inline-flex min-h-11 items-center gap-2 rounded-full border border-current/25 px-4 text-base font-medium transition-[border-color,background-color] duration-180 hover:border-current/60 hover:bg-current/6';
 ---
 
 <header
@@ -36,9 +40,13 @@ const linkClass =
     <a
       href="/"
       aria-label={`${site.siteName} – Startseite`}
-      class="flex min-h-11 min-w-0 items-center gap-3 rounded-control font-serif text-xl"
+      class="group/logo flex min-h-11 min-w-0 items-center gap-3 font-serif text-xl"
     >
-      <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+      <Icon
+        name="logo"
+        aria-hidden="true"
+        class="size-9 shrink-0 transition-transform duration-500 ease-out group-hover/logo:rotate-45 motion-reduce:group-hover/logo:rotate-0"
+      />
       <span class="max-[22.5rem]:sr-only">Männerkreis</span>
     </a>
 
@@ -75,49 +83,55 @@ const linkClass =
       data-nav-open
       aria-controls="nav"
       aria-haspopup="dialog"
-      class="inline-flex min-h-11 items-center gap-2 rounded-control px-2 text-base font-medium nav:hidden"
+      class:list={[roundButton, 'nav:hidden max-[26rem]:px-2.5']}
     >
-      <Icon name="menu" aria-hidden="true" class="size-6" />
+      <Icon name="menu" aria-hidden="true" class="size-5" />
       <span class="max-[26rem]:sr-only">Menü</span>
     </button>
   </Container>
 
-  {/* The phone menu: the content links, the action, then the display option. */}
+  {/* The phone menu: the content links, the action, then the display option. It
+      opens as a circle from the menu button (`--nav-origin`, set by
+      lib/site-header.ts) and its links rise in; under reduced motion it fades. */}
   <dialog
     id="nav"
     aria-label="Menü"
     class:list={[
-      'm-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain bg-ground p-0 text-fg nav:hidden',
-      'opacity-0 transition-[opacity,display,overlay] transition-discrete duration-200 open:opacity-100 starting:open:opacity-0 backdrop:bg-transparent',
+      'group/menu m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain bg-ground p-0 text-fg backdrop:bg-transparent nav:hidden',
+      '[--nav-origin:100%_0]',
+      'motion-safe:[clip-path:circle(0_at_var(--nav-origin))] motion-safe:transition-[clip-path,display,overlay] motion-safe:transition-discrete motion-safe:duration-[560ms] motion-safe:ease-in-out',
+      'motion-safe:open:[clip-path:circle(150vmax_at_var(--nav-origin))] motion-safe:starting:open:[clip-path:circle(0_at_var(--nav-origin))]',
+      'motion-reduce:opacity-0 motion-reduce:transition-[opacity,display,overlay] motion-reduce:transition-discrete motion-reduce:open:opacity-100 motion-reduce:starting:open:opacity-0',
     ]}
   >
     <Container class="flex h-header items-center gap-4 border-b border-line">
-      <a href="/" class="flex min-h-11 min-w-0 items-center gap-3 rounded-control font-serif text-xl" data-nav-link>
+      <a href="/" class="flex min-h-11 min-w-0 items-center gap-3 font-serif text-xl" data-nav-link>
         <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
         <span>Männerkreis</span>
       </a>
-      <button
-        type="button"
-        data-nav-close
-        class="ml-auto inline-flex min-h-11 items-center gap-2 rounded-control px-2 text-base font-medium"
-      >
-        <Icon name="close" aria-hidden="true" class="size-6" />
+      <button type="button" data-nav-close class:list={[roundButton, 'ml-auto']}>
+        <Icon name="close" aria-hidden="true" class="size-5" />
         <span>Schließen</span>
       </button>
     </Container>
     <Container class="grid gap-8 py-8">
       <nav aria-label="Hauptnavigation">
         <ul role="list" class="grid border-t border-line">
-          {links.map((link) => (
-            <li class="border-b border-line">
+          {links.map((link, i) => (
+            <li class="border-b border-line" style={`--i: ${i}`}>
               <a
                 href={link.url}
                 data-nav-link
                 data-umami-event="nav-click"
                 data-umami-event-target={link.umamiTarget}
-                class="flex min-h-14 items-center text-xl font-medium transition-colors duration-180 hover:text-accent"
+                class="group/link flex min-h-16 items-center justify-between text-xl font-medium transition-colors duration-180 hover:text-accent group-open/menu:animate-rise group-open/menu:[animation-delay:calc(180ms+var(--i)*60ms)]"
               >
                 {link.label}
+                <Icon
+                  name="arrow"
+                  aria-hidden="true"
+                  class="size-5 text-accent transition-transform duration-180 group-hover/link:translate-x-1"
+                />
               </a>
             </li>
           ))}

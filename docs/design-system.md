@@ -4,7 +4,9 @@ Calm, warm, clear and contemporary: the site reads like a carefully made
 invitation to a real meeting — personal, approachable, precise. It keeps its
 identity (the mark and the circle, Playfair Display and DM Sans, a warm ground, a
 restrained rust, the photograph) and gets its modernity from proportion, clear
-navigation, fluid type, steady spacing and careful interaction, not from effects.
+navigation, fluid type, steady spacing and careful interaction. It is flat — clear
+grounds and thin lines, no shadows — and it moves: openings rise in, blocks rise
+into view as they scroll in, lines draw across, the circles breathe.
 Built on Tailwind CSS v4 utilities over the tokens in `src/styles/theme.css`; there
 are no component stylesheets.
 
@@ -14,8 +16,9 @@ Four rules decide:
    support the reading.
 2. **What belongs together stays together.** An explanation and its questions share
    one ground; a date's facts stand in one summary.
-3. **Decoration has one place.** The circle appears twice: one ring behind the home
-   opening and the breathing circle of the breath invitation.
+3. **Decoration has one place.** The circle: the rings behind the home opening,
+   the breathing circle of the breath invitation, the phone menu that opens as a
+   circle. Everything you press is round; everything that holds is square.
 4. **Same function, same design.** Fields, buttons, dates and states come from
    shared components.
 
@@ -94,23 +97,39 @@ them. Space per width on `:root`: `py-section` 64 → 96px, `py-band` (compact b
 `md` 48rem (tablet: two columns), `lg` 64rem (desktop: four columns), `nav` 68.75rem
 (the header shows its links), `xl` 80rem. No section is forced to a screen's height.
 
-**Shape.** 8px (`rounded-control`) on buttons, inputs and textareas; 12px
-(`rounded-card`) on cards and photographs; a full circle on icon buttons and the
-mark. One restrained shadow (`shadow-card`) for what is truly raised (the date
-summary in the closing, the first date on `/event`, the summary beside an event's
-title); `shadow-overlay` for popovers. A card carries at most one emphasis — no
-coloured cap, no glow, no frame around a photo. Lists and quotes stand without
-cards, under thin lines.
+**Shape.** Either fully round or square, nothing in between; there is no radius
+token. Round (`rounded-full`) is what you press: buttons (pills), icon buttons,
+the menu and close buttons, the FAQ indicator, the scroll-to-top button — and the
+circle itself (rings, the breath, the mark). Square is everything that holds:
+fields and textareas, cards, panels, the breath panel, photographs, the map, the
+calendar popover. Flat: cards are a thin line (`card`: `border-line-strong` on the
+raised ground), never a shadow; a card carries at most one emphasis — no coloured
+cap, no glow, no frame around a photo. Lists and quotes stand without cards, under
+thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
 
-**Motion.** Interactions take ~180ms (`duration-180`), hover changes colour and at
-most nudges an arrow. The only running motion is the circle: the hero's ring
-(`animate-ring`) and the breath guide (`animate-breathe`, 4 s in, 5 s out — the
-words beside it say the same; under reduced motion the circle rests and the timed
-words go). One fade on the home opening (`entrance:`, never after a view
-transition); the scroll-to-top button appears past the first screen
-(`scroll-motion:`). No scroll reveals, no scroll-tied size changes, no
-`content-visibility` (anchors land where they should). Under
-`prefers-reduced-motion` everything rests.
+**Motion.** It carries the site's energy; it never carries content.
+
+- Interactions take ~180ms (`duration-180`): a button changes colour and rises 2px
+  (pressed, it settles), its arrow slides; a header link draws a line under itself;
+  the FAQ's round plus turns into a minus; the mark turns a little on hover.
+- Openings rise in, one after the other (`entrance:animate-rise` with
+  `animate-delay-*`, ≤ 260ms in all; never after a view transition): the home
+  statement, a sub-page's title, an event's date.
+- Blocks rise into view as they scroll in (`reveal`: section heads, list items,
+  the breath panel, the date cards), and the lines over facts, phases, agreements
+  and positions draw across (`draw`). Both are tied to the scroll position on a
+  `view()` timeline: what is already on screen is already complete, and without
+  timeline support or with reduced motion the content simply stands.
+- The circles breathe: the hero's three rings out of phase (`animate-ring`,
+  `animate-ring-slow`), drifting down as the page scrolls away (`ring-drift`); the
+  breath guide (`animate-breathe`, 4 s in, 5 s out — the words beside it say the
+  same). Markus's photograph moves a touch slower than the page (`drift-slow`).
+- The phone menu opens as a circle from its button (`clip-path`, `--nav-origin`),
+  its links rising in; the scroll-to-top button appears past the first screen
+  (`scroll-motion:`).
+- No scroll-tied size changes, no `content-visibility` (anchors land where they
+  should). Under `prefers-reduced-motion` everything rests and the timed breath
+  guide hides.
 
 ## Components
 
@@ -121,7 +140,7 @@ transition); the scroll-to-top button appears past the first screen
 | `SectionHead` (`size`, `align`)                   | Label, title (`section` / `page` / `sub`), lead                                                 |
 | `PageIntro` (`lead`, `media` slots)               | The compact light opening of every sub-page, a photo beside it where there is one               |
 | `Eyebrow`                                         | A short section label (`label` recipe)                                                          |
-| `Button` (`variant`, `size`, `block`, `decorate`) | `primary` (one per module), `secondary`, `ghost`, `danger`; 48 / 52px high                      |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Fully round: `primary` (one per module), `secondary`, `ghost`, `danger`; 48 / 52px high         |
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                     |
 | `Field`, `control()`, `FormStatus`                | Label, control, hint, field error; the form's own result line under its button                  |
 | `EventSummary`                                    | One date: label, the date on two fixed lines, time / place / fee / seats, the action that fits  |
@@ -133,8 +152,8 @@ transition); the scroll-to-top button appears past the first screen
 **Header.** 72px: the mark, from `nav` four content links and one filled action
 ("Termine"); below `nav` the action and a menu button. The phone menu is a native
 modal `<dialog>` (focus trap, Escape, the focus returns to the button; the page holds
-still under `:root:has(dialog:modal)`) with the links, the action and the display
-option. Over the home opening the bar is clear with light text and turns to the
+still under `:root:has(dialog:modal)`) that opens as a circle from its button, with
+the links, the action and the display option. Over the home opening the bar is clear with light text and turns to the
 opaque paper at once when the page moves (`over-hero:`, `data-scrolled`).
 
 **Footer.** Compact on the dark focus ground on every page: the mark and one line,

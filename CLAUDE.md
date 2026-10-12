@@ -135,8 +135,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - `docs/design-system.md` is the reference; the brief behind it (DESIGN.md, 12 Oct
   2026): calm, warm, clear and contemporary — an invitation to a real meeting, never
   a stage. Meaning sets size; what belongs together stays together; decoration has
-  one place (the circle: the hero's ring and the breath circle); same function,
-  same design.
+  one place (the circle); same function, same design. Flat and moving: clear
+  grounds and thin lines, no shadows; openings rise in, blocks rise into view.
 - Colours are roles (`ground`, `ground-alt`, `fg`, `fg-muted`, `line`, `line-bold`,
   `accent`, `fill`/`fill-strong`/`on-fill`, `success`/`danger` for states only); hex
   primitives (`--p-*`) live on `:root` only, never in markup. One palette; day and
@@ -158,9 +158,11 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Grid: 1200px of content (`max-w-page`), side margins 20 / 32 / 48px; `py-section`
   64 → 96px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop, `nav`
   (1100px) header links. No section is forced to a screen's height.
-- Shapes: 8px (`rounded-control`) buttons and inputs, 12px (`rounded-card`) cards and
-  photos, circles for icon buttons. One restrained `shadow-card` for what is truly
-  raised; a card carries one emphasis at most (no cap bar, no glow, no photo frame).
+- Shapes: fully round or square, never in between (no radius token). Round
+  (`rounded-full`) is what you press — buttons as pills, icon buttons, the FAQ
+  indicator — and the circle itself; square is what holds — fields, cards, panels,
+  photos, the map, popovers. Flat: a card is a thin line (`card`), never a shadow,
+  and carries one emphasis at most (no cap bar, no glow, no photo frame).
 - Shared components: `EventSummary` (every date, fed by `lib/event-status.ts`),
   `PageIntro` (every sub-page opening, light), `SectionHead`, `Button`, `Field` +
   `FormStatus`, `Quote` (`short` once per section, long voices fold), `Accordion`
@@ -175,9 +177,13 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   menu is a native modal `<dialog>`. Over the home opening the bar is clear
   (`over-hero:`) until the page moves (`data-scrolled`), then opaque paper at once.
   The footer is compact and the same everywhere; it carries no invitation.
-- Motion: interactions ~180ms, colour only; the only running motion is the hero's
-  ring and the breath circle, whose 10 s cycle matches its words (4 s in, 5 s out);
-  one fade on the opening (`entrance:`). No scroll reveals, no `content-visibility`.
+- Motion: interactions ~180ms (a button rises 2px, arrows slide, header links draw
+  a line); openings rise in staggered (`entrance:animate-rise`, ≤ 260ms); blocks
+  rise into view (`reveal`) and list lines draw across (`draw`), both on `view()`
+  timelines, so what is on screen is complete and nothing waits on a script; the
+  hero's rings breathe and drift on scroll; the breath circle's 10 s cycle matches
+  its words (4 s in, 5 s out); the phone menu opens as a circle from its button.
+  Island content does not animate (its swap must not flash). No `content-visibility`.
   Under reduced motion everything rests and the timed guide hides.
 - No layout shift: an island's fallback sets the same lines as its loaded state;
   every summary line is one line (`truncate`). Both Playfair styles are preloaded
