@@ -43,11 +43,12 @@ to `/`, in `src/middleware.ts`; `trailingSlash: 'never'`.
 explicit env; config is read at module load, so an in-process import measures `.env`.
 
 **Actions.** Everything is an Astro Action (`src/actions/*`), merged flat in `index.ts`.
-Public forms validate only in their Zod schema; `lib/form.ts` owns submit and field
-errors (forms need JS). They go through `publicForm()` in `actions/forms.ts`: an
-in-process per-IP rate limit (`lib/server/ratelimit.ts`, one more reason for a single
-replica), a honeypot field (`website`) answered with a fake success, German messages,
-and no internal error ever shown. Admin scripts use `bindOnce` + `ok` from `lib/admin.ts`
+Public forms validate only in their Zod schema; `lib/form.ts` owns submit, field
+errors and the form's result line (`FormStatus`, never a toast; forms need JS). They
+go through `publicForm()` in `actions/forms.ts`: an in-process per-IP rate limit
+(`lib/server/ratelimit.ts`, one more reason for a single replica), a honeypot field
+(`website`) answered with a fake success, German messages, and no internal error
+ever shown. Admin scripts use `bindOnce` + `ok` from `lib/admin.ts`
 (the admin runs `<ClientRouter />`). Mutating admin actions call `requireAdmin`.
 Other endpoints: `/health`, `/sitemap-events.xml`, `/auth/*`, `/api/public/events/<slug>/ics`.
 
@@ -67,7 +68,8 @@ replica on the same SQLite file is not supported.
 
 **Rendering.** Home is prerendered with exactly four `server:defer` islands
 (`HomeEventStatus` ×2, `Facts`, `Testimonials`); fallbacks never read the DB, islands
-get no images. The `HomeEventStatus` fallback sets the same lines as a scheduled date
+get no images. The hero's `HomeEventStatus` renders two items of the hero's grid
+(the summary and the action under the statement), so the action can name the state. The `HomeEventStatus` fallback sets the same lines as a scheduled date
 (static words, same length or shorter), so the swap changes text, not height: no
 layout shift. Text in the first screen that an island fills stays one fixed line.
 Event pages are SSR. `lib/event-status.ts` has three states; a failed read
@@ -130,65 +132,56 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Design
 
-- The look of the earlier hand-written design (commit b286281), rebuilt on Tailwind:
-  warm earth and terracotta, a fire just out of sight — a circle of men, grounded and
-  calm, never macho, never a wellness retreat. `docs/design-system.md` is the
-  reference.
-- Palettes: OKLCH primitives (`--p-*`) on `:root`; `warm` (earth, terracotta) is the
-  default, `cool` (`:root[data-theme='cool']`, spruce and fern) re-pitches only the
-  primitives. Day and night are `data-mode` (`light-dark()` tokens). Both are set
-  before first paint and switched by `ThemeSwitch` (flame/leaf, sun/moon).
-- Colours are semantic tokens (`ground`, `ground-alt`, `raised`, `surface`, `fg`,
-  `fg-soft`, `fg-muted`, `accent*`, `fill*`/`on-fill`, `line*`); no hex in markup.
-  `accent` is terracotta as text, `fill` the terracotta of buttons, seats and bars.
-  Every text token holds ≥ 4.5:1 on every ground, control borders (`line-bold`)
-  ≥ 3:1; check new pairs in both palettes and both modes.
-- Grounds (`Section ground`): `default` paper; `alt` parchment; `sand` the stone band
-  (88% opaque, so the breathing light runs on beneath it); `night` deep earth with
-  grain (openings, the journey, registration, the menu); `earth` the brown panel
-  (`HalfBleed`, the newsletter band); `forest` the WhatsApp band; `ink` the footer.
-  Surfaces (`surface-*`) re-declare the semantic colours, so everything inside follows.
-- Openings are dark: `HeroFrame` (two warm glows, breathing hairline `Rings`,
-  `data-hero`); nothing stands at its sides — no frame lines, no labels set on end.
-  Home fills the first screen, an event takes `tall`, sub-pages (`PageOpening`)
-  `auto`, with a photo beside the text where there is one. On scroll the content
-  lifts a little (never fades) and the rings drift down. The header is the page's
-  opaque paper (never glass: the hero title would show through), light and clear over
-  an opening until the page moves (`over-hero:`, `data-scrolled`), then switches at
-  once: no cross-fade, which passes through a grey half-clear bar.
-- Type: Playfair Display (`font-serif`, weight 400, tracked in) speaks — titles in
-  sentence case; a phrase of a title in the italic accent (`<em>`, via
-  `titleEmphasis`); quotes and questions in the italic. DM Sans (`font-sans`)
-  explains: text, UI, a size step above the usual (DM Sans runs small). Eyebrows are
-  spaced capitals (`tracking-eyebrow`) behind a long fading rule, with a rule on each
-  side over a centred head (`Eyebrow center`); buttons and labels bold capitals
-  (`tracking-label`). A dash in running copy is bound to the word before it
-  (`\u00a0–`), so no line starts with one.
-- Shapes: pill buttons (`rounded-full`, lift and glow on hover), soft cards
-  (`rounded-card` 12px, `shadow-card`) for self-contained units — the date, forms —
-  never for running text; a date or form card carries a 4px `fill` cap on top
-  (`capCard`), never a side bar. On a dark opening the date and the seats stand
-  open behind a hairline, not in a card. Groups of equals stand in hairline grids
-  (facts, agreements, values, voices, link rows). The Ablauf steps are numbered
-  `01`–`04` in large serif figures on the dark band; everything else is told in
-  sentences.
-- `HalfBleed` puts the reading on the paper beside a brown panel to the screen's edge
-  (Intro). The FAQ is a list of serif questions between hairlines with a round plus
-  that turns. Voices (`Quote`) are never cards: serif italic under a large accent
-  mark, in the hairline grid, the name in capitals. Seats are counted by
-  `SeatMeter` (a row of bars, taken filled) beside the count in words.
-- Layout: a 1400px container. Titles stand above their content; `Split` puts a head
-  beside its content where both earn a column. Phones stack in DOM order. Vertical
-  rhythm: `section` > `group` > `item`; never inverted.
-- Motion: entrances on the openings (`entrance:`, never after a view transition),
-  scroll-tied reveals (`reveal`, view() only), the rings breathing out of phase
-  (`ring`, `ring-slow`), the page's background breath (`BreathBackdrop`), the 10 s
-  guide in the statement (`breathe`), the menu: a full-screen dark overlay that opens
-  as a circle from its toggle (`--nav-origin`), links rising. No numbers in the
-  navigation. Under reduced motion everything rests.
-- No layout shift: an island's fallback sets the same lines as its loaded state; the
-  date card's lines are each one fixed line (`truncate`). Both Playfair styles are
-  preloaded (the hero title's accent is italic); dropping one brings the shift back.
+- `docs/design-system.md` is the reference; the brief behind it (DESIGN.md, 12 Oct
+  2026): calm, warm, clear and contemporary — an invitation to a real meeting, never
+  a stage. Meaning sets size; what belongs together stays together; decoration has
+  one place (the circle: the hero's ring and the breath circle); same function,
+  same design.
+- Colours are roles (`ground`, `ground-alt`, `fg`, `fg-muted`, `line`, `line-bold`,
+  `accent`, `fill`/`fill-strong`/`on-fill`, `success`/`danger` for states only); hex
+  primitives (`--p-*`) live on `:root` only, never in markup. One palette; day and
+  night are `data-mode` (`light-dark()` tokens), switched by `ModeToggle` in the
+  footer and the phone menu. The boot script drops a stored `mc-theme`. Every text
+  token ≥ 4.5:1 on every ground in both modes, `line-bold` ≥ 3:1; `line` never
+  outlines a control alone. Check new pairs in both modes.
+- Grounds: `Section ground` is `default` (paper), `alt` (the quiet secondary ground:
+  facts, agreements, the breath panel, the closing invitation, compact bands) or
+  `dark` (`surface-dark`: the home opening and the footer only). No other bands.
+- Type: Playfair Display (400) for chosen titles, short quotes and the date in a
+  summary; DM Sans for text, navigation, forms, data, FAQ questions, list titles.
+  Role tokens: `text-hero`, `text-page`, `text-section`, `text-sub`, `text-quote`,
+  `text-md` (body), `text-base` (controls, data). Titles are one colour; the italic
+  accent appears only in the home statement (`titleEmphasis`) and the breath line.
+  Labels are small spaced capitals (`label`) with no rules; buttons and navigation in
+  normal case. Running text on `max-w-measure`. A dash in running copy is bound to
+  the word before it (`\u00a0–`).
+- Grid: 1200px of content (`max-w-page`), side margins 20 / 32 / 48px; `py-section`
+  64 → 96px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop, `nav`
+  (1100px) header links. No section is forced to a screen's height.
+- Shapes: 8px (`rounded-control`) buttons and inputs, 12px (`rounded-card`) cards and
+  photos, circles for icon buttons. One restrained `shadow-card` for what is truly
+  raised; a card carries one emphasis at most (no cap bar, no glow, no photo frame).
+- Shared components: `EventSummary` (every date, fed by `lib/event-status.ts`),
+  `PageIntro` (every sub-page opening, light), `SectionHead`, `Button`, `Field` +
+  `FormStatus`, `Quote` (`short` once per section, long voices fold), `Accordion`
+  (every FAQ). Use them; do not restyle a copy.
+- Home: the dark opening holds statement, explanation, the action (in the first
+  screen at 1440 × 900) and the next date; then facts, intro with its questions,
+  the four phases with the breath panel (`#haltung`), Markus at 5 : 7, agreements,
+  voices, FAQ, taking part (`#termine`), staying in touch (`#newsletter`, WhatsApp as
+  a link). `/event` lists every upcoming date; an event page puts the description
+  beside the registration; legal pages are a title and one column.
+- Header 72px: links visible from `nav`, "Termine" the one filled action; the phone
+  menu is a native modal `<dialog>`. Over the home opening the bar is clear
+  (`over-hero:`) until the page moves (`data-scrolled`), then opaque paper at once.
+  The footer is compact and the same everywhere; it carries no invitation.
+- Motion: interactions ~180ms, colour only; the only running motion is the hero's
+  ring and the breath circle, whose 10 s cycle matches its words (4 s in, 5 s out);
+  one fade on the opening (`entrance:`). No scroll reveals, no `content-visibility`.
+  Under reduced motion everything rests and the timed guide hides.
+- No layout shift: an island's fallback sets the same lines as its loaded state;
+  every summary line is one line (`truncate`). Both Playfair styles are preloaded
+  (the statement's phrase is italic); dropping one brings the shift back.
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Styles live in the component's markup as utilities. `global.css` is inlined into

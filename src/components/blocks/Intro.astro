@@ -1,6 +1,6 @@
 ---
-import HalfBleed from '../ui/HalfBleed.astro';
 import Prose from '../ui/Prose.astro';
+import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
@@ -8,7 +8,6 @@ interface Props {
     anchor?: string;
     eyebrow?: string;
     title?: string;
-    titleEmphasis?: string;
     text?: string;
     questionsLabel?: string;
     questions?: string[];
@@ -16,36 +15,38 @@ interface Props {
   };
 }
 
-/** What an evening is about: the reading on the paper, the questions it often turns on in the brown panel beside it, set large in the serif's italic. */
+/**
+ * What an evening is about, on one light ground: the explanation in the wider
+ * column, the questions an evening often turns on beside it in a narrower one,
+ * parted by a single line — help to understand, not a second statement. Phones
+ * set them one under the other.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'ueber';
 const questions = (data.questions ?? []).slice(0, 4);
 ---
 
-<HalfBleed id={anchor} labelledby="ueber-title">
-  <div slot="start" class="grid justify-items-start gap-6">
-    <SectionHead
-      eyebrow={data.eyebrow}
-      title={data.title}
-      titleEmphasis={data.titleEmphasis}
-      titleId="ueber-title"
-      size="display-3"
-    />
-    {data.text && <Prose html={data.text} size="lg" />}
-    {data.close && <p class="max-w-measure font-serif text-xl text-accent italic">{data.close}</p>}
+<Section id={anchor} labelledby="ueber-title" innerClass="grid gap-x-grid gap-y-6 lg:grid-cols-12">
+  <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="ueber-title" class="lg:col-span-12" />
+  <div class="lg:col-span-7">
+    {data.text && <Prose html={data.text} />}
+    {data.close && <p class="mt-6 max-w-measure text-md font-semibold text-fg">{data.close}</p>}
   </div>
 
   {questions.length > 0 && (
-    <figure aria-labelledby="ueber-questions-label" class="reveal grid gap-8">
-      <figcaption id="ueber-questions-label" class="text-xs font-bold tracking-[0.2em] text-fg-muted uppercase">
+    <aside
+      aria-labelledby="ueber-questions-label"
+      class="border-line max-lg:mt-4 max-lg:border-t max-lg:pt-8 lg:col-span-4 lg:col-start-9 lg:self-start lg:border-l lg:pl-8"
+    >
+      <h3 id="ueber-questions-label" class="font-sans text-base font-semibold text-fg">
         {data.questionsLabel}
-      </figcaption>
-      <ul role="list" class="divide-y divide-line border-y border-line">
+      </h3>
+      <ul role="list" class="mt-4 grid gap-3">
         {questions.map((question) => (
-          <li class="py-5 font-serif text-[clamp(1.375rem,1rem+1.2vw,2rem)] leading-snug text-fg italic">{question}</li>
+          <li class="text-md text-fg-soft">{question}</li>
         ))}
       </ul>
-    </figure>
+    </aside>
   )}
-</HalfBleed>
+</Section>

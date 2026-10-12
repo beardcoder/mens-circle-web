@@ -1,0 +1,29 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/**
+ * The one display option: day or night, as a quiet text button. It sits in the
+ * footer and, on phones, at the end of the menu; lib/theme.ts keeps every
+ * instance in sync (`aria-pressed` while dark).
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  data-mode-toggle
+  aria-pressed="false"
+  class:list={[
+    'inline-flex min-h-11 items-center gap-2 text-sm text-fg-muted transition-colors duration-180 hover:text-fg',
+    className,
+  ]}
+>
+  <Icon name="theme-dark" aria-hidden="true" class="size-4.5 dark:hidden" />
+  <Icon name="theme-light" aria-hidden="true" class="hidden size-4.5 dark:block" />
+  <span class="dark:hidden">Dunkle Darstellung</span>
+  <span class="hidden dark:inline">Helle Darstellung</span>
+</button>

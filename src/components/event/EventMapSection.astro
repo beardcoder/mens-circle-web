@@ -11,7 +11,7 @@ interface Props {
   event: EventDTO;
   lat: number;
   lng: number;
-  ground?: 'default' | 'sand';
+  ground?: 'default' | 'alt';
 }
 
 /**
@@ -27,18 +27,33 @@ const address =
   fullAddress({ street: event.street, postalCode: event.postal_code, city: event.city }) || event.location;
 ---
 
-<Section ground={ground} labelledby="anfahrt-title" innerClass="grid justify-items-center gap-group" defer>
-  <SectionHead
-    eyebrow="Anfahrt"
-    title="So findest du zu uns"
-    titleEmphasis="zu uns"
-    titleId="anfahrt-title"
-    align="center"
-  >
-    <p class="font-serif text-xl text-fg-soft italic">{address}</p>
-  </SectionHead>
+<Section ground={ground} labelledby="anfahrt-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
+  <div class="lg:col-span-4">
+    <SectionHead eyebrow="Anfahrt" title="So findest du zu uns" titleId="anfahrt-title" size="sub" />
+    <p class="mt-4 text-md text-fg">{address}</p>
+    <div class="mt-6 grid justify-items-start gap-3">
+      <Button
+        href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
+        variant="secondary"
+        target="_blank"
+        rel="noopener"
+        class="max-sm:w-full"
+      >
+        Route planen (Google Maps)
+      </Button>
+      <Button
+        href={`https://atlas.bayern.de/?c=${lng},${lat}&z=16&crh=true`}
+        variant="secondary"
+        target="_blank"
+        rel="noopener"
+        class="max-sm:w-full"
+      >
+        Im BayernAtlas öffnen
+      </Button>
+    </div>
+  </div>
 
-  <div class="w-full max-w-5xl">
+  <div class="min-w-0 lg:col-span-8">
     {/* A fixed frame so the map can never push the page around as it loads. */}
     <div class="aspect-4/3 overflow-clip rounded-card border border-line has-data-[state=failed]:aspect-auto sm:aspect-video">
       <div
@@ -64,32 +79,13 @@ const address =
           ></bayern-atlas>
         </div>
         <p data-map-fallback hidden class="p-4 text-sm text-balance text-fg-muted">
-          Die Karte lässt sich gerade nicht laden. Die Adresse steht über dieser Box, und die Routen-Links darunter
-          funktionieren weiterhin.
+          Die Karte lässt sich gerade nicht laden. Die Adresse und die Routen-Links stehen daneben und funktionieren
+          weiterhin.
         </p>
       </div>
     </div>
 
-    <div class="mt-6 flex flex-wrap justify-center gap-3 max-sm:flex-col">
-      <Button
-        href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
-        variant="secondary"
-        target="_blank"
-        rel="noopener"
-      >
-        Route planen (Google Maps)
-      </Button>
-      <Button
-        href={`https://atlas.bayern.de/?c=${lng},${lat}&z=16&crh=true`}
-        variant="secondary"
-        target="_blank"
-        rel="noopener"
-      >
-        Im BayernAtlas öffnen
-      </Button>
-    </div>
-
-    <p class="mt-3 text-center text-sm text-fg-muted">
+    <p class="mt-3 text-sm text-fg-muted">
       Karte:{' '}
       <a href="https://atlas.bayern.de" target="_blank" rel="noopener" class={link}>
         BayernAtlas
