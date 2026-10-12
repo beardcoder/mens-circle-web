@@ -45,7 +45,7 @@ const photo = resolveAssetImage(data.image);
     <figure class="aspect-4/3 overflow-clip lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-4/5 lg:self-start [&_picture]:block [&_picture]:h-full">
       <CropPicture
         src={photo}
-        class="block size-full scale-110 object-cover object-[30%_45%] scroll-motion:animate-[drift-slow_linear_both] scroll-motion:[animation-timeline:view()]"
+        class="block size-full object-cover object-[30%_45%]"
         breakpoint="64em"
         narrow={{ ratio: 4 / 3, widths: [400, 640, 960], sizes: 'calc(100vw - 2.5rem)' }}
         wide={{ ratio: 4 / 5, widths: [400, 560, 800], sizes: 'min(30rem, 38vw)' }}
