@@ -1,10 +1,12 @@
 ---
+import { Icon } from 'astro-icon/components';
+
+import { button } from '@lib/ui';
+
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
-import { Icon } from 'astro-icon/components';
-import { button } from '@lib/ui';
-import Container from './ui/Container.astro';
 import ModeToggle from './ModeToggle.astro';
+import Container from './ui/Container.astro';
 
 /**
  * The bar, 72px: the mark on the left; from `nav` (1100px) the four content links
@@ -17,9 +19,11 @@ import ModeToggle from './ModeToggle.astro';
 
 const links = nav.header.links;
 const cta = nav.header.cta;
+
 // A line slides in under a link from its start edge on hover and focus.
 const linkClass =
   'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100';
+
 /** What you press is round. */
 const roundButton =
   'inline-flex min-h-11 items-center gap-2 rounded-full border border-current/25 px-4 text-base font-medium transition-[border-color,background-color] duration-180 hover:border-current/60 hover:bg-current/6';

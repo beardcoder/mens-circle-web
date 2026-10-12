@@ -1,5 +1,6 @@
-import type { APIContext, MiddlewareNext } from 'astro';
 import { defineMiddleware } from 'astro:middleware';
+import type { APIContext, MiddlewareNext } from 'astro';
+
 import { CACHE_CONTROL, cacheControlForRoute } from './lib/cache-policy';
 import { readSession, SESSION_COOKIE } from './lib/server/auth';
 
@@ -9,12 +10,16 @@ const HOME_ALIASES = new Set(['/home', '/atemuebung', '/atemuebung/app']);
 /** Adds the cache policy unless the route set its own; copies immutable (redirect) responses. */
 const withCacheControl = (response: Response, value: string): Response => {
   if (response.headers.has(CACHE_CONTROL)) return response;
+
   try {
     response.headers.set(CACHE_CONTROL, value);
+
     return response;
   } catch {
     const headers = new Headers(response.headers);
+
     headers.set(CACHE_CONTROL, value);
+
     return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
   }
 };
@@ -31,9 +36,11 @@ const handle = async (context: APIContext, next: MiddlewareNext): Promise<Respon
   if (isAdminPage && !isLogin) {
     const token = context.cookies.get(SESSION_COOKIE)?.value;
     const email = await readSession(token);
+
     if (!email) {
       return context.redirect(`/admin/login?redirect=${encodeURIComponent(pathname)}`, 302);
     }
+
     context.locals.admin = email;
   }
 
@@ -42,5 +49,6 @@ const handle = async (context: APIContext, next: MiddlewareNext): Promise<Respon
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const response = await handle(context, next);
+
   return withCacheControl(response, cacheControlForRoute(context.url.pathname));
 });

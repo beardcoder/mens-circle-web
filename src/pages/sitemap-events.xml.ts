@@ -1,5 +1,6 @@
 /** The event pages, listed at request time. */
 import type { APIRoute } from 'astro';
+
 import { listPublishedEventsForSitemap } from '@lib/server/events';
 
 export const prerender = false;
@@ -16,6 +17,7 @@ const xml = (value: string): string =>
 /** W3C-datetime for `<lastmod>`; falls back to the raw value if unparseable. */
 const lastmod = (iso: string): string => {
   const d = new Date(iso);
+
   return Number.isNaN(d.getTime()) ? iso : d.toISOString();
 };
 
@@ -26,6 +28,7 @@ export const GET: APIRoute = async ({ site }) => {
   const urls = events
     .map((event) => {
       const loc = xml(new URL(`/event/${event.slug}`, base).href);
+
       return `<url><loc>${loc}</loc><lastmod>${lastmod(event.updatedAt)}</lastmod></url>`;
     })
     .join('');

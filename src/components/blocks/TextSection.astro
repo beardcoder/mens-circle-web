@@ -20,10 +20,12 @@ interface Props {
  */
 
 const { data } = Astro.props;
+
 const slug = (data.title ?? '')
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '');
+
 const anchor = data.anchor ?? slug;
 const hasHead = Boolean(data.eyebrow || data.title);
 ---

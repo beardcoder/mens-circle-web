@@ -1,7 +1,8 @@
 ---
-import AdminLayout from '../../../layouts/AdminLayout.astro';
-import EventForm from '../../../components/admin/EventForm.astro';
 import { getEventById } from '@lib/server/events';
+
+import EventForm from '../../../components/admin/EventForm.astro';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
 
 export const prerender = false;
 

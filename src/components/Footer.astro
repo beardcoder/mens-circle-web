@@ -1,9 +1,10 @@
 ---
+import { Icon } from 'astro-icon/components';
+
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
-import { Icon } from 'astro-icon/components';
-import Container from './ui/Container.astro';
 import ModeToggle from './ModeToggle.astro';
+import Container from './ui/Container.astro';
 
 /**
  * The compact footer on the dark focus ground, the same on every page: the mark
@@ -18,12 +19,15 @@ const socialLinks = site.socialLinks.map((link) => {
   const internal = link.type === 'email' || link.type === 'phone';
   const scheme = link.type === 'email' ? 'mailto:' : link.type === 'phone' ? 'tel:' : '';
   const text = link.type === 'email' ? site.contactEmail : link.type === 'phone' ? site.contactPhone : link.label;
+
   return { ...link, href: `${scheme}${link.value}`, internal, text };
 });
+
 // Only these prerendered pages are safe to fetch before a click.
 const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum', '/datenschutz']);
 
 const heading = 'mb-3 font-sans text-xs font-semibold tracking-label text-fg-muted uppercase';
+
 const footerLink =
   'inline-flex min-h-11 items-center gap-3 text-base text-fg transition-colors duration-180 hover:text-accent sm:min-h-10';
 ---

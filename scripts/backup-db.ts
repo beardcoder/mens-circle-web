@@ -1,10 +1,11 @@
 /** SQLite → S3 backup. */
-import { Database } from 'bun:sqlite';
 import { existsSync, rmSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
+import { Database } from 'bun:sqlite';
 
 function env(key: string, fallback = ''): string {
   const v = process.env[key];
+
   return v && v.length > 0 ? v : fallback;
 }
 
@@ -37,9 +38,11 @@ function readConfig(): BackupConfig {
   const secretAccessKey = env('BACKUP_S3_SECRET_ACCESS_KEY', env('AWS_SECRET_ACCESS_KEY'));
 
   if (!bucket) throw new Error('BACKUP_S3_BUCKET is not set — nothing to upload to.');
+
   if (!accessKeyId || !secretAccessKey) {
     throw new Error('S3 credentials missing — set BACKUP_S3_ACCESS_KEY_ID / BACKUP_S3_SECRET_ACCESS_KEY.');
   }
+
   // Bail rather than let bun:sqlite create an empty file at a mistyped path.
   if (!existsSync(dbPath)) throw new Error(`database not found at ${dbPath} (check DATABASE_PATH).`);
 
@@ -58,10 +61,12 @@ function readConfig(): BackupConfig {
 /** Snapshots `dbPath` via `VACUUM INTO` and gzips the result. Cleans up the snapshot file itself. */
 async function snapshotToGzip(dbPath: string, snapshotPath: string): Promise<Uint8Array> {
   console.log(`[backup] snapshotting ${dbPath} → ${snapshotPath}`);
+
   try {
     // Read-write open: an explicit `{ readonly: … }` trips bun:sqlite's flag
     // handling with SQLITE_MISUSE, and VACUUM INTO needs a normal connection.
     const db = new Database(dbPath);
+
     db.run(`VACUUM INTO '${snapshotPath.replace(/'/g, "''")}'`);
     db.close();
   } catch (err) {
@@ -81,35 +86,44 @@ async function snapshotToGzip(dbPath: string, snapshotPath: string): Promise<Uin
 type Listed = { key?: string; lastModified?: string | Date };
 function isExpired(obj: Listed | undefined, cutoff: number, currentKey: string): obj is Listed & { key: string } {
   if (!obj?.key || obj.key === currentKey) return false;
+
   const modified = obj.lastModified ? new Date(obj.lastModified).getTime() : NaN;
+
   return Number.isFinite(modified) && modified < cutoff;
 }
 
 async function pruneExpired(s3: Bun.S3Client, prefix: string, currentKey: string, cutoff: number): Promise<number> {
   let token: string | undefined;
   let pruned = 0;
+
   do {
     const page = await s3.list({
       prefix: `${prefix}/`,
       maxKeys: 1000,
       ...(token ? { continuationToken: token } : {}),
     });
+
     for (const obj of page?.contents ?? []) {
       if (!isExpired(obj, cutoff, currentKey)) continue;
+
       await s3.delete(obj.key);
       pruned++;
     }
+
     token = page?.isTruncated ? page?.nextContinuationToken : undefined;
   } while (token);
+
   return pruned;
 }
 
 /** Best-effort: a failed prune must not fail the backup. */
 async function pruneIfConfigured(s3: Bun.S3Client, config: BackupConfig, currentKey: string): Promise<void> {
   if (config.retentionDays <= 0 || typeof s3.list !== 'function') return;
+
   try {
     const cutoff = Date.now() - config.retentionDays * 24 * 60 * 60 * 1000;
     const pruned = await pruneExpired(s3, config.prefix, currentKey, cutoff);
+
     if (pruned > 0) {
       console.log(`[backup] pruned ${pruned} backup(s) older than ${config.retentionDays} day(s)`);
     }
@@ -134,6 +148,7 @@ export async function runBackup(): Promise<void> {
     region: config.region,
     ...(config.endpoint ? { endpoint: config.endpoint } : {}),
   });
+
   try {
     await s3.write(key, gz, { type: 'application/gzip' });
     console.log(`[backup] uploaded s3://${config.bucket}/${key} (${(gz.byteLength / 1024).toFixed(1)} KiB)`);

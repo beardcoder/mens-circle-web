@@ -11,7 +11,8 @@ Commit messages are English too, in Conventional Commits form (`fix(seo): …`).
 bun run dev            # under an agent it daemonizes; bunx astro dev status|logs|stop
 bun run build          # bun --bun astro build: Astro runs on Bun (≥ 1.4) for Bun.Image
 bun run check          # astro check
-bun run lint           # eslint; complexity ≤ 12, max-depth ≤ 4 are enforced
+bun run lint           # eslint; complexity ≤ 12, max-depth ≤ 4, blank lines, import order
+bun run lint:fix       # sets blank lines and import order, then runs prettier
 bun run format         # prettier; also run after db:generate (drizzle/meta is formatted)
 bun run format:check   # what CI runs; CLAUDE.md and docs/ are formatted too
 bun test               # each *.fixture.ts case runs in its own Bun process
@@ -207,3 +208,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   what the pages say (Person, `areaServed`); no FAQPage for rich results.
 - JSON-LD ids (`#organization`, `#markus`, `#website`, `#series`) are defined once.
 - Aliases: `@lib/*`, `@components/*`, `@data/*`.
+- Layout ESLint enforces (`eslint.config.ts`; Prettier leaves it alone): a blank line
+  after declarations (one-line ones may stand together), around `if`, loops,
+  `switch` and `try`, and before `return`. Imports are sorted in groups: side
+  effects, `node:`/`bun:`, `astro:` and packages, aliases, relative.

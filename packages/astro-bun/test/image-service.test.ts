@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test';
+
 import service from '../src/image-service';
 
 const source = await Bun.file(new URL('./fixtures/64x48.jpg', import.meta.url)).bytes();
@@ -6,6 +7,7 @@ const logger = { warn: () => {} } as never;
 
 async function run(transform: Record<string, unknown>) {
   const { data } = await service.transform(source, { src: '64x48.jpg', ...transform }, {} as never, logger);
+
   return new Bun.Image(data).metadata();
 }
 
