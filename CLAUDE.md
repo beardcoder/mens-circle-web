@@ -107,7 +107,8 @@ the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) s
 `listmonk-templates/` holds the versioned copies of the listmonk templates: edit
 there, then paste into listmonk. The `template-contract` email test fails when a
 template reads a `.Tx.Data` field its payload does not send. The templates load the
-mail mark from `/images/logo-flame.png` by URL, so keep that file.
+mail mark from `/images/logo-mail.png` by URL; mails already sent still load
+`/images/logo-flame.png`, so keep both files.
 
 **Map.** The BayernAtlas web component (`<bayern-atlas>`, `atlas.bayern.de/wc.js`,
 an iframe; keyless). Its script loads only near the viewport, as a classic script:

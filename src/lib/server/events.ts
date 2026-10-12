@@ -207,25 +207,51 @@ const introToProse = (text: string): string =>
     .map((para) => `<p>${escapeHtml(para.trim()).replace(/\r?\n/g, '<br />')}</p>`)
     .join('\n');
 
-// The campaign template's palette; inline, so the block holds in any template.
-const NL = { night: '#151210', chalk: '#f1e9db', muted: '#b3a594', flame: '#e4632e' };
+// The campaign template's palette and type; inline, so the block holds in any template.
+const NL = {
+  text: '#28251f',
+  muted: '#71685e',
+  line: '#d8d0c4',
+  lineStrong: '#c3b9ab',
+  raised: '#fdfbf7',
+  fill: '#9f4429',
+  onFill: '#fff9f3',
+  serif: "'Playfair Display',Georgia,'Times New Roman',serif",
+  sans: "'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif",
+};
 
-/** The event as the site sets it: the date in flame capitals on the night ground, then the facts as one line. */
+const newsletterRow = ([label, value]: [string, string]): string =>
+  `<tr><td width="88" style="width:88px;padding:4px 12px 4px 0;vertical-align:top;font-family:${NL.sans};font-size:14px;line-height:24px;color:${NL.muted};">${label}</td>` +
+  `<td style="padding:4px 0;vertical-align:top;font-family:${NL.sans};font-size:16px;line-height:24px;color:${NL.text};">${escapeHtml(value)}</td></tr>`;
+
+/**
+ * The event as the site's date summary sets it: a flat, square card with the
+ * label, the date, the title, the facts as rows and the one round action.
+ */
 const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
   const url = `${config.APP_URL}/event/${ev.slug}`;
   const dateLong = formatDateLongDE(ev.eventDate);
-  const where = [timeRangeText(ev), fullAddress(ev) || ev.location || ''].filter(Boolean).join(' · ');
   const body = intro.trim() ? intro : DEFAULT_EVENT_NEWSLETTER_INTRO;
+  const rows = (
+    [
+      ['Zeit', timeRangeText(ev)],
+      ['Ort', ev.location],
+      ['Adresse', fullAddress(ev)],
+      ['Beitrag', ev.costBasis],
+    ] satisfies [string, string][]
+  ).filter(([, value]) => value);
 
   const event = [
-    `<div class="em-event" style="margin:8px 0 26px;padding:24px 26px;background-color:${NL.night};border-radius:3px;">`,
+    `<div class="em-event" style="margin:10px 0 30px;padding:26px 28px 24px;background-color:${NL.raised};border:1px solid ${NL.lineStrong};">`,
+    `<p style="margin:0 0 10px;font-family:${NL.sans};font-size:12px;font-weight:600;line-height:1.3;letter-spacing:0.14em;text-transform:uppercase;color:${NL.muted};">Nächster Termin</p>`,
     dateLong
-      ? `<p class="em-event__date" style="margin:0 0 8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${NL.flame};">${escapeHtml(dateLong)}</p>`
+      ? `<p class="em-event__date" style="margin:0;font-family:${NL.serif};font-size:26px;font-weight:400;line-height:1.25;color:${NL.text};">${escapeHtml(dateLong)}</p>`
       : '',
-    `<h2 style="margin:0 0 10px;color:${NL.chalk};">${escapeHtml(ev.title)}</h2>`,
-    where ? `<p style="margin:0 0 6px;color:${NL.chalk};">${escapeHtml(where)}</p>` : '',
-    ev.costBasis ? `<p style="margin:0 0 6px;color:${NL.muted};">Beitrag: ${escapeHtml(ev.costBasis)}</p>` : '',
-    `<p style="margin:14px 0 0;"><a href="${escapeHtml(url)}" style="color:${NL.chalk};font-weight:600;text-decoration:underline;text-decoration-color:${NL.flame};">Zur Anmeldung&nbsp;→</a></p>`,
+    `<h2 style="margin:4px 0 0;font-family:${NL.sans};font-size:16px;font-weight:600;line-height:1.5;letter-spacing:0;color:${NL.text};">${escapeHtml(ev.title)}</h2>`,
+    rows.length
+      ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;border-top:1px solid ${NL.line};"><tr><td style="padding-top:12px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${rows.map(newsletterRow).join('')}</table></td></tr></table>`
+      : '',
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;"><tr><td style="background-color:${NL.fill};border-radius:999px;"><a href="${escapeHtml(url)}" style="display:inline-block;padding:14px 26px;font-family:${NL.sans};font-size:16px;font-weight:600;line-height:1.1;color:${NL.onFill};text-decoration:none;border-radius:999px;">Zur Anmeldung&nbsp;&nbsp;&rarr;</a></td></tr></table>`,
     '</div>',
   ]
     .filter(Boolean)
