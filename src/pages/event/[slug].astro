@@ -1,16 +1,18 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { getEventBySlug } from '@lib/server/events';
 import { buildEventMeta } from '@lib/event-meta';
 import { buildEventSchema } from '@lib/event-schema';
+import { getEventBySlug } from '@lib/server/events';
+
 import EventFinalCta from '../../components/event/EventFinalCta.astro';
 import EventIntro from '../../components/event/EventIntro.astro';
 import EventMapSection from '../../components/event/EventMapSection.astro';
 import EventRegister from '../../components/event/EventRegister.astro';
+import Layout from '../../layouts/Layout.astro';
 
 // One SSR page per event, read per request, so a new or edited event is live with no rebuild.
 const { slug } = Astro.params;
 const event = slug ? await getEventBySlug(slug) : null;
+
 if (!event) return Astro.redirect('/event', 302);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');

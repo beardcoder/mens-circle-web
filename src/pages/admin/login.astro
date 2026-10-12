@@ -1,13 +1,15 @@
 ---
-import AdminLayout from '../../layouts/AdminLayout.astro';
-import LoginForm from '../../components/admin/LoginForm.astro';
 import { readSession, SESSION_COOKIE } from '@lib/server/auth';
 import { oidcConfigured, safeRedirect } from '@lib/server/oidc';
+
+import LoginForm from '../../components/admin/LoginForm.astro';
+import AdminLayout from '../../layouts/AdminLayout.astro';
 
 export const prerender = false;
 
 // Already authenticated → go straight to the dashboard.
 const existing = await readSession(Astro.cookies.get(SESSION_COOKIE)?.value);
+
 if (existing) return Astro.redirect('/admin', 302);
 
 const redirect = safeRedirect(Astro.url.searchParams.get('redirect'));

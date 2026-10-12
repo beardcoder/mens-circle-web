@@ -1,7 +1,9 @@
 ---
 import '../styles/global.css';
+
 import { Font } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
+
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import SeoHead from '../components/SeoHead.astro';
@@ -39,12 +41,15 @@ const props = Astro.props;
       (() => {
         try {
           const root = document.documentElement;
+
           // The cool palette is gone: drop a stored choice of it.
           localStorage.removeItem('mc-theme');
           const stored = localStorage.getItem('mc-mode');
           const mode = stored === 'light' || stored === 'dark' ? stored : null;
           const resolved = mode || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
           root.setAttribute('data-mode-resolved', resolved);
+
           if (mode) root.setAttribute('data-mode', mode);
         } catch {
           /* localStorage or matchMedia unavailable — fall back to CSS defaults. */

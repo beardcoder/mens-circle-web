@@ -1,8 +1,8 @@
 /** Regression guard: ADMIN_SESSION_SECRET must never fall back to ADMIN_PASSWORD or to a literal default. */
-import { expect, test } from 'bun:test';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { expect, test } from 'bun:test';
 
 const fixture = fileURLToPath(new URL('./admin-session-secret.fixture.ts', import.meta.url));
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -24,6 +24,7 @@ for (const [scenario, env] of scenarios) {
       encoding: 'utf8',
       timeout: 15_000,
     });
+
     expect(result.error).toBeUndefined();
     expect({ code: result.status, output: result.status === 0 ? '' : result.stdout + result.stderr }).toEqual({
       code: 0,

@@ -1,7 +1,8 @@
 ---
-import type { EventDTO } from '@lib/types';
 import { fullAddress } from '@lib/server/format';
+import type { EventDTO } from '@lib/types';
 import { link } from '@lib/ui';
+
 import Button from '../ui/Button.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -113,10 +114,12 @@ const address =
   function loadScript(): Promise<void> {
     script ??= new Promise((resolve, reject) => {
       const element = Object.assign(document.createElement('script'), { src: SCRIPT_URL });
+
       element.addEventListener('load', () => resolve());
       element.addEventListener('error', () => reject(new Error(`Could not load ${SCRIPT_URL}`)));
       document.head.append(element);
     });
+
     return script;
   }
 
@@ -127,8 +130,11 @@ const address =
 
   async function draw(root: HTMLElement): Promise<void> {
     const map = root.querySelector<BayernAtlas>('[data-map-canvas]');
+
     if (!map) return;
+
     const { lat, lng, title = '' } = root.dataset;
+
     root.dataset.state = 'loading';
 
     // The iframe answers with `baLoad`; commands sent before it would be lost.
@@ -154,11 +160,13 @@ const address =
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
+
         observer.unobserve(entry.target);
         void draw(entry.target as HTMLElement);
       }
     },
     { rootMargin: '200px' },
   );
+
   for (const root of document.querySelectorAll('[data-map]')) observer.observe(root);
 </script>

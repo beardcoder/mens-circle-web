@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test';
+
 import { buildEventMeta, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/event-meta';
 import { buildEventSchema } from '../src/lib/event-schema';
 import type { EventDTO } from '../src/lib/types';
@@ -33,6 +34,7 @@ const event = (overrides: Partial<EventDTO> = {}): EventDTO => ({
 
 test('held outside the home town, the title names the place before the brand', () => {
   const meta = buildEventMeta(event({ city: 'Geiselhöring', location: 'Gasthaus' }), SITE);
+
   expect(meta.title).toBe('Männerkreis am 18. September 2026 in Geiselhöring');
   expect(meta.title.length).toBeLessThanOrEqual(60);
   // Short enough, both stay.
@@ -73,6 +75,7 @@ test('the brand is appended once, never twice', () => {
   // An empty admin title falls back to the circle's own name; appending the site
   // name again would say it twice.
   const meta = buildEventMeta(event({ title: '   ' }), SITE);
+
   expect(meta.title).toBe('Männerkreis Niederbayern am 18. September 2026');
   expect(buildEventMeta(event({ title: 'Wintersonnwende' }), SITE).title).toBe(
     'Wintersonnwende am 18. September 2026 – Männerkreis Niederbayern',
@@ -93,6 +96,7 @@ test('additional event images remain direct original URLs', () => {
 
 test('missing or unparseable dates never produce a half-written line', () => {
   const meta = buildEventMeta(event({ event_date: 'not-a-date', start_time: '', end_time: '' }), SITE);
+
   expect(meta.ogTitle).toBe('Männerkreis in Straubing');
   expect(meta.title).toBe('Männerkreis – Männerkreis Niederbayern');
   expect(meta.description.startsWith('Männerkreis in Straubing.')).toBe(true);
@@ -109,6 +113,7 @@ test('markup is stripped until stable, so nothing escapes into a JSON-LD script'
   // Not a pretty result, but no surviving tag: one pass leaves "</script>" on
   // nested markup, which breaks out of the JSON-LD block.
   const residue = stripHtml('<scr<script>ipt>alert(1)</script>');
+
   expect(residue).not.toContain('<');
   expect(residue.toLowerCase()).not.toContain('script>');
   expect(stripHtml('a\n\n  b')).toBe('a b');
@@ -137,28 +142,33 @@ test('the Event node joins the site graph instead of starting a second one', () 
 
 test('availability and seat counts stay honest for full and past evenings', () => {
   const full = buildEventSchema(event({ is_full: true, available_spots: 0 }), SITE);
+
   expect(full.offers).toMatchObject({ availability: 'https://schema.org/SoldOut' });
   expect(full).not.toHaveProperty('remainingAttendeeCapacity');
 
   // A past event cannot be booked either, and "InStock" there gets the rich
   // result pulled.
   const past = buildEventSchema(event({ is_past: true }), SITE);
+
   expect(past.offers).toMatchObject({ availability: 'https://schema.org/SoldOut' });
   expect(past).not.toHaveProperty('remainingAttendeeCapacity');
   expect(past.maximumAttendeeCapacity).toBe(12);
 
   // No capacity claims at all when the evening has no seat limit.
   const open = buildEventSchema(event({ max_participants: 0 }), SITE);
+
   expect(open).not.toHaveProperty('maximumAttendeeCapacity');
   expect(open).not.toHaveProperty('remainingAttendeeCapacity');
 });
 
 test('an evening with no text of its own still gets a description', () => {
   const schema = buildEventSchema(event({ description: '' }), SITE);
+
   expect(String(schema.description)).toContain('18. September 2026');
 });
 
 test('winter dates get the winter offset', () => {
   const schema = buildEventSchema(event({ event_date: '2026-01-15T00:00:00.000Z' }), SITE);
+
   expect(schema.startDate).toBe('2026-01-15T19:00:00+01:00');
 });

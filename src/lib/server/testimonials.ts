@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, isNull } from 'drizzle-orm';
+
 import type { Testimonial as TestimonialDTO } from '../types';
 import { db } from './db';
 import type { Testimonial } from './db/schema';
@@ -45,6 +46,7 @@ export async function fetchTestimonialsState(
       .where(and(eq(testimonials.isPublished, true), isNull(testimonials.deleted)))
       .orderBy(asc(testimonials.sortOrder), desc(testimonials.createdAt))
       .limit(limit);
+
     return {
       status: 'ok',
       testimonials: rows.map((r) => ({ quote: r.quote, author: r.authorName || null, role: r.role || null })),
@@ -52,6 +54,7 @@ export async function fetchTestimonialsState(
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('[testimonials] fetchTestimonials failed', String(err));
+
     return { status: 'unavailable', testimonials: [] };
   }
 }
@@ -69,13 +72,17 @@ export async function listTestimonialsForAdmin(): Promise<Testimonial[]> {
 /** Publish or unpublish; stamps published_at on first publish. */
 export async function setTestimonialPublished(id: string, publish: boolean): Promise<Testimonial | null> {
   const existing = (await db.select().from(testimonials).where(eq(testimonials.id, id)).limit(1))[0];
+
   if (!existing) return null;
+
   const publishedAt = publish ? (existing.publishedAt ?? new Date().toISOString()) : existing.publishedAt;
+
   const rows = await db
     .update(testimonials)
     .set({ isPublished: publish, publishedAt })
     .where(eq(testimonials.id, id))
     .returning();
+
   return rows[0] ?? null;
 }
 
@@ -99,6 +106,7 @@ export async function updateTestimonialContent(
     })
     .where(and(eq(testimonials.id, id), isNull(testimonials.deleted)))
     .returning();
+
   return rows[0] ?? null;
 }
 

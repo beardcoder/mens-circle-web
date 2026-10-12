@@ -1,5 +1,6 @@
 /** Admin sign-in through Pocket ID — OpenID Connect via `openid-client`: authorization code flow with PKCE and `state`. */
 import * as client from 'openid-client';
+
 import { sessionSecretConfigured, signToken, verifyToken } from './auth';
 import { config } from './config';
 
@@ -23,6 +24,7 @@ export const safeRedirect = (target: string | null | undefined): string =>
   target && /^\/admin(?:[/?#]|$)/.test(target) ? target : '/admin';
 
 let discovered: Promise<client.Configuration> | null = null;
+
 const provider = (): Promise<client.Configuration> =>
   (discovered ??= client
     .discovery(
@@ -45,6 +47,7 @@ export const beginLogin = async (redirect: string): Promise<{ url: string; cooki
     verifier: client.randomPKCECodeVerifier(),
     redirect: safeRedirect(redirect),
   };
+
   const url = client.buildAuthorizationUrl(await provider(), {
     redirect_uri: callbackUrl(),
     scope: config.ADMIN_GROUP ? 'openid email groups' : 'openid email',
@@ -52,6 +55,7 @@ export const beginLogin = async (redirect: string): Promise<{ url: string; cooki
     code_challenge: await client.calculatePKCECodeChallenge(flow.verifier),
     code_challenge_method: 'S256',
   });
+
   return { url: url.href, cookie: await signToken(flow, FLOW_TTL_S) };
 };
 
@@ -59,7 +63,9 @@ export const beginLogin = async (redirect: string): Promise<{ url: string; cooki
  *  an email only counts once the provider has verified it. */
 const isAdmin = (user: client.UserInfoResponse, email: string): boolean => {
   const groups = Array.isArray(user.groups) ? user.groups : [];
+
   if (config.ADMIN_GROUP && groups.includes(config.ADMIN_GROUP)) return true;
+
   return user.email_verified !== false && config.ADMIN_EMAILS.includes(email);
 };
 
@@ -69,22 +75,30 @@ export const completeLogin = async (
   flowCookie: string | undefined,
 ): Promise<{ email: string; redirect: string }> => {
   const flow = await verifyToken<Flow>(flowCookie);
+
   if (!flow) throw new Error('sign-in flow cookie missing, expired or forged');
 
   // From APP_URL, not the request (http:// behind the proxy); must equal the redirect_uri.
   const currentUrl = new URL(callbackUrl());
+
   currentUrl.search = search;
 
   const config_ = await provider();
+
   const tokens = await client.authorizationCodeGrant(config_, currentUrl, {
     pkceCodeVerifier: flow.verifier,
     expectedState: flow.state,
   });
+
   const subject = tokens.claims()?.sub;
+
   if (!subject) throw new Error('no ID token subject');
+
   const user = await client.fetchUserInfo(config_, tokens.access_token, subject);
 
   const email = typeof user.email === 'string' ? user.email.trim().toLowerCase() : '';
+
   if (!email || !isAdmin(user, email)) throw new AccessDenied(email || 'no email');
+
   return { email, redirect: flow.redirect };
 };

@@ -1,7 +1,7 @@
 /** Run every minute by Coolify (`bun run scripts/schedule.ts`); runs due tasks in sequence. */
+import { runReminders } from '../src/lib/server/reminders';
 import { backupConfigured, runBackup } from './backup-db';
 import { isDue } from './lib/cron';
-import { runReminders } from '../src/lib/server/reminders';
 
 interface ScheduledTask {
   name: string;
@@ -22,10 +22,12 @@ const tasks: ScheduledTask[] = [
 
 async function runDueTasks(at: Date): Promise<void> {
   const due = tasks.filter((task) => isDue(task.cron, at));
+
   if (due.length === 0) return;
 
   for (const task of due) {
     console.log(`[schedule] running ${task.name}`);
+
     try {
       await task.run();
     } catch (err) {

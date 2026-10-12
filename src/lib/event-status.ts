@@ -43,6 +43,7 @@ export interface DateStatus {
 
 export const dateStatus = (status: NextEventStatus, event: EventDTO | null): DateStatus => {
   const next = status === 'scheduled' ? summarizeNextEvent(event) : null;
+
   return { status, next, isFull: Boolean(next?.isFull) };
 };
 
@@ -53,11 +54,17 @@ export const dateStatus = (status: NextEventStatus, event: EventDTO | null): Dat
  */
 export const splitFee = (costBasis = ''): { main: string; note: string } => {
   const fee = costBasis.trim();
+
   if (!fee) return { main: 'Spendenbasis', note: 'Du gibst, was für dich machbar ist' };
+
   const bracketed = /^(.+?)\s*\((.+)\)\s*$/.exec(fee);
+
   if (bracketed) return { main: bracketed[1].trim(), note: bracketed[2].trim() };
+
   const parted = /^(.{4,28}?)\s*[,;–]\s+(.+)$/.exec(fee);
+
   if (parted) return { main: parted[1].trim(), note: parted[2].trim() };
+
   return { main: fee, note: '' };
 };
 
@@ -89,6 +96,7 @@ export interface SummaryView {
 /** "Freitag, 16. Oktober 2026" → ["Freitag,", "16. Oktober 2026"]. */
 const dateLines = (dateLabel: string): [string, string] => {
   const [weekday, ...rest] = dateLabel.split(', ');
+
   return rest.length ? [`${weekday},`, rest.join(', ')] : [dateLabel, ''];
 };
 
@@ -134,8 +142,11 @@ export const nextDateView = (
       action: OVERVIEW,
     };
   }
+
   const { status, next } = state;
+
   if (status === 'unavailable' || !next) return noDateView(status === 'unavailable', whenNone, kicker);
+
   return {
     state: next.isFull ? 'full' : 'open',
     kicker,
@@ -155,6 +166,7 @@ export const nextDateView = (
 export const eventView = (event: EventDTO, kicker: string, withAction = true): SummaryView => {
   const next = summarizeNextEvent(event)!;
   const state = event.is_past ? 'past' : event.is_full ? 'full' : 'open';
+
   return {
     state,
     kicker: state === 'full' ? `${kicker} · ausgebucht` : kicker,

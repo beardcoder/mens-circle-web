@@ -1,5 +1,6 @@
-import { ActionError, defineAction, type ActionAPIContext } from 'astro:actions';
+import { type ActionAPIContext, ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
+
 import { accepted, type FormResult, isHoneypotFilled, rejected } from '@lib/server/form-submission';
 import { subscribeToNewsletter } from '@lib/server/listmonk';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';
@@ -16,7 +17,9 @@ const publicForm =
         message: 'Zu viele Anfragen. Bitte versuche es später erneut.',
       });
     }
+
     let result: FormResult;
+
     try {
       result = await handler(input);
     } catch (err) {
@@ -27,19 +30,23 @@ const publicForm =
         message: 'Es ist ein Fehler aufgetreten. Bitte versuche es später erneut.',
       });
     }
+
     if (!result.body.success) {
       throw new ActionError({ code: ActionError.statusToCode(result.status), message: result.body.message });
     }
+
     return { message: result.body.message };
   };
 
 /* Field rules for the public forms, worded for the visitor. */
 const required = (message: string) => z.string({ error: message }).trim().min(1, { error: message });
+
 const email = z
   .string({ error: 'Bitte gib deine E-Mail-Adresse an.' })
   .trim()
   .toLowerCase()
   .pipe(z.email({ error: 'Diese E-Mail-Adresse sieht nicht gültig aus.' }));
+
 const optional = z.string().trim().nullish();
 const privacy = z.boolean().refine(Boolean, { error: 'Bitte bestätige die Datenschutzerklärung.' });
 /** Honeypot — real users never see it, so they leave it empty. */
@@ -50,10 +57,14 @@ const NEWSLETTER_SUCCESS =
 
 const subscribe = async (input: { email: string; website?: string | null }): Promise<FormResult> => {
   if (isHoneypotFilled(input.website)) return accepted(NEWSLETTER_SUCCESS);
+
   const result = await subscribeToNewsletter(input.email, '');
+
   if (result.status === 'exists')
     return rejected(409, 'Diese E-Mail-Adresse ist bereits für den Newsletter angemeldet.');
+
   if (!result.ok) return rejected(502, 'Die Anmeldung ist momentan nicht möglich. Bitte versuche es später erneut.');
+
   return accepted(NEWSLETTER_SUCCESS);
 };
 

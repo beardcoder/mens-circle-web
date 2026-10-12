@@ -2,6 +2,7 @@ import type { Event } from './db/schema';
 
 export const escapeHtml = (str: unknown): string => {
   if (str === undefined || str === null) return '';
+
   return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -21,16 +22,22 @@ export const plainTextToHtml = (text: string): string => {
   const html: string[] = [];
   let lines: string[] = [];
   let items: string[] = [];
+
   const flushLines = (): void => {
     if (lines.length) html.push(`<p>${lines.join('<br />')}</p>`);
+
     lines = [];
   };
+
   const flushItems = (): void => {
     if (items.length) html.push(`<ul>${items.map((item) => `<li>${item}</li>`).join('')}</ul>`);
+
     items = [];
   };
+
   for (const raw of escapeHtml(text.trim()).split(/\r\n|\r|\n/)) {
     const item = LIST_ITEM.exec(raw);
+
     if (item) {
       flushLines();
       items.push(item[1].trim());
@@ -42,12 +49,15 @@ export const plainTextToHtml = (text: string): string => {
       lines.push(raw.trim());
     }
   }
+
   flushLines();
   flushItems();
+
   return html.join('');
 };
 
 const WEEKDAYS_DE = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+
 const MONTHS_DE = [
   'Januar',
   'Februar',
@@ -65,11 +75,16 @@ const MONTHS_DE = [
 
 export const toDate = (value: unknown): Date | null => {
   if (!value) return null;
+
   if (value instanceof Date) return value;
+
   let s = String(value).trim();
+
   if (s === '') return null;
+
   s = s.replace(' ', 'T');
   const d = new Date(s);
+
   return Number.isNaN(d.getTime()) ? null : d;
 };
 
@@ -81,34 +96,44 @@ export const timeRange = (start: string, end: string): string => (start ? `${sta
 
 export const formatWeekdayDE = (value: unknown): string => {
   const d = toDate(value);
+
   return d ? WEEKDAYS_DE[d.getUTCDay()] : '';
 };
 
 /** "12. Juni 2026" — long date without the weekday. */
 export const formatDayMonthYearDE = (value: unknown): string => {
   const d = toDate(value);
+
   if (!d) return '';
+
   return `${d.getUTCDate()}. ${MONTHS_DE[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 };
 
 export const formatDateLongDE = (value: unknown): string => {
   const d = toDate(value);
+
   if (!d) return '';
+
   return `${WEEKDAYS_DE[d.getUTCDay()]}, ${d.getUTCDate()}. ${MONTHS_DE[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 };
 
 export const formatDateShortDE = (value: unknown): string => {
   const d = toDate(value);
+
   if (!d) return '';
+
   const dd = String(d.getUTCDate()).padStart(2, '0');
   const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+
   return `${dd}.${mm}.${d.getUTCFullYear()}`;
 };
 
 export const timeRangeText = (ev: Pick<Event, 'startTime' | 'endTime'>): string => {
   const st = ev.startTime || '';
   const et = ev.endTime || '';
+
   if (!st && !et) return '';
+
   return `${st}${et ? ` – ${et}` : ''} Uhr`;
 };
 

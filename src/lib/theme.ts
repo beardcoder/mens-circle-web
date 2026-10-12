@@ -17,6 +17,7 @@ const darkQuery = matchMedia('(prefers-color-scheme: dark)');
 const storedMode = (): Mode | null => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
+
     return raw === 'light' || raw === 'dark' ? raw : null;
   } catch {
     return null;
@@ -35,10 +36,12 @@ function apply(): void {
   const resolved = resolvedMode();
 
   root.setAttribute('data-mode-resolved', resolved);
+
   if (stored) root.setAttribute('data-mode', stored);
   else root.removeAttribute('data-mode');
 
   document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[resolved]);
+
   for (const toggle of toggles()) toggle.setAttribute('aria-pressed', String(resolved === 'dark'));
 }
 
@@ -52,6 +55,7 @@ export function initTheme(): void {
       } catch {
         // Storage unavailable (private mode) — the choice just will not persist.
       }
+
       apply();
     });
   }
