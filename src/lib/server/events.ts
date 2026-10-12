@@ -259,6 +259,7 @@ const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
   const url = `${config.APP_URL}/event/${ev.slug}`;
   const dateLong = formatDateLongDE(ev.eventDate);
   const body = intro.trim() ? intro : DEFAULT_EVENT_NEWSLETTER_INTRO;
+
   const rows = (
     [
       ['Zeit', timeRangeText(ev)],
