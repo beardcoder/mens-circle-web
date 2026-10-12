@@ -1,5 +1,6 @@
 ---
 import { checkbox, control, fieldError, link } from '@lib/ui';
+
 import Button from '../ui/Button.astro';
 import Field from '../ui/Field.astro';
 import FormStatus from './FormStatus.astro';
@@ -111,6 +112,7 @@ const { class: className } = Astro.props;
 
 <script>
   import { actions } from 'astro:actions';
+
   import { enhanceForms } from '@lib/form';
 
   enhanceForms('testimonial', actions.submitTestimonial);
@@ -118,9 +120,11 @@ const { class: className } = Astro.props;
   // Live character count under the textarea; reset with the form.
   const quote = document.querySelector<HTMLTextAreaElement>('#quote');
   const count = document.querySelector('[data-char-count]');
+
   const update = (): void => {
     if (quote && count) count.textContent = String(quote.value.length);
   };
+
   quote?.addEventListener('input', update);
   quote?.form?.addEventListener('reset', () => setTimeout(update));
 </script>

@@ -1,9 +1,10 @@
 /** Executed only by forwarded-origin.test.ts, in a child process started with `--no-env-file` and an explicit environment. */
 import assert from 'node:assert/strict';
+
+import config from '../astro.config.mjs';
 // Deep imports: these two modules are the code that decides, and Astro exports neither.
 import { isForbiddenCrossOriginRequest } from '../node_modules/astro/dist/core/app/origin-check.js';
 import { validateForwardedHeaders } from '../node_modules/astro/dist/core/app/validate-headers.js';
-import config from '../astro.config.mjs';
 
 const allowedDomains = config.security?.allowedDomains ?? [];
 
@@ -18,15 +19,20 @@ function rejects(
     headers: { 'content-type': 'multipart/form-data; boundary=x', ...headers },
     body: 'x',
   });
+
   const url = new URL(request.url);
+
   const forwarded = validateForwardedHeaders(
     headers['x-forwarded-proto'],
     headers['x-forwarded-host'],
     undefined,
     domains,
   );
+
   if (forwarded.protocol) url.protocol = `${forwarded.protocol}:`;
+
   if (forwarded.host) url.hostname = forwarded.host;
+
   return isForbiddenCrossOriginRequest(request, url, false);
 }
 

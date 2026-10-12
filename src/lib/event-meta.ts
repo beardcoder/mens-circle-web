@@ -12,19 +12,23 @@ const TITLE_LIMIT = 60;
 export function stripHtml(value = ''): string {
   let previous: string;
   let out = value;
+
   do {
     previous = out;
     out = out.replace(/<[^>]*>/g, '');
   } while (out !== previous);
+
   return out.replace(/\s+/g, ' ').trim();
 }
 
 /** Cut to `limit` on a word boundary. */
 function truncate(text: string, limit = DESCRIPTION_LIMIT): string {
   if (text.length <= limit) return text;
+
   const cut = text.slice(0, limit - 1);
   const space = cut.lastIndexOf(' ');
   const kept = space > limit / 2 ? cut.slice(0, space) : cut;
+
   return `${kept.replace(/[\s.,;:–-]+$/, '')}…`;
 }
 
@@ -41,17 +45,21 @@ const eventTimeRange = (event: EventDTO): string => timeRange(event.start_time, 
 export const eventWhenWhere = (event: EventDTO): string => {
   const when = [formatDateLongDE(event.event_date), eventTimeRange(event)].filter(Boolean).join(', ');
   const place = eventPlace(event);
+
   return when ? `${when} in ${place}` : `Männerkreis in ${place}`;
 };
 
 /** The seat situation, in the words the registration section uses. */
 function statusSentence(event: EventDTO): string {
   if (event.is_past) return 'Dieser Abend hat bereits stattgefunden.';
+
   if (event.is_full)
     return 'Der Abend ist ausgebucht – über die Warteliste rückst du nach, sobald ein Platz frei wird.';
+
   if (event.max_participants > 0 && event.available_spots > 0) {
     return `Noch ${event.available_spots} von ${event.max_participants} Plätzen frei.`;
   }
+
   return 'Anmeldung online, ohne Vorerfahrung.';
 }
 
@@ -64,14 +72,18 @@ function tailSentence(event: EventDTO): string {
   const own = stripHtml(event.description)
     .split(/(?<=[.!?])\s/)[0]
     ?.trim();
+
   if (own) return asSentence(own);
+
   const fee = event.cost_basis?.trim();
+
   return fee ? asSentence(fee) : 'Auf Spendenbasis und ohne Vorerfahrung.';
 }
 
 /** Two facts a card can render as labelled fields (Slack and X both do). */
 function shareDetails(event: EventDTO): { label: string; value: string }[] {
   const when = [formatDateLongDE(event.event_date), eventTimeRange(event)].filter(Boolean).join(', ');
+
   return [
     { label: event.is_past ? 'Termin (vorbei)' : 'Termin', value: when || 'Termin folgt' },
     { label: 'Ort', value: eventPlace(event) },
@@ -81,9 +93,12 @@ function shareDetails(event: EventDTO): { label: string; value: string }[] {
 /** Optional admin-supplied image, added to the JSON-LD only. */
 function adminImage(event: EventDTO, siteUrl: URL): string | null {
   const raw = event.image_url?.trim();
+
   if (!raw) return null;
+
   try {
     const resolved = new URL(raw, siteUrl);
+
     return resolved.protocol === 'https:' || resolved.protocol === 'http:' ? resolved.href : null;
   } catch {
     return null;

@@ -3,7 +3,9 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+
 import { eq, sql } from 'drizzle-orm';
+
 import { config } from '../src/lib/server/config';
 import { events, participants, registrations } from '../src/lib/server/db/schema';
 
@@ -16,19 +18,25 @@ const calls: Call[] = [];
 let active = 0;
 let peak = 0;
 const pause = () => new Promise((resolve) => setTimeout(resolve, 2));
+
 /** Polls the fetch stub's own in-flight counter rather than guessing how many
  *  background calls a batch of fire-and-forget work will make. */
 const waitForIdle = async (): Promise<void> => {
   while (active > 0) await pause();
 };
+
 const json = (data: unknown, status = 200) => Response.json(data, { status });
+
 const deferred = () => {
   let resolve!: () => void;
+
   const promise = new Promise<void>((done) => {
     resolve = done;
   });
+
   return { promise, resolve };
 };
+
 let handler: (call: Call) => Response | Promise<Response> = () => {
   throw new Error('unexpected HTTP');
 };
@@ -36,6 +44,7 @@ let handler: (call: Call) => Response | Promise<Response> = () => {
 // Never retain a reference to real fetch, even on an assertion failure.
 globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
   const url = new URL(String(input));
+
   assert.equal(url.origin, 'https://newsletter.example.invalid');
   assert(url.pathname.startsWith('/api/'), 'base URL must not introduce duplicate slashes');
   assert.equal(new Headers(init?.headers).get('Authorization'), 'token test:test');
@@ -45,10 +54,13 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
     path: url.pathname + url.search,
     body: JSON.parse(String(init?.body ?? '{}')),
   };
+
   calls.push(call);
   peak = Math.max(peak, ++active);
+
   try {
     await pause();
+
     return await handler(call);
   } finally {
     active--;
@@ -57,9 +69,11 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
 
 const lm = await import('../src/lib/server/listmonk');
 const subscriber = { id: 42, email: 'person@example.invalid', name: 'Person', status: 'enabled', lists: [{ id: 9 }] };
+
 const seed = async (count = 10) => {
   const { db } = await import('../src/lib/server/db');
   const today = new Date().toISOString().slice(0, 10);
+
   const [event] = await db
     .insert(events)
     .values({
@@ -71,11 +85,13 @@ const seed = async (count = 10) => {
       listmonkListId: 7,
     })
     .returning();
+
   for (let i = 0; i < count; i++) {
     const [participant] = await db
       .insert(participants)
       .values({ email: `p${i}@example.invalid`, firstName: `P${i}` })
       .returning();
+
     await db.insert(registrations).values({
       id: `r${i}`,
       eventId: event.id,
@@ -84,16 +100,22 @@ const seed = async (count = 10) => {
       registeredAt: String(i).padStart(3, '0'),
     });
   }
+
   return { db, event };
 };
+
 const txHandler = (call: Call) => {
   if (call.path === '/api/subscribers')
     return json({ data: { id: Number(String(call.body.email).match(/^p(\d+)/)?.[1] ?? 99) + 1 } });
+
   if (call.path === '/api/tx') {
     if (call.body.subscriber_id === 2) return json({}, 503);
+
     if (call.body.subscriber_id === 3) throw new Error('simulated transport failure');
+
     return json({});
   }
+
   throw new Error(`unexpected request: ${call.path}`);
 };
 
@@ -141,13 +163,17 @@ const scenarios: Record<string, () => Promise<void>> = {
   },
   async 'provisioning-errors'() {
     const timeoutMs: number[] = [];
+
     AbortSignal.timeout = (ms) => {
       timeoutMs.push(ms);
+
       return new AbortController().signal;
     };
+
     for (const status of [401, 422, 429, 500]) {
       handler = () => json({}, status);
       const before = calls.length;
+
       assert.deepEqual(
         await Promise.all([
           lm.ensureSubscriber(subscriber.email, 'Person'),
@@ -157,6 +183,7 @@ const scenarios: Record<string, () => Promise<void>> = {
       );
       assert.equal(calls.length, before + 1, 'non-conflicts must never trigger lookup');
     }
+
     handler = () => {
       throw new DOMException('timeout', 'TimeoutError');
     };
@@ -174,7 +201,9 @@ const scenarios: Record<string, () => Promise<void>> = {
       calls.length = 0;
       handler = (call) => {
         if (call.path === '/api/subscribers') return existing ? json({}, 409) : json({ data: subscriber });
+
         if (call.method === 'GET') return json({ data: { results: [subscriber] } });
+
         return json({});
       };
       await lm.withSubscriberScope(async () => {
@@ -189,6 +218,7 @@ const scenarios: Record<string, () => Promise<void>> = {
       await lm.ensureSubscriber(subscriber.email, 'Person');
       assert.equal(calls.length, existing ? 6 : 4, 'workflow identity must not escape its lifetime');
     }
+
     await assert.rejects(
       lm.withSubscriberScope(async () => {
         await lm.ensureSubscriber(subscriber.email, 'Person');
@@ -196,6 +226,7 @@ const scenarios: Record<string, () => Promise<void>> = {
       }),
     );
     const before = calls.length;
+
     await lm.ensureSubscriber(subscriber.email, 'Person');
     assert.equal(calls.length, before + 2, 'failed workflow must also release identity');
   },
@@ -205,11 +236,15 @@ const scenarios: Record<string, () => Promise<void>> = {
         calls.length = 0;
         handler = (call) => {
           if (call.method === 'POST') return json({}, 409);
+
           if (call.method === 'GET') return json({ data: { results: [{ ...subscriber, name: '' }] } });
+
           if (transport) throw new Error('membership transport error');
+
           return json({}, 500);
         };
         const work = () => lm.addToLists(subscriber.email, 'Person', [7], true);
+
         assert.deepEqual(await (scoped ? lm.withSubscriberScope(work) : work()), { ok: false, status: 'error' });
         assert.equal(calls.length, 3, 'failed membership must not continue to name update');
       }
@@ -226,15 +261,19 @@ const scenarios: Record<string, () => Promise<void>> = {
     handler = () => json({ data: subscriber });
     assert.deepEqual(await lm.addToLists(subscriber.email, 'Person', [7], false), { ok: true, status: 'subscribed' });
     assert.equal(calls[2].body.preconfirm_subscriptions, false);
+
     for (const scoped of [false, true]) {
       calls.length = 0;
       handler = (call) => {
         if (call.method === 'POST') return json({}, 409);
+
         if (call.method === 'GET')
           return json({ data: { results: [{ ...subscriber, name: '', status: 'blocklisted' }] } });
+
         return json({});
       };
       const work = () => lm.addToLists(subscriber.email, 'Person', [7], false);
+
       assert.deepEqual(await (scoped ? lm.withSubscriberScope(work) : work()), { ok: true, status: 'exists' });
       assert.deepEqual(calls[2].body, { ids: [42], action: 'add', target_list_ids: [7], status: 'unconfirmed' });
       assert.deepEqual(calls[3].body, {
@@ -248,17 +287,22 @@ const scenarios: Record<string, () => Promise<void>> = {
   },
   async 'reminder-acceptance'() {
     const { db } = await seed(13);
+
     await db.update(registrations).set({ status: 'waitlist' }).where(eq(registrations.id, 'r10'));
     await db.update(registrations).set({ status: 'cancelled' }).where(eq(registrations.id, 'r11'));
     await db.update(registrations).set({ deleted: 'deleted' }).where(eq(registrations.id, 'r12'));
     await db.update(registrations).set({ status: 'attended' }).where(eq(registrations.id, 'r9'));
     handler = txHandler;
     const { runReminders } = await import('../src/lib/server/reminders');
+
     await runReminders();
     const rows = await db.select().from(registrations);
+
     assert.equal(rows.filter((row) => row.reminderSentAt).length, 8);
+
     for (const id of ['r1', 'r2', 'r10', 'r11', 'r12'])
       assert.equal(rows.find((row) => row.id === id)?.reminderSentAt, null);
+
     assert.equal(calls.filter((call) => call.path === '/api/tx').length, 10);
     assert.equal(peak, 4);
     calls.length = 0;
@@ -271,6 +315,7 @@ const scenarios: Record<string, () => Promise<void>> = {
     const { sendEventReminder } = await import('../src/lib/server/email');
     const [event] = await db.select().from(events);
     const [participant] = await db.select().from(participants);
+
     config.TX_EVENT_REMINDER = 0;
     assert.equal(await sendEventReminder(event, participant, false), false);
     await runReminders();
@@ -282,11 +327,13 @@ const scenarios: Record<string, () => Promise<void>> = {
   },
   async 'reminder-stamp-failure'() {
     const { db } = await seed(10);
+
     db.run(
       sql`CREATE TRIGGER fail_one_stamp BEFORE UPDATE OF reminder_sent_at ON registrations WHEN NEW.id = 'r0' BEGIN SELECT RAISE(FAIL, 'simulated stamp failure'); END`,
     );
     handler = (call) => (call.path === '/api/subscribers' ? json({ data: subscriber }) : json({}));
     const { runReminders } = await import('../src/lib/server/reminders');
+
     await runReminders();
     assert.equal((await db.select().from(registrations)).filter((row) => row.reminderSentAt).length, 9);
     assert.equal(
@@ -298,6 +345,7 @@ const scenarios: Record<string, () => Promise<void>> = {
   },
   async broadcast() {
     const { db, event } = await seed(14);
+
     for (const [id, status] of [
       ['r10', 'waitlist'],
       ['r11', 'cancelled'],
@@ -305,9 +353,11 @@ const scenarios: Record<string, () => Promise<void>> = {
     ] as const) {
       await db.update(registrations).set({ status }).where(eq(registrations.id, id));
     }
+
     await db.update(registrations).set({ deleted: 'deleted' }).where(eq(registrations.id, 'r13'));
     handler = txHandler;
     const { broadcastEventMessage } = await import('../src/lib/server/registrations');
+
     assert.deepEqual(await broadcastEventMessage(event.id, 'Subject', 'Hello {first_name}'), { sent: 8, total: 10 });
     assert.equal(peak, 4);
     assert.equal(calls.filter((call) => call.path === '/api/tx').length, 10);
@@ -318,16 +368,21 @@ const scenarios: Record<string, () => Promise<void>> = {
     const gate = deferred();
     const done = deferred();
     let completed = 0;
+
     handler = async (call) => {
       await gate.promise;
+
       if (call.path === '/api/subscribers')
         return json({
           data: { ...subscriber, email: call.body.email, id: call.body.email === 'admin@example.invalid' ? 43 : 42 },
         });
+
       if (++completed === 3) done.resolve();
+
       return json({});
     };
     const { register } = await import('../src/lib/server/registrations');
+
     const result = await register({
       event_id: event.id,
       email: ' PERSON@EXAMPLE.INVALID ',
@@ -335,6 +390,7 @@ const scenarios: Record<string, () => Promise<void>> = {
       last_name: '',
       phone_number: '',
     });
+
     assert.equal(result.status, 200, 'registration must resolve while all HTTP is still blocked');
     assert.equal(completed, 0);
     assert.equal((await db.select().from(registrations)).length, 1);
@@ -362,6 +418,7 @@ const scenarios: Record<string, () => Promise<void>> = {
   },
   async 'waitlist-promotion'() {
     const { db, event } = await seed(5);
+
     // r0-r3 hold seats; r4 waits.
     await db.update(registrations).set({ status: 'waitlist' }).where(eq(registrations.id, 'r4'));
 
@@ -369,13 +426,16 @@ const scenarios: Record<string, () => Promise<void>> = {
 
     // Cancelling a SEAT (r0, 'registered') frees one — the sole waitlisted entry must be promoted and mailed.
     const promoted = deferred();
+
     handler = (call) => {
       if (call.path === '/api/tx') promoted.resolve();
+
       return txHandler(call);
     };
     await changeRegistrationStatus('r0', 'cancelled');
     await promoted.promise;
     let rows = await db.select().from(registrations);
+
     assert.equal(rows.find((row) => row.id === 'r4')?.status, 'registered', 'the waitlisted entry is promoted');
     assert.equal(
       calls.filter((call) => call.path === '/api/tx' && call.body.template_id === config.TX_WAITLIST_PROMOTION).length,
@@ -393,6 +453,7 @@ const scenarios: Record<string, () => Promise<void>> = {
         { email: 'still-waiting@example.invalid', firstName: 'Waiting' },
       ])
       .returning();
+
     await db.insert(registrations).values([
       { id: 'r-late', eventId: event.id, participantId: waiters[0].id, status: 'waitlist', registeredAt: '998' },
       {
@@ -422,6 +483,7 @@ const scenarios: Record<string, () => Promise<void>> = {
   async 'registration-race'() {
     const { db } = await import('../src/lib/server/db');
     const today = new Date().toISOString().slice(0, 10);
+
     const [event] = await db
       .insert(events)
       .values({
@@ -437,6 +499,7 @@ const scenarios: Record<string, () => Promise<void>> = {
 
     const { register } = await import('../src/lib/server/registrations');
     const RACERS = 12;
+
     // All calls start before any claim finishes.
     const results = await Promise.all(
       Array.from({ length: RACERS }, (_, i) =>
@@ -456,6 +519,7 @@ const scenarios: Record<string, () => Promise<void>> = {
     );
 
     const rows = await db.select().from(registrations).where(eq(registrations.eventId, event.id));
+
     assert.equal(rows.length, RACERS, 'every racer gets exactly one row');
     assert.equal(
       rows.filter((row) => row.status === 'registered').length,
@@ -472,8 +536,10 @@ const scenarios: Record<string, () => Promise<void>> = {
   async 'template-contract'() {
     const { db, event } = await seed(1);
     const [participant] = await db.select().from(participants);
+
     handler = (call) => (call.path === '/api/subscribers' ? json({ data: subscriber }) : json({}));
     const mail = await import('../src/lib/server/email');
+
     await mail.sendRegistrationEmails(event, participant, 'registered', 1);
     await mail.sendRegistrationConfirmation(event, participant, 'waitlist');
     await mail.sendWaitlistPromotion(event, participant);
@@ -481,8 +547,10 @@ const scenarios: Record<string, () => Promise<void>> = {
     await mail.sendEventMessage(event, participant, 'Betreff', 'Hallo {first_name}');
 
     const sent = new Map<number, Record<string, unknown>>();
+
     for (const call of calls.filter((c) => c.path === '/api/tx'))
       sent.set(Number(call.body.template_id), call.body.data as Record<string, unknown>);
+
     const templates: Record<string, number> = {
       'tx-registration-confirmation': config.TX_REGISTRATION_CONFIRMATION,
       'tx-waitlist-confirmation': config.TX_WAITLIST_CONFIRMATION,
@@ -491,18 +559,23 @@ const scenarios: Record<string, () => Promise<void>> = {
       'tx-event-reminder': config.TX_EVENT_REMINDER,
       'tx-event-message': config.TX_EVENT_MESSAGE,
     };
+
     for (const [file, id] of Object.entries(templates)) {
       const html = await readFile(new URL(`../listmonk-templates/${file}.html`, import.meta.url), 'utf8');
       const data = sent.get(id);
+
       assert(data, `${file}: no payload was sent`);
       const read = new Set([...html.matchAll(/\.Tx\.Data\.(\w+)/g)].map((m) => m[1]));
+
       assert(read.size > 0, `${file}: reads no data`);
+
       for (const key of read) assert(key in data, `${file} reads .Tx.Data.${key}, which the payload does not send`);
     }
   },
 };
 
 const scenario = process.argv[2];
+
 assert(scenario in scenarios, `unknown scenario: ${scenario}`);
 await scenarios[scenario]();
 assert.equal(active, 0);

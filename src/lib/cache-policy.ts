@@ -31,7 +31,10 @@ const GENERATED = /^\/(?:sitemap[^/]*\.xml|llms(?:-full)?\.txt)$|\.md$/;
 /** `null` keeps the adapter's default: hashed assets stay immutable, HTML keeps what the page set. */
 export function cacheControlForFile(pathname: string, assetsPrefix: string): string | null {
   if (pathname.startsWith(`/${assetsPrefix}/`)) return null;
+
   if (pathname === '/sw.js') return NO_CACHE;
+
   if (pathname === '/robots.txt' || pathname === '/manifest.webmanifest' || GENERATED.test(pathname)) return SHORT;
+
   return UNHASHED_ASSET.test(pathname) ? PUBLIC_ASSET : null;
 }

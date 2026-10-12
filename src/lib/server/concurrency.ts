@@ -7,11 +7,14 @@ export const settleWithConcurrency = async <T, R>(
   if (!Number.isInteger(concurrency) || concurrency < 1) {
     throw new RangeError('concurrency must be a positive integer');
   }
+
   const results: PromiseSettledResult<R>[] = new Array(items.length);
   let next = 0;
+
   const worker = async () => {
     while (next < items.length) {
       const index = next++;
+
       try {
         results[index] = { status: 'fulfilled', value: await work(items[index], index) };
       } catch (reason) {
@@ -19,6 +22,8 @@ export const settleWithConcurrency = async <T, R>(
       }
     }
   };
+
   await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+
   return results;
 };

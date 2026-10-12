@@ -1,5 +1,6 @@
 ---
 import { checkbox, control, fieldError, link } from '@lib/ui';
+
 import Button from '../ui/Button.astro';
 import Field from '../ui/Field.astro';
 import FormStatus from './FormStatus.astro';
@@ -108,6 +109,7 @@ const { eventId, isFull } = Astro.props;
 
 <script>
   import { actions } from 'astro:actions';
+
   import { enhanceForms } from '@lib/form';
 
   enhanceForms('register', actions.register);

@@ -6,7 +6,9 @@ const OPEN = 'Weniger anzeigen';
 const bind = (): void => {
   for (const figure of document.querySelectorAll<HTMLElement>('[data-quote][data-collapsible]')) {
     const toggle = figure.querySelector<HTMLButtonElement>('[data-quote-toggle]');
+
     if (!toggle || toggle.dataset.bound !== undefined) continue;
+
     toggle.dataset.bound = '';
 
     const render = (collapsed: boolean): void => {
@@ -25,10 +27,14 @@ const bind = (): void => {
 export function initQuotes(): void {
   bind();
   const pending = (): boolean => document.querySelector('script[data-island-id]') !== null;
+
   if (!pending()) return;
+
   const observer = new MutationObserver(() => {
     bind();
+
     if (!pending()) observer.disconnect();
   });
+
   observer.observe(document.body, { childList: true, subtree: true });
 }
