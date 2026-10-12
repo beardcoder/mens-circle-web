@@ -8,9 +8,8 @@ import Eyebrow from '../ui/Eyebrow.astro';
  * italic accent), the short explanation, the main action with the quiet link to
  * the course of an evening, and beside them the next date. Phones stack it:
  * statement, explanation, date, action. The circle stands in the right
- * background: three rings breathing out of phase that drift down as the page
- * scrolls away. The words rise in, one after the other. It sizes to its
- * content: no forced screen height.
+ * background: three rings breathing out of phase. The words rise in, one after
+ * the other. It sizes to its content: no forced screen height.
  */
 
 interface Props {
@@ -38,10 +37,10 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
   aria-labelledby="hero-title"
   class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section lg:pt-[calc(var(--spacing-header)+var(--spacing-section))]"
 >
-  {/* The circle: three rings, out of phase, drifting down on scroll. */}
+  {/* The circle: three rings, breathing out of phase. */}
   <div
     aria-hidden="true"
-    class="pointer-events-none absolute right-[-14rem] bottom-[-15rem] aspect-square w-[30rem] scroll-motion:animate-[ring-drift_linear_both] scroll-motion:[animation-range:0_100vh] scroll-motion:[animation-timeline:scroll(root)] lg:top-[calc(50%-22rem)] lg:right-[-16rem] lg:bottom-auto lg:w-[44rem]"
+    class="pointer-events-none absolute right-[-14rem] bottom-[-15rem] aspect-square w-[30rem] lg:top-[calc(50%-22rem)] lg:right-[-16rem] lg:bottom-auto lg:w-[44rem]"
   >
     <span class="absolute inset-0 rounded-full border border-line-strong motion-safe:animate-ring"></span>
     <span class="absolute inset-[13%] rounded-full border border-line motion-safe:animate-ring-slow motion-safe:animate-delay-[-7s]"></span>
