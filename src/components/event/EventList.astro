@@ -37,11 +37,10 @@ const whatsapp = site.whatsappCommunityLink;
     {events.length > 0 ? (
       <ul role="list" class="mt-6 grid gap-6">
         {events.map((event, i) => (
-          <li>
+          <li class="reveal">
             <EventSummary
               view={eventView(event, i === 0 ? 'Nächster Termin' : 'Weiterer Termin')}
               as="h3"
-              raised={i === 0}
               location="event-landing"
             />
           </li>

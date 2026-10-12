@@ -39,6 +39,7 @@ const view = nextDateView(result ? dateStatus(result.status, result.event) : nul
         <Button
           href={view.action.href}
           size="lg"
+          decorate
           class="max-sm:w-full"
           data-umami-event="cta-click"
           data-umami-event-location="home-hero"
@@ -52,6 +53,6 @@ const view = nextDateView(result ? dateStatus(result.status, result.event) : nul
   </>
 ) : (
   <div data-llms-skip class="min-w-0">
-    <EventSummary view={view} raised location="home-dates" />
+    <EventSummary view={view} location="home-dates" />
   </div>
 )}

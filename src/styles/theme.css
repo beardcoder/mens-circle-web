@@ -152,14 +152,11 @@
   --container-column: 45rem; /* a reading column (legal pages, essays) */
   --container-measure: 38rem; /* a line of running text, ~62 characters */
 
-  /* Shapes: controls and buttons 8px, cards and photographs 12px. */
-  --radius-control: 0.5rem;
-  --radius-card: 0.75rem;
-
-  /* One shadow for what is truly raised, very restrained; one for overlays. */
-  --shadow-card:
-    0 1px 2px light-dark(rgb(40 37 31 / 6%), rgb(0 0 0 / 30%)),
-    0 10px 24px -14px light-dark(rgb(40 37 31 / 22%), rgb(0 0 0 / 50%));
+  /* Shapes have no radius token: a thing is either fully round or square.
+     Round (`rounded-full`) is what you press — buttons, icon buttons, toggles —
+     and the circle itself; square is everything that holds — fields, cards,
+     panels, photographs, the map. Flat: no shadow on the page; one for what
+     floats over it (the admin's toast). */
   --shadow-overlay:
     0 2px 6px light-dark(rgb(40 37 31 / 8%), rgb(0 0 0 / 35%)),
     0 24px 48px -16px light-dark(rgb(40 37 31 / 28%), rgb(0 0 0 / 60%));
@@ -167,10 +164,16 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
 
-  /* Motion. Interactions take ~180ms (`duration-180`); the only running motion
-     is the circle: the hero's ring and the breath guide. */
+  /* Motion. Interactions take ~180ms (`duration-180`) and may move a little
+     (a button rises 2px, an arrow slides). Openings enter with a short rise
+     (`animate-rise`, staggered with `animate-delay-*`); blocks rise into view as
+     they scroll in (`reveal`); lines draw across (`draw`); the circles breathe
+     (`animate-ring`, `animate-ring-slow`, the breath guide). Under reduced
+     motion everything rests. */
+  --animate-rise: rise 720ms var(--ease-out) both;
   --animate-fade-in: fade-in 480ms var(--ease-out) both;
   --animate-ring: ring-breathe 16s var(--ease-in-out) infinite;
+  --animate-ring-slow: ring-breathe 23s var(--ease-in-out) infinite;
   --animate-breathe: breathe 10s infinite both;
   --animate-skeleton: pulse 2s ease-in-out infinite;
 }
@@ -235,6 +238,41 @@
   }
 }
 
+/* A short rise into place: openings on load, blocks as they scroll in. `translate`
+   and `opacity` only, which the compositor runs. Kept here, outside @theme, so it
+   is always emitted. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 1.25rem;
+  }
+}
+
+/* A line drawn across from its start edge. */
+@keyframes draw-x {
+  from {
+    scale: 0 1;
+  }
+}
+
+/* The hero's rings drift down a little as the page scrolls away from them. */
+@keyframes ring-drift {
+  to {
+    translate: 0 var(--drift, 6rem);
+  }
+}
+
+/* A photograph moves a touch slower than the page: depth without decoration. */
+@keyframes drift-slow {
+  from {
+    translate: 0 -1.5rem;
+  }
+
+  to {
+    translate: 0 1.5rem;
+  }
+}
+
 /* ── Surfaces ─────────────────────────────────────────────────────────────── */
 
 /* A ground re-declares the colour roles, so text, lines, buttons, focus rings
@@ -267,6 +305,34 @@
   --color-danger: #f0a197;
   color: var(--color-fg);
   background-color: var(--color-surface);
+}
+
+/* ── Scroll-driven utilities ──────────────────────────────────────────────── */
+
+/* Rises into view as it scrolls in, tied to the scroll position: an element
+   already on screen is already complete, and nothing waits on a script. Gated,
+   so where timelines or motion are unavailable the content simply stands. */
+@utility reveal {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+
+/* A line that draws itself across as it enters (from the start edge). */
+@utility draw {
+  transform-origin: left center;
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: draw-x linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 40%;
+    }
+  }
 }
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */

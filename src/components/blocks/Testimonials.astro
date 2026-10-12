@@ -57,14 +57,14 @@ const note = loading
       author={featured.author}
       role={featured.role}
       variant="short"
-      class="mt-group max-w-[44rem]"
+      class="reveal mt-group max-w-[44rem]"
     />
   )}
 
   {rest.length > 0 && (
     <ul role="list" class="mt-group gap-x-grid md:columns-2">
       {rest.map((t) => (
-        <li class="mb-8 break-inside-avoid border-t border-line pt-6">
+        <li class="reveal mb-8 break-inside-avoid border-t border-line pt-6">
           <Quote quote={t.quote} author={t.author} role={t.role} />
         </li>
       ))}
