@@ -15,6 +15,8 @@ import Container from './ui/Container.astro';
  * and turns to the page's opaque paper once the page moves (`data-scrolled`, set
  * by lib/site-header.ts); elsewhere it is paper from the start. The phone menu is
  * a native modal `<dialog>`: Escape closes it, the focus returns to the button.
+ * Opening focuses the dialog itself, not its first link, so no ring lands on the
+ * mark; Tab moves on from there.
  */
 
 const links = nav.header.links;
@@ -100,8 +102,9 @@ const roundButton =
   <dialog
     id="nav"
     aria-label="Menü"
+    tabindex="-1"
     class:list={[
-      'group/menu m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain bg-ground p-0 text-fg backdrop:bg-transparent nav:hidden',
+      'group/menu m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain bg-ground p-0 text-fg outline-none backdrop:bg-transparent nav:hidden',
       '[--nav-origin:100%_0]',
       'motion-safe:[clip-path:circle(0_at_var(--nav-origin))] motion-safe:transition-[clip-path,display,overlay] motion-safe:transition-discrete motion-safe:duration-[560ms] motion-safe:ease-in-out',
       'motion-safe:open:[clip-path:circle(150vmax_at_var(--nav-origin))] motion-safe:starting:open:[clip-path:circle(0_at_var(--nav-origin))]',
