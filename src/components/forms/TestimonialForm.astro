@@ -2,12 +2,24 @@
 import { checkbox, control, fieldError, link } from '@lib/ui';
 import Button from '../ui/Button.astro';
 import Field from '../ui/Field.astro';
+import FormStatus from './FormStatus.astro';
 import Honeypot from './Honeypot.astro';
 
 /** "Teile deine Erfahrung" — stored unpublished for moderation. Required fields carry `required`; the rest say "(optional)". */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
 ---
 
-<form id="testimonial" data-form="testimonial" data-track="testimonial" data-track-context="{}" class="grid gap-6">
+<form
+  id="testimonial"
+  data-form="testimonial"
+  data-track="testimonial"
+  data-track-context="{}"
+  class:list={['grid gap-6', className]}
+>
   <Honeypot />
 
   <Field for="quote" label="Deine Erfahrung" errorId="testimonial-quote-error">
@@ -23,7 +35,7 @@ import Honeypot from './Honeypot.astro';
       class:list={[control(), 'min-h-40 resize-y']}
     ></textarea>
     {/* The rule and the live count on one line under the field. */}
-    <span class="mt-1.5 flex justify-between gap-4 text-sm text-fg-muted">
+    <span class="mt-2 flex justify-between gap-4 text-sm text-fg-muted">
       <span id="testimonial-quote-hint">Mindestens 10, höchstens 1000 Zeichen.</span>
       <span class="tabular-nums" aria-hidden="true">
         <span data-char-count>0</span>/1000
@@ -94,6 +106,7 @@ import Honeypot from './Honeypot.astro';
     </Button>
     <p class="text-sm text-fg-muted">Dein Text wird erst nach Prüfung veröffentlicht.</p>
   </div>
+  <FormStatus form="testimonial" />
 </form>
 
 <script>

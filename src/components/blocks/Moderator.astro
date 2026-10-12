@@ -11,8 +11,6 @@ interface Props {
     anchor?: string;
     eyebrow?: string;
     name?: string;
-    /** A phrase of the name line set in the italic accent. */
-    titleEmphasis?: string;
     quote?: string;
     bio?: string;
     image?: string;
@@ -22,57 +20,51 @@ interface Props {
   };
 }
 
-/** Markus, on the sand band: his portrait floating gently on the left; his name set large, his own words, and his sentence beside an accent rule on the right. */
+/**
+ * Markus: his photograph and his words at about 5 : 7 on the shared grid. On
+ * phones the title comes first, then a photo of moderate height, then the text,
+ * so the photo never pushes the orientation down by screens. His sentence stays
+ * below the size of the section's title.
+ */
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
 const photo = resolveAssetImage(data.image);
 ---
 
-<Section
-  id={anchor}
-  ground="sand"
-  labelledby="person-title"
-  defer
-  innerClass="grid items-center gap-y-12 lg:grid-cols-12 lg:gap-x-grid"
->
+<Section id={anchor} labelledby="person-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
+  <SectionHead
+    eyebrow={data.eyebrow}
+    title={data.name}
+    titleId="person-title"
+    class="lg:col-span-7 lg:col-start-6 lg:row-start-1"
+  />
+
   {photo && (
-    <figure class="reveal max-w-md lg:col-span-5 lg:max-w-none">
-      <div class="aspect-2/3 overflow-clip rounded-card bg-ground-alt shadow-lift motion-safe:animate-float [&_picture]:block [&_picture]:h-full">
-        <CropPicture
-          src={photo}
-          class="block size-full object-cover object-[30%_50%]"
-          breakpoint="56.25em"
-          narrow={{ ratio: 2 / 3, widths: [320, 480, 640], sizes: 'min(28rem, 90vw)' }}
-          wide={{ ratio: 2 / 3, widths: [400, 600, 800], sizes: 'min(32rem, 40vw)' }}
-          loading="lazy"
-          alt={data.imageAlt ?? ''}
-        />
-      </div>
+    <figure class="lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-start">
+      <CropPicture
+        src={photo}
+        class="block aspect-4/3 w-full rounded-card object-cover object-[30%_45%] lg:aspect-4/5"
+        breakpoint="64em"
+        narrow={{ ratio: 4 / 3, widths: [400, 640, 960], sizes: 'calc(100vw - 2.5rem)' }}
+        wide={{ ratio: 4 / 5, widths: [400, 560, 800], sizes: 'min(30rem, 38vw)' }}
+        loading="lazy"
+        alt={data.imageAlt ?? ''}
+      />
     </figure>
   )}
 
-  <div class="grid content-start justify-items-start gap-8 lg:col-span-6 lg:col-start-7">
-    <SectionHead
-      eyebrow={data.eyebrow}
-      title={data.name}
-      titleEmphasis={data.titleEmphasis}
-      titleId="person-title"
-      size="display-2"
-    />
-
-    {data.bio && <Prose html={data.bio} class="reveal" />}
-
+  <div class="grid content-start justify-items-start gap-6 lg:col-span-7 lg:col-start-6 lg:row-start-2">
+    {data.quote && (
+      <blockquote class="max-w-measure border-l-2 border-line-strong pl-5 font-serif text-quote text-fg">
+        <p>„{data.quote}“</p>
+      </blockquote>
+    )}
+    {data.bio && <Prose html={data.bio} />}
     {data.linkLabel && data.linkUrl && (
       <TextLink href={data.linkUrl} data-astro-prefetch="hover">
         {data.linkLabel}
       </TextLink>
-    )}
-
-    {data.quote && (
-      <blockquote class="reveal mt-4 border-l-2 border-fill pl-6 font-serif text-[clamp(1.375rem,1rem+1.4vw,2rem)] leading-snug text-fg-soft italic sm:pl-8">
-        <p>„{data.quote}“</p>
-      </blockquote>
     )}
   </div>
 </Section>

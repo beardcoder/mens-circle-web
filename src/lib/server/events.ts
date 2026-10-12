@@ -137,6 +137,23 @@ export const fetchNextEventState = async (): Promise<NextEventState> => {
   }
 };
 
+/** Every upcoming published event, soonest first, for the overview; `unavailable` when they cannot be read. */
+export const fetchUpcomingEventsState = async (
+  limit = 12,
+): Promise<{ status: NextEventState['status']; events: EventDTO[] }> => {
+  try {
+    const rows = await eventWithCapacityQuery()
+      .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, startOfTodayIso())))
+      .orderBy(asc(events.eventDate))
+      .limit(limit);
+    const list = rows.map((row) => eventDtoWithCount(row.event, row.activeCount));
+    return { status: list.length > 0 ? 'scheduled' : 'none', events: list };
+  } catch (err) {
+    console.error('[events] fetchUpcomingEventsState failed', String(err));
+    return { status: 'unavailable', events: [] };
+  }
+};
+
 export const getEventBySlug = (slug: string): Promise<EventDTO | null> =>
   tryEventDto(async () => {
     const rows = await eventWithCapacityQuery()

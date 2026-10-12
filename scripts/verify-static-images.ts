@@ -47,12 +47,13 @@ for (const path of [
   if (eventSlug && path === `/event/${eventSlug}`) {
     assert.ok(
       html.includes('property="og:image" content="https://mens-circle.de/images/og-default.png"') ||
-        /property="og:image" content="[^"]*\/images\/og-default.png"/.test(html),
+        /property="og:image" content="[^"]*\/images\/og-default.png(?:\?[^"]*)?"/.test(html),
     );
   }
 }
-// WebP and JPEG per width; the two heroes share the narrow widths.
-assert.ok(images.size >= 12, 'Native Picture variants missing');
+// WebP per crop and width, JPEG for the wide crop; the moderator's portrait and the
+// personal page share the wide variants.
+assert.ok(images.size >= 10, 'Native Picture variants missing');
 images.set('/images/og-default.png', 1200);
 for (const [path, width] of images) {
   const response = await get(path);

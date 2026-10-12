@@ -1,13 +1,14 @@
 ---
-import HeroFrame from '../HeroFrame.astro';
 import HomeEventStatus from '../HomeEventStatus.astro';
-import TextLink from '../ui/TextLink.astro';
+import Container from '../ui/Container.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
 
 /**
- * The home page opening, on the dark frame (HeroFrame): the label behind its
- * rule, the sentence set large with its phrase in the italic accent, the three
- * words under it; at the foot the reading on the left and the next date on the
- * right, open behind a hairline. Phones stack it: sentence, reading, date.
+ * The home opening on the dark focus ground: the statement (its phrase in the
+ * italic accent), the short explanation, the main action with the quiet link to
+ * the course of an evening, and beside them the next date. Phones stack it:
+ * statement, explanation, date, action. One quiet ring stands in the right
+ * background. It sizes to its content: no forced screen height.
  */
 
 interface Props {
@@ -17,8 +18,6 @@ interface Props {
     title?: string;
     /** A phrase inside `title` set in the italic accent. */
     titleEmphasis?: string;
-    /** Three short words under the sentence. */
-    claim?: string;
     lede?: string;
     secondaryLabel?: string;
     secondaryLink?: string;
@@ -32,48 +31,41 @@ const emphasis = data.titleEmphasis && title.includes(data.titleEmphasis) ? data
 const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
 ---
 
-<HeroFrame labelledby="hero-title">
-  <h1 id="hero-title" class="grid justify-items-start gap-6">
-    {/* Spaces between the blocks: raw-HTML readers (llms.txt, AI crawlers) run them together otherwise. */}
-    {data.kicker && (
-      <span class="flex items-center gap-4 font-sans text-xs font-semibold tracking-[0.25em] text-accent uppercase entrance:animate-fade-in-up">
-        <span
-          class="h-px w-[clamp(2.5rem,6vw,5rem)] bg-linear-to-r from-transparent via-current/70 via-25% to-current/70"
-          aria-hidden="true"
-        ></span>
-        {data.kicker}
-      </span>
-    )}{' '}
-    <span class="block max-w-[15ch] text-display-1 text-bone hyphens-auto wrap-break-word entrance:animate-fade-in-up entrance:animate-delay-80">
-      {before}
-      {emphasis && <em>{emphasis}</em>}
-      {after}
-    </span>{' '}
-    {data.claim && (
-      <span class="block font-serif text-xl text-fg-soft italic entrance:animate-fade-in-up entrance:animate-delay-160">
-        {data.claim}
-      </span>
-    )}
-  </h1>
+<section
+  data-hero
+  aria-labelledby="hero-title"
+  class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section lg:pt-[calc(var(--spacing-header)+var(--spacing-section))]"
+>
+  {/* The one circle: a ring in the right background, breathing slowly. */}
+  <span
+    aria-hidden="true"
+    class="pointer-events-none absolute top-1/2 right-[-18rem] aspect-square w-[44rem] -translate-y-1/2 rounded-full border border-line-strong motion-safe:animate-ring max-lg:top-auto max-lg:right-[-14rem] max-lg:bottom-[-16rem] max-lg:w-[30rem] max-lg:translate-y-0"
+  ></span>
 
-  <div class="mt-group grid items-end gap-x-grid gap-y-10 lg:grid-cols-12">
-    <div class="grid justify-items-start gap-6 lg:col-span-6 xl:col-span-5">
-      {data.lede && (
-        <p class="max-w-[34rem] text-lg leading-[1.9] text-sand entrance:animate-fade-in-up entrance:animate-delay-280">
-          {data.lede}
-        </p>
-      )}
-      {data.secondaryLabel && data.secondaryLink && (
-        <TextLink href={data.secondaryLink} class="entrance:animate-fade-in-up entrance:animate-delay-420">
-          {data.secondaryLabel}
-        </TextLink>
-      )}
+  <Container class="relative grid gap-x-grid gap-y-8 lg:grid-cols-12">
+    <div class="grid min-w-0 justify-items-start lg:col-span-7 lg:row-start-1 entrance:animate-fade-in">
+      {data.kicker && <Eyebrow class="mb-4">{data.kicker}</Eyebrow>}
+      <h1 id="hero-title" class="max-w-[14ch] text-hero text-fg wrap-anywhere hyphens-auto">
+        {before}
+        {emphasis && <em class="text-accent">{emphasis}</em>}
+        {after}
+      </h1>
+      {data.lede && <p class="mt-6 max-w-measure text-lg text-fg-muted">{data.lede}</p>}
     </div>
 
-    <div class="min-w-0 entrance:animate-fade-in-up entrance:animate-delay-560 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
-      <HomeEventStatus placement="hero" server:defer>
-        <HomeEventStatus placement="hero" fallback slot="fallback" />
-      </HomeEventStatus>
-    </div>
-  </div>
-</HeroFrame>
+    <HomeEventStatus
+      placement="hero"
+      secondaryLabel={data.secondaryLabel}
+      secondaryLink={data.secondaryLink}
+      server:defer
+    >
+      <HomeEventStatus
+        placement="hero"
+        secondaryLabel={data.secondaryLabel}
+        secondaryLink={data.secondaryLink}
+        fallback
+        slot="fallback"
+      />
+    </HomeEventStatus>
+  </Container>
+</section>

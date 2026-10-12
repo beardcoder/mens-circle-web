@@ -1,10 +1,10 @@
-/** Client entry — wires up theme, header and the breathing backgrounds. Reveals are pure CSS (utilities/_motion.css). */
+/** Client entry — wires up the display mode, the header and the folding voices. */
 
-import { initBreath } from './breath';
+import { initQuotes } from './quotes';
 import { initSiteHeader } from './site-header';
 import { initTheme } from './theme';
 
-for (const init of [initTheme, initSiteHeader, initBreath]) {
+for (const init of [initTheme, initSiteHeader, initQuotes]) {
   try {
     init();
   } catch (error) {

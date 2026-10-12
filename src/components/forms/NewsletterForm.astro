@@ -1,17 +1,19 @@
 ---
 import Button from '../ui/Button.astro';
+import FormStatus from './FormStatus.astro';
 import Honeypot from './Honeypot.astro';
 import { control, fieldError, fieldLabel } from '@lib/ui';
 
-/** "Bei neuen Terminen benachrichtigen" — one address into the listmonk list. */
+/** "Termine per E-Mail erhalten" — one address into the listmonk list. */
 interface Props {
   /** Analytics context sent with the Umami events. */
   context?: Record<string, string>;
   /** The form's id; also prefixes the field ids, so a page can render it twice. */
   id?: string;
+  class?: string;
 }
 
-const { context = {}, id = 'newsletter-form' } = Astro.props;
+const { context = {}, id = 'newsletter-form', class: className } = Astro.props;
 ---
 
 <form
@@ -19,34 +21,36 @@ const { context = {}, id = 'newsletter-form' } = Astro.props;
   data-form="newsletter"
   data-track="newsletter"
   data-track-context={JSON.stringify(context)}
-  class="flex max-w-xl flex-col items-stretch gap-x-3 gap-y-3 sm:flex-row sm:items-end"
+  class:list={['@container grid max-w-xl gap-4', className]}
 >
   <Honeypot />
 
-  {/* A real, visible <label>, not an aria-label over a placeholder. */}
-  <div class="min-w-0 flex-1">
-    <label class={fieldLabel} for={`${id}-email`}>
-      E-Mail-Adresse
-    </label>
-    <input
-      id={`${id}-email`}
-      type="email"
-      name="email"
-      placeholder="name@beispiel.de"
-      required
-      autocomplete="email"
-      inputmode="email"
-      aria-describedby={`${id}-email-error`}
-      class={control('md', true)}
-    />
+  {/* Side by side only where the form itself has the room (a container query), not where the screen has it. */}
+  <div class="flex flex-col items-stretch gap-3 @lg:flex-row @lg:items-end">
+    {/* A real, visible <label>, not an aria-label over a placeholder. */}
+    <div class="min-w-0 flex-1">
+      <label class={fieldLabel} for={`${id}-email`}>
+        E-Mail-Adresse
+      </label>
+      <input
+        id={`${id}-email`}
+        type="email"
+        name="email"
+        placeholder="name@beispiel.de"
+        required
+        autocomplete="email"
+        inputmode="email"
+        aria-describedby={`${id}-email-error`}
+        class={control()}
+      />
+    </div>
+    <Button type="submit" variant="secondary" class="shrink-0">
+      Termine per E-Mail erhalten
+    </Button>
   </div>
-
-  <Button type="submit" decorate={false}>
-    Anmelden
-  </Button>
+  <span class={fieldError} id={`${id}-email-error`} hidden></span>
+  <FormStatus form={id} />
 </form>
-{/* After the form, not inside it: a third item would compete with the input/button pair for the line. */}
-<span class={fieldError} id={`${id}-email-error`} hidden></span>
 
 <script>
   import { actions } from 'astro:actions';

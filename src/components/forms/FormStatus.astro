@@ -1,0 +1,14 @@
+---
+import { formStatus } from '@lib/ui';
+
+/** The line under a form's button where lib/form.ts says what happened: sent, or what to fix. Empty and hidden until then. */
+interface Props {
+  /** The form's id; the line is `<id>-status`. */
+  form: string;
+  class?: string;
+}
+
+const { form, class: className } = Astro.props;
+---
+
+<p id={`${form}-status`} data-form-status aria-live="polite" hidden class:list={[formStatus, className]}></p>
