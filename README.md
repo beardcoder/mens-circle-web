@@ -46,9 +46,10 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 
 ## Content
 
-- Home page copy and block order: `src/content/home.json`
+- Home page copy and block order: `src/content/home.json` (content collection `pages`;
+  the schema in `src/content.config.ts` rejects unknown fields at build time)
 - Site settings, navigation: `src/data/site.json`, `src/data/navigation.json`
-- Legal pages: `src/content/legal/*.json`
+- Legal pages: `src/content/legal/*.json` (content collection `legal`; a new file is a new URL)
 - Events, registrations, testimonials: `/admin`
 - Newsletter: listmonk admin
 

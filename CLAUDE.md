@@ -202,8 +202,12 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Conventions
 
-- Static content: `src/content/*.json`, `src/data/*.json`. Home blocks are dispatched by
-  `PageContent.astro`; a new block needs a component and a case.
+- Page copy is content collections (`src/content.config.ts`): `pages` (`src/content/*.json`,
+  read with `getEntry`) and `legal` (`src/content/legal/*.json`, one URL per file). Strict
+  Zod schemas: an unknown field fails the build. Images are `image()` paths relative to the
+  JSON file. Blocks are dispatched by `PageContent.astro`; a new block needs a schema in
+  the union, a component and a case. `src/data/*.json` stays a plain import: the config,
+  the server lib and the scripts read it outside Astro.
 - The brand name comes from `site.siteName`; never type it out.
 - Canonical URLs come from `lib/canonical.ts`.
 - Search: utility pages (`/teile-deine-erfahrung`, `/auth/*`) are `noindex, follow` and
