@@ -3,16 +3,16 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Adds the SSR sitemap to sitemap-index.xml and the SSR pages to llms.txt.
- * Register after sitemap() and llms(). The adapter serves whatever ends up on disk.
+ * Adds the SSR pages to llms.txt, which astro-llms-md builds from prerendered pages
+ * only and has no option for. Register after llms(). The adapter serves whatever ends
+ * up on disk. (The SSR sitemap goes into the index through sitemap's `customSitemaps`.)
  *
  * @param {object} options
- * @param {string[]} options.sitemaps Root-relative sitemap routes for the index.
  * @param {{ path: string, title: string, description: string }[]} options.llmsPages
  *   SSR pages for llms.txt, filed under one heading above the generated sections.
  * @returns {import('astro').AstroIntegration}
  */
-export function publishGeneratedFiles({ sitemaps, llmsPages }) {
+export function publishGeneratedFiles({ llmsPages }) {
   /** @type {import('astro').AstroConfig} */
   let config;
 
@@ -34,14 +34,6 @@ export function publishGeneratedFiles({ sitemaps, llmsPages }) {
             logger.warn(`${file} not found; left unpatched`);
           }
         };
-
-        // No <lastmod>: these are regenerated per request.
-        await patch('sitemap-index.xml', (index) =>
-          index.replace(
-            '</sitemapindex>',
-            `${sitemaps.map((path) => `<sitemap><loc>${new URL(path, site).href}</loc></sitemap>`).join('')}</sitemapindex>`,
-          ),
-        );
 
         await patch('llms.txt', (text) => {
           const lines = llmsPages.map(

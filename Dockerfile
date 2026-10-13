@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# Always the latest Bun (the build needs Bun.Image, ≥ 1.4).
+# Always the latest Bun (≥ 1.4).
 FROM oven/bun:latest AS build
 WORKDIR /app
 # The workspace manifests must be present before install.

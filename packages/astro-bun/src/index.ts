@@ -68,9 +68,6 @@ async function writeManifest(
   return Object.keys(manifest).length;
 }
 
-/** Astro's `image.service` for the Bun.Image service; see image-service.ts. */
-export const bunImageService = () => ({ entrypoint: `${NAME}/image-service`, config: {} });
-
 export default function bun(options: BunAdapterOptions = {}): AstroIntegration {
   let config: AstroConfig;
   let routeHeaders: RouteToHeaders | undefined;
