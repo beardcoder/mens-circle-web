@@ -1,5 +1,6 @@
 ---
-import { resolveAssetImage } from '../../lib/images';
+import type { ImageMetadata } from 'astro';
+
 import CropPicture from '../CropPicture.astro';
 import PageIntro from '../PageIntro.astro';
 import Button from '../ui/Button.astro';
@@ -14,7 +15,7 @@ interface Props {
     align?: 'left' | 'center';
     buttonText?: string;
     buttonLink?: string;
-    image?: string;
+    image?: ImageMetadata;
     imageAlt?: string;
     imageCaption?: string;
   };
@@ -25,7 +26,7 @@ interface Props {
 const { data } = Astro.props;
 const hasButton = Boolean(data.buttonText && data.buttonLink);
 const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
-const imageAsset = resolveAssetImage(data.image);
+const imageAsset = data.image;
 
 // The photo's column: the container (gutters 20 / 32 / 48px) below `lg`; from it,
 // 4 of 12 columns, i.e. a third of the content less two thirds of a grid gap.

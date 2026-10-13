@@ -1,5 +1,6 @@
 ---
-import { resolveAssetImage } from '../../lib/images';
+import type { ImageMetadata } from 'astro';
+
 import CropPicture from '../CropPicture.astro';
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
@@ -13,7 +14,7 @@ interface Props {
     name?: string;
     quote?: string;
     bio?: string;
-    image?: string;
+    image?: ImageMetadata;
     imageAlt?: string;
     linkLabel?: string;
     linkUrl?: string;
@@ -29,7 +30,7 @@ interface Props {
 
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
-const photo = resolveAssetImage(data.image);
+const photo = data.image;
 
 // The photo's column: the container (gutters 20 / 32 / 48px) below `lg`; from it,
 // 5 of 12 columns, i.e. 5/12 of the content less 7/12 of a grid gap.

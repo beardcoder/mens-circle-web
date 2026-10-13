@@ -1,4 +1,6 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+
 import Cta from './blocks/Cta.astro';
 import Dates from './blocks/Dates.astro';
 import Facts from './blocks/Facts.astro';
@@ -14,22 +16,19 @@ import Testimonials from './blocks/Testimonials.astro';
 import TextSection from './blocks/TextSection.astro';
 import ValueItems from './blocks/ValueItems.astro';
 
-export interface Block {
-  type: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- payload shape is unknown and varies widely; refined where consumed
-  data?: Record<string, any>;
+interface Props {
+  /** A page's blocks, as `src/content.config.ts` validates them. */
+  blocks: CollectionEntry<'pages'>['data']['blocks'];
 }
 
-interface Props {
-  blocks: Block[];
-}
 const { blocks } = Astro.props;
 ---
 
 {blocks.map((block) => {
-  const data = block.data ?? {};
+  // Destructured together, so the switch on `type` narrows `data`.
+  const { type, data } = block;
 
-  switch (block.type) {
+  switch (type) {
     case 'hero':
       return <Hero data={data} />;
     case 'facts':
