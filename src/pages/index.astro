@@ -1,10 +1,10 @@
 ---
+import { getEntry } from 'astro:content';
+
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import { eventSeriesSchema } from '@lib/series-schema';
 
-import type { Block } from '../components/PageContent.astro';
 import PageContent from '../components/PageContent.astro';
-import home from '../content/home.json';
 import Layout from '../layouts/Layout.astro';
 
 // Static shell and native <Picture> assets; live content uses server:defer.
@@ -13,7 +13,11 @@ export const prerender = true;
 // Everything live on this page arrives through a server island, so the document itself may be cached.
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
-const blocks = home.blocks as Block[];
+const home = await getEntry('pages', 'home');
+
+if (!home) throw new Error('src/content/home.json is missing');
+
+const { meta, blocks } = home.data;
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 
@@ -28,8 +32,8 @@ if (faq?.data?.items?.length) {
     '@type': 'FAQPage',
     '@id': `${siteUrl.origin}/#faq`,
     mainEntity: faq.data.items
-      .filter((i: { question?: string; answer?: string }) => i.question && i.answer)
-      .map((i: { question?: string; answer?: string }) => ({
+      .filter((i) => i.question && i.answer)
+      .map((i) => ({
         '@type': 'Question',
         name: i.question,
         acceptedAnswer: { '@type': 'Answer', text: i.answer },
@@ -47,7 +51,7 @@ if (evening?.data?.steps?.length) {
     '@type': 'ItemList',
     name: evening.data.title ?? 'Wie ein Abend abläuft',
     description: evening.data.subtitle ?? '',
-    itemListElement: evening.data.steps.map((s: { title?: string; description?: string }, i: number) => ({
+    itemListElement: evening.data.steps.map((s, i) => ({
       '@type': 'ListItem',
       position: i + 1,
       name: s.title ?? '',
@@ -60,6 +64,6 @@ if (evening?.data?.steps?.length) {
 schemas.push(eventSeriesSchema(siteUrl));
 ---
 
-<Layout title={home.meta.title} description={home.meta.description} schemas={schemas}>
+<Layout title={meta.title} description={meta.description} schemas={schemas}>
   <PageContent blocks={blocks} />
 </Layout>

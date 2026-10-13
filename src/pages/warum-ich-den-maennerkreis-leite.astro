@@ -1,10 +1,10 @@
 ---
+import { getEntry } from 'astro:content';
+
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import { canonicalUrl } from '@lib/canonical';
 
-import type { Block } from '../components/PageContent.astro';
 import PageContent from '../components/PageContent.astro';
-import page from '../content/warum-ich-den-maennerkreis-leite.json';
 import Layout from '../layouts/Layout.astro';
 
 // Prerendered: content only, no live data.
@@ -12,7 +12,11 @@ export const prerender = true;
 
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
-const blocks = page.blocks as Block[];
+const page = await getEntry('pages', 'warum-ich-den-maennerkreis-leite');
+
+if (!page) throw new Error('src/content/warum-ich-den-maennerkreis-leite.json is missing');
+
+const { meta, blocks } = page.data;
 
 // Strip inline HTML from titles/answers for schema text.
 const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
@@ -30,8 +34,8 @@ if (faq?.data?.items?.length) {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: faq.data.items
-      .filter((i: { question?: string; answer?: string }) => i.question && i.answer)
-      .map((i: { question?: string; answer?: string }) => ({
+      .filter((i) => i.question && i.answer)
+      .map((i) => ({
         '@type': 'Question',
         name: i.question,
         acceptedAnswer: { '@type': 'Answer', text: strip(i.answer) },
@@ -58,12 +62,12 @@ schemas.push({
   '@id': `${canonical}#article`,
   url: canonical,
   mainEntityOfPage: canonical,
-  headline: page.meta.ogTitle ?? strip(page.meta.title),
-  description: page.meta.description,
+  headline: meta.ogTitle ?? strip(meta.title),
+  description: meta.description,
   image: articleImage,
   inLanguage: 'de-DE',
-  datePublished: page.meta.datePublished,
-  dateModified: page.meta.dateModified,
+  datePublished: meta.datePublished,
+  dateModified: meta.dateModified,
   author: { '@id': `${siteUrl.origin}/#markus` },
   publisher: { '@id': `${siteUrl.origin}/#organization` },
   isPartOf: { '@id': `${siteUrl.origin}/#website` },
@@ -76,17 +80,17 @@ const OG_IMAGE = { width: 1200, height: 630 };
 ---
 
 <Layout
-  title={page.meta.title}
-  description={page.meta.description}
-  ogTitle={page.meta.ogTitle}
-  ogDescription={page.meta.ogDescription}
+  title={meta.title}
+  description={meta.description}
+  ogTitle={meta.ogTitle}
+  ogDescription={meta.ogDescription}
   ogType="article"
   ogImage="/images/og-markus.jpg?v=2"
   ogImageWidth={OG_IMAGE.width}
   ogImageHeight={OG_IMAGE.height}
   ogImageAlt="Markus Sommer, der den Männerkreis in Straubing leitet"
-  publishedTime={page.meta.datePublished}
-  modifiedTime={page.meta.dateModified}
+  publishedTime={meta.datePublished}
+  modifiedTime={meta.dateModified}
   schemas={schemas}
 >
   {/* One reading column; the page closes on its one invitation (the `cta` block). */}

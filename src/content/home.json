@@ -12,10 +12,7 @@
         "titleEmphasis": "nichts darstellen",
         "lede": "Wir sitzen im Kreis und sprechen über das, was gerade wirklich da ist. Die anderen hören zu\u00a0– ohne zu bewerten, ohne Ratschläge. Je nach Abend kommen einfache Übungen mit Atem und Körperwahrnehmung dazu; du machst mit, soweit es für dich passt.",
         "secondaryLabel": "Wie ein Abend abläuft",
-        "secondaryLink": "#reise",
-        "image": "/images/markus-sommer.jpg",
-        "imageAlt": "Markus Sommer sitzt auf einem Felsen und blickt im Abendlicht über eine bewaldete Hügellandschaft.",
-        "imageCaption": "Markus Sommer begleitet den Männerkreis."
+        "secondaryLink": "#reise"
       }
     },
     {
@@ -90,7 +87,7 @@
         "name": "Ich bin Markus.",
         "quote": "Ich gebe dir keine Ratschläge. Ich sorge dafür, dass du in Ruhe reden kannst\u00a0– und gehört wirst.",
         "bio": "<p>Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.</p><p>Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit\u00a0– einfach, ruhig und ohne große Worte.</p><p>Zu Beginn jedes Abends erkläre ich die Absprachen und achte darauf, dass sie gelten. Jeder kann zu Wort kommen, keiner muss. Und wenn wir eine Übung mit Atem oder Körperwahrnehmung machen, leite ich sie an\u00a0– als Angebot, nicht als Pflicht.</p>",
-        "image": "/images/markus-sommer.jpg",
+        "image": "../assets/images/markus-sommer.jpg",
         "imageAlt": "Markus Sommer, von der Seite, auf einem Felsen sitzend.",
         "linkLabel": "Warum ich den Männerkreis leite",
         "linkUrl": "/warum-ich-den-maennerkreis-leite"
