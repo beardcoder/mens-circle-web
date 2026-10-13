@@ -1,7 +1,7 @@
 // @ts-check
 
 import sitemap from '@astrojs/sitemap';
-import bun, { bunImageService } from '@mens-circle/astro-bun';
+import bun from '@mens-circle/astro-bun';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders } from 'astro/config';
 import icon from 'astro-icon';
@@ -31,9 +31,9 @@ export default defineConfig({
     },
   }),
   image: {
-    // Bun.Image instead of Sharp; needs the build to run on Bun (`bun --bun astro build`).
-    service: bunImageService(),
-    // Replaces Astro's runtime transformer with a 404.
+    // Sharp (Astro's default service) renders every variant at build time; no page
+    // transforms images on demand. Without Sharp at runtime, Astro's `/_image` endpoint
+    // would answer 500, so this documented option swaps it for a 404.
     endpoint: { entrypoint: './src/lib/disabled-image-endpoint.ts', route: '/_image' },
   },
   vite: {
@@ -94,6 +94,8 @@ export default defineConfig({
   integrations: [
     icon(),
     sitemap({
+      // The event pages are SSR; their sitemap is a route, listed in the index here.
+      customSitemaps: [new URL('/sitemap-events.xml', siteUrl).href],
       // The testimonial form is for people who were there, not for search (noindex too).
       filter: (page) =>
         !['/admin', '/impressum', '/datenschutz', '/teile-deine-erfahrung', '/auth'].some((p) => page.includes(p)),
@@ -124,9 +126,8 @@ export default defineConfig({
       // event/health: v3 would fetch these SSR routes from the live site at build time.
       exclude: ['admin/**', 'auth/**', 'impressum/**', 'datenschutz/**', 'teile-deine-erfahrung/**', 'event', 'health'],
     }),
-    // After sitemap() and llms(), whose output it patches.
+    // After llms(), whose output it patches.
     publishGeneratedFiles({
-      sitemaps: ['/sitemap-events.xml'],
       llmsPages: [
         {
           path: '/event',

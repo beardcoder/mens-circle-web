@@ -21,8 +21,7 @@ interface Props {
 }
 
 /**
- * Markus: his square photograph (a touch slower than the page as it scrolls)
- * and his words at about 5 : 7 on the shared grid. On
+ * Markus: his photograph and his words at about 5 : 7 on the shared grid. On
  * phones the title comes first, then a photo of moderate height, then the text,
  * so the photo never pushes the orientation down by screens. His sentence stays
  * below the size of the section's title.
@@ -31,6 +30,11 @@ interface Props {
 const { data } = Astro.props;
 const anchor = data.anchor ?? 'moderator';
 const photo = resolveAssetImage(data.image);
+
+// The photo's column: the container (gutters 20 / 32 / 48px) below `lg`; from it,
+// 5 of 12 columns, i.e. 5/12 of the content less 7/12 of a grid gap.
+const NARROW_SIZES = '(min-width: 48rem) calc(100vw - 4rem), calc(100vw - 2.5rem)';
+const WIDE_SIZES = '(min-width: 80rem) 29.5rem, calc(41.67vw - 2.83rem)';
 ---
 
 <Section id={anchor} labelledby="person-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
@@ -45,10 +49,10 @@ const photo = resolveAssetImage(data.image);
     <figure class="aspect-4/3 overflow-clip lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-4/5 lg:self-start [&_picture]:block [&_picture]:h-full">
       <CropPicture
         src={photo}
-        class="block size-full object-cover object-[30%_45%]"
+        class="block size-full object-cover"
         breakpoint="64em"
-        narrow={{ ratio: 4 / 3, widths: [400, 640, 960], sizes: 'calc(100vw - 2.5rem)' }}
-        wide={{ ratio: 4 / 5, widths: [400, 560, 800], sizes: 'min(30rem, 38vw)' }}
+        narrow={{ ratio: 4 / 3, widths: [400, 640, 800, 1024], sizes: NARROW_SIZES, position: 'center' }}
+        wide={{ ratio: 4 / 5, widths: [400, 600, 800], sizes: WIDE_SIZES, position: 'left' }}
         loading="lazy"
         alt={data.imageAlt ?? ''}
       />
