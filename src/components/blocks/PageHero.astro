@@ -26,6 +26,11 @@ const { data } = Astro.props;
 const hasButton = Boolean(data.buttonText && data.buttonLink);
 const buttonExternal = data.buttonLink?.startsWith('http') ?? false;
 const imageAsset = resolveAssetImage(data.image);
+
+// The photo's column: the container (gutters 20 / 32 / 48px) below `lg`; from it,
+// 4 of 12 columns, i.e. a third of the content less two thirds of a grid gap.
+const NARROW_SIZES = '(min-width: 48rem) calc(100vw - 4rem), calc(100vw - 2.5rem)';
+const WIDE_SIZES = '(min-width: 80rem) 23rem, calc(33.33vw - 2.67rem)';
 ---
 
 <PageIntro id={data.anchor} eyebrow={data.eyebrow} title={data.title ?? ''} titleHtml>
@@ -44,10 +49,10 @@ const imageAsset = resolveAssetImage(data.image);
     <figure slot="media">
       <CropPicture
         src={imageAsset}
-        class="block aspect-4/3 w-full object-cover object-[22%_40%] lg:aspect-4/5"
+        class="block aspect-4/3 w-full object-cover lg:aspect-4/5"
         breakpoint="64em"
-        narrow={{ ratio: 4 / 3, widths: [420, 700, 960], sizes: 'calc(100vw - 2.5rem)' }}
-        wide={{ ratio: 4 / 5, widths: [400, 560, 800], sizes: 'min(30rem, 38vw)' }}
+        narrow={{ ratio: 4 / 3, widths: [400, 640, 800, 1024], sizes: NARROW_SIZES, position: 'center' }}
+        wide={{ ratio: 4 / 5, widths: [300, 400, 600, 800], sizes: WIDE_SIZES, position: 'left' }}
         loading="eager"
         fetchpriority="high"
         alt={data.imageAlt ?? ''}

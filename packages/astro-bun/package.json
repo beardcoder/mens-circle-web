@@ -2,12 +2,11 @@
   "name": "@mens-circle/astro-bun",
   "version": "0.1.0",
   "private": true,
-  "description": "Astro adapter for Bun: Bun.serve with native static routes (ETag/304), graceful shutdown and a Bun.Image image service.",
+  "description": "Astro adapter for Bun: Bun.serve with native static routes (ETag/304), and graceful shutdown.",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./server": "./src/server.ts",
-    "./image-service": "./src/image-service.ts"
+    "./server": "./src/server.ts"
   },
   "files": [
     "src"

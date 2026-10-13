@@ -9,7 +9,7 @@ Commit messages are English too, in Conventional Commits form (`fix(seo): …`).
 
 ```bash
 bun run dev            # under an agent it daemonizes; bunx astro dev status|logs|stop
-bun run build          # bun --bun astro build: Astro runs on Bun (≥ 1.4) for Bun.Image
+bun run build          # bun --bun astro build: Astro runs on Bun, like the server
 bun run check          # astro check
 bun run lint           # eslint; complexity ≤ 12, max-depth ≤ 4, blank lines, import order
 bun run lint:fix       # sets blank lines and import order, then runs prettier
@@ -18,7 +18,7 @@ bun run format:check   # what CI runs; CLAUDE.md and docs/ are formatted too
 bun test               # each *.fixture.ts case runs in its own Bun process
 bun run db:generate    # after editing src/lib/server/db/schema.ts
 bun run knip           # unused files, exports and dependencies
-bun run images:verify  # a running build (default :18092): 4 islands, image variants, /_image 404
+bun run images:verify  # a running build (default :18092): 4 islands, AVIF/WebP crops, /_image 404
 ```
 
 Verify with `check` + `lint` + `format:check` + `test`; CI (`.github/workflows/ci.yml`)
@@ -84,15 +84,19 @@ stable build-time `ASTRO_KEY`; without it, revert to `no-cache`. `public/sw.js` 
 retires the removed breathing app's service worker and is served `no-cache`; it can go
 once old installs have updated.
 
-**Generated files.** `publish-generated-files.mjs` must run after `sitemap()` and `llms()`:
-it adds `/sitemap-events.xml` and `/event`. The adapter serves whatever is on disk at startup.
+**Generated files.** `sitemap()` lists `/sitemap-events.xml` in the index (`customSitemaps`).
+`publish-generated-files.mjs` must run after `llms()`: it adds `/event` to llms.txt. The
+adapter serves whatever is on disk at startup.
 `astro-llms-md` excludes `event` and `health` so it never fetches the live site at build.
 
-**Images.** `CropPicture` at build time only, through the adapter's Bun.Image service
-(no Sharp). Bun.Image cannot crop and has no AVIF on Linux: variants are WebP/JPEG at the
-source ratio (`fit: 'outside'`), and the block crops them with `aspect-ratio`,
-`object-fit: cover` and `object-position`. Keep the `/_image` 404 override. All events
-use `/images/og-default.png`.
+**Images.** Astro's default service (Sharp, a dev dependency), at build time only. Photos
+live in `src/assets/images/`. `CropPicture` is Astro's art-direction recipe (`getImage()` per
+`<source>`): one crop below the breakpoint, one above, each cropped by Sharp (`fit: 'cover'`,
+`position` keyword), in AVIF then WebP, JPEG fallback. A single crop needs only
+`<Picture formats={['avif', 'webp']} />`. `sizes` follows the real column width
+(see the blocks); widths stay within the source (1024px). No page renders images on
+demand, so the `/_image` endpoint is a 404 (`image.endpoint`): Sharp is not in the
+runtime image. All events use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; tasks
 declare their own cron, on the UTC clock (reminders every 15 min, the S3 backup at

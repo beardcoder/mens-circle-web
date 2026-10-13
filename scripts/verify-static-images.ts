@@ -1,6 +1,8 @@
-/** Verifies the built server over HTTP. Images are decoded with Bun.Image. */
+/** Verifies the built server over HTTP. Images are decoded with Sharp, Astro's image service. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+
+import sharp from 'sharp';
 
 import { PRERENDERED_CACHE_CONTROL } from '../src/lib/cache';
 
@@ -68,9 +70,12 @@ for (const path of [
   }
 }
 
-// WebP per crop and width, JPEG for the wide crop; the moderator's portrait and the
-// personal page share the wide variants.
-assert.ok(images.size >= 10, 'Native Picture variants missing');
+// AVIF and WebP per crop and width, JPEG for the wide crop.
+assert.ok(
+  [...images.keys()].some((path) => path.endsWith('.avif')),
+  'AVIF variants missing',
+);
+assert.ok(images.size >= 20, 'Picture variants missing');
 images.set('/images/og-default.png', 1200);
 
 for (const [path, width] of images) {
@@ -78,13 +83,11 @@ for (const [path, width] of images) {
 
   assert.match(response.headers.get('content-type') || '', /^image\//);
   const bytes = new Uint8Array(await response.arrayBuffer());
-  const metadata = await new Bun.Image(bytes).metadata();
+  // A full decode, not just the header.
+  const { info } = await sharp(bytes).raw().toBuffer({ resolveWithObject: true });
 
-  // A full decode (re-encode to PNG), not just the header.
-  await new Bun.Image(bytes).png().bytes();
-
-  // `w` names the box a variant covers; the variant is at least that wide.
-  if (width) assert.ok(metadata.width >= width, path);
+  // Sharp crops at build time, so a variant is exactly as wide as its `w` descriptor.
+  if (width) assert.equal(info.width, width, path);
 
   const changed = new Uint8Array(await (await get(`${path}?w=1&h=2&f=png&q=1`)).arrayBuffer());
 
