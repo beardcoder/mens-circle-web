@@ -193,7 +193,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   Under reduced motion everything rests and the timed guide hides.
 - No layout shift: an island's fallback sets the same lines as its loaded state;
   every summary line is one line (`truncate`). Both Playfair styles are preloaded
-  (the statement's phrase is italic); dropping one brings the shift back.
+  (the statement's phrase is italic); dropping one brings the shift back. A title's
+  measure is in `em`, never `ch`: `ch` follows the font in use (0.5em in the fallback,
+  0.6em in Playfair) and Chrome re-resolves it late, so the hero title broke onto a
+  fourth line and back while the fonts swapped (CLS 0.27).
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Styles live in the component's markup as utilities. `global.css` is inlined into
