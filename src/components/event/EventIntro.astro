@@ -31,7 +31,7 @@ const dayMonthYear = formatDayMonthYearDE(event.event_date);
       <Eyebrow class="mb-3 entrance:animate-rise">
         {event.is_past ? 'Vergangenes Treffen' : 'Männerkreis · Nächstes Treffen'}
       </Eyebrow>
-      <h1 id="event-title" class="max-w-[16ch] text-page text-fg entrance:animate-rise entrance:animate-delay-[90ms]">
+      <h1 id="event-title" class="max-w-[9.6em] text-page text-fg entrance:animate-rise entrance:animate-delay-[90ms]">
         <time datetime={isoDay(event.event_date)}>
           <span class="block">{weekday},</span>
           <span class="block">{dayMonthYear}</span>
