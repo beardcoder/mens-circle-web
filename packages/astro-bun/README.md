@@ -37,22 +37,6 @@ export default defineConfig({
   answer `/404` with 200). It is held in memory and handed to Astro through
   `prerenderedErrorPageFetch`, so every 404 keeps its status and its file's headers.
 
-## Image service
-
-`bunImageService()` replaces Sharp with `Bun.Image` (Bun ≥ 1.4) for Astro's build-time
-images. Astro must run on Bun for it: `bun --bun astro build`.
-
-```js
-import bun, { bunImageService } from '@mens-circle/astro-bun';
-
-export default defineConfig({ adapter: bun(), image: { service: bunImageService() } });
-```
-
-Bun.Image resizes, but cannot crop. `fit: 'cover'` with a different aspect ratio is
-therefore refused rather than stretched; ask for `fit: 'outside'` (the smallest size
-that covers the box, source ratio kept) and crop with `object-fit: cover` in CSS.
-JPEG, PNG and WebP encode everywhere; AVIF needs an OS encoder that Linux lacks.
-
 ## Build
 
 `src/index.ts` sticks to `node:*`, so the integration also works when Astro runs on
