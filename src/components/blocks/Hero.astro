@@ -65,19 +65,6 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
       )}
     </div>
 
-    <HomeEventStatus
-      placement="hero"
-      secondaryLabel={data.secondaryLabel}
-      secondaryLink={data.secondaryLink}
-      server:defer
-    >
-      <HomeEventStatus
-        placement="hero"
-        secondaryLabel={data.secondaryLabel}
-        secondaryLink={data.secondaryLink}
-        fallback
-        slot="fallback"
-      />
-    </HomeEventStatus>
+    <HomeEventStatus placement="hero" secondaryLabel={data.secondaryLabel} secondaryLink={data.secondaryLink} />
   </Container>
 </section>

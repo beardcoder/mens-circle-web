@@ -1,6 +1,7 @@
 ---
 import site from '@data/site.json';
-import { type NextEventSummary, splitFee, summarizeNextEvent } from '@lib/event-status';
+import { splitFee, summarizeNextEvent } from '@lib/event-status';
+import { fetchNextEventState } from '@lib/server/events';
 import { label } from '@lib/ui';
 
 import Section from '../ui/Section.astro';
@@ -15,17 +16,10 @@ import Section from '../ui/Section.astro';
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string };
-  /** The next scheduled event, when there is one. Read live when omitted. */
-  next?: NextEventSummary | null;
 }
 
 const { data = {} } = Astro.props;
-
-const next =
-  Astro.props.next !== undefined
-    ? Astro.props.next
-    : // Dynamic, so the static fallback never opens SQLite.
-      summarizeNextEvent((await (await import('../../lib/server/events')).fetchNextEventState()).event);
+const next = summarizeNextEvent((await fetchNextEventState()).event);
 
 const fee = splitFee(next?.costBasis);
 

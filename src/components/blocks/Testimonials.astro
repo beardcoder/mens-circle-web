@@ -1,5 +1,5 @@
 ---
-import type { Testimonial } from '@lib/types';
+import { fetchTestimonialsState } from '@lib/server/testimonials';
 
 import Quote from '../ui/Quote.astro';
 import Section from '../ui/Section.astro';
@@ -11,25 +11,18 @@ import TextLink from '../ui/TextLink.astro';
  * reworded. At most one short voice takes the quote size; the rest read like
  * running text in two columns that flow (one on phones), so different lengths
  * never leave empty neighbours. Long voices open folded (Quote). With none
- * published, or when they cannot be read, the block says so in one line. The
- * island's fallback holds the head and the link, never a lasting "loading".
+ * published, or when they cannot be read, the block says so in one line.
  */
 
 interface Props {
   data?: { anchor?: string; eyebrow?: string; title?: string };
-  testimonials?: Testimonial[];
-  /** The island's fallback. */
-  loading?: boolean;
 }
 
 /** A voice this short may stand out at the quote size. */
 const SHORT = 160;
 
-const { data, loading = false } = Astro.props;
-
-const result = Astro.props.testimonials
-  ? { status: 'ok' as const, testimonials: Astro.props.testimonials }
-  : await (await import('../../lib/server/testimonials')).fetchTestimonialsState();
+const { data } = Astro.props;
+const result = await fetchTestimonialsState();
 
 const { testimonials } = result;
 const anchor = data?.anchor ?? 'stimmen';
@@ -37,16 +30,15 @@ const [first, ...others] = testimonials;
 const featured = first && first.quote.length <= SHORT ? first : null;
 const rest = featured ? others : testimonials;
 
-const note = loading
-  ? ''
-  : result.status === 'unavailable'
+const note =
+  result.status === 'unavailable'
     ? 'Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei.'
     : testimonials.length === 0
       ? 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'
       : '';
 ---
 
-<Section id={anchor} labelledby="testimonials-title" space={note ? 'band' : 'default'} data-llms-skip>
+<Section id={anchor} labelledby="testimonials-title" space={note ? 'band' : 'default'}>
   <SectionHead
     eyebrow={data?.eyebrow ?? 'Aus dem Kreis'}
     title={data?.title ?? 'Was Teilnehmer geschrieben haben'}

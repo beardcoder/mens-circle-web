@@ -3,12 +3,7 @@
   "tags": ["-lintignore"],
   "workspaces": {
     ".": {
-      "entry": [
-        "scripts/schedule.ts",
-        "scripts/send-reminders.ts",
-        "src/lib/disabled-image-endpoint.ts",
-        "public/sw.js"
-      ]
+      "entry": ["scripts/schedule.ts", "scripts/send-reminders.ts", "src/lib/image-endpoint.ts", "public/sw.js"]
     }
   }
 }
