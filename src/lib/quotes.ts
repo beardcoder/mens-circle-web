@@ -23,18 +23,6 @@ const bind = (): void => {
   }
 };
 
-/** The voices arrive in a server island after this runs: bind again as islands land, until none is pending. */
 export function initQuotes(): void {
   bind();
-  const pending = (): boolean => document.querySelector('script[data-island-id]') !== null;
-
-  if (!pending()) return;
-
-  const observer = new MutationObserver(() => {
-    bind();
-
-    if (!pending()) observer.disconnect();
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
 }

@@ -32,11 +32,7 @@ const { blocks } = Astro.props;
     case 'hero':
       return <Hero data={data} />;
     case 'facts':
-      return (
-        <Facts data={data} server:defer>
-          <Facts data={data} next={null} slot="fallback" />
-        </Facts>
-      );
+      return <Facts data={data} />;
     case 'intro':
       return <Intro data={data} />;
     case 'moderator':
@@ -56,11 +52,7 @@ const { blocks } = Astro.props;
     case 'value-items':
       return <ValueItems data={data} />;
     case 'testimonials':
-      return (
-        <Testimonials data={data} server:defer>
-          <Testimonials data={data} testimonials={[]} loading slot="fallback" />
-        </Testimonials>
-      );
+      return <Testimonials data={data} />;
     case 'page-hero':
       return <PageHero data={data} />;
     case 'text-section':
