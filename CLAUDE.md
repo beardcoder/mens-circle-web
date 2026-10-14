@@ -18,7 +18,7 @@ bun run format:check   # what CI runs; CLAUDE.md and docs/ are formatted too
 bun test               # each *.fixture.ts case runs in its own Bun process
 bun run db:generate    # after editing src/lib/server/db/schema.ts
 bun run knip           # unused files, exports and dependencies
-bun run images:verify  # a running build (default :18092): 4 islands, AVIF/WebP crops, /_image 404
+bun run images:verify  # a running build (default :18092): live home, AVIF/WebP crops, /_image refusals
 ```
 
 Verify with `check` + `lint` + `format:check` + `test`; CI (`.github/workflows/ci.yml`)
@@ -67,36 +67,41 @@ proxy's forwarded headers. Never fix a 403 with `checkOrigin: false`.
 `claimSeat()`). Capacity is computed from `holdsASeat()` only. More than one web
 replica on the same SQLite file is not supported.
 
-**Rendering.** Home is prerendered with exactly four `server:defer` islands
-(`HomeEventStatus` ×2, `Facts`, `Testimonials`); fallbacks never read the DB, islands
-get no images. The hero's `HomeEventStatus` renders two items of the hero's grid
-(the summary and the action under the statement), so the action can name the state. The `HomeEventStatus` fallback sets the same lines as a scheduled date
-(static words, same length or shorter), so the swap changes text, not height: no
-layout shift. Text in the first screen that an island fills stays one fixed line.
-Event pages are SSR. `lib/event-status.ts` has three states; a failed read
-(`unavailable`) must never render as "no date planned".
+**Rendering.** Home and the event pages render on demand; the legal pages, the
+personal page and the testimonial form are prerendered. Home has no server islands:
+the next date (`HomeEventStatus` ×2), `Facts` and `Testimonials` read SQLite while the
+page renders, so the first HTML is final and nothing is swapped after load (an island's
+fallback showed other text first). The hero's `HomeEventStatus` renders two items of
+the hero's grid (the summary and the action under the statement), so the action can
+name the state. `lib/event-status.ts` has three states; a failed read
+(`unavailable`) must never render as "no date planned", and the reads catch their
+errors, so a database failure never fails the page.
 
 **Caching.** `lib/cache-policy.ts` is the one table (middleware + the adapter's `staticHeaders`);
-routes with their own header are left alone. The prerendered pages (home, the legal
-pages, `/warum-ich-den-maennerkreis-leite`, `/teile-deine-erfahrung`) use
-`PRERENDERED_CACHE_CONTROL` (`lib/cache.ts`, `s-maxage=300`), which is only safe with a
-stable build-time `ASTRO_KEY`; without it, revert to `no-cache`. `public/sw.js` only
+routes with their own header are left alone. Home takes the revalidate default, so the
+seat count is never served stale. The prerendered pages (the legal pages,
+`/warum-ich-den-maennerkreis-leite`, `/teile-deine-erfahrung`) use
+`PRERENDERED_CACHE_CONTROL` (`lib/cache.ts`, `s-maxage=300`). `public/sw.js` only
 retires the removed breathing app's service worker and is served `no-cache`; it can go
 once old installs have updated.
 
 **Generated files.** `sitemap()` lists `/sitemap-events.xml` in the index (`customSitemaps`).
-`publish-generated-files.mjs` must run after `llms()`: it adds `/event` to llms.txt. The
-adapter serves whatever is on disk at startup.
-`astro-llms-md` excludes `event` and `health` so it never fetches the live site at build.
+`publish-generated-files.mjs` must run after `llms()`: it adds home and `/event` to
+llms.txt as links. The adapter serves whatever is on disk at startup. `astro-llms-md`
+excludes the SSR routes (`index.html`, `event`, `health`) so it never fetches the live
+site at build.
 
-**Images.** Astro's default service (Sharp, a dev dependency), at build time only. Photos
-live in `src/assets/images/`. `CropPicture` is Astro's art-direction recipe (`getImage()` per
+**Images.** Astro's default service (Sharp, a production dependency). Photos live in
+`src/assets/images/`. `CropPicture` is Astro's art-direction recipe (`getImage()` per
 `<source>`): one crop below the breakpoint, one above, each cropped by Sharp (`fit: 'cover'`,
 `position` keyword), in AVIF then WebP, JPEG fallback. A single crop needs only
 `<Picture formats={['avif', 'webp']} />`. `sizes` follows the real column width
-(see the blocks); widths stay within the source (1024px). No page renders images on
-demand, so the `/_image` endpoint is a 404 (`image.endpoint`): Sharp is not in the
-runtime image. All events use `/images/og-default.png`.
+(see the blocks); widths stay within the source (1024px). Prerendered pages get the
+variants at build time; the on-demand home names them as `/_image` URLs, served by
+`lib/image-endpoint.ts` (`image.endpoint`): Astro's Node endpoint (sources from disk,
+own files only) with each result kept in memory, since an AVIF takes 1–3 s. Sharp is
+external to the bundle (`vite.ssr.external`) so its native binding resolves. All
+events use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; tasks
 declare their own cron, on the UTC clock (reminders every 15 min, the S3 backup at
@@ -189,10 +194,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   timelines, so what is on screen is complete and nothing waits on a script; the
   hero's rings breathe (no parallax); the breath circle's 10 s cycle matches
   its words (4 s in, 5 s out); the phone menu opens as a circle from its button.
-  Island content does not animate (its swap must not flash). No `content-visibility`.
+  No `content-visibility`.
   Under reduced motion everything rests and the timed guide hides.
-- No layout shift: an island's fallback sets the same lines as its loaded state;
-  every summary line is one line (`truncate`). Both Playfair styles are preloaded
+- No layout shift: every summary line is one line (`truncate`). Both Playfair styles are preloaded
   (the statement's phrase is italic); dropping one brings the shift back. A title's
   measure is in `em`, never `ch`: `ch` follows the font in use (0.5em in the fallback,
   0.6em in Playfair) and Chrome re-resolves it late, so the hero title broke onto a
