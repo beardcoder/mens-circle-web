@@ -201,10 +201,9 @@ that ends on one sets it itself.
 - Allowed outside utilities, each with its reason in `theme.css`/`global.css`: font
   tokens, primitives, the two surfaces, the reduced-motion floor, the scroll lock
   under a modal, the focus ring default, view-transition pseudo-elements, keyframes.
-- No layout shift: an island's fallback sets the same lines as its loaded state;
-  every line of a date summary is one line (`truncate`; below 360px a row stacks its
-  label over its value). Both serif styles are preloaded: the home statement sets its
-  phrase in the italic.
+- No layout shift: every line of a date summary is one line (`truncate`; below 360px
+  a row stacks its label over its value). Both serif styles are preloaded: the home
+  statement sets its phrase in the italic. Titles measure in `em`, never `ch`.
 - Forms: labels always visible, placeholders never instead; a field's message under
   the field, the form's result under its button (`FormStatus`), never a toast;
   entries survive an error; success says what actually happened.

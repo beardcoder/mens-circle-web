@@ -39,9 +39,7 @@ const title = (data.displayLines ?? ['Dabei sein.']).join(' ');
 >
   <SectionHead eyebrow={data.eyebrow} title={title} titleId="termine-title" lead={data.lede} class="lg:col-span-6" />
   <div class="lg:col-span-5 lg:col-start-8">
-    <HomeEventStatus placement="dates" server:defer>
-      <HomeEventStatus placement="dates" fallback slot="fallback" />
-    </HomeEventStatus>
+    <HomeEventStatus placement="dates" />
   </div>
 </Section>
 

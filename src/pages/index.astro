@@ -1,17 +1,14 @@
 ---
 import { getEntry } from 'astro:content';
 
-import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import { eventSeriesSchema } from '@lib/series-schema';
 
 import PageContent from '../components/PageContent.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Static shell and native <Picture> assets; live content uses server:defer.
-export const prerender = true;
-
-// Everything live on this page arrives through a server island, so the document itself may be cached.
-Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
+// Rendered on demand: the next date, the facts and the voices are in the first HTML,
+// so nothing on the page is swapped after load. The middleware's revalidate policy
+// keeps the seat count current.
 
 const home = await getEntry('pages', 'home');
 

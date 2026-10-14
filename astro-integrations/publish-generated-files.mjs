@@ -3,9 +3,10 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Adds the SSR pages to llms.txt, which astro-llms-md builds from prerendered pages
- * only and has no option for. Register after llms(). The adapter serves whatever ends
- * up on disk. (The SSR sitemap goes into the index through sitemap's `customSitemaps`.)
+ * Adds the SSR pages (home, /event) to llms.txt as links: astro-llms-md would fetch
+ * them from the live site at build time, so they are excluded there. Register after
+ * llms(). The adapter serves whatever ends up on disk. (The SSR sitemap goes into the
+ * index through sitemap's `customSitemaps`.)
  *
  * @param {object} options
  * @param {{ path: string, title: string, description: string }[]} options.llmsPages

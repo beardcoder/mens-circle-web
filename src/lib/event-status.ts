@@ -77,11 +77,10 @@ interface SummaryRow {
 /**
  * Everything an event summary shows, in every state. Scheduled and past dates
  * name time, place, fee and seats; the other states keep the same four rows with
- * what is always true (rhythm, place, fee), so a loading summary and a loaded one
- * stand the same height.
+ * what is always true (rhythm, place, fee), so every state stands the same height.
  */
 export interface SummaryView {
-  state: 'loading' | 'open' | 'full' | 'past' | 'none' | 'unavailable';
+  state: 'open' | 'full' | 'past' | 'none' | 'unavailable';
   /** The label above the date: "Nächster Termin", "Termin", … */
   kicker: string;
   /** Two fixed lines: the weekday and the date ("Freitag," / "16. Oktober 2026"), or the state in words. */
@@ -125,24 +124,13 @@ const noDateView = (unavailable: boolean, whenNone: 'overview' | 'notify', kicke
 /**
  * The summary of the next date, for the home page: its action points to the event;
  * with none planned to the overview (`overview`, the hero) or to the e-mail
- * notification (`notify`, beside the form). `null` is the island's fallback.
+ * notification (`notify`, beside the form).
  */
 export const nextDateView = (
-  state: DateStatus | null,
+  state: DateStatus,
   whenNone: 'overview' | 'notify' = 'overview',
   kicker = 'Nächster Termin',
 ): SummaryView => {
-  if (!state) {
-    return {
-      state: 'loading',
-      kicker,
-      title: ['Termine', 'und Anmeldung'],
-      datetime: '',
-      rows: [...RHYTHM_ROWS(), { label: 'Status', value: 'Siehe Terminseite' }],
-      action: OVERVIEW,
-    };
-  }
-
   const { status, next } = state;
 
   if (status === 'unavailable' || !next) return noDateView(status === 'unavailable', whenNone, kicker);

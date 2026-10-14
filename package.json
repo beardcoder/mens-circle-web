@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
-    "openid-client": "^6.8.8"
+    "openid-client": "^6.8.8",
+    "sharp": "^0.35.4"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
@@ -50,7 +51,6 @@
     "knip": "^6.41.0",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.1",
-    "sharp": "^0.35.4",
     "tailwind-animations": "^1.0.2",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",

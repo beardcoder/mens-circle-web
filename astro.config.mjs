@@ -8,6 +8,7 @@ import icon from 'astro-icon';
 import llms from 'astro-llms-md';
 
 import { publishGeneratedFiles } from './astro-integrations/publish-generated-files.mjs';
+import home from './src/content/home.json' with { type: 'json' };
 import site from './src/data/site.json' with { type: 'json' };
 import { cacheControlForFile } from './src/lib/cache-policy.ts';
 
@@ -31,16 +32,16 @@ export default defineConfig({
     },
   }),
   image: {
-    // Sharp (Astro's default service) renders every variant at build time; no page
-    // transforms images on demand. Without Sharp at runtime, Astro's `/_image` endpoint
-    // would answer 500, so this documented option swaps it for a 404.
-    endpoint: { entrypoint: './src/lib/disabled-image-endpoint.ts', route: '/_image' },
+    // Astro's Node image endpoint (reads sources from disk) behind an in-memory cache:
+    // the on-demand home page names its photo's variants as /_image URLs.
+    endpoint: { entrypoint: './src/lib/image-endpoint.ts', route: '/_image' },
   },
   vite: {
     // Tailwind v4: the theme lives in src/styles/global.css (CSS-first).
     plugins: [tailwindcss()],
     // Bundle everything for the build only; in dev, CommonJS deps break Vite's module runner.
-    ssr: { noExternal: process.argv.includes('build') || undefined, external: ['bun:sqlite'] },
+    // Sharp stays external: its native binding resolves from node_modules, not from the bundle.
+    ssr: { noExternal: process.argv.includes('build') || undefined, external: ['bun:sqlite', 'sharp'] },
     optimizeDeps: { exclude: ['bun:sqlite'] },
     css: {
       transformer: 'lightningcss',
@@ -113,22 +114,23 @@ export default defineConfig({
       description: site.description,
       contentSelector: 'main',
       // The first six are v3's DEFAULT_NOISE_SELECTORS, which 3.0.2 does not export.
-      excludeSelectors: [
-        'nav',
-        'aside',
-        'footer',
-        'form',
-        "[aria-hidden='true']",
-        '[hidden]',
-        // Live islands (the next date, the voices): their text changes after the build.
-        '[data-llms-skip]',
+      excludeSelectors: ['nav', 'aside', 'footer', 'form', "[aria-hidden='true']", '[hidden]', '[data-llms-skip]'],
+      // SSR routes (home, event, health): v3 would fetch them from the live site at build time.
+      exclude: [
+        'index.html',
+        'admin/**',
+        'auth/**',
+        'impressum/**',
+        'datenschutz/**',
+        'teile-deine-erfahrung/**',
+        'event',
+        'health',
       ],
-      // event/health: v3 would fetch these SSR routes from the live site at build time.
-      exclude: ['admin/**', 'auth/**', 'impressum/**', 'datenschutz/**', 'teile-deine-erfahrung/**', 'event', 'health'],
     }),
     // After llms(), whose output it patches.
     publishGeneratedFiles({
       llmsPages: [
+        { path: '/', title: 'Startseite', description: home.meta.description },
         {
           path: '/event',
           title: 'Termine & Anmeldung',
