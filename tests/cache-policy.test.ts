@@ -80,7 +80,7 @@ test('crawler and installer files stay changeable within the hour', () => {
 });
 
 test('crawler files are regenerated per build and stay changeable within the hour', () => {
-  for (const pathname of ['/llms.txt', '/llms-full.txt', '/home.md', '/sitemap-0.xml', '/sitemap-index.xml']) {
+  for (const pathname of ['/llms.txt', '/sitemap-0.xml', '/sitemap-index.xml']) {
     expect(cacheControlForFile(pathname, 'assets')).toBe('public, max-age=3600, must-revalidate');
   }
 });

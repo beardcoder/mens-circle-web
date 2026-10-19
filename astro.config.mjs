@@ -5,11 +5,7 @@ import bun from '@mens-circle/astro-bun';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders } from 'astro/config';
 import icon from 'astro-icon';
-import llms from 'astro-llms-md';
 
-import { publishGeneratedFiles } from './astro-integrations/publish-generated-files.mjs';
-import home from './src/content/home.json' with { type: 'json' };
-import site from './src/data/site.json' with { type: 'json' };
 import { cacheControlForFile } from './src/lib/cache-policy.ts';
 
 const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
@@ -108,36 +104,6 @@ export default defineConfig({
 
         return { ...item, url: url.href };
       },
-    }),
-    llms({
-      name: site.siteName,
-      description: site.description,
-      contentSelector: 'main',
-      // The first six are v3's DEFAULT_NOISE_SELECTORS, which 3.0.2 does not export.
-      excludeSelectors: ['nav', 'aside', 'footer', 'form', "[aria-hidden='true']", '[hidden]', '[data-llms-skip]'],
-      // SSR routes (home, event, health): v3 would fetch them from the live site at build time.
-      exclude: [
-        'index.html',
-        'admin/**',
-        'auth/**',
-        'impressum/**',
-        'datenschutz/**',
-        'teile-deine-erfahrung/**',
-        'event',
-        'health',
-      ],
-    }),
-    // After llms(), whose output it patches.
-    publishGeneratedFiles({
-      llmsPages: [
-        { path: '/', title: 'Startseite', description: home.meta.description },
-        {
-          path: '/event',
-          title: 'Termine & Anmeldung',
-          description:
-            'Wann der nächste Männerkreis stattfindet, wo er stattfindet, wie lange er dauert, was er kostet und wie du dich anmeldest.',
-        },
-      ],
     }),
   ],
 });

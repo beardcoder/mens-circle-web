@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 import { and, asc, desc, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
 
+import type { EventInput } from '../event-input';
 import type { EventDTO } from '../types';
 import { config, listmonkApiConfigured } from './config';
 import { db } from './db';
-import type { Event, NewEvent } from './db/schema';
+import type { Event } from './db/schema';
 import { ACTIVE_REGISTRATION_STATUSES, events, registrations } from './db/schema';
 import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
 import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
@@ -308,26 +309,6 @@ export const sendEventNewsletter = async (
   });
 };
 
-export interface EventInput {
-  title: string;
-  slug?: string;
-  description?: string;
-  eventDate: string;
-  startTime?: string;
-  endTime?: string;
-  location?: string;
-  locationDetails?: string;
-  street?: string;
-  postalCode?: string;
-  city?: string;
-  latitude?: number | null;
-  longitude?: number | null;
-  maxParticipants?: number;
-  costBasis?: string;
-  isPublished?: boolean;
-  imageUrl?: string | null;
-}
-
 export const listEventsForAdmin = async (): Promise<Array<Event & { activeCount: number }>> => {
   // count(column), not count(*): an event without registrations counts 0.
   const rows = await db
@@ -344,33 +325,12 @@ export const listEventsForAdmin = async (): Promise<Array<Event & { activeCount:
   return rows.map(({ event, activeCount }) => ({ ...event, activeCount }));
 };
 
-// A lookup table; every `??` counts as a branch.
-// eslint-disable-next-line complexity
-const inputToColumns = (input: EventInput): Partial<NewEvent> => ({
-  title: input.title.trim(),
-  description: input.description ?? '',
-  eventDate: input.eventDate,
-  startTime: input.startTime ?? '',
-  endTime: input.endTime ?? '',
-  location: input.location ?? '',
-  locationDetails: input.locationDetails ?? '',
-  street: input.street ?? '',
-  postalCode: input.postalCode ?? '',
-  city: input.city ?? '',
-  latitude: input.latitude ?? null,
-  longitude: input.longitude ?? null,
-  maxParticipants: input.maxParticipants ?? 8,
-  costBasis: input.costBasis ?? '',
-  isPublished: input.isPublished ?? false,
-  imageUrl: input.imageUrl ?? null,
-});
-
 export const createEvent = async (input: EventInput): Promise<Event> => {
-  const slug = input.slug?.trim() || (await generateSlug(input.eventDate));
+  const slug = input.slug || (await generateSlug(input.eventDate));
 
   const rows = await db
     .insert(events)
-    .values({ ...(inputToColumns(input) as NewEvent), slug })
+    .values({ ...input, slug })
     .returning();
 
   const created = rows[0];
@@ -385,11 +345,11 @@ export const updateEvent = async (id: string, input: EventInput): Promise<Event 
 
   if (!existing) return null;
 
-  const slug = input.slug?.trim() || existing.slug || (await generateSlug(input.eventDate, id));
+  const slug = input.slug || existing.slug || (await generateSlug(input.eventDate, id));
 
   const rows = await db
     .update(events)
-    .set({ ...inputToColumns(input), slug })
+    .set({ ...input, slug })
     .where(eq(events.id, id))
     .returning();
 

@@ -34,7 +34,6 @@ COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/drizzle ./drizzle
 # Run by Coolify's scheduled task and by hand; they import src/lib/server directly.
 COPY --from=build /app/scripts/schedule.ts /app/scripts/backup-db.ts /app/scripts/send-reminders.ts ./scripts/
-COPY --from=build /app/scripts/lib ./scripts/lib
 COPY --from=build /app/src/lib/server ./src/lib/server
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

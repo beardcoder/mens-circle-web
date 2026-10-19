@@ -39,12 +39,6 @@ export default defineConfig([
     },
   },
 
-  // The home-page block dispatcher: one `switch` over the block union with a component per case (CLAUDE.md: adding a block means adding a case here).
-  {
-    files: ['src/components/PageContent.astro'],
-    rules: { complexity: 'off' },
-  },
-
   // CLI scripts log to the console by design.
   {
     files: ['scripts/**'],

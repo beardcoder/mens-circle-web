@@ -1,34 +1,37 @@
 ---
-import { getEntry } from 'astro:content';
-
 import { eventSeriesSchema } from '@lib/series-schema';
 
-import PageContent from '../components/PageContent.astro';
+import photo from '../assets/images/markus-sommer.jpg';
+import Dates from '../components/blocks/Dates.astro';
+import Facts from '../components/blocks/Facts.astro';
+import Faq from '../components/blocks/Faq.astro';
+import Frame from '../components/blocks/Frame.astro';
+import Hero from '../components/blocks/Hero.astro';
+import Intro from '../components/blocks/Intro.astro';
+import JourneySteps from '../components/blocks/JourneySteps.astro';
+import Moderator from '../components/blocks/Moderator.astro';
+import Statement from '../components/blocks/Statement.astro';
+import Testimonials from '../components/blocks/Testimonials.astro';
+import home from '../content/home.json';
 import Layout from '../layouts/Layout.astro';
 
 // Rendered on demand: the next date, the facts and the voices are in the first HTML,
 // so nothing on the page is swapped after load. The middleware's revalidate policy
 // keeps the seat count current.
 
-const home = await getEntry('pages', 'home');
-
-if (!home) throw new Error('src/content/home.json is missing');
-
-const { meta, blocks } = home.data;
+const { meta, faq, journey_steps: evening } = home;
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 
-// Build per-page structured data from the content blocks.
+// Structured data uses the same copy as the visible sections.
 const schemas: Record<string, unknown>[] = [];
 
-const faq = blocks.find((b) => b.type === 'faq');
-
-if (faq?.data?.items?.length) {
+if (faq.items.length) {
   schemas.push({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     '@id': `${siteUrl.origin}/#faq`,
-    mainEntity: faq.data.items
+    mainEntity: faq.items
       .filter((i) => i.question && i.answer)
       .map((i) => ({
         '@type': 'Question',
@@ -40,15 +43,13 @@ if (faq?.data?.items?.length) {
 
 // ItemList, not HowTo: the steps describe how an evening runs rather than an
 // actionable procedure, and Google retired HowTo rich results in 2023.
-const evening = blocks.find((b) => b.type === 'journey-steps');
-
-if (evening?.data?.steps?.length) {
+if (evening.steps.length) {
   schemas.push({
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: evening.data.title ?? 'Wie ein Abend abläuft',
-    description: evening.data.subtitle ?? '',
-    itemListElement: evening.data.steps.map((s, i) => ({
+    name: evening.title ?? 'Wie ein Abend abläuft',
+    description: evening.subtitle ?? '',
+    itemListElement: evening.steps.map((s, i) => ({
       '@type': 'ListItem',
       position: i + 1,
       name: s.title ?? '',
@@ -62,5 +63,14 @@ schemas.push(eventSeriesSchema(siteUrl));
 ---
 
 <Layout title={meta.title} description={meta.description} schemas={schemas}>
-  <PageContent blocks={blocks} />
+  <Hero data={home.hero} />
+  <Facts data={home.facts} />
+  <Intro data={home.intro} />
+  <JourneySteps data={home.journey_steps} />
+  <Statement data={home.statement} />
+  <Moderator data={{ ...home.moderator, image: photo }} />
+  <Frame data={home.frame} />
+  <Testimonials data={home.testimonials} />
+  <Faq data={home.faq} />
+  <Dates data={home.dates} />
 </Layout>

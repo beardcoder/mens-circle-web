@@ -86,10 +86,8 @@ retires the removed breathing app's service worker and is served `no-cache`; it 
 once old installs have updated.
 
 **Generated files.** `sitemap()` lists `/sitemap-events.xml` in the index (`customSitemaps`).
-`publish-generated-files.mjs` must run after `llms()`: it adds home and `/event` to
-llms.txt as links. The adapter serves whatever is on disk at startup. `astro-llms-md`
-excludes the SSR routes (`index.html`, `event`, `health`) so it never fetches the live
-site at build.
+`src/pages/llms.txt.ts` prerenders a short index of the three public content pages.
+No live-site fetching, Markdown export or post-build patching is needed.
 
 **Images.** Astro's default service (Sharp, a production dependency). Photos live in
 `src/assets/images/`. `CropPicture` is Astro's art-direction recipe (`getImage()` per
@@ -103,11 +101,11 @@ own files only) with each result kept in memory, since an AVIF takes 1–3 s. Sh
 external to the bundle (`vite.ssr.external`) so its native binding resolves. All
 events use `/images/og-default.png`.
 
-**Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; tasks
-declare their own cron, on the UTC clock (reminders every 15 min, the S3 backup at
+**Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; the two schedules
+are direct UTC checks (reminders every 15 min, the S3 backup at
 03:00 when `BACKUP_S3_*` is set). No in-process timer and no `Bun.cron` (throws at
 boot). Beside `dist/` and `drizzle/`, the Docker image keeps only the three scheduled
-scripts, `scripts/lib/`, `src/lib/server/` and the production `dependencies` (the build
+scripts, `src/lib/server/` and the production `dependencies` (the build
 bundles the rest): what those scripts and the server lib import at runtime must be in
 there (other `src/lib` files as types only).
 
@@ -209,12 +207,12 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Conventions
 
-- Page copy is content collections (`src/content.config.ts`): `pages` (`src/content/*.json`,
-  read with `getEntry`) and `legal` (`src/content/legal/*.json`, one URL per file). Strict
-  Zod schemas: an unknown field fails the build. Images are `image()` paths relative to the
-  JSON file. Blocks are dispatched by `PageContent.astro`; a new block needs a schema in
-  the union, a component and a case. `src/data/*.json` stays a plain import: the config,
-  the server lib and the scripts read it outside Astro.
+- Home and personal-page copy live in `src/content/*.json` as named sections,
+  imported directly by their Astro pages. The pages compose the section components
+  explicitly; TypeScript checks the JSON against component props. Photos are normal
+  asset imports in the pages. Change section order in the page, copy in the JSON.
+  Only legal pages use a content collection (`src/content/legal/*.json`, one URL per
+  file, validated by `src/content.config.ts`). `src/data/*.json` is shared site config.
 - The brand name comes from `site.siteName`; never type it out.
 - Canonical URLs come from `lib/canonical.ts`.
 - Search: utility pages (`/teile-deine-erfahrung`, `/auth/*`) are `noindex, follow` and

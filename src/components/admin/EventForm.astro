@@ -1,32 +1,13 @@
 ---
+import type { EventInput } from '@lib/event-input';
 import { DEFAULT_EVENT_NEWSLETTER_INTRO } from '@lib/server/events';
 import { button, control, panel } from '@lib/ui';
 
 import Field from '../ui/Field.astro';
 import AdminHead from './AdminHead.astro';
 
-interface EventData {
-  id?: string;
-  title?: string;
-  slug?: string;
-  description?: string;
-  eventDate?: string;
-  startTime?: string;
-  endTime?: string;
-  location?: string;
-  locationDetails?: string;
-  street?: string;
-  postalCode?: string;
-  city?: string;
-  latitude?: number | null;
-  longitude?: number | null;
-  maxParticipants?: number;
-  costBasis?: string;
-  isPublished?: boolean;
-  imageUrl?: string | null;
-}
 interface Props {
-  event?: EventData | null;
+  event?: (Partial<EventInput> & { id?: string }) | null;
 }
 const { event = null } = Astro.props;
 
@@ -235,30 +216,12 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(form);
-      const get = (k: string) => String(fd.get(k) ?? '');
+
+      if (form.dataset.id) fd.set('id', form.dataset.id);
 
       btn.disabled = true;
       btn.textContent = 'Speichern…';
-      const result = await actions.saveEvent({
-        id: form.dataset.id || undefined,
-        title: get('title'),
-        slug: get('slug'),
-        description: get('description'),
-        eventDate: get('eventDate'),
-        startTime: get('startTime'),
-        endTime: get('endTime'),
-        location: get('location'),
-        locationDetails: get('locationDetails'),
-        street: get('street'),
-        postalCode: get('postalCode'),
-        city: get('city'),
-        latitude: get('latitude'),
-        longitude: get('longitude'),
-        maxParticipants: get('maxParticipants'),
-        costBasis: get('costBasis'),
-        imageUrl: get('imageUrl'),
-        isPublished: fd.get('isPublished') === 'on',
-      });
+      const result = await actions.saveEvent(fd);
 
       btn.disabled = false;
       btn.textContent = 'Speichern';

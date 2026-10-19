@@ -1,84 +1,20 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
-import { createEvent, type EventInput, sendEventNewsletter, softDeleteEvent, updateEvent } from '@lib/server/events';
+import { eventInputSchema } from '@lib/event-input';
+import { createEvent, sendEventNewsletter, softDeleteEvent, updateEvent } from '@lib/server/events';
 
 import { requireAdmin } from './auth';
 
-const eventSchema = z.object({
-  id: z.string().optional(),
-  title: z.string(),
-  slug: z.string().optional(),
-  description: z.string().optional(),
-  eventDate: z.string(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
-  location: z.string().optional(),
-  locationDetails: z.string().optional(),
-  street: z.string().optional(),
-  postalCode: z.string().optional(),
-  city: z.string().optional(),
-  latitude: z.union([z.number(), z.string()]).nullish(),
-  longitude: z.union([z.number(), z.string()]).nullish(),
-  maxParticipants: z.union([z.number(), z.string()]).optional(),
-  costBasis: z.string().optional(),
-  isPublished: z.boolean().optional(),
-  imageUrl: z.string().optional(),
-});
-
-const numOrNull = (v: number | string | null | undefined): number | null => {
-  if (v === '' || v == null) return null;
-
-  const n = Number(v);
-
-  return Number.isFinite(n) ? n : null;
-};
-
-/** Optional admin-form text; an omitted field becomes the empty string. */
-const text = (v: string | undefined): string => (v ?? '').trim();
-
-/** A date-only `<input type="date">` value becomes midnight UTC. */
-const toEventDate = (v: string | undefined): string => {
-  const value = text(v);
-
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00.000Z` : value;
-};
-
-type EventRaw = z.output<typeof eventSchema>;
-
-const toEventInput = (raw: EventRaw): EventInput => ({
-  title: text(raw.title),
-  slug: text(raw.slug) || undefined,
-  description: raw.description ?? '',
-  eventDate: toEventDate(raw.eventDate),
-  startTime: text(raw.startTime),
-  endTime: text(raw.endTime),
-  location: text(raw.location),
-  locationDetails: raw.locationDetails ?? '',
-  street: text(raw.street),
-  postalCode: text(raw.postalCode),
-  city: text(raw.city),
-  latitude: numOrNull(raw.latitude),
-  longitude: numOrNull(raw.longitude),
-  maxParticipants: Number(raw.maxParticipants) || 8,
-  costBasis: text(raw.costBasis),
-  isPublished: raw.isPublished === true,
-  imageUrl: text(raw.imageUrl) || null,
-});
-
 export const events = {
   saveEvent: defineAction({
-    input: eventSchema,
-    handler: async (raw, context) => {
+    accept: 'form',
+    input: eventInputSchema.extend({ id: z.string().optional() }),
+    handler: async ({ id, ...input }, context) => {
       await requireAdmin(context);
-      const input = toEventInput(raw);
 
-      if (!input.title) throw new ActionError({ code: 'BAD_REQUEST', message: 'Titel ist erforderlich.' });
-
-      if (!input.eventDate) throw new ActionError({ code: 'BAD_REQUEST', message: 'Datum ist erforderlich.' });
-
-      if (raw.id) {
-        const event = await updateEvent(raw.id, input);
+      if (id) {
+        const event = await updateEvent(id, input);
 
         if (!event) throw new ActionError({ code: 'NOT_FOUND', message: 'Veranstaltung nicht gefunden.' });
 

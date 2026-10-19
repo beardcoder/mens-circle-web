@@ -25,8 +25,8 @@ const isPrivatePath = (pathname: string): boolean =>
 export const cacheControlForRoute = (pathname: string): string => (isPrivatePath(pathname) ? NO_STORE : REVALIDATE);
 
 const UNHASHED_ASSET = /\.(?:png|jpe?g|gif|svg|ico|webp|avif|woff2?)$/;
-/** Sitemaps, llms.txt and the per-page Markdown, regenerated on every build. */
-const GENERATED = /^\/(?:sitemap[^/]*\.xml|llms(?:-full)?\.txt)$|\.md$/;
+/** Sitemaps and llms.txt, regenerated on every build. */
+const GENERATED = /^\/(?:sitemap[^/]*\.xml|llms\.txt)$/;
 
 /** `null` keeps the adapter's default: hashed assets stay immutable, HTML keeps what the page set. */
 export function cacheControlForFile(pathname: string, assetsPrefix: string): string | null {

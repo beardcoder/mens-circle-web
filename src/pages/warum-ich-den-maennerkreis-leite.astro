@@ -1,10 +1,14 @@
 ---
-import { getEntry } from 'astro:content';
-
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import { canonicalUrl } from '@lib/canonical';
 
-import PageContent from '../components/PageContent.astro';
+import photo from '../assets/images/markus-sommer.jpg';
+import Cta from '../components/blocks/Cta.astro';
+import Faq from '../components/blocks/Faq.astro';
+import PageHero from '../components/blocks/PageHero.astro';
+import TextSection from '../components/blocks/TextSection.astro';
+import ValueItems from '../components/blocks/ValueItems.astro';
+import page from '../content/warum-ich-den-maennerkreis-leite.json';
 import Layout from '../layouts/Layout.astro';
 
 // Prerendered: content only, no live data.
@@ -12,11 +16,7 @@ export const prerender = true;
 
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
-const page = await getEntry('pages', 'warum-ich-den-maennerkreis-leite');
-
-if (!page) throw new Error('src/content/warum-ich-den-maennerkreis-leite.json is missing');
-
-const { meta, blocks } = page.data;
+const { meta, faq } = page;
 
 // Strip inline HTML from titles/answers for schema text.
 const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
@@ -24,16 +24,14 @@ const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 
-// Build per-page structured data from the content blocks.
+// Structured data uses the same copy as the visible sections.
 const schemas: Record<string, unknown>[] = [];
 
-const faq = blocks.find((b) => b.type === 'faq');
-
-if (faq?.data?.items?.length) {
+if (faq.items.length) {
   schemas.push({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faq.data.items
+    mainEntity: faq.items
       .filter((i) => i.question && i.answer)
       .map((i) => ({
         '@type': 'Question',
@@ -93,6 +91,12 @@ const OG_IMAGE = { width: 1200, height: 630 };
   modifiedTime={meta.dateModified}
   schemas={schemas}
 >
-  {/* One reading column; the page closes on its one invitation (the `cta` block). */}
-  <PageContent blocks={blocks} />
+  <PageHero data={{ ...page.page_hero, image: photo }} />
+  <TextSection data={page.why} />
+  <TextSection data={page.hesitation} />
+  <ValueItems data={page.value_items} />
+  <TextSection data={page.expectations} />
+  <TextSection data={page.invitation} />
+  <Faq data={page.faq} />
+  <Cta data={page.cta} />
 </Layout>
