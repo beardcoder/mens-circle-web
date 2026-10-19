@@ -153,14 +153,7 @@ const socialDetails = next
   {/* The dates are what this page is for; the notification stands beside them, smaller. */}
   <EventList status={upcoming.status} events={upcoming.events} />
 
-  <Faq
-    data={{
-      anchor: 'fragen-zum-termin',
-      eyebrow: 'Vor dem Termin',
-      title: 'Fragen zu Termin und Anmeldung',
-      items: faqItems,
-    }}
-  />
+  <Faq anchor="fragen-zum-termin" eyebrow="Vor dem Termin" title="Fragen zu Termin und Anmeldung" items={faqItems} />
 
   <Section ground="alt" space="band" labelledby="mehr-title">
     <Split>

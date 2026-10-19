@@ -4,19 +4,17 @@ import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
 interface Step {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
 }
 
 interface Props {
-  data: {
-    anchor?: string;
-    eyebrow?: string;
-    title?: string;
-    subtitle?: string;
-    steps?: Step[];
-    close?: string;
-  };
+  anchor: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  steps: Step[];
+  close: string;
 }
 
 /**
@@ -25,13 +23,11 @@ interface Props {
  * small number, its title, its description.
  */
 
-const { data } = Astro.props;
-const anchor = data.anchor ?? 'reise';
-const steps = (data.steps ?? []).slice(0, 4);
+const { anchor, eyebrow, title, subtitle, steps, close } = Astro.props;
 ---
 
 <Section id={anchor} labelledby="ablauf-title">
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="ablauf-title" lead={data.subtitle} />
+  <SectionHead eyebrow={eyebrow} title={title} titleId="ablauf-title" lead={subtitle} />
 
   {steps.length > 0 && (
     <ol role="list" class="mt-group grid gap-x-grid gap-y-8 md:grid-cols-2 lg:grid-cols-4">
@@ -48,5 +44,5 @@ const steps = (data.steps ?? []).slice(0, 4);
     </ol>
   )}
 
-  {data.close && <Prose html={data.close} class="mt-group" />}
+  {close && <Prose html={close} class="mt-group" />}
 </Section>

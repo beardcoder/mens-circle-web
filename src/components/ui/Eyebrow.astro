@@ -3,14 +3,12 @@ import { label } from '@lib/ui';
 
 /** A short section label above a title: small spaced capitals in the secondary text colour, no ornament. */
 interface Props {
-  as?: 'p' | 'span' | 'h2';
-  id?: string;
   class?: string;
 }
 
-const { as: Tag = 'p', id, class: className } = Astro.props;
+const { class: className }: Props = Astro.props;
 ---
 
-<Tag id={id} class:list={[label, className]}>
+<p class:list={[label, className]}>
   <slot />
-</Tag>
+</p>

@@ -4,17 +4,16 @@ import Section from '../ui/Section.astro';
 import TextLink from '../ui/TextLink.astro';
 
 interface Props {
-  data: {
-    anchor?: string;
-    eyebrow?: string;
-    /** The statement, one line each; the second in the italic accent. */
-    lines?: string[];
-    text?: string;
-    linkLabel?: string;
-    linkUrl?: string;
-    /** A short line beside the breathing circle. */
-    breathGuide?: string;
-  };
+  anchor: string;
+  eyebrow: string;
+  /** The statement, one line each;
+  the second in the italic accent. */
+  lines: string[];
+  text: string;
+  linkLabel: string;
+  linkUrl: string;
+  /** A short line beside the breathing circle. */
+  breathGuide: string;
 }
 
 /**
@@ -25,29 +24,27 @@ interface Props {
  * theme.css). Under reduced motion the circle rests and the timed guide goes.
  */
 
-const { data } = Astro.props;
-const anchor = data.anchor ?? 'haltung';
-const lines = data.lines ?? [];
+const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.props;
 ---
 
 <Section id={anchor} space="none" labelledby="statement-title" class="pb-section">
   <div class="reveal surface-alt grid items-center gap-x-grid gap-y-8 p-6 sm:p-10 lg:grid-cols-12 lg:p-12">
     <div class="grid justify-items-start lg:col-span-7">
-      {data.eyebrow && <Eyebrow class="mb-3">{data.eyebrow}</Eyebrow>}
+      {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
       <h2 id="statement-title" class="text-section text-fg">
         {lines.map((line, i) =>
           i > 0 ? <em class="block text-accent">{line}</em> : <span class="block">{line}</span>,
         )}
       </h2>
-      {data.text && <p class="mt-6 max-w-measure text-md text-fg-soft">{data.text}</p>}
-      {data.linkLabel && data.linkUrl && (
-        <TextLink href={data.linkUrl} class="mt-4">
-          {data.linkLabel}
+      {text && <p class="mt-6 max-w-measure text-md text-fg-soft">{text}</p>}
+      {linkLabel && linkUrl && (
+        <TextLink href={linkUrl} class="mt-4">
+          {linkLabel}
         </TextLink>
       )}
     </div>
 
-    {data.breathGuide && (
+    {breathGuide && (
       <div class="flex items-center gap-6 lg:col-span-4 lg:col-start-9 lg:flex-col lg:text-center">
         <span class="relative grid size-28 shrink-0 place-items-center lg:size-44" aria-hidden="true">
           <span class="absolute inset-0 animate-breathe rounded-full border border-fill/50 [--alpha:1] [--rest:0.62]"></span>
@@ -55,7 +52,7 @@ const lines = data.lines ?? [];
           <span class="absolute inset-[30%] animate-breathe rounded-full bg-fill/15 animate-delay-[300ms] [--alpha:1] [--rest:0.5]"></span>
           <span class="size-2 rounded-full bg-fill"></span>
         </span>
-        <p class="font-serif text-xl text-fg motion-reduce:hidden">{data.breathGuide}</p>
+        <p class="font-serif text-xl text-fg motion-reduce:hidden">{breathGuide}</p>
       </div>
     )}
   </div>

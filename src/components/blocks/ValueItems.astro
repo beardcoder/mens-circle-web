@@ -3,18 +3,16 @@ import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
 interface Item {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
 }
 
 interface Props {
-  data: {
-    anchor?: string;
-    eyebrow?: string;
-    title?: string;
-    intro?: string;
-    items?: Item[];
-  };
+  anchor: string;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  items: Item[];
 }
 
 /**
@@ -23,21 +21,21 @@ interface Props {
  * thin lines, like the agreements on the home page.
  */
 
-const { data } = Astro.props;
+const { anchor, eyebrow, title, intro, items } = Astro.props;
 
-const items = (data.items ?? []).map((item) => {
-  const [keep, ...rest] = (item.title ?? '').split(' statt ');
+const values = items.map((item) => {
+  const [keep, ...rest] = item.title.split(' statt ');
 
   return { ...item, keep, instead: rest.join(' statt ') };
 });
 ---
 
-<Section id={data.anchor} space="band">
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleHtml lead={data.intro} size="sub" />
+<Section id={anchor} space="band">
+  <SectionHead eyebrow={eyebrow} title={title} lead={intro} size="sub" />
 
   {items.length > 0 && (
     <ul role="list" class="mt-8 grid gap-x-grid gap-y-6 md:grid-cols-2">
-      {items.map((item) => (
+      {values.map((item) => (
         <li class="reveal grid content-start gap-2">
           <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
           <h3 class="font-sans text-xl font-semibold text-fg">

@@ -1,7 +1,11 @@
 ---
-import HomeEventStatus from '../HomeEventStatus.astro';
+import { type DateStatus, nextDateView } from '@lib/event-status';
+
+import EventSummary from '../event/EventSummary.astro';
+import Button from '../ui/Button.astro';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
+import TextLink from '../ui/TextLink.astro';
 
 /**
  * The home opening on the dark focus ground: the statement (its phrase in the
@@ -13,22 +17,21 @@ import Eyebrow from '../ui/Eyebrow.astro';
  */
 
 interface Props {
-  data: {
-    kicker?: string;
-    /** The central sentence. */
-    title?: string;
-    /** A phrase inside `title` set in the italic accent. */
-    titleEmphasis?: string;
-    lede?: string;
-    secondaryLabel?: string;
-    secondaryLink?: string;
-  };
+  state: DateStatus;
+  kicker: string;
+  /** The central sentence. */
+  title: string;
+  /** A phrase inside `title` set in the italic accent. */
+  titleEmphasis: string;
+  lede: string;
+  secondaryLabel: string;
+  secondaryLink: string;
 }
 
-const { data } = Astro.props;
+const { state, kicker, title, titleEmphasis, lede, secondaryLabel, secondaryLink } = Astro.props;
 
-const title = data.title ?? '';
-const emphasis = data.titleEmphasis && title.includes(data.titleEmphasis) ? data.titleEmphasis : '';
+const view = nextDateView(state, 'overview');
+const emphasis = titleEmphasis && title.includes(titleEmphasis) ? titleEmphasis : '';
 const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
 ---
 
@@ -49,7 +52,7 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
 
   <Container class="relative grid gap-x-grid gap-y-8 lg:grid-cols-12">
     <div class="grid min-w-0 justify-items-start lg:col-span-7 lg:row-start-1">
-      {data.kicker && <Eyebrow class="mb-4 entrance:animate-rise">{data.kicker}</Eyebrow>}
+      {kicker && <Eyebrow class="mb-4 entrance:animate-rise">{kicker}</Eyebrow>}
       <h1
         id="hero-title"
         class="max-w-[8.4em] text-hero text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-[90ms]"
@@ -58,13 +61,31 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
         {emphasis && <em class="text-accent">{emphasis}</em>}
         {after}
       </h1>
-      {data.lede && (
+      {lede && (
         <p class="mt-6 max-w-measure text-lg text-fg-muted entrance:animate-rise entrance:animate-delay-[180ms]">
-          {data.lede}
+          {lede}
         </p>
       )}
     </div>
 
-    <HomeEventStatus placement="hero" secondaryLabel={data.secondaryLabel} secondaryLink={data.secondaryLink} />
+    <div class="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:self-end">
+      <EventSummary view={{ ...view, action: null }} />
+    </div>
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 lg:col-span-7 lg:row-start-2">
+      {view.action && (
+        <Button
+          href={view.action.href}
+          size="lg"
+          decorate
+          class="max-sm:w-full"
+          data-umami-event="cta-click"
+          data-umami-event-location="home-hero"
+          data-umami-event-state={view.state}
+        >
+          {view.action.label}
+        </Button>
+      )}
+      <TextLink href={secondaryLink}>{secondaryLabel}</TextLink>
+    </div>
   </Container>
 </section>

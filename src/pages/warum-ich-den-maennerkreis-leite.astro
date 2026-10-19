@@ -3,11 +3,14 @@ import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
 import { canonicalUrl } from '@lib/canonical';
 
 import photo from '../assets/images/markus-sommer.jpg';
-import Cta from '../components/blocks/Cta.astro';
 import Faq from '../components/blocks/Faq.astro';
-import PageHero from '../components/blocks/PageHero.astro';
 import TextSection from '../components/blocks/TextSection.astro';
 import ValueItems from '../components/blocks/ValueItems.astro';
+import CropPicture from '../components/CropPicture.astro';
+import PageIntro from '../components/PageIntro.astro';
+import Button from '../components/ui/Button.astro';
+import Section from '../components/ui/Section.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
 import page from '../content/warum-ich-den-maennerkreis-leite.json';
 import Layout from '../layouts/Layout.astro';
 
@@ -16,7 +19,7 @@ export const prerender = true;
 
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
-const { meta, faq } = page;
+const { meta, faq, page_hero: opening, cta } = page;
 
 // Strip inline HTML from titles/answers for schema text.
 const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
@@ -91,12 +94,50 @@ const OG_IMAGE = { width: 1200, height: 630 };
   modifiedTime={meta.dateModified}
   schemas={schemas}
 >
-  <PageHero data={{ ...page.page_hero, image: photo }} />
-  <TextSection data={page.why} />
-  <TextSection data={page.hesitation} />
-  <ValueItems data={page.value_items} />
-  <TextSection data={page.expectations} />
-  <TextSection data={page.invitation} />
-  <Faq data={page.faq} />
-  <Cta data={page.cta} />
+  <PageIntro id={opening.anchor} eyebrow={opening.eyebrow} title={opening.title}>
+    <Fragment slot="lead">{opening.lead}</Fragment>
+    <figure slot="media">
+      <CropPicture
+        src={photo}
+        class="block aspect-4/3 w-full object-cover lg:aspect-4/5"
+        breakpoint="64em"
+        narrow={{
+          ratio: 4 / 3,
+          widths: [400, 640, 800, 1024],
+          sizes: '(min-width: 48rem) calc(100vw - 4rem), calc(100vw - 2.5rem)',
+          position: 'center',
+        }}
+        wide={{
+          ratio: 4 / 5,
+          widths: [300, 400, 600, 800],
+          sizes: '(min-width: 80rem) 23rem, calc(33.33vw - 2.67rem)',
+          position: 'left',
+        }}
+        loading="eager"
+        fetchpriority="high"
+        alt={opening.imageAlt}
+      />
+      <figcaption class="mt-3 text-sm text-fg-muted">{opening.imageCaption}</figcaption>
+    </figure>
+  </PageIntro>
+  <TextSection {...page.why} />
+  <TextSection {...page.hesitation} />
+  <ValueItems {...page.value_items} />
+  <TextSection {...page.expectations} />
+  <TextSection {...page.invitation} />
+  <Faq {...page.faq} />
+  <Section ground="alt" space="band" innerClass="grid items-end gap-x-grid gap-y-6 py-4 lg:grid-cols-12">
+    <SectionHead eyebrow={cta.eyebrow} title={cta.title} lead={cta.text} size="sub" class="lg:col-span-8" />
+    <p class="flex flex-wrap items-center gap-x-6 gap-y-2 lg:col-span-4 lg:justify-end">
+      <Button
+        href={cta.buttonLink}
+        size="lg"
+        data-umami-event="cta-click"
+        data-umami-event-location="cta-block"
+        data-umami-event-text={cta.buttonText}
+      >
+        {cta.buttonText}
+      </Button>
+    </p>
+  </Section>
 </Layout>

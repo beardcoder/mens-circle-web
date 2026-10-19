@@ -11,13 +11,11 @@ import Eyebrow from './ui/Eyebrow.astro';
 interface Props {
   eyebrow?: string;
   title: string;
-  /** Trusted HTML from the content files. */
-  titleHtml?: boolean;
   id?: string;
   titleId?: string;
 }
 
-const { eyebrow, title, titleHtml = false, id, titleId } = Astro.props;
+const { eyebrow, title, id, titleId } = Astro.props;
 
 const titleClass =
   'max-w-[12em] text-page text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-[90ms]';
@@ -31,13 +29,9 @@ const hasMedia = Astro.slots.has('media');
   <Container class:list={['grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
     <div class:list={['grid justify-items-start', hasMedia && 'lg:col-span-7']}>
       {eyebrow && <Eyebrow class="mb-3 entrance:animate-rise">{eyebrow}</Eyebrow>}
-      {titleHtml ? (
-        <h1 id={titleId} class={titleClass} set:html={title} />
-      ) : (
-        <h1 id={titleId} class={titleClass}>
-          {title}
-        </h1>
-      )}
+      <h1 id={titleId} class={titleClass}>
+        {title}
+      </h1>
       {hasLead && (
         <div class="mt-6 max-w-measure text-lg text-fg-muted entrance:animate-rise entrance:animate-delay-[180ms]">
           <slot name="lead" />
