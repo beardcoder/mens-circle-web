@@ -15,17 +15,18 @@ import TextLink from '../ui/TextLink.astro';
  */
 
 interface Props {
-  data?: { anchor?: string; eyebrow?: string; title?: string };
+  anchor: string;
+  eyebrow: string;
+  title: string;
 }
 
 /** A voice this short may stand out at the quote size. */
 const SHORT = 160;
 
-const { data } = Astro.props;
+const { anchor, eyebrow, title } = Astro.props;
 const result = await fetchTestimonialsState();
 
 const { testimonials } = result;
-const anchor = data?.anchor ?? 'stimmen';
 const [first, ...others] = testimonials;
 const featured = first && first.quote.length <= SHORT ? first : null;
 const rest = featured ? others : testimonials;
@@ -39,11 +40,7 @@ const note =
 ---
 
 <Section id={anchor} labelledby="testimonials-title" space={note ? 'band' : 'default'}>
-  <SectionHead
-    eyebrow={data?.eyebrow ?? 'Aus dem Kreis'}
-    title={data?.title ?? 'Was Teilnehmer geschrieben haben'}
-    titleId="testimonials-title"
-  />
+  <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" />
 
   {note && <p class="mt-6 max-w-measure text-md text-fg-muted">{note}</p>}
 

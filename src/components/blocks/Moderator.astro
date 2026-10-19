@@ -8,17 +8,15 @@ import SectionHead from '../ui/SectionHead.astro';
 import TextLink from '../ui/TextLink.astro';
 
 interface Props {
-  data: {
-    anchor?: string;
-    eyebrow?: string;
-    name?: string;
-    quote?: string;
-    bio?: string;
-    image?: ImageMetadata;
-    imageAlt?: string;
-    linkLabel?: string;
-    linkUrl?: string;
-  };
+  anchor: string;
+  eyebrow: string;
+  name: string;
+  quote: string;
+  bio: string;
+  image: ImageMetadata;
+  imageAlt: string;
+  linkLabel: string;
+  linkUrl: string;
 }
 
 /**
@@ -28,9 +26,7 @@ interface Props {
  * below the size of the section's title.
  */
 
-const { data } = Astro.props;
-const anchor = data.anchor ?? 'moderator';
-const photo = data.image;
+const { anchor, eyebrow, name, quote, bio, image, imageAlt, linkLabel, linkUrl } = Astro.props;
 
 // The photo's column: the container (gutters 20 / 32 / 48px) below `lg`; from it,
 // 5 of 12 columns, i.e. 5/12 of the content less 7/12 of a grid gap.
@@ -40,36 +36,34 @@ const WIDE_SIZES = '(min-width: 80rem) 29.5rem, calc(41.67vw - 2.83rem)';
 
 <Section id={anchor} labelledby="person-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
   <SectionHead
-    eyebrow={data.eyebrow}
-    title={data.name}
+    eyebrow={eyebrow}
+    title={name}
     titleId="person-title"
     class="lg:col-span-7 lg:col-start-6 lg:row-start-1"
   />
 
-  {photo && (
-    <figure class="aspect-4/3 overflow-clip lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-4/5 lg:self-start [&_picture]:block [&_picture]:h-full">
-      <CropPicture
-        src={photo}
-        class="block size-full object-cover"
-        breakpoint="64em"
-        narrow={{ ratio: 4 / 3, widths: [400, 640, 800, 1024], sizes: NARROW_SIZES, position: 'center' }}
-        wide={{ ratio: 4 / 5, widths: [400, 600, 800], sizes: WIDE_SIZES, position: 'left' }}
-        loading="lazy"
-        alt={data.imageAlt ?? ''}
-      />
-    </figure>
-  )}
+  <figure class="aspect-4/3 overflow-clip lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-4/5 lg:self-start [&_picture]:block [&_picture]:h-full">
+    <CropPicture
+      src={image}
+      class="block size-full object-cover"
+      breakpoint="64em"
+      narrow={{ ratio: 4 / 3, widths: [400, 640, 800, 1024], sizes: NARROW_SIZES, position: 'center' }}
+      wide={{ ratio: 4 / 5, widths: [400, 600, 800], sizes: WIDE_SIZES, position: 'left' }}
+      loading="lazy"
+      alt={imageAlt}
+    />
+  </figure>
 
   <div class="grid content-start justify-items-start gap-6 lg:col-span-7 lg:col-start-6 lg:row-start-2">
-    {data.quote && (
+    {quote && (
       <blockquote class="max-w-measure border-l-2 border-line-strong pl-5 font-serif text-quote text-fg">
-        <p>„{data.quote}“</p>
+        <p>„{quote}“</p>
       </blockquote>
     )}
-    {data.bio && <Prose html={data.bio} />}
-    {data.linkLabel && data.linkUrl && (
-      <TextLink href={data.linkUrl} data-astro-prefetch="hover">
-        {data.linkLabel}
+    {bio && <Prose html={bio} />}
+    {linkLabel && linkUrl && (
+      <TextLink href={linkUrl} data-astro-prefetch="hover">
+        {linkLabel}
       </TextLink>
     )}
   </div>

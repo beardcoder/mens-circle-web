@@ -1,7 +1,6 @@
 ---
 import site from '@data/site.json';
-import { splitFee, summarizeNextEvent } from '@lib/event-status';
-import { fetchNextEventState } from '@lib/server/events';
+import { type NextEventSummary, splitFee } from '@lib/event-status';
 import { label } from '@lib/ui';
 
 import Section from '../ui/Section.astro';
@@ -15,11 +14,12 @@ import Section from '../ui/Section.astro';
  */
 
 interface Props {
-  data?: { anchor?: string; eyebrow?: string };
+  next: NextEventSummary | null;
+  anchor: string;
+  eyebrow: string;
 }
 
-const { data = {} } = Astro.props;
-const next = summarizeNextEvent((await fetchNextEventState()).event);
+const { anchor, eyebrow, next } = Astro.props;
 
 const fee = splitFee(next?.costBasis);
 
@@ -35,13 +35,11 @@ const facts = [
   },
   { label: 'Beitrag', value: fee.main, sub: fee.note || 'Du gibst, was für dich machbar ist' },
 ];
-
-const anchor = data.anchor ?? 'praktisches';
 ---
 
 <Section id={anchor} ground="alt" space="band" labelledby="praktisches-title">
   <h2 id="praktisches-title" class:list={[label, 'mb-6']}>
-    {data.eyebrow ?? 'Auf einen Blick'}
+    {eyebrow}
   </h2>
   <dl class="grid gap-x-grid gap-y-6 md:grid-cols-2 lg:grid-cols-4">
     {facts.map((fact) => (

@@ -69,13 +69,12 @@ replica on the same SQLite file is not supported.
 
 **Rendering.** Home and the event pages render on demand; the legal pages, the
 personal page and the testimonial form are prerendered. Home has no server islands:
-the next date (`HomeEventStatus` ×2), `Facts` and `Testimonials` read SQLite while the
-page renders, so the first HTML is final and nothing is swapped after load (an island's
-fallback showed other text first). The hero's `HomeEventStatus` renders two items of
-the hero's grid (the summary and the action under the statement), so the action can
-name the state. `lib/event-status.ts` has three states; a failed read
-(`unavailable`) must never render as "no date planned", and the reads catch their
-errors, so a database failure never fails the page.
+`src/pages/index.astro` reads the next date once and passes the same state to
+`Hero`, `Facts` and `Dates`. Those components only render; `Testimonials` reads its
+own moderated entries. The first HTML is final and nothing is swapped after load.
+The hero owns its summary and action layout. `lib/event-status.ts` has three states;
+a failed read (`unavailable`) must never render as "no date planned". The reads
+catch their errors, so a database failure never fails the page.
 
 **Caching.** `lib/cache-policy.ts` is the one table (middleware + the adapter's `staticHeaders`);
 routes with their own header are left alone. Home takes the revalidate default, so the
@@ -209,7 +208,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 - Home and personal-page copy live in `src/content/*.json` as named sections,
   imported directly by their Astro pages. The pages compose the section components
-  explicitly; TypeScript checks the JSON against component props. Photos are normal
+  explicitly, spreading each section into flat component props; TypeScript checks
+  the JSON against those props. Photos are normal
   asset imports in the pages. Change section order in the page, copy in the JSON.
   Only legal pages use a content collection (`src/content/legal/*.json`, one URL per
   file, validated by `src/content.config.ts`). `src/data/*.json` is shared site config.

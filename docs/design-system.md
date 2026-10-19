@@ -136,7 +136,7 @@ thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
 | ------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `Container`                                       | The 1200px width and the side margins                                                           |
 | `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `dark` ground, `default` / `band` space                            |
-| `SectionHead` (`size`, `align`)                   | Label, title (`section` / `page` / `sub`), lead                                                 |
+| `SectionHead` (`size`)                            | Label, section title (`section` / `sub`), lead                                                  |
 | `PageIntro` (`lead`, `media` slots)               | The compact light opening of every sub-page, a photo beside it where there is one               |
 | `Eyebrow`                                         | A short section label (`label` recipe)                                                          |
 | `Button` (`variant`, `size`, `block`, `decorate`) | Fully round: `primary` (one per module), `secondary`, `ghost`, `danger`; 48 / 52px high         |
@@ -181,7 +181,7 @@ that ends on one sets it itself.
   paragraphs and lists, `plainTextToHtml`) beside the registration card; the map;
   where next. A past date offers no registration.
 - **Personal page.** `PageIntro` with the photo, one reading column, the positions
-  and the FAQ in the same components, one closing invitation (`Cta`, a compact `alt`
+  and the FAQ in the same components, one closing invitation (a compact `alt`
   band).
 - **Testimonial form.** `PageIntro`, then the notes and the form in one column of
   ~672px (`max-w-form`).

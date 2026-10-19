@@ -1,5 +1,7 @@
 ---
+import { dateStatus } from '@lib/event-status';
 import { eventSeriesSchema } from '@lib/series-schema';
+import { fetchNextEventState } from '@lib/server/events';
 
 import photo from '../assets/images/markus-sommer.jpg';
 import Dates from '../components/blocks/Dates.astro';
@@ -20,6 +22,8 @@ import Layout from '../layouts/Layout.astro';
 // keeps the seat count current.
 
 const { meta, faq, journey_steps: evening } = home;
+const result = await fetchNextEventState();
+const state = dateStatus(result.status, result.event);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 
@@ -63,14 +67,14 @@ schemas.push(eventSeriesSchema(siteUrl));
 ---
 
 <Layout title={meta.title} description={meta.description} schemas={schemas}>
-  <Hero data={home.hero} />
-  <Facts data={home.facts} />
-  <Intro data={home.intro} />
-  <JourneySteps data={home.journey_steps} />
-  <Statement data={home.statement} />
-  <Moderator data={{ ...home.moderator, image: photo }} />
-  <Frame data={home.frame} />
-  <Testimonials data={home.testimonials} />
-  <Faq data={home.faq} />
-  <Dates data={home.dates} />
+  <Hero {...home.hero} state={state} />
+  <Facts {...home.facts} next={state.next} />
+  <Intro {...home.intro} />
+  <JourneySteps {...home.journey_steps} />
+  <Statement {...home.statement} />
+  <Moderator {...home.moderator} image={photo} />
+  <Frame {...home.frame} />
+  <Testimonials {...home.testimonials} />
+  <Faq {...home.faq} />
+  <Dates {...home.dates} state={state} />
 </Layout>
