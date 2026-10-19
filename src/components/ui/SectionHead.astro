@@ -1,70 +1,32 @@
 ---
 import Eyebrow from './Eyebrow.astro';
 
-/**
- * Label, title and optional lead of a block, stacked above its content: 12px from
- * label to title, 24px from title to lead. Titles are one colour; `size` names
- * the role (`section` a section's title, `page` a sub-page's title, `sub` a
- * subheading). `center` only for a short invitation. It rises into view as it
- * scrolls in (`reveal`).
- */
-
-type Size = 'section' | 'page' | 'sub';
-
+/** A section heading, with an optional label and lead. Page titles use PageIntro. */
 interface Props {
   eyebrow?: string;
   title?: string;
-  /** The title holds trusted HTML from the content files. */
-  titleHtml?: boolean;
   titleId?: string;
   lead?: string;
   /** The lead holds trusted HTML from the content files (e.g. a link). */
   leadHtml?: boolean;
-  as?: 'h1' | 'h2' | 'h3';
-  size?: Size;
-  align?: 'start' | 'center';
+  size?: 'section' | 'sub';
   class?: string;
 }
 
-const SIZES: Record<Size, string> = {
-  section: 'text-section',
-  page: 'text-page',
-  sub: 'text-sub',
-};
+const { eyebrow, title, titleId, lead, leadHtml = false, size = 'section', class: className }: Props = Astro.props;
 
-const {
-  eyebrow,
-  title,
-  titleHtml = false,
-  titleId,
-  lead,
-  leadHtml = false,
-  as: Heading = 'h2',
-  size = 'section',
-  align = 'start',
-  class: className,
-}: Props = Astro.props;
+const leadClass =
+  'mt-6 max-w-measure text-lg text-fg-muted [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong';
 
-const center = align === 'center';
-
-const leadClass = [
-  'mt-6 max-w-measure text-lg text-fg-muted [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong',
-  center && 'mx-auto',
-];
-
-const titleClass = ['max-w-[14.4em] text-fg wrap-anywhere hyphens-auto', SIZES[size], center && 'mx-auto'];
+const titleClass = ['max-w-[14.4em] text-fg wrap-anywhere hyphens-auto', size === 'sub' ? 'text-sub' : 'text-section'];
 ---
 
-<div class:list={['reveal grid justify-items-start', center && 'justify-items-center text-center', className]}>
+<div class:list={['reveal grid justify-items-start', className]}>
   {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
-  {title &&
-    (titleHtml ? (
-      <Heading id={titleId} class:list={titleClass} set:html={title} />
-    ) : (
-      <Heading id={titleId} class:list={titleClass}>
-        {title}
-      </Heading>
-    ))}
+  {title && (
+    <h2 id={titleId} class:list={titleClass}>
+      {title}
+    </h2>
+  )}
   {lead && (leadHtml ? <p class:list={leadClass} set:html={lead} /> : <p class:list={leadClass}>{lead}</p>)}
-  <slot />
 </div>

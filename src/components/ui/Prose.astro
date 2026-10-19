@@ -5,7 +5,7 @@
  * descendant variants, since the HTML arrives as a string.
  */
 interface Props {
-  html?: string;
+  html: string;
   /** `measure` a line of running text (~62 characters); `column` the wider reading column of the legal pages. */
   width?: 'measure' | 'column';
   class?: string;
@@ -29,10 +29,4 @@ const PROSE = [
 ];
 ---
 
-{html ? (
-  <div class:list={[PROSE, className]} set:html={html} />
-) : (
-  <div class:list={[PROSE, className]}>
-    <slot />
-  </div>
-)}
+<div class:list={[PROSE, className]} set:html={html} />

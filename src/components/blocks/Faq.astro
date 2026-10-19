@@ -8,19 +8,16 @@ import SectionHead from '../ui/SectionHead.astro';
 import Split from '../ui/Split.astro';
 
 interface FaqItem {
-  question?: string;
-  answer?: string;
+  question: string;
+  answer: string;
 }
 
 interface Props {
-  data: {
-    anchor?: string;
-    eyebrow?: string;
-    title?: string;
-    intro?: string;
-    items?: FaqItem[];
-  };
-  ground?: 'default' | 'alt';
+  anchor: string;
+  eyebrow: string;
+  title: string;
+  intro?: string;
+  items: FaqItem[];
 }
 
 /**
@@ -28,23 +25,13 @@ interface Props {
  * intro, the way to ask what is not there), the questions as one Accordion.
  */
 
-const { data, ground = 'default' } = Astro.props;
-const anchor = data.anchor ?? 'faq';
-const items = data.items ?? [];
+const { anchor, eyebrow, title, intro, items } = Astro.props;
 ---
 
-<Section id={anchor} ground={ground} labelledby={`${anchor}-title`}>
+<Section id={anchor} labelledby={`${anchor}-title`}>
   <Split>
     <div slot="head" class="grid justify-items-start gap-6">
-      <SectionHead
-        eyebrow={data.eyebrow}
-        title={data.title}
-        titleHtml={/<[a-z]/i.test(data.title ?? '')}
-        titleId={`${anchor}-title`}
-        lead={data.intro}
-        leadHtml
-        size="sub"
-      />
+      <SectionHead eyebrow={eyebrow} title={title} titleId={`${anchor}-title`} lead={intro} leadHtml size="sub" />
       {site.contactEmail && (
         <p class="max-w-measure text-base text-fg-muted">
           Deine Frage ist nicht dabei? Schreib mir an{' '}

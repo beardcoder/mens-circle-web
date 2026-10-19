@@ -23,7 +23,7 @@ export interface NextEventSummary {
   maxParticipants: number;
 }
 
-export const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
+const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
   event && {
     slug: event.slug,
     dateLabel: [formatWeekdayDE(event.event_date), formatDayMonthYearDE(event.event_date)].filter(Boolean).join(', '),

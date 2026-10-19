@@ -4,12 +4,10 @@ import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
-  data: {
-    anchor?: string;
-    eyebrow?: string;
-    title?: string;
-    content?: string;
-  };
+  anchor?: string;
+  eyebrow: string;
+  title: string;
+  content: string;
 }
 
 /**
@@ -19,20 +17,20 @@ interface Props {
  * space is the band's, not a section's.
  */
 
-const { data } = Astro.props;
+const { anchor, eyebrow, title, content } = Astro.props;
 
-const slug = (data.title ?? '')
+const slug = title
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '');
 
-const anchor = data.anchor ?? slug;
-const hasHead = Boolean(data.eyebrow || data.title);
+const sectionId = anchor ?? slug;
+const hasHead = Boolean(eyebrow || title);
 ---
 
-<Section id={anchor || undefined} space="band">
+<Section id={sectionId || undefined} space="band">
   <div class="grid max-w-column gap-6">
-    {hasHead && <SectionHead eyebrow={data.eyebrow} title={data.title} size="sub" />}
-    {data.content && <Prose html={data.content} />}
+    {hasHead && <SectionHead eyebrow={eyebrow} title={title} size="sub" />}
+    {content && <Prose html={content} />}
   </div>
 </Section>

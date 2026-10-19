@@ -1,21 +1,21 @@
 ---
+import { type DateStatus, nextDateView } from '@lib/event-status';
 import { link } from '@lib/ui';
 
 import site from '../../data/site.json';
+import EventSummary from '../event/EventSummary.astro';
 import NewsletterForm from '../forms/NewsletterForm.astro';
-import HomeEventStatus from '../HomeEventStatus.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
-  data: {
-    anchor?: string;
-    eyebrow?: string;
-    displayLines?: string[];
-    lede?: string;
-    newsletterText?: string;
-    whatsappText?: string;
-  };
+  state: DateStatus;
+  anchor: string;
+  eyebrow: string;
+  displayLines: string[];
+  lede: string;
+  newsletterText: string;
+  whatsappText: string;
 }
 
 /**
@@ -25,10 +25,10 @@ interface Props {
  * dates by e-mail (`#newsletter`) and the WhatsApp group as a link.
  */
 
-const { data } = Astro.props;
-const anchor = data.anchor ?? 'termine';
+const { state, anchor, eyebrow, displayLines, lede, newsletterText, whatsappText } = Astro.props;
+const view = nextDateView(state, 'notify');
 const whatsapp = site.whatsappCommunityLink;
-const title = (data.displayLines ?? ['Dabei sein.']).join(' ');
+const title = displayLines.join(' ');
 ---
 
 <Section
@@ -37,9 +37,11 @@ const title = (data.displayLines ?? ['Dabei sein.']).join(' ');
   labelledby="termine-title"
   innerClass="grid items-center gap-x-grid gap-y-10 lg:grid-cols-12"
 >
-  <SectionHead eyebrow={data.eyebrow} title={title} titleId="termine-title" lead={data.lede} class="lg:col-span-6" />
+  <SectionHead eyebrow={eyebrow} title={title} titleId="termine-title" lead={lede} class="lg:col-span-6" />
   <div class="lg:col-span-5 lg:col-start-8">
-    <HomeEventStatus placement="dates" />
+    <div class="min-w-0">
+      <EventSummary view={view} location="home-dates" />
+    </div>
   </div>
 </Section>
 
@@ -53,14 +55,14 @@ const title = (data.displayLines ?? ['Dabei sein.']).join(' ');
     <h2 id="newsletter-title" class="text-sub text-fg">
       Termine per E-Mail erhalten
     </h2>
-    {data.newsletterText && <p class="mt-3 max-w-measure text-md text-fg-soft">{data.newsletterText}</p>}
+    {newsletterText && <p class="mt-3 max-w-measure text-md text-fg-soft">{newsletterText}</p>}
     <NewsletterForm context={{ location: 'home-dates' }} class="mt-6" />
   </div>
-  {whatsapp && data.whatsappText && (
+  {whatsapp && whatsappText && (
     <div class="border-line max-lg:border-t max-lg:pt-8 lg:col-span-4 lg:col-start-9 lg:border-l lg:pl-8">
       <h2 class="font-sans text-base font-semibold text-fg">Zwischen den Abenden</h2>
       <p class="mt-2 text-md text-fg-soft">
-        {data.whatsappText}{' '}
+        {whatsappText}{' '}
         <a
           href={whatsapp}
           target="_blank"

@@ -3,20 +3,18 @@ import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
 interface Agreement {
-  title?: string;
+  title: string;
   text?: string;
 }
 
 interface Props {
-  data: {
-    anchor?: string;
-    eyebrow?: string;
-    title?: string;
-    intro?: string;
-    agreements?: Agreement[];
-    boundaryTitle?: string;
-    boundaryText?: string;
-  };
+  anchor: string;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  agreements: Agreement[];
+  boundaryTitle: string;
+  boundaryText: string;
 }
 
 /**
@@ -25,13 +23,11 @@ interface Props {
  * not, as plain additional information under them.
  */
 
-const { data } = Astro.props;
-const anchor = data.anchor ?? 'rahmen';
-const agreements = data.agreements ?? [];
+const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props;
 ---
 
 <Section id={anchor} ground="alt" labelledby="rahmen-title">
-  <SectionHead eyebrow={data.eyebrow} title={data.title} titleId="rahmen-title" lead={data.intro} />
+  <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} />
 
   {agreements.length > 0 && (
     <ol role="list" class="mt-group grid gap-x-grid gap-y-6 md:grid-cols-2">
@@ -45,15 +41,15 @@ const agreements = data.agreements ?? [];
     </ol>
   )}
 
-  {data.boundaryText && (
+  {boundaryText && (
     <aside
       aria-labelledby="rahmen-boundary-title"
       class="reveal mt-group grid max-w-[48rem] gap-2 border-l-2 border-line-strong pl-5"
     >
       <h3 id="rahmen-boundary-title" class="font-sans text-base font-semibold text-fg">
-        {data.boundaryTitle ?? 'Gut zu wissen'}
+        {boundaryTitle}
       </h3>
-      <p class="text-md text-fg-soft">{data.boundaryText}</p>
+      <p class="text-md text-fg-soft">{boundaryText}</p>
     </aside>
   )}
 </Section>
