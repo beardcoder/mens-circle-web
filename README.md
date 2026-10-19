@@ -46,11 +46,15 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 
 ## Content
 
-- Home page copy and block order: `src/content/home.json` (content collection `pages`;
-  the schema in `src/content.config.ts` rejects unknown fields at build time)
+- Home and personal-page copy: `src/content/home.json`,
+  `src/content/warum-ich-den-maennerkreis-leite.json` (named sections, checked against
+  component props by TypeScript)
+- Section order: explicit component markup in the corresponding `src/pages/*.astro`
+- Crawler index: `src/pages/llms.txt.ts` (prerendered; no Markdown export pipeline)
 - Site settings, navigation: `src/data/site.json`, `src/data/navigation.json`
 - Legal pages: `src/content/legal/*.json` (content collection `legal`; a new file is a new URL)
 - Events, registrations, testimonials: `/admin`
+- Event form validation and defaults: `src/lib/event-input.ts`; the action accepts `FormData` directly
 - Newsletter: listmonk admin
 
 ## Email (listmonk)
