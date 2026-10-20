@@ -18,7 +18,6 @@ bun run format:check   # what CI runs; CLAUDE.md and docs/ are formatted too
 bun test               # each *.fixture.ts case runs in its own Bun process
 bun run db:generate    # after editing src/lib/server/db/schema.ts
 bun run knip           # unused files, exports and dependencies
-bun run images:verify  # a running build (default :18092): live home, AVIF/WebP crops, /_image refusals
 ```
 
 Verify with `check` + `lint` + `format:check` + `test`; CI (`.github/workflows/ci.yml`)
@@ -67,18 +66,20 @@ proxy's forwarded headers. Never fix a 403 with `checkOrigin: false`.
 `claimSeat()`). Capacity is computed from `holdsASeat()` only. More than one web
 replica on the same SQLite file is not supported.
 
-**Rendering.** Home and the event pages render on demand; the legal pages, the
-personal page and the testimonial form are prerendered. Home has no server islands:
-`src/pages/index.astro` reads the next date once and passes the same state to
-`Hero`, `Facts` and `Dates`. Those components only render; `Testimonials` reads its
-own moderated entries. The first HTML is final and nothing is swapped after load.
-The hero owns its summary and action layout. `lib/event-status.ts` has three states;
-a failed read (`unavailable`) must never render as "no date planned". The reads
-catch their errors, so a database failure never fails the page.
+**Rendering.** The event pages render on demand; home, the legal pages, the personal
+page and the testimonial form are prerendered. Home's live parts are server islands
+(`server:defer`), each reading for itself: `HeroDate` (the hero's date and action),
+`Facts`, `NextDate` (beside the newsletter) and `Testimonials`. Each one's `fallback`
+slot is the same component in its `pending` state (`PENDING` from `lib/event-status.ts`,
+`pending` for `Testimonials`) and stands the same height. The islands import the server
+lib late (`readDateStatus()`, a dynamic `import()`), so a prerender never opens the
+database. `lib/event-status.ts` has three read states plus `pending`; a failed read
+(`unavailable`) must never render as "no date planned". The reads catch their errors,
+so a database failure never fails the page.
 
 **Caching.** `lib/cache-policy.ts` is the one table (middleware + the adapter's `staticHeaders`);
-routes with their own header are left alone. Home takes the revalidate default, so the
-seat count is never served stale. The prerendered pages (the legal pages,
+routes with their own header are left alone. The server islands are `no-store`, so the
+seat count is never served stale. The prerendered pages (home, the legal pages,
 `/warum-ich-den-maennerkreis-leite`, `/teile-deine-erfahrung`) use
 `PRERENDERED_CACHE_CONTROL` (`lib/cache.ts`, `s-maxage=300`). `public/sw.js` only
 retires the removed breathing app's service worker and is served `no-cache`; it can go
@@ -88,17 +89,13 @@ once old installs have updated.
 `src/pages/llms.txt.ts` prerenders a short index of the three public content pages.
 No live-site fetching, Markdown export or post-build patching is needed.
 
-**Images.** Astro's default service (Sharp, a production dependency). Photos live in
-`src/assets/images/`. `CropPicture` is Astro's art-direction recipe (`getImage()` per
-`<source>`): one crop below the breakpoint, one above, each cropped by Sharp (`fit: 'cover'`,
-`position` keyword), in AVIF then WebP, JPEG fallback. A single crop needs only
-`<Picture formats={['avif', 'webp']} />`. `sizes` follows the real column width
-(see the blocks); widths stay within the source (1024px). Prerendered pages get the
-variants at build time; the on-demand home names them as `/_image` URLs, served by
-`lib/image-endpoint.ts` (`image.endpoint`): Astro's Node endpoint (sources from disk,
-own files only) with each result kept in memory, since an AVIF takes 1–3 s. Sharp is
-external to the bundle (`vite.ssr.external`) so its native binding resolves. All
-events use `/images/og-default.png`.
+**Images.** Astro's `<Image />` straight from `astro:assets`, no wrapper component:
+`layout="constrained"` with `width`/`height` (Astro writes `srcset` and `sizes`), `position`
+for the crop, Tailwind for the box (`image.responsiveStyles` stays off). Photos live in
+`src/assets/images/` and appear on prerendered pages only, so every variant is built at
+build time; never put an `<Image />` on an on-demand page (that would generate through
+`/_image` per request). Sharp is external to the bundle (`vite.ssr.external`) so its
+native binding resolves. All events use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; the two schedules
 are direct UTC checks (reminders every 15 min, the S3 backup at

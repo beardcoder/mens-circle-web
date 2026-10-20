@@ -1,0 +1,17 @@
+---
+import { type DateStatus, nextDateView, readDateStatus } from '@lib/event-status';
+
+import EventSummary from './EventSummary.astro';
+
+/** The next date beside the e-mail notification, a server island; without `state` it reads the date. */
+
+interface Props {
+  state?: DateStatus;
+  location: string;
+}
+
+const { location } = Astro.props;
+const view = nextDateView(Astro.props.state ?? (await readDateStatus()), 'notify');
+---
+
+<EventSummary view={view} location={location} />
