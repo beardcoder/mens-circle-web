@@ -3,7 +3,10 @@ import { type DateStatus, nextDateView, readDateStatus } from '@lib/event-status
 
 import EventSummary from './EventSummary.astro';
 
-/** The next date beside the e-mail notification, a server island; without `state` it reads the date. */
+/**
+ * The next date beside the e-mail notification, a server island; without `state` it
+ * reads the date. With no date planned there is no card; a failed read still shows one.
+ */
 
 interface Props {
   state?: DateStatus;
@@ -14,4 +17,4 @@ const { location } = Astro.props;
 const view = nextDateView(Astro.props.state ?? (await readDateStatus()), 'notify');
 ---
 
-<EventSummary view={view} location={location} />
+{view.state !== 'none' && <EventSummary view={view} location={location} />}

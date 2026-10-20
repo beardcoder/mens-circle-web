@@ -20,12 +20,13 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   danger: 'border-danger bg-transparent text-danger hover:bg-danger hover:text-surface',
 };
 
+/** Heights and text sizes are shared with the fields (`CONTROL_SIZES`), so a field and its button stand as one row. */
 const BUTTON_SIZES: Record<ButtonSize, string> = {
   /** The admin's dense row buttons: still well clear of the 24px minimum target. */
-  xs: 'min-h-9 gap-1.5 px-3 py-1.5 text-sm',
-  /** The header's action. */
+  xs: 'min-h-9 gap-1.5 px-4 py-1.5 text-sm',
+  /** The header's action, the admin's field rows. */
   sm: 'min-h-11 gap-2 px-5 py-2 text-[0.9375rem]',
-  md: 'min-h-12 gap-2 px-7 py-3 text-base',
+  md: 'min-h-12 gap-2 px-6 py-3 text-base',
   lg: 'min-h-13 gap-2.5 px-8 py-3.5 text-base',
 };
 
@@ -42,16 +43,20 @@ export const link =
 
 type ControlSize = 'md' | 'sm' | 'xs';
 
-/** Square: fields hold, they are not pressed. */
+/**
+ * Fields share the buttons' shape, outline, focus and motion: fully round (a
+ * textarea, which cannot be a pill, keeps the same curve at its corners), the
+ * control outline, the site's focus outline.
+ */
 const CONTROL_BASE =
-  'border border-line-bold bg-field font-sans text-fg placeholder:text-fg-muted transition-[border-color,box-shadow] duration-180 ease-out hover:not-focus:not-disabled:border-fg-muted focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-1 aria-invalid:ring-danger';
+  'rounded-[1.5rem] border border-line-bold bg-field font-sans text-fg placeholder:text-fg-muted transition-[border-color,background-color] duration-180 ease-out not-[textarea]:rounded-full hover:not-focus:not-disabled:border-fg focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger';
 
-/** 16px at least on the public forms: anything smaller makes iOS zoom on focus. */
+/** The buttons' heights and text sizes; 16px at least on the public forms, anything smaller makes iOS zoom on focus. */
 const CONTROL_SIZES: Record<ControlSize, string> = {
-  md: 'block min-h-12 w-full px-4 py-3 text-base leading-normal',
-  sm: 'block min-h-10 w-full px-3 py-2 text-sm leading-normal',
+  md: 'block min-h-12 w-full px-6 py-2.5 text-base leading-normal',
+  sm: 'block min-h-11 w-full px-5 py-2 text-[0.9375rem] leading-normal',
   /** A select inside a dense admin row. */
-  xs: 'inline-block min-h-9 w-auto px-2.5 py-1.5 text-sm leading-normal',
+  xs: 'inline-block min-h-9 w-auto px-4 py-1.5 text-sm leading-normal',
 };
 
 /** Text inputs, textareas and selects: one family everywhere. `md` on the public forms, `sm` and `xs` in the admin. */
