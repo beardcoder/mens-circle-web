@@ -15,6 +15,13 @@ const SHORT = 'public, max-age=3600, must-revalidate';
 /** `sw.js` only unregisters the old service worker; a cached copy could not retire itself. */
 const NO_CACHE = 'no-cache';
 
+/**
+ * The prerendered documents (home, the legal pages, the personal page, the testimonial
+ * form) set this themselves. Browsers revalidate (the HTML names per-build assets); a
+ * shared cache may serve it for 5 minutes. None of them holds live data.
+ */
+export const PRERENDERED_CACHE_CONTROL = 'public, max-age=0, must-revalidate, s-maxage=300, stale-while-revalidate=60';
+
 const isPrivatePath = (pathname: string): boolean =>
   pathname === '/admin' ||
   pathname.startsWith('/admin/') ||

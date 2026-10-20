@@ -1,12 +1,12 @@
 import { and, asc, desc, eq, isNull } from 'drizzle-orm';
 
-import type { Testimonial as TestimonialDTO } from '../types';
+import type { TestimonialDTO } from '../types';
 import { db } from './db';
 import type { Testimonial } from './db/schema';
 import { testimonials } from './db/schema';
-import { accepted, type FormResult, isHoneypotFilled } from './form-submission';
+import { accepted, type FormResult } from './form-submission';
 
-const SUCCESS_MESSAGE = 'Vielen Dank! Dein Testimonial wurde eingereicht und wird nach Prüfung veröffentlicht.';
+export const SUCCESS_MESSAGE = 'Vielen Dank! Dein Testimonial wurde eingereicht und wird nach Prüfung veröffentlicht.';
 
 /** The testimonial form, already validated by the `submitTestimonial` action's schema. */
 export interface TestimonialInput {
@@ -14,19 +14,15 @@ export interface TestimonialInput {
   email: string;
   author_name?: string | null;
   role?: string | null;
-  /** Honeypot — real users leave it empty. */
-  website?: string | null;
 }
 
 /** Always stored unpublished, for moderation. */
 export async function submitTestimonial(payload: TestimonialInput): Promise<FormResult> {
-  if (isHoneypotFilled(payload.website)) return accepted(SUCCESS_MESSAGE);
-
   await db.insert(testimonials).values({
-    quote: payload.quote.trim(),
-    authorName: (payload.author_name || '').trim(),
-    role: (payload.role || '').trim(),
-    email: payload.email.trim().toLowerCase(),
+    quote: payload.quote,
+    authorName: payload.author_name ?? '',
+    role: payload.role ?? '',
+    email: payload.email,
     isPublished: false,
     sortOrder: 0,
   });
@@ -34,7 +30,6 @@ export async function submitTestimonial(payload: TestimonialInput): Promise<Form
   return accepted(SUCCESS_MESSAGE);
 }
 
-/** Published testimonials, sorted by sortOrder then newest. */
 /** Published entries in the curated order, and whether they could be read at all. */
 export async function fetchTestimonialsState(
   limit = 200,
@@ -53,15 +48,10 @@ export async function fetchTestimonialsState(
     };
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error('[testimonials] fetchTestimonials failed', String(err));
+    console.error('[testimonials] fetchTestimonialsState failed', String(err));
 
     return { status: 'unavailable', testimonials: [] };
   }
-}
-
-/** Published entries; empty when none are published or they cannot be read. */
-export async function fetchTestimonials(limit = 200): Promise<TestimonialDTO[]> {
-  return (await fetchTestimonialsState(limit)).testimonials;
 }
 
 /** All non-deleted testimonials (admin), newest first. */

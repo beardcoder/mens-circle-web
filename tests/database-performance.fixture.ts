@@ -38,7 +38,8 @@ const {
   listEventsForAdmin,
 } = await import('../src/lib/server/events');
 
-const { fetchTestimonials } = await import('../src/lib/server/testimonials');
+const { fetchTestimonialsState } = await import('../src/lib/server/testimonials');
+const fetchTestimonials = async (limit?: number) => (await fetchTestimonialsState(limit)).testimonials;
 
 type Query = { sql: string; params: SQLQueryBindings[] };
 const queries: Query[] = [];

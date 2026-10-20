@@ -1,6 +1,8 @@
 ---
 import { Icon } from 'astro-icon/components';
 
+import { label } from '@lib/ui';
+
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
 import ModeToggle from './ModeToggle.astro';
@@ -26,8 +28,6 @@ const socialLinks = site.socialLinks.map((link) => {
 // Only these prerendered pages are safe to fetch before a click.
 const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum', '/datenschutz']);
 
-const heading = 'mb-3 font-sans text-xs font-semibold tracking-label text-fg-muted uppercase';
-
 const footerLink =
   'inline-flex min-h-11 items-center gap-3 text-base text-fg transition-colors duration-180 hover:text-accent sm:min-h-10';
 ---
@@ -44,7 +44,7 @@ const footerLink =
       </div>
 
       <nav aria-label="Fußnavigation">
-        <h2 class={heading}>Navigation</h2>
+        <h2 class:list={[label, 'mb-3']}>Navigation</h2>
         <ul role="list">
           {nav.footerPrimary.map((item) => (
             <li>
@@ -62,7 +62,7 @@ const footerLink =
       </nav>
 
       <div>
-        <h2 class={heading}>Kontakt</h2>
+        <h2 class:list={[label, 'mb-3']}>Kontakt</h2>
         <ul role="list">
           {socialLinks.map((link) => (
             <li>

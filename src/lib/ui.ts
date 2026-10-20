@@ -5,7 +5,7 @@
  * See docs/design-system.md.
  */
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 /** One shape for every button: fully round, the label in normal case at weight 600. On hover it changes colour and rises 2px; pressed, it settles. */
@@ -17,7 +17,6 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary: 'border-transparent bg-fill text-on-fill hover:bg-fill-strong',
   /** A further action beside it: outlined in the control colour. */
   secondary: 'border-line-bold bg-transparent text-fg hover:border-fg hover:bg-fg/6',
-  ghost: 'border-transparent bg-transparent text-accent hover:bg-accent-soft',
   danger: 'border-danger bg-transparent text-danger hover:bg-danger hover:text-surface',
 };
 
@@ -41,7 +40,7 @@ export const button = ({
 export const link =
   'text-accent underline decoration-1 underline-offset-[3px] transition-colors duration-180 hover:text-accent-strong';
 
-export type ControlSize = 'md' | 'sm' | 'xs';
+type ControlSize = 'md' | 'sm' | 'xs';
 
 /** Square: fields hold, they are not pressed. */
 const CONTROL_BASE =

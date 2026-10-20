@@ -22,7 +22,7 @@ export interface EventDTO {
   is_past: boolean;
 }
 
-export interface Testimonial {
+export interface TestimonialDTO {
   quote: string;
   author: string | null;
   role: string | null;

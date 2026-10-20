@@ -10,6 +10,3 @@ export const rejected = (status: number, message: string): FormResult => ({
   status,
   body: { success: false, message },
 });
-
-/** The honeypot was filled. */
-export const isHoneypotFilled = (value: unknown): boolean => typeof value === 'string' && value.trim() !== '';

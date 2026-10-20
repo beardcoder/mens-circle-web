@@ -6,7 +6,8 @@ const uuid = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
 
 /** Lifecycle of a seat in an event. */
-export type RegistrationStatus = 'registered' | 'waitlist' | 'cancelled' | 'attended';
+export const REGISTRATION_STATUSES = ['registered', 'waitlist', 'cancelled', 'attended'] as const;
+export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number];
 
 /** Seat-holding statuses; `attended` still counts. */
 export const ACTIVE_REGISTRATION_STATUSES = ['registered', 'attended'] as const satisfies RegistrationStatus[];

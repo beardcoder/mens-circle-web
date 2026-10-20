@@ -1,7 +1,7 @@
 ---
-import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
+import { eventSeriesSchema, faqSchema } from '@lib/event-schema';
 import { PENDING } from '@lib/event-status';
-import { eventSeriesSchema } from '@lib/series-schema';
 
 import photo from '../assets/images/markus-sommer.jpg';
 import Dates from '../components/blocks/Dates.astro';
@@ -25,25 +25,12 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 const { meta, faq, journey_steps: evening } = home;
 
-const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const siteUrl = Astro.site!;
 
 // Structured data uses the same copy as the visible sections.
 const schemas: Record<string, unknown>[] = [];
 
-if (faq.items.length) {
-  schemas.push({
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `${siteUrl.origin}/#faq`,
-    mainEntity: faq.items
-      .filter((i) => i.question && i.answer)
-      .map((i) => ({
-        '@type': 'Question',
-        name: i.question,
-        acceptedAnswer: { '@type': 'Answer', text: i.answer },
-      })),
-  });
-}
+if (faq.items.length) schemas.push(faqSchema(faq.items, `${siteUrl.origin}/#faq`));
 
 // ItemList, not HowTo: the steps describe how an evening runs rather than an
 // actionable procedure, and Google retired HowTo rich results in 2023.
