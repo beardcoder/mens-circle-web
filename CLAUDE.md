@@ -151,6 +151,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   footer and the phone menu. The boot script drops a stored `mc-theme`. Every text
   token ≥ 4.5:1 on every ground in both modes, `line-bold` ≥ 3:1; `line` never
   outlines a control alone. Check new pairs in both modes.
+- Cards: with no date planned the home shows no date card (`HeroDate`, `NextDate`);
+  `unavailable` and `pending` still show one.
 - Grounds: `Section ground` is `default` (paper), `alt` (the quiet secondary ground:
   facts, agreements, the breath panel, the closing invitation, compact bands) or
   `dark` (`surface-dark`: the home opening and the footer only). No other bands.
@@ -165,10 +167,11 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Grid: 1200px of content (`max-w-page`), side margins 20 / 32 / 48px; `py-section`
   64 → 96px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop, `nav`
   (1100px) header links. No section is forced to a screen's height.
-- Shapes: fully round or square, never in between (no radius token). Round
-  (`rounded-full`) is what you press — buttons as pills, icon buttons, the FAQ
-  indicator — and the circle itself; square is what holds — fields, cards, panels,
-  photos, the map, popovers. Flat: a card is a thin line (`card`), never a shadow,
+- Shapes: fully round or square (no radius token). Round (`rounded-full`) is every
+  control — buttons and fields as pills of the same heights, outline and focus
+  (`button()` and `control()` share their sizes; a textarea keeps the curve at its
+  corners, `rounded-[1.5rem]`), icon buttons, the FAQ indicator — and the circle itself;
+  square is what holds — cards, panels, photos, the map, popovers. Flat: a card is a thin line (`card`), never a shadow,
   and carries one emphasis at most (no cap bar, no glow, no photo frame).
 - Shared components: `EventSummary` (every date, fed by `lib/event-status.ts`),
   `PageIntro` (every sub-page opening, light), `SectionHead`, `Button`, `Field` +

@@ -97,12 +97,14 @@ them. Space per width on `:root`: `py-section` 64 → 96px, `py-band` (compact b
 `md` 48rem (tablet: two columns), `lg` 64rem (desktop: four columns), `nav` 68.75rem
 (the header shows its links), `xl` 80rem. No section is forced to a screen's height.
 
-**Shape.** Either fully round or square, nothing in between; there is no radius
-token. Round (`rounded-full`) is what you press: buttons (pills), icon buttons,
-the menu and close buttons, the FAQ indicator, the scroll-to-top button — and the
-circle itself (rings, the breath, the mark). Square is everything that holds:
-fields and textareas, cards, panels, the breath panel, photographs, the map, the
-calendar popover. Flat: cards are a thin line (`card`: `border-line-strong` on the
+**Shape.** Either fully round or square; there is no radius token. Round
+(`rounded-full`) is every control: buttons and fields alike, as pills of the same
+heights (`button()` and `control()` share 36 / 44 / 48px), the same outline
+(`line-bold`) and the site's focus outline; a textarea keeps the curve at its
+corners (`rounded-[1.5rem]`). Also round: icon buttons, the menu and close buttons, the
+FAQ indicator, the scroll-to-top button — and the circle itself (rings, the
+breath, the mark). Square is everything that holds: cards, panels, the breath
+panel, photographs, the map, the calendar popover. Flat: cards are a thin line (`card`: `border-line-strong` on the
 raised ground), never a shadow; a card carries at most one emphasis — no coloured
 cap, no glow, no frame around a photo. Lists and quotes stand without cards, under
 thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
@@ -132,21 +134,21 @@ thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
 
 ## Components
 
-| Component                                         | Purpose                                                                                         |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `Container`                                       | The 1200px width and the side margins                                                           |
-| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `dark` ground, `default` / `band` space                            |
-| `SectionHead` (`size`)                            | Label, section title (`section` / `sub`), lead                                                  |
-| `PageIntro` (`lead`, `media` slots)               | The compact light opening of every sub-page, a photo beside it where there is one               |
-| `Eyebrow`                                         | A short section label (`label` recipe)                                                          |
-| `Button` (`variant`, `size`, `block`, `decorate`) | Fully round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                  |
-| `TextLink`                                        | A quiet, underlined link with a small arrow                                                     |
-| `Field`, `control()`, `FormStatus`                | Label, control, hint, field error; the form's own result line under its button                  |
-| `EventSummary`                                    | One date: label, the date on two fixed lines, time / place / fee / seats, the action that fits  |
-| `Quote` (`variant`)                               | `short` at the quote size (one per section), `text` as running text; long voices fold           |
-| `Accordion`                                       | Questions in DM Sans, a plus that becomes a minus, answers on the measure                       |
-| `Split`, `LinkList`, `Prose` (`width`), `Badge`   | Head beside content; where-next rows; rich text (`measure` / `column`); the admin's status chip |
-| `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                   |
+| Component                                         | Purpose                                                                                           |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `Container`                                       | The 1200px width and the side margins                                                             |
+| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `dark` ground, `default` / `band` space                              |
+| `SectionHead` (`size`)                            | Label, section title (`section` / `sub`), lead                                                    |
+| `PageIntro` (`lead`, `media` slots)               | The compact light opening of every sub-page, a photo beside it where there is one                 |
+| `Eyebrow`                                         | A short section label (`label` recipe)                                                            |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Fully round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                    |
+| `TextLink`                                        | A quiet, underlined link with a small arrow                                                       |
+| `Field`, `control()`, `FormStatus`                | Label, a pill control (the buttons' heights), hint, field error; the result line under its button |
+| `EventSummary`                                    | One date: label, the date on two fixed lines, time / place / fee / seats, the action that fits    |
+| `Quote` (`variant`)                               | `short` at the quote size (one per section), `text` as running text; long voices fold             |
+| `Accordion`                                       | Questions in DM Sans, a plus that becomes a minus, answers on the measure                         |
+| `Split`, `LinkList`, `Prose` (`width`), `Badge`   | Head beside content; where-next rows; rich text (`measure` / `column`); the admin's status chip   |
+| `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                     |
 
 **Header.** 72px: the mark, from `nav` four content links and one filled action
 ("Termine"); below `nav` the action and a menu button. The phone menu is a native
