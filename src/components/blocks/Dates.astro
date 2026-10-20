@@ -37,12 +37,10 @@ const title = displayLines.join(' ');
   innerClass="grid items-center gap-x-grid gap-y-10 lg:grid-cols-12"
 >
   <SectionHead eyebrow={eyebrow} title={title} titleId="termine-title" lead={lede} class="lg:col-span-6" />
-  <div class="lg:col-span-5 lg:col-start-8">
-    <div class="min-w-0">
-      <NextDate server:defer location="home-dates">
-        <NextDate slot="fallback" state={PENDING} location="home-dates" />
-      </NextDate>
-    </div>
+  <div class="min-w-0 lg:col-span-5 lg:col-start-8">
+    <NextDate server:defer location="home-dates">
+      <NextDate slot="fallback" state={PENDING} location="home-dates" />
+    </NextDate>
   </div>
 </Section>
 

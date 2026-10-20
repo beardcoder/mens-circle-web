@@ -1,18 +1,14 @@
 ---
 import site from '@data/site.json';
-import { buildEventSchema } from '@lib/event-schema';
+import { breadcrumbSchema, buildEventSchema, eventSeriesSchema, faqSchema } from '@lib/event-schema';
 import { dateStatus } from '@lib/event-status';
-import { eventSeriesSchema } from '@lib/series-schema';
 import { fetchUpcomingEventsState } from '@lib/server/events';
 import { link } from '@lib/ui';
 
 import Faq from '../components/blocks/Faq.astro';
+import LinkBand from '../components/blocks/LinkBand.astro';
 import EventList from '../components/event/EventList.astro';
 import PageIntro from '../components/PageIntro.astro';
-import LinkList from '../components/ui/LinkList.astro';
-import Section from '../components/ui/Section.astro';
-import SectionHead from '../components/ui/SectionHead.astro';
-import Split from '../components/ui/Split.astro';
 import Layout from '../layouts/Layout.astro';
 
 /** Evergreen landing page for the dates; never redirects. SSR so the dates are in the HTML. */
@@ -23,7 +19,7 @@ const event = upcoming.events[0] ?? null;
 const state = dateStatus(upcoming.status, event);
 const { next } = state;
 
-const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const siteUrl = Astro.site!;
 const canonical = new URL('/event', siteUrl).href;
 
 // Rendered below and emitted as FAQPage JSON-LD from this one list — Google flags FAQ markup that does not match the visible text.
@@ -82,7 +78,7 @@ const moreLinks = [
   },
 ];
 
-/** The series is built once in lib/series-schema.ts and shared with the home page, so both describe one entity under one `@id`. */
+/** The series is built once in lib/event-schema.ts and shared with the home page, so both describe one entity under one `@id`. */
 const eventSeries = eventSeriesSchema(siteUrl);
 
 if (event) {
@@ -93,25 +89,8 @@ if (event) {
   eventSeries.subEvent = subEvent;
 }
 
-const faqPage = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  '@id': `${canonical}#faq`,
-  mainEntity: faqItems.map((item) => ({
-    '@type': 'Question',
-    name: item.question,
-    acceptedAnswer: { '@type': 'Answer', text: item.answer },
-  })),
-};
-
-const breadcrumbs = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl.origin },
-    { '@type': 'ListItem', position: 2, name: 'Termine', item: canonical },
-  ],
-};
+const faqPage = faqSchema(faqItems, `${canonical}#faq`);
+const breadcrumbs = breadcrumbSchema(siteUrl, [['Termine', canonical]]);
 
 // Changes with the state so the SERP snippet is never stale, but both variants
 // lead with the same evergreen keywords.
@@ -155,10 +134,5 @@ const socialDetails = next
 
   <Faq anchor="fragen-zum-termin" eyebrow="Vor dem Termin" title="Fragen zu Termin und Anmeldung" items={faqItems} />
 
-  <Section ground="alt" space="band" labelledby="mehr-title">
-    <Split>
-      <SectionHead slot="head" eyebrow="Mehr über den Kreis" title="Weiterlesen" titleId="mehr-title" size="sub" />
-      <LinkList items={moreLinks} />
-    </Split>
-  </Section>
+  <LinkBand eyebrow="Mehr über den Kreis" title="Weiterlesen" titleId="mehr-title" items={moreLinks} />
 </Layout>

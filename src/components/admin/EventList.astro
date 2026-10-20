@@ -1,4 +1,5 @@
 ---
+import { formatDateShortDE } from '@lib/server/format';
 import { button, card } from '@lib/ui';
 
 import Badge from '../ui/Badge.astro';
@@ -10,7 +11,7 @@ interface EventRow {
   title: string;
   slug: string;
   eventDate: string;
-  startTime?: string;
+  startTime: string;
   isPublished: boolean;
   maxParticipants: number;
   activeCount: number;
@@ -21,14 +22,6 @@ interface Props {
 const { events } = Astro.props;
 
 const publishedCount = events.filter((e) => e.isPublished).length;
-
-function fmtDate(iso: string): string {
-  const d = new Date(iso);
-
-  if (Number.isNaN(d.getTime())) return iso;
-
-  return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
-}
 ---
 
 <AdminHead eyebrow="Übersicht" title="Veranstaltungen">
@@ -69,7 +62,7 @@ function fmtDate(iso: string): string {
               {ev.title}
             </span>
             <span class="truncate text-sm text-fg-muted tabular-nums">
-              {fmtDate(ev.eventDate)}
+              {formatDateShortDE(ev.eventDate)}
               {ev.startTime ? ` · ${ev.startTime}` : ''} · /event/{ev.slug}
             </span>
           </span>

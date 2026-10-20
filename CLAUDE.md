@@ -81,7 +81,7 @@ so a database failure never fails the page.
 routes with their own header are left alone. The server islands are `no-store`, so the
 seat count is never served stale. The prerendered pages (home, the legal pages,
 `/warum-ich-den-maennerkreis-leite`, `/teile-deine-erfahrung`) use
-`PRERENDERED_CACHE_CONTROL` (`lib/cache.ts`, `s-maxage=300`). `public/sw.js` only
+`PRERENDERED_CACHE_CONTROL` (in the same file, `s-maxage=300`). `public/sw.js` only
 retires the removed breathing app's service worker and is served `no-cache`; it can go
 once old installs have updated.
 

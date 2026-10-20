@@ -3,7 +3,7 @@
 const FOLDED = 'Vollständige Erfahrung lesen';
 const OPEN = 'Weniger anzeigen';
 
-const bind = (): void => {
+export function initQuotes(): void {
   for (const figure of document.querySelectorAll<HTMLElement>('[data-quote][data-collapsible]')) {
     const toggle = figure.querySelector<HTMLButtonElement>('[data-quote-toggle]');
 
@@ -21,8 +21,4 @@ const bind = (): void => {
     render(true);
     toggle.addEventListener('click', () => render(!figure.hasAttribute('data-collapsed')));
   }
-};
-
-export function initQuotes(): void {
-  bind();
 }

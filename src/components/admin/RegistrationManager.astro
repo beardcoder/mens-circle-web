@@ -1,4 +1,5 @@
 ---
+import type { RegistrationStatus } from '@lib/server/db/schema';
 import { button, card, control, panel } from '@lib/ui';
 
 import Badge from '../ui/Badge.astro';
@@ -6,10 +7,9 @@ import Field from '../ui/Field.astro';
 import AdminHead from './AdminHead.astro';
 import CapacityRing from './CapacityRing.astro';
 
-type Status = 'registered' | 'waitlist' | 'cancelled' | 'attended';
 interface Reg {
   id: string;
-  status: Status;
+  status: RegistrationStatus;
   registeredAt: string | null;
   confirmationSentAt: string | null;
   firstName: string;
@@ -25,7 +25,7 @@ interface Props {
 }
 const { eventId, eventTitle, maxParticipants, registrations } = Astro.props;
 
-const STATUS_LABEL: Record<Status, string> = {
+const STATUS_LABEL: Record<RegistrationStatus, string> = {
   registered: 'Angemeldet',
   waitlist: 'Warteliste',
   cancelled: 'Storniert',
@@ -47,7 +47,7 @@ function fmt(iso: string | null): string {
 
   return Number.isNaN(d.getTime()) ? '–' : d.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' });
 }
-function badgeTone(s: Status): 'live' | 'wait' | 'off' {
+function badgeTone(s: RegistrationStatus): 'live' | 'wait' | 'off' {
   if (s === 'registered' || s === 'attended') return 'live';
 
   if (s === 'waitlist') return 'wait';
