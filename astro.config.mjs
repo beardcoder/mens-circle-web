@@ -27,11 +27,6 @@ export default defineConfig({
       return cacheControl ? { 'cache-control': cacheControl } : null;
     },
   }),
-  image: {
-    // Astro's Node image endpoint (reads sources from disk) behind an in-memory cache:
-    // the on-demand home page names its photo's variants as /_image URLs.
-    endpoint: { entrypoint: './src/lib/image-endpoint.ts', route: '/_image' },
-  },
   vite: {
     // Tailwind v4: the theme lives in src/styles/global.css (CSS-first).
     plugins: [tailwindcss()],

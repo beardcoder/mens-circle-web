@@ -21,7 +21,6 @@
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
     "db:backup": "bun run scripts/backup-db.ts",
-    "images:verify": "bun scripts/verify-static-images.ts",
     "knip": "knip"
   },
   "dependencies": {
