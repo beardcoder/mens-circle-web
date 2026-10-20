@@ -3,7 +3,7 @@
 const FOLDED = 'Vollständige Erfahrung lesen';
 const OPEN = 'Weniger anzeigen';
 
-export function initQuotes(): void {
+const bind = (): void => {
   for (const figure of document.querySelectorAll<HTMLElement>('[data-quote][data-collapsible]')) {
     const toggle = figure.querySelector<HTMLButtonElement>('[data-quote-toggle]');
 
@@ -21,4 +21,10 @@ export function initQuotes(): void {
     render(true);
     toggle.addEventListener('click', () => render(!figure.hasAttribute('data-collapsed')));
   }
+};
+
+export function initQuotes(): void {
+  bind();
+  // The home's voices are a server island and arrive after this script has run.
+  new MutationObserver(bind).observe(document.body, { childList: true, subtree: true });
 }

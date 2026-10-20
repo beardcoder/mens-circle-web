@@ -71,7 +71,9 @@ page and the testimonial form are prerendered. Home's live parts are server isla
 (`server:defer`), each reading for itself: `HeroDate` (the hero's date and action),
 `Facts`, `NextDate` (beside the newsletter) and `Testimonials`. Each one's `fallback`
 slot is the same component in its `pending` state (`PENDING` from `lib/event-status.ts`,
-`pending` for `Testimonials`) and stands the same height. The islands import the server
+`pending` for `Testimonials`); the date and fact fallbacks stand the same height, the
+voices (below the fold) grow when they arrive. Client code that binds to island content
+must also run on late insertions (`initQuotes` observes the DOM). The islands import the server
 lib late (`readDateStatus()`, a dynamic `import()`), so a prerender never opens the
 database. `lib/event-status.ts` has three read states plus `pending`; a failed read
 (`unavailable`) must never render as "no date planned". The reads catch their errors,
