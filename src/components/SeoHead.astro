@@ -46,7 +46,7 @@ const {
   modifiedTime,
 } = Astro.props;
 
-const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const siteUrl = Astro.site!;
 
 // One spelling per page, shared with the pages' own structured data.
 const canonical = canonicalUrl(siteUrl, Astro.url.pathname);

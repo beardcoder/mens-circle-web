@@ -139,7 +139,7 @@ thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
 | `SectionHead` (`size`)                            | Label, section title (`section` / `sub`), lead                                                  |
 | `PageIntro` (`lead`, `media` slots)               | The compact light opening of every sub-page, a photo beside it where there is one               |
 | `Eyebrow`                                         | A short section label (`label` recipe)                                                          |
-| `Button` (`variant`, `size`, `block`, `decorate`) | Fully round: `primary` (one per module), `secondary`, `ghost`, `danger`; 48 / 52px high         |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Fully round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                  |
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                     |
 | `Field`, `control()`, `FormStatus`                | Label, control, hint, field error; the form's own result line under its button                  |
 | `EventSummary`                                    | One date: label, the date on two fixed lines, time / place / fee / seats, the action that fits  |

@@ -2,17 +2,9 @@
 import type { APIRoute } from 'astro';
 
 import { listPublishedEventsForSitemap } from '@lib/server/events';
+import { escapeHtml } from '@lib/server/format';
 
 export const prerender = false;
-
-/** An unescaped `&` from a hand-set slug makes the whole document unparseable. */
-const xml = (value: string): string =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
 
 /** W3C-datetime for `<lastmod>`; falls back to the raw value if unparseable. */
 const lastmod = (iso: string): string => {
@@ -22,12 +14,12 @@ const lastmod = (iso: string): string => {
 };
 
 export const GET: APIRoute = async ({ site }) => {
-  const base = site ?? new URL('https://mens-circle.de');
   const events = await listPublishedEventsForSitemap();
 
   const urls = events
     .map((event) => {
-      const loc = xml(new URL(`/event/${event.slug}`, base).href);
+      // An unescaped `&` from a hand-set slug would make the whole document unparseable.
+      const loc = escapeHtml(new URL(`/event/${event.slug}`, site).href);
 
       return `<url><loc>${loc}</loc><lastmod>${lastmod(event.updatedAt)}</lastmod></url>`;
     })

@@ -28,7 +28,7 @@ export default defineConfig({
     },
   }),
   vite: {
-    // Tailwind v4: the theme lives in src/styles/global.css (CSS-first).
+    // Tailwind v4: the theme lives in src/styles/theme.css (CSS-first).
     plugins: [tailwindcss()],
     // Bundle everything for the build only; in dev, CommonJS deps break Vite's module runner.
     // Sharp stays external: its native binding resolves from node_modules, not from the bundle.
@@ -51,10 +51,8 @@ export default defineConfig({
     '/ueber-uns': '/#ueber',
     '/sitemap.xml': '/sitemap-index.xml',
   },
-  prefetch: {
-    prefetchAll: false,
-    defaultStrategy: 'hover',
-  },
+  // Only links marked `data-astro-prefetch`; the admin's <ClientRouter /> would otherwise prefetch all.
+  prefetch: { prefetchAll: false },
   build: {
     assets: 'assets',
     inlineStylesheets: 'always',

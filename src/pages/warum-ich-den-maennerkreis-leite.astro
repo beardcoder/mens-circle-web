@@ -1,8 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 
-import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
 import { canonicalUrl } from '@lib/canonical';
+import { stripHtml } from '@lib/event-meta';
+import { breadcrumbSchema, faqSchema } from '@lib/event-schema';
 
 import photo from '../assets/images/markus-sommer.jpg';
 import Faq from '../components/blocks/Faq.astro';
@@ -22,38 +24,18 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 const { meta, faq, page_hero: opening, cta } = page;
 
-// Strip inline HTML from titles/answers for schema text.
-const strip = (s = '') => s.replace(/<[^>]*>/g, '').trim();
-
-const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const siteUrl = Astro.site!;
 const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 
 // Structured data uses the same copy as the visible sections.
 const schemas: Record<string, unknown>[] = [];
 
 if (faq.items.length) {
-  schemas.push({
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faq.items
-      .filter((i) => i.question && i.answer)
-      .map((i) => ({
-        '@type': 'Question',
-        name: i.question,
-        acceptedAnswer: { '@type': 'Answer', text: strip(i.answer) },
-      })),
-  });
+  schemas.push(faqSchema(faq.items.map((i) => ({ question: i.question, answer: stripHtml(i.answer) }))));
 }
 
 // Breadcrumb: home → this page.
-schemas.push({
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl.origin },
-    { '@type': 'ListItem', position: 2, name: 'Warum ich den Männerkreis leite', item: canonical },
-  ],
-});
+schemas.push(breadcrumbSchema(siteUrl, [['Warum ich den Männerkreis leite', canonical]]));
 
 // `Article`, not a bare `WebPage`: a signed piece of writing, attributed to the `Person` entity in SeoHead.
 const articleImage = new URL('/images/og-markus.jpg?v=2', siteUrl).href;
@@ -64,7 +46,7 @@ schemas.push({
   '@id': `${canonical}#article`,
   url: canonical,
   mainEntityOfPage: canonical,
-  headline: meta.ogTitle ?? strip(meta.title),
+  headline: meta.ogTitle ?? stripHtml(meta.title),
   description: meta.description,
   image: articleImage,
   inLanguage: 'de-DE',

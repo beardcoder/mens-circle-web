@@ -25,6 +25,14 @@ const eventDetail = (ev: Event, opts: { includeAddress?: boolean } = {}) => ({
   locationDetails: ev.locationDetails,
 });
 
+/** The whole event, for the mails that carry everything a participant needs to come. */
+const fullDetail = (ev: Event) => ({
+  eventTitle: ev.title,
+  ...eventDetail(ev, { includeAddress: true }),
+  description: ev.description,
+  costBasis: ev.costBasis,
+});
+
 /** The participant's own confirmation. */
 export const sendRegistrationConfirmation = async (
   ev: Event,
@@ -45,10 +53,7 @@ export const sendRegistrationConfirmation = async (
     : sendTransactional(config.TX_REGISTRATION_CONFIRMATION, recipient, recipientName, {
         subject: `Anmeldebestätigung: ${ev.title}`,
         ...ctx,
-        eventTitle: ev.title,
-        ...eventDetail(ev, { includeAddress: true }),
-        description: ev.description,
-        costBasis: ev.costBasis,
+        ...fullDetail(ev),
         icsUrl: icsUrlFor(ev.slug),
       });
 };
@@ -60,16 +65,13 @@ export const sendRegistrationEmails = async (
   status: 'registered' | 'waitlist',
   activeCount: number,
 ): Promise<boolean> => {
-  const recipient = participant.email;
-  const recipientName = fullName(participant);
-
   const userSend = sendRegistrationConfirmation(ev, participant, status);
 
   const adminSend = sendTransactional(config.TX_ADMIN_NOTIFICATION, config.MAIL_ADMIN_ADDRESS, config.MAIL_ADMIN_NAME, {
     subject: `Neue Anmeldung: ${ev.title}`,
     eventTitle: ev.title,
-    participantName: recipientName,
-    participantEmail: recipient,
+    participantName: fullName(participant),
+    participantEmail: participant.email,
     participantPhone: participant.phone,
     dateShort: formatDateShortDE(ev.eventDate),
     timeRange: timeRangeText(ev),
@@ -88,10 +90,7 @@ export const sendWaitlistPromotion = async (ev: Event, participant: Participant)
   await sendTransactional(config.TX_WAITLIST_PROMOTION, participant.email, fullName(participant), {
     subject: `Ein Platz ist frei – ${ev.title}`,
     ...participantCtx(participant),
-    eventTitle: ev.title,
-    ...eventDetail(ev, { includeAddress: true }),
-    description: ev.description,
-    costBasis: ev.costBasis,
+    ...fullDetail(ev),
     icsUrl: icsUrlFor(ev.slug),
   });
 };
@@ -100,13 +99,10 @@ export const sendEventReminder = async (ev: Event, participant: Participant, isT
   return sendTransactional(config.TX_EVENT_REMINDER, participant.email, fullName(participant), {
     subject: `Erinnerung: ${ev.title} ist ${isToday ? 'heute' : 'morgen'}!`,
     ...participantCtx(participant),
-    eventTitle: ev.title,
+    ...fullDetail(ev),
     whenWord: isToday ? 'heute' : 'morgen',
     whenWordCap: isToday ? 'Heute' : 'Morgen',
     closingWord: isToday ? 'gleich' : 'morgen',
-    ...eventDetail(ev, { includeAddress: true }),
-    description: ev.description,
-    costBasis: ev.costBasis,
   });
 };
 
@@ -120,10 +116,8 @@ export const sendEventMessage = async (
 
   return sendTransactional(config.TX_EVENT_MESSAGE, participant.email, fullName(participant), {
     subject,
+    ...participantCtx(participant),
     content: personalised,
     eventTitle: ev.title,
-    siteName: config.SITE_NAME,
-    recipientEmail: participant.email,
-    contactEmail: config.CONTACT_EMAIL,
   });
 };

@@ -1,6 +1,6 @@
 ---
 import type { SummaryView } from '@lib/event-status';
-import { card } from '@lib/ui';
+import { card, label } from '@lib/ui';
 
 import Button from '../ui/Button.astro';
 
@@ -14,34 +14,26 @@ interface Props {
   view: SummaryView;
   /** The date's element: a heading where the summary heads its own block. */
   as?: 'p' | 'h2' | 'h3';
-  titleId?: string;
   /** Off where the date already stands as the page's title: the label and the rows only. */
   showTitle?: boolean;
   /** Analytics: where the action sits. */
   location?: string;
-  class?: string;
 }
 
-const { view, as: Title = 'p', titleId, showTitle = true, location, class: className }: Props = Astro.props;
+const { view, as: Title = 'p', showTitle = true, location }: Props = Astro.props;
 const [lead, rest] = view.title;
-const isDate = Boolean(view.datetime);
+// A date goes into `<time>`; a state in words stands as it is.
+const Lines = view.datetime ? 'time' : Fragment;
 ---
 
-<div data-summary data-state={view.state} class:list={[card, 'grid content-start p-6 sm:p-8', className]}>
-  <p class="text-xs font-semibold tracking-label text-fg-muted uppercase">{view.kicker}</p>
+<div data-summary data-state={view.state} class:list={[card, 'grid content-start p-6 sm:p-8']}>
+  <p class={label}>{view.kicker}</p>
   {showTitle && (
-    <Title id={titleId} class="mt-3 font-serif text-sub text-fg">
-      {isDate ? (
-        <time datetime={view.datetime}>
-          <span class="block truncate">{lead}</span>
-          <span class="block truncate">{rest}</span>
-        </time>
-      ) : (
-        <>
-          <span class="block truncate">{lead}</span>
-          <span class="block truncate">{rest}</span>
-        </>
-      )}
+    <Title class="mt-3 font-serif text-sub text-fg">
+      <Lines datetime={view.datetime || undefined}>
+        <span class="block truncate">{lead}</span>
+        <span class="block truncate">{rest}</span>
+      </Lines>
     </Title>
   )}
   <dl

@@ -18,7 +18,8 @@ export function stripHtml(value = ''): string {
     out = out.replace(/<[^>]*>/g, '');
   } while (out !== previous);
 
-  return out.replace(/\s+/g, ' ').trim();
+  // ASCII whitespace only: a no-break space binds a dash to its word on purpose.
+  return out.replace(/[ \t\r\n]+/g, ' ').trim();
 }
 
 /** Cut to `limit` on a word boundary. */
@@ -39,11 +40,13 @@ export const eventName = (event: EventDTO): string => stripHtml(event.title) || 
 export const eventPlace = (event: EventDTO): string =>
   event.city?.trim() || event.location?.trim() || site.geo.locality;
 
-const eventTimeRange = (event: EventDTO): string => timeRange(event.start_time, event.end_time);
+/** "Freitag, 16. Oktober 2026, 19:00–21:30 Uhr", or empty without a date and time. */
+const eventWhen = (event: EventDTO): string =>
+  [formatDateLongDE(event.event_date), timeRange(event.start_time, event.end_time)].filter(Boolean).join(', ');
 
 /** The single line answering "when and where" for a forwarded link. */
 export const eventWhenWhere = (event: EventDTO): string => {
-  const when = [formatDateLongDE(event.event_date), eventTimeRange(event)].filter(Boolean).join(', ');
+  const when = eventWhen(event);
   const place = eventPlace(event);
 
   return when ? `${when} in ${place}` : `Männerkreis in ${place}`;
@@ -82,10 +85,8 @@ function tailSentence(event: EventDTO): string {
 
 /** Two facts a card can render as labelled fields (Slack and X both do). */
 function shareDetails(event: EventDTO): { label: string; value: string }[] {
-  const when = [formatDateLongDE(event.event_date), eventTimeRange(event)].filter(Boolean).join(', ');
-
   return [
-    { label: event.is_past ? 'Termin (vorbei)' : 'Termin', value: when || 'Termin folgt' },
+    { label: event.is_past ? 'Termin (vorbei)' : 'Termin', value: eventWhen(event) || 'Termin folgt' },
     { label: 'Ort', value: eventPlace(event) },
   ];
 }

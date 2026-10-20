@@ -1,7 +1,85 @@
-/** schema.org/Event JSON-LD for one scheduled meeting, embedded by /event/[slug] via SeoHead. */
+/** The pages' JSON-LD, embedded via SeoHead: the series, one meeting, FAQ and breadcrumbs. */
 import site from '../data/site.json';
-import { buildEventMeta, eventName, stripHtml } from './event-meta';
+import { buildEventMeta, type EventMeta, eventName, stripHtml } from './event-meta';
 import type { EventDTO } from './types';
+
+type Schema = Record<string, unknown>;
+
+const organizer = (siteUrl: URL): Schema => ({
+  '@type': 'Organization',
+  '@id': `${siteUrl.origin}/#organization`,
+  name: site.siteName,
+  url: siteUrl.origin,
+});
+
+/** Meetings run on a donation basis, marked up as a free offer. */
+const freeOffer = (url: string, availability = 'https://schema.org/InStock'): Schema => ({
+  '@type': 'Offer',
+  price: '0',
+  priceCurrency: 'EUR',
+  availability,
+  url,
+});
+
+/** The recurring circle as one `EventSeries` entity under one site-level `@id` (`/#series`), emitted by both the home page and /event. */
+export function eventSeriesSchema(siteUrl: URL): Schema {
+  const seriesUrl = new URL('/event', siteUrl).href;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'EventSeries',
+    '@id': `${siteUrl.origin}/#series`,
+    name: site.siteName,
+    description:
+      'Regelmäßiger Männerkreis in Straubing, Niederbayern: Männer sitzen zusammen, hören einander zu und sprechen über das, was sie gerade beschäftigt. Alle zwei bis vier Wochen, zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.',
+    url: seriesUrl,
+    inLanguage: 'de-DE',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    audience: { '@type': 'Audience', audienceType: 'Männer' },
+    location: {
+      '@type': 'Place',
+      name: site.siteName,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: site.geo.locality,
+        addressRegion: site.geo.region,
+        addressCountry: site.geo.country,
+      },
+    },
+    organizer: organizer(siteUrl),
+    offers: freeOffer(seriesUrl),
+  };
+}
+
+/** FAQPage from the visible questions; Google flags FAQ markup that does not match the page's text. */
+export function faqSchema(items: { question: string; answer: string }[], id?: string): Schema {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    ...(id ? { '@id': id } : {}),
+    mainEntity: items
+      .filter((i) => i.question && i.answer)
+      .map((i) => ({
+        '@type': 'Question',
+        name: i.question,
+        acceptedAnswer: { '@type': 'Answer', text: i.answer },
+      })),
+  };
+}
+
+/** Home, then each `[name, url]` level below it. */
+export function breadcrumbSchema(siteUrl: URL, levels: [name: string, url: string][]): Schema {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [['Startseite', siteUrl.origin], ...levels].map(([name, item], i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name,
+      item,
+    })),
+  };
+}
 
 /** DST-aware Europe/Berlin UTC offset (e.g. "+02:00"). */
 function berlinOffset(date: Date): string {
@@ -61,11 +139,14 @@ function capacity(event: EventDTO): Record<string, number> {
   return { ...max, remainingAttendeeCapacity: Math.max(0, event.available_spots) };
 }
 
-export function buildEventSchema(event: EventDTO, siteUrl: URL): Record<string, unknown> {
+export function buildEventSchema(
+  event: EventDTO,
+  siteUrl: URL,
+  meta: EventMeta = buildEventMeta(event, siteUrl),
+): Schema {
   const startDate = localDateTime(event.event_date, event.start_time);
   const endDate = event.end_time ? localDateTime(event.event_date, event.end_time) : undefined;
   const url = new URL(`/event/${event.slug}`, siteUrl).href;
-  const meta = buildEventMeta(event, siteUrl);
 
   return {
     '@context': 'https://schema.org',
@@ -84,29 +165,19 @@ export function buildEventSchema(event: EventDTO, siteUrl: URL): Record<string, 
     url,
     ...capacity(event),
     audience: { '@type': 'Audience', audienceType: 'Männer' },
-    organizer: {
-      '@type': 'Organization',
-      '@id': `${siteUrl.origin}/#organization`,
-      name: site.siteName,
-      url: siteUrl.origin,
-    },
+    organizer: organizer(siteUrl),
     superEvent: {
       '@type': 'EventSeries',
       '@id': `${siteUrl.origin}/#series`,
       name: site.siteName,
       url: new URL('/event', siteUrl).href,
     },
-    // Meetings run on a donation basis, marked up as a free offer.
     offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'EUR',
       // A past event cannot be booked either — "InStock" there gets the rich
       // result pulled.
-      availability: event.is_full || event.is_past ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+      ...freeOffer(url, event.is_full || event.is_past ? 'https://schema.org/SoldOut' : undefined),
       // Registration closes when the event starts.
       validThrough: startDate,
-      url,
     },
   };
 }

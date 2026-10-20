@@ -1,6 +1,8 @@
 /** Site header — its tone over the home opening, the phone menu (a modal `<dialog>`) and the way back to the top. */
 
-import { prefersReducedMotion } from './helpers';
+/** Smooth scrolling, unless the reader asked for reduced motion. */
+export const scrollBehavior = (): ScrollBehavior =>
+  matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
 
 /** A link's fragment when it targets the current page, else `null`. */
 const samePageHash = (link: HTMLAnchorElement): string | null => {
@@ -21,7 +23,7 @@ const initScrollTop = (): void => {
   for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-scroll-top]')) {
     link.addEventListener('click', (event) => {
       event.preventDefault();
-      window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
+      window.scrollTo({ top: 0, behavior: scrollBehavior() });
       top?.focus({ preventScroll: true });
     });
   }
@@ -82,7 +84,7 @@ const initMenu = (menu: HTMLDialogElement): void => {
       menu.close();
       const target = document.getElementById(decodeURIComponent(hash.slice(1)));
 
-      target?.scrollIntoView({ behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
+      target?.scrollIntoView({ behavior: scrollBehavior() });
       history.pushState(null, '', hash);
     });
   }

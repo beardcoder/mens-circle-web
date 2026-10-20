@@ -1,0 +1,25 @@
+---
+import type { ComponentProps } from 'astro/types';
+
+import LinkList from '../ui/LinkList.astro';
+import Section from '../ui/Section.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import Split from '../ui/Split.astro';
+
+/** A page's exit, as a compact band: where someone who has read it goes next. */
+interface Props {
+  eyebrow: string;
+  title: string;
+  titleId: string;
+  items: ComponentProps<typeof LinkList>['items'];
+}
+
+const { eyebrow, title, titleId, items } = Astro.props;
+---
+
+<Section ground="alt" space="band" labelledby={titleId}>
+  <Split>
+    <SectionHead slot="head" eyebrow={eyebrow} title={title} titleId={titleId} size="sub" />
+    <LinkList items={items} />
+  </Split>
+</Section>

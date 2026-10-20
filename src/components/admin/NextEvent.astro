@@ -1,25 +1,25 @@
 ---
-import { button } from '@lib/ui';
+import type { RegistrationStatus } from '@lib/server/db/schema';
+import { formatDateLongDE, timeRange } from '@lib/server/format';
+import { button, label } from '@lib/ui';
 
 import Badge from '../ui/Badge.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import CircleSeating from './CircleSeating.astro';
 
-type Status = 'registered' | 'waitlist' | 'cancelled' | 'attended';
 interface Person {
   firstName: string;
   lastName: string;
-  status: Status;
+  status: RegistrationStatus;
 }
 interface NextEventData {
   id: string;
   title: string;
   eventDate: string;
-  startTime?: string;
-  endTime?: string;
-  location?: string;
+  startTime: string;
+  endTime: string;
+  location: string;
   maxParticipants: number;
-  activeCount: number;
 }
 interface Props {
   event: NextEventData;
@@ -34,21 +34,8 @@ const name = (p: Person) => `${p.firstName} ${p.lastName}`.trim();
 const initials = (p: Person) => `${p.firstName[0] ?? ''}${p.lastName[0] ?? ''}`.toUpperCase() || '·';
 const seats = registered.map((p) => ({ initials: initials(p), name: name(p) }));
 
-const dateLong = (() => {
-  const d = new Date(event.eventDate);
-
-  if (Number.isNaN(d.getTime())) return event.eventDate;
-
-  return d.toLocaleDateString('de-DE', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
-})();
-
-const timeStr = event.startTime ? `${event.startTime}${event.endTime ? `–${event.endTime}` : ''} Uhr` : '';
+const dateLong = formatDateLongDE(event.eventDate);
+const timeStr = timeRange(event.startTime, event.endTime);
 ---
 
 {/* The one panel that outranks everything under it. */}
@@ -79,7 +66,7 @@ const timeStr = event.startTime ? `${event.startTime}${event.endTime ? `–${eve
 
     <div class="grid gap-x-8 gap-y-6 self-start sm:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
       <div>
-        <p class="mb-2 flex items-baseline gap-2 text-xs font-semibold tracking-label text-fg-muted uppercase">
+        <p class:list={[label, 'mb-2 flex items-baseline gap-2']}>
           Angemeldet
           <span class="tracking-normal text-accent tabular-nums">
             {registered.length}/{event.maxParticipants}
@@ -106,7 +93,7 @@ const timeStr = event.startTime ? `${event.startTime}${event.endTime ? `–${eve
 
       {waitlist.length > 0 && (
         <div>
-          <p class="mb-2 flex items-baseline gap-2 text-xs font-semibold tracking-label text-fg-muted uppercase">
+          <p class:list={[label, 'mb-2 flex items-baseline gap-2']}>
             Warteliste <span class="tracking-normal text-accent tabular-nums">{waitlist.length}</span>
           </p>
           <ol>

@@ -1,16 +1,21 @@
 import { type ActionAPIContext, ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
-import { accepted, type FormResult, isHoneypotFilled, rejected } from '@lib/server/form-submission';
+import { accepted, type FormResult, rejected } from '@lib/server/form-submission';
 import { subscribeToNewsletter } from '@lib/server/listmonk';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';
-import { register } from '@lib/server/registrations';
-import { submitTestimonial } from '@lib/server/testimonials';
+import { confirmationMessage, register } from '@lib/server/registrations';
+import { submitTestimonial, SUCCESS_MESSAGE as TESTIMONIAL_SUCCESS } from '@lib/server/testimonials';
 
-/** The public forms: rate-limited per IP, answered in the visitor's language, and never leaking an internal error. */
+/**
+ * The public forms: rate-limited per IP, answered in the visitor's language, and never
+ * leaking an internal error. A filled honeypot (`website`) gets `fakeSuccess` unhandled.
+ */
 const publicForm =
-  <T>(key: string, maxPerHour: number, handler: (input: T) => Promise<FormResult>) =>
-  async (input: T, context: ActionAPIContext): Promise<{ message: string }> => {
+  <T>(key: string, maxPerHour: number, handler: (input: T) => Promise<FormResult>, fakeSuccess: (input: T) => string) =>
+  async (input: T & { website?: string | null }, context: ActionAPIContext): Promise<{ message: string }> => {
+    if (input.website?.trim()) return { message: fakeSuccess(input) };
+
     if (!rateLimit(key, clientIp(context.request), maxPerHour, 3600)) {
       throw new ActionError({
         code: 'TOO_MANY_REQUESTS',
@@ -55,9 +60,7 @@ const website = z.string().nullish();
 const NEWSLETTER_SUCCESS =
   'Vielen Dank! Du hast dich erfolgreich für unseren Newsletter angemeldet. Schau in dein Postfach.';
 
-const subscribe = async (input: { email: string; website?: string | null }): Promise<FormResult> => {
-  if (isHoneypotFilled(input.website)) return accepted(NEWSLETTER_SUCCESS);
-
+const subscribe = async (input: { email: string }): Promise<FormResult> => {
   const result = await subscribeToNewsletter(input.email, '');
 
   if (result.status === 'exists')
@@ -80,13 +83,13 @@ export const forms = {
       privacy,
       website,
     }),
-    handler: publicForm('event-register', 5, register),
+    handler: publicForm('event-register', 5, register, (input) => confirmationMessage(input.first_name)),
   }),
 
   subscribeNewsletter: defineAction({
     accept: 'form',
     input: z.object({ email, website }),
-    handler: publicForm('newsletter', 5, subscribe),
+    handler: publicForm('newsletter', 5, subscribe, () => NEWSLETTER_SUCCESS),
   }),
 
   submitTestimonial: defineAction({
@@ -101,6 +104,6 @@ export const forms = {
       privacy,
       website,
     }),
-    handler: publicForm('testimonial', 3, submitTestimonial),
+    handler: publicForm('testimonial', 3, submitTestimonial, () => TESTIMONIAL_SUCCESS),
   }),
 };

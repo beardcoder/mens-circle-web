@@ -1,6 +1,7 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
+import { REGISTRATION_STATUSES } from '@lib/server/db/schema';
 import {
   broadcastEventMessage,
   changeRegistrationStatus,
@@ -53,7 +54,7 @@ export const registrations = {
   setRegistrationStatus: defineAction({
     input: z.object({
       id: z.string(),
-      status: z.enum(['registered', 'waitlist', 'cancelled', 'attended']),
+      status: z.enum(REGISTRATION_STATUSES),
     }),
     handler: async ({ id, status }, context) => {
       await requireAdmin(context);

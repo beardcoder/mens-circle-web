@@ -10,9 +10,6 @@ import SectionHead from '../ui/SectionHead.astro';
 interface Props {
   /** Event with non-null coordinates; the caller guards. */
   event: EventDTO;
-  lat: number;
-  lng: number;
-  ground?: 'default' | 'alt';
 }
 
 /**
@@ -22,13 +19,15 @@ interface Props {
  * even when the map cannot draw itself.
  */
 
-const { event, lat, lng, ground = 'default' } = Astro.props;
+const { event } = Astro.props;
+const lat = event.latitude!;
+const lng = event.longitude!;
 
 const address =
   fullAddress({ street: event.street, postalCode: event.postal_code, city: event.city }) || event.location;
 ---
 
-<Section ground={ground} labelledby="anfahrt-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
+<Section labelledby="anfahrt-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
   <div class="lg:col-span-4">
     <SectionHead eyebrow="Anfahrt" title="So findest du zu uns" titleId="anfahrt-title" size="sub" />
     <p class="mt-4 text-md text-fg">{address}</p>

@@ -35,10 +35,10 @@ export const rateLimit = (key: string, ip: string, maxRequests: number, windowSe
   return true;
 };
 
-export const clientIp = (request: Request, fallback = 'unknown'): string => {
+export const clientIp = (request: Request): string => {
   const xff = request.headers.get('x-forwarded-for');
 
   if (xff) return xff.split(',')[0].trim();
 
-  return request.headers.get('x-real-ip') || fallback;
+  return request.headers.get('x-real-ip') || 'unknown';
 };

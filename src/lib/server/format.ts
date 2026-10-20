@@ -94,12 +94,6 @@ export const isoDay = (value: unknown): string => toDate(value)?.toISOString().s
 /** "19:00–21:30 Uhr" as the pages print it, or empty when no start time is set. */
 export const timeRange = (start: string, end: string): string => (start ? `${start}${end ? `–${end}` : ''} Uhr` : '');
 
-export const formatWeekdayDE = (value: unknown): string => {
-  const d = toDate(value);
-
-  return d ? WEEKDAYS_DE[d.getUTCDay()] : '';
-};
-
 /** "12. Juni 2026" — long date without the weekday. */
 export const formatDayMonthYearDE = (value: unknown): string => {
   const d = toDate(value);

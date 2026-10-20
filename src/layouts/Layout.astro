@@ -2,28 +2,14 @@
 import '../styles/global.css';
 
 import { Font } from 'astro:assets';
+import type { ComponentProps } from 'astro/types';
 import { Icon } from 'astro-icon/components';
 
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import SeoHead from '../components/SeoHead.astro';
 
-interface Props {
-  title?: string;
-  description?: string;
-  ogType?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: string;
-  ogImageAlt?: string;
-  ogImageWidth?: number;
-  ogImageHeight?: number;
-  socialDetails?: { label: string; value: string }[];
-  robots?: string;
-  schemas?: Record<string, unknown>[];
-  publishedTime?: string;
-  modifiedTime?: string;
-}
+type Props = ComponentProps<typeof SeoHead>;
 
 const props = Astro.props;
 ---

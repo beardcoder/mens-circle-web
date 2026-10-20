@@ -6,7 +6,7 @@ import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import { Icon } from 'astro-icon/components';
 
-import { button } from '@lib/ui';
+import { button, label } from '@lib/ui';
 
 interface Props {
   title: string;
@@ -44,7 +44,7 @@ const links = [
           <a href="/admin" class="flex items-center gap-2.5">
             <Icon name="logo" aria-hidden="true" class="size-7 text-flame" />
             <span class="font-serif text-lg">Männerkreis</span>
-            <span class="text-xs font-semibold tracking-label text-fg-muted uppercase">Admin</span>
+            <span class={label}>Admin</span>
           </a>
           <div class="flex items-center gap-6">
             {links.map((link) => (

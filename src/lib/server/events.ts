@@ -8,7 +8,7 @@ import { db } from './db';
 import type { Event } from './db/schema';
 import { ACTIVE_REGISTRATION_STATUSES, events, registrations } from './db/schema';
 import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
-import { createList, eventListName, renameList, sendNewsletterCampaign } from './listmonk';
+import { createList, renameList, sendNewsletterCampaign } from './listmonk';
 
 /** The one definition of a seat-holding registration; reused by the seat claim. */
 export const holdsASeat = () =>
@@ -22,6 +22,9 @@ export const countActiveRegistrations = async (eventId: string): Promise<number>
 
   return rows[0]?.c ?? 0;
 };
+
+/** Published and not deleted: what the public may see. */
+const isPublic = () => and(eq(events.isPublished, true), isNull(events.deleted));
 
 export const isEventPast = (ev: Pick<Event, 'eventDate'>): boolean => {
   const d = toDate(ev.eventDate);
@@ -60,11 +63,6 @@ const eventDtoWithCount = (ev: Event, activeCount: number): EventDTO => {
   };
 };
 
-interface EventWithCapacity {
-  event: Event;
-  activeCount: number;
-}
-
 const eventWithCapacityQuery = () =>
   db
     .select({
@@ -80,38 +78,29 @@ const startOfTodayIso = (): string => {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0)).toISOString();
 };
 
-const getNextEventWithCapacity = async (): Promise<EventWithCapacity | null> => {
-  const rows = await eventWithCapacityQuery()
-    .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, startOfTodayIso())))
+/** Upcoming public events with their seat counts, soonest first. */
+const upcomingQuery = (limit: number) =>
+  eventWithCapacityQuery()
+    .where(and(isPublic(), gte(events.eventDate, startOfTodayIso())))
     .orderBy(asc(events.eventDate))
-    .limit(1);
-
-  return rows[0] ?? null;
-};
+    .limit(limit);
 
 export const getPublishedEventBySlug = async (slug: string): Promise<Event | null> => {
   const rows = await db
     .select()
     .from(events)
-    .where(and(eq(events.slug, slug), eq(events.isPublished, true), isNull(events.deleted)))
+    .where(and(eq(events.slug, slug), isPublic()))
     .limit(1);
 
   return rows[0] ?? null;
 };
 
-/** One row per publicly reachable /event/<slug> page, for the XML sitemap. */
-export interface SitemapEvent {
-  slug: string;
-  updatedAt: string;
-  eventDate: string;
-}
-
 /** Every public event page, past ones included (the sitemap is their only link). */
-export const listPublishedEventsForSitemap = async (): Promise<SitemapEvent[]> =>
+export const listPublishedEventsForSitemap = (): Promise<Array<{ slug: string; updatedAt: string }>> =>
   db
-    .select({ slug: events.slug, updatedAt: events.updatedAt, eventDate: events.eventDate })
+    .select({ slug: events.slug, updatedAt: events.updatedAt })
     .from(events)
-    .where(and(eq(events.isPublished, true), isNull(events.deleted)))
+    .where(isPublic())
     .orderBy(desc(events.eventDate));
 
 export const getEventById = async (id: string): Promise<Event | null> => {
@@ -120,25 +109,13 @@ export const getEventById = async (id: string): Promise<Event | null> => {
   return rows[0] ?? null;
 };
 
-const tryEventDto = async (fetch: () => Promise<EventWithCapacity | null>, label: string): Promise<EventDTO | null> => {
-  try {
-    const row = await fetch();
-
-    return row ? eventDtoWithCount(row.event, row.activeCount) : null;
-  } catch (err) {
-    console.error(`[events] ${label} failed`, String(err));
-
-    return null;
-  }
-};
-
 /** `unavailable` (read failed) must never be shown as "no date planned". */
-export type NextEventState =
+type NextEventState =
   { status: 'scheduled'; event: EventDTO } | { status: 'none'; event: null } | { status: 'unavailable'; event: null };
 
 export const fetchNextEventState = async (): Promise<NextEventState> => {
   try {
-    const row = await getNextEventWithCapacity();
+    const [row] = await upcomingQuery(1);
 
     return row
       ? { status: 'scheduled', event: eventDtoWithCount(row.event, row.activeCount) }
@@ -155,11 +132,7 @@ export const fetchUpcomingEventsState = async (
   limit = 12,
 ): Promise<{ status: NextEventState['status']; events: EventDTO[] }> => {
   try {
-    const rows = await eventWithCapacityQuery()
-      .where(and(eq(events.isPublished, true), isNull(events.deleted), gte(events.eventDate, startOfTodayIso())))
-      .orderBy(asc(events.eventDate))
-      .limit(limit);
-
+    const rows = await upcomingQuery(limit);
     const list = rows.map((row) => eventDtoWithCount(row.event, row.activeCount));
 
     return { status: list.length > 0 ? 'scheduled' : 'none', events: list };
@@ -170,14 +143,19 @@ export const fetchUpcomingEventsState = async (
   }
 };
 
-export const getEventBySlug = (slug: string): Promise<EventDTO | null> =>
-  tryEventDto(async () => {
-    const rows = await eventWithCapacityQuery()
-      .where(and(eq(events.slug, slug), eq(events.isPublished, true), isNull(events.deleted)))
+export const getEventBySlug = async (slug: string): Promise<EventDTO | null> => {
+  try {
+    const [row] = await eventWithCapacityQuery()
+      .where(and(eq(events.slug, slug), isPublic()))
       .limit(1);
 
-    return rows[0] ?? null;
-  }, 'getEventBySlug');
+    return row ? eventDtoWithCount(row.event, row.activeCount) : null;
+  } catch (err) {
+    console.error('[events] getEventBySlug failed', String(err));
+
+    return null;
+  }
+};
 
 const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
   const base = String(eventDate).slice(0, 10);
@@ -200,6 +178,13 @@ const generateSlug = async (eventDate: string, excludeId?: string): Promise<stri
   }
 
   return candidate;
+};
+
+/** "Event: Männerkreis (16.10.2026)": the per-event listmonk list. */
+const eventListName = (title: string, dateShort: string): string => {
+  const t = (title || 'Veranstaltung').trim();
+
+  return dateShort ? `Event: ${t} (${dateShort})` : `Event: ${t}`;
 };
 
 export const ensureEventList = async (ev: Event): Promise<number> => {

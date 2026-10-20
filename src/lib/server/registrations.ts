@@ -7,14 +7,11 @@ import type { Event, Participant, Registration, RegistrationStatus } from './db/
 import { participants, registrations } from './db/schema';
 import { sendEventMessage, sendRegistrationConfirmation, sendRegistrationEmails, sendWaitlistPromotion } from './email';
 import { countActiveRegistrations, ensureEventList, getEventById, holdsASeat, isEventPast } from './events';
-import { accepted, type FormResult, isHoneypotFilled, rejected } from './form-submission';
+import { accepted, type FormResult, rejected } from './form-submission';
 import { addToLists, removeFromList, withSubscriberScope } from './listmonk';
 
-/** Alias for the existing call sites; the union lives with the column. */
-export type RegStatus = RegistrationStatus;
-
 /** The two statuses a fresh registration can be given; the rest are admin transitions. */
-type IntakeStatus = Extract<RegStatus, 'registered' | 'waitlist'>;
+type IntakeStatus = Extract<RegistrationStatus, 'registered' | 'waitlist'>;
 
 const fireAndForget = (label: string, promise: Promise<unknown>): void => {
   void promise.catch((err) => console.error(label, String(err)));
@@ -56,8 +53,6 @@ export interface RegistrationInput {
   last_name: string;
   email: string;
   phone_number?: string | null;
-  /** Honeypot — real users leave it empty. */
-  website?: string | null;
 }
 
 interface RegistrationFields {
@@ -76,7 +71,7 @@ const readFields = (payload: RegistrationInput): RegistrationFields => ({
   eventId: payload.event_id,
 });
 
-const confirmationMessage = (firstName: string): string =>
+export const confirmationMessage = (firstName: string): string =>
   `Vielen Dank, ${firstName}! Deine Anmeldung war erfolgreich. Du erhältst in Kürze eine Bestätigung per E-Mail.`;
 
 /** The event this registration may still join, or the answer explaining why it may not. */
@@ -209,10 +204,6 @@ const dispatchSideEffects = (
 
 export const register = async (payload: RegistrationInput): Promise<FormResult> => {
   const fields = readFields(payload);
-  const confirmation = confirmationMessage(fields.firstName);
-
-  if (isHoneypotFilled(payload.website)) return accepted(confirmation);
-
   const found = await openEvent(fields.eventId);
 
   if ('error' in found) return found.error;
@@ -231,13 +222,13 @@ export const register = async (payload: RegistrationInput): Promise<FormResult> 
   return accepted(
     status === 'waitlist'
       ? `Du wurdest auf die Warteliste eingetragen, ${fields.firstName}. Wir benachrichtigen dich per E-Mail, sobald ein Platz frei wird.`
-      : confirmation,
+      : confirmationMessage(fields.firstName),
   );
 };
 
 export interface RegistrationRow {
   id: string;
-  status: RegStatus;
+  status: RegistrationStatus;
   registeredAt: string | null;
   cancelledAt: string | null;
   confirmationSentAt: string | null;
@@ -248,8 +239,8 @@ export interface RegistrationRow {
   phone: string;
 }
 
-export const listRegistrationsForEvent = async (eventId: string): Promise<RegistrationRow[]> => {
-  const rows = await db
+export const listRegistrationsForEvent = (eventId: string): Promise<RegistrationRow[]> =>
+  db
     .select({
       id: registrations.id,
       status: registrations.status,
@@ -267,8 +258,8 @@ export const listRegistrationsForEvent = async (eventId: string): Promise<Regist
     .where(and(eq(registrations.eventId, eventId), isNull(registrations.deleted)))
     .orderBy(asc(registrations.registeredAt));
 
-  return rows;
-};
+const participantById = async (id: string): Promise<Participant | undefined> =>
+  (await db.select().from(participants).where(eq(participants.id, id)).limit(1))[0];
 
 const promoteNextWaitlisted = async (event: Event): Promise<void> => {
   const next = (
@@ -289,14 +280,17 @@ const promoteNextWaitlisted = async (event: Event): Promise<void> => {
     .set({ status: 'registered', registeredAt: new Date().toISOString() })
     .where(eq(registrations.id, next.id));
 
-  const participant = (await db.select().from(participants).where(eq(participants.id, next.participantId)).limit(1))[0];
+  const participant = await participantById(next.participantId);
 
   if (participant) {
     fireAndForget('[registrations] promotion email failed', sendWaitlistPromotion(event, participant));
   }
 };
 
-export const changeRegistrationStatus = async (regId: string, newStatus: RegStatus): Promise<Registration | null> => {
+export const changeRegistrationStatus = async (
+  regId: string,
+  newStatus: RegistrationStatus,
+): Promise<Registration | null> => {
   const reg = (await db.select().from(registrations).where(eq(registrations.id, regId)).limit(1))[0];
 
   if (!reg) return null;
@@ -314,9 +308,7 @@ export const changeRegistrationStatus = async (regId: string, newStatus: RegStat
 
     if (event) {
       if (event.listmonkListId > 0) {
-        const participant = (
-          await db.select().from(participants).where(eq(participants.id, reg.participantId)).limit(1)
-        )[0];
+        const participant = await participantById(reg.participantId);
 
         if (participant) void removeFromList(participant.email, event.listmonkListId).catch(() => {});
       }

@@ -55,10 +55,18 @@ export interface SubscribeResult {
 /** Fresh object per call, so callers may keep the result. */
 const failed = (): SubscribeResult => ({ ok: false, status: 'error' });
 
-const trimmedName = (name: string): string => (name ?? '').trim();
-
 /** listmonk insists on a name, so an unnamed subscriber is stored under its address. */
-const displayName = (name: string, email: string): string => trimmedName(name) || email;
+const displayName = (name: string, email: string): string => (name ?? '').trim() || email;
+
+const fromEmail = (): string => `${config.MAIL_FROM_NAME} <${config.MAIL_FROM_ADDRESS}>`;
+
+/** Create an enabled subscriber; listmonk answers 409 when the address exists. */
+const postSubscriber = (
+  email: string,
+  name: string,
+  extra: { lists?: number[]; preconfirm_subscriptions: boolean },
+): Promise<ListmonkResponse | null> =>
+  request('POST', '/api/subscribers', { email, name: displayName(name, email), status: 'enabled', ...extra });
 
 export const subscribeToNewsletter = async (email: string, name: string): Promise<SubscribeResult> => {
   if (!listmonkConfigured()) {
@@ -67,13 +75,7 @@ export const subscribeToNewsletter = async (email: string, name: string): Promis
     return failed();
   }
 
-  const res = await request('POST', '/api/subscribers', {
-    email,
-    name: displayName(name, email),
-    status: 'enabled',
-    lists: config.LISTMONK_LIST_IDS,
-    preconfirm_subscriptions: false,
-  });
+  const res = await postSubscriber(email, name, { lists: config.LISTMONK_LIST_IDS, preconfirm_subscriptions: false });
 
   if (!res) return failed();
 
@@ -122,12 +124,7 @@ export const withSubscriberScope = async <T>(work: () => Promise<T>): Promise<T>
 };
 
 const provisionSubscriber = async (email: string, name: string): Promise<SubscriberIdentity | null> => {
-  const created = await request('POST', '/api/subscribers', {
-    email,
-    name: displayName(name, email),
-    status: 'enabled',
-    preconfirm_subscriptions: true,
-  });
+  const created = await postSubscriber(email, name, { preconfirm_subscriptions: true });
 
   if (created?.ok) {
     const id = Number(created.body?.data?.id) || 0;
@@ -171,12 +168,6 @@ export const ensureSubscriber = async (email: string, name: string): Promise<num
   if (!listmonkApiConfigured()) return 0;
 
   return (await resolveSubscriber(email, name))?.subscriber.id ?? 0;
-};
-
-export const eventListName = (title: string, dateShort: string): string => {
-  const t = (title || 'Veranstaltung').trim();
-
-  return dateShort ? `Event: ${t} (${dateShort})` : `Event: ${t}`;
 };
 
 export const createList = async (name: string): Promise<number> => {
@@ -239,7 +230,7 @@ const applyMembership = async (
     return failed();
   }
 
-  await backfillName(sub, email, trimmedName(name), listIds);
+  await backfillName(sub, email, (name ?? '').trim(), listIds);
 
   return { ok: true, status: identity?.created ? 'subscribed' : 'exists' };
 };
@@ -257,13 +248,7 @@ export const addToLists = async (
     return applyMembership(await resolveSubscriber(email, name), email, name, listIds, confirmed);
   }
 
-  const created = await request('POST', '/api/subscribers', {
-    email,
-    name: displayName(name, email),
-    status: 'enabled',
-    lists: listIds,
-    preconfirm_subscriptions: confirmed,
-  });
+  const created = await postSubscriber(email, name, { lists: listIds, preconfirm_subscriptions: confirmed });
 
   if (!created) return failed();
 
@@ -297,7 +282,7 @@ export const removeFromList = async (email: string, listId: number): Promise<boo
   return !!res?.ok;
 };
 
-export interface CampaignOptions {
+interface CampaignOptions {
   name: string;
   subject: string;
   bodyHtml: string;
@@ -305,7 +290,7 @@ export interface CampaignOptions {
   templateId?: number;
 }
 
-export interface CampaignResult {
+interface CampaignResult {
   ok: boolean;
   campaignId: number;
   /** Shown to the admin verbatim, so every failure carries its own wording. */
@@ -318,7 +303,7 @@ const createCampaign = async (opts: CampaignOptions): Promise<{ id: number } | {
     name: opts.name,
     subject: opts.subject,
     lists: opts.listIds,
-    from_email: `${config.MAIL_FROM_NAME} <${config.MAIL_FROM_ADDRESS}>`,
+    from_email: fromEmail(),
     type: 'regular',
     content_type: 'html',
     body: opts.bodyHtml,
@@ -403,7 +388,7 @@ export const sendTransactional = async (
     template_id: templateId,
     data,
     content_type: 'html',
-    from_email: `${config.MAIL_FROM_NAME} <${config.MAIL_FROM_ADDRESS}>`,
+    from_email: fromEmail(),
   });
 
   if (!res?.ok) {

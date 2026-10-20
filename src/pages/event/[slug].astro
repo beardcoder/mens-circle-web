@@ -1,9 +1,9 @@
 ---
 import { buildEventMeta } from '@lib/event-meta';
-import { buildEventSchema } from '@lib/event-schema';
+import { breadcrumbSchema, buildEventSchema } from '@lib/event-schema';
 import { getEventBySlug } from '@lib/server/events';
 
-import EventFinalCta from '../../components/event/EventFinalCta.astro';
+import LinkBand from '../../components/blocks/LinkBand.astro';
 import EventIntro from '../../components/event/EventIntro.astro';
 import EventMapSection from '../../components/event/EventMapSection.astro';
 import EventRegister from '../../components/event/EventRegister.astro';
@@ -15,7 +15,7 @@ const event = slug ? await getEventBySlug(slug) : null;
 
 if (!event) return Astro.redirect('/event', 302);
 
-const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
+const siteUrl = Astro.site!;
 const hasMap = event.latitude !== null && event.longitude !== null;
 
 // This is the page people forward, so the preview answers "when, where, still a
@@ -25,24 +25,22 @@ const meta = buildEventMeta(event, siteUrl);
 // No `ogType="event"`: Open Graph never registered that type, so every scraper
 // falls back to "website". The Event JSON-LD below carries the event-ness.
 
-const eventSchema = buildEventSchema(event, siteUrl);
+const eventSchema = buildEventSchema(event, siteUrl, meta);
 
 // /event carries the first two levels; without this the individual date sits
 // outside the site's hierarchy.
-const breadcrumbs = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl.origin },
-    { '@type': 'ListItem', position: 2, name: 'Termine', item: new URL('/event', siteUrl).href },
-    {
-      '@type': 'ListItem',
-      position: 3,
-      name: meta.ogTitle,
-      item: new URL(`/event/${event.slug}`, siteUrl).href,
-    },
-  ],
-};
+const breadcrumbs = breadcrumbSchema(siteUrl, [
+  ['Termine', new URL('/event', siteUrl).href],
+  [meta.ogTitle, new URL(`/event/${event.slug}`, siteUrl).href],
+]);
+
+// The page's exit: where someone who has read the date goes next.
+const nextLinks = [
+  ...(event.is_past ? [{ href: '/event#benachrichtigung', title: 'Termine per E-Mail erhalten' }] : []),
+  { href: '/event', title: 'Alle Termine' },
+  { href: '/#ueber', title: 'Worum es an so einem Abend geht' },
+  { href: '/warum-ich-den-maennerkreis-leite', title: 'Warum ich den Männerkreis leite', prefetch: true },
+];
 ---
 
 <Layout
@@ -57,6 +55,6 @@ const breadcrumbs = {
   <EventIntro event={event} />
   <EventRegister event={event} />
 
-  {hasMap && <EventMapSection event={event} lat={event.latitude!} lng={event.longitude!} />}
-  <EventFinalCta event={event} />
+  {hasMap && <EventMapSection event={event} />}
+  <LinkBand eyebrow="Weiter" title="Wohin als Nächstes" titleId="weiter-title" items={nextLinks} />
 </Layout>

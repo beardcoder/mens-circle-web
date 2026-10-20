@@ -6,7 +6,7 @@
 
 import site from '../data/site.json';
 import { eventPlace } from './event-meta';
-import { formatDayMonthYearDE, formatWeekdayDE, isoDay, timeRange } from './server/format';
+import { formatDateLongDE, isoDay, timeRange } from './server/format';
 import type { EventDTO } from './types';
 
 export type NextEventStatus = 'scheduled' | 'none' | 'unavailable';
@@ -14,6 +14,8 @@ export type NextEventStatus = 'scheduled' | 'none' | 'unavailable';
 /** The upcoming event reduced to the strings the pages show. */
 interface NextEventSummary {
   slug: string;
+  /** ISO day for `<time>`. */
+  day: string;
   /** "Donnerstag, 18. September 2026" */
   dateLabel: string;
   /** "19:00–21:30 Uhr", or empty when no time is set. */
@@ -30,7 +32,8 @@ interface NextEventSummary {
 const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
   event && {
     slug: event.slug,
-    dateLabel: [formatWeekdayDE(event.event_date), formatDayMonthYearDE(event.event_date)].filter(Boolean).join(', '),
+    day: isoDay(event.event_date),
+    dateLabel: formatDateLongDE(event.event_date),
     timeRange: timeRange(event.start_time, event.end_time),
     place: eventPlace(event),
     costBasis: event.cost_basis?.trim() ?? '',
@@ -42,16 +45,15 @@ const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
 export interface DateStatus {
   status: NextEventStatus | 'pending';
   next: NextEventSummary | null;
-  isFull: boolean;
 }
 
 export const dateStatus = (status: NextEventStatus, event: EventDTO | null): DateStatus => {
   const next = status === 'scheduled' ? summarizeNextEvent(event) : null;
 
-  return { status, next, isFull: Boolean(next?.isFull) };
+  return { status, next };
 };
 
-export const PENDING: DateStatus = { status: 'pending', next: null, isFull: false };
+export const PENDING: DateStatus = { status: 'pending', next: null };
 
 /** The live state, read by the home's server islands; imported late so a prerender never opens the database. */
 export const readDateStatus = async (): Promise<DateStatus> => {
@@ -119,15 +121,24 @@ const RHYTHM_ROWS = (place = site.geo.locality): SummaryRow[] => [
   { label: 'Beitrag', value: 'Auf Spendenbasis' },
 ];
 
-const seatsText = (event: { isFull: boolean; availableSpots: number; maxParticipants: number }): string =>
+const seatsText = (event: NextEventSummary): string =>
   event.isFull ? 'Ausgebucht · Warteliste' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`;
 
+/** Time, place, fee and seats: the four rows of a dated summary. */
+const dateRows = (next: NextEventSummary, seats = seatsText(next)): SummaryRow[] => [
+  { label: 'Zeit', value: next.timeRange || 'Abends' },
+  { label: 'Ort', value: next.place },
+  { label: 'Beitrag', value: splitFee(next.costBasis).main },
+  { label: 'Plätze', value: seats },
+];
+
 const OVERVIEW = { label: 'Termine ansehen', href: '/event' };
+const KICKER = 'Nächster Termin';
 
 /** No date to show: none planned, or none readable. The rows keep what is always true. */
-const noDateView = (unavailable: boolean, whenNone: 'overview' | 'notify', kicker: string): SummaryView => ({
+const noDateView = (unavailable: boolean, whenNone: 'overview' | 'notify'): SummaryView => ({
   state: unavailable ? 'unavailable' : 'none',
-  kicker,
+  kicker: KICKER,
   title: unavailable ? ['Termine gerade', 'nicht abrufbar'] : ['Zurzeit kein', 'Termin geplant'],
   datetime: '',
   rows: [...RHYTHM_ROWS(), { label: 'Status', value: unavailable ? 'Siehe Terminseite' : 'Neuer Termin folgt' }],
@@ -136,42 +147,31 @@ const noDateView = (unavailable: boolean, whenNone: 'overview' | 'notify', kicke
 });
 
 /** Until the island has read the date: the same four rows, the overview as the action. */
-const pendingView = (kicker: string): SummaryView => ({
+const PENDING_VIEW: SummaryView = {
   state: 'pending',
-  kicker,
+  kicker: KICKER,
   title: ['Termin wird', 'geladen …'],
   datetime: '',
   rows: [...RHYTHM_ROWS(), { label: 'Status', value: 'Wird geladen' }],
   action: OVERVIEW,
-});
+};
 
 /**
  * The summary of the next date, for the home page: its action points to the event;
  * with none planned to the overview (`overview`, the hero) or to the e-mail
  * notification (`notify`, beside the form).
  */
-export const nextDateView = (
-  state: DateStatus,
-  whenNone: 'overview' | 'notify' = 'overview',
-  kicker = 'Nächster Termin',
-): SummaryView => {
-  const { status, next } = state;
+export const nextDateView = ({ status, next }: DateStatus, whenNone: 'overview' | 'notify'): SummaryView => {
+  if (status === 'pending') return PENDING_VIEW;
 
-  if (status === 'pending') return pendingView(kicker);
-
-  if (status === 'unavailable' || !next) return noDateView(status === 'unavailable', whenNone, kicker);
+  if (status === 'unavailable' || !next) return noDateView(status === 'unavailable', whenNone);
 
   return {
     state: next.isFull ? 'full' : 'open',
-    kicker,
+    kicker: KICKER,
     title: dateLines(next.dateLabel),
-    datetime: next.slug,
-    rows: [
-      { label: 'Zeit', value: next.timeRange || 'Abends' },
-      { label: 'Ort', value: next.place },
-      { label: 'Beitrag', value: splitFee(next.costBasis).main },
-      { label: 'Plätze', value: seatsText(next) },
-    ],
+    datetime: next.day,
+    rows: dateRows(next),
     action: { label: next.isFull ? 'Auf die Warteliste' : 'Zum nächsten Termin', href: `/event/${next.slug}` },
   };
 };
@@ -185,16 +185,8 @@ export const eventView = (event: EventDTO, kicker: string, withAction = true): S
     state,
     kicker: state === 'full' ? `${kicker} · ausgebucht` : kicker,
     title: dateLines(next.dateLabel),
-    datetime: isoDay(event.event_date),
-    rows: [
-      { label: 'Zeit', value: next.timeRange || 'Abends' },
-      { label: 'Ort', value: next.place },
-      { label: 'Beitrag', value: splitFee(next.costBasis).main },
-      {
-        label: 'Plätze',
-        value: event.is_past ? 'Hat stattgefunden' : seatsText(next),
-      },
-    ],
+    datetime: next.day,
+    rows: dateRows(next, event.is_past ? 'Hat stattgefunden' : undefined),
     action:
       withAction && !event.is_past
         ? { label: event.is_full ? 'Auf die Warteliste' : 'Zur Anmeldung', href: `/event/${event.slug}` }

@@ -18,11 +18,9 @@ interface Props {
   /** `default` is a section's space (64 / 96px); `band` the compact space of a band (40 / 56px). */
   space?: Space;
   labelledby?: string;
-  label?: string;
   class?: string;
   /** Classes for the inner container (grid, etc.). */
   innerClass?: string;
-  [attribute: `data-${string}`]: string | boolean | undefined;
 }
 
 const GROUNDS: Record<Ground, string> = {
@@ -37,25 +35,10 @@ const SPACES: Record<Space, string> = {
   none: '',
 };
 
-const {
-  id,
-  ground = 'default',
-  space = 'default',
-  labelledby,
-  label,
-  class: className,
-  innerClass,
-  ...attributes
-} = Astro.props;
+const { id, ground = 'default', space = 'default', labelledby, class: className, innerClass } = Astro.props;
 ---
 
-<section
-  id={id}
-  aria-labelledby={labelledby}
-  aria-label={label}
-  class:list={['relative', GROUNDS[ground], SPACES[space], className]}
-  {...attributes}
->
+<section id={id} aria-labelledby={labelledby} class:list={['relative', GROUNDS[ground], SPACES[space], className]}>
   <Container class={innerClass}>
     <slot />
   </Container>
