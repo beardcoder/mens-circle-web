@@ -1,6 +1,4 @@
 ---
-import { fetchTestimonialsState } from '@lib/server/testimonials';
-
 import Quote from '../ui/Quote.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -11,20 +9,26 @@ import TextLink from '../ui/TextLink.astro';
  * reworded. At most one short voice takes the quote size; the rest read like
  * running text in two columns that flow (one on phones), so different lengths
  * never leave empty neighbours. Long voices open folded (Quote). With none
- * published, or when they cannot be read, the block says so in one line.
+ * published, or when they cannot be read, the block says so in one line. A
+ * server island on the home page; its `pending` fallback is the title and the link.
  */
 
 interface Props {
   anchor: string;
   eyebrow: string;
   title: string;
+  pending?: boolean;
 }
 
 /** A voice this short may stand out at the quote size. */
 const SHORT = 160;
 
-const { anchor, eyebrow, title } = Astro.props;
-const result = await fetchTestimonialsState();
+const { anchor, eyebrow, title, pending } = Astro.props;
+
+// Imported late, so a prerender never opens the database.
+const result = pending
+  ? { status: 'pending', testimonials: [] }
+  : await (await import('@lib/server/testimonials')).fetchTestimonialsState();
 
 const { testimonials } = result;
 const [first, ...others] = testimonials;
@@ -34,7 +38,7 @@ const rest = featured ? others : testimonials;
 const note =
   result.status === 'unavailable'
     ? 'Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei.'
-    : testimonials.length === 0
+    : result.status === 'ok' && testimonials.length === 0
       ? 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'
       : '';
 ---

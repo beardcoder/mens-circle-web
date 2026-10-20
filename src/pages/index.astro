@@ -1,7 +1,7 @@
 ---
-import { dateStatus } from '@lib/event-status';
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache';
+import { PENDING } from '@lib/event-status';
 import { eventSeriesSchema } from '@lib/series-schema';
-import { fetchNextEventState } from '@lib/server/events';
 
 import photo from '../assets/images/markus-sommer.jpg';
 import Dates from '../components/blocks/Dates.astro';
@@ -17,13 +17,13 @@ import Testimonials from '../components/blocks/Testimonials.astro';
 import home from '../content/home.json';
 import Layout from '../layouts/Layout.astro';
 
-// Rendered on demand: the next date, the facts and the voices are in the first HTML,
-// so nothing on the page is swapped after load. The middleware's revalidate policy
-// keeps the seat count current.
+// Prerendered, so its photo is built with the page. What is live (the next date, the
+// facts that follow from it, the voices) comes as server islands, read on every visit.
+export const prerender = true;
+
+Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 const { meta, faq, journey_steps: evening } = home;
-const result = await fetchNextEventState();
-const state = dateStatus(result.status, result.event);
 
 const siteUrl = Astro.site ?? new URL('https://mens-circle.de');
 
@@ -67,14 +67,18 @@ schemas.push(eventSeriesSchema(siteUrl));
 ---
 
 <Layout title={meta.title} description={meta.description} schemas={schemas}>
-  <Hero {...home.hero} state={state} />
-  <Facts {...home.facts} next={state.next} />
+  <Hero {...home.hero} />
+  <Facts server:defer {...home.facts}>
+    <Facts slot="fallback" {...home.facts} state={PENDING} />
+  </Facts>
   <Intro {...home.intro} />
   <JourneySteps {...home.journey_steps} />
   <Statement {...home.statement} />
   <Moderator {...home.moderator} image={photo} />
   <Frame {...home.frame} />
-  <Testimonials {...home.testimonials} />
+  <Testimonials server:defer {...home.testimonials}>
+    <Testimonials slot="fallback" {...home.testimonials} pending />
+  </Testimonials>
   <Faq {...home.faq} />
-  <Dates {...home.dates} state={state} />
+  <Dates {...home.dates} />
 </Layout>

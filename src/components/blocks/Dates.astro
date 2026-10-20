@@ -1,15 +1,14 @@
 ---
-import { type DateStatus, nextDateView } from '@lib/event-status';
+import { PENDING } from '@lib/event-status';
 import { link } from '@lib/ui';
 
 import site from '../../data/site.json';
-import EventSummary from '../event/EventSummary.astro';
+import NextDate from '../event/NextDate.astro';
 import NewsletterForm from '../forms/NewsletterForm.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
-  state: DateStatus;
   anchor: string;
   eyebrow: string;
   displayLines: string[];
@@ -22,11 +21,11 @@ interface Props {
  * The close of the home page, in order of what it asks: first taking part — a
  * short invitation beside the next date (the same summary as in the hero) on the
  * secondary ground (`#termine`); then, smaller, on the paper, staying in touch:
- * dates by e-mail (`#newsletter`) and the WhatsApp group as a link.
+ * dates by e-mail (`#newsletter`) and the WhatsApp group as a link. The date
+ * is a server island.
  */
 
-const { state, anchor, eyebrow, displayLines, lede, newsletterText, whatsappText } = Astro.props;
-const view = nextDateView(state, 'notify');
+const { anchor, eyebrow, displayLines, lede, newsletterText, whatsappText } = Astro.props;
 const whatsapp = site.whatsappCommunityLink;
 const title = displayLines.join(' ');
 ---
@@ -40,7 +39,9 @@ const title = displayLines.join(' ');
   <SectionHead eyebrow={eyebrow} title={title} titleId="termine-title" lead={lede} class="lg:col-span-6" />
   <div class="lg:col-span-5 lg:col-start-8">
     <div class="min-w-0">
-      <EventSummary view={view} location="home-dates" />
+      <NextDate server:defer location="home-dates">
+        <NextDate slot="fallback" state={PENDING} location="home-dates" />
+      </NextDate>
     </div>
   </div>
 </Section>

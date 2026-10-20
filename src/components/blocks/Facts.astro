@@ -1,6 +1,6 @@
 ---
 import site from '@data/site.json';
-import { type NextEventSummary, splitFee } from '@lib/event-status';
+import { type DateStatus, readDateStatus, splitFee } from '@lib/event-status';
 import { label } from '@lib/ui';
 
 import Section from '../ui/Section.astro';
@@ -10,16 +10,18 @@ import Section from '../ui/Section.astro';
  * secondary ground: four equal cells (four columns on the desktop, two on the
  * tablet, one on phones), each a label, a short value and one line of detail. A
  * long fee keeps its value short; the rest goes to the detail. Never more
- * precise than the city.
+ * precise than the city. A server island on the home page: without `state` it
+ * reads the next date; the fallback shows what is always true.
  */
 
 interface Props {
-  next: NextEventSummary | null;
+  state?: DateStatus;
   anchor: string;
   eyebrow: string;
 }
 
-const { anchor, eyebrow, next } = Astro.props;
+const { anchor, eyebrow } = Astro.props;
+const { next } = Astro.props.state ?? (await readDateStatus());
 
 const fee = splitFee(next?.costBasis);
 
