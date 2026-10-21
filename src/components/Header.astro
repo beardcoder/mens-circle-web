@@ -22,9 +22,19 @@ import Container from './ui/Container.astro';
 const links = nav.header.links;
 const cta = nav.header.cta;
 
+const isCurrentPage = (url: string): boolean => {
+  const target = new URL(url, Astro.url);
+
+  return (
+    !target.hash &&
+    (Astro.url.pathname === target.pathname ||
+      (target.pathname === '/event' && Astro.url.pathname.startsWith('/event/')))
+  );
+};
+
 // A line slides in under a link from its start edge on hover and focus.
 const linkClass =
-  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100';
+  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-[current=page]:text-accent aria-[current=page]:after:scale-x-100';
 
 /** What you press is round. */
 const roundButton =
@@ -58,6 +68,7 @@ const roundButton =
           <li>
             <a
               href={link.url}
+              aria-current={isCurrentPage(link.url) ? 'page' : undefined}
               data-nav-link
               data-umami-event="nav-click"
               data-umami-event-target={link.umamiTarget}
@@ -72,6 +83,7 @@ const roundButton =
 
     <a
       href={cta.url}
+      aria-current={isCurrentPage(cta.url) ? 'page' : undefined}
       data-umami-event="cta-click"
       data-umami-event-location="header"
       data-umami-event-target={cta.umamiTarget}
@@ -128,10 +140,11 @@ const roundButton =
             <li class="border-b border-line" style={`--i: ${i}`}>
               <a
                 href={link.url}
+                aria-current={isCurrentPage(link.url) ? 'page' : undefined}
                 data-nav-link
                 data-umami-event="nav-click"
                 data-umami-event-target={link.umamiTarget}
-                class="group/link flex min-h-16 items-center justify-between text-xl font-medium transition-colors duration-180 hover:text-accent group-open/menu:animate-rise group-open/menu:[animation-delay:calc(180ms+var(--i)*60ms)]"
+                class="group/link flex min-h-16 items-center justify-between text-xl font-medium transition-colors duration-180 hover:text-accent group-open/menu:animate-rise group-open/menu:[animation-delay:calc(180ms+var(--i)*60ms)] aria-[current=page]:text-accent"
               >
                 {link.label}
                 <Icon
@@ -146,6 +159,7 @@ const roundButton =
       </nav>
       <a
         href={cta.url}
+        aria-current={isCurrentPage(cta.url) ? 'page' : undefined}
         data-nav-link
         data-umami-event="cta-click"
         data-umami-event-location="menu"

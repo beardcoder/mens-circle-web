@@ -26,6 +26,13 @@ settles from a subtle zoom, and the hero actions enter last. FAQ answers fade in
 page scroll. Scroll effects use native CSS timelines and fall back to visible,
 static content. All additions respect reduced motion and require no JavaScript.
 
+Review refinements: personal-page text sections use the shared heading/content
+split on desktop and stack on mobile. Navigation marks the current page. The footer
+uses the same sans wordmark as the header, with two-column navigation on phones.
+Long legal headings wrap and hyphenate. When no next date is scheduled, the home
+close displays a notification invitation instead of an empty column. Back-to-top
+visibility follows the existing scroll handler in all motion modes.
+
 The reference below describes the shared foundations; the public typography
 above takes precedence over the original serif heading specification.
 
@@ -156,7 +163,7 @@ thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
   words beside it say the same).
 - The phone menu opens as a circle from its button (`clip-path`, `--nav-origin`),
   its links rising in; the scroll-to-top button appears past the first screen
-  (`scroll-motion:`).
+  (`data-visible`, set by the existing scroll handler).
 - No parallax (nothing moves at its own speed against the page), no scroll-tied
   size changes, no `content-visibility` (anchors land where they should). Under
   `prefers-reduced-motion` everything rests and the timed breath guide hides.
@@ -211,7 +218,7 @@ that ends on one sets it itself.
   summary beside it; the evening's description (plain text rendered with real
   paragraphs and lists, `plainTextToHtml`) beside the registration card; the map;
   where next. A past date offers no registration.
-- **Personal page.** `PageIntro` with the photo, one reading column, the positions
+- **Personal page.** `PageIntro` with the photo, split heading/text sections, the positions
   and the FAQ in the same components, one closing invitation (a compact `alt`
   band).
 - **Testimonial form.** `PageIntro`, then the notes and the form in one column of

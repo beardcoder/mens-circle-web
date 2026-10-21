@@ -49,7 +49,7 @@ const whatsapp = site.whatsappCommunityLink;
       </ul>
     ) : (
       <div data-status={status} class:list={[card, 'mt-6 grid gap-3 p-6 sm:p-8']}>
-        <h3 class="font-serif text-sub text-fg">
+        <h3 class="text-sub text-fg">
           {status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
         </h3>
         <p class="max-w-measure text-md text-fg-soft">
