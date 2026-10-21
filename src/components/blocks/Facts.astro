@@ -44,8 +44,8 @@ const facts = [
     {eyebrow}
   </h2>
   <dl class="grid gap-x-grid gap-y-6 md:grid-cols-2 lg:grid-cols-4">
-    {facts.map((fact) => (
-      <div class="reveal grid content-start gap-1">
+    {facts.map((fact, i) => (
+      <div class="reveal reveal-stagger grid content-start gap-1" style={`--motion-order: ${i}`}>
         <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
         <dt class="text-sm text-fg-muted">{fact.label}</dt>
         <dd class="text-xl font-semibold text-fg">{fact.value}</dd>

@@ -18,7 +18,7 @@ interface Props {
 
 /**
  * The invitation to breathe, as a compact part of the course of an evening: a
- * panel on the secondary ground right under the phases, the short statement
+ * full-width band on the secondary ground under the phases, the short statement
  * (its second line in the italic accent), a few sentences, and the circle that
  * breathes on the cycle its guide names (4 s in, 5 s out: `breathe` in
  * theme.css). Under reduced motion the circle rests and the timed guide goes.
@@ -27,13 +27,13 @@ interface Props {
 const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.props;
 ---
 
-<Section id={anchor} space="none" labelledby="statement-title" class="pb-section">
-  <div class="reveal surface-alt grid items-center gap-x-grid gap-y-8 p-6 sm:p-10 lg:grid-cols-12 lg:p-12">
+<Section id={anchor} ground="alt" labelledby="statement-title">
+  <div class="reveal grid items-center gap-x-grid gap-y-8 lg:grid-cols-12">
     <div class="grid justify-items-start lg:col-span-7">
       {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
       <h2 id="statement-title" class="text-section text-fg">
         {lines.map((line, i) =>
-          i > 0 ? <em class="block text-accent">{line}</em> : <span class="block">{line}</span>,
+          i > 0 ? <em class="block font-serif font-normal text-accent">{line}</em> : <span class="block">{line}</span>,
         )}
       </h2>
       {text && <p class="mt-6 max-w-measure text-md text-fg-soft">{text}</p>}

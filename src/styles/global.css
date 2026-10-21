@@ -56,3 +56,85 @@
     opacity: 0;
   }
 }
+
+/* Public typography: a clear hierarchy with a lighter editorial weight.
+   Colours come exclusively from the shared warm-paper / charcoal / rust palette
+   in theme.css, including the light and dark surfaces. */
+@theme {
+  --text-hero: clamp(2.75rem, 1.65rem + 4vw, 5rem);
+  --text-hero--line-height: 1.08;
+  --text-hero--letter-spacing: -0.035em;
+  --text-section: clamp(1.875rem, 1.4rem + 1.9vw, 3.25rem);
+  --text-section--line-height: 1.14;
+  --text-section--letter-spacing: -0.03em;
+  --text-page: clamp(2.25rem, 1.6rem + 2.6vw, 4rem);
+  --text-page--line-height: 1.12;
+  --text-page--letter-spacing: -0.03em;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+}
+
+/* Scroll animations are progressive enhancement: all content is visible in
+   browsers without view timelines and when reduced motion is requested. */
+@keyframes scroll-reveal {
+  from {
+    opacity: 0;
+    translate: 0 2rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes photo-settle {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes reading-progress {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+/* Stagger by scroll position, not a timer: no delayed text after scrolling. */
+@utility reveal-stagger {
+  --reveal-start: calc(var(--motion-order, 0) * 7%);
+  --reveal-end: calc(75% + var(--motion-order, 0) * 7%);
+}
+
+@utility photo-reveal {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      animation: photo-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+
+/* Warm rust light stays to the right; the text sits on the dark base. */
+@utility hero-gradient {
+  background-image:
+    radial-gradient(ellipse at 95% 25%, color-mix(in srgb, var(--p-rust) 32%, transparent), transparent 62%),
+    radial-gradient(ellipse at 65% 110%, color-mix(in srgb, var(--p-rust-light) 12%, transparent), transparent 60%),
+    linear-gradient(120deg, var(--p-focus) 20%, var(--p-focus-raised) 100%);
+}

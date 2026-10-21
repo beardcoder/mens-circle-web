@@ -17,6 +17,11 @@
         "umamiTarget": "markus"
       },
       {
+        "label": "Warum ich den Kreis leite",
+        "url": "/warum-ich-den-maennerkreis-leite",
+        "umamiTarget": "warum-ich-den-maennerkreis-leite"
+      },
+      {
         "label": "Fragen",
         "url": "/#faq",
         "umamiTarget": "faq"
@@ -46,7 +51,7 @@
       "url": "/#faq"
     },
     {
-      "label": "Meine Haltung",
+      "label": "Warum ich den Kreis leite",
       "url": "/warum-ich-den-maennerkreis-leite"
     },
     {

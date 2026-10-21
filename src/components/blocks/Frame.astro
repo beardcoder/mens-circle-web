@@ -31,8 +31,8 @@ const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText }
 
   {agreements.length > 0 && (
     <ol role="list" class="mt-group grid gap-x-grid gap-y-6 md:grid-cols-2">
-      {agreements.map((rule) => (
-        <li class="reveal grid content-start gap-2">
+      {agreements.map((rule, i) => (
+        <li class="reveal reveal-stagger grid content-start gap-2" style={`--motion-order: ${i}`}>
           <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
           <h3 class="font-sans text-xl font-semibold text-fg hyphens-auto">{rule.title}</h3>
           <p class="max-w-measure text-md text-fg-soft">{rule.text}</p>
