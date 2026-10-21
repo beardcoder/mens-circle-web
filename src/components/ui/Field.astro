@@ -21,15 +21,27 @@ const { for: htmlFor, label, optional = false, hint, hintId, errorId, class: cla
 ---
 
 <div class={className}>
-  <label for={htmlFor} class={fieldLabel}>
+  <label
+    for={htmlFor}
+    class={fieldLabel}
+  >
     {label}
     {optional && <span class="font-normal text-fg-muted"> (optional)</span>}
   </label>
   <slot />
   {hint && (
-    <span id={hintId} class={fieldHint}>
+    <span
+      id={hintId}
+      class={fieldHint}
+    >
       {hint}
     </span>
   )}
-  {errorId && <span id={errorId} class={fieldError} hidden />}
+  {errorId && (
+    <span
+      id={errorId}
+      class={fieldError}
+      hidden
+    />
+  )}
 </div>
