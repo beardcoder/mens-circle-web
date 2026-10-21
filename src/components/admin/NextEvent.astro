@@ -42,7 +42,10 @@ const timeStr = timeRange(event.startTime, event.endTime);
 <section class="mb-10 border border-t-4 border-line-strong border-t-accent bg-raised p-[clamp(1.1rem,3vw,1.6rem)]">
   <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
     <Eyebrow>Nächstes Event · Planung</Eyebrow>
-    <a class={button({ size: 'xs' })} href={`/admin/events/${event.id}/registrations`}>
+    <a
+      class={button({ size: 'xs' })}
+      href={`/admin/events/${event.id}/registrations`}
+    >
       Anmeldungen verwalten
     </a>
   </div>
@@ -62,7 +65,10 @@ const timeStr = timeRange(event.startTime, event.endTime);
   </div>
 
   <div class="grid items-center gap-8 pt-5 sm:grid-cols-[minmax(0,280px)_1fr]">
-    <CircleSeating seats={seats} capacity={event.maxParticipants} />
+    <CircleSeating
+      seats={seats}
+      capacity={event.maxParticipants}
+    />
 
     <div class="grid gap-x-8 gap-y-6 self-start sm:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
       <div>
@@ -81,7 +87,10 @@ const timeStr = timeRange(event.startTime, event.endTime);
                 <span class="text-xs text-fg-muted tabular-nums">{String(i + 1).padStart(2, '0')}</span>
                 <span class="text-sm">{name(p)}</span>
                 {p.status === 'attended' && (
-                  <Badge tone="live" class="ml-auto">
+                  <Badge
+                    tone="live"
+                    class="ml-auto"
+                  >
                     da
                   </Badge>
                 )}

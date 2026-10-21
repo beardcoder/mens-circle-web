@@ -22,8 +22,16 @@ const { class: className } = Astro.props;
     className,
   ]}
 >
-  <Icon name="theme-dark" aria-hidden="true" class="size-4.5 dark:hidden" />
-  <Icon name="theme-light" aria-hidden="true" class="hidden size-4.5 dark:block" />
+  <Icon
+    name="theme-dark"
+    aria-hidden="true"
+    class="size-4.5 dark:hidden"
+  />
+  <Icon
+    name="theme-light"
+    aria-hidden="true"
+    class="hidden size-4.5 dark:block"
+  />
   <span class="dark:hidden">Dunkle Darstellung</span>
   <span class="hidden dark:inline">Helle Darstellung</span>
 </button>

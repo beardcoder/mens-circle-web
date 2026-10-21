@@ -24,10 +24,18 @@ const sectionId = anchor ?? slug;
 const hasHead = Boolean(eyebrow || title);
 ---
 
-<Section id={sectionId || undefined} space="band">
+<Section
+  id={sectionId || undefined}
+  space="band"
+>
   {hasHead ? (
     <Split>
-      <SectionHead slot="head" eyebrow={eyebrow} title={title} size="sub" />
+      <SectionHead
+        slot="head"
+        eyebrow={eyebrow}
+        title={title}
+        size="sub"
+      />
       {content && <Prose html={content} />}
     </Split>
   ) : (

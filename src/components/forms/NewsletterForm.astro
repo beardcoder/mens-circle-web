@@ -30,7 +30,10 @@ const { context = {}, id = 'newsletter-form', class: className } = Astro.props;
   <div class="flex flex-col items-stretch gap-3 @lg:flex-row @lg:items-end">
     {/* A real, visible <label>, not an aria-label over a placeholder. */}
     <div class="min-w-0 flex-1">
-      <label class={fieldLabel} for={`${id}-email`}>
+      <label
+        class={fieldLabel}
+        for={`${id}-email`}
+      >
         E-Mail-Adresse
       </label>
       <input
@@ -45,11 +48,19 @@ const { context = {}, id = 'newsletter-form', class: className } = Astro.props;
         class={control()}
       />
     </div>
-    <Button type="submit" variant="secondary" class="shrink-0">
+    <Button
+      type="submit"
+      variant="secondary"
+      class="shrink-0"
+    >
       Termine per E-Mail erhalten
     </Button>
   </div>
-  <span class={fieldError} id={`${id}-email-error`} hidden></span>
+  <span
+    class={fieldError}
+    id={`${id}-email-error`}
+    hidden
+  ></span>
   <FormStatus form={id} />
 </form>
 

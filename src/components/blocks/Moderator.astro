@@ -29,7 +29,11 @@ interface Props {
 const { anchor, eyebrow, name, quote, bio, image, imageAlt, linkLabel, linkUrl } = Astro.props;
 ---
 
-<Section id={anchor} labelledby="person-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
+<Section
+  id={anchor}
+  labelledby="person-title"
+  innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12"
+>
   <SectionHead
     eyebrow={eyebrow}
     title={name}
@@ -57,7 +61,10 @@ const { anchor, eyebrow, name, quote, bio, image, imageAlt, linkLabel, linkUrl }
     )}
     {bio && <Prose html={bio} />}
     {linkLabel && linkUrl && (
-      <TextLink href={linkUrl} data-astro-prefetch="hover">
+      <TextLink
+        href={linkUrl}
+        data-astro-prefetch="hover"
+      >
         {linkLabel}
       </TextLink>
     )}

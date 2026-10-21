@@ -39,10 +39,26 @@ const fire = full ? 'fill-success' : 'fill-accent';
     aria-label={`Sitzkreis: ${seats.length} von ${capacity} Plätzen belegt`}
     class="block h-auto w-full overflow-visible"
   >
-    <circle class="stroke-line [stroke-width:1.5]" cx={C} cy={C} r={R} fill="none"></circle>
+    <circle
+      class="stroke-line [stroke-width:1.5]"
+      cx={C}
+      cy={C}
+      r={R}
+      fill="none"
+    ></circle>
 
-    <circle class:list={['origin-center animate-glow opacity-20 transform-fill', fire]} cx={C} cy={C} r="46"></circle>
-    <circle class:list={[fire]} cx={C} cy={C} r="30"></circle>
+    <circle
+      class:list={['origin-center animate-glow opacity-20 transform-fill', fire]}
+      cx={C}
+      cy={C}
+      r="46"
+    ></circle>
+    <circle
+      class:list={[fire]}
+      cx={C}
+      cy={C}
+      r="30"
+    ></circle>
     <text
       class="fill-on-accent text-[19px] font-semibold tabular-nums"
       x={C}
@@ -57,7 +73,12 @@ const fire = full ? 'fill-success' : 'fill-accent';
     {points.map((p) =>
       p.seat ? (
         <g>
-          <circle class={fire} cx={p.x} cy={p.y} r={NODE} />
+          <circle
+            class={fire}
+            cx={p.x}
+            cy={p.y}
+            r={NODE}
+          />
           <text
             class="fill-on-accent text-[13px] font-semibold"
             x={p.x}

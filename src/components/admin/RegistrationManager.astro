@@ -56,14 +56,25 @@ function badgeTone(s: RegistrationStatus): 'live' | 'wait' | 'off' {
 }
 ---
 
-<AdminHead eyebrow="Anmeldungen" title={eventTitle}>
-  <a class={button({ variant: 'secondary' })} href="/admin">
+<AdminHead
+  eyebrow="Anmeldungen"
+  title={eventTitle}
+>
+  <a
+    class={button({ variant: 'secondary' })}
+    href="/admin"
+  >
     Zurück
   </a>
 </AdminHead>
 
 <div class:list={[card, 'mb-6 flex items-center gap-5 p-5']}>
-  <CapacityRing value={activeCount} max={maxParticipants} size={76} stroke={6} />
+  <CapacityRing
+    value={activeCount}
+    max={maxParticipants}
+    size={76}
+    stroke={6}
+  />
   <div class="grid gap-1">
     <p>
       {/* `{' '}`: a line break after "von" collapses to nothing ("von8"). */}
@@ -96,7 +107,12 @@ function badgeTone(s: RegistrationStatus): 'live' | 'wait' | 'off' {
     </p>
   </div>
   <div class="flex flex-wrap items-center gap-2">
-    <button class={button({ size: 'sm' })} type="button" data-resend-missing disabled={missingConfirmation === 0}>
+    <button
+      class={button({ size: 'sm' })}
+      type="button"
+      data-resend-missing
+      disabled={missingConfirmation === 0}
+    >
       Fehlende senden
     </button>
     <button
@@ -115,9 +131,17 @@ function badgeTone(s: RegistrationStatus): 'live' | 'wait' | 'off' {
     Noch keine Anmeldungen.
   </div>
 ) : (
-  <ul id="reg-list" class="mb-10 flex flex-col gap-3" data-event={eventId}>
+  <ul
+    id="reg-list"
+    class="mb-10 flex flex-col gap-3"
+    data-event={eventId}
+  >
     {registrations.map((reg) => (
-      <li class:list={[card, 'grid gap-2 px-5 py-4']} data-id={reg.id} data-name={`${reg.firstName} ${reg.lastName}`}>
+      <li
+        class:list={[card, 'grid gap-2 px-5 py-4']}
+        data-id={reg.id}
+        data-name={`${reg.firstName} ${reg.lastName}`}
+      >
         <div class="flex items-center justify-between gap-3">
           <span class="font-serif text-lg">
             {reg.firstName} {reg.lastName}
@@ -125,7 +149,10 @@ function badgeTone(s: RegistrationStatus): 'live' | 'wait' | 'off' {
           <Badge tone={badgeTone(reg.status)}>{STATUS_LABEL[reg.status]}</Badge>
         </div>
         <div class="min-w-0 text-sm break-words text-fg-muted">
-          <a href={`mailto:${reg.email}`} class="underline decoration-line-strong underline-offset-2 hover:text-fg">
+          <a
+            href={`mailto:${reg.email}`}
+            class="underline decoration-line-strong underline-offset-2 hover:text-fg"
+          >
             {reg.email}
           </a>
           {reg.phone && <span> · {reg.phone}</span>}
@@ -143,7 +170,11 @@ function badgeTone(s: RegistrationStatus): 'live' | 'wait' | 'off' {
           </span>
           <div class="flex flex-wrap items-center gap-2 max-sm:w-full">
             {(reg.status === 'registered' || reg.status === 'waitlist') && (
-              <button class={button({ variant: 'secondary', size: 'xs' })} type="button" data-resend-one>
+              <button
+                class={button({ variant: 'secondary', size: 'xs' })}
+                type="button"
+                data-resend-one
+              >
                 Bestätigung senden
               </button>
             )}
@@ -152,20 +183,36 @@ function badgeTone(s: RegistrationStatus): 'live' | 'wait' | 'off' {
               aria-label={`Status von ${reg.firstName} ${reg.lastName} ändern`}
               class:list={[control('xs'), 'max-sm:flex-1']}
             >
-              <option value="registered" selected={reg.status === 'registered'}>
+              <option
+                value="registered"
+                selected={reg.status === 'registered'}
+              >
                 Angemeldet
               </option>
-              <option value="waitlist" selected={reg.status === 'waitlist'}>
+              <option
+                value="waitlist"
+                selected={reg.status === 'waitlist'}
+              >
                 Warteliste
               </option>
-              <option value="attended" selected={reg.status === 'attended'}>
+              <option
+                value="attended"
+                selected={reg.status === 'attended'}
+              >
                 Teilgenommen
               </option>
-              <option value="cancelled" selected={reg.status === 'cancelled'}>
+              <option
+                value="cancelled"
+                selected={reg.status === 'cancelled'}
+              >
                 Storniert
               </option>
             </select>
-            <button class={button({ variant: 'danger', size: 'xs' })} type="button" data-delete>
+            <button
+              class={button({ variant: 'danger', size: 'xs' })}
+              type="button"
+              data-delete
+            >
               Entfernen
             </button>
           </div>
@@ -182,14 +229,37 @@ function badgeTone(s: RegistrationStatus): 'live' | 'wait' | 'off' {
     <code class="bg-ground px-1.5 py-0.5 text-[0.9em] text-accent">{'{first_name}'}</code> wird durch den Vornamen
     ersetzt.
   </p>
-  <form id="broadcast-form" class:list={[panel, 'grid gap-5']} data-event={eventId}>
-    <Field for="msg-subject" label="Betreff">
-      <input id="msg-subject" name="subject" type="text" class={control('sm')} />
+  <form
+    id="broadcast-form"
+    class:list={[panel, 'grid gap-5']}
+    data-event={eventId}
+  >
+    <Field
+      for="msg-subject"
+      label="Betreff"
+    >
+      <input
+        id="msg-subject"
+        name="subject"
+        type="text"
+        class={control('sm')}
+      />
     </Field>
-    <Field for="msg-content" label="Nachricht">
-      <textarea id="msg-content" name="content" rows="6" class:list={[control('sm'), 'resize-y']}></textarea>
+    <Field
+      for="msg-content"
+      label="Nachricht"
+    >
+      <textarea
+        id="msg-content"
+        name="content"
+        rows="6"
+        class:list={[control('sm'), 'resize-y']}
+      ></textarea>
     </Field>
-    <button class:list={[button(), 'justify-self-start']} type="submit">
+    <button
+      class:list={[button(), 'justify-self-start']}
+      type="submit"
+    >
       Nachricht senden
     </button>
   </form>

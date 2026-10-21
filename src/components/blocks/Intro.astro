@@ -23,8 +23,17 @@ interface Props {
 const { anchor, eyebrow, title, text, questionsLabel, questions, close } = Astro.props;
 ---
 
-<Section id={anchor} labelledby="ueber-title" innerClass="grid gap-x-grid gap-y-6 lg:grid-cols-12">
-  <SectionHead eyebrow={eyebrow} title={title} titleId="ueber-title" class="lg:col-span-12" />
+<Section
+  id={anchor}
+  labelledby="ueber-title"
+  innerClass="grid gap-x-grid gap-y-6 lg:grid-cols-12"
+>
+  <SectionHead
+    eyebrow={eyebrow}
+    title={title}
+    titleId="ueber-title"
+    class="lg:col-span-12"
+  />
   <div class="lg:col-span-7">
     {text && <Prose html={text} />}
     {close && <p class="mt-6 max-w-measure text-md font-semibold text-fg">{close}</p>}
@@ -35,12 +44,21 @@ const { anchor, eyebrow, title, text, questionsLabel, questions, close } = Astro
       aria-labelledby="ueber-questions-label"
       class="border-line max-lg:mt-4 max-lg:border-t max-lg:pt-8 lg:col-span-4 lg:col-start-9 lg:self-start lg:border-l lg:pl-8"
     >
-      <h3 id="ueber-questions-label" class="font-sans text-base font-semibold text-fg">
+      <h3
+        id="ueber-questions-label"
+        class="font-sans text-base font-semibold text-fg"
+      >
         {questionsLabel}
       </h3>
-      <ul role="list" class="mt-4 grid gap-3">
+      <ul
+        role="list"
+        class="mt-4 grid gap-3"
+      >
         {questions.map((question, i) => (
-          <li class="reveal reveal-stagger text-md text-fg-soft" style={`--motion-order: ${i}`}>
+          <li
+            class="reveal reveal-stagger text-md text-fg-soft"
+            style={`--motion-order: ${i}`}
+          >
             {question}
           </li>
         ))}

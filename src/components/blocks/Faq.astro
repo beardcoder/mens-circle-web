@@ -28,14 +28,30 @@ interface Props {
 const { anchor, eyebrow, title, intro, items } = Astro.props;
 ---
 
-<Section id={anchor} labelledby={`${anchor}-title`}>
+<Section
+  id={anchor}
+  labelledby={`${anchor}-title`}
+>
   <Split>
-    <div slot="head" class="grid justify-items-start gap-6">
-      <SectionHead eyebrow={eyebrow} title={title} titleId={`${anchor}-title`} lead={intro} leadHtml size="sub" />
+    <div
+      slot="head"
+      class="grid justify-items-start gap-6"
+    >
+      <SectionHead
+        eyebrow={eyebrow}
+        title={title}
+        titleId={`${anchor}-title`}
+        lead={intro}
+        leadHtml
+        size="sub"
+      />
       {site.contactEmail && (
         <p class="max-w-measure text-base text-fg-muted">
           Deine Frage ist nicht dabei? Schreib mir an{' '}
-          <a class={link} href={`mailto:${site.contactEmail}`}>
+          <a
+            class={link}
+            href={`mailto:${site.contactEmail}`}
+          >
             {site.contactEmail}
           </a>
           .

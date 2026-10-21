@@ -27,7 +27,10 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
   eyebrow={isEdit ? 'Bearbeiten' : 'Anlegen'}
   title={isEdit ? 'Veranstaltung bearbeiten' : 'Neue Veranstaltung'}
 >
-  <a class={button({ variant: 'secondary' })} href="/admin">
+  <a
+    class={button({ variant: 'secondary' })}
+    href="/admin"
+  >
     Zurück
   </a>
 </AdminHead>
@@ -38,13 +41,31 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
   </p>
 )}
 
-<form id="event-form" class:list={[panel, 'grid gap-5']} data-id={event?.id ?? ''} data-edit={isEdit ? '1' : ''}>
-  <Field for="title" label="Titel *">
-    <input id="title" name="title" type="text" value={v.title ?? ''} required class={input} />
+<form
+  id="event-form"
+  class:list={[panel, 'grid gap-5']}
+  data-id={event?.id ?? ''}
+  data-edit={isEdit ? '1' : ''}
+>
+  <Field
+    for="title"
+    label="Titel *"
+  >
+    <input
+      id="title"
+      name="title"
+      type="text"
+      value={v.title ?? ''}
+      required
+      class={input}
+    />
   </Field>
 
   <div class={row}>
-    <Field for="eventDate" label="Datum *">
+    <Field
+      for="eventDate"
+      label="Datum *"
+    >
       <input
         id="eventDate"
         name="eventDate"
@@ -54,7 +75,10 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
         class:list={[input, 'tabular-nums']}
       />
     </Field>
-    <Field for="startTime" label="Beginn">
+    <Field
+      for="startTime"
+      label="Beginn"
+    >
       <input
         id="startTime"
         name="startTime"
@@ -63,13 +87,25 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
         class:list={[input, 'tabular-nums']}
       />
     </Field>
-    <Field for="endTime" label="Ende">
-      <input id="endTime" name="endTime" type="time" value={v.endTime ?? ''} class:list={[input, 'tabular-nums']} />
+    <Field
+      for="endTime"
+      label="Ende"
+    >
+      <input
+        id="endTime"
+        name="endTime"
+        type="time"
+        value={v.endTime ?? ''}
+        class:list={[input, 'tabular-nums']}
+      />
     </Field>
   </div>
 
   <div class={row}>
-    <Field for="maxParticipants" label="Max. Teilnehmer">
+    <Field
+      for="maxParticipants"
+      label="Max. Teilnehmer"
+    >
       <input
         id="maxParticipants"
         name="maxParticipants"
@@ -95,29 +131,78 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
         class={input}
       />
     </Field>
-    <Field for="slug" label="Slug">
-      <input id="slug" name="slug" type="text" value={v.slug ?? ''} placeholder="auto aus Datum" class={input} />
+    <Field
+      for="slug"
+      label="Slug"
+    >
+      <input
+        id="slug"
+        name="slug"
+        type="text"
+        value={v.slug ?? ''}
+        placeholder="auto aus Datum"
+        class={input}
+      />
     </Field>
   </div>
 
-  <Field for="location" label="Ort (Name)">
-    <input id="location" name="location" type="text" value={v.location ?? ''} class={input} />
+  <Field
+    for="location"
+    label="Ort (Name)"
+  >
+    <input
+      id="location"
+      name="location"
+      type="text"
+      value={v.location ?? ''}
+      class={input}
+    />
   </Field>
 
   <div class={row}>
-    <Field for="street" label="Straße">
-      <input id="street" name="street" type="text" value={v.street ?? ''} class={input} />
+    <Field
+      for="street"
+      label="Straße"
+    >
+      <input
+        id="street"
+        name="street"
+        type="text"
+        value={v.street ?? ''}
+        class={input}
+      />
     </Field>
-    <Field for="postalCode" label="PLZ">
-      <input id="postalCode" name="postalCode" type="text" value={v.postalCode ?? ''} class={input} />
+    <Field
+      for="postalCode"
+      label="PLZ"
+    >
+      <input
+        id="postalCode"
+        name="postalCode"
+        type="text"
+        value={v.postalCode ?? ''}
+        class={input}
+      />
     </Field>
-    <Field for="city" label="Stadt">
-      <input id="city" name="city" type="text" value={v.city ?? ''} class={input} />
+    <Field
+      for="city"
+      label="Stadt"
+    >
+      <input
+        id="city"
+        name="city"
+        type="text"
+        value={v.city ?? ''}
+        class={input}
+      />
     </Field>
   </div>
 
   <div class={row}>
-    <Field for="latitude" label="Breitengrad (lat)">
+    <Field
+      for="latitude"
+      label="Breitengrad (lat)"
+    >
       <input
         id="latitude"
         name="latitude"
@@ -127,7 +212,10 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
         class:list={[input, 'tabular-nums']}
       />
     </Field>
-    <Field for="longitude" label="Längengrad (lng)">
+    <Field
+      for="longitude"
+      label="Längengrad (lng)"
+    >
       <input
         id="longitude"
         name="longitude"
@@ -139,7 +227,10 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
     </Field>
   </div>
 
-  <Field for="locationDetails" label="Hinweis zum Ort / Treffpunkt">
+  <Field
+    for="locationDetails"
+    label="Hinweis zum Ort / Treffpunkt"
+  >
     <textarea
       id="locationDetails"
       name="locationDetails"
@@ -147,7 +238,10 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
     >{v.locationDetails ?? ''}</textarea>
   </Field>
 
-  <Field for="description" label="Beschreibung">
+  <Field
+    for="description"
+    label="Beschreibung"
+  >
     <textarea
       id="description"
       name="description"
@@ -156,8 +250,18 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
     >{v.description ?? ''}</textarea>
   </Field>
 
-  <Field for="imageUrl" label="Bild-URL">
-    <input id="imageUrl" name="imageUrl" type="url" value={v.imageUrl ?? ''} placeholder="https://…" class={input} />
+  <Field
+    for="imageUrl"
+    label="Bild-URL"
+  >
+    <input
+      id="imageUrl"
+      name="imageUrl"
+      type="url"
+      value={v.imageUrl ?? ''}
+      placeholder="https://…"
+      class={input}
+    />
   </Field>
 
   <label class="flex cursor-pointer items-center gap-3 text-base">
@@ -170,7 +274,10 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
     <span>Veröffentlicht (öffentlich sichtbar)</span>
   </label>
 
-  <button class:list={[button(), 'min-w-44 justify-self-start']} type="submit">
+  <button
+    class:list={[button(), 'min-w-44 justify-self-start']}
+    type="submit"
+  >
     Speichern
   </button>
 </form>
@@ -184,8 +291,15 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
       Titel, Datum, Ort und der Link zur Veranstaltung werden automatisch ergänzt; Anrede, Grußformel, Fußzeile und
       Abmeldelink kommen aus der listmonk-Vorlage.
     </p>
-    <form id="newsletter-form" class:list={[panel, 'grid gap-5']} data-id={event?.id ?? ''}>
-      <Field for="nl-subject" label="Betreff *">
+    <form
+      id="newsletter-form"
+      class:list={[panel, 'grid gap-5']}
+      data-id={event?.id ?? ''}
+    >
+      <Field
+        for="nl-subject"
+        label="Betreff *"
+      >
         <input
           id="nl-subject"
           name="subject"
@@ -195,10 +309,22 @@ const row = 'grid gap-x-4 gap-y-5 sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr
           class={input}
         />
       </Field>
-      <Field for="nl-intro" label="Einleitungstext">
-        <textarea id="nl-intro" name="intro" rows="8" set:text={nlIntro} class:list={[input, 'resize-y']} />
+      <Field
+        for="nl-intro"
+        label="Einleitungstext"
+      >
+        <textarea
+          id="nl-intro"
+          name="intro"
+          rows="8"
+          set:text={nlIntro}
+          class:list={[input, 'resize-y']}
+        />
       </Field>
-      <button class:list={[button({ variant: 'secondary' }), 'min-w-44 justify-self-start']} type="submit">
+      <button
+        class:list={[button({ variant: 'secondary' }), 'min-w-44 justify-self-start']}
+        type="submit"
+      >
         Newsletter senden
       </button>
     </form>

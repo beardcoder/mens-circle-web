@@ -38,7 +38,11 @@ const SPACES: Record<Space, string> = {
 const { id, ground = 'default', space = 'default', labelledby, class: className, innerClass } = Astro.props;
 ---
 
-<section id={id} aria-labelledby={labelledby} class:list={['relative', GROUNDS[ground], SPACES[space], className]}>
+<section
+  id={id}
+  aria-labelledby={labelledby}
+  class:list={['relative', GROUNDS[ground], SPACES[space], className]}
+>
   <Container class={innerClass}>
     <slot />
   </Container>

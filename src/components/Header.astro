@@ -58,12 +58,22 @@ const roundButton =
       aria-label={`${site.siteName} – Startseite`}
       class="group/logo flex min-h-11 min-w-0 items-center gap-3 font-sans text-xl font-medium tracking-[-0.025em]"
     >
-      <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+      <Icon
+        name="logo"
+        aria-hidden="true"
+        class="size-9 shrink-0"
+      />
       <span class="max-[22.5rem]:sr-only">Männerkreis</span>
     </a>
 
-    <nav aria-label="Hauptnavigation" class="ml-auto max-nav:hidden">
-      <ul role="list" class="flex items-center gap-1">
+    <nav
+      aria-label="Hauptnavigation"
+      class="ml-auto max-nav:hidden"
+    >
+      <ul
+        role="list"
+        class="flex items-center gap-1"
+      >
         {links.map((link) => (
           <li>
             <a
@@ -99,7 +109,11 @@ const roundButton =
       aria-haspopup="dialog"
       class:list={[roundButton, 'nav:hidden max-[26rem]:px-2.5']}
     >
-      <Icon name="menu" aria-hidden="true" class="size-5" />
+      <Icon
+        name="menu"
+        aria-hidden="true"
+        class="size-5"
+      />
       <span class="max-[26rem]:sr-only">Menü</span>
     </button>
   </Container>
@@ -125,19 +139,37 @@ const roundButton =
         class="flex min-h-11 min-w-0 items-center gap-3 font-sans text-xl font-medium tracking-[-0.025em]"
         data-nav-link
       >
-        <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+        <Icon
+          name="logo"
+          aria-hidden="true"
+          class="size-9 shrink-0"
+        />
         <span>Männerkreis</span>
       </a>
-      <button type="button" data-nav-close class:list={[roundButton, 'ml-auto']}>
-        <Icon name="close" aria-hidden="true" class="size-5" />
+      <button
+        type="button"
+        data-nav-close
+        class:list={[roundButton, 'ml-auto']}
+      >
+        <Icon
+          name="close"
+          aria-hidden="true"
+          class="size-5"
+        />
         <span>Schließen</span>
       </button>
     </Container>
     <Container class="grid gap-8 py-8">
       <nav aria-label="Hauptnavigation">
-        <ul role="list" class="grid border-t border-line">
+        <ul
+          role="list"
+          class="grid border-t border-line"
+        >
           {links.map((link, i) => (
-            <li class="border-b border-line" style={`--i: ${i}`}>
+            <li
+              class="border-b border-line"
+              style={`--i: ${i}`}
+            >
               <a
                 href={link.url}
                 aria-current={isCurrentPage(link.url) ? 'page' : undefined}

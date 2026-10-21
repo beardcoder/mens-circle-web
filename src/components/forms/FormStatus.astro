@@ -11,4 +11,10 @@ interface Props {
 const { form, class: className } = Astro.props;
 ---
 
-<p id={`${form}-status`} data-form-status aria-live="polite" hidden class:list={[formStatus, className]}></p>
+<p
+  id={`${form}-status`}
+  data-form-status
+  aria-live="polite"
+  hidden
+  class:list={[formStatus, className]}
+></p>
