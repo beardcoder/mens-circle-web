@@ -1,4 +1,6 @@
 ---
+import { button } from '@lib/ui';
+
 import Eyebrow from '../ui/Eyebrow.astro';
 import Section from '../ui/Section.astro';
 import TextLink from '../ui/TextLink.astro';
@@ -20,8 +22,8 @@ interface Props {
  * The invitation to breathe, as a compact part of the course of an evening: a
  * full-width band on the secondary ground under the phases, the short statement
  * (its second line in the italic accent), a few sentences, and the circle that
- * breathes on the cycle its guide names (4 s in, 5 s out: `breathe` in
- * theme.css). Under reduced motion the circle rests and the timed guide goes.
+ * follows an optional rhythm (4 s in, 5 s out: `breath-cycle` in global.css).
+ * Under reduced motion the instruction and circle remain static.
  */
 
 const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.props;
@@ -45,14 +47,38 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
     </div>
 
     {breathGuide && (
-      <div class="flex items-center gap-6 lg:col-span-4 lg:col-start-9 lg:flex-col lg:text-center">
-        <span class="relative grid size-28 shrink-0 place-items-center lg:size-44" aria-hidden="true">
-          <span class="absolute inset-0 animate-breathe rounded-full border border-fill/50 [--alpha:1] [--rest:0.62]"></span>
-          <span class="absolute inset-[14%] animate-breathe rounded-full border border-fill/40 animate-delay-[150ms] [--alpha:1] [--rest:0.55]"></span>
-          <span class="absolute inset-[30%] animate-breathe rounded-full bg-fill/15 animate-delay-[300ms] [--alpha:1] [--rest:0.5]"></span>
+      <div
+        data-breath
+        class="group/breath flex flex-wrap items-center gap-6 lg:col-span-4 lg:col-start-9 lg:flex-col lg:text-center"
+      >
+        <span class="breath-orbit relative grid size-28 shrink-0 place-items-center lg:size-44" aria-hidden="true">
+          <span class="breath-ring absolute inset-0 rounded-full border border-fill/50 [--alpha:1] [--rest:0.62]"></span>
+          <span class="breath-ring absolute inset-[14%] rounded-full border border-fill/40 [--alpha:1] [--rest:0.55]"></span>
+          <span class="breath-ring absolute inset-[30%] rounded-full bg-fill/15 [--alpha:1] [--rest:0.5]"></span>
           <span class="size-2 rounded-full bg-fill"></span>
         </span>
-        <p class="font-serif text-xl text-fg motion-reduce:hidden">{breathGuide}</p>
+        <div class="grid flex-1 justify-items-start gap-3 lg:justify-items-center">
+          <p id="breath-guide" class="max-w-[25ch] text-base text-fg-soft">
+            {breathGuide}
+          </p>
+          <span
+            aria-hidden="true"
+            class="breath-phase invisible grid font-serif text-xl text-accent group-data-[running]/breath:visible motion-reduce:hidden"
+          >
+            <span class="breath-in col-start-1 row-start-1">Einatmen</span>
+            <span class="breath-out col-start-1 row-start-1">Ausatmen</span>
+          </span>
+          <button
+            type="button"
+            data-breath-toggle
+            hidden
+            aria-pressed="false"
+            aria-describedby="breath-guide"
+            class:list={[button({ variant: 'secondary', size: 'sm' }), 'motion-reduce:hidden']}
+          >
+            Rhythmus starten
+          </button>
+        </div>
       </div>
     )}
   </div>

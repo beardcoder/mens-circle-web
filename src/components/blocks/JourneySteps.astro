@@ -30,7 +30,7 @@ const { anchor, eyebrow, title, subtitle, steps, close } = Astro.props;
   <SectionHead eyebrow={eyebrow} title={title} titleId="ablauf-title" lead={subtitle} />
 
   {steps.length > 0 && (
-    <ol role="list" class="mt-group grid gap-x-grid gap-y-8 md:grid-cols-2 lg:grid-cols-4">
+    <ol role="list" class="journey-flow mt-group grid items-start gap-x-grid gap-y-8 md:grid-cols-2 lg:grid-cols-4">
       {steps.map((step, i) => (
         <li class="reveal reveal-stagger group/step grid content-start gap-3" style={`--motion-order: ${i}`}>
           <span aria-hidden="true" class="draw mb-2 block h-px bg-line-strong"></span>

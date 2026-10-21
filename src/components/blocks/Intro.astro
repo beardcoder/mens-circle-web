@@ -39,8 +39,10 @@ const { anchor, eyebrow, title, text, questionsLabel, questions, close } = Astro
         {questionsLabel}
       </h3>
       <ul role="list" class="mt-4 grid gap-3">
-        {questions.map((question) => (
-          <li class="text-md text-fg-soft">{question}</li>
+        {questions.map((question, i) => (
+          <li class="reveal reveal-stagger text-md text-fg-soft" style={`--motion-order: ${i}`}>
+            {question}
+          </li>
         ))}
       </ul>
     </aside>
