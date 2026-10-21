@@ -2,6 +2,17 @@
 
 ## Public design update — October 2026
 
+Organic refinements: section transitions keep their straight edges.
+Hero rings have subtly uneven contours. On desktop the four
+evening phases sit at different heights; on smaller screens they keep their regular
+reading order. The intro questions use the existing staggered scroll reveal.
+
+The breath illustration now rests until its button starts it. Rings and phase
+labels share an exact nine-second cycle (four seconds in, five out, no holds).
+The button stops it, as do leaving the viewport, hiding the tab or enabling reduced
+motion. Under reduced motion the illustration and instruction remain static and
+the controls hide. No additional dependencies are used.
+
 The public site uses medium-weight DM Sans headings with Playfair italic for the
 hero emphasis and the breath statement. Hero titles scale from 44–80px, section
 titles from 30–52px. These typography overrides live in `src/styles/global.css`;

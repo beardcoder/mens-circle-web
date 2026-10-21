@@ -138,3 +138,71 @@
     radial-gradient(ellipse at 65% 110%, color-mix(in srgb, var(--p-rust-light) 12%, transparent), transparent 60%),
     linear-gradient(120deg, var(--p-focus) 20%, var(--p-focus-raised) 100%);
 }
+
+/* A slight change in height lets the evening read as a sequence rather than a table. */
+.journey-flow > li {
+  @media (width >= 64rem) {
+    &:nth-child(2) {
+      margin-block-start: 2.5rem;
+    }
+
+    &:nth-child(3) {
+      margin-block-start: 4rem;
+    }
+
+    &:nth-child(4) {
+      margin-block-start: 1.5rem;
+    }
+  }
+}
+
+/* The shape rests until the visitor explicitly starts the rhythm. Text and
+   rings share one clock: four seconds in, five out, without live announcements. */
+.breath-orbit {
+  border-radius: 47% 53% 58% 42% / 53% 43% 57% 47%;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--color-fill) 9%, transparent), transparent 72%);
+}
+
+[data-breath][data-running] .breath-ring {
+  animation: breath-cycle 9s ease-in-out infinite;
+}
+
+[data-breath][data-running] .breath-in {
+  animation: breath-in 9s steps(1, end) infinite;
+}
+
+[data-breath][data-running] .breath-out {
+  animation: breath-out 9s steps(1, end) infinite;
+}
+
+@keyframes breath-in {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  44.444% {
+    opacity: 0;
+  }
+}
+
+@keyframes breath-cycle {
+  0%,
+  100% {
+    opacity: 0.45;
+    scale: var(--rest, 0.62);
+  }
+  44.444% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes breath-out {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  44.444% {
+    opacity: 1;
+  }
+}
