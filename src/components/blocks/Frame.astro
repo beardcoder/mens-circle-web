@@ -26,14 +26,32 @@ interface Props {
 const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props;
 ---
 
-<Section id={anchor} ground="alt" labelledby="rahmen-title">
-  <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} />
+<Section
+  id={anchor}
+  ground="alt"
+  labelledby="rahmen-title"
+>
+  <SectionHead
+    eyebrow={eyebrow}
+    title={title}
+    titleId="rahmen-title"
+    lead={intro}
+  />
 
   {agreements.length > 0 && (
-    <ol role="list" class="mt-group grid gap-x-grid gap-y-6 md:grid-cols-2">
+    <ol
+      role="list"
+      class="mt-group grid gap-x-grid gap-y-6 md:grid-cols-2"
+    >
       {agreements.map((rule, i) => (
-        <li class="reveal reveal-stagger grid content-start gap-2" style={`--motion-order: ${i}`}>
-          <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
+        <li
+          class="reveal reveal-stagger grid content-start gap-2"
+          style={`--motion-order: ${i}`}
+        >
+          <span
+            aria-hidden="true"
+            class="draw mb-3 block h-px bg-line-strong"
+          ></span>
           <h3 class="font-sans text-xl font-semibold text-fg hyphens-auto">{rule.title}</h3>
           <p class="max-w-measure text-md text-fg-soft">{rule.text}</p>
         </li>
@@ -44,9 +62,12 @@ const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText }
   {boundaryText && (
     <aside
       aria-labelledby="rahmen-boundary-title"
-      class="reveal mt-group grid max-w-[48rem] gap-2 border-l-2 border-line-strong pl-5"
+      class="reveal mt-group grid max-w-3xl gap-2 border-l-2 border-line-strong pl-5"
     >
-      <h3 id="rahmen-boundary-title" class="font-sans text-base font-semibold text-fg">
+      <h3
+        id="rahmen-boundary-title"
+        class="font-sans text-base font-semibold text-fg"
+      >
         {boundaryTitle}
       </h3>
       <p class="text-md text-fg-soft">{boundaryText}</p>

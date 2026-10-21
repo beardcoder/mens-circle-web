@@ -23,7 +23,11 @@ const { class: className } = Astro.props;
 >
   <Honeypot />
 
-  <Field for="quote" label="Deine Erfahrung" errorId="testimonial-quote-error">
+  <Field
+    for="quote"
+    label="Deine Erfahrung"
+    errorId="testimonial-quote-error"
+  >
     <textarea
       id="quote"
       name="quote"
@@ -38,13 +42,21 @@ const { class: className } = Astro.props;
     {/* The rule and the live count on one line under the field. */}
     <span class="mt-2 flex justify-between gap-4 text-sm text-fg-muted">
       <span id="testimonial-quote-hint">Mindestens 10, höchstens 1000 Zeichen.</span>
-      <span class="tabular-nums" aria-hidden="true">
+      <span
+        class="tabular-nums"
+        aria-hidden="true"
+      >
         <span data-char-count>0</span>/1000
       </span>
     </span>
   </Field>
 
-  <Field for="author_name" label="Dein Name" optional hint="Leer lassen, wenn du anonym bleiben möchtest.">
+  <Field
+    for="author_name"
+    label="Dein Name"
+    optional
+    hint="Leer lassen, wenn du anonym bleiben möchtest."
+  >
     <input
       type="text"
       id="author_name"
@@ -55,7 +67,11 @@ const { class: className } = Astro.props;
     />
   </Field>
 
-  <Field for="role" label="Rolle oder Beschreibung" optional>
+  <Field
+    for="role"
+    label="Rolle oder Beschreibung"
+    optional
+  >
     <input
       type="text"
       id="role"
@@ -88,21 +104,40 @@ const { class: className } = Astro.props;
 
   <div>
     <label class="flex cursor-pointer items-start gap-3">
-      <input type="checkbox" name="privacy" required aria-describedby="testimonial-privacy-error" class={checkbox} />
+      <input
+        type="checkbox"
+        name="privacy"
+        required
+        aria-describedby="testimonial-privacy-error"
+        class={checkbox}
+      />
       <span class="text-base text-fg">
         Ich habe die{' '}
-        <a href="/datenschutz" target="_blank" rel="noopener" class={link}>
+        <a
+          href="/datenschutz"
+          target="_blank"
+          rel="noopener"
+          class={link}
+        >
           Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span>
         </a>{' '}
         zur Kenntnis genommen und bin damit einverstanden, dass meine Daten zum Zwecke der Veröffentlichung gespeichert
         werden.
       </span>
     </label>
-    <span class={fieldError} id="testimonial-privacy-error" hidden></span>
+    <span
+      class={fieldError}
+      id="testimonial-privacy-error"
+      hidden
+    ></span>
   </div>
 
   <div class="grid justify-items-start gap-3">
-    <Button type="submit" size="lg" class="max-sm:w-full">
+    <Button
+      type="submit"
+      size="lg"
+      class="max-sm:w-full"
+    >
       Erfahrung teilen
     </Button>
     <p class="text-sm text-fg-muted">Dein Text wird erst nach Prüfung veröffentlicht.</p>

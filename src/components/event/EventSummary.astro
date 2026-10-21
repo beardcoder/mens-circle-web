@@ -26,7 +26,11 @@ const [lead, rest] = view.title;
 const Lines = view.datetime ? 'time' : Fragment;
 ---
 
-<div data-summary data-state={view.state} class:list={[card, 'grid content-start p-6 sm:p-8']}>
+<div
+  data-summary
+  data-state={view.state}
+  class:list={[card, 'grid content-start p-6 sm:p-8']}
+>
   <p class={label}>{view.kicker}</p>
   {showTitle && (
     <Title class="mt-3 font-serif text-sub text-fg">

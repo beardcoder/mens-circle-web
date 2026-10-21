@@ -25,11 +25,18 @@ const hasAction = Astro.slots.has('default');
 const hasMedia = Astro.slots.has('media');
 ---
 
-<section id={id} aria-labelledby={titleId} class="pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group">
+<section
+  id={id}
+  aria-labelledby={titleId}
+  class="pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
+>
   <Container class:list={['grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
     <div class:list={['grid justify-items-start', hasMedia && 'lg:col-span-7']}>
       {eyebrow && <Eyebrow class="mb-3 entrance:animate-rise">{eyebrow}</Eyebrow>}
-      <h1 id={titleId} class={titleClass}>
+      <h1
+        id={titleId}
+        class={titleClass}
+      >
         {title}
       </h1>
       {hasLead && (

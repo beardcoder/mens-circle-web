@@ -25,10 +25,18 @@ const view = nextDateView(Astro.props.state ?? (await readDateStatus()), 'notify
     <p class="text-md text-fg-soft">
       Zurzeit steht kein Termin fest. Wenn du möchtest, bekommst du eine E-Mail, sobald der nächste Abend geplant ist.
     </p>
-    <Button href="#newsletter" variant="secondary" decorate class="justify-self-start max-sm:w-full">
+    <Button
+      href="#newsletter"
+      variant="secondary"
+      decorate
+      class="justify-self-start max-sm:w-full"
+    >
       Per E-Mail erfahren
     </Button>
   </div>
 ) : (
-  <EventSummary view={view} location={location} />
+  <EventSummary
+    view={view}
+    location={location}
+  />
 )}

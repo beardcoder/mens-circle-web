@@ -24,8 +24,14 @@ const { events } = Astro.props;
 const publishedCount = events.filter((e) => e.isPublished).length;
 ---
 
-<AdminHead eyebrow="Übersicht" title="Veranstaltungen">
-  <a class={button()} href="/admin/events/new">
+<AdminHead
+  eyebrow="Übersicht"
+  title="Veranstaltungen"
+>
+  <a
+    class={button()}
+    href="/admin/events/new"
+  >
     Neue Veranstaltung
   </a>
 </AdminHead>
@@ -40,12 +46,18 @@ const publishedCount = events.filter((e) => e.isPublished).length;
 {events.length === 0 ? (
   <div class="grid justify-items-center gap-4 border border-dashed border-line-strong px-4 py-12 text-center text-fg-muted">
     <p>Noch keine Veranstaltungen.</p>
-    <a class={button({ variant: 'secondary', size: 'xs' })} href="/admin/events/new">
+    <a
+      class={button({ variant: 'secondary', size: 'xs' })}
+      href="/admin/events/new"
+    >
       Die erste anlegen
     </a>
   </div>
 ) : (
-  <ul id="event-list" class="flex flex-col gap-3">
+  <ul
+    id="event-list"
+    class="flex flex-col gap-3"
+  >
     {events.map((ev) => (
       <li
         data-id={ev.id}
@@ -55,8 +67,14 @@ const publishedCount = events.filter((e) => e.isPublished).length;
           'flex flex-wrap items-center justify-between gap-x-5 gap-y-4 px-5 py-4 transition-[border-color,opacity,translate,height,padding,margin] duration-200 hover:border-line-strong data-[removing]:-mt-3 data-[removing]:h-0! data-[removing]:-translate-x-4 data-[removing]:overflow-hidden data-[removing]:py-0 data-[removing]:opacity-0',
         ]}
       >
-        <a class="group/ev flex min-w-0 flex-[1_1_16rem] items-center gap-4" href={`/admin/events/${ev.id}`}>
-          <CapacityRing value={ev.activeCount} max={ev.maxParticipants} />
+        <a
+          class="group/ev flex min-w-0 flex-[1_1_16rem] items-center gap-4"
+          href={`/admin/events/${ev.id}`}
+        >
+          <CapacityRing
+            value={ev.activeCount}
+            max={ev.maxParticipants}
+          />
           <span class="flex min-w-0 flex-col gap-0.5">
             <span class="font-serif text-lg text-fg transition-colors duration-150 group-hover/ev:text-accent">
               {ev.title}
@@ -70,13 +88,23 @@ const publishedCount = events.filter((e) => e.isPublished).length;
         <div class="flex flex-wrap items-center justify-end gap-3 max-sm:w-full max-sm:justify-between">
           {ev.isPublished ? <Badge tone="live">veröffentlicht</Badge> : <Badge>Entwurf</Badge>}
           <div class="flex flex-wrap justify-end gap-1.5 max-sm:flex-[1_1_100%] max-sm:[&>*]:flex-auto">
-            <a class={button({ variant: 'secondary', size: 'xs' })} href={`/admin/events/${ev.id}/registrations`}>
+            <a
+              class={button({ variant: 'secondary', size: 'xs' })}
+              href={`/admin/events/${ev.id}/registrations`}
+            >
               Anmeldungen
             </a>
-            <a class={button({ variant: 'secondary', size: 'xs' })} href={`/admin/events/new?from=${ev.id}`}>
+            <a
+              class={button({ variant: 'secondary', size: 'xs' })}
+              href={`/admin/events/new?from=${ev.id}`}
+            >
               Duplizieren
             </a>
-            <button class={button({ variant: 'danger', size: 'xs' })} type="button" data-delete>
+            <button
+              class={button({ variant: 'danger', size: 'xs' })}
+              type="button"
+              data-delete
+            >
               Löschen
             </button>
           </div>

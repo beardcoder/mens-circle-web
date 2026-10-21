@@ -43,8 +43,16 @@ const note =
       : '';
 ---
 
-<Section id={anchor} labelledby="testimonials-title" space={note ? 'band' : 'default'}>
-  <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" />
+<Section
+  id={anchor}
+  labelledby="testimonials-title"
+  space={note ? 'band' : 'default'}
+>
+  <SectionHead
+    eyebrow={eyebrow}
+    title={title}
+    titleId="testimonials-title"
+  />
 
   {note && <p class="mt-6 max-w-measure text-md text-fg-muted">{note}</p>}
 
@@ -54,15 +62,22 @@ const note =
       author={featured.author}
       role={featured.role}
       variant="short"
-      class="reveal mt-group max-w-[44rem]"
+      class="reveal mt-group max-w-176"
     />
   )}
 
   {rest.length > 0 && (
-    <ul role="list" class="mt-group gap-x-grid md:columns-2">
+    <ul
+      role="list"
+      class="mt-group gap-x-grid md:columns-2"
+    >
       {rest.map((t) => (
         <li class="reveal mb-8 break-inside-avoid border-t border-line pt-6">
-          <Quote quote={t.quote} author={t.author} role={t.role} />
+          <Quote
+            quote={t.quote}
+            author={t.author}
+            role={t.role}
+          />
         </li>
       ))}
     </ul>

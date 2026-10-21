@@ -1,6 +1,4 @@
 ---
-import { PENDING } from '@lib/event-status';
-
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import HeroDate from './HeroDate.astro';
@@ -40,7 +38,7 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
   {/* Thin rings breathe slowly, without adding visual weight. */}
   <div
     aria-hidden="true"
-    class="pointer-events-none absolute right-[-14rem] bottom-[-15rem] aspect-square w-[30rem] lg:top-[calc(50%-22rem)] lg:right-[-16rem] lg:bottom-auto lg:w-[44rem]"
+    class="pointer-events-none absolute -right-56 -bottom-60 aspect-square w-120 lg:top-[calc(50%-22rem)] lg:-right-64 lg:bottom-auto lg:w-176"
   >
     <span class="absolute inset-0 rounded-[48%_52%_46%_54%/54%_45%_55%_46%] border border-line-strong motion-safe:animate-ring"></span>
     <span class="absolute inset-[23%] rounded-[54%_46%_52%_48%/46%_55%_45%_54%] border border-line motion-safe:animate-ring-slow motion-safe:animate-delay-[-7s]"></span>
@@ -51,21 +49,21 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
       {kicker && <Eyebrow class="mb-4 entrance:animate-rise">{kicker}</Eyebrow>}
       <h1
         id="hero-title"
-        class="max-w-[9.5em] text-hero text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-[90ms]"
+        class="max-w-[9.5em] text-hero text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-90"
       >
         {before}
         {emphasis && <em class="font-serif font-normal text-accent">{emphasis}</em>}
         {after}
       </h1>
       {lede && (
-        <p class="mt-6 max-w-measure text-lg text-fg-muted entrance:animate-rise entrance:animate-delay-[180ms]">
-          {lede}
-        </p>
+        <p class="mt-6 max-w-measure text-lg text-fg-muted entrance:animate-rise entrance:animate-delay-180">{lede}</p>
       )}
     </div>
 
-    <HeroDate server:defer secondaryLabel={secondaryLabel} secondaryLink={secondaryLink}>
-      <HeroDate slot="fallback" state={PENDING} secondaryLabel={secondaryLabel} secondaryLink={secondaryLink} />
-    </HeroDate>
+    <HeroDate
+      server:defer
+      secondaryLabel={secondaryLabel}
+      secondaryLink={secondaryLink}
+    />
   </Container>
 </section>
