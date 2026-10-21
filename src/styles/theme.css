@@ -297,9 +297,9 @@
 @utility reveal {
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
-      animation: rise linear both;
+      animation: scroll-reveal linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 70%;
+      animation-range: entry var(--reveal-start, 0%) entry var(--reveal-end, 85%);
     }
   }
 }

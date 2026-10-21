@@ -9,7 +9,7 @@ import ModeToggle from './ModeToggle.astro';
 import Container from './ui/Container.astro';
 
 /**
- * The bar, 72px: the mark on the left; from `nav` (1100px) the four content links
+ * The bar, 72px: the mark on the left; from `nav` (1100px) the five content links
  * and the one filled action on the right, below that the action and a menu
  * button. Over the home opening (`over-hero:`) it starts clear with light text
  * and turns to the page's opaque paper once the page moves (`data-scrolled`, set
@@ -46,13 +46,9 @@ const roundButton =
     <a
       href="/"
       aria-label={`${site.siteName} – Startseite`}
-      class="group/logo flex min-h-11 min-w-0 items-center gap-3 font-serif text-xl"
+      class="group/logo flex min-h-11 min-w-0 items-center gap-3 font-sans text-xl font-medium tracking-[-0.025em]"
     >
-      <Icon
-        name="logo"
-        aria-hidden="true"
-        class="size-9 shrink-0 transition-transform duration-500 ease-out group-hover/logo:rotate-45 motion-reduce:group-hover/logo:rotate-0"
-      />
+      <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
       <span class="max-[22.5rem]:sr-only">Männerkreis</span>
     </a>
 
@@ -112,7 +108,11 @@ const roundButton =
     ]}
   >
     <Container class="flex h-header items-center gap-4 border-b border-line">
-      <a href="/" class="flex min-h-11 min-w-0 items-center gap-3 font-serif text-xl" data-nav-link>
+      <a
+        href="/"
+        class="flex min-h-11 min-w-0 items-center gap-3 font-sans text-xl font-medium tracking-[-0.025em]"
+        data-nav-link
+      >
         <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
         <span>Männerkreis</span>
       </a>

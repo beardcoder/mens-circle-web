@@ -37,7 +37,7 @@ const shown = items.filter((i) => i.question && i.answer);
         />
       </summary>
       <div
-        class="max-w-measure pb-6 text-md text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px]"
+        class="motion-safe:group-open/item:animate-fade-in max-w-measure pb-6 text-md text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px]"
         set:html={item.answer}
       />
     </details>

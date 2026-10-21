@@ -32,9 +32,12 @@ const { anchor, eyebrow, title, subtitle, steps, close } = Astro.props;
   {steps.length > 0 && (
     <ol role="list" class="mt-group grid gap-x-grid gap-y-8 md:grid-cols-2 lg:grid-cols-4">
       {steps.map((step, i) => (
-        <li class="reveal grid content-start gap-3">
+        <li class="reveal reveal-stagger group/step grid content-start gap-3" style={`--motion-order: ${i}`}>
           <span aria-hidden="true" class="draw mb-2 block h-px bg-line-strong"></span>
-          <span class="font-sans text-lg font-semibold text-accent tabular-nums" aria-hidden="true">
+          <span
+            class="font-sans text-sub font-medium text-accent tabular-nums motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/step:translate-x-1"
+            aria-hidden="true"
+          >
             {String(i + 1).padStart(2, '0')}
           </span>
           {step.title && <h3 class="text-sub text-fg">{step.title}</h3>}

@@ -1,5 +1,34 @@
 # Design system
 
+## Public design update — October 2026
+
+The public site uses medium-weight DM Sans headings with Playfair italic for the
+hero emphasis and the breath statement. Hero titles scale from 44–80px, section
+titles from 30–52px. These typography overrides live in `src/styles/global.css`;
+admin typography stays unchanged.
+
+All colours come from the shared tokens in `src/styles/theme.css`: warm paper,
+warm charcoal and one rust accent. The hero and footer are the dark anchors;
+content sections stay on paper or the quiet secondary paper. Two slowly breathing circle outlines,
+moderately sized phase numbers and generous space bring movement without heavy
+colour blocks, thick frames or oversized decoration.
+
+The hero adds soft rust radial gradients over warm charcoal. Its minimum height
+scales from 90svh on phones to the smaller of 58rem or 100svh on desktops;
+content can always expand it. Extra vertical padding gives the opening more air.
+
+The breath invitation spans the full viewport width on the secondary paper,
+with its text and circle aligned to the shared content grid.
+
+Motion update: section headings and rows rise into view over a longer scroll
+range; facts, phases and agreements are staggered by scroll position. The photo
+settles from a subtle zoom, and the hero actions enter last. FAQ answers fade in. A thin reading-progress line follows the
+page scroll. Scroll effects use native CSS timelines and fall back to visible,
+static content. All additions respect reduced motion and require no JavaScript.
+
+The reference below describes the shared foundations; the public typography
+above takes precedence over the original serif heading specification.
+
 Calm, warm, clear and contemporary: the site reads like a carefully made
 invitation to a real meeting — personal, approachable, precise. It keeps its
 identity (the mark and the circle, Playfair Display and DM Sans, a warm ground, a
@@ -150,7 +179,7 @@ thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
 | `Split`, `LinkList`, `Prose` (`width`), `Badge`   | Head beside content; where-next rows; rich text (`measure` / `column`); the admin's status chip   |
 | `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                     |
 
-**Header.** 72px: the mark, from `nav` four content links and one filled action
+**Header.** 72px: the mark, from `nav` five content links and one filled action
 ("Termine"); below `nav` the action and a menu button. The phone menu is a native
 modal `<dialog>` (focus trap, Escape, the focus returns to the button; the page holds
 still under `:root:has(dialog:modal)`) that opens as a circle from its button, with

@@ -35,8 +35,8 @@ const values = items.map((item) => {
 
   {items.length > 0 && (
     <ul role="list" class="mt-8 grid gap-x-grid gap-y-6 md:grid-cols-2">
-      {values.map((item) => (
-        <li class="reveal grid content-start gap-2">
+      {values.map((item, i) => (
+        <li class="reveal reveal-stagger grid content-start gap-2" style={`--motion-order: ${i}`}>
           <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
           <h3 class="font-sans text-xl font-semibold text-fg">
             {item.keep}
