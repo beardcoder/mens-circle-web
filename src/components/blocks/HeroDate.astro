@@ -26,7 +26,7 @@ const view = nextDateView(Astro.props.state ?? (await readDateStatus()), 'overvi
     <EventSummary view={{ ...view, action: null }} />
   </div>
 )}
-<div class="flex flex-wrap items-center gap-x-6 gap-y-3 lg:col-span-7 lg:row-start-2">
+<div class="flex flex-wrap items-center gap-x-6 gap-y-3 entrance:animate-rise entrance:animate-delay-[270ms] lg:col-span-7 lg:row-start-2">
   {view.action && (
     <Button
       href={view.action.href}

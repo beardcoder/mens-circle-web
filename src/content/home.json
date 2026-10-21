@@ -7,7 +7,7 @@
     "kicker": "Männerkreis in Straubing · Niederbayern",
     "title": "Ein Abend, an dem du nichts darstellen musst.",
     "titleEmphasis": "nichts darstellen",
-    "lede": "Wir sitzen im Kreis und sprechen über das, was gerade wirklich da ist. Die anderen hören zu – ohne zu bewerten, ohne Ratschläge. Je nach Abend kommen einfache Übungen mit Atem und Körperwahrnehmung dazu; du machst mit, soweit es für dich passt.",
+    "lede": "Wir sitzen im Kreis und sprechen über das, was uns gerade beschäftigt. Die anderen hören zu, ohne zu bewerten oder Ratschläge zu geben. Je nach Abend kommen einfache Atem- und Körperübungen dazu. Du entscheidest, ob du mitmachst.",
     "secondaryLabel": "Wie ein Abend abläuft",
     "secondaryLink": "#reise"
   },
@@ -19,7 +19,7 @@
     "anchor": "ueber",
     "eyebrow": "Der Kreis",
     "title": "Worum es an so einem Abend geht",
-    "text": "<p>Im Alltag läuft viel: Arbeit, Familie, Beziehung, Verantwortung. Das meiste davon machen wir mit uns selbst aus – und Gespräche unter Männern landen oft schnell bei Job, Sport oder dem nächsten Ratschlag.</p><p>Im Kreis ist Platz für das, was darunter liegt. Fertige Antworten brauchst du dafür nicht. Es reicht, dass du den anderen zuhörst und ehrlich bist, wenn du dran bist.</p>",
+    "text": "<p>Arbeit, Familie, Beziehung und Verantwortung beschäftigen uns im Alltag. Vieles machen wir mit uns selbst aus. Gespräche unter Männern landen oft schnell bei Job, Sport oder dem nächsten Ratschlag.</p><p>Im Kreis können wir auch über persönliche Fragen sprechen. Du brauchst keine fertigen Antworten. Es reicht, den anderen zuzuhören und ehrlich zu erzählen, wenn du dran bist.</p>",
     "questionsLabel": "Fragen, um die ein Abend oft kreist",
     "questions": [
       "Was beschäftigt dich gerade wirklich?",
@@ -31,17 +31,17 @@
   },
   "journey_steps": {
     "anchor": "reise",
-    "eyebrow": "Ablauf",
+    "eyebrow": "",
     "title": "Wie ein Abend abläuft",
-    "subtitle": "Kein Minutenplan, aber eine verlässliche Reihenfolge. Wir sitzen im Kreis, auf Augenhöhe – keiner steht über dem anderen.",
+    "subtitle": "Die Abende haben einen ähnlichen Ablauf, auch wenn wir uns nicht an einen festen Minutenplan halten. Wir sitzen im Kreis und jeder hat das gleiche Recht, zu sprechen und gehört zu werden.",
     "steps": [
       {
         "title": "Ankommen",
-        "description": "Raus aus dem Alltag. Wir nehmen uns Zeit, wirklich da zu sein. Je nach Abend gehört eine einfache Übung dazu: ein paar bewusste Atemzüge, kurz spüren, wie du gerade dasitzt."
+        "description": "Wir nehmen uns Zeit zum Ankommen. Manchmal beginnen wir mit ein paar bewussten Atemzügen oder damit, kurz zu spüren, wie wir gerade dasitzen."
       },
       {
         "title": "Zuhören",
-        "description": "Einer spricht, die anderen hören zu. Nicht um eine Lösung zu finden oder zu diskutieren, sondern um zu verstehen."
+        "description": "Während einer spricht, hören die anderen zu. Wir lassen ihn ausreden und versuchen zu verstehen, was ihn beschäftigt. Lösungen und Diskussionen stehen dabei nicht im Vordergrund."
       },
       {
         "title": "Teilen",
@@ -58,7 +58,7 @@
     "anchor": "haltung",
     "eyebrow": "Atem und Körper",
     "lines": ["Aus dem Kopf.", "In den Körper."],
-    "text": "Viele Männer leben im Kopf: planen, abwägen, funktionieren. Deshalb beginnt der Abend mit Ankommen – je nach Abend mit ein paar ruhigen Atemzügen, den Füßen auf dem Boden, einem kurzen Spüren, wie es dir gerade geht. Jede Übung ist ein Angebot, kein Programm. Du machst mit, soweit es für dich passt.",
+    "text": "Nach einem Tag voller Pläne und Aufgaben kann es helfen, kurz auf den Körper zu achten. Dafür nehmen wir uns am Anfang Zeit: ein paar ruhige Atemzüge, die Füße auf dem Boden spüren. Du entscheidest bei jeder Übung, ob und wie weit du mitmachst.",
     "linkLabel": "Was wir miteinander vereinbaren",
     "linkUrl": "#rahmen",
     "breathGuide": "Atme ein paar Züge mit: vier Sekunden ein, fünf aus."
@@ -67,7 +67,7 @@
     "anchor": "moderator",
     "eyebrow": "Wer den Kreis leitet",
     "name": "Ich bin Markus.",
-    "quote": "Ich gebe dir keine Ratschläge. Ich sorge dafür, dass du in Ruhe reden kannst – und gehört wirst.",
+    "quote": "Ich sorge dafür, dass du in Ruhe reden kannst und die anderen dir zuhören. Mit Ratschlägen halte ich mich zurück.",
     "bio": "<p>Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.</p><p>Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit – einfach, ruhig und ohne große Worte.</p><p>Zu Beginn jedes Abends erkläre ich die Absprachen und achte darauf, dass sie gelten. Jeder kann zu Wort kommen, keiner muss. Und wenn wir eine Übung mit Atem oder Körperwahrnehmung machen, leite ich sie an – als Angebot, nicht als Pflicht.</p>",
     "imageAlt": "Markus Sommer, von der Seite, auf einem Felsen sitzend.",
     "linkLabel": "Warum ich den Männerkreis leite",
@@ -106,7 +106,7 @@
   },
   "faq": {
     "anchor": "faq",
-    "eyebrow": "Häufige Fragen",
+    "eyebrow": "",
     "title": "Was Männer vorher wissen wollen",
     "items": [
       {
@@ -137,7 +137,7 @@
   },
   "dates": {
     "anchor": "termine",
-    "eyebrow": "Nächster Schritt",
+    "eyebrow": "",
     "displayLines": ["Dabei sein."],
     "lede": "Du meldest dich auf der Seite des jeweiligen Termins an. Dafür brauchst du nur Name und E-Mail-Adresse – den genauen Treffpunkt bekommst du mit der Bestätigung.",
     "newsletterText": "Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler nicht verschickt.",

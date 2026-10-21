@@ -10,8 +10,9 @@ import HeroDate from './HeroDate.astro';
  * italic accent), the short explanation, the main action with the quiet link to
  * the course of an evening, and beside them the next date. Phones stack it:
  * statement, explanation, date, action. The circle stands in the right
- * background: three rings breathing out of phase. The words rise in, one after
- * the other. It sizes to its content: no forced screen height. The date and the
+ * background: two thin rings breathing out of phase. The words rise in, one after
+ * the other. A responsive minimum height gives it room while longer content can
+ * expand naturally. The date and the
  * action are a server island (HeroDate); its fallback stands the same height.
  */
 
@@ -34,16 +35,15 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
 <section
   data-hero
   aria-labelledby="hero-title"
-  class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section lg:pt-[calc(var(--spacing-header)+var(--spacing-section))]"
+  class="surface-dark hero-gradient relative flex min-h-[90svh] items-center overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group)+1rem)] pb-[calc(var(--spacing-section)+1.5rem)] lg:min-h-[min(58rem,100svh)] lg:pt-[calc(var(--spacing-header)+var(--spacing-section)+1.5rem)]"
 >
-  {/* The circle: three rings, breathing out of phase. */}
+  {/* Thin rings breathe slowly, without adding visual weight. */}
   <div
     aria-hidden="true"
     class="pointer-events-none absolute right-[-14rem] bottom-[-15rem] aspect-square w-[30rem] lg:top-[calc(50%-22rem)] lg:right-[-16rem] lg:bottom-auto lg:w-[44rem]"
   >
     <span class="absolute inset-0 rounded-full border border-line-strong motion-safe:animate-ring"></span>
-    <span class="absolute inset-[13%] rounded-full border border-line motion-safe:animate-ring-slow motion-safe:animate-delay-[-7s]"></span>
-    <span class="absolute inset-[29%] rounded-full border border-accent/45 motion-safe:animate-ring motion-safe:animate-delay-[-11s]"></span>
+    <span class="absolute inset-[23%] rounded-full border border-line motion-safe:animate-ring-slow motion-safe:animate-delay-[-7s]"></span>
   </div>
 
   <Container class="relative grid gap-x-grid gap-y-8 lg:grid-cols-12">
@@ -51,10 +51,10 @@ const [before, after] = emphasis ? title.split(emphasis) : [title, ''];
       {kicker && <Eyebrow class="mb-4 entrance:animate-rise">{kicker}</Eyebrow>}
       <h1
         id="hero-title"
-        class="max-w-[8.4em] text-hero text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-[90ms]"
+        class="max-w-[9.5em] text-hero text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-[90ms]"
       >
         {before}
-        {emphasis && <em class="text-accent">{emphasis}</em>}
+        {emphasis && <em class="font-serif font-normal text-accent">{emphasis}</em>}
         {after}
       </h1>
       {lede && (
