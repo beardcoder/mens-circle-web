@@ -15,7 +15,7 @@ const samePageHash = (link: HTMLAnchorElement): string | null => {
 /**
  * The corner button scrolls to the very top itself instead of leaving it to the
  * fragment: no `#top` left in the address bar, and the focus moves to the top so
- * keyboard users continue from there. Without JS the plain `#top` link still works.
+ * keyboard users continue from there. The scroll handler reveals it past the first screen.
  */
 const initScrollTop = (): void => {
   const top = document.getElementById('top');
@@ -36,10 +36,12 @@ const initScrollTop = (): void => {
  */
 const initHeaderTone = (header: HTMLElement): void => {
   let frame = 0;
+  const backToTop = document.querySelector<HTMLElement>('[data-scroll-top]');
 
   const update = (): void => {
     frame = 0;
     header.toggleAttribute('data-scrolled', window.scrollY > 24);
+    backToTop?.toggleAttribute('data-visible', window.scrollY > window.innerHeight * 0.8);
   };
 
   window.addEventListener(
@@ -49,6 +51,8 @@ const initHeaderTone = (header: HTMLElement): void => {
     },
     { passive: true },
   );
+  window.addEventListener('resize', update, { passive: true });
+  window.addEventListener('pageshow', update);
   update();
 };
 

@@ -2,6 +2,7 @@
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
+import Split from '../ui/Split.astro';
 
 interface Props {
   anchor?: string;
@@ -10,12 +11,7 @@ interface Props {
   content: string;
 }
 
-/**
- * Prose on one reading column, aligned with the page's left edge: the essay
- * register of the sub-pages (a label and a subheading above the text) and the
- * legal pages (content only). Consecutive sections read as one column: their
- * space is the band's, not a section's.
- */
+/** Essay sections share the FAQ grid: a compact heading beside a readable text column. */
 
 const { anchor, eyebrow, title, content } = Astro.props;
 
@@ -29,8 +25,12 @@ const hasHead = Boolean(eyebrow || title);
 ---
 
 <Section id={sectionId || undefined} space="band">
-  <div class="grid max-w-column gap-6">
-    {hasHead && <SectionHead eyebrow={eyebrow} title={title} size="sub" />}
-    {content && <Prose html={content} />}
-  </div>
+  {hasHead ? (
+    <Split>
+      <SectionHead slot="head" eyebrow={eyebrow} title={title} size="sub" />
+      {content && <Prose html={content} />}
+    </Split>
+  ) : (
+    content && <Prose html={content} />
+  )}
 </Section>

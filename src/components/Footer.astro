@@ -36,7 +36,10 @@ const footerLink =
   <Container>
     <div class="grid gap-x-grid gap-y-10 pb-group sm:grid-cols-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]">
       <div class="max-w-[38ch] sm:col-span-2 lg:col-span-1">
-        <a href="/" class="mb-4 inline-flex min-h-11 items-center gap-3 font-serif text-sub">
+        <a
+          href="/"
+          class="mb-4 inline-flex min-h-11 items-center gap-3 font-sans text-xl font-medium tracking-[-0.025em]"
+        >
           <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
           <span>{site.siteName}</span>
         </a>
@@ -45,7 +48,7 @@ const footerLink =
 
       <nav aria-label="Fußnavigation">
         <h2 class:list={[label, 'mb-3']}>Navigation</h2>
-        <ul role="list">
+        <ul role="list" class="grid grid-cols-2 gap-x-5 sm:grid-cols-1">
           {nav.footerPrimary.map((item) => (
             <li>
               <a

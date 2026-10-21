@@ -17,7 +17,7 @@ const WIDTHS = { measure: 'max-w-measure', column: 'max-w-column' } as const;
 
 const PROSE = [
   WIDTHS[width],
-  'text-md text-fg-soft',
+  'text-md text-fg-soft [&_h2]:wrap-anywhere [&_h2]:hyphens-auto [&_h3]:wrap-anywhere [&_h3]:hyphens-auto',
   '[&_p]:mb-[1.15em] [&_p:last-child]:mb-0',
   '[&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong',
   '[&_strong]:font-semibold [&_strong]:text-fg',
