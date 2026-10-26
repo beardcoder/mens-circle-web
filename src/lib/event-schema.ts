@@ -51,22 +51,6 @@ export function eventSeriesSchema(siteUrl: URL): Schema {
   };
 }
 
-/** FAQPage from the visible questions; Google flags FAQ markup that does not match the page's text. */
-export function faqSchema(items: { question: string; answer: string }[], id?: string): Schema {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    ...(id ? { '@id': id } : {}),
-    mainEntity: items
-      .filter((i) => i.question && i.answer)
-      .map((i) => ({
-        '@type': 'Question',
-        name: i.question,
-        acceptedAnswer: { '@type': 'Answer', text: i.answer },
-      })),
-  };
-}
-
 /** Home, then each `[name, url]` level below it. */
 export function breadcrumbSchema(siteUrl: URL, levels: [name: string, url: string][]): Schema {
   return {

@@ -25,6 +25,4 @@ const bind = (): void => {
 
 export function initQuotes(): void {
   bind();
-  // The home's voices are a server island and arrive after this script has run.
-  new MutationObserver(bind).observe(document.body, { childList: true, subtree: true });
 }

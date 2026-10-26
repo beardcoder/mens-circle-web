@@ -1,71 +1,264 @@
 ---
-import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
-import { eventSeriesSchema, faqSchema } from '@lib/event-schema';
-import { PENDING } from '@lib/event-status';
+import site from '@data/site.json';
+import { eventSeriesSchema } from '@lib/event-schema';
+import { dateStatus, nextDateView, splitFee } from '@lib/event-status';
+import { fetchNextEventState } from '@lib/server/events';
+import { fetchTestimonialsState } from '@lib/server/testimonials';
 
 import photo from '../assets/images/markus-sommer.jpg';
 import Dates from '../components/blocks/Dates.astro';
+import Fact from '../components/blocks/Fact.astro';
 import Facts from '../components/blocks/Facts.astro';
 import Faq from '../components/blocks/Faq.astro';
 import Frame from '../components/blocks/Frame.astro';
 import Hero from '../components/blocks/Hero.astro';
 import Intro from '../components/blocks/Intro.astro';
+import JourneyStep from '../components/blocks/JourneyStep.astro';
 import JourneySteps from '../components/blocks/JourneySteps.astro';
 import Moderator from '../components/blocks/Moderator.astro';
+import Newsletter from '../components/blocks/Newsletter.astro';
 import Statement from '../components/blocks/Statement.astro';
 import Testimonials from '../components/blocks/Testimonials.astro';
-import home from '../content/home.json';
+import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Prerendered, so its photo is built with the page. What is live (the next date, the
-// facts that follow from it, the voices) comes as server islands, read on every visit.
-export const prerender = true;
+// One read per source and request; all sections use the same event state.
+const [upcoming, result] = await Promise.all([fetchNextEventState(), fetchTestimonialsState()]);
+const state = dateStatus(upcoming.status, upcoming.event);
+const { next } = state;
+const heroView = nextDateView(state, 'overview');
+const dateView = nextDateView(state, 'notify');
+const fee = splitFee(next?.costBasis);
 
-Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
-
-const { meta, faq, journey_steps: evening } = home;
-
-const siteUrl = Astro.site!;
-
-// Structured data uses the same copy as the visible sections.
-const schemas: Record<string, unknown>[] = [];
-
-if (faq.items.length) schemas.push(faqSchema(faq.items, `${siteUrl.origin}/#faq`));
-
-// ItemList, not HowTo: the steps describe how an evening runs rather than an
-// actionable procedure, and Google retired HowTo rich results in 2023.
-if (evening.steps.length) {
-  schemas.push({
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: evening.title ?? 'Wie ein Abend abläuft',
-    description: evening.subtitle ?? '',
-    itemListElement: evening.steps.map((s, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: s.title ?? '',
-      description: s.description ?? '',
-    })),
-  });
-}
-
-// One shared entity, also emitted by /event.
-schemas.push(eventSeriesSchema(siteUrl));
+const { testimonials } = result;
 ---
 
-<Layout title={meta.title} description={meta.description} schemas={schemas}>
-  <Hero {...home.hero} />
-  <Facts server:defer {...home.facts}>
-    <Facts slot="fallback" {...home.facts} state={PENDING} />
+<Layout
+  title="Männerkreis Niederbayern · Straubing und Umgebung"
+  description="Männerkreis in Straubing, Niederbayern: Männer sitzen im Kreis, hören zu und sprechen offen, dazu einfache Atemübungen. Auf Spendenbasis, ohne Vorerfahrung."
+  schemas={[eventSeriesSchema(Astro.site!)]}
+>
+  <Hero
+    kicker="Männerkreis in Straubing · Niederbayern"
+    secondaryLabel="Wie ein Abend abläuft"
+    secondaryLink="#reise"
+    view={heroView}
+  >
+    <Fragment slot="title">
+      Ein Abend, an dem du <em class="font-serif font-normal text-accent">nichts darstellen</em> musst.
+    </Fragment>
+    Wir sitzen im Kreis und sprechen über das, was uns gerade beschäftigt. Die anderen hören zu, ohne zu bewerten oder
+    Ratschläge zu geben. Je nach Abend kommen einfache Atem- und Körperübungen dazu. Du entscheidest, ob du mitmachst.
+  </Hero>
+
+  <Facts anchor="praktisches" eyebrow="Auf einen Blick">
+    <Fact label="Wo" order={0}>
+      <Fragment slot="value">{next?.place || site.geo.locality}</Fragment>
+      Die genaue Adresse kommt mit der Bestätigung
+    </Fact>
+    <Fact label="Wie oft" order={1}>
+      <Fragment slot="value">Alle 2–4 Wochen</Fragment>
+      Ohne Mitgliedschaft – du kommst, wann es passt
+    </Fact>
+    <Fact label="Dauer" order={2}>
+      <Fragment slot="value">2–3 Stunden</Fragment>
+      {next?.timeRange ? (
+        <>Nächster Termin: {next.timeRange.replace('–', '\u2060–\u2060')}</>
+      ) : (
+        <>Ein Abend, kein Seminar</>
+      )}
+    </Fact>
+    <Fact label="Beitrag" order={3}>
+      <Fragment slot="value">{fee.main}</Fragment>
+      {fee.note || 'Du gibst, was für dich machbar ist'}
+    </Fact>
   </Facts>
-  <Intro {...home.intro} />
-  <JourneySteps {...home.journey_steps} />
-  <Statement {...home.statement} />
-  <Moderator {...home.moderator} image={photo} />
-  <Frame {...home.frame} />
-  <Testimonials server:defer {...home.testimonials}>
-    <Testimonials slot="fallback" {...home.testimonials} pending />
+
+  <Intro
+    anchor="ueber"
+    eyebrow="Der Kreis"
+    title="Worum es an so einem Abend geht"
+    questionsLabel="Fragen, um die ein Abend oft kreist"
+    questions={[
+      'Was beschäftigt dich gerade wirklich?',
+      'Was läuft gerade gut?',
+      'Was kostet dich Kraft?',
+      'Was schiebst du vielleicht schon länger vor dir her?',
+    ]}
+    close="Einen besonderen Grund zu kommen brauchst du nicht. Manchmal reicht Neugier."
+  >
+    <p>
+      Arbeit, Familie, Beziehung und Verantwortung beschäftigen uns im Alltag. Vieles machen wir mit uns selbst aus.
+      Gespräche unter Männern landen oft schnell bei Job, Sport oder dem nächsten Ratschlag.
+    </p>
+    <p>
+      Im Kreis können wir auch über persönliche Fragen sprechen. Du brauchst keine fertigen Antworten. Es reicht, den
+      anderen zuzuhören und ehrlich zu erzählen, wenn du dran bist.
+    </p>
+  </Intro>
+
+  <JourneySteps
+    anchor="reise"
+    eyebrow=""
+    title="Wie ein Abend abläuft"
+    subtitle="Die Abende haben einen ähnlichen Ablauf, auch wenn wir uns nicht an einen festen Minutenplan halten. Wir sitzen im Kreis und jeder hat das gleiche Recht, zu sprechen und gehört zu werden."
+  >
+    <Fragment slot="steps">
+      <JourneyStep number={1} title="Ankommen">
+        Wir nehmen uns Zeit zum Ankommen. Manchmal beginnen wir mit ein paar bewussten Atemzügen oder damit, kurz zu
+        spüren, wie wir gerade dasitzen.
+      </JourneyStep>
+      <JourneyStep number={2} title="Zuhören">
+        Während einer spricht, hören die anderen zu. Wir lassen ihn ausreden und versuchen zu verstehen, was ihn
+        beschäftigt. Lösungen und Diskussionen stehen dabei nicht im Vordergrund.
+      </JourneyStep>
+      <JourneyStep number={3} title="Teilen">
+        Wenn du dran bist, erzählst du, was dich gerade beschäftigt&nbsp;– so persönlich, wie du möchtest. Auch nichts
+        zu sagen ist in Ordnung.
+      </JourneyStep>
+      <JourneyStep number={4} title="Mitnehmen">
+        Du musst keine große Erkenntnis mit nach Hause nehmen. Oft ist es ein Gedanke, eine andere Sicht&nbsp;– oder die
+        Erfahrung, mit etwas nicht allein zu sein.
+      </JourneyStep>
+    </Fragment>
+    <p slot="close">
+      Vorerfahrung mit Männerkreisen, Meditation oder Atemarbeit brauchst du nicht, vorbereiten musst du nichts. Den
+      Rahmen erkläre ich zu Beginn jedes Abends.
+    </p>
+  </JourneySteps>
+
+  <Statement
+    anchor="haltung"
+    eyebrow="Atem und Körper"
+    lines={['Aus dem Kopf.', 'In den Körper.']}
+    text="Nach einem Tag voller Pläne und Aufgaben kann es helfen, kurz auf den Körper zu achten. Dafür nehmen wir uns am Anfang Zeit: ein paar ruhige Atemzüge, die Füße auf dem Boden spüren. Du entscheidest bei jeder Übung, ob und wie weit du mitmachst."
+    linkLabel="Was wir miteinander vereinbaren"
+    linkUrl="#rahmen"
+    breathGuide="Atme ein paar Züge mit: vier Sekunden ein, fünf aus."
+  />
+
+  <Moderator
+    anchor="moderator"
+    eyebrow="Wer den Kreis leitet"
+    name="Ich bin Markus."
+    quote="Ich sorge dafür, dass du in Ruhe reden kannst und die anderen dir zuhören. Mit Ratschlägen halte ich mich zurück."
+    imageAlt="Markus Sommer, von der Seite, auf einem Felsen sitzend."
+    linkLabel="Warum ich den Männerkreis leite"
+    linkUrl="/warum-ich-den-maennerkreis-leite"
+    image={photo}
+  >
+    <p>
+      Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt
+      hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.
+    </p>
+    <p>
+      Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis
+      mit&nbsp;– einfach, ruhig und ohne große Worte.
+    </p>
+    <p>
+      Zu Beginn jedes Abends erkläre ich die Absprachen und achte darauf, dass sie gelten. Jeder kann zu Wort kommen,
+      keiner muss. Und wenn wir eine Übung mit Atem oder Körperwahrnehmung machen, leite ich sie an&nbsp;– als Angebot,
+      nicht als Pflicht.
+    </p>
+  </Moderator>
+
+  <Frame
+    anchor="rahmen"
+    eyebrow="Der Rahmen"
+    title="Was wir miteinander vereinbaren"
+    intro={
+      'Zu Beginn jedes Abends benennen wir ein paar Absprachen. Niemand kontrolliert sie\u00a0– sie machen es leichter, ehrlich zu sein.'
+    }
+    agreements={[
+      {
+        title: 'Vertraulichkeit',
+        text: 'Was im Kreis erzählt wird, bleibt im Kreis. Das sagen wir uns zu Beginn gegenseitig zu.',
+      },
+      {
+        title: 'Respekt',
+        text: 'Wir hören einander zu, auch wenn Erfahrungen und Sichtweisen weit auseinandergehen.',
+      },
+      {
+        title: 'Eigenverantwortung',
+        text: 'Du entscheidest, was du erzählst und bei welcher Übung du mitmachst. Jeder bleibt für sich verantwortlich.',
+      },
+      {
+        title: 'Keine ungefragten Ratschläge',
+        text: 'Wir versuchen nicht, einander zu reparieren. Zuhören hilft oft mehr als der nächste Tipp.',
+      },
+    ]}
+    boundaryTitle="Gut zu wissen"
+    boundaryText={
+      'Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Im Kreis sitzen Männer, die einander zuhören\u00a0– ohne Lehre, ohne Glaubensrichtung und ohne Vorstellung davon, wie ein Mann zu sein hat.'
+    }
+  />
+
+  <Testimonials
+    anchor="stimmen"
+    eyebrow="Aus dem Kreis"
+    title="Was Teilnehmer geschrieben haben"
+    linkUrl="/teile-deine-erfahrung"
+    linkLabel="Du warst dabei? Teile deine Erfahrung"
+    items={testimonials}
+    showNote={result.status === 'unavailable' || testimonials.length === 0}
+  >
+    <Fragment slot="note">
+      {result.status === 'unavailable' ? (
+        <>Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei.</>
+      ) : (
+        <>Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.</>
+      )}
+    </Fragment>
   </Testimonials>
-  <Faq {...home.faq} />
-  <Dates {...home.dates} />
+
+  <Faq anchor="faq" eyebrow="" title="Was Männer vorher wissen wollen">
+    <AccordionItem question="Was ist ein Männerkreis?">
+      Ein Männerkreis ist eine feste Runde von Männern, die sich regelmäßig trifft, im Kreis sitzt und offen über das
+      spricht, was gerade da ist. Einer spricht, die anderen hören zu&nbsp;– ohne Bewertung und ohne Ratschläge. In
+      Straubing treffen wir uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne
+      Vorerfahrung.
+    </AccordionItem>
+    <AccordionItem question="Für wen ist der Männerkreis?">
+      Für Männer, die sich ehrlichere Gespräche mit anderen Männern wünschen. Alter, Beruf und Lebenssituation spielen
+      keine Rolle. Mitbringen musst du nur die Bereitschaft, zuzuhören und die anderen respektvoll zu behandeln.
+    </AccordionItem>
+    <AccordionItem question="Muss ich etwas erzählen?">
+      Nein. Du entscheidest, was und wie viel du teilst. Niemand wird gedrängt, und zuhören ist genauso Teil des Kreises
+      wie sprechen.
+    </AccordionItem>
+    <AccordionItem question="Muss ich bei den Atem- und Körperübungen mitmachen?">
+      Nein. Die Übungen sind einfach und ein Angebot. Du machst mit, soweit es für dich passt&nbsp;– oder bleibst
+      einfach sitzen und bist dabei.
+    </AccordionItem>
+    <AccordionItem question="Ich war noch nie in einem Männerkreis. Ist das ein Problem?">
+      Nein. Du brauchst keine Vorerfahrung und musst nichts vorbereiten. Der Rahmen wird zu Beginn erklärt, damit du
+      weißt, worauf du dich einlässt.
+    </AccordionItem>
+    <AccordionItem question="Wie vertraulich ist das, was ich erzähle?">
+      Vertraulichkeit ist die erste Absprache jedes Abends: Was hier erzählt wird, bleibt hier. Sie ist eine Zusage der
+      Anwesenden untereinander&nbsp;– wie viel du erzählst, entscheidest deshalb immer du.
+    </AccordionItem>
+  </Faq>
+
+  <Dates
+    anchor="termine"
+    eyebrow=""
+    lede={
+      'Du meldest dich auf der Seite des jeweiligen Termins an. Dafür brauchst du nur Name und E-Mail-Adresse\u00a0– den genauen Treffpunkt bekommst du mit der Bestätigung.'
+    }
+    title="Dabei sein."
+    emptyTitle="Der nächste Termin folgt"
+    emptyText="Zurzeit steht kein Termin fest. Wenn du möchtest, bekommst du eine E-Mail, sobald der nächste Abend geplant ist."
+    emptyButtonLabel="Per E-Mail erfahren"
+    view={dateView}
+  />
+
+  <Newsletter
+    title="Termine per E-Mail erhalten"
+    text="Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler nicht verschickt."
+    whatsappTitle="Zwischen den Abenden"
+    whatsappText="Für den Austausch zwischen den Abenden gibt es außerdem eine WhatsApp-Gruppe."
+    whatsappLabel="Zur WhatsApp-Gruppe"
+    whatsappLink={site.whatsappCommunityLink}
+  />
 </Layout>

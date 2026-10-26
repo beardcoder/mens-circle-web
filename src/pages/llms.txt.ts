@@ -1,7 +1,5 @@
 import type { APIRoute } from 'astro';
 
-import home from '../content/home.json';
-import about from '../content/warum-ich-den-maennerkreis-leite.json';
 import site from '../data/site.json';
 
 export const prerender = true;
@@ -16,9 +14,9 @@ export const GET: APIRoute = ({ site: siteUrl }) => {
 
 ## Seiten
 
-- [Startseite](${url('/')}): ${home.meta.description}
+- [Startseite](${url('/')}): Männerkreis in Straubing, Niederbayern: Männer sitzen im Kreis, hören zu und sprechen offen, dazu einfache Atemübungen. Auf Spendenbasis, ohne Vorerfahrung.
 - [Termine & Anmeldung](${url('/event')}): Aktuelle Termine, freie Plätze und Anmeldung.
-- [Warum ich den Männerkreis leite](${url('/warum-ich-den-maennerkreis-leite')}): ${about.meta.description}
+- [Warum ich den Männerkreis leite](${url('/warum-ich-den-maennerkreis-leite')}): Markus Sommer erzählt, warum er den Männerkreis in Straubing gegründet hat und wie er die Abende leitet.
 `,
     { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
   );

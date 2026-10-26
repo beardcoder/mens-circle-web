@@ -1,0 +1,76 @@
+---
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
+
+import PageIntro from '../components/PageIntro.astro';
+import Container from '../components/ui/Container.astro';
+import Prose from '../components/ui/Prose.astro';
+import Layout from '../layouts/Layout.astro';
+
+export const prerender = true;
+
+Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
+---
+
+<Layout
+  title="Impressum – Männerkreis Niederbayern"
+  description="Impressum des Männerkreises Niederbayern."
+  robots="noindex, nofollow"
+>
+  <PageIntro title="Impressum" />
+  <Container class="pb-section">
+    <Prose width="column">
+      <p>Angaben gemäß § 5 DDG</p>
+      <p>
+        Markus Sommer
+        <br />
+        Ahornstraße 15
+        <br />
+        94369 Rain
+        <br />
+        Deutschland
+      </p>
+      <h2>Kontakt</h2>
+      <p>
+        E-Mail: <a href="mailto:hallo@mens-circle.de">hallo@mens-circle.de</a>
+      </p>
+      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+      <p>
+        Markus Sommer
+        <br />
+        Ahornstraße 15
+        <br />
+        94369 Rain
+        <br />
+        Deutschland
+      </p>
+      <h2>Verbraucherstreitbeilegung</h2>
+      <p>
+        Ich bin nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer
+        Verbraucherschlichtungsstelle teilzunehmen.
+      </p>
+      <h2>Haftung für Inhalte</h2>
+      <p>
+        Die Inhalte dieser Website wurden mit Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der
+        Inhalte kann jedoch keine Gewähr übernommen werden. Als Diensteanbieter bin ich für eigene Inhalte auf diesen
+        Seiten nach den allgemeinen Gesetzen verantwortlich.
+      </p>
+      <h2>Haftung für Links</h2>
+      <p>
+        Diese Website kann Links zu externen Websites Dritter enthalten, auf deren Inhalte ich keinen Einfluss habe. Für
+        die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich. Bei
+        Bekanntwerden von Rechtsverletzungen werden entsprechende Links entfernt.
+      </p>
+      <h2>Urheberrecht</h2>
+      <p>
+        Die durch den Seitenbetreiber erstellten Inhalte und Werke auf dieser Website unterliegen dem deutschen
+        Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung oder sonstige Verwertung außerhalb der Grenzen des
+        Urheberrechts bedarf der vorherigen schriftlichen Zustimmung des jeweiligen Rechteinhabers.
+      </p>
+      <h2>Hinweis zum Angebot</h2>
+      <p>
+        Der Männerkreis ist ein persönlicher Entwicklungs- und Erfahrungsraum. Er ersetzt keine Psychotherapie,
+        ärztliche Behandlung oder medizinische Beratung.
+      </p>
+    </Prose>
+  </Container>
+</Layout>

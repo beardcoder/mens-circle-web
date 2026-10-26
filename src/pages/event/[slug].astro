@@ -33,14 +33,6 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
   ['Termine', new URL('/event', siteUrl).href],
   [meta.ogTitle, new URL(`/event/${event.slug}`, siteUrl).href],
 ]);
-
-// The page's exit: where someone who has read the date goes next.
-const nextLinks = [
-  ...(event.is_past ? [{ href: '/event#benachrichtigung', title: 'Termine per E-Mail erhalten' }] : []),
-  { href: '/event', title: 'Alle Termine' },
-  { href: '/#ueber', title: 'Worum es an so einem Abend geht' },
-  { href: '/warum-ich-den-maennerkreis-leite', title: 'Warum ich den Männerkreis leite', prefetch: true },
-];
 ---
 
 <Layout
@@ -56,5 +48,15 @@ const nextLinks = [
   <EventRegister event={event} />
 
   {hasMap && <EventMapSection event={event} />}
-  <LinkBand eyebrow="Weiter" title="Wohin als Nächstes" titleId="weiter-title" items={nextLinks} />
+  <LinkBand
+    eyebrow="Weiter"
+    title="Wohin als Nächstes"
+    titleId="weiter-title"
+    items={[
+      ...(event.is_past ? [{ href: '/event#benachrichtigung', title: 'Termine per E-Mail erhalten' }] : []),
+      { href: '/event', title: 'Alle Termine' },
+      { href: '/#ueber', title: 'Worum es an so einem Abend geht' },
+      { href: '/warum-ich-den-maennerkreis-leite', title: 'Warum ich den Männerkreis leite', prefetch: true },
+    ]}
+  />
 </Layout>

@@ -1,0 +1,19 @@
+---
+interface Props {
+  label: string;
+  order: number;
+}
+
+const { label, order } = Astro.props;
+---
+
+<div class="reveal reveal-stagger grid content-start gap-1" style={`--motion-order: ${order}`}>
+  <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
+  <dt class="text-sm text-fg-muted">{label}</dt>
+  <dd class="text-xl font-semibold text-fg">
+    <slot name="value" />
+  </dd>
+  <dd class="text-sm text-fg-muted">
+    <slot />
+  </dd>
+</div>

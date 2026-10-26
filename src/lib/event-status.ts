@@ -1,7 +1,6 @@
 /**
  * The next-date state and the one view every event summary renders; `unavailable` must
- * never read as "no date planned". `pending` is the prerendered home's placeholder
- * until its server island has read the date.
+ * never read as "no date planned".
  */
 
 import site from '../data/site.json';
@@ -43,7 +42,7 @@ const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
   };
 
 export interface DateStatus {
-  status: NextEventStatus | 'pending';
+  status: NextEventStatus;
   next: NextEventSummary | null;
 }
 
@@ -51,16 +50,6 @@ export const dateStatus = (status: NextEventStatus, event: EventDTO | null): Dat
   const next = status === 'scheduled' ? summarizeNextEvent(event) : null;
 
   return { status, next };
-};
-
-export const PENDING: DateStatus = { status: 'pending', next: null };
-
-/** The live state, read by the home's server islands; imported late so a prerender never opens the database. */
-export const readDateStatus = async (): Promise<DateStatus> => {
-  const { fetchNextEventState } = await import('./server/events');
-  const result = await fetchNextEventState();
-
-  return dateStatus(result.status, result.event);
 };
 
 /**
@@ -96,7 +85,7 @@ interface SummaryRow {
  * what is always true (rhythm, place, fee), so every state stands the same height.
  */
 export interface SummaryView {
-  state: 'open' | 'full' | 'past' | 'none' | 'unavailable' | 'pending';
+  state: 'open' | 'full' | 'past' | 'none' | 'unavailable';
   /** The label above the date: "Nächster Termin", "Termin", … */
   kicker: string;
   /** Two fixed lines: the weekday and the date ("Freitag," / "16. Oktober 2026"), or the state in words. */
@@ -146,24 +135,12 @@ const noDateView = (unavailable: boolean, whenNone: 'overview' | 'notify'): Summ
     unavailable || whenNone === 'overview' ? OVERVIEW : { label: 'Termine per E-Mail erhalten', href: '#newsletter' },
 });
 
-/** Until the island has read the date: the same four rows, the overview as the action. */
-const PENDING_VIEW: SummaryView = {
-  state: 'pending',
-  kicker: KICKER,
-  title: ['Termin wird', 'geladen …'],
-  datetime: '',
-  rows: [...RHYTHM_ROWS(), { label: 'Status', value: 'Wird geladen' }],
-  action: OVERVIEW,
-};
-
 /**
  * The summary of the next date, for the home page: its action points to the event;
  * with none planned to the overview (`overview`, the hero) or to the e-mail
  * notification (`notify`, beside the form).
  */
 export const nextDateView = ({ status, next }: DateStatus, whenNone: 'overview' | 'notify'): SummaryView => {
-  if (status === 'pending') return PENDING_VIEW;
-
   if (status === 'unavailable' || !next) return noDateView(status === 'unavailable', whenNone);
 
   return {

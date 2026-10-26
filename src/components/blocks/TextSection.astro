@@ -5,40 +5,19 @@ import SectionHead from '../ui/SectionHead.astro';
 import Split from '../ui/Split.astro';
 
 interface Props {
-  anchor?: string;
+  anchor: string;
   eyebrow: string;
   title: string;
-  content: string;
 }
 
-/** Essay sections share the FAQ grid: a compact heading beside a readable text column. */
-
-const { anchor, eyebrow, title, content } = Astro.props;
-
-const slug = title
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/^-+|-+$/g, '');
-
-const sectionId = anchor ?? slug;
-const hasHead = Boolean(eyebrow || title);
+const { anchor, eyebrow, title } = Astro.props;
 ---
 
-<Section
-  id={sectionId || undefined}
-  space="band"
->
-  {hasHead ? (
-    <Split>
-      <SectionHead
-        slot="head"
-        eyebrow={eyebrow}
-        title={title}
-        size="sub"
-      />
-      {content && <Prose html={content} />}
-    </Split>
-  ) : (
-    content && <Prose html={content} />
-  )}
+<Section id={anchor} space="band">
+  <Split>
+    <SectionHead slot="head" eyebrow={eyebrow} title={title} size="sub" />
+    <Prose>
+      <slot />
+    </Prose>
+  </Split>
 </Section>

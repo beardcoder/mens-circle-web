@@ -16,7 +16,7 @@ const SHORT = 'public, max-age=3600, must-revalidate';
 const NO_CACHE = 'no-cache';
 
 /**
- * The prerendered documents (home, the legal pages, the personal page, the testimonial
+ * The prerendered documents (the legal pages, the personal page, the testimonial
  * form) set this themselves. Browsers revalidate (the HTML names per-build assets); a
  * shared cache may serve it for 5 minutes. None of them holds live data.
  */

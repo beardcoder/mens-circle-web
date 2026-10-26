@@ -15,50 +15,18 @@ interface Props {
   items: Item[];
 }
 
-/**
- * Positions set as pairs: "Ehrlichkeit statt Fassade" becomes the word that
- * counts and, quieter, what it replaces — an ordered list in two columns under
- * thin lines, like the agreements on the home page.
- */
-
 const { anchor, eyebrow, title, intro, items } = Astro.props;
-
-const values = items.map((item) => {
-  const [keep, ...rest] = item.title.split(' statt ');
-
-  return { ...item, keep, instead: rest.join(' statt ') };
-});
 ---
 
-<Section
-  id={anchor}
-  space="band"
->
-  <SectionHead
-    eyebrow={eyebrow}
-    title={title}
-    lead={intro}
-    size="sub"
-  />
+<Section id={anchor} space="band">
+  <SectionHead eyebrow={eyebrow} title={title} lead={intro} size="sub" />
 
   {items.length > 0 && (
-    <ul
-      role="list"
-      class="mt-8 grid gap-x-grid gap-y-6 md:grid-cols-2"
-    >
-      {values.map((item, i) => (
-        <li
-          class="reveal reveal-stagger grid content-start gap-2"
-          style={`--motion-order: ${i}`}
-        >
-          <span
-            aria-hidden="true"
-            class="draw mb-3 block h-px bg-line-strong"
-          ></span>
-          <h3 class="font-sans text-xl font-semibold text-fg">
-            {item.keep}
-            {item.instead && <span class="block text-base font-normal text-fg-muted">statt {item.instead}</span>}
-          </h3>
+    <ul role="list" class="mt-8 grid gap-x-grid gap-y-6 md:grid-cols-2">
+      {items.map((item, i) => (
+        <li class="reveal reveal-stagger grid content-start gap-2" style={`--motion-order: ${i}`}>
+          <span aria-hidden="true" class="draw mb-3 block h-px bg-line-strong"></span>
+          <h3 class="font-sans text-xl font-semibold text-fg">{item.title}</h3>
           {item.description && <p class="max-w-measure text-md text-fg-soft">{item.description}</p>}
         </li>
       ))}
