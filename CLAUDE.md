@@ -205,7 +205,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   explicit `impressum.astro` and `datenschutz.astro` routes. No content collections
   or JSON page content. Section components live in `src/components/blocks/`; pages
   pass their content explicitly as props and rich-text slots. Load dynamic data in
-  page frontmatter and pass it down; blocks only render their inputs. `Prose` accepts inline markup in its slot or
+  page frontmatter and pass it down; blocks only render their inputs. Component-specific
+  browser behavior belongs in its own `<script>` (Header, ModeToggle, Statement,
+  Quote, BackToTop), with no global client entry. Shared form/admin helpers stay
+  in `lib/form.ts` and `lib/admin.ts`. `Prose` accepts inline markup in its slot or
   an `html` prop for dynamic content. Static FAQ answers, journey steps and facts
   use slotted item components at their page location, rather than frontmatter arrays.
   FAQ and journey microdata describe the visible HTML directly, including dynamic

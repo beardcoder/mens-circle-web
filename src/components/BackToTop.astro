@@ -1,0 +1,45 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<a
+  href="#top"
+  data-scroll-top
+  aria-label="Nach oben scrollen"
+  title="Nach oben"
+  class="invisible fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full bg-fill text-on-fill opacity-0 transition-[background-color,translate,opacity,visibility] duration-180 data-[visible]:visible data-[visible]:opacity-100 hover:-translate-y-0.5 hover:bg-fill-strong motion-reduce:hover:translate-y-0 print:hidden sm:right-6 sm:bottom-6"
+>
+  <Icon name="chevron-up" aria-hidden="true" class="size-4.5" />
+</a>
+
+<script>
+  const link = document.querySelector<HTMLAnchorElement>('[data-scroll-top]');
+
+  if (link) {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+
+      window.scrollTo({ top: 0, behavior });
+      document.getElementById('top')?.focus({ preventScroll: true });
+    });
+
+    let frame = 0;
+
+    const update = (): void => {
+      frame = 0;
+      link.toggleAttribute('data-visible', window.scrollY > window.innerHeight * 0.8);
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!frame) frame = requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+    window.addEventListener('resize', update, { passive: true });
+    window.addEventListener('pageshow', update);
+    update();
+  }
+</script>
