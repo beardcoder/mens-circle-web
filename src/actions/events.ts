@@ -3,6 +3,7 @@ import { z } from 'astro/zod';
 
 import { eventInputSchema } from '@lib/event-input';
 import { createEvent, sendEventNewsletter, softDeleteEvent, updateEvent } from '@lib/server/events';
+import { invalidatePublicData } from '@lib/server/public-data';
 
 import { requireAdmin } from './auth';
 
@@ -18,10 +19,14 @@ export const events = {
 
         if (!event) throw new ActionError({ code: 'NOT_FOUND', message: 'Veranstaltung nicht gefunden.' });
 
+        invalidatePublicData();
+
         return { id: event.id, message: 'Veranstaltung gespeichert.' };
       }
 
       const event = await createEvent(input);
+
+      invalidatePublicData();
 
       return { id: event.id, message: 'Veranstaltung erstellt.' };
     },
@@ -32,6 +37,7 @@ export const events = {
     handler: async ({ id }, context) => {
       await requireAdmin(context);
       await softDeleteEvent(id);
+      invalidatePublicData();
 
       return { message: 'Veranstaltung gelöscht.' };
     },

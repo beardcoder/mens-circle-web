@@ -7,7 +7,7 @@ node_modules/
 bun.lock
 
 # generated / vendored assets (not hand-edited)
-public/
+/public/
 **/*.min.js
 
 # tooling

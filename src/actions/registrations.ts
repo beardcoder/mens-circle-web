@@ -2,6 +2,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
 import { REGISTRATION_STATUSES } from '@lib/server/db/schema';
+import { invalidatePublicData } from '@lib/server/public-data';
 import {
   broadcastEventMessage,
   changeRegistrationStatus,
@@ -62,6 +63,8 @@ export const registrations = {
 
       if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Anmeldung nicht gefunden.' });
 
+      invalidatePublicData();
+
       return { message: 'Status aktualisiert.' };
     },
   }),
@@ -71,6 +74,7 @@ export const registrations = {
     handler: async ({ id }, context) => {
       await requireAdmin(context);
       await softDeleteRegistration(id);
+      invalidatePublicData();
 
       return { message: 'Anmeldung entfernt.' };
     },

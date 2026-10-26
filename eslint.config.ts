@@ -21,7 +21,7 @@ export default defineConfig([
 
   // Browser + Node globals for plain script files.
   {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
+    files: ['**/*.{js,mjs,cjs,ts,tsx,mts,cts}'],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
     },

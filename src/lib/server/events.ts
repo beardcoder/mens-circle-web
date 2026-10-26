@@ -143,19 +143,28 @@ export const fetchUpcomingEventsState = async (
   }
 };
 
-export const getEventBySlug = async (slug: string): Promise<EventDTO | null> => {
+export const fetchEventState = async (
+  slug: string,
+): Promise<{
+  status: 'ok' | 'not-found' | 'unavailable';
+  event: EventDTO | null;
+}> => {
   try {
     const [row] = await eventWithCapacityQuery()
       .where(and(eq(events.slug, slug), isPublic()))
       .limit(1);
 
-    return row ? eventDtoWithCount(row.event, row.activeCount) : null;
+    return row
+      ? { status: 'ok', event: eventDtoWithCount(row.event, row.activeCount) }
+      : { status: 'not-found', event: null };
   } catch (err) {
     console.error('[events] getEventBySlug failed', String(err));
 
-    return null;
+    return { status: 'unavailable', event: null };
   }
 };
+
+export const getEventBySlug = async (slug: string): Promise<EventDTO | null> => (await fetchEventState(slug)).event;
 
 const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
   const base = String(eventDate).slice(0, 10);

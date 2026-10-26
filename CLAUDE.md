@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Website for the Männerkreis. Astro 7 (no UI framework), Tailwind CSS v4, SSR on the Bun
+Website for the Männerkreis. Astro 7 with Preact TSX islands, Tailwind CSS v4, SSR on the Bun
 runtime, Drizzle on `bun:sqlite`, email via external listmonk, admin sign-in via Pocket ID.
 Code, comments and docs are English; user-facing content is German.
 Commit messages are English too, in Conventional Commits form (`fix(seo): …`).
@@ -43,8 +43,11 @@ to `/`, in `src/middleware.ts`; `trailingSlash: 'never'`.
 explicit env; config is read at module load, so an in-process import measures `.env`.
 
 **Actions.** Everything is an Astro Action (`src/actions/*`), merged flat in `index.ts`.
-Public forms validate only in their Zod schema; `lib/form.ts` owns submit, field
-errors and the form's result line (`FormStatus`, never a toast; forms need JS). They
+Public forms validate only in their action Zod schemas. `lib/form.ts` owns submit,
+field errors and the result line for newsletter/testimonial forms (`FormStatus`).
+The Preact registration form handles its own busy/error/success state and calls the
+same `actions.register`; errors preserve inputs and success refreshes capacity. Forms
+need JS and keep feedback at the form rather than a toast. They
 go through `publicForm()` in `actions/forms.ts`: an in-process per-IP rate limit
 (`lib/server/ratelimit.ts`, one more reason for a single replica), a honeypot field
 (`website`) answered with a fake success, German messages, and no internal error
@@ -66,20 +69,24 @@ proxy's forwarded headers. Never fix a 403 with `checkOrigin: false`.
 `claimSeat()`). Capacity is computed from `holdsASeat()` only. More than one web
 replica on the same SQLite file is not supported.
 
-**Rendering.** Home and event pages render on demand. Home reads the next event and
-published testimonials once per request in its frontmatter; the sections share that
-state and render directly in the response. No server islands or pending placeholders.
-The legal pages, personal page and testimonial form are prerendered.
-`lib/event-status.ts` distinguishes `scheduled`, `none` and `unavailable`; a failed
-read must never render as "no date planned". Public reads catch query errors.
+**Rendering.** Home and `/event` are prerendered, with Preact client islands for
+next-date summaries, event facts, the upcoming list and moderated testimonials.
+They use shared browser requests in `components/event/usePublicData.ts`; no polling.
+Date widgets hydrate on load, testimonials and the closing date near the viewport.
+Single event pages retain SSR for metadata, JSON-LD and event copy, with live capacity
+and a client-only registration island. `lib/server/public-data.ts` coalesces and caches
+reads for 30 seconds (testimonials: five minutes); mutations invalidate its bounded
+process cache. Public DTOs exclude precise addresses and participant information.
+See `docs/public-api.md` for the response contract, ETags and freshness guarantees.
+Failures are retriable 503s, distinct from an empty list or an unpublished event (404).
+The existing registration action checks capacity transactionally; cached counts do
+not reserve seats. Legal pages, personal page and testimonial form stay prerendered.
 
-**Caching.** `lib/cache-policy.ts` is the one table (middleware + the adapter's `staticHeaders`);
-routes with their own header are left alone. Home and event pages revalidate on every
-visit so seat counts stay current. The prerendered pages (legal pages,
-`/warum-ich-den-maennerkreis-leite`, `/teile-deine-erfahrung`) use
-`PRERENDERED_CACHE_CONTROL` (in the same file, `s-maxage=300`). `public/sw.js` only
-retires the removed breathing app's service worker and is served `no-cache`; it can go
-once old installs have updated.
+**Caching.** `lib/cache-policy.ts` supplies defaults (middleware + adapter static headers).
+Prerendered pages use `PRERENDERED_CACHE_CONTROL`; individual event HTML and event
+JSON permit 30 seconds in a shared cache. Public JSON browsers revalidate with ETags.
+Admin and actions are `no-store`, as are public API errors. `public/sw.js` only retires
+the old breathing app's service worker and is served `no-cache`.
 
 **Generated files.** `sitemap()` lists `/sitemap-events.xml` in the index (`customSitemaps`).
 `src/pages/llms.txt.ts` prerenders a short index of the three public content pages.
@@ -88,8 +95,8 @@ No live-site fetching, Markdown export or post-build patching is needed.
 **Images.** Astro's `<Image />` straight from `astro:assets`, no wrapper component:
 `layout="constrained"` with `width`/`height` (Astro writes `srcset` and `sizes`), `position`
 for the crop, Tailwind for the box (`image.responsiveStyles` stays off). Photos live in
-`src/assets/images/`. Prerendered pages build their variants ahead of time; the SSR
-home page uses Astro’s `/_image` endpoint for its portrait variants. Sharp is external to the bundle (`vite.ssr.external`) so its
+`src/assets/images/`. Both portrait pages are prerendered, so their image variants
+are built ahead of time. Sharp is external to the bundle (`vite.ssr.external`) so its
 native binding resolves. All events use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; the two schedules
@@ -168,7 +175,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   and carries one emphasis at most (no cap bar, no glow, no photo frame).
 - Shared components: `EventSummary` (every date, fed by `lib/event-status.ts`),
   `PageIntro` (every sub-page opening, light), `SectionHead`, `Button`, `Field` +
-  `FormStatus`, `Quote` (`short` once per section, long voices fold), `Accordion`
+  `FormStatus`, the testimonial island (one short featured quote, long voices fold), `Accordion`
   (every FAQ). Use them; do not restyle a copy.
 - Home: the dark opening holds statement, explanation, the action (in the first
   screen at 1440 × 900) and the next date; then facts, intro with its questions,
@@ -205,9 +212,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   explicit `impressum.astro` and `datenschutz.astro` routes. No content collections
   or JSON page content. Section components live in `src/components/blocks/`; pages
   pass their content explicitly as props and rich-text slots. Load dynamic data in
-  page frontmatter and pass it down; blocks only render their inputs. Component-specific
+  server code or through the public JSON endpoints; blocks only render their inputs. Component-specific
   browser behavior belongs in its own `<script>` (Header, ModeToggle, Statement,
-  Quote, BackToTop), with no global client entry. Shared form/admin helpers stay
+  BackToTop), with no global client entry. Shared form/admin helpers stay
   in `lib/form.ts` and `lib/admin.ts`. `Prose` accepts inline markup in its slot or
   an `html` prop for dynamic content. Static FAQ answers, journey steps and facts
   use slotted item components at their page location, rather than frontmatter arrays.

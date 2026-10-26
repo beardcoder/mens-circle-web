@@ -1,57 +1,27 @@
 ---
-import type { TestimonialDTO } from '@lib/types';
-
-import Quote from '../ui/Quote.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 import TextLink from '../ui/TextLink.astro';
+import TestimonialList from './TestimonialList';
 
 interface Props {
   anchor: string;
   eyebrow: string;
   title: string;
-  items: TestimonialDTO[];
-  showNote: boolean;
+  emptyText: string;
+  errorText: string;
   linkUrl: string;
   linkLabel: string;
 }
 
-const { anchor, eyebrow, title, items, showNote, linkUrl, linkLabel } = Astro.props;
-const [first, ...others] = items;
-const featured = first && first.quote.length <= 160 ? first : null;
-const rest = featured ? others : items;
+const { anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel } = Astro.props;
 ---
 
-<Section id={anchor} labelledby="testimonials-title" space={showNote ? 'band' : 'default'}>
+<Section id={anchor} labelledby="testimonials-title">
   <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" />
 
-  {showNote && (
-    <p class="mt-6 max-w-measure text-md text-fg-muted">
-      <slot name="note" />
-    </p>
-  )}
-
-  {featured && (
-    <Quote
-      quote={featured.quote}
-      author={featured.author}
-      role={featured.role}
-      variant="short"
-      class="reveal mt-group max-w-176"
-    />
-  )}
-
-  {rest.length > 0 && (
-    <ul role="list" class="mt-group gap-x-grid md:columns-2">
-      {rest.map((t) => (
-        <li class="reveal mb-8 break-inside-avoid border-t border-line pt-6">
-          <Quote quote={t.quote} author={t.author} role={t.role} />
-        </li>
-      ))}
-    </ul>
-  )}
-
-  <p class:list={[items.length > 0 ? 'mt-4' : 'mt-6']}>
+  <TestimonialList client:visible={{ rootMargin: '300px' }} emptyText={emptyText} errorText={errorText} />
+  <p class="mt-6">
     <TextLink href={linkUrl}>{linkLabel}</TextLink>
   </p>
 </Section>

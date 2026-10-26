@@ -1,9 +1,5 @@
 ---
-import type { SummaryView } from '@lib/event-status';
-import { card } from '@lib/ui';
-
-import EventSummary from '../event/EventSummary.astro';
-import Button from '../ui/Button.astro';
+import NextDate from '../event/NextDate';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
@@ -12,13 +8,12 @@ interface Props {
   eyebrow: string;
   title: string;
   lede: string;
-  view: SummaryView;
   emptyTitle: string;
   emptyText: string;
   emptyButtonLabel: string;
 }
 
-const { anchor, eyebrow, title, lede, view, emptyTitle, emptyText, emptyButtonLabel } = Astro.props;
+const { anchor, eyebrow, title, lede, emptyTitle, emptyText, emptyButtonLabel } = Astro.props;
 ---
 
 <Section
@@ -29,16 +24,11 @@ const { anchor, eyebrow, title, lede, view, emptyTitle, emptyText, emptyButtonLa
 >
   <SectionHead eyebrow={eyebrow} title={title} titleId="termine-title" lead={lede} class="lg:col-span-6" />
   <div class="min-w-0 lg:col-span-5 lg:col-start-8">
-    {view.state === 'none' ? (
-      <div class:list={[card, 'grid gap-4 p-6 sm:p-8']}>
-        <h3 class="text-sub text-fg">{emptyTitle}</h3>
-        <p class="text-md text-fg-soft">{emptyText}</p>
-        <Button href="#newsletter" variant="secondary" decorate class="justify-self-start max-sm:w-full">
-          {emptyButtonLabel}
-        </Button>
-      </div>
-    ) : (
-      <EventSummary view={view} location="home-dates" />
-    )}
+    <NextDate
+      client:visible={{ rootMargin: '300px' }}
+      emptyTitle={emptyTitle}
+      emptyText={emptyText}
+      emptyButtonLabel={emptyButtonLabel}
+    />
   </div>
 </Section>

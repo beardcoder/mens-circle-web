@@ -1,5 +1,6 @@
 // @ts-check
 
+import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
 import bun from '@mens-circle/astro-bun';
 import tailwindcss from '@tailwindcss/vite';
@@ -82,6 +83,7 @@ export default defineConfig({
     },
   ],
   integrations: [
+    preact(),
     icon(),
     sitemap({
       // The event pages are SSR; their sitemap is a route, listed in the index here.
