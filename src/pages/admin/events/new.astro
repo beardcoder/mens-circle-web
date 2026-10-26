@@ -1,7 +1,8 @@
 ---
+import { DEFAULT_EVENT_NEWSLETTER_INTRO } from '@lib/server/events';
 import { getEventById } from '@lib/server/events';
 
-import EventForm from '../../../components/admin/EventForm.astro';
+import EventForm from '../../../components/admin/EventForm';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 
 export const prerender = false;
@@ -22,5 +23,5 @@ const event = source
 ---
 
 <AdminLayout title="Neue Veranstaltung">
-  <EventForm event={event} />
+  <EventForm client:load event={event} newsletterIntro={DEFAULT_EVENT_NEWSLETTER_INTRO} />
 </AdminLayout>

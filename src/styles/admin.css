@@ -9,3 +9,15 @@
 
 /* Agent skills quote example classes (`animate-tada`, …); none of them is ours. */
 @source not '../../.claude';
+
+/* Native page navigation; editing itself stays in Preact without page reloads. */
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

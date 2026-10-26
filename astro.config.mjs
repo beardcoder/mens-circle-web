@@ -52,7 +52,7 @@ export default defineConfig({
     '/ueber-uns': '/#ueber',
     '/sitemap.xml': '/sitemap-index.xml',
   },
-  // Only links marked `data-astro-prefetch`; the admin's <ClientRouter /> would otherwise prefetch all.
+  // Prefetch only explicitly marked links; private admin pages use native navigation.
   prefetch: { prefetchAll: false },
   build: {
     assets: 'assets',
