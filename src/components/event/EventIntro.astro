@@ -7,6 +7,7 @@ import { link } from '@lib/ui';
 import Button from '../ui/Button.astro';
 import Container from '../ui/Container.astro';
 import CalendarButton from './CalendarButton.astro';
+import EventDock from './EventDock.astro';
 
 interface Props {
   event: EventDTO;
@@ -32,24 +33,19 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       </div>
       <h1
         id="event-title"
+        data-event-title
         aria-label={event.title}
         class:list={[
-          'mt-5 font-sans font-medium tracking-[-0.065em] text-fg lg:mt-8',
+          'mt-5 font-sans font-medium tracking-[-0.065em] text-fg lg:mt-8 print:opacity-100!',
           isCircleTitle
-            ? 'text-[clamp(3.125rem,14vw,8.75rem)] leading-[0.86]'
+            ? 'text-[clamp(2.5rem,6.4vw,5.75rem)] leading-[1.05] whitespace-nowrap'
             : 'text-page wrap-anywhere hyphens-auto lg:text-hero',
         ]}
       >
         {isCircleTitle ? (
-          <>
-            <span class="block">Männer</span>
-            <span class="ml-[14%] block font-serif font-normal tracking-[-0.035em] text-accent italic">
-              kreis
-              <span aria-hidden="true" class="text-flame">
-                .
-              </span>
-            </span>
-          </>
+          <span>
+            Männer<span class="font-serif font-normal tracking-[-0.035em] text-accent italic">kreis</span>
+          </span>
         ) : (
           <span class="font-serif font-normal tracking-normal italic">{event.title}</span>
         )}
@@ -93,3 +89,5 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     </div>
   </Container>
 </section>
+
+<EventDock event={event} />
