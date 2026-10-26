@@ -27,7 +27,13 @@ try {
 Astro.response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=30');
 
 const siteUrl = Astro.site!;
-const hasMap = event.latitude !== null && event.longitude !== null;
+
+const hasPlace = !!(
+  event.location ||
+  event.street ||
+  event.city ||
+  (event.latitude !== null && event.longitude !== null)
+);
 
 // This is the page people forward, so the preview answers "when, where, still a
 // seat?" without anyone opening the link.
@@ -55,19 +61,19 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
   schemas={[eventSchema, breadcrumbs]}
   preloadData={[`/api/public/events/${encodeURIComponent(event.slug)}`]}
 >
-  {/* The date and its facts, then what the page is for: the description beside the registration. */}
+  {/* Invitation and date, the conversation beside the signup, then the meeting place. */}
   <EventIntro event={event} />
   <EventRegister event={event} />
 
-  {hasMap && <EventMapSection event={event} />}
+  {hasPlace && <EventMapSection event={event} />}
   <LinkBand
-    eyebrow="Weiter"
-    title="Wohin als Nächstes"
+    eyebrow=""
+    title="Den Kreis kennenlernen"
     titleId="weiter-title"
     items={[
       ...(event.is_past ? [{ href: '/event#benachrichtigung', title: 'Termine per E-Mail erhalten' }] : []),
       { href: '/event', title: 'Alle Termine' },
-      { href: '/#ueber', title: 'Worum es an so einem Abend geht' },
+      { href: '/#reise', title: 'So läuft ein Abend ab' },
       { href: '/warum-ich-den-maennerkreis-leite', title: 'Warum ich den Männerkreis leite', prefetch: true },
     ]}
   />

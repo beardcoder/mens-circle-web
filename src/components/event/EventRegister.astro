@@ -1,8 +1,9 @@
 ---
-import { plainTextToHtml } from '@lib/server/format';
+import site from '@data/site.json';
+import { formatDayMonthYearDE, plainTextToHtml, timeRange } from '@lib/server/format';
 import { publicEvent } from '@lib/server/public-data';
 import type { EventDTO } from '@lib/types';
-import { card } from '@lib/ui';
+import { link } from '@lib/ui';
 
 import RegistrationForm from '../forms/RegistrationForm';
 import Prose from '../ui/Prose.astro';
@@ -12,53 +13,68 @@ interface Props {
   event: EventDTO;
 }
 
-/**
- * What the page is for, as one composition on the paper: the evening's own
- * description (paragraphs and real lists) beside the registration — open,
- * waiting list or past. The form sits in a quiet card; nothing decorates it.
- */
-
 const { event } = Astro.props;
 const description = event.description?.trim() ?? '';
 ---
 
-<Section
-  id="anmeldung"
-  labelledby="anmeldung-title"
-  class="scroll-mt-header"
-  innerClass="grid items-start gap-x-grid gap-y-12 lg:grid-cols-12"
->
-  <div class="min-w-0 lg:col-span-5">
-    <h2 id="ueber-den-abend" class="text-sub text-fg">
-      Zu diesem Abend
+<Section labelledby="ueber-den-abend" innerClass="grid items-start gap-x-grid gap-y-12 lg:grid-cols-12">
+  <div class="min-w-0 lg:col-span-5 lg:col-start-2 lg:pt-10">
+    <h2 id="ueber-den-abend" class="max-w-[12em] text-section text-fg">
+      Was beschäftigt dich gerade?
     </h2>
     {description ? (
-      <Prose html={plainTextToHtml(description)} class="mt-5" />
+      <Prose html={plainTextToHtml(description)} class="mt-6" />
     ) : (
-      <p class="mt-5 max-w-measure text-md text-fg-soft">
-        Wir sitzen im Kreis, hören einander zu und sprechen über das, was gerade da ist.
-      </p>
+      <Prose class="mt-6">
+        <p>
+          Zwischen Arbeit und Alltag bleibt manches liegen. Im Kreis nehmen wir uns Zeit dafür. Du kannst erzählen, was
+          dich gerade fordert, was dir fehlt oder worüber du dich freust.
+        </p>
+        <p>
+          Wenn einer spricht, hören die anderen zu. Wir lassen einander ausreden und verzichten auf ungefragte
+          Ratschläge. Zu Beginn vereinbaren wir miteinander: Persönliches bleibt im Kreis.
+        </p>
+      </Prose>
     )}
-    {!event.is_past && (
-      <p class="mt-6 max-w-measure text-base text-fg-muted">
-        Die genaue Adresse bekommst du mit der Anmeldebestätigung per E-Mail.
+    <div class="mt-8 border-l-2 border-accent pl-5 sm:mt-10 sm:pl-6">
+      <h3 class="text-xl font-semibold text-fg">Du kannst erst einmal zuhören.</h3>
+      <p class="mt-3 max-w-measure text-md text-fg-soft">
+        Du brauchst keine Vorerfahrung und musst nichts vorbereiten. Ich erkläre den Rahmen zu Beginn. Wie viel du
+        erzählst und ob du bei einer Atem- oder Körperübung mitmachst, entscheidest du selbst.
       </p>
-    )}
+    </div>
+    <p class="mt-8 text-base text-fg-muted">
+      Noch eine Frage vor dem Abend?{' '}
+      <a class={link} href={`mailto:${site.contactEmail}`}>
+        Schreib mir.
+      </a>
+      <span class="mt-2 block">Markus</span>
+    </p>
   </div>
 
-  <div class:list={[card, 'min-w-0 p-6 sm:p-8 lg:col-span-6 lg:col-start-7', !event.is_past && 'min-h-176']}>
+  <div
+    id="anmeldung"
+    class:list={['min-w-0 bg-ground-alt p-5 sm:p-8 lg:col-span-5 lg:col-start-8 lg:p-9', !event.is_past && 'min-h-176']}
+  >
+    <p class="mb-5 border-b border-line pb-4 text-sm text-fg-muted">
+      {formatDayMonthYearDE(event.event_date)}
+      {event.start_time && <span class="mt-1 block">{timeRange(event.start_time, event.end_time)}</span>}
+    </p>
     <RegistrationForm client:only="preact" initial={publicEvent(event)}>
       <div slot="fallback">
         <h2 id="anmeldung-title" class="text-sub text-fg">
-          Anmeldung
+          {event.is_past ? 'Dieser Abend hat stattgefunden' : 'Dein Platz im Kreis'}
         </h2>
         <p role="status" class="mt-3 text-md text-fg-soft">
-          Das Anmeldeformular wird geladen …
+          Die Anmeldung wird geladen …
         </p>
         <noscript>
-          <p>
-            Für die Online-Anmeldung benötigst du JavaScript. Alternativ erreichst du mich per E-Mail an{' '}
-            <a href="mailto:hallo@mens-circle.de">hallo@mens-circle.de</a>.
+          <p class="mt-4 text-base">
+            Für die Online-Anmeldung benötigst du JavaScript. Du kannst dich auch per E-Mail an{' '}
+            <a class={link} href={`mailto:${site.contactEmail}`}>
+              {site.contactEmail}
+            </a>{' '}
+            anmelden.
           </p>
         </noscript>
       </div>

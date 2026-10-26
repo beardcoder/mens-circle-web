@@ -59,12 +59,12 @@ export default function RegistrationForm({ initial }: { initial: PublicEvent }) 
   return (
     <>
       <h2 id="anmeldung-title" class="text-sub text-fg">
-        {data.view.state === 'full' ? 'Auf die Warteliste' : 'Anmeldung'}
+        {data.view.state === 'full' ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
       </h2>
       <p class="mt-3 mb-6 max-w-measure text-md text-fg-soft">
         {data.view.state === 'full'
-          ? 'Dieser Abend ist ausgebucht. Trag dich trotzdem ein: Wird ein Platz frei, rückst du automatisch nach und bekommst sofort eine E-Mail.'
-          : `Von ${data.maxParticipants} Plätzen sind noch ${data.availableSpots} frei. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail.`}
+          ? 'Dieser Abend ist voll. Du kannst dich auf die Warteliste setzen lassen. Sobald du nachrückst, bekommst du eine E-Mail.'
+          : 'Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.'}
       </p>
       {error && (
         <p role="status" class="mb-4 text-sm text-fg-muted">

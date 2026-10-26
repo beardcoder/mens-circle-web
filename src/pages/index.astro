@@ -45,7 +45,7 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
       <NextEventFact client:load slot="value" kind="place">
         {site.geo.locality}
       </NextEventFact>
-      Die genaue Adresse kommt mit der Bestätigung
+      Adresse und Anfahrt stehen beim jeweiligen Termin
     </Fact>
     <Fact label="Wie oft" order={1}>
       <Fragment slot="value">Alle 2–4 Wochen</Fragment>
@@ -229,7 +229,7 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
     anchor="termine"
     eyebrow=""
     lede={
-      'Du meldest dich auf der Seite des jeweiligen Termins an. Dafür brauchst du nur Name und E-Mail-Adresse\u00a0– den genauen Treffpunkt bekommst du mit der Bestätigung.'
+      'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin. Du brauchst keine Vorerfahrung.'
     }
     title="Dabei sein."
   />
