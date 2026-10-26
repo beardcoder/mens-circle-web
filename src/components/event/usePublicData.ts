@@ -25,9 +25,9 @@ export async function refreshPublicData(url: string, force = false): Promise<voi
 
   if (!force && Date.now() - entry.updated < entry.maxAge) return;
 
+  // Default credentials and cache mode, so the first read can take the layout's
+  // `<link rel="preload" as="fetch" crossorigin>`; the responses say must-revalidate.
   entry.pending = fetch(force ? `${url}?refresh=${Date.now()}` : url, {
-    credentials: 'omit',
-    cache: 'no-cache',
     signal: AbortSignal.timeout(8000),
   })
     .then(async (response) => {
