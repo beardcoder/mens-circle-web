@@ -17,41 +17,53 @@ interface Props {
 
 const { event } = Astro.props;
 const view = eventView(event, 'Dieser Abend', false);
-const [weekday, date] = view.title;
-const [day, ...monthYear] = date.split(' ');
 const hasPlace = !!(event.location || event.street || event.city);
+const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
 ---
 
 <section
   aria-labelledby="event-title"
-  class="pt-[calc(var(--spacing-header)+1.5rem)] pb-0 sm:pb-8 lg:pt-[calc(var(--spacing-header)+3.5rem)] lg:pb-12"
+  class="pt-[calc(var(--spacing-header)+1.25rem)] pb-0 sm:pb-8 lg:pt-[calc(var(--spacing-header)+2.75rem)] lg:pb-12"
 >
-  <Container class="grid items-start gap-x-grid gap-y-7 lg:grid-cols-12 lg:gap-y-0">
-    <div class="min-w-0 lg:col-span-6 lg:pr-4">
-      <time datetime={view.datetime} class="flex items-center gap-4 lg:gap-6">
-        <span class="block shrink-0 font-serif text-[clamp(3.75rem,12vw,8rem)] leading-none tracking-display text-fg">
-          {day}
-        </span>
-        <span class="block border-l border-line-strong pl-4 text-sm text-fg-muted lg:pl-6 lg:text-base">
-          <span class="block text-fg">{monthYear.join(' ')}</span>
-          <span class="block">
-            {weekday.replace(',', '')}
-            {event.start_time && ` · ${timeRange(event.start_time, event.end_time)}`}
-          </span>
-        </span>
-      </time>
-      <h1 id="event-title" class="mt-5 text-page text-fg lg:mt-9 lg:text-hero">
-        <span class="block font-serif">{event.title}</span>
-        {event.city && (
-          <span class="mt-2 block text-xl font-normal tracking-normal lg:mt-4 lg:text-quote">in {event.city}</span>
+  <Container class="grid items-start gap-x-grid gap-y-6 lg:grid-cols-12 lg:gap-y-0">
+    <div class="min-w-0 lg:col-span-7 lg:pr-8">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line-strong pt-3 text-sm lg:pt-4">
+        <time datetime={view.datetime} class="text-fg">
+          {view.title.join(' ')}
+        </time>
+        {event.start_time && <p class="text-fg-muted">{timeRange(event.start_time, event.end_time)}</p>}
+      </div>
+      <h1
+        id="event-title"
+        aria-label={event.title}
+        class:list={[
+          'mt-5 font-sans font-medium tracking-[-0.065em] text-fg lg:mt-8',
+          isCircleTitle
+            ? 'text-[clamp(3.125rem,14vw,8.75rem)] leading-[0.86]'
+            : 'text-page wrap-anywhere hyphens-auto lg:text-hero',
+        ]}
+      >
+        {isCircleTitle ? (
+          <>
+            <span class="block">Männer</span>
+            <span class="ml-[14%] block">
+              kreis
+              <span aria-hidden="true" class="text-flame">
+                .
+              </span>
+            </span>
+          </>
+        ) : (
+          event.title
         )}
       </h1>
-      <p class="mt-4 max-w-[25em] text-md text-fg-soft lg:mt-7 lg:text-lg">
+      {event.city && <p class="mt-3 text-base text-fg-muted lg:mt-6 lg:text-xl">in {event.city}</p>}
+      <p class="mt-4 max-w-[25em] text-base text-fg-soft lg:mt-6 lg:text-lg">
         {event.is_past
           ? 'Dieser Abend hat bereits stattgefunden. Bei den aktuellen Terminen findest du die nächsten Treffen.'
           : 'Ein Abend für das, was dich gerade beschäftigt. Mit Männern, die dir zuhören.'}
       </p>
-      <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm lg:mt-7 lg:text-base">
+      <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm lg:mt-6 lg:text-base">
         <a href="#ueber-den-abend" class={`${link} inline-flex min-h-9 items-center`}>
           Was dich erwartet
         </a>
@@ -72,40 +84,52 @@ const hasPlace = !!(event.location || event.street || event.city);
       <slot />
     </div>
 
-    <div class="min-w-0 border-t border-line pt-6 pb-7 sm:pb-0 lg:col-span-6 lg:col-start-1 lg:row-start-2 lg:mt-10 lg:pt-8">
-      <div class="mb-6 flex items-start gap-5">
-        <Image
-          data-event-portrait
-          src={photo}
-          alt="Markus Sommer, der den Männerkreis leitet"
-          width={128}
-          height={160}
-          densities={[1, 2]}
-          position="left"
-          class="-mt-10 block h-28 w-22 shrink-0 object-cover lg:h-40 lg:w-32"
-        />
-        <div class="min-w-0">
-          <p class="max-w-[22em] text-base text-fg">Ich halte den Rahmen, damit du in Ruhe sprechen kannst.</p>
-          <a href="/warum-ich-den-maennerkreis-leite" class={`${link} mt-2 inline-flex min-h-9 items-center text-sm`}>
-            Markus Sommer · Über mich
-          </a>
+    <div class="min-w-0 pt-4 pb-8 sm:pb-0 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-10 lg:pt-0 lg:pr-8">
+      <figure class="relative isolate grid grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] items-center gap-5 sm:gap-7">
+        <div
+          data-event-portrait-frame
+          class="relative isolate aspect-4/5 min-w-0 before:absolute before:inset-0 before:-z-10 before:translate-x-3 before:translate-y-3 before:rounded-full before:bg-flame sm:before:translate-x-5 sm:before:translate-y-4"
+        >
+          <Image
+            data-event-portrait
+            src={photo}
+            alt="Markus Sommer, der den Männerkreis leitet"
+            layout="constrained"
+            width={400}
+            height={500}
+            widths={[200, 400, 600, 800]}
+            sizes="(min-width: 1200px) 300px, (min-width: 1024px) 26vw, (min-width: 576px) 48vw, 48vw"
+            position="left"
+            class="block size-full object-cover"
+          />
         </div>
+        <figcaption class="relative min-w-0">
+          <p class="font-serif text-[clamp(1.125rem,2.1vw,1.75rem)] leading-[1.3] tracking-[-0.015em] text-fg">
+            Ich halte den Rahmen, damit du in Ruhe sprechen kannst.
+          </p>
+          <a href="/warum-ich-den-maennerkreis-leite" class={`${link} mt-4 inline-flex min-h-9 items-center text-sm`}>
+            Markus Sommer<span class="sr-only"> · Über mich</span>
+          </a>
+        </figcaption>
+      </figure>
+      <div class="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
+        {event.location && (
+          <p class="max-w-[22em] text-sm text-fg-muted">
+            Treffpunkt: <span class="text-fg">{event.location}</span>
+          </p>
+        )}
+        {!event.is_past && <CalendarButton event={event} />}
       </div>
-      {event.location && (
-        <p class="mb-5 max-w-measure text-sm text-fg-muted">
-          Treffpunkt: <span class="text-fg">{event.location}</span>
-        </p>
-      )}
-      {!event.is_past && <CalendarButton event={event} />}
     </div>
   </Container>
 </section>
 
 <script>
-  // Morph only the portrait's mask. Its box and every reading/interaction target stay fixed.
+  // The frame is the timeline subject, so the changing mask cannot affect its own progress.
   const portrait = document.querySelector<HTMLElement>('[data-event-portrait]');
+  const frame = document.querySelector<HTMLElement>('[data-event-portrait-frame]');
 
-  if (portrait && typeof ViewTimeline !== 'undefined') {
+  if (portrait && frame && typeof ViewTimeline !== 'undefined') {
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
     let morph: Animation | undefined;
 
@@ -115,11 +139,11 @@ const hasPlace = !!(event.location || event.street || event.city);
       if (reducedMotion.matches) return;
 
       morph = portrait!.animate(
-        { clipPath: ['inset(0 round 0%)', 'inset(0 round 50% 50% 8% 8%)'] },
+        { clipPath: ['inset(0 round 0%)', 'inset(0 round 50%)'] },
         {
-          timeline: new ViewTimeline({ subject: portrait!, axis: 'block' }),
+          timeline: new ViewTimeline({ subject: frame!, axis: 'block' }),
           rangeStart: 'entry 0%',
-          rangeEnd: 'cover 60%',
+          rangeEnd: 'cover 65%',
           fill: 'both',
         },
       );
