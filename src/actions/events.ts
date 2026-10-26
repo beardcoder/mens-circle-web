@@ -2,7 +2,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
 import { eventInputSchema } from '@lib/event-input';
-import { createEvent, sendEventNewsletter, softDeleteEvent, updateEvent } from '@lib/server/events';
+import { createEvent, sendEventNewsletter, setEventPublished, softDeleteEvent, updateEvent } from '@lib/server/events';
 import { invalidatePublicData } from '@lib/server/public-data';
 
 import { requireAdmin } from './auth';
@@ -21,14 +21,28 @@ export const events = {
 
         invalidatePublicData();
 
-        return { id: event.id, message: 'Veranstaltung gespeichert.' };
+        return { id: event.id, slug: event.slug, message: 'Veranstaltung gespeichert.' };
       }
 
       const event = await createEvent(input);
 
       invalidatePublicData();
 
-      return { id: event.id, message: 'Veranstaltung erstellt.' };
+      return { id: event.id, slug: event.slug, message: 'Veranstaltung erstellt.' };
+    },
+  }),
+
+  setEventPublished: defineAction({
+    input: z.object({ id: z.string().min(1), published: z.boolean() }),
+    handler: async ({ id, published }, context) => {
+      await requireAdmin(context);
+      const updated = await setEventPublished(id, published);
+
+      if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Veranstaltung nicht gefunden.' });
+
+      invalidatePublicData();
+
+      return { message: published ? 'Veranstaltung veröffentlicht.' : 'Veranstaltung als Entwurf gespeichert.' };
     },
   }),
 

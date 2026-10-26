@@ -51,8 +51,9 @@ need JS and keep feedback at the form rather than a toast. They
 go through `publicForm()` in `actions/forms.ts`: an in-process per-IP rate limit
 (`lib/server/ratelimit.ts`, one more reason for a single replica), a honeypot field
 (`website`) answered with a fake success, German messages, and no internal error
-ever shown. Admin scripts use `bindOnce` + `ok` from `lib/admin.ts`
-(the admin runs `<ClientRouter />`). Mutating admin actions call `requireAdmin`.
+ever shown. Admin pages mount Preact workspaces with local state and native navigation.
+`components/admin/useAdminTask.ts` handles busy state and inline feedback. All private
+admin reads and mutations call `requireAdmin`; see `docs/admin-ui.md`.
 Other endpoints: `/health`, `/sitemap-events.xml`, `/auth/*`, `/api/public/events/<slug>/ics`.
 
 **Auth.** Pocket ID via `openid-client` (`lib/server/oidc.ts`): code flow with PKCE +
@@ -216,8 +217,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   pass their content explicitly as props and rich-text slots. Load dynamic data in
   server code or through the public JSON endpoints; blocks only render their inputs. Component-specific
   browser behavior belongs in its own `<script>` (Header, ModeToggle, Statement,
-  BackToTop), with no global client entry. Shared form/admin helpers stay
-  in `lib/form.ts` and `lib/admin.ts`. `Prose` accepts inline markup in its slot or
+  BackToTop), with no global client entry. Public form helpers stay
+  in `lib/form.ts`; admin helpers live beside their Preact components. `Prose` accepts inline markup in its slot or
   an `html` prop for dynamic content. Static FAQ answers, journey steps and facts
   use slotted item components at their page location, rather than frontmatter arrays.
   FAQ and journey microdata describe the visible HTML directly, including dynamic

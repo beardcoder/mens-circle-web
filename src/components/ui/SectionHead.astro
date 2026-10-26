@@ -24,20 +24,9 @@ const titleClass = ['max-w-[14.4em] text-fg wrap-anywhere hyphens-auto', size ==
 <div class:list={['reveal grid justify-items-start', className]}>
   {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
   {title && (
-    <h2
-      id={titleId}
-      class:list={titleClass}
-    >
+    <h2 id={titleId} class:list={titleClass}>
       {title}
     </h2>
   )}
-  {lead &&
-    (leadHtml ? (
-      <p
-        class:list={leadClass}
-        set:html={lead}
-      />
-    ) : (
-      <p class:list={leadClass}>{lead}</p>
-    ))}
+  {lead && (leadHtml ? <p class:list={leadClass} set:html={lead} /> : <p class:list={leadClass}>{lead}</p>)}
 </div>

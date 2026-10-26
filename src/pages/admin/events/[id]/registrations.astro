@@ -1,25 +1,16 @@
 ---
-import { getEventById } from '@lib/server/events';
-import { listRegistrationsForEvent } from '@lib/server/registrations';
+import { readAdminRegistrations } from '@lib/server/admin-data';
 
-import RegistrationManager from '../../../../components/admin/RegistrationManager.astro';
+import RegistrationManager from '../../../../components/admin/RegistrationManager';
 import AdminLayout from '../../../../layouts/AdminLayout.astro';
 
 export const prerender = false;
 
-const { id } = Astro.params;
-const event = id ? await getEventById(id) : null;
+const data = await readAdminRegistrations(Astro.params.id ?? '');
 
-if (!event) return Astro.redirect('/admin', 302);
-
-const registrations = await listRegistrationsForEvent(event.id);
+if (!data) return Astro.redirect('/admin', 302);
 ---
 
 <AdminLayout title="Anmeldungen">
-  <RegistrationManager
-    eventId={event.id}
-    eventTitle={event.title}
-    maxParticipants={event.maxParticipants}
-    registrations={registrations}
-  />
+  <RegistrationManager client:load initial={data} />
 </AdminLayout>

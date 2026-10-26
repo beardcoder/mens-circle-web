@@ -363,6 +363,16 @@ export const updateEvent = async (id: string, input: EventInput): Promise<Event 
   return updated;
 };
 
+export const setEventPublished = async (id: string, isPublished: boolean): Promise<boolean> => {
+  const rows = await db
+    .update(events)
+    .set({ isPublished })
+    .where(and(eq(events.id, id), isNull(events.deleted)))
+    .returning({ id: events.id });
+
+  return rows.length > 0;
+};
+
 export const softDeleteEvent = async (id: string): Promise<void> => {
   await db
     .update(events)

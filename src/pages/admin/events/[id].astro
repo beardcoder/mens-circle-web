@@ -1,7 +1,8 @@
 ---
+import { DEFAULT_EVENT_NEWSLETTER_INTRO } from '@lib/server/events';
 import { getEventById } from '@lib/server/events';
 
-import EventForm from '../../../components/admin/EventForm.astro';
+import EventForm from '../../../components/admin/EventForm';
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 
 export const prerender = false;
@@ -9,7 +10,7 @@ export const prerender = false;
 const { id } = Astro.params;
 const event = id ? await getEventById(id) : null;
 
-if (!event) return Astro.redirect('/admin', 302);
+if (!event || event.deleted) return Astro.redirect('/admin', 302);
 
 const data = {
   id: event.id,
@@ -34,5 +35,5 @@ const data = {
 ---
 
 <AdminLayout title="Veranstaltung bearbeiten">
-  <EventForm event={data} />
+  <EventForm client:load event={data} newsletterIntro={DEFAULT_EVENT_NEWSLETTER_INTRO} />
 </AdminLayout>

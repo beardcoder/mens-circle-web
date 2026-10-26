@@ -3,10 +3,11 @@
 import '../styles/admin.css';
 
 import { Font } from 'astro:assets';
-import { ClientRouter } from 'astro:transitions';
 import { Icon } from 'astro-icon/components';
 
-import { button, label } from '@lib/ui';
+import { label } from '@lib/ui';
+
+import LogoutButton from '../components/admin/LogoutButton';
 
 interface Props {
   title: string;
@@ -35,7 +36,6 @@ const links = [
     <title>{title} · Admin · Männerkreis</title>
     <Font cssVariable="--font-dm-sans" preload={[{ weight: '100 1000', style: 'normal' }]} />
     <Font cssVariable="--font-playfair" />
-    <ClientRouter />
   </head>
   <body class="text-base">
     {!bare && (
@@ -59,74 +59,18 @@ const links = [
           </div>
         </nav>
         <div class="flex min-w-0 items-center gap-3">
-          {admin && <span class="max-w-52 truncate text-sm text-fg-muted">{admin}</span>}
-          <button type="button" id="admin-logout" class={button({ variant: 'secondary', size: 'xs' })}>
-            Abmelden
-          </button>
+          {admin && <span class="hidden max-w-52 truncate text-sm text-fg-muted md:inline">{admin}</span>}
+          <LogoutButton client:load />
         </div>
       </header>
     )}
     <main
       class:list={[
-        'mx-auto w-full max-w-[60rem] px-[clamp(1rem,4vw,2rem)]',
+        'mx-auto w-full max-w-[72rem] px-[clamp(1rem,4vw,2rem)]',
         bare ? 'grid min-h-dvh place-items-center py-10' : 'pt-[clamp(1.5rem,4vw,2.75rem)] pb-20',
       ]}
     >
       <slot />
     </main>
-
-    <div
-      id="toasts"
-      aria-live="polite"
-      aria-atomic="false"
-      transition:persist
-      class="pointer-events-none fixed bottom-5 left-1/2 z-50 flex w-[min(92vw,26rem)] -translate-x-1/2 flex-col gap-2"
-    ></div>
-
-    <script>
-      import { actions } from 'astro:actions';
-
-      import type { AdminToastKind } from '@lib/admin';
-
-      const TOAST =
-        'translate-y-2 border-2 bg-raised px-4 py-3 text-sm font-semibold opacity-0 shadow-overlay transition-[opacity,translate] duration-150 data-[in]:translate-y-0 data-[in]:opacity-100';
-
-      const TONES: Record<AdminToastKind, string> = {
-        ok: 'border-success text-success',
-        err: 'border-danger text-danger',
-      };
-
-      // Persists on `window` across view-transition swaps; components reach it
-      // through `adminToast()` in lib/admin.ts.
-      if (!window.adminToast) {
-        window.adminToast = (kind: AdminToastKind, text: string) => {
-          const host = document.getElementById('toasts');
-
-          if (!host) return;
-
-          const el = document.createElement('div');
-
-          el.className = `${TOAST} ${TONES[kind]}`;
-          el.setAttribute('role', kind === 'err' ? 'alert' : 'status');
-          el.textContent = text;
-          host.appendChild(el);
-          requestAnimationFrame(() => (el.dataset.in = ''));
-          setTimeout(() => {
-            delete el.dataset.in;
-            el.addEventListener('transitionend', () => el.remove(), { once: true });
-          }, 3600);
-        };
-      }
-
-      // The button is a fresh node after each swap, so re-bind every time.
-      document.addEventListener('astro:page-load', () => {
-        const btn = document.getElementById('admin-logout');
-
-        btn?.addEventListener('click', async () => {
-          await actions.logout();
-          window.location.href = '/admin/login';
-        });
-      });
-    </script>
   </body>
 </html>

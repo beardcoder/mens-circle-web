@@ -36,15 +36,8 @@ const footerLink =
   <Container>
     <div class="grid gap-x-grid gap-y-10 pb-group sm:grid-cols-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]">
       <div class="max-w-[38ch] sm:col-span-2 lg:col-span-1">
-        <a
-          href="/"
-          class="mb-4 inline-flex min-h-11 items-center gap-3 font-sans text-xl font-medium tracking-tight"
-        >
-          <Icon
-            name="logo"
-            aria-hidden="true"
-            class="size-9 shrink-0"
-          />
+        <a href="/" class="mb-4 inline-flex min-h-11 items-center gap-3 font-sans text-xl font-medium tracking-tight">
+          <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
           <span>{site.siteName}</span>
         </a>
         <p class="text-base text-fg-muted">{site.footerDescription}</p>
@@ -52,10 +45,7 @@ const footerLink =
 
       <nav aria-label="Fußnavigation">
         <h2 class:list={[label, 'mb-3']}>Navigation</h2>
-        <ul
-          role="list"
-          class="grid grid-cols-2 gap-x-5 sm:grid-cols-1"
-        >
+        <ul role="list" class="grid grid-cols-2 gap-x-5 sm:grid-cols-1">
           {nav.footerPrimary.map((item) => (
             <li>
               <a
@@ -84,11 +74,7 @@ const footerLink =
                 data-umami-event-platform={link.type}
                 class={footerLink}
               >
-                <Icon
-                  name={`social-${link.type}`}
-                  aria-hidden="true"
-                  class="size-4.5 shrink-0 text-fg-muted"
-                />
+                <Icon name={`social-${link.type}`} aria-hidden="true" class="size-4.5 shrink-0 text-fg-muted" />
                 <span>
                   {link.text}
                   {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
@@ -98,11 +84,7 @@ const footerLink =
           ))}
           {nav.footerContact.map((item) => (
             <li>
-              <a
-                href={item.url}
-                class={footerLink}
-                data-umami-event="footer-link"
-              >
+              <a href={item.url} class={footerLink} data-umami-event="footer-link">
                 {item.label}
               </a>
             </li>
@@ -114,10 +96,7 @@ const footerLink =
     <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-line pt-6">
       <p class="text-sm text-fg-muted">{site.footerText}</p>
       <div class="flex flex-wrap items-center gap-x-6">
-        <nav
-          aria-label="Rechtliches"
-          class="flex flex-wrap gap-x-6"
-        >
+        <nav aria-label="Rechtliches" class="flex flex-wrap gap-x-6">
           {nav.footerLegal.map((item) => (
             <a
               href={item.url}

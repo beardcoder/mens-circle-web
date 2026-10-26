@@ -154,7 +154,7 @@ breath, the mark). Square is everything that holds: cards, panels, the breath
 panel, photographs, the map, the calendar popover. Flat: cards are a thin line (`card`: `border-line-strong` on the
 raised ground), never a shadow; a card carries at most one emphasis — no coloured
 cap, no glow, no frame around a photo. Lists and quotes stand without cards, under
-thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
+thin lines. `shadow-overlay` is reserved for admin dialogs, action menus and the save bar.
 
 **Motion.** It carries the site's energy; it never carries content.
 
@@ -194,7 +194,7 @@ thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
 | `EventSummary`                                    | One date: label, the date on two fixed lines, time / place / fee / seats, the action that fits    |
 | `TestimonialList` (Preact)                        | `short` at the quote size (one per section), `text` as running text; long voices fold             |
 | `Accordion`                                       | Questions in DM Sans, a plus that becomes a minus, answers on the measure                         |
-| `Split`, `LinkList`, `Prose` (`width`), `Badge`   | Head beside content; where-next rows; rich text (`measure` / `column`); the admin's status chip   |
+| `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                            |
 | `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                     |
 
 **Header.** 72px: the mark, from `nav` five content links and one filled action

@@ -53,7 +53,8 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Event details: SSR metadata and copy, cached reads plus live Preact capacity and registration
 - Public JSON, cache durations and privacy boundary: `docs/public-api.md`
 - Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)
-- Component-specific browser behavior: `<script>` in the owning component; shared form/admin helpers stay in `src/lib/`
+- Public component behavior: `<script>` in the owning Astro component; shared public form helpers stay in `src/lib/`
+- Admin: Preact TSX workspaces with local state, protected Astro Actions and native page navigation; see [admin UI](docs/admin-ui.md)
 - Shared layouts: `src/layouts/`; reusable UI, forms and event components: `src/components/`
 - Crawler index: `src/pages/llms.txt.ts` (prerendered)
 - Site settings, navigation: `src/data/site.json`, `src/data/navigation.json`
