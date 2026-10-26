@@ -23,6 +23,8 @@ export interface OverviewData {
   events: AdminEvent[];
   nextEventId: string | null;
   people: RegistrationRow[];
+  /** Submitted voices still waiting for moderation. */
+  pendingTestimonials: number;
 }
 
 export interface RegistrationsData {

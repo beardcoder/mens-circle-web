@@ -6,7 +6,7 @@ import { listTestimonialsForAdmin } from './testimonials';
 
 /** Called only behind the page middleware or requireAdmin; never cached. */
 export async function readAdminOverview(): Promise<OverviewData> {
-  const rows = await listEventsForAdmin();
+  const [rows, voices] = await Promise.all([listEventsForAdmin(), listTestimonialsForAdmin()]);
   const today = new Date().toISOString().slice(0, 10);
 
   const next = rows
@@ -43,6 +43,7 @@ export async function readAdminOverview(): Promise<OverviewData> {
     ),
     nextEventId: next?.id ?? null,
     people: next ? await listRegistrationsForEvent(next.id) : [],
+    pendingTestimonials: voices.filter((voice) => !voice.isPublished).length,
   };
 }
 

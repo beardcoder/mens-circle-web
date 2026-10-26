@@ -5,15 +5,26 @@ page mounts one Preact TSX workspace. Native navigation keeps routing simple;
 form `beforeunload` guards protect unsaved edits. No global store, persistent
 browser storage or polling is used for admin data.
 
-Visual direction: retain the existing dark ground (#151210), warm foreground,
-muted text, rust accent and semantic success/danger tokens from theme.css. Use DM
-Sans for controls and data, Playfair for page titles and the next evening. Keep
-content left aligned, space actions away from destructive tools, and show feedback
-at the affected workspace. Native modal dialogs confirm deletion and sending.
+Layout: a dashboard shell (`AdminLayout.astro`) with a sidebar from `lg` and a top
+bar plus bottom tab bar below it. `/admin` is the dashboard (key figures, the next
+evening, later dates, open tasks); `/admin/events` lists every date with filters;
+event, registration and testimonial pages keep their tools beside the work in a
+right column. Shared pieces live in `components/admin/ui.tsx` (`PageHeader`, `Stat`,
+`Tabs`, `SearchField`, `StatusPill`, `Meter`, `Menu`, `EmptyState`) and the line icons
+in `components/admin/icons.tsx`, which AdminLayout also renders statically.
+
+Visual direction: the dark ground, warm foreground, muted text, rust accent and
+semantic success/danger tokens from theme.css. DM Sans for controls and data,
+Playfair for page titles and the next evening. Controls are round, cards square
+and flat. Space actions away from destructive tools, and show feedback at the
+affected workspace. Native modal dialogs confirm deletion and sending.
+
+Signing out is a plain form post to `/auth/logout` (no island), which deletes the
+session cookie and redirects to `/admin/login`.
 
 | Authenticated action     | Input               | Response                                            |
 | ------------------------ | ------------------- | --------------------------------------------------- |
-| `loadAdminOverview`      | none                | events, nextEventId, people for the next event      |
+| `loadAdminOverview`      | none                | events, nextEventId, people, pendingTestimonials    |
 | `loadAdminRegistrations` | `{ eventId }`       | eventId, eventTitle, maxParticipants, registrations |
 | `loadAdminTestimonials`  | none                | testimonials with moderation fields                 |
 | `setEventPublished`      | `{ id, published }` | success message                                     |
