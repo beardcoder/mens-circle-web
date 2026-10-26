@@ -8,12 +8,9 @@ interface Props {
   eyebrow: string;
   title: string;
   lede: string;
-  emptyTitle: string;
-  emptyText: string;
-  emptyButtonLabel: string;
 }
 
-const { anchor, eyebrow, title, lede, emptyTitle, emptyText, emptyButtonLabel } = Astro.props;
+const { anchor, eyebrow, title, lede } = Astro.props;
 ---
 
 <Section
@@ -23,12 +20,6 @@ const { anchor, eyebrow, title, lede, emptyTitle, emptyText, emptyButtonLabel } 
   innerClass="grid items-center gap-x-grid gap-y-10 lg:grid-cols-12"
 >
   <SectionHead eyebrow={eyebrow} title={title} titleId="termine-title" lead={lede} class="lg:col-span-6" />
-  <div class="min-w-0 lg:col-span-5 lg:col-start-8">
-    <NextDate
-      client:visible={{ rootMargin: '300px' }}
-      emptyTitle={emptyTitle}
-      emptyText={emptyText}
-      emptyButtonLabel={emptyButtonLabel}
-    />
-  </div>
+  {/* An empty island has no visible target for client:visible; its request is shared with the hero. */}
+  <NextDate client:load />
 </Section>
