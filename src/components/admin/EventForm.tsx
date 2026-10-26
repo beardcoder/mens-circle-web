@@ -3,10 +3,11 @@ import type { ComponentProps } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import type { EventInput } from '@lib/event-input';
-import { button, control, panel } from '@lib/ui';
+import { button, card, control, panel } from '@lib/ui';
 
+import { Icon } from './icons';
 import type { EventFormData } from './types';
-import { AdminHead, ConfirmDialog, Feedback, Field } from './ui';
+import { ConfirmDialog, Feedback, Field, PageHeader, StatusPill } from './ui';
 import { useAdminTask } from './useAdminTask';
 import { useUnsavedChanges } from './useUnsavedChanges';
 
@@ -34,31 +35,9 @@ export default function EventForm({ event, newsletterIntro }: { event: EventForm
 
   return (
     <>
-      <AdminHead
-        title={id ? 'Veranstaltung bearbeiten' : 'Neuer Termin'}
-        description="Termin, Treffpunkt und Veröffentlichung an einem Ort."
-      >
-        <a href="/admin" class={button({ variant: 'secondary', size: 'sm' })}>
-          Zur Übersicht
-        </a>
-        {id && (
-          <a href={`/admin/events/${id}/registrations`} class={button({ variant: 'secondary', size: 'sm' })}>
-            Anmeldungen
-          </a>
-        )}
-        {slug && (
-          <a
-            href={`/event/${slug}`}
-            target="_blank"
-            rel="noopener"
-            class={button({ variant: 'secondary', size: 'sm' })}
-          >
-            Öffentliche Seite öffnen
-          </a>
-        )}
-      </AdminHead>
+      <EventHeader id={id} slug={slug} />
       {!!event && !event.id && (
-        <p class="mb-6 border-l-2 border-accent bg-raised p-4 text-sm">
+        <p class="mb-6 border-l-2 border-accent bg-raised px-4 py-3 text-sm">
           Vorlage übernommen. Bitte Datum setzen und die Veröffentlichung prüfen.
         </p>
       )}
@@ -69,7 +48,7 @@ export default function EventForm({ event, newsletterIntro }: { event: EventForm
         method="post"
         noValidate
         data-unsaved={dirty ? 'true' : undefined}
-        class="grid gap-6"
+        class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
         onInput={(event) => {
           setDirty(true);
           setSaved(false);
@@ -95,14 +74,37 @@ export default function EventForm({ event, newsletterIntro }: { event: EventForm
           setDirty(false);
           setSaved(true);
           window.history.replaceState(null, '', `/admin/events/${result.id}`);
-          document.title = 'Veranstaltung bearbeiten · Admin · Männerkreis';
+          document.title = document.title.replace(/^[^·]+/, 'Termin bearbeiten ');
         }}
       >
         <EventFields event={event} errors={task.fields} busy={!!task.busy} editing={!!id} draftSlug={draftSlug} />
-        <SaveBar dirty={dirty} saved={saved} busy={!!task.busy} />
+        <PublishPanel published={event?.isPublished ?? false} dirty={dirty} saved={saved} busy={!!task.busy} />
       </form>
       {id && <EventNewsletter eventId={id} intro={newsletterIntro} disabled={dirty || !!task.busy} />}
     </>
+  );
+}
+
+function EventHeader({ id, slug }: { id: string; slug: string }) {
+  return (
+    <PageHeader
+      title={id ? 'Termin bearbeiten' : 'Neuer Termin'}
+      description="Termin, Treffpunkt und Veröffentlichung an einem Ort."
+      back={{ href: '/admin/events', label: 'Termine' }}
+    >
+      {id && (
+        <a href={`/admin/events/${id}/registrations`} class={button({ variant: 'secondary', size: 'sm' })}>
+          <Icon name="users" class="size-4.5" />
+          Anmeldungen
+        </a>
+      )}
+      {slug && (
+        <a href={`/event/${slug}`} target="_blank" rel="noopener" class={button({ variant: 'secondary', size: 'sm' })}>
+          <Icon name="external" class="size-4.5" />
+          Öffentliche Seite
+        </a>
+      )}
+    </PageHeader>
   );
 }
 
@@ -148,7 +150,7 @@ function EventFields({
     <fieldset disabled={busy} class="grid min-w-0 gap-6 border-0 p-0">
       <legend class="sr-only">Veranstaltung bearbeiten</legend>
       <section class={`${panel} grid gap-5`} aria-labelledby="event-basics-title">
-        <h2 id="event-basics-title" class="text-xl font-semibold">
+        <h2 id="event-basics-title" class="font-sans text-lg font-semibold">
           Termin und Plätze
         </h2>
         {input('title', 'Titel', { required: true, placeholder: 'Männerkreis in Straubing' })}
@@ -166,7 +168,7 @@ function EventFields({
         </div>
       </section>
       <section class={`${panel} grid gap-5`} aria-labelledby="event-location-title">
-        <h2 id="event-location-title" class="text-xl font-semibold">
+        <h2 id="event-location-title" class="font-sans text-lg font-semibold">
           Treffpunkt
         </h2>
         {input('location', 'Name des Ortes')}
@@ -191,8 +193,8 @@ function EventFields({
         </Field>
       </section>
       <section class={`${panel} grid gap-5`} aria-labelledby="event-description-title">
-        <h2 id="event-description-title" class="text-xl font-semibold">
-          Beschreibung und Sichtbarkeit
+        <h2 id="event-description-title" class="font-sans text-lg font-semibold">
+          Beschreibung
         </h2>
         <Field
           id="event-description"
@@ -208,23 +210,9 @@ function EventFields({
             class={`${control('sm')} resize-y`}
           />
         </Field>
-        <label class="flex cursor-pointer items-start gap-3 border-t border-line pt-5">
-          <input
-            type="checkbox"
-            name="isPublished"
-            defaultChecked={value.isPublished ?? false}
-            class="mt-1 size-5 accent-accent"
-          />
-          <span class="grid gap-1">
-            <strong>Öffentlich sichtbar</strong>
-            <span class="text-sm text-fg-muted">
-              Nach dem Speichern erscheint dieser Termin auf der Website. Ohne Haken bleibt er ein Entwurf.
-            </span>
-          </span>
-        </label>
       </section>
       <details class={`${panel} group`}>
-        <summary class="cursor-pointer font-semibold">Weitere Einstellungen</summary>
+        <summary class="cursor-pointer text-lg font-semibold">Weitere Einstellungen</summary>
         <div class="mt-5 grid gap-5">
           {input('slug', 'Adresse der Terminseite', {
             hint: editing
@@ -243,26 +231,86 @@ function EventFields({
   );
 }
 
-function SaveBar({ dirty, saved, busy }: { dirty: boolean; saved: boolean; busy: boolean }) {
+function PublishPanel({
+  published,
+  dirty,
+  saved,
+  busy,
+}: {
+  published: boolean;
+  dirty: boolean;
+  saved: boolean;
+  busy: boolean;
+}) {
   return (
-    <div class="sticky bottom-3 z-20 flex flex-wrap items-center justify-between gap-3 border border-line-strong bg-ground/95 p-4 shadow-overlay backdrop-blur-sm">
-      <p role="status" class={`text-sm ${dirty ? 'text-accent' : 'text-fg-muted'}`}>
-        {dirty ? 'Ungespeicherte Änderungen' : saved ? 'Alle Änderungen gespeichert.' : 'Bereit zum Bearbeiten'}
-      </p>
-      <div class="flex flex-wrap gap-2">
-        <button
-          type="button"
-          disabled={!dirty || busy}
-          class={button({ variant: 'secondary', size: 'sm' })}
-          onClick={() => window.location.reload()}
-        >
-          Verwerfen
-        </button>
-        <button type="submit" disabled={busy} class={button({ size: 'sm' })}>
-          {busy ? 'Speichern …' : 'Änderungen speichern'}
-        </button>
+    <>
+      <aside class="grid gap-6 lg:sticky lg:top-6" aria-label="Veröffentlichung">
+        <section class={`${card} grid gap-4 p-5`} aria-labelledby="event-publish-title">
+          <div class="flex items-center justify-between gap-3">
+            <h2 id="event-publish-title" class="font-sans text-base font-semibold">
+              Veröffentlichung
+            </h2>
+            <SaveState dirty={dirty} saved={saved} />
+          </div>
+          <label class="flex cursor-pointer items-start gap-3">
+            <input
+              type="checkbox"
+              name="isPublished"
+              disabled={busy}
+              defaultChecked={published}
+              class="mt-1 size-5 shrink-0 accent-accent"
+            />
+            <span class="grid gap-1">
+              <strong>Öffentlich sichtbar</strong>
+              <span class="text-sm text-fg-muted">
+                Nach dem Speichern erscheint der Termin auf der Website. Ohne Haken bleibt er ein Entwurf.
+              </span>
+            </span>
+          </label>
+          <div class="grid gap-2 border-t border-line pt-4 max-lg:hidden">
+            <SaveButtons dirty={dirty} busy={busy} block />
+          </div>
+        </section>
+      </aside>
+      <div class="sticky bottom-20 z-20 flex flex-wrap items-center justify-between gap-3 border border-line-strong bg-raised p-3 shadow-overlay lg:hidden">
+        <SaveState dirty={dirty} saved={saved} />
+        <div class="flex gap-2">
+          <SaveButtons dirty={dirty} busy={busy} />
+        </div>
       </div>
-    </div>
+    </>
+  );
+}
+
+function SaveState({ dirty, saved }: { dirty: boolean; saved: boolean }) {
+  return (
+    <p role="status">
+      {dirty ? (
+        <StatusPill tone="accent">Ungespeichert</StatusPill>
+      ) : saved ? (
+        <StatusPill tone="success">Gespeichert</StatusPill>
+      ) : (
+        <span class="sr-only">Keine Änderungen</span>
+      )}
+    </p>
+  );
+}
+
+function SaveButtons({ dirty, busy, block = false }: { dirty: boolean; busy: boolean; block?: boolean }) {
+  return (
+    <>
+      <button type="submit" disabled={busy} class={button({ size: 'sm', block })}>
+        {busy ? 'Speichern …' : 'Speichern'}
+      </button>
+      <button
+        type="button"
+        disabled={!dirty || busy}
+        class={button({ variant: 'secondary', size: 'sm', block })}
+        onClick={() => window.location.reload()}
+      >
+        Verwerfen
+      </button>
+    </>
   );
 }
 
@@ -271,8 +319,8 @@ function EventNewsletter({ eventId, intro, disabled }: { eventId: string; intro:
   const [draft, setDraft] = useState<{ subject: string; intro: string } | null>(null);
 
   return (
-    <details class="mt-10 border-t border-line pt-6">
-      <summary class="cursor-pointer text-xl font-semibold">Diesen Termin per Newsletter ankündigen</summary>
+    <details class={`${panel} mt-6 lg:mr-[21.5rem]`}>
+      <summary class="cursor-pointer text-lg font-semibold">Per Newsletter ankündigen</summary>
       <p class="mt-3 max-w-measure text-sm text-fg-muted">
         Geht an den öffentlichen Newsletter-Verteiler. Datum, Treffpunkt und Anmeldelink werden aus dem gespeicherten
         Termin ergänzt.
@@ -310,6 +358,7 @@ function EventNewsletter({ eventId, intro, disabled }: { eventId: string; intro:
             />
           </Field>
           <button class={`${button({ variant: 'secondary', size: 'sm' })} justify-self-start`} type="submit">
+            <Icon name="send" class="size-4.5" />
             Versand prüfen
           </button>
         </fieldset>

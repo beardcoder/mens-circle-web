@@ -3,14 +3,30 @@ import { useEffect, useState } from 'preact/hooks';
 
 import { button, card, control } from '@lib/ui';
 
+import { Icon } from './icons';
 import type { Testimonial } from './types';
-import { AdminHead, Badge, ConfirmDialog, Feedback, Field, shortDate } from './ui';
+import {
+  ConfirmDialog,
+  EmptyState,
+  Feedback,
+  Field,
+  iconButton,
+  PageHeader,
+  SearchField,
+  shortDate,
+  StatusPill,
+  Tabs,
+} from './ui';
 import { useAdminTask } from './useAdminTask';
 import { useUnsavedChanges } from './useUnsavedChanges';
 
 export default function TestimonialModerator({ initial }: { initial: Testimonial[] }) {
   const [rows, setRows] = useState(initial);
-  const [filter, setFilter] = useState(initial.some((row) => !row.isPublished) ? 'pending' : 'all');
+
+  const [filter, setFilter] = useState<'pending' | 'published' | 'all'>(
+    initial.some((row) => !row.isPublished) ? 'pending' : 'all',
+  );
+
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<{ row: Testimonial; kind: 'delete' | 'publish' } | null>(null);
@@ -30,7 +46,7 @@ export default function TestimonialModerator({ initial }: { initial: Testimonial
 
   return (
     <>
-      <AdminHead title="Stimmen" description={`${pending} zur Prüfung · ${rows.length - pending} veröffentlicht`}>
+      <PageHeader title="Stimmen" description="Eingereichte Erfahrungen prüfen, bearbeiten und freigeben.">
         <button
           type="button"
           disabled={!!task.busy || !!editing}
@@ -43,35 +59,30 @@ export default function TestimonialModerator({ initial }: { initial: Testimonial
             )
           }
         >
+          <Icon name="refresh" class="size-4.5" />
           Aktualisieren
         </button>
-      </AdminHead>
+      </PageHeader>
       <Feedback notice={task.notice} />
-      <div class="mb-5 grid gap-3 sm:grid-cols-[1fr_14rem]">
-        <label class="grid gap-2 text-sm font-semibold">
-          Suchen
-          <input
-            type="search"
-            class={control('sm')}
-            placeholder="Name, E-Mail oder Text"
-            disabled={!!editing}
-            value={search}
-            onInput={(event) => setSearch(event.currentTarget.value)}
-          />
-        </label>
-        <label class="grid gap-2 text-sm font-semibold">
-          Status
-          <select
-            class={control('sm')}
-            value={filter}
-            disabled={!!editing}
-            onChange={(event) => setFilter(event.currentTarget.value)}
-          >
-            <option value="pending">Zur Prüfung ({pending})</option>
-            <option value="published">Veröffentlicht ({rows.length - pending})</option>
-            <option value="all">Alle Stimmen ({rows.length})</option>
-          </select>
-        </label>
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <Tabs
+          label="Nach Status filtern"
+          value={filter}
+          disabled={!!editing}
+          onChange={setFilter}
+          options={[
+            { value: 'pending', label: 'Zur Prüfung', count: pending },
+            { value: 'published', label: 'Veröffentlicht', count: rows.length - pending },
+            { value: 'all', label: 'Alle', count: rows.length },
+          ]}
+        />
+        <SearchField
+          label="Stimmen durchsuchen"
+          placeholder="Name, E-Mail oder Text"
+          disabled={!!editing}
+          value={search}
+          onInput={setSearch}
+        />
       </div>
       {editing && (
         <p class="mb-4 text-sm text-accent">
@@ -79,9 +90,7 @@ export default function TestimonialModerator({ initial }: { initial: Testimonial
         </p>
       )}
       {!visible.length && (
-        <p class="border border-dashed border-line-strong p-8 text-fg-muted">
-          {rows.length ? 'Keine Stimmen für diese Auswahl.' : 'Noch keine Einreichungen.'}
-        </p>
+        <EmptyState>{rows.length ? 'Keine Stimmen für diese Auswahl.' : 'Noch keine Einreichungen.'}</EmptyState>
       )}
       <ul class="grid gap-4" aria-label="Teilnehmerstimmen">
         {visible.map((row) => (
@@ -185,10 +194,12 @@ function TestimonialCard({
   }, [editing]);
 
   return (
-    <li class={`${card} grid gap-5 p-5 sm:p-6`}>
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <Badge active={row.isPublished}>{row.isPublished ? 'Veröffentlicht' : 'Zur Prüfung'}</Badge>
-        <span class="text-xs text-fg-muted">Eingereicht: {shortDate(row.createdAt)}</span>
+    <li class={`${card} p-5 sm:p-6`}>
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <StatusPill tone={row.isPublished ? 'success' : 'accent'}>
+          {row.isPublished ? 'Veröffentlicht' : 'Zur Prüfung'}
+        </StatusPill>
+        <span class="text-xs text-fg-muted">Eingereicht {shortDate(row.createdAt)}</span>
       </div>
       {editing ? (
         <TestimonialEditor
@@ -202,66 +213,76 @@ function TestimonialCard({
         />
       ) : (
         <>
-          <blockquote class="whitespace-pre-wrap text-lg leading-relaxed text-fg">„{row.quote}“</blockquote>
-          <p class="min-w-0 break-words text-sm text-fg-muted">
+          <blockquote class="max-w-[48rem] font-serif text-lg leading-relaxed whitespace-pre-wrap">
+            „{row.quote}“
+          </blockquote>
+          <p class="mt-3 min-w-0 text-sm break-words text-fg-muted">
             <strong class="text-fg">{row.authorName || 'Ohne Namensangabe'}</strong>
             {row.role && ` · ${row.role}`}
-            <br />
-            <a href={`mailto:${row.email}`} class="hover:text-accent">
-              {row.email}
-            </a>
+            {row.email && (
+              <>
+                {' · '}
+                <a href={`mailto:${row.email}`} class="hover:text-accent">
+                  {row.email}
+                </a>
+              </>
+            )}
           </p>
-          <div class="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-4">
+          <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
             <form
-              class="flex flex-wrap items-end gap-2"
+              class="flex items-center gap-2"
               onSubmit={(event) => {
                 event.preventDefault();
                 onOrder(Number(order) || 0);
               }}
             >
-              <label class="grid gap-1 text-xs text-fg-muted">
+              <label for={`order-${row.id}`} class="text-sm text-fg-muted">
                 Reihenfolge
-                <input
-                  name="sortOrder"
-                  type="number"
-                  value={order}
-                  onInput={(event) => setOrder(event.currentTarget.value)}
-                  disabled={disabled}
-                  class={`${control('xs')} max-w-24`}
-                />
               </label>
-              <button
-                type="submit"
-                disabled={disabled || Number(order) === row.sortOrder}
-                class={button({ variant: 'secondary', size: 'xs' })}
-              >
-                Übernehmen
-              </button>
+              <input
+                id={`order-${row.id}`}
+                name="sortOrder"
+                type="number"
+                value={order}
+                onInput={(event) => setOrder(event.currentTarget.value)}
+                disabled={disabled}
+                class={`${control('xs')} max-w-24`}
+              />
+              {Number(order) !== row.sortOrder && (
+                <button type="submit" disabled={disabled} class={button({ variant: 'secondary', size: 'xs' })}>
+                  Übernehmen
+                </button>
+              )}
             </form>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 disabled={disabled}
                 onClick={onEdit}
-                class={button({ variant: 'secondary', size: 'xs' })}
+                class={iconButton}
+                aria-label="Bearbeiten"
+                title="Bearbeiten"
               >
-                Bearbeiten
-              </button>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={onPublish}
-                class={button({ variant: 'secondary', size: 'xs' })}
-              >
-                {row.isPublished ? 'Verbergen' : 'Veröffentlichen'}
+                <Icon name="edit" class="size-4.5" />
               </button>
               <button
                 type="button"
                 disabled={disabled}
                 onClick={onRemove}
-                class={button({ variant: 'danger', size: 'xs' })}
+                class={`${iconButton} hover:text-danger`}
+                aria-label="Löschen"
+                title="Löschen"
               >
-                Löschen
+                <Icon name="trash" class="size-4.5" />
+              </button>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={onPublish}
+                class={button({ variant: row.isPublished ? 'secondary' : 'primary', size: 'xs' })}
+              >
+                <Icon name={row.isPublished ? 'eyeOff' : 'check'} class="size-4" />
+                {row.isPublished ? 'Verbergen' : 'Freigeben'}
               </button>
             </div>
           </div>

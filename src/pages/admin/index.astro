@@ -9,6 +9,6 @@ export const prerender = false;
 const data = await readAdminOverview();
 ---
 
-<AdminLayout title="Veranstaltungen">
+<AdminLayout title="Übersicht">
   <Overview client:load initial={data} />
 </AdminLayout>

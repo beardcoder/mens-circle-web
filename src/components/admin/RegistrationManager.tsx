@@ -3,8 +3,22 @@ import { useState } from 'preact/hooks';
 
 import { button, card, control } from '@lib/ui';
 
+import { Icon } from './icons';
 import type { RegistrationRow, RegistrationsData, RegistrationStatus } from './types';
-import { AdminHead, Badge, ConfirmDialog, Feedback, holdsSeat, needsConfirmation, shortDate, statusLabel } from './ui';
+import {
+  ConfirmDialog,
+  Feedback,
+  holdsSeat,
+  iconButton,
+  Meter,
+  needsConfirmation,
+  PageHeader,
+  SearchField,
+  shortDate,
+  Stat,
+  statusLabel,
+  Tabs,
+} from './ui';
 import { useAdminTask } from './useAdminTask';
 
 interface Command {
@@ -18,7 +32,7 @@ interface Command {
 export default function RegistrationManager({ initial }: { initial: RegistrationsData }) {
   const [data, setData] = useState(initial);
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('all');
+  const [status, setStatus] = useState<RegistrationStatus | 'all'>('all');
   const [missingOnly, setMissingOnly] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [command, setCommand] = useState<Command | null>(null);
@@ -94,13 +108,11 @@ export default function RegistrationManager({ initial }: { initial: Registration
 
   return (
     <>
-      <AdminHead title={data.eventTitle} description="Anmeldungen, Warteliste und Nachrichten für diesen Termin.">
-        <a class={button({ variant: 'secondary', size: 'sm' })} href="/admin">
-          Zur Übersicht
-        </a>
-        <a class={button({ variant: 'secondary', size: 'sm' })} href={`/admin/events/${data.eventId}`}>
-          Termin bearbeiten
-        </a>
+      <PageHeader
+        title={data.eventTitle}
+        description="Anmeldungen, Warteliste und Nachrichten für diesen Termin."
+        back={{ href: '/admin/events', label: 'Termine' }}
+      >
         <button
           type="button"
           class={button({ variant: 'secondary', size: 'sm' })}
@@ -109,168 +121,162 @@ export default function RegistrationManager({ initial }: { initial: Registration
             void task.run('refresh', () => actions.loadAdminRegistrations({ eventId: data.eventId }), setData)
           }
         >
+          <Icon name="refresh" class="size-4.5" />
           Aktualisieren
         </button>
-      </AdminHead>
-      <dl class="mb-6 grid grid-cols-2 gap-5 border-y border-line py-5 sm:grid-cols-4">
-        <div>
-          <dt class="text-sm text-fg-muted">Plätze belegt</dt>
-          <dd class="mt-1 text-2xl font-semibold tabular-nums">
-            {occupied} / {data.maxParticipants}
-          </dd>
-        </div>
-        <div>
-          <dt class="text-sm text-fg-muted">Plätze frei</dt>
-          <dd class="mt-1 text-2xl font-semibold tabular-nums">{Math.max(0, data.maxParticipants - occupied)}</dd>
-        </div>
-        <div>
-          <dt class="text-sm text-fg-muted">Warteliste</dt>
-          <dd class="mt-1 text-2xl font-semibold tabular-nums">{waiting}</dd>
-        </div>
-        <div>
-          <dt class="text-sm text-fg-muted">Bestätigung fehlt</dt>
-          <dd class={`mt-1 text-2xl font-semibold tabular-nums ${missing ? 'text-accent' : ''}`}>{missing}</dd>
-        </div>
-      </dl>
-      <Feedback notice={task.notice} />
-      <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <button
-          type="button"
-          class={button({ size: 'sm', variant: 'secondary' })}
-          disabled={!missing || !!task.busy}
-          onClick={() => confirmations(undefined, true)}
-        >
-          Fehlende Bestätigungen senden ({missing})
-        </button>
-        <details class="relative">
-          <summary class="cursor-pointer px-2 py-3 text-sm text-fg-muted">Weitere Versandaktionen</summary>
-          <div class="absolute right-0 z-10 mt-2 min-w-56 border border-line-strong bg-raised p-2 shadow-overlay">
-            <button
-              type="button"
-              disabled={!rows.length || !!task.busy}
-              class="w-full px-3 py-2 text-left text-sm"
-              onClick={() => confirmations()}
-            >
-              Alle Bestätigungen erneut senden
-            </button>
-          </div>
-        </details>
+        <a class={button({ variant: 'secondary', size: 'sm' })} href={`/admin/events/${data.eventId}`}>
+          <Icon name="edit" class="size-4.5" />
+          Termin bearbeiten
+        </a>
+      </PageHeader>
+      <div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+        <Stat
+          label="Plätze belegt"
+          icon="users"
+          value={`${occupied}/${data.maxParticipants}`}
+          hint={<Meter value={occupied} max={data.maxParticipants} label="Plätze belegt" />}
+        />
+        <Stat label="Plätze frei" icon="calendar" value={Math.max(0, data.maxParticipants - occupied)} />
+        <Stat label="Warteliste" icon="clock" value={waiting} />
+        <Stat
+          label="Bestätigung fehlt"
+          icon="mail"
+          value={missing}
+          tone={missing ? 'accent' : undefined}
+          hint={missing ? 'noch nicht versendet' : 'alle versendet'}
+        />
       </div>
-      <section aria-label="Anmeldungen filtern">
-        <div class="mb-4 grid gap-3 sm:grid-cols-[1fr_12rem]">
-          <label class="grid gap-2 text-sm font-semibold">
-            Suchen
-            <input
-              type="search"
+      <Feedback notice={task.notice} />
+      <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <section aria-label="Anmeldungen" class="min-w-0">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <Tabs
+              label="Nach Status filtern"
+              value={status}
+              onChange={setStatus}
+              options={[
+                { value: 'all', label: 'Alle', count: rows.length },
+                ...(Object.entries(statusLabel) as [RegistrationStatus, string][]).map(([value, label]) => ({
+                  value,
+                  label,
+                  count: rows.filter((row) => row.status === value).length,
+                })),
+              ]}
+            />
+            <SearchField
+              label="Anmeldungen durchsuchen"
               placeholder="Name, E-Mail oder Telefon"
               value={search}
-              onInput={(event) => setSearch(event.currentTarget.value)}
-              class={control('sm')}
+              onInput={setSearch}
             />
-          </label>
-          <label class="grid gap-2 text-sm font-semibold">
-            Status
-            <select class={control('sm')} value={status} onChange={(event) => setStatus(event.currentTarget.value)}>
-              <option value="all">Alle</option>
-              {Object.entries(statusLabel).map(([value, label]) => (
-                <option value={value} key={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm">
-          <label class="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              checked={missingOnly}
-              onChange={(event) => setMissingOnly(event.currentTarget.checked)}
-              class="size-4 accent-accent"
-            />
-            Nur fehlende Bestätigungen
-          </label>
-          <p role="status" class="text-fg-muted">
-            {visible.length} von {rows.length} Anmeldungen
-          </p>
-        </div>
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-          <label class="flex cursor-pointer items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              aria-label="Alle sichtbaren aktiven Anmeldungen auswählen"
-              disabled={!eligible.length}
-              checked={eligible.length > 0 && eligible.every((row) => selected.has(row.id))}
-              onChange={(event) => {
-                const checked = event.currentTarget.checked;
+          </div>
+          <div class={card}>
+            <div class="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-2 sm:px-5">
+              {selected.size > 0 ? (
+                <div class="flex flex-wrap items-center gap-3">
+                  <span class="text-sm font-semibold">{selected.size} ausgewählt</span>
+                  <button
+                    class={button({ size: 'xs' })}
+                    type="button"
+                    disabled={!!task.busy}
+                    onClick={() => confirmations([...selected])}
+                  >
+                    <Icon name="send" class="size-4" />
+                    Bestätigungen senden
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelected(new Set())}
+                    class="text-sm text-fg-muted underline hover:text-fg"
+                  >
+                    Auswahl aufheben
+                  </button>
+                </div>
+              ) : (
+                <label class="flex cursor-pointer items-center gap-3 text-sm text-fg-muted">
+                  <input
+                    type="checkbox"
+                    aria-label="Alle sichtbaren aktiven Anmeldungen auswählen"
+                    disabled={!eligible.length}
+                    checked={eligible.length > 0 && eligible.every((row) => selected.has(row.id))}
+                    onChange={(event) => {
+                      const checked = event.currentTarget.checked;
 
-                setSelected((current) => {
-                  const next = new Set(current);
+                      setSelected((current) => {
+                        const next = new Set(current);
 
-                  eligible.forEach((row) => (checked ? next.add(row.id) : next.delete(row.id)));
+                        eligible.forEach((row) => (checked ? next.add(row.id) : next.delete(row.id)));
 
-                  return next;
-                });
-              }}
-              class="size-4 accent-accent"
-            />
-            Sichtbare auswählen
-          </label>
-          {selected.size > 0 && (
-            <div class="flex flex-wrap items-center gap-3">
-              <span class="text-sm text-fg-muted">{selected.size} ausgewählt</span>
-              <button
-                class={button({ variant: 'secondary', size: 'xs' })}
-                type="button"
-                disabled={!!task.busy}
-                onClick={() => confirmations([...selected])}
-              >
-                Bestätigungen für Auswahl senden
-              </button>
-              <button type="button" onClick={() => setSelected(new Set())} class="text-sm text-fg-muted underline">
-                Auswahl aufheben
-              </button>
+                        return next;
+                      });
+                    }}
+                    class="size-4 accent-accent"
+                  />
+                  <span role="status">
+                    {visible.length} von {rows.length} Anmeldungen
+                  </span>
+                </label>
+              )}
+              <label class="flex cursor-pointer items-center gap-2 text-sm text-fg-muted">
+                <input
+                  type="checkbox"
+                  checked={missingOnly}
+                  onChange={(event) => setMissingOnly(event.currentTarget.checked)}
+                  class="size-4 accent-accent"
+                />
+                Nur fehlende Bestätigungen
+              </label>
             </div>
-          )}
-        </div>
-        {!visible.length && (
-          <p class="border border-dashed border-line-strong p-8 text-fg-muted">
-            {rows.length ? 'Keine Anmeldungen für diese Auswahl.' : 'Noch keine Anmeldungen zu diesem Termin.'}
-          </p>
-        )}
-        <ul class="grid gap-3" aria-label="Anmeldungen">
-          {visible.map((row) => (
-            <RegistrationCard
-              key={row.id}
-              row={row}
-              busy={!!task.busy}
-              selected={selected.has(row.id)}
-              onSelect={(checked) =>
-                setSelected((current) => {
-                  const next = new Set(current);
+            {visible.length ? (
+              <ul class="divide-y divide-line" aria-label="Anmeldungen">
+                {visible.map((row) => (
+                  <RegistrationCard
+                    key={row.id}
+                    row={row}
+                    busy={!!task.busy}
+                    selected={selected.has(row.id)}
+                    onSelect={(checked) =>
+                      setSelected((current) => {
+                        const next = new Set(current);
 
-                  if (checked) next.add(row.id);
-                  else next.delete(row.id);
+                        if (checked) next.add(row.id);
+                        else next.delete(row.id);
 
-                  return next;
-                })
-              }
-              onStatus={(next) => changeStatus(row, next)}
-              onSend={() => confirmations([row.id])}
-              onRemove={() =>
-                prepare({
-                  title: 'Anmeldung entfernen?',
-                  description: `Die Anmeldung von ${row.firstName} ${row.lastName} wird entfernt.`,
-                  actionLabel: 'Anmeldung entfernen',
-                  danger: true,
-                  request: () => actions.deleteRegistration({ id: row.id }),
-                })
-              }
-            />
-          ))}
-        </ul>
-      </section>
-      <Broadcast eventId={data.eventId} count={rows.filter((row) => row.status === 'registered').length} />
+                        return next;
+                      })
+                    }
+                    onStatus={(next) => changeStatus(row, next)}
+                    onSend={() => confirmations([row.id])}
+                    onRemove={() =>
+                      prepare({
+                        title: 'Anmeldung entfernen?',
+                        description: `Die Anmeldung von ${row.firstName} ${row.lastName} wird entfernt.`,
+                        actionLabel: 'Anmeldung entfernen',
+                        danger: true,
+                        request: () => actions.deleteRegistration({ id: row.id }),
+                      })
+                    }
+                  />
+                ))}
+              </ul>
+            ) : (
+              <p class="px-5 py-12 text-center text-fg-muted">
+                {rows.length ? 'Keine Anmeldungen für diese Auswahl.' : 'Noch keine Anmeldungen zu diesem Termin.'}
+              </p>
+            )}
+          </div>
+        </section>
+        <aside class="grid gap-6 xl:sticky xl:top-6" aria-label="Versand">
+          <ConfirmationPanel
+            missing={missing}
+            disabled={!!task.busy}
+            empty={!rows.length}
+            onMissing={() => confirmations(undefined, true)}
+            onAll={() => confirmations()}
+          />
+          <Broadcast eventId={data.eventId} count={rows.filter((row) => row.status === 'registered').length} />
+        </aside>
+      </div>
       {command && (
         <ConfirmDialog
           title={command.title}
@@ -313,66 +319,123 @@ function RegistrationCard({
   const name = `${row.firstName} ${row.lastName}`;
 
   return (
-    <li class={`${card} grid gap-4 p-5`}>
-      <div class="flex flex-wrap items-start justify-between gap-3">
-        <div class="flex min-w-0 items-start gap-3">
-          <input
-            type="checkbox"
-            checked={selected}
-            disabled={!eligible || busy}
-            onChange={(event) => onSelect(event.currentTarget.checked)}
-            aria-label={`${name} auswählen`}
-            class="mt-1 size-4 shrink-0 accent-accent"
-          />
-          <div class="min-w-0">
-            <h2 class="font-semibold text-fg">{name}</h2>
-            <a class="mt-1 block break-all text-sm text-fg-muted hover:text-accent" href={`mailto:${row.email}`}>
-              {row.email}
+    <li class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-x-3 gap-y-3 px-4 py-4 sm:px-5 lg:grid-cols-[auto_minmax(0,1fr)_10rem_10rem_4.75rem] lg:items-center lg:gap-x-4">
+      <input
+        type="checkbox"
+        checked={selected}
+        disabled={!eligible || busy}
+        onChange={(event) => onSelect(event.currentTarget.checked)}
+        aria-label={`${name} auswählen`}
+        class="col-start-1 row-start-1 mt-1 size-4 shrink-0 accent-accent lg:mt-0"
+      />
+      <div class="col-start-2 row-start-1 min-w-0">
+        <h3 class="font-sans font-semibold">{name}</h3>
+        <p class="mt-0.5 flex min-w-0 flex-wrap gap-x-3 text-sm text-fg-muted">
+          <a class="min-w-0 truncate hover:text-accent" href={`mailto:${row.email}`}>
+            {row.email}
+          </a>
+          {row.phone && (
+            <a class="hover:text-accent" href={`tel:${row.phone}`}>
+              {row.phone}
             </a>
-            {row.phone && (
-              <a class="mt-1 block text-sm text-fg-muted hover:text-accent" href={`tel:${row.phone}`}>
-                {row.phone}
-              </a>
-            )}
-          </div>
-        </div>
-        <Badge active={holdsSeat(row.status)}>{statusLabel[row.status]}</Badge>
-      </div>
-      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
-        <p class="text-xs leading-relaxed text-fg-muted">
-          Angemeldet: {shortDate(row.registeredAt)}
-          <br />
-          {row.confirmationSentAt
-            ? `Bestätigung gesendet: ${shortDate(row.confirmationSentAt)}`
-            : eligible
-              ? 'Bestätigung noch nicht nachgewiesen'
-              : 'Keine Bestätigung erforderlich'}
-        </p>
-        <div class="flex flex-wrap items-center gap-2">
-          <select
-            value={row.status}
-            disabled={busy}
-            onChange={(event) => onStatus(event.currentTarget.value as RegistrationStatus)}
-            aria-label={`Status von ${name}`}
-            class={control('xs')}
-          >
-            {Object.entries(statusLabel).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-          {eligible && (
-            <button type="button" disabled={busy} onClick={onSend} class={button({ variant: 'secondary', size: 'xs' })}>
-              Bestätigung senden
-            </button>
           )}
-          <button type="button" disabled={busy} onClick={onRemove} class={button({ variant: 'danger', size: 'xs' })}>
-            Entfernen
+        </p>
+      </div>
+      <select
+        value={row.status}
+        disabled={busy}
+        onChange={(event) => onStatus(event.currentTarget.value as RegistrationStatus)}
+        aria-label={`Status von ${name}`}
+        class={`${control('xs')} col-start-2 row-start-2 justify-self-start lg:col-start-3 lg:row-start-1 lg:w-full`}
+      >
+        {Object.entries(statusLabel).map(([value, label]) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
+      <p class="col-span-2 col-start-2 row-start-3 text-xs leading-relaxed text-fg-muted lg:col-span-1 lg:col-start-4 lg:row-start-1">
+        Angemeldet {shortDate(row.registeredAt)}
+        <br />
+        {row.confirmationSentAt ? (
+          `Bestätigt ${shortDate(row.confirmationSentAt)}`
+        ) : eligible ? (
+          <span class="text-accent">Bestätigung fehlt</span>
+        ) : (
+          'Keine Bestätigung nötig'
+        )}
+      </p>
+      <div class="col-start-3 row-start-1 flex items-center justify-end gap-1 lg:col-start-5">
+        {eligible && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onSend}
+            class={iconButton}
+            aria-label={`Bestätigung an ${name} senden`}
+            title="Bestätigung senden"
+          >
+            <Icon name="send" class="size-4.5" />
           </button>
-        </div>
+        )}
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onRemove}
+          class={`${iconButton} hover:text-danger`}
+          aria-label={`Anmeldung von ${name} entfernen`}
+          title="Entfernen"
+        >
+          <Icon name="trash" class="size-4.5" />
+        </button>
       </div>
     </li>
+  );
+}
+
+function ConfirmationPanel({
+  missing,
+  disabled,
+  empty,
+  onMissing,
+  onAll,
+}: {
+  missing: number;
+  disabled: boolean;
+  empty: boolean;
+  onMissing: () => void;
+  onAll: () => void;
+}) {
+  return (
+    <section aria-labelledby="confirm-title-aside" class={`${card} grid gap-4 p-5`}>
+      <div>
+        <h2 id="confirm-title-aside" class="font-sans text-base font-semibold">
+          Bestätigungen
+        </h2>
+        <p class="mt-1 text-sm text-fg-muted">
+          {missing
+            ? `${missing} Person${missing > 1 ? 'en haben' : ' hat'} noch keine Bestätigung.`
+            : 'Alle Bestätigungen sind versendet.'}
+        </p>
+      </div>
+      <button
+        type="button"
+        class={button({ size: 'sm', block: true })}
+        disabled={!missing || disabled}
+        onClick={onMissing}
+      >
+        <Icon name="send" class="size-4.5" />
+        Fehlende senden ({missing})
+      </button>
+      <button
+        type="button"
+        disabled={empty || disabled}
+        class="text-sm text-fg-muted underline hover:text-fg disabled:opacity-50"
+        onClick={onAll}
+      >
+        Alle Bestätigungen erneut senden
+      </button>
+    </section>
   );
 }
 
@@ -381,15 +444,19 @@ function Broadcast({ eventId, count }: { eventId: string; count: number }) {
   const [draft, setDraft] = useState<{ subject: string; content: string } | null>(null);
 
   return (
-    <details class="mt-10 border-t border-line pt-6">
-      <summary class="cursor-pointer text-xl font-semibold">Nachricht an Teilnehmer senden</summary>
-      <p class="mt-3 max-w-measure text-sm text-fg-muted">
+    <section aria-labelledby="broadcast-title" class={`${card} p-5`}>
+      <h2 id="broadcast-title" class="font-sans text-base font-semibold">
+        Nachricht an Teilnehmer
+      </h2>
+      <p class="mt-1 text-sm text-fg-muted">
         Geht an die {count} Personen mit Status „Angemeldet“. Warteliste, stornierte Anmeldungen und bereits als
         teilgenommen markierte Personen sind ausgenommen. {'{first_name}'} wird durch den Vornamen ersetzt.
       </p>
-      <Feedback notice={task.notice} />
+      <div class="mt-4">
+        <Feedback notice={task.notice} />
+      </div>
       <form
-        class="mt-5 grid gap-4"
+        class="mt-4 grid gap-4"
         method="post"
         onSubmit={(event) => {
           event.preventDefault();
@@ -406,9 +473,9 @@ function Broadcast({ eventId, count }: { eventId: string; count: number }) {
           </label>
           <label class="grid gap-2 text-sm font-semibold">
             Nachricht
-            <textarea name="content" required rows={7} class={`${control('sm')} resize-y`} />
+            <textarea name="content" required rows={6} class={`${control('sm')} resize-y`} />
           </label>
-          <button type="submit" class={`${button({ variant: 'secondary', size: 'sm' })} justify-self-start`}>
+          <button type="submit" class={button({ variant: 'secondary', size: 'sm', block: true })}>
             Nachricht prüfen
           </button>
         </fieldset>
@@ -433,6 +500,6 @@ function Broadcast({ eventId, count }: { eventId: string; count: number }) {
           <p class="max-h-48 overflow-auto whitespace-pre-wrap">{draft.content}</p>
         </ConfirmDialog>
       )}
-    </details>
+    </section>
   );
 }
