@@ -54,3 +54,32 @@ const collapsible = !short && quote.length > COLLAPSE_AT;
     </button>
   )}
 </figure>
+
+<script>
+  /** Long participant voices open folded to a few lines; the button unfolds the full, unchanged text. */
+
+  const FOLDED = 'Vollständige Erfahrung lesen';
+  const OPEN = 'Weniger anzeigen';
+
+  const bind = (): void => {
+    for (const figure of document.querySelectorAll<HTMLElement>('[data-quote][data-collapsible]')) {
+      const toggle = figure.querySelector<HTMLButtonElement>('[data-quote-toggle]');
+
+      if (!toggle || toggle.dataset.bound !== undefined) continue;
+
+      toggle.dataset.bound = '';
+
+      const render = (collapsed: boolean): void => {
+        figure.toggleAttribute('data-collapsed', collapsed);
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+        toggle.textContent = collapsed ? FOLDED : OPEN;
+      };
+
+      toggle.hidden = false;
+      render(true);
+      toggle.addEventListener('click', () => render(!figure.hasAttribute('data-collapsed')));
+    }
+  };
+
+  bind();
+</script>

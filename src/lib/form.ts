@@ -5,8 +5,6 @@
  */
 import { isInputError } from 'astro:actions';
 
-import { scrollBehavior } from './site-header';
-
 type ActionCall = (input: FormData) => Promise<{ data?: { message: string }; error?: Error }>;
 
 const FAILED = 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.';
@@ -112,7 +110,10 @@ function enhance(form: HTMLFormElement, action: ActionCall): void {
     say('error', first ? 'Bitte prüfe die markierten Angaben.' : message);
     trackEvent(`${track}-error`, { ...context, error: message });
     first?.focus({ preventScroll: true });
-    first?.scrollIntoView({ block: 'center', behavior: scrollBehavior() });
+    first?.scrollIntoView({
+      block: 'center',
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    });
   });
 }
 
