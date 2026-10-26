@@ -27,9 +27,9 @@ const canonical = new URL('/event', siteUrl).href;
 >
   <PageIntro eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung">
     <Fragment slot="lead">
-      Wir treffen uns alle zwei bis vier Wochen in {site.geo.locality} in Niederbayern. Ein Abend dauert zwei bis drei
-      Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was dich erwartet,
-      lies zuerst, {/* The period follows the link directly: on its own line Astro sets a space before it. */}
+      Wir treffen uns alle zwei bis vier Wochen im Raum {site.geo.locality} in Niederbayern. Ein Abend dauert zwei bis
+      drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was dich
+      erwartet, lies zuerst, {/* The period follows the link directly: on its own line Astro sets a space before it. */}
       <a class={link} href="/#ueber">
         worum es an so einem Abend geht
       </a>
@@ -47,16 +47,16 @@ const canonical = new URL('/event', siteUrl).href;
     </AccordionItem>
     <AccordionItem question="Wie melde ich mich an?">
       Über das Anmeldeformular auf der Seite des jeweiligen Termins. Du brauchst nur Vor- und Nachnamen und eine
-      E-Mail-Adresse. Danach bekommst du eine Bestätigung per E-Mail mit dem genauen Treffpunkt. Ist ein Abend
-      ausgebucht, kommst du auf die Warteliste und rückst nach, sobald ein Platz frei wird.
+      E-Mail-Adresse. Deine Bestätigung bekommst du per E-Mail. Den Treffpunkt findest du bereits auf der Terminseite.
+      Ist ein Abend ausgebucht, kommst du auf die Warteliste und rückst nach, sobald ein Platz frei wird.
     </AccordionItem>
     <AccordionItem question="Was kostet die Teilnahme?">
       Der Kreis läuft auf Spendenbasis. Du gibst, was dir der Abend wert ist und was für dich machbar ist. Es gibt
       keinen festen Preis und keine Mitgliedschaft. Die Angaben zum jeweiligen Abend stehen beim Termin.
     </AccordionItem>
     <AccordionItem question="Wo genau findet der Männerkreis statt?">
-      Der Männerkreis findet in {site.geo.locality} in Niederbayern statt. Die genaue Adresse bekommst du mit der
-      Anmeldebestätigung – so bleibt der Ort der Gruppe vorbehalten, die tatsächlich zusammenkommt.
+      Wir treffen uns im Raum {site.geo.locality} in Niederbayern. Den Veranstaltungsort mit Adresse und Anfahrt findest
+      du auf der Seite des jeweiligen Termins. So kannst du schon vor der Anmeldung schauen, ob der Weg für dich passt.
     </AccordionItem>
     <AccordionItem question="Kann ich alleine kommen?">
       Ja. Du musst vorher niemanden kennen. Es reicht, wenn du dich für einen Termin anmeldest und an dem Abend da bist.
