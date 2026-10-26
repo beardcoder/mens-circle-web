@@ -1,0 +1,31 @@
+---
+interface Props {
+  title: string;
+  number: number;
+}
+
+const { title, number } = Astro.props;
+---
+
+<li
+  itemprop="itemListElement"
+  itemscope
+  itemtype="https://schema.org/ListItem"
+  class="reveal reveal-stagger group/step grid content-start gap-3"
+  style={`--motion-order: ${number - 1}`}
+>
+  <meta itemprop="position" content={String(number)} />
+  <span aria-hidden="true" class="draw mb-2 block h-px bg-line-strong"></span>
+  <span
+    class="font-sans text-sub font-medium text-accent tabular-nums motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/step:translate-x-1"
+    aria-hidden="true"
+  >
+    {String(number).padStart(2, '0')}
+  </span>
+  <h3 itemprop="name" class="text-sub text-fg">
+    {title}
+  </h3>
+  <p itemprop="description" class="text-md text-fg-soft">
+    <slot />
+  </p>
+</li>

@@ -1,60 +1,35 @@
 ---
+import type { TestimonialDTO } from '@lib/types';
+
 import Quote from '../ui/Quote.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 import TextLink from '../ui/TextLink.astro';
 
-/**
- * Submitted and moderated entries, quoted as written — nothing is added or
- * reworded. At most one short voice takes the quote size; the rest read like
- * running text in two columns that flow (one on phones), so different lengths
- * never leave empty neighbours. Long voices open folded (Quote). With none
- * published, or when they cannot be read, the block says so in one line. A
- * server island on the home page; its `pending` fallback is the title and the link.
- */
-
 interface Props {
   anchor: string;
   eyebrow: string;
   title: string;
-  pending?: boolean;
+  items: TestimonialDTO[];
+  showNote: boolean;
+  linkUrl: string;
+  linkLabel: string;
 }
 
-/** A voice this short may stand out at the quote size. */
-const SHORT = 160;
-
-const { anchor, eyebrow, title, pending } = Astro.props;
-
-// Imported late, so a prerender never opens the database.
-const result = pending
-  ? { status: 'pending', testimonials: [] }
-  : await (await import('@lib/server/testimonials')).fetchTestimonialsState();
-
-const { testimonials } = result;
-const [first, ...others] = testimonials;
-const featured = first && first.quote.length <= SHORT ? first : null;
-const rest = featured ? others : testimonials;
-
-const note =
-  result.status === 'unavailable'
-    ? 'Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei.'
-    : result.status === 'ok' && testimonials.length === 0
-      ? 'Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.'
-      : '';
+const { anchor, eyebrow, title, items, showNote, linkUrl, linkLabel } = Astro.props;
+const [first, ...others] = items;
+const featured = first && first.quote.length <= 160 ? first : null;
+const rest = featured ? others : items;
 ---
 
-<Section
-  id={anchor}
-  labelledby="testimonials-title"
-  space={note ? 'band' : 'default'}
->
-  <SectionHead
-    eyebrow={eyebrow}
-    title={title}
-    titleId="testimonials-title"
-  />
+<Section id={anchor} labelledby="testimonials-title" space={showNote ? 'band' : 'default'}>
+  <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" />
 
-  {note && <p class="mt-6 max-w-measure text-md text-fg-muted">{note}</p>}
+  {showNote && (
+    <p class="mt-6 max-w-measure text-md text-fg-muted">
+      <slot name="note" />
+    </p>
+  )}
 
   {featured && (
     <Quote
@@ -67,23 +42,16 @@ const note =
   )}
 
   {rest.length > 0 && (
-    <ul
-      role="list"
-      class="mt-group gap-x-grid md:columns-2"
-    >
+    <ul role="list" class="mt-group gap-x-grid md:columns-2">
       {rest.map((t) => (
         <li class="reveal mb-8 break-inside-avoid border-t border-line pt-6">
-          <Quote
-            quote={t.quote}
-            author={t.author}
-            role={t.role}
-          />
+          <Quote quote={t.quote} author={t.author} role={t.role} />
         </li>
       ))}
     </ul>
   )}
 
-  <p class:list={[testimonials.length > 0 ? 'mt-4' : 'mt-6']}>
-    <TextLink href="/teile-deine-erfahrung">Du warst dabei? Teile deine Erfahrung</TextLink>
+  <p class:list={[items.length > 0 ? 'mt-4' : 'mt-6']}>
+    <TextLink href={linkUrl}>{linkLabel}</TextLink>
   </p>
 </Section>

@@ -3,18 +3,15 @@ import { Image } from 'astro:assets';
 
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
 import { canonicalUrl } from '@lib/canonical';
-import { stripHtml } from '@lib/event-meta';
-import { breadcrumbSchema, faqSchema } from '@lib/event-schema';
+import { breadcrumbSchema } from '@lib/event-schema';
 
 import photo from '../assets/images/markus-sommer.jpg';
+import Cta from '../components/blocks/Cta.astro';
 import Faq from '../components/blocks/Faq.astro';
 import TextSection from '../components/blocks/TextSection.astro';
 import ValueItems from '../components/blocks/ValueItems.astro';
 import PageIntro from '../components/PageIntro.astro';
-import Button from '../components/ui/Button.astro';
-import Section from '../components/ui/Section.astro';
-import SectionHead from '../components/ui/SectionHead.astro';
-import page from '../content/warum-ich-den-maennerkreis-leite.json';
+import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
 // Prerendered: content only, no live data.
@@ -22,67 +19,53 @@ export const prerender = true;
 
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
-const { meta, faq, page_hero: opening, cta } = page;
-
 const siteUrl = Astro.site!;
 const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
-
-// Structured data uses the same copy as the visible sections.
-const schemas: Record<string, unknown>[] = [];
-
-if (faq.items.length) {
-  schemas.push(faqSchema(faq.items.map((i) => ({ question: i.question, answer: stripHtml(i.answer) }))));
-}
-
-// Breadcrumb: home → this page.
-schemas.push(breadcrumbSchema(siteUrl, [['Warum ich den Männerkreis leite', canonical]]));
-
-// `Article`, not a bare `WebPage`: a signed piece of writing, attributed to the `Person` entity in SeoHead.
-const articleImage = new URL('/images/og-markus.jpg?v=2', siteUrl).href;
-
-schemas.push({
-  '@context': 'https://schema.org',
-  '@type': 'Article',
-  '@id': `${canonical}#article`,
-  url: canonical,
-  mainEntityOfPage: canonical,
-  headline: meta.ogTitle ?? stripHtml(meta.title),
-  description: meta.description,
-  image: articleImage,
-  inLanguage: 'de-DE',
-  datePublished: meta.datePublished,
-  dateModified: meta.dateModified,
-  author: { '@id': `${siteUrl.origin}/#markus` },
-  publisher: { '@id': `${siteUrl.origin}/#organization` },
-  isPartOf: { '@id': `${siteUrl.origin}/#website` },
-  about: { '@id': `${siteUrl.origin}/#organization` },
-});
-
-// This page ships its own card image, so it declares its size too: a declared
-// size that does not match the file downgrades a large card to a small one.
-const OG_IMAGE = { width: 1200, height: 630 };
 ---
 
 <Layout
-  title={meta.title}
-  description={meta.description}
-  ogTitle={meta.ogTitle}
-  ogDescription={meta.ogDescription}
+  title={'Warum ich den Männerkreis leite\u00a0– Männerkreis Niederbayern'}
+  description="Markus Sommer erzählt, warum er den Männerkreis in Straubing gegründet hat und wie er die Abende leitet."
+  ogTitle="Warum ich den Männerkreis leite"
+  ogDescription="Warum Markus Sommer den Männerkreis in Straubing leitet und was dich beim ersten Abend erwartet."
   ogType="article"
   ogImage="/images/og-markus.jpg?v=2"
-  ogImageWidth={OG_IMAGE.width}
-  ogImageHeight={OG_IMAGE.height}
+  ogImageWidth={1200}
+  ogImageHeight={630}
   ogImageAlt="Markus Sommer, der den Männerkreis in Straubing leitet"
-  publishedTime={meta.datePublished}
-  modifiedTime={meta.dateModified}
-  schemas={schemas}
+  publishedTime="2026-06-20"
+  modifiedTime="2026-10-21"
+  schemas={[
+    breadcrumbSchema(siteUrl, [['Warum ich den Männerkreis leite', canonical]]),
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      '@id': `${canonical}#article`,
+      url: canonical,
+      mainEntityOfPage: canonical,
+      headline: 'Warum ich den Männerkreis leite',
+      description:
+        'Markus Sommer erzählt, warum er den Männerkreis in Straubing gegründet hat und wie er die Abende leitet.',
+      image: new URL('/images/og-markus.jpg?v=2', siteUrl).href,
+      inLanguage: 'de-DE',
+      datePublished: '2026-06-20',
+      dateModified: '2026-10-21',
+      author: { '@id': `${siteUrl.origin}/#markus` },
+      publisher: { '@id': `${siteUrl.origin}/#organization` },
+      isPartOf: { '@id': `${siteUrl.origin}/#website` },
+      about: { '@id': `${siteUrl.origin}/#organization` },
+    },
+  ]}
 >
-  <PageIntro id={opening.anchor} eyebrow={opening.eyebrow} title={opening.title}>
-    <Fragment slot="lead">{opening.lead}</Fragment>
+  <PageIntro id="anfang" eyebrow="Persönlich" title="Warum ich den Männerkreis leite">
+    <Fragment slot="lead">
+      Arbeit, Familie und Verantwortung nehmen viel Zeit ein. Für Gespräche darüber, wie es einem damit geht, bleibt oft
+      wenig Gelegenheit. Im Männerkreis können wir uns diese Zeit nehmen.
+    </Fragment>
     <figure slot="media">
       <Image
         src={photo}
-        alt={opening.imageAlt}
+        alt="Markus Sommer sitzt auf einem Felsen und blickt im Abendlicht über eine bewaldete Hügellandschaft."
         layout="constrained"
         width={800}
         height={1000}
@@ -91,27 +74,114 @@ const OG_IMAGE = { width: 1200, height: 630 };
         fetchpriority="high"
         class="block aspect-4/3 w-full object-cover lg:aspect-4/5"
       />
-      <figcaption class="mt-3 text-sm text-fg-muted">{opening.imageCaption}</figcaption>
+      <figcaption class="mt-3 text-sm text-fg-muted">Markus Sommer begleitet den Männerkreis in Straubing.</figcaption>
     </figure>
   </PageIntro>
-  <TextSection {...page.why} />
-  <TextSection {...page.hesitation} />
-  <ValueItems {...page.value_items} />
-  <TextSection {...page.expectations} />
-  <TextSection {...page.invitation} />
-  <Faq {...page.faq} />
-  <Section ground="alt" space="band" innerClass="grid items-end gap-x-grid gap-y-6 py-4 lg:grid-cols-12">
-    <SectionHead eyebrow={cta.eyebrow} title={cta.title} lead={cta.text} size="sub" class="lg:col-span-8" />
-    <p class="flex flex-wrap items-center gap-x-6 gap-y-2 lg:col-span-4 lg:justify-end">
-      <Button
-        href={cta.buttonLink}
-        size="lg"
-        data-umami-event="cta-click"
-        data-umami-event-location="cta-block"
-        data-umami-event-text={cta.buttonText}
-      >
-        {cta.buttonText}
-      </Button>
+  <TextSection
+    anchor="warum-mir-diese-gespr-che-wichtig-sind"
+    eyebrow="Warum überhaupt"
+    title="Warum mir diese Gespräche wichtig sind"
+  >
+    <p>
+      Ich leite den Kreis, weil ich selbst erlebt habe, wie gut mir ehrliche Gespräche unter Männern tun. Auf vieles
+      habe ich selbst keine Antwort.
     </p>
-  </Section>
+    <p>
+      Viele von uns haben gelernt, ihre Probleme allein zu lösen und weiterzumachen. Das hilft manchmal, kann aber auch
+      einsam werden. Im Kreis können wir darüber sprechen, was uns beschäftigt, auch wenn wir es noch nicht gut in Worte
+      fassen können.
+    </p>
+  </TextSection>
+  <TextSection anchor="vielleicht-bist-du-unsicher" eyebrow="Die Hürde davor" title="Vielleicht bist du unsicher">
+    <p>Vielleicht spricht dich der Kreis an, und trotzdem weißt du noch nicht, ob du kommen möchtest.</p>
+    <p>
+      Vor dem ersten Abend sind viele unsicher. Sie wissen nicht, was sie erwartet, oder sind es nicht gewohnt, vor
+      anderen Männern persönlich zu sprechen. Manche befürchten auch, dass es abgehoben wird. Deshalb erkläre ich zu
+      Beginn, wie der Abend abläuft und was wir miteinander vereinbaren.
+    </p>
+    <blockquote>Du kannst erst einmal zuhören. Wie viel du von dir erzählst, entscheidest du selbst.</blockquote>
+    <p>Du brauchst hier niemandem etwas zu beweisen.</p>
+  </TextSection>
+  <ValueItems
+    anchor="haltung"
+    eyebrow="Meine Haltung"
+    title="Was mir im Kreis wichtig ist"
+    intro="Ich möchte, dass wir offen miteinander sprechen und einander zuhören können. Für das eigene Verhalten und die eigenen Entscheidungen bleibt jeder selbst verantwortlich."
+    items={[
+      {
+        title: 'Ehrlich sprechen',
+        description:
+          'Du kannst sagen, wie es dir geht, auch wenn du dich gerade unsicher fühlst oder etwas nicht im Griff hast.',
+      },
+      {
+        title: 'Sich austauschen',
+        description: 'Was du sonst mit dir allein ausmachst, kannst du hier mit anderen Männern besprechen.',
+      },
+      {
+        title: 'Den Körper wahrnehmen',
+        description: 'Mit einfachen Atemübungen nehmen wir uns Zeit, zu spüren, wie es uns gerade geht.',
+      },
+      {
+        title: 'Verantwortung übernehmen',
+        description: 'Jeder spricht von seiner eigenen Erfahrung und bleibt für seine Entscheidungen verantwortlich.',
+      },
+      {
+        title: 'Einander respektieren',
+        description: 'Wir nehmen einander ernst, ohne etwas vorspielen zu müssen oder andere abzuwerten.',
+      },
+    ]}
+  />
+  <TextSection anchor="der-kreis-bleibt-einfach" eyebrow="Was du erwarten kannst" title="Der Kreis bleibt einfach">
+    <p>
+      Bei Begriffen wie Männerarbeit oder Atemarbeit sind manche Männer skeptisch. Das verstehe ich. Bei uns beginnt ein
+      Abend damit, dass wir uns zusammensetzen und die Absprachen klären. Dann nehmen wir uns Zeit zum Ankommen und für
+      Gespräche.
+    </p>
+    <p>
+      Manchmal leite ich eine einfache Atem- oder Körperübung an. Dafür brauchst du keine bestimmte Technik zu
+      beherrschen. Du probierst sie aus, soweit es für dich passt.
+    </p>
+    <p>
+      Ich habe keine Anleitung dafür, wie du leben solltest. Meine Aufgabe ist, den Ablauf zu leiten und darauf zu
+      achten, dass wir einander respektvoll zuhören. Vertraulichkeit vereinbaren wir gemeinsam. Jeder bleibt dabei für
+      sich selbst verantwortlich.
+    </p>
+  </TextSection>
+  <TextSection anchor="wenn-du-zum-ersten-mal-kommst" eyebrow="Einladung" title="Wenn du zum ersten Mal kommst">
+    <p>
+      Du kannst kommen, auch wenn du noch unsicher bist und dir das offene Sprechen schwerfällt. Vorbereiten musst du
+      nichts. Bring die Bereitschaft mit, zuzuhören und ehrlich zu sein, wenn du etwas erzählen möchtest.
+    </p>
+    <p>
+      <a href="/">Zurück zur Übersicht des Männerkreises</a>
+    </p>
+  </TextSection>
+  <Faq
+    anchor="faq"
+    eyebrow="Häufige Fragen"
+    title="Fragen zu mir und meiner Rolle"
+    intro='Die allgemeinen Fragen zum Kreis beantwortet die <a href="/#faq">Startseite</a>. Hier geht es um meine Rolle.'
+  >
+    <AccordionItem question="Muss ich Markus vorher kennen?">
+      Nein. Du kannst einfach zum Männerkreis kommen, wenn ein Platz frei ist. Der Rahmen wird am Anfang klar erklärt.
+    </AccordionItem>
+    <AccordionItem question="Warum leitest du den Kreis?">
+      Weil ich selbst erlebt habe, wie wichtig ehrliche Gespräche unter Männern sind. Und weil ich glaube, dass viele
+      Männer genau so einen Ort brauchen.
+    </AccordionItem>
+    <AccordionItem question="Ist der Kreis auch für zurückhaltende Männer geeignet?">
+      Ja. Du kannst auch als zurückhaltender Mann teilnehmen und erst einmal zuhören. Vorerfahrung brauchst du keine.
+    </AccordionItem>
+    <AccordionItem question="Ist das sehr spirituell?">
+      Nein. Der Kreis bleibt bodenständig. Manchmal gibt es einfache Übungen mit Atem, Körperwahrnehmung oder
+      Stille&nbsp;– ohne abgehobene Sprache und ohne Druck.
+    </AccordionItem>
+  </Faq>
+  <Cta
+    eyebrow=""
+    title="Beim nächsten Abend dabei sein"
+    text="Auf der Terminseite findest du die nächsten Abende und die Anmeldung."
+    buttonText="Termine ansehen"
+    buttonLink="/event"
+  />
 </Layout>
