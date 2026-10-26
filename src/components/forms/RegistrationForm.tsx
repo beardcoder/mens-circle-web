@@ -1,0 +1,232 @@
+import { actions, isInputError } from 'astro:actions';
+import { useEffect, useRef, useState } from 'preact/hooks';
+
+import { button, checkbox, control, fieldError, fieldHint, fieldLabel, formStatus, link } from '@lib/ui';
+
+import type { PublicEvent } from '../event/types';
+import { refreshPublicData, usePublicData } from '../event/usePublicData';
+
+function trackRegistration(name: string, eventId: string): void {
+  try {
+    window.umami?.track(`event-registration-${name}`, { event_id: eventId });
+  } catch {
+    // Analytics must never interrupt a registration.
+  }
+}
+
+export default function RegistrationForm({ initial }: { initial: PublicEvent }) {
+  const url = `/api/public/events/${encodeURIComponent(initial.slug)}`;
+  const { data = initial, error } = usePublicData<PublicEvent>(url, initial);
+  const form = useRef<HTMLFormElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [message, setMessage] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const first = form.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+
+    first?.focus({ preventScroll: true });
+    first?.scrollIntoView({
+      block: 'center',
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    });
+  }, [errors]);
+
+  if (data.isPast)
+    return (
+      <div>
+        <h2 id="anmeldung-title" class="text-sub text-fg">
+          Dieser Abend hat stattgefunden
+        </h2>
+        <p class="mt-3 text-md text-fg-soft">Eine Anmeldung ist nicht mehr möglich.</p>
+        <a class={`${button()} mt-6`} href="/event#benachrichtigung">
+          Termine per E-Mail erhalten
+        </a>
+      </div>
+    );
+
+  if (success)
+    return (
+      <div role="status">
+        <h2 id="anmeldung-title" class="text-sub text-fg">
+          Vielen Dank für deine Anmeldung
+        </h2>
+        <p class="mt-4 text-md text-fg-soft">{success}</p>
+      </div>
+    );
+
+  return (
+    <>
+      <h2 id="anmeldung-title" class="text-sub text-fg">
+        {data.view.state === 'full' ? 'Auf die Warteliste' : 'Anmeldung'}
+      </h2>
+      <p class="mt-3 mb-6 max-w-measure text-md text-fg-soft">
+        {data.view.state === 'full'
+          ? 'Dieser Abend ist ausgebucht. Trag dich trotzdem ein: Wird ein Platz frei, rückst du automatisch nach und bekommst sofort eine E-Mail.'
+          : `Von ${data.maxParticipants} Plätzen sind noch ${data.availableSpots} frei. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail.`}
+      </p>
+      {error && (
+        <p role="status" class="mb-4 text-sm text-fg-muted">
+          Der Platzstand lässt sich gerade nicht aktualisieren. Bei der Anmeldung werden die freien Plätze erneut
+          geprüft.
+        </p>
+      )}
+      <form
+        ref={form}
+        method="post"
+        noValidate
+        autoComplete="on"
+        class="grid gap-6"
+        onInput={(event) => {
+          const target = event.target as HTMLInputElement;
+
+          if (errors[target.name]) setErrors((current) => ({ ...current, [target.name]: '' }));
+        }}
+        onSubmit={async (event) => {
+          event.preventDefault();
+
+          if (busy) return;
+
+          const body = new FormData(event.currentTarget);
+
+          trackRegistration('submit', data.id);
+
+          setBusy(true);
+          setMessage('');
+
+          try {
+            const result = await actions.register(body);
+
+            if (result.data) {
+              trackRegistration('success', data.id);
+              setSuccess(result.data.message);
+              void refreshPublicData(url, true);
+              void refreshPublicData('/api/public/events', true);
+            } else {
+              trackRegistration('error', data.id);
+              setErrors(
+                isInputError(result.error)
+                  ? Object.fromEntries(
+                      Object.entries(result.error.fields).map(([key, messages]) => [key, messages?.[0] ?? '']),
+                    )
+                  : {},
+              );
+              setMessage(isInputError(result.error) ? 'Bitte prüfe die markierten Angaben.' : result.error.message);
+            }
+          } catch {
+            trackRegistration('error', data.id);
+            setMessage('Die Anmeldung ist gerade nicht möglich. Bitte versuche es erneut.');
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <fieldset disabled={busy} class="grid gap-6 border-0 p-0">
+          <legend class="sr-only">Deine Angaben zur Anmeldung</legend>
+          <input type="hidden" name="event_id" value={data.id} />
+          <div aria-hidden="true" class="absolute -left-[9999px] size-px overflow-hidden">
+            <label>
+              Website
+              <input name="website" tabIndex={-1} autoComplete="off" />
+            </label>
+          </div>
+          <div class="grid gap-6 sm:grid-cols-2 sm:gap-4">
+            {[
+              { name: 'first_name', label: 'Vorname', complete: 'given-name' },
+              { name: 'last_name', label: 'Nachname', complete: 'family-name' },
+            ].map((field) => (
+              <div key={field.name}>
+                <label for={`register-${field.name}`} class={fieldLabel}>
+                  {field.label}
+                </label>
+                <input
+                  id={`register-${field.name}`}
+                  name={field.name}
+                  autoComplete={field.complete}
+                  required
+                  class={control()}
+                  aria-invalid={!!errors[field.name] || undefined}
+                  aria-describedby={`register-${field.name}-error`}
+                />
+                <span id={`register-${field.name}-error`} class={fieldError} hidden={!errors[field.name]}>
+                  {errors[field.name]}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div>
+            <label for="register-email" class={fieldLabel}>
+              E-Mail
+            </label>
+            <input
+              type="email"
+              id="register-email"
+              name="email"
+              required
+              autoComplete="email"
+              inputMode="email"
+              class={control()}
+              aria-invalid={!!errors.email || undefined}
+              aria-describedby="register-email-error"
+            />
+            <span id="register-email-error" class={fieldError} hidden={!errors.email}>
+              {errors.email}
+            </span>
+          </div>
+          <div>
+            <label for="register-phone" class={fieldLabel}>
+              Handynummer <span class="font-normal text-fg-muted">(optional)</span>
+            </label>
+            <input
+              type="tel"
+              id="register-phone"
+              name="phone_number"
+              autoComplete="tel"
+              inputMode="tel"
+              class={control()}
+              aria-describedby="register-phone-hint"
+            />
+            <p id="register-phone-hint" class={fieldHint}>
+              Falls wir dich am Veranstaltungstag kurzfristig erreichen müssen.
+            </p>
+          </div>
+          <div>
+            <label class="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                name="privacy"
+                required
+                class={checkbox}
+                aria-invalid={!!errors.privacy || undefined}
+                aria-describedby="register-privacy-error"
+              />
+              <span class="text-base text-fg">
+                Ich habe die{' '}
+                <a href="/datenschutz" target="_blank" rel="noopener" class={link}>
+                  Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span>
+                </a>{' '}
+                gelesen und stimme der Verarbeitung meiner Daten zu.
+              </span>
+            </label>
+            <span id="register-privacy-error" class={fieldError} hidden={!errors.privacy}>
+              {errors.privacy}
+            </span>
+          </div>
+          <button type="submit" class={`${button({ size: 'lg', block: true })} mt-2`} disabled={busy}>
+            {busy
+              ? 'Wird gesendet …'
+              : data.view.state === 'full'
+                ? 'Auf die Warteliste eintragen'
+                : 'Verbindlich anmelden'}
+          </button>
+        </fieldset>
+        {message && (
+          <p role="alert" data-tone="error" class={formStatus}>
+            {message}
+          </p>
+        )}
+      </form>
+    </>
+  );
+}

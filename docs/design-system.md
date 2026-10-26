@@ -192,7 +192,7 @@ thin lines. The only shadow left (`shadow-overlay`) is the admin's toast.
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                       |
 | `Field`, `control()`, `FormStatus`                | Label, a pill control (the buttons' heights), hint, field error; the result line under its button |
 | `EventSummary`                                    | One date: label, the date on two fixed lines, time / place / fee / seats, the action that fits    |
-| `Quote` (`variant`)                               | `short` at the quote size (one per section), `text` as running text; long voices fold             |
+| `TestimonialList` (Preact)                        | `short` at the quote size (one per section), `text` as running text; long voices fold             |
 | `Accordion`                                       | Questions in DM Sans, a plus that becomes a minus, answers on the measure                         |
 | `Split`, `LinkList`, `Prose` (`width`), `Badge`   | Head beside content; where-next rows; rich text (`measure` / `column`); the admin's status chip   |
 | `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                     |

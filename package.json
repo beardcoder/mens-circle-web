@@ -24,8 +24,10 @@
     "knip": "knip"
   },
   "dependencies": {
+    "@astrojs/preact": "^6.1.1",
     "drizzle-orm": "^0.45.4",
     "openid-client": "^6.8.8",
+    "preact": "^11.0.2",
     "sharp": "^0.35.5"
   },
   "devDependencies": {

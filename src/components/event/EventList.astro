@@ -1,12 +1,10 @@
 ---
 import site from '@data/site.json';
-import { eventView, type NextEventStatus } from '@lib/event-status';
-import type { EventDTO } from '@lib/types';
-import { card, link } from '@lib/ui';
+import { link } from '@lib/ui';
 
 import NewsletterForm from '../forms/NewsletterForm.astro';
 import Section from '../ui/Section.astro';
-import EventSummary from './EventSummary.astro';
+import UpcomingEvents from './UpcomingEvents';
 
 /**
  * The dates on /event — what the page is for: every upcoming date as the same
@@ -15,12 +13,6 @@ import EventSummary from './EventSummary.astro';
  * never reads as "no date planned".
  */
 
-interface Props {
-  status: NextEventStatus;
-  events: EventDTO[];
-}
-
-const { status, events } = Astro.props;
 const whatsapp = site.whatsappCommunityLink;
 ---
 
@@ -32,52 +24,10 @@ const whatsapp = site.whatsappCommunityLink;
   innerClass="grid items-start gap-x-grid gap-y-12 lg:grid-cols-12"
 >
   <div class="min-w-0 lg:col-span-7">
-    <h2
-      id="termine-liste-title"
-      class="text-sub text-fg"
-    >
-      {events.length > 1 ? 'Kommende Termine' : 'Nächster Termin'}
+    <h2 id="termine-liste-title" class="text-sub text-fg">
+      Kommende Termine
     </h2>
-    {events.length > 0 ? (
-      <ul
-        role="list"
-        class="mt-6 grid gap-6"
-      >
-        {events.map((event, i) => (
-          <li class="reveal">
-            <EventSummary
-              view={eventView(event, i === 0 ? 'Nächster Termin' : 'Weiterer Termin')}
-              as="h3"
-              location="event-landing"
-            />
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <div
-        data-status={status}
-        class:list={[card, 'mt-6 grid gap-3 p-6 sm:p-8']}
-      >
-        <h3 class="text-sub text-fg">
-          {status === 'unavailable' ? 'Termine gerade nicht abrufbar' : 'Zurzeit steht kein Termin fest'}
-        </h3>
-        <p class="max-w-measure text-md text-fg-soft">
-          {status === 'unavailable'
-            ? 'Die Termine lassen sich im Moment nicht laden. Das heißt nicht, dass keiner geplant ist – bitte versuche es später noch einmal oder schreib mir kurz.'
-            : 'Sobald der nächste Abend geplant ist, steht er hier. Du musst dafür nicht regelmäßig nachsehen: Trag dich für die Benachrichtigung ein, dann bekommst du eine kurze E-Mail.'}
-        </p>
-        {status === 'unavailable' && site.contactEmail && (
-          <p class="text-base">
-            <a
-              class={link}
-              href={`mailto:${site.contactEmail}`}
-            >
-              {site.contactEmail}
-            </a>
-          </p>
-        )}
-      </div>
-    )}
+    <UpcomingEvents client:load />
   </div>
 
   <aside
@@ -85,26 +35,16 @@ const whatsapp = site.whatsappCommunityLink;
     aria-labelledby="benachrichtigung-title"
     class="scroll-mt-(--spacing-clearance) border-line max-lg:border-t max-lg:pt-10 lg:col-span-4 lg:col-start-9 lg:border-l lg:pl-8"
   >
-    <h2
-      id="benachrichtigung-title"
-      class="font-sans text-xl font-semibold text-fg"
-    >
+    <h2 id="benachrichtigung-title" class="font-sans text-xl font-semibold text-fg">
       Termine per E-Mail erhalten
     </h2>
     <p class="mt-2 text-base text-fg-soft">
       Du bekommst eine kurze Nachricht, sobald ein neuer Termin feststeht. Mehr wird über diesen Verteiler nicht
       verschickt.
     </p>
-    <NewsletterForm
-      id="event-newsletter"
-      context={{ page: 'event-landing' }}
-      class="mt-5"
-    />
+    <NewsletterForm id="event-newsletter" context={{ page: 'event-landing' }} class="mt-5" />
     {whatsapp && (
-      <p
-        class="mt-6 text-base text-fg-soft"
-        id="whatsapp-community"
-      >
+      <p class="mt-6 text-base text-fg-soft" id="whatsapp-community">
         Lieber zwischendurch austauschen? Es gibt außerdem eine{' '}
         <a
           class={link}
