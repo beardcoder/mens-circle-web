@@ -51,6 +51,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Static FAQ answers, journey steps and facts use slotted items; FAQ/journey microdata comes from the visible HTML
 - Home: SSR; next event and approved testimonials are read once per request, without server islands
 - Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)
+- Component-specific browser behavior: `<script>` in the owning component; shared form/admin helpers stay in `src/lib/`
 - Shared layouts: `src/layouts/`; reusable UI, forms and event components: `src/components/`
 - Crawler index: `src/pages/llms.txt.ts` (prerendered)
 - Site settings, navigation: `src/data/site.json`, `src/data/navigation.json`
