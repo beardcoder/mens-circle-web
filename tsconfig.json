@@ -12,6 +12,8 @@
       "@lib/*": ["src/lib/*"],
       "@components/*": ["src/components/*"],
       "@data/*": ["src/data/*"]
-    }
+    },
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
   }
 }

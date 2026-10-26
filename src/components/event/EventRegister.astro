@@ -1,10 +1,10 @@
 ---
 import { plainTextToHtml } from '@lib/server/format';
+import { publicEvent } from '@lib/server/public-data';
 import type { EventDTO } from '@lib/types';
 import { card } from '@lib/ui';
 
-import RegistrationForm from '../forms/RegistrationForm.astro';
-import Button from '../ui/Button.astro';
+import RegistrationForm from '../forms/RegistrationForm';
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 
@@ -20,8 +20,6 @@ interface Props {
 
 const { event } = Astro.props;
 const description = event.description?.trim() ?? '';
-
-const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full ? 'Auf die Warteliste' : 'Anmeldung';
 ---
 
 <Section
@@ -31,17 +29,11 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
   innerClass="grid items-start gap-x-grid gap-y-12 lg:grid-cols-12"
 >
   <div class="min-w-0 lg:col-span-5">
-    <h2
-      id="ueber-den-abend"
-      class="text-sub text-fg"
-    >
+    <h2 id="ueber-den-abend" class="text-sub text-fg">
       Zu diesem Abend
     </h2>
     {description ? (
-      <Prose
-        html={plainTextToHtml(description)}
-        class="mt-5"
-      />
+      <Prose html={plainTextToHtml(description)} class="mt-5" />
     ) : (
       <p class="mt-5 max-w-measure text-md text-fg-soft">
         Wir sitzen im Kreis, hören einander zu und sprechen über das, was gerade da ist.
@@ -54,39 +46,22 @@ const heading = event.is_past ? 'Dieser Abend hat stattgefunden' : event.is_full
     )}
   </div>
 
-  <div class:list={[card, 'min-w-0 p-6 sm:p-8 lg:col-span-6 lg:col-start-7']}>
-    <h2
-      id="anmeldung-title"
-      class="text-sub text-fg"
-    >
-      {heading}
-    </h2>
-    {event.is_past ? (
-      <>
-        <p class="mt-3 max-w-measure text-md text-fg-soft">
-          Eine Anmeldung ist nicht mehr möglich. Wenn du beim nächsten Mal dabei sein möchtest, lass dich
-          benachrichtigen, sobald ein neuer Termin feststeht.
+  <div class:list={[card, 'min-w-0 p-6 sm:p-8 lg:col-span-6 lg:col-start-7', !event.is_past && 'min-h-176']}>
+    <RegistrationForm client:only="preact" initial={publicEvent(event)}>
+      <div slot="fallback">
+        <h2 id="anmeldung-title" class="text-sub text-fg">
+          Anmeldung
+        </h2>
+        <p role="status" class="mt-3 text-md text-fg-soft">
+          Das Anmeldeformular wird geladen …
         </p>
-        <Button
-          href="/event#benachrichtigung"
-          size="lg"
-          class="mt-6 max-sm:w-full"
-        >
-          Termine per E-Mail erhalten
-        </Button>
-      </>
-    ) : (
-      <>
-        <p class="mt-3 mb-6 max-w-measure text-md text-fg-soft">
-          {event.is_full
-            ? 'Dieser Abend ist ausgebucht. Trag dich trotzdem ein: Wird ein Platz frei, rückst du automatisch nach und bekommst sofort eine E-Mail.'
-            : `Von ${event.max_participants} Plätzen sind noch ${event.available_spots} frei. Den genauen Treffpunkt bekommst du mit der Bestätigung per E-Mail.`}
-        </p>
-        <RegistrationForm
-          eventId={event.id}
-          isFull={event.is_full}
-        />
-      </>
-    )}
+        <noscript>
+          <p>
+            Für die Online-Anmeldung benötigst du JavaScript. Alternativ erreichst du mich per E-Mail an{' '}
+            <a href="mailto:hallo@mens-circle.de">hallo@mens-circle.de</a>.
+          </p>
+        </noscript>
+      </div>
+    </RegistrationForm>
   </div>
 </Section>

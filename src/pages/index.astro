@@ -1,9 +1,7 @@
 ---
 import site from '@data/site.json';
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
 import { eventSeriesSchema } from '@lib/event-schema';
-import { dateStatus, nextDateView, splitFee } from '@lib/event-status';
-import { fetchNextEventState } from '@lib/server/events';
-import { fetchTestimonialsState } from '@lib/server/testimonials';
 
 import photo from '../assets/images/markus-sommer.jpg';
 import Dates from '../components/blocks/Dates.astro';
@@ -19,18 +17,13 @@ import Moderator from '../components/blocks/Moderator.astro';
 import Newsletter from '../components/blocks/Newsletter.astro';
 import Statement from '../components/blocks/Statement.astro';
 import Testimonials from '../components/blocks/Testimonials.astro';
+import NextEventFact from '../components/event/NextEventFact';
 import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
-// One read per source and request; all sections use the same event state.
-const [upcoming, result] = await Promise.all([fetchNextEventState(), fetchTestimonialsState()]);
-const state = dateStatus(upcoming.status, upcoming.event);
-const { next } = state;
-const heroView = nextDateView(state, 'overview');
-const dateView = nextDateView(state, 'notify');
-const fee = splitFee(next?.costBasis);
+export const prerender = true;
 
-const { testimonials } = result;
+Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 ---
 
 <Layout
@@ -38,12 +31,7 @@ const { testimonials } = result;
   description="Männerkreis in Straubing, Niederbayern: Männer sitzen im Kreis, hören zu und sprechen offen, dazu einfache Atemübungen. Auf Spendenbasis, ohne Vorerfahrung."
   schemas={[eventSeriesSchema(Astro.site!)]}
 >
-  <Hero
-    kicker="Männerkreis in Straubing · Niederbayern"
-    secondaryLabel="Wie ein Abend abläuft"
-    secondaryLink="#reise"
-    view={heroView}
-  >
+  <Hero kicker="Männerkreis in Straubing · Niederbayern" secondaryLabel="Wie ein Abend abläuft" secondaryLink="#reise">
     <Fragment slot="title">
       Ein Abend, an dem du <em class="font-serif font-normal text-accent">nichts darstellen</em> musst.
     </Fragment>
@@ -53,7 +41,9 @@ const { testimonials } = result;
 
   <Facts anchor="praktisches" eyebrow="Auf einen Blick">
     <Fact label="Wo" order={0}>
-      <Fragment slot="value">{next?.place || site.geo.locality}</Fragment>
+      <NextEventFact client:load slot="value" kind="place">
+        {site.geo.locality}
+      </NextEventFact>
       Die genaue Adresse kommt mit der Bestätigung
     </Fact>
     <Fact label="Wie oft" order={1}>
@@ -62,15 +52,17 @@ const { testimonials } = result;
     </Fact>
     <Fact label="Dauer" order={2}>
       <Fragment slot="value">2–3 Stunden</Fragment>
-      {next?.timeRange ? (
-        <>Nächster Termin: {next.timeRange.replace('–', '\u2060–\u2060')}</>
-      ) : (
-        <>Ein Abend, kein Seminar</>
-      )}
+      <NextEventFact client:load kind="time">
+        Ein Abend, kein Seminar
+      </NextEventFact>
     </Fact>
     <Fact label="Beitrag" order={3}>
-      <Fragment slot="value">{fee.main}</Fragment>
-      {fee.note || 'Du gibst, was für dich machbar ist'}
+      <NextEventFact client:load slot="value" kind="fee">
+        Spendenbasis
+      </NextEventFact>
+      <NextEventFact client:load kind="feeNote">
+        Du gibst, was für dich machbar ist
+      </NextEventFact>
     </Fact>
   </Facts>
 
@@ -199,17 +191,9 @@ const { testimonials } = result;
     title="Was Teilnehmer geschrieben haben"
     linkUrl="/teile-deine-erfahrung"
     linkLabel="Du warst dabei? Teile deine Erfahrung"
-    items={testimonials}
-    showNote={result.status === 'unavailable' || testimonials.length === 0}
-  >
-    <Fragment slot="note">
-      {result.status === 'unavailable' ? (
-        <>Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei.</>
-      ) : (
-        <>Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind.</>
-      )}
-    </Fragment>
-  </Testimonials>
+    emptyText="Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind."
+    errorText="Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei."
+  />
 
   <Faq anchor="faq" eyebrow="" title="Was Männer vorher wissen wollen">
     <AccordionItem question="Was ist ein Männerkreis?">
@@ -250,7 +234,6 @@ const { testimonials } = result;
     emptyTitle="Der nächste Termin folgt"
     emptyText="Zurzeit steht kein Termin fest. Wenn du möchtest, bekommst du eine E-Mail, sobald der nächste Abend geplant ist."
     emptyButtonLabel="Per E-Mail erfahren"
-    view={dateView}
   />
 
   <Newsletter

@@ -1,8 +1,7 @@
 ---
 import site from '@data/site.json';
-import { breadcrumbSchema, buildEventSchema, eventSeriesSchema } from '@lib/event-schema';
-import { dateStatus } from '@lib/event-status';
-import { fetchUpcomingEventsState } from '@lib/server/events';
+import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
+import { breadcrumbSchema, eventSeriesSchema } from '@lib/event-schema';
 import { link } from '@lib/ui';
 
 import Faq from '../components/blocks/Faq.astro';
@@ -12,60 +11,24 @@ import PageIntro from '../components/PageIntro.astro';
 import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
-/** Evergreen landing page for the dates; never redirects. SSR so the dates are in the HTML. */
-const upcoming = await fetchUpcomingEventsState();
-const event = upcoming.events[0] ?? null;
-// One object for the whole page, so the list, the FAQ and the metadata cannot
-// disagree. A failed read is its own state, never "kein Termin geplant".
-const state = dateStatus(upcoming.status, event);
-const { next } = state;
+export const prerender = true;
+
+Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 const siteUrl = Astro.site!;
 const canonical = new URL('/event', siteUrl).href;
-
-/** The series is built once in lib/event-schema.ts and shared with the home page, so both describe one entity under one `@id`. */
-const eventSeries = eventSeriesSchema(siteUrl);
-
-if (event) {
-  // Google validates every Event node as a rich result, so a stub with only `@id`/`url`
-  // is flagged invalid: embed the full Event, minus what the series already states.
-  const { '@context': _context, superEvent: _superEvent, ...subEvent } = buildEventSchema(event, siteUrl);
-
-  eventSeries.subEvent = subEvent;
-}
-
-const breadcrumbs = breadcrumbSchema(siteUrl, [['Termine', canonical]]);
-
-// Changes with the state so the SERP snippet is never stale, but both variants
-// lead with the same evergreen keywords.
-const description = next
-  ? `Nächster Männerkreis in ${next.place}: ${next.dateLabel}${next.timeRange ? `, ${next.timeRange}` : ''}. Anmeldung, Ort, Dauer und Beitrag auf einen Blick – ohne Vorerfahrung, auf Spendenbasis.`
-  : 'Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis.';
-
-// The <title> stays evergreen because that is what ranks; the social title leads with the date when there is one.
-const socialTitle = next ? `Nächster Männerkreis: ${next.dateLabel} in ${next.place}` : `Termine – ${site.siteName}`;
-
-const socialDetails = next
-  ? [
-      { label: 'Nächster Termin', value: [next.dateLabel, next.timeRange].filter(Boolean).join(', ') },
-      { label: 'Ort', value: next.place },
-    ]
-  : [];
 ---
 
 <Layout
   title={`Termine & Anmeldung – ${site.siteName}`}
-  description={description}
-  ogTitle={socialTitle}
-  socialDetails={socialDetails}
-  schemas={[eventSeries, breadcrumbs]}
+  description="Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis."
+  schemas={[eventSeriesSchema(siteUrl), breadcrumbSchema(siteUrl, [['Termine', canonical]])]}
 >
   <PageIntro eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung">
     <Fragment slot="lead">
-      Wir treffen uns alle zwei bis vier Wochen in {next?.place || site.geo.locality} in Niederbayern. Ein Abend dauert
-      zwei bis drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was
-      dich erwartet, lies zuerst,{' '}
-      {/* The period follows the link directly: on its own line Astro sets a space before it. */}
+      Wir treffen uns alle zwei bis vier Wochen in {site.geo.locality} in Niederbayern. Ein Abend dauert zwei bis drei
+      Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was dich erwartet,
+      lies zuerst, {/* The period follows the link directly: on its own line Astro sets a space before it. */}
       <a class={link} href="/#ueber">
         worum es an so einem Abend geht
       </a>
@@ -74,22 +37,12 @@ const socialDetails = next
   </PageIntro>
 
   {/* The dates are what this page is for; the notification stands beside them, smaller. */}
-  <EventList status={upcoming.status} events={upcoming.events} />
+  <EventList />
 
   <Faq anchor="fragen-zum-termin" eyebrow="Vor dem Termin" title="Fragen zu Termin und Anmeldung">
     <AccordionItem question="Wann findet der nächste Männerkreis statt?">
-      {next ? (
-        <>
-          Der nächste Termin ist {next.dateLabel}
-          {next.timeRange ? ` um ${next.timeRange}` : ''} in {next.place}. Alle Details und die Anmeldung findest du auf
-          der Seite zu diesem Termin.
-        </>
-      ) : (
-        <>
-          Der nächste Termin steht noch nicht fest. Sobald er geplant ist, erfährst du es per E-Mail über die
-          Benachrichtigung auf dieser Seite oder über die WhatsApp-Gruppe.
-        </>
-      )}
+      Die aktuellen Termine stehen oben auf dieser Seite. Sobald ein neuer Abend geplant ist, erfährst du es auch per
+      E-Mail oder über die WhatsApp-Gruppe.
     </AccordionItem>
     <AccordionItem question="Wie melde ich mich an?">
       Über das Anmeldeformular auf der Seite des jeweiligen Termins. Du brauchst nur Vor- und Nachnamen und eine
@@ -97,21 +50,12 @@ const socialDetails = next
       ausgebucht, kommst du auf die Warteliste und rückst nach, sobald ein Platz frei wird.
     </AccordionItem>
     <AccordionItem question="Was kostet die Teilnahme?">
-      {next?.costBasis ? (
-        <>
-          Für den nächsten Termin gilt: {next.costBasis}. Du gibst, was dir der Abend wert ist und was für dich machbar
-          ist – einen festen Preis oder eine Mitgliedschaft gibt es nicht.
-        </>
-      ) : (
-        <>
-          Der Kreis läuft auf Spendenbasis. Du gibst, was dir der Abend wert ist und was für dich machbar ist. Es gibt
-          keinen festen Preis und keine Mitgliedschaft.
-        </>
-      )}
+      Der Kreis läuft auf Spendenbasis. Du gibst, was dir der Abend wert ist und was für dich machbar ist. Es gibt
+      keinen festen Preis und keine Mitgliedschaft. Die Angaben zum jeweiligen Abend stehen beim Termin.
     </AccordionItem>
     <AccordionItem question="Wo genau findet der Männerkreis statt?">
-      Der Männerkreis findet in {next?.place || site.geo.locality} in Niederbayern statt. Die genaue Adresse bekommst du
-      mit der Anmeldebestätigung – so bleibt der Ort der Gruppe vorbehalten, die tatsächlich zusammenkommt.
+      Der Männerkreis findet in {site.geo.locality} in Niederbayern statt. Die genaue Adresse bekommst du mit der
+      Anmeldebestätigung – so bleibt der Ort der Gruppe vorbehalten, die tatsächlich zusammenkommt.
     </AccordionItem>
     <AccordionItem question="Kann ich alleine kommen?">
       Ja. Du musst vorher niemanden kennen. Es reicht, wenn du dich für einen Termin anmeldest und an dem Abend da bist.

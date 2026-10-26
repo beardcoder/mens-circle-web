@@ -1,7 +1,7 @@
 ---
 import { buildEventMeta } from '@lib/event-meta';
 import { breadcrumbSchema, buildEventSchema } from '@lib/event-schema';
-import { getEventBySlug } from '@lib/server/events';
+import { PublicDataError, readPublicEvent } from '@lib/server/public-data';
 
 import LinkBand from '../../components/blocks/LinkBand.astro';
 import EventIntro from '../../components/event/EventIntro.astro';
@@ -11,9 +11,20 @@ import Layout from '../../layouts/Layout.astro';
 
 // One SSR page per event, read per request, so a new or edited event is live with no rebuild.
 const { slug } = Astro.params;
-const event = slug ? await getEventBySlug(slug) : null;
+let event;
 
-if (!event) return Astro.redirect('/event', 302);
+try {
+  event = await readPublicEvent(slug ?? '');
+} catch (error) {
+  if (error instanceof PublicDataError && error.status === 404) return Astro.redirect('/event', 302);
+
+  return new Response('Der Termin ist gerade nicht abrufbar. Bitte versuche es später erneut.', {
+    status: 503,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'Retry-After': '30' },
+  });
+}
+
+Astro.response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=30');
 
 const siteUrl = Astro.site!;
 const hasMap = event.latitude !== null && event.longitude !== null;

@@ -3,7 +3,6 @@
  * never read as "no date planned".
  */
 
-import site from '../data/site.json';
 import { eventPlace } from './event-meta';
 import { formatDateLongDE, isoDay, timeRange } from './server/format';
 import type { EventDTO } from './types';
@@ -81,11 +80,11 @@ interface SummaryRow {
 
 /**
  * Everything an event summary shows, in every state. Scheduled and past dates
- * name time, place, fee and seats; the other states keep the same four rows with
- * what is always true (rhythm, place, fee), so every state stands the same height.
+ * name time, place, fee and seats in the same four rows. Loading and error states
+ * are rendered by the client islands, separate from event data.
  */
 export interface SummaryView {
-  state: 'open' | 'full' | 'past' | 'none' | 'unavailable';
+  state: 'open' | 'full' | 'past';
   /** The label above the date: "Nächster Termin", "Termin", … */
   kicker: string;
   /** Two fixed lines: the weekday and the date ("Freitag," / "16. Oktober 2026"), or the state in words. */
@@ -104,12 +103,6 @@ const dateLines = (dateLabel: string): [string, string] => {
   return rest.length ? [`${weekday},`, rest.join(', ')] : [dateLabel, ''];
 };
 
-const RHYTHM_ROWS = (place = site.geo.locality): SummaryRow[] => [
-  { label: 'Rhythmus', value: 'Alle 2–4 Wochen' },
-  { label: 'Ort', value: place },
-  { label: 'Beitrag', value: 'Auf Spendenbasis' },
-];
-
 const seatsText = (event: NextEventSummary): string =>
   event.isFull ? 'Ausgebucht · Warteliste' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`;
 
@@ -120,38 +113,6 @@ const dateRows = (next: NextEventSummary, seats = seatsText(next)): SummaryRow[]
   { label: 'Beitrag', value: splitFee(next.costBasis).main },
   { label: 'Plätze', value: seats },
 ];
-
-const OVERVIEW = { label: 'Termine ansehen', href: '/event' };
-const KICKER = 'Nächster Termin';
-
-/** No date to show: none planned, or none readable. The rows keep what is always true. */
-const noDateView = (unavailable: boolean, whenNone: 'overview' | 'notify'): SummaryView => ({
-  state: unavailable ? 'unavailable' : 'none',
-  kicker: KICKER,
-  title: unavailable ? ['Termine gerade', 'nicht abrufbar'] : ['Zurzeit kein', 'Termin geplant'],
-  datetime: '',
-  rows: [...RHYTHM_ROWS(), { label: 'Status', value: unavailable ? 'Siehe Terminseite' : 'Neuer Termin folgt' }],
-  action:
-    unavailable || whenNone === 'overview' ? OVERVIEW : { label: 'Termine per E-Mail erhalten', href: '#newsletter' },
-});
-
-/**
- * The summary of the next date, for the home page: its action points to the event;
- * with none planned to the overview (`overview`, the hero) or to the e-mail
- * notification (`notify`, beside the form).
- */
-export const nextDateView = ({ status, next }: DateStatus, whenNone: 'overview' | 'notify'): SummaryView => {
-  if (status === 'unavailable' || !next) return noDateView(status === 'unavailable', whenNone);
-
-  return {
-    state: next.isFull ? 'full' : 'open',
-    kicker: KICKER,
-    title: dateLines(next.dateLabel),
-    datetime: next.day,
-    rows: dateRows(next),
-    action: { label: next.isFull ? 'Auf die Warteliste' : 'Zum nächsten Termin', href: `/event/${next.slug}` },
-  };
-};
 
 /** The summary of one event, as listed on /event or opening its own page. */
 export const eventView = (event: EventDTO, kicker: string, withAction = true): SummaryView => {
