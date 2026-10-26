@@ -12,9 +12,10 @@ import SeoHead from '../components/SeoHead.astro';
 type Props = ComponentProps<typeof SeoHead> & {
   /** Public JSON the page's `client:load` islands read: fetched with the HTML, not after their scripts. */
   preloadData?: string[];
+  headerAction?: ComponentProps<typeof Header>['action'];
 };
 
-const { preloadData = [], ...props } = Astro.props;
+const { preloadData = [], headerAction, ...props } = Astro.props;
 ---
 
 <!doctype html>
@@ -74,7 +75,7 @@ const { preloadData = [], ...props } = Astro.props;
       Zum Inhalt springen
     </a>
 
-    <Header />
+    <Header action={headerAction} />
     <span
       aria-hidden="true"
       class="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 origin-left scale-x-0 bg-fill scroll-motion:animate-[reading-progress_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"

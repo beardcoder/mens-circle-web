@@ -1,0 +1,55 @@
+---
+import site from '@data/site.json';
+import { plainTextToHtml } from '@lib/server/format';
+import type { EventDTO } from '@lib/types';
+import { link } from '@lib/ui';
+
+import Prose from '../ui/Prose.astro';
+import Section from '../ui/Section.astro';
+
+interface Props {
+  event: EventDTO;
+}
+
+const { event } = Astro.props;
+const description = event.description?.trim() ?? '';
+---
+
+<Section
+  labelledby="ueber-den-abend"
+  innerClass="grid items-start gap-x-grid gap-y-8 border-t border-line pt-10 lg:grid-cols-12 lg:pt-16"
+>
+  <h2 id="ueber-den-abend" class="max-w-[12em] text-section text-fg lg:col-span-5 lg:row-start-1">
+    Was beschäftigt dich gerade?
+  </h2>
+  <div class="min-w-0 lg:col-span-6 lg:col-start-7 lg:row-span-2">
+    {description ? (
+      <Prose html={plainTextToHtml(description)} />
+    ) : (
+      <Prose>
+        <p>
+          Zwischen Arbeit und Alltag bleibt manches liegen. Im Kreis nehmen wir uns Zeit dafür. Du kannst erzählen, was
+          dich gerade fordert, was dir fehlt oder worüber du dich freust.
+        </p>
+        <p>
+          Wenn einer spricht, hören die anderen zu. Wir lassen einander ausreden und verzichten auf ungefragte
+          Ratschläge. Zu Beginn vereinbaren wir miteinander: Persönliches bleibt im Kreis.
+        </p>
+      </Prose>
+    )}
+    <div class="mt-8 border-l-2 border-accent pl-5 sm:mt-10 sm:pl-6">
+      <h3 class="text-xl font-semibold text-fg">Du kannst erst einmal zuhören.</h3>
+      <p class="mt-3 max-w-measure text-md text-fg-soft">
+        Du brauchst keine Vorerfahrung und musst nichts vorbereiten. Ich erkläre den Rahmen zu Beginn. Wie viel du
+        erzählst und ob du bei einer Atem- oder Körperübung mitmachst, entscheidest du selbst.
+      </p>
+    </div>
+  </div>
+  <p class="text-base text-fg-muted lg:col-span-4 lg:col-start-2 lg:row-start-2">
+    Noch eine Frage vor dem Abend?{' '}
+    <a class={link} href={`mailto:${site.contactEmail}`}>
+      Schreib mir.
+    </a>
+    <span class="mt-2 block">Markus</span>
+  </p>
+</Section>

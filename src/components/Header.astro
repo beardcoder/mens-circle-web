@@ -19,8 +19,13 @@ import Container from './ui/Container.astro';
  * mark; Tab moves on from there.
  */
 
+interface Props {
+  action?: { href: string; label: string };
+}
+
+const { action } = Astro.props;
 const links = nav.header.links;
-const cta = nav.header.cta;
+const cta = action ? { url: action.href, label: action.label, umamiTarget: 'event-registration' } : nav.header.cta;
 
 const isCurrentPage = (url: string): boolean => {
   const target = new URL(url, Astro.url);
@@ -165,7 +170,7 @@ const roundButton =
         data-umami-event-location="menu"
         class={button({ variant: 'primary', size: 'lg', block: true })}
       >
-        Termine &amp; Anmeldung
+        {action?.label ?? 'Termine & Anmeldung'}
       </a>
       <ModeToggle class="justify-self-start" />
     </Container>

@@ -115,37 +115,6 @@
   }
 }
 
-/* The date travels with its own opening, never with the length of the page.
-   Only a transform changes: the document flow and signup targets stay fixed. */
-@keyframes event-date-drift {
-  from {
-    translate: 0 0;
-  }
-  to {
-    translate: 0 var(--event-date-travel);
-  }
-}
-
-@utility event-opening {
-  view-timeline-name: --event-opening;
-  view-timeline-axis: block;
-}
-
-@utility event-date-parallax {
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      --event-date-travel: 0.75rem;
-      animation: event-date-drift linear both;
-      animation-timeline: --event-opening;
-      animation-range: exit 0% exit 100%;
-
-      @media (width >= 64rem) {
-        --event-date-travel: 4rem;
-      }
-    }
-  }
-}
-
 /* Stagger by scroll position, not a timer: no delayed text after scrolling. */
 @utility reveal-stagger {
   --reveal-start: calc(var(--motion-order, 0) * 7%);

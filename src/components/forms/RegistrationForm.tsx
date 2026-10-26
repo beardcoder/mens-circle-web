@@ -14,7 +14,13 @@ function trackRegistration(name: string, eventId: string): void {
   }
 }
 
-export default function RegistrationForm({ initial }: { initial: PublicEvent }) {
+export default function RegistrationForm({
+  initial,
+  contribution,
+}: {
+  initial: PublicEvent;
+  contribution: { main: string; note: string };
+}) {
   const url = `/api/public/events/${encodeURIComponent(initial.slug)}`;
   const { data = initial, error } = usePublicData<PublicEvent>(url, initial);
   const form = useRef<HTMLFormElement>(null);
@@ -58,14 +64,7 @@ export default function RegistrationForm({ initial }: { initial: PublicEvent }) 
 
   return (
     <>
-      <h2 id="anmeldung-title" class="text-sub text-fg">
-        {data.view.state === 'full' ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
-      </h2>
-      <p class="mt-3 mb-6 max-w-measure text-md text-fg-soft">
-        {data.view.state === 'full'
-          ? 'Dieser Abend ist voll. Du kannst dich auf die Warteliste setzen lassen. Sobald du nachrückst, bekommst du eine E-Mail.'
-          : 'Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.'}
-      </p>
+      <RegistrationIntro data={data} contribution={contribution} />
       {error && (
         <p role="status" class="mb-4 text-sm text-fg-muted">
           Der Platzstand lässt sich gerade nicht aktualisieren. Bei der Anmeldung werden die freien Plätze erneut
@@ -131,7 +130,7 @@ export default function RegistrationForm({ initial }: { initial: PublicEvent }) 
               <input name="website" tabIndex={-1} autoComplete="off" />
             </label>
           </div>
-          <div class="grid gap-6 sm:grid-cols-2 sm:gap-4">
+          <div class="grid gap-5 min-[22.5rem]:grid-cols-2 min-[22.5rem]:gap-4">
             {[
               { name: 'first_name', label: 'Vorname', complete: 'given-name' },
               { name: 'last_name', label: 'Nachname', complete: 'family-name' },
@@ -227,6 +226,41 @@ export default function RegistrationForm({ initial }: { initial: PublicEvent }) 
           </p>
         )}
       </form>
+    </>
+  );
+}
+
+function RegistrationIntro({
+  data,
+  contribution,
+}: {
+  data: PublicEvent;
+  contribution: { main: string; note: string };
+}) {
+  return (
+    <>
+      <p role="status" class="mb-3 text-sm text-fg-muted">
+        {data.view.state === 'full'
+          ? 'Alle Plätze sind belegt'
+          : `${data.availableSpots} von ${data.maxParticipants} Plätzen frei`}
+      </p>
+      <h2 id="anmeldung-title" class="text-sub text-fg">
+        {data.view.state === 'full' ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
+      </h2>
+      <p class="mt-3 mb-6 max-w-measure text-md text-fg-soft">
+        {data.view.state === 'full'
+          ? 'Dieser Abend ist voll. Du kannst dich auf die Warteliste setzen lassen. Sobald du nachrückst, bekommst du eine E-Mail.'
+          : 'Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.'}
+      </p>
+      <dl class="mb-6 border-y border-line py-3 text-sm">
+        <div class="flex items-baseline justify-between gap-4">
+          <dt class="text-fg-muted">Beitrag</dt>
+          <dd class="text-right text-fg">
+            {contribution.main}
+            {contribution.note && <span class="mt-1 block text-xs text-fg-muted">{contribution.note}</span>}
+          </dd>
+        </div>
+      </dl>
     </>
   );
 }
