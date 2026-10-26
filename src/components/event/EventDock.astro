@@ -1,0 +1,115 @@
+---
+import { formatDateShortDE, formatDayMonthYearDE, isoDay, timeRange } from '@lib/server/format';
+import type { EventDTO } from '@lib/types';
+
+import Container from '../ui/Container.astro';
+
+interface Props {
+  event: EventDTO;
+}
+
+const { event } = Astro.props;
+const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
+const hours = timeRange(event.start_time, event.end_time);
+---
+
+{/* A visual continuation of the existing heading, never a second heading or focus target. */}
+<div
+  data-event-dock
+  hidden
+  aria-hidden="true"
+  class="fixed inset-x-0 top-header z-30 overflow-clip border-b border-line bg-ground text-fg print:hidden"
+>
+  <Container class="flex min-h-14 items-center justify-between gap-4 py-2">
+    <p
+      data-event-dock-title
+      class="min-w-0 max-w-[50%] origin-left truncate text-xl font-medium tracking-[-0.035em] sm:text-2xl"
+    >
+      {isCircleTitle ? (
+        <span>
+          Männer<span class="font-serif font-normal tracking-normal text-accent italic">kreis</span>
+        </span>
+      ) : (
+        event.title
+      )}
+    </p>
+    <p data-event-dock-date class="shrink-0 origin-right text-right text-xs leading-snug text-fg-muted sm:text-sm">
+      <time datetime={isoDay(event.event_date)} class="text-fg">
+        <span class="sm:hidden">{formatDateShortDE(event.event_date)}</span>
+        <span class="hidden sm:inline">{formatDayMonthYearDE(event.event_date)}</span>
+      </time>
+      {hours && <span class="mt-0.5 block sm:mt-0 sm:ml-4 sm:inline">{hours}</span>}
+    </p>
+  </Container>
+</div>
+
+<script>
+  const source = document.querySelector<HTMLElement>('[data-event-title]');
+  const dock = document.querySelector<HTMLElement>('[data-event-dock]');
+  const title = dock?.querySelector<HTMLElement>('[data-event-dock-title]');
+  const date = dock?.querySelector<HTMLElement>('[data-event-dock-date]');
+  const header = document.querySelector<HTMLElement>('#header');
+
+  if (source && dock && title && date && header) {
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const headerHeight = header.getBoundingClientRect().height;
+    let animations: Animation[] = [];
+
+    // Unsupported browsers and reduced motion get the same bar, with an instant switch.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        dock.hidden = entry.boundingClientRect.bottom > headerHeight;
+      },
+      { rootMargin: `-${headerHeight}px 0px 0px 0px` },
+    );
+
+    function updateDock() {
+      animations.forEach((animation) => animation.cancel());
+      animations = [];
+      observer.disconnect();
+
+      if (
+        reducedMotion.matches ||
+        typeof ViewTimeline === 'undefined' ||
+        !CSS.supports('animation-range', 'exit 0% exit 100%')
+      ) {
+        dock!.hidden = source!.getBoundingClientRect().bottom > headerHeight;
+        observer.observe(source!);
+
+        return;
+      }
+
+      const options: KeyframeAnimationOptions = {
+        timeline: new ViewTimeline({ subject: source!, axis: 'block', inset: `${headerHeight}px 0px` }),
+        rangeStart: 'exit 0%',
+        rangeEnd: 'exit 100%',
+        fill: 'both',
+      };
+
+      dock!.hidden = false;
+      animations = [
+        dock!.animate({ opacity: [0, 1], pointerEvents: ['none', 'auto'] }, options),
+        source!.animate([{ opacity: 1 }, { opacity: 0, offset: 0.45 }, { opacity: 0 }], options),
+        title!.animate(
+          [
+            { opacity: 0, transform: 'translateY(12px) scale(1.12)' },
+            { opacity: 0, transform: 'translateY(8px) scale(1.08)', offset: 0.45 },
+            { opacity: 1, transform: 'translateY(0) scale(1)' },
+          ],
+          options,
+        ),
+        date!.animate(
+          [
+            { opacity: 0, transform: 'translateY(8px)' },
+            { opacity: 0, transform: 'translateY(6px)', offset: 0.45 },
+            { opacity: 1, transform: 'translateY(0)' },
+          ],
+          options,
+        ),
+      ];
+    }
+
+    updateDock();
+    reducedMotion.addEventListener('change', updateDock);
+  }
+</script>
