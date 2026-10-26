@@ -1,26 +1,14 @@
 ---
-import { listEventsForAdmin } from '@lib/server/events';
-import { listRegistrationsForEvent } from '@lib/server/registrations';
+import { readAdminOverview } from '@lib/server/admin-data';
 
-import EventList from '../../components/admin/EventList.astro';
-import NextEvent from '../../components/admin/NextEvent.astro';
+import Overview from '../../components/admin/Overview';
 import AdminLayout from '../../layouts/AdminLayout.astro';
 
 export const prerender = false;
 
-const events = await listEventsForAdmin();
-
-// Next upcoming event (today or later, soonest first) for the planning panel.
-const todayYmd = new Date().toISOString().slice(0, 10);
-
-const next = events
-  .filter((e) => String(e.eventDate).slice(0, 10) >= todayYmd)
-  .sort((a, b) => (a.eventDate < b.eventDate ? -1 : 1))[0];
-
-const people = next ? await listRegistrationsForEvent(next.id) : [];
+const data = await readAdminOverview();
 ---
 
 <AdminLayout title="Veranstaltungen">
-  {next && <NextEvent event={next} people={people} />}
-  <EventList events={events} />
+  <Overview client:load initial={data} />
 </AdminLayout>

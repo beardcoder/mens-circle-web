@@ -17,19 +17,9 @@ interface Props {
 const { eyebrow, title, titleId, items } = Astro.props;
 ---
 
-<Section
-  ground="alt"
-  space="band"
-  labelledby={titleId}
->
+<Section ground="alt" space="band" labelledby={titleId}>
   <Split>
-    <SectionHead
-      slot="head"
-      eyebrow={eyebrow}
-      title={title}
-      titleId={titleId}
-      size="sub"
-    />
+    <SectionHead slot="head" eyebrow={eyebrow} title={title} titleId={titleId} size="sub" />
     <LinkList items={items} />
   </Split>
 </Section>

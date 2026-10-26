@@ -1,23 +1,14 @@
 ---
-import { listTestimonialsForAdmin } from '@lib/server/testimonials';
+import { readAdminTestimonials } from '@lib/server/admin-data';
 
-import TestimonialModerator from '../../components/admin/TestimonialModerator.astro';
+import TestimonialModerator from '../../components/admin/TestimonialModerator';
 import AdminLayout from '../../layouts/AdminLayout.astro';
 
 export const prerender = false;
 
-const testimonials = (await listTestimonialsForAdmin()).map((t) => ({
-  id: t.id,
-  quote: t.quote,
-  authorName: t.authorName,
-  role: t.role,
-  email: t.email,
-  isPublished: t.isPublished,
-  sortOrder: t.sortOrder,
-  createdAt: t.createdAt,
-}));
+const { testimonials } = await readAdminTestimonials();
 ---
 
 <AdminLayout title="Stimmen">
-  <TestimonialModerator testimonials={testimonials} />
+  <TestimonialModerator client:load initial={testimonials} />
 </AdminLayout>
