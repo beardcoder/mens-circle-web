@@ -12,28 +12,16 @@ interface Props {
   eyebrow: string;
   name: string;
   quote: string;
-  bio: string;
   image: ImageMetadata;
   imageAlt: string;
   linkLabel: string;
   linkUrl: string;
 }
 
-/**
- * Markus: his photograph and his words at about 5 : 7 on the shared grid. On
- * phones the title comes first, then a photo of moderate height, then the text,
- * so the photo never pushes the orientation down by screens. His sentence stays
- * below the size of the section's title.
- */
-
-const { anchor, eyebrow, name, quote, bio, image, imageAlt, linkLabel, linkUrl } = Astro.props;
+const { anchor, eyebrow, name, quote, image, imageAlt, linkLabel, linkUrl } = Astro.props;
 ---
 
-<Section
-  id={anchor}
-  labelledby="person-title"
-  innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12"
->
+<Section id={anchor} labelledby="person-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
   <SectionHead
     eyebrow={eyebrow}
     title={name}
@@ -59,12 +47,11 @@ const { anchor, eyebrow, name, quote, bio, image, imageAlt, linkLabel, linkUrl }
         <p>„{quote}“</p>
       </blockquote>
     )}
-    {bio && <Prose html={bio} />}
+    <Prose>
+      <slot />
+    </Prose>
     {linkLabel && linkUrl && (
-      <TextLink
-        href={linkUrl}
-        data-astro-prefetch="hover"
-      >
+      <TextLink href={linkUrl} data-astro-prefetch="hover">
         {linkLabel}
       </TextLink>
     )}

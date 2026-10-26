@@ -1,6 +1,6 @@
 ---
 import site from '@data/site.json';
-import { breadcrumbSchema, buildEventSchema, eventSeriesSchema, faqSchema } from '@lib/event-schema';
+import { breadcrumbSchema, buildEventSchema, eventSeriesSchema } from '@lib/event-schema';
 import { dateStatus } from '@lib/event-status';
 import { fetchUpcomingEventsState } from '@lib/server/events';
 import { link } from '@lib/ui';
@@ -9,6 +9,7 @@ import Faq from '../components/blocks/Faq.astro';
 import LinkBand from '../components/blocks/LinkBand.astro';
 import EventList from '../components/event/EventList.astro';
 import PageIntro from '../components/PageIntro.astro';
+import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
 /** Evergreen landing page for the dates; never redirects. SSR so the dates are in the HTML. */
@@ -22,62 +23,6 @@ const { next } = state;
 const siteUrl = Astro.site!;
 const canonical = new URL('/event', siteUrl).href;
 
-// Rendered below and emitted as FAQPage JSON-LD from this one list — Google flags FAQ markup that does not match the visible text.
-const faqItems = [
-  {
-    question: 'Wann findet der nächste Männerkreis statt?',
-    answer: next
-      ? `Der nächste Termin ist ${next.dateLabel}${next.timeRange ? ` um ${next.timeRange}` : ''} in ${next.place}. Alle Details und die Anmeldung findest du auf der Seite zu diesem Termin.`
-      : 'Der nächste Termin steht noch nicht fest. Sobald er geplant ist, erfährst du es per E-Mail über die Benachrichtigung auf dieser Seite oder über die WhatsApp-Gruppe.',
-  },
-  {
-    question: 'Wie melde ich mich an?',
-    answer:
-      'Über das Anmeldeformular auf der Seite des jeweiligen Termins. Du brauchst nur Vor- und Nachnamen und eine E-Mail-Adresse. Danach bekommst du eine Bestätigung per E-Mail mit dem genauen Treffpunkt. Ist ein Abend ausgebucht, kommst du auf die Warteliste und rückst nach, sobald ein Platz frei wird.',
-  },
-  {
-    question: 'Was kostet die Teilnahme?',
-    answer: next?.costBasis
-      ? `Für den nächsten Termin gilt: ${next.costBasis}. Du gibst, was dir der Abend wert ist und was für dich machbar ist – einen festen Preis oder eine Mitgliedschaft gibt es nicht.`
-      : 'Der Kreis läuft auf Spendenbasis. Du gibst, was dir der Abend wert ist und was für dich machbar ist. Es gibt keinen festen Preis und keine Mitgliedschaft.',
-  },
-  {
-    question: 'Wo genau findet der Männerkreis statt?',
-    answer: `Der Männerkreis findet in ${next?.place || site.geo.locality} in Niederbayern statt. Die genaue Adresse bekommst du mit der Anmeldebestätigung – so bleibt der Ort der Gruppe vorbehalten, die tatsächlich zusammenkommt.`,
-  },
-  {
-    question: 'Kann ich alleine kommen?',
-    answer:
-      'Ja. Du musst vorher niemanden kennen. Es reicht, wenn du dich für einen Termin anmeldest und an dem Abend da bist.',
-  },
-  {
-    question: 'Gibt es Atemübungen oder Meditation?',
-    answer:
-      'Je nach Abend kann eine einfache Übung mit Atem, Körperwahrnehmung oder Stille dazugehören. Sie wird vorher erklärt, bleibt bodenständig, und du entscheidest selbst, woran du teilnimmst.',
-  },
-];
-
-// The page's exit, ordered by what someone who has just read the date wants
-// next: what an evening is, who holds it, what others said.
-const moreLinks = [
-  {
-    href: '/#ueber',
-    title: 'Worum es an so einem Abend geht',
-    text: 'Der Ablauf, der Rahmen und was der Kreis ausdrücklich nicht ist.',
-  },
-  {
-    href: '/warum-ich-den-maennerkreis-leite',
-    title: 'Warum ich den Männerkreis leite',
-    prefetch: true,
-    text: 'Ein persönlicher Text von Markus: was ihm wichtig ist und was du von ihm erwarten kannst.',
-  },
-  {
-    href: '/#stimmen',
-    title: 'Stimmen aus dem Kreis',
-    text: 'Was Männer nach einem Abend geschrieben haben.',
-  },
-];
-
 /** The series is built once in lib/event-schema.ts and shared with the home page, so both describe one entity under one `@id`. */
 const eventSeries = eventSeriesSchema(siteUrl);
 
@@ -89,7 +34,6 @@ if (event) {
   eventSeries.subEvent = subEvent;
 }
 
-const faqPage = faqSchema(faqItems, `${canonical}#faq`);
 const breadcrumbs = breadcrumbSchema(siteUrl, [['Termine', canonical]]);
 
 // Changes with the state so the SERP snippet is never stale, but both variants
@@ -114,7 +58,7 @@ const socialDetails = next
   description={description}
   ogTitle={socialTitle}
   socialDetails={socialDetails}
-  schemas={[eventSeries, faqPage, breadcrumbs]}
+  schemas={[eventSeries, breadcrumbs]}
 >
   <PageIntro eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung">
     <Fragment slot="lead">
@@ -132,7 +76,73 @@ const socialDetails = next
   {/* The dates are what this page is for; the notification stands beside them, smaller. */}
   <EventList status={upcoming.status} events={upcoming.events} />
 
-  <Faq anchor="fragen-zum-termin" eyebrow="Vor dem Termin" title="Fragen zu Termin und Anmeldung" items={faqItems} />
+  <Faq anchor="fragen-zum-termin" eyebrow="Vor dem Termin" title="Fragen zu Termin und Anmeldung">
+    <AccordionItem question="Wann findet der nächste Männerkreis statt?">
+      {next ? (
+        <>
+          Der nächste Termin ist {next.dateLabel}
+          {next.timeRange ? ` um ${next.timeRange}` : ''} in {next.place}. Alle Details und die Anmeldung findest du auf
+          der Seite zu diesem Termin.
+        </>
+      ) : (
+        <>
+          Der nächste Termin steht noch nicht fest. Sobald er geplant ist, erfährst du es per E-Mail über die
+          Benachrichtigung auf dieser Seite oder über die WhatsApp-Gruppe.
+        </>
+      )}
+    </AccordionItem>
+    <AccordionItem question="Wie melde ich mich an?">
+      Über das Anmeldeformular auf der Seite des jeweiligen Termins. Du brauchst nur Vor- und Nachnamen und eine
+      E-Mail-Adresse. Danach bekommst du eine Bestätigung per E-Mail mit dem genauen Treffpunkt. Ist ein Abend
+      ausgebucht, kommst du auf die Warteliste und rückst nach, sobald ein Platz frei wird.
+    </AccordionItem>
+    <AccordionItem question="Was kostet die Teilnahme?">
+      {next?.costBasis ? (
+        <>
+          Für den nächsten Termin gilt: {next.costBasis}. Du gibst, was dir der Abend wert ist und was für dich machbar
+          ist – einen festen Preis oder eine Mitgliedschaft gibt es nicht.
+        </>
+      ) : (
+        <>
+          Der Kreis läuft auf Spendenbasis. Du gibst, was dir der Abend wert ist und was für dich machbar ist. Es gibt
+          keinen festen Preis und keine Mitgliedschaft.
+        </>
+      )}
+    </AccordionItem>
+    <AccordionItem question="Wo genau findet der Männerkreis statt?">
+      Der Männerkreis findet in {next?.place || site.geo.locality} in Niederbayern statt. Die genaue Adresse bekommst du
+      mit der Anmeldebestätigung – so bleibt der Ort der Gruppe vorbehalten, die tatsächlich zusammenkommt.
+    </AccordionItem>
+    <AccordionItem question="Kann ich alleine kommen?">
+      Ja. Du musst vorher niemanden kennen. Es reicht, wenn du dich für einen Termin anmeldest und an dem Abend da bist.
+    </AccordionItem>
+    <AccordionItem question="Gibt es Atemübungen oder Meditation?">
+      Je nach Abend kann eine einfache Übung mit Atem, Körperwahrnehmung oder Stille dazugehören. Sie wird vorher
+      erklärt, bleibt bodenständig, und du entscheidest selbst, woran du teilnimmst.
+    </AccordionItem>
+  </Faq>
 
-  <LinkBand eyebrow="Mehr über den Kreis" title="Weiterlesen" titleId="mehr-title" items={moreLinks} />
+  <LinkBand
+    eyebrow="Mehr über den Kreis"
+    title="Weiterlesen"
+    titleId="mehr-title"
+    items={[
+      {
+        href: '/#ueber',
+        title: 'Worum es an so einem Abend geht',
+        text: 'Der Ablauf, der Rahmen und was der Kreis ausdrücklich nicht ist.',
+      },
+      {
+        href: '/warum-ich-den-maennerkreis-leite',
+        title: 'Warum ich den Männerkreis leite',
+        prefetch: true,
+        text: 'Ein persönlicher Text von Markus: was ihm wichtig ist und was du von ihm erwarten kannst.',
+      },
+      {
+        href: '/#stimmen',
+        title: 'Stimmen aus dem Kreis',
+        text: 'Was Männer nach einem Abend geschrieben haben.',
+      },
+    ]}
+  />
 </Layout>

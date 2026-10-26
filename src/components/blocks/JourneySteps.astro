@@ -3,71 +3,28 @@ import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 
-interface Step {
-  title: string;
-  description: string;
-}
-
 interface Props {
   anchor: string;
   eyebrow: string;
   title: string;
   subtitle: string;
-  steps: Step[];
-  close: string;
 }
 
-/**
- * The evening in four phases, in order: four equal columns on the desktop, two
- * on the tablet, one running list on phones. Each phase reads on its own: a
- * small number, its title, its description.
- */
-
-const { anchor, eyebrow, title, subtitle, steps, close } = Astro.props;
+const { anchor, eyebrow, title, subtitle } = Astro.props;
 ---
 
-<Section
-  id={anchor}
-  labelledby="ablauf-title"
->
-  <SectionHead
-    eyebrow={eyebrow}
-    title={title}
-    titleId="ablauf-title"
-    lead={subtitle}
-  />
+<Section id={anchor} labelledby="ablauf-title">
+  <div itemscope itemtype="https://schema.org/ItemList">
+    <meta itemprop="name" content={title} />
+    <meta itemprop="description" content={subtitle} />
+    <SectionHead eyebrow={eyebrow} title={title} titleId="ablauf-title" lead={subtitle} />
 
-  {steps.length > 0 && (
-    <ol
-      role="list"
-      class="journey-flow mt-group grid items-start gap-x-grid gap-y-8 md:grid-cols-2 lg:grid-cols-4"
-    >
-      {steps.map((step, i) => (
-        <li
-          class="reveal reveal-stagger group/step grid content-start gap-3"
-          style={`--motion-order: ${i}`}
-        >
-          <span
-            aria-hidden="true"
-            class="draw mb-2 block h-px bg-line-strong"
-          ></span>
-          <span
-            class="font-sans text-sub font-medium text-accent tabular-nums motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/step:translate-x-1"
-            aria-hidden="true"
-          >
-            {String(i + 1).padStart(2, '0')}
-          </span>
-          {step.title && <h3 class="text-sub text-fg">{step.title}</h3>}
-          {step.description && <p class="text-md text-fg-soft">{step.description}</p>}
-        </li>
-      ))}
+    <ol role="list" class="journey-flow mt-group grid items-start gap-x-grid gap-y-8 md:grid-cols-2 lg:grid-cols-4">
+      <slot name="steps" />
     </ol>
-  )}
 
-  {close && (
-    <Prose
-      html={close}
-      class="mt-group"
-    />
-  )}
+    <Prose class="mt-group">
+      <slot name="close" />
+    </Prose>
+  </div>
 </Section>

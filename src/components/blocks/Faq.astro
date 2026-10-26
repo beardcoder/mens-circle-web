@@ -7,17 +7,11 @@ import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 import Split from '../ui/Split.astro';
 
-interface FaqItem {
-  question: string;
-  answer: string;
-}
-
 interface Props {
   anchor: string;
   eyebrow: string;
   title: string;
   intro?: string;
-  items: FaqItem[];
 }
 
 /**
@@ -25,40 +19,28 @@ interface Props {
  * intro, the way to ask what is not there), the questions as one Accordion.
  */
 
-const { anchor, eyebrow, title, intro, items } = Astro.props;
+const { anchor, eyebrow, title, intro } = Astro.props;
 ---
 
-<Section
-  id={anchor}
-  labelledby={`${anchor}-title`}
->
-  <Split>
-    <div
-      slot="head"
-      class="grid justify-items-start gap-6"
-    >
-      <SectionHead
-        eyebrow={eyebrow}
-        title={title}
-        titleId={`${anchor}-title`}
-        lead={intro}
-        leadHtml
-        size="sub"
-      />
-      {site.contactEmail && (
-        <p class="max-w-measure text-base text-fg-muted">
-          Deine Frage ist nicht dabei? Schreib mir an{' '}
-          <a
-            class={link}
-            href={`mailto:${site.contactEmail}`}
-          >
-            {site.contactEmail}
-          </a>
-          .
-        </p>
-      )}
-    </div>
+<Section id={anchor} labelledby={`${anchor}-title`}>
+  <div itemscope itemtype="https://schema.org/FAQPage">
+    <Split>
+      <div slot="head" class="grid justify-items-start gap-6">
+        <SectionHead eyebrow={eyebrow} title={title} titleId={`${anchor}-title`} lead={intro} leadHtml size="sub" />
+        {site.contactEmail && (
+          <p class="max-w-measure text-base text-fg-muted">
+            Deine Frage ist nicht dabei? Schreib mir an{' '}
+            <a class={link} href={`mailto:${site.contactEmail}`}>
+              {site.contactEmail}
+            </a>
+            .
+          </p>
+        )}
+      </div>
 
-    <Accordion items={items} />
-  </Split>
+      <Accordion>
+        <slot />
+      </Accordion>
+    </Split>
+  </div>
 </Section>

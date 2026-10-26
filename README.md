@@ -46,13 +46,14 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 
 ## Content
 
-- Home and personal-page copy: `src/content/home.json`,
-  `src/content/warum-ich-den-maennerkreis-leite.json` (named sections, checked against
-  component props by TypeScript)
-- Section order: explicit component markup in the corresponding `src/pages/*.astro`
-- Crawler index: `src/pages/llms.txt.ts` (prerendered; no Markdown export pipeline)
+- Page content and section order: directly in `src/pages/*.astro`
+- Section markup: `src/components/blocks/`; content arrives as explicit props and slots at its page location
+- Static FAQ answers, journey steps and facts use slotted items; FAQ/journey microdata comes from the visible HTML
+- Home: SSR; next event and approved testimonials are read once per request, without server islands
+- Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)
+- Shared layouts: `src/layouts/`; reusable UI, forms and event components: `src/components/`
+- Crawler index: `src/pages/llms.txt.ts` (prerendered)
 - Site settings, navigation: `src/data/site.json`, `src/data/navigation.json`
-- Legal pages: `src/content/legal/*.json` (content collection `legal`; a new file is a new URL)
 - Events, registrations, testimonials: `/admin`
 - Event form validation and defaults: `src/lib/event-input.ts`; the action accepts `FormData` directly
 - Newsletter: listmonk admin

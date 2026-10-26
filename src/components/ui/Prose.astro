@@ -1,11 +1,11 @@
 ---
 /**
- * Rich text from the content files and the admin: paragraphs, links, lists,
+ * Shared typography for inline page content and HTML from the admin: paragraphs, links, lists,
  * subheadings, quotes and tables, on the reading measure. Element styles are
- * descendant variants, since the HTML arrives as a string.
+ * descendant variants, for both slotted markup and HTML strings.
  */
 interface Props {
-  html: string;
+  html?: string;
   /** `measure` a line of running text (~62 characters); `column` the wider reading column of the legal pages. */
   width?: 'measure' | 'column';
   class?: string;
@@ -29,7 +29,10 @@ const PROSE = [
 ];
 ---
 
-<div
-  class:list={[PROSE, className]}
-  set:html={html}
-/>
+{html !== undefined ? (
+  <div class:list={[PROSE, className]} set:html={html} />
+) : (
+  <div class:list={[PROSE, className]}>
+    <slot />
+  </div>
+)}

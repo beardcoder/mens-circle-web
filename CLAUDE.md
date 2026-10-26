@@ -66,22 +66,16 @@ proxy's forwarded headers. Never fix a 403 with `checkOrigin: false`.
 `claimSeat()`). Capacity is computed from `holdsASeat()` only. More than one web
 replica on the same SQLite file is not supported.
 
-**Rendering.** The event pages render on demand; home, the legal pages, the personal
-page and the testimonial form are prerendered. Home's live parts are server islands
-(`server:defer`), each reading for itself: `HeroDate` (the hero's date and action),
-`Facts`, `NextDate` (beside the newsletter) and `Testimonials`. Each one's `fallback`
-slot is the same component in its `pending` state (`PENDING` from `lib/event-status.ts`,
-`pending` for `Testimonials`); the date and fact fallbacks stand the same height, the
-voices (below the fold) grow when they arrive. Client code that binds to island content
-must also run on late insertions (`initQuotes` observes the DOM). The islands import the server
-lib late (`readDateStatus()`, a dynamic `import()`), so a prerender never opens the
-database. `lib/event-status.ts` has three read states plus `pending`; a failed read
-(`unavailable`) must never render as "no date planned". The reads catch their errors,
-so a database failure never fails the page.
+**Rendering.** Home and event pages render on demand. Home reads the next event and
+published testimonials once per request in its frontmatter; the sections share that
+state and render directly in the response. No server islands or pending placeholders.
+The legal pages, personal page and testimonial form are prerendered.
+`lib/event-status.ts` distinguishes `scheduled`, `none` and `unavailable`; a failed
+read must never render as "no date planned". Public reads catch query errors.
 
 **Caching.** `lib/cache-policy.ts` is the one table (middleware + the adapter's `staticHeaders`);
-routes with their own header are left alone. The server islands are `no-store`, so the
-seat count is never served stale. The prerendered pages (home, the legal pages,
+routes with their own header are left alone. Home and event pages revalidate on every
+visit so seat counts stay current. The prerendered pages (legal pages,
 `/warum-ich-den-maennerkreis-leite`, `/teile-deine-erfahrung`) use
 `PRERENDERED_CACHE_CONTROL` (in the same file, `s-maxage=300`). `public/sw.js` only
 retires the removed breathing app's service worker and is served `no-cache`; it can go
@@ -94,9 +88,8 @@ No live-site fetching, Markdown export or post-build patching is needed.
 **Images.** Astro's `<Image />` straight from `astro:assets`, no wrapper component:
 `layout="constrained"` with `width`/`height` (Astro writes `srcset` and `sizes`), `position`
 for the crop, Tailwind for the box (`image.responsiveStyles` stays off). Photos live in
-`src/assets/images/` and appear on prerendered pages only, so every variant is built at
-build time; never put an `<Image />` on an on-demand page (that would generate through
-`/_image` per request). Sharp is external to the bundle (`vite.ssr.external`) so its
+`src/assets/images/`. Prerendered pages build their variants ahead of time; the SSR
+home page uses Astro’s `/_image` endpoint for its portrait variants. Sharp is external to the bundle (`vite.ssr.external`) so its
 native binding resolves. All events use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; the two schedules
@@ -151,8 +144,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   footer and the phone menu. The boot script drops a stored `mc-theme`. Every text
   token ≥ 4.5:1 on every ground in both modes, `line-bold` ≥ 3:1; `line` never
   outlines a control alone. Check new pairs in both modes.
-- Cards: with no date planned the home shows no date card (`HeroDate`, `NextDate`);
-  `unavailable` and `pending` still show one.
+- Cards: with no date planned the home hero shows no date card and the closing
+  invitation offers email notification; `unavailable` keeps its own error state.
 - Grounds: `Section ground` is `default` (paper), `alt` (the quiet secondary ground:
   facts, agreements, the breath panel, the closing invitation, compact bands) or
   `dark` (`surface-dark`: the home opening and the footer only). No other bands.
@@ -160,7 +153,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   summary; DM Sans for text, navigation, forms, data, FAQ questions, list titles.
   Role tokens: `text-hero`, `text-page`, `text-section`, `text-sub`, `text-quote`,
   `text-md` (body), `text-base` (controls, data). Titles are one colour; the italic
-  accent appears only in the home statement (`titleEmphasis`) and the breath line.
+  accent appears only in the home statement and the breath line.
   Labels are small spaced capitals (`label`) with no rules; buttons and navigation in
   normal case. Running text on `max-w-measure`. A dash in running copy is bound to
   the word before it (`\u00a0–`).
@@ -208,13 +201,15 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Conventions
 
-- Home and personal-page copy live in `src/content/*.json` as named sections,
-  imported directly by their Astro pages. The pages compose the section components
-  explicitly, spreading each section into flat component props; TypeScript checks
-  the JSON against those props. Photos are normal
-  asset imports in the pages. Change section order in the page, copy in the JSON.
-  Only legal pages use a content collection (`src/content/legal/*.json`, one URL per
-  file, validated by `src/content.config.ts`). `src/data/*.json` is shared site config.
+- Content and section order live directly in `src/pages/*.astro`; legal pages are
+  explicit `impressum.astro` and `datenschutz.astro` routes. No content collections
+  or JSON page content. Section components live in `src/components/blocks/`; pages
+  pass their content explicitly as props and rich-text slots. Load dynamic data in
+  page frontmatter and pass it down; blocks only render their inputs. `Prose` accepts inline markup in its slot or
+  an `html` prop for dynamic content. Static FAQ answers, journey steps and facts
+  use slotted item components at their page location, rather than frontmatter arrays.
+  FAQ and journey microdata describe the visible HTML directly, including dynamic
+  event answers. `src/data/*.json` is shared site config.
 - The brand name comes from `site.siteName`; never type it out.
 - Canonical URLs come from `lib/canonical.ts`.
 - Search: utility pages (`/teile-deine-erfahrung`, `/auth/*`) are `noindex, follow` and

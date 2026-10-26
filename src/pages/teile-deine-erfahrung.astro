@@ -1,6 +1,7 @@
 ---
 import site from '@data/site.json';
 import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
+import { breadcrumbSchema } from '@lib/event-schema';
 
 import TestimonialForm from '../components/forms/TestimonialForm.astro';
 import PageIntro from '../components/PageIntro.astro';
@@ -12,29 +13,15 @@ import Layout from '../layouts/Layout.astro';
 export const prerender = true;
 
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
-
-const schemas = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Startseite', item: '/' },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Teile deine Erfahrung',
-        item: '/teile-deine-erfahrung',
-      },
-    ],
-  },
-];
 ---
 
 <Layout
   title={`Teile deine Erfahrung – ${site.siteName}`}
   description="Du warst schon einmal da? Erzähl in ein paar Sätzen, wie der Abend für dich war. Deine Worte helfen Männern, die noch überlegen, ob sie kommen."
   robots="noindex, follow"
-  schemas={schemas}
+  schemas={[
+    breadcrumbSchema(Astro.site!, [['Teile deine Erfahrung', new URL('/teile-deine-erfahrung', Astro.site!).href]]),
+  ]}
 >
   <PageIntro eyebrow="Aus dem Kreis" title="Teile deine Erfahrung">
     <Fragment slot="lead">
