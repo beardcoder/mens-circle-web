@@ -1,4 +1,4 @@
-import { type ActionAPIContext, ActionError, defineAction } from 'astro:actions';
+import { type ActionAPIContext, ActionError } from 'astro:actions';
 
 import { readSession, SESSION_COOKIE } from '@lib/server/auth';
 
@@ -9,15 +9,4 @@ export const requireAdmin = async (context: ActionAPIContext): Promise<string> =
   if (!email) throw new ActionError({ code: 'UNAUTHORIZED', message: 'Nicht angemeldet.' });
 
   return email;
-};
-
-// Sign-in itself runs through Pocket ID (src/pages/auth/*), not an action.
-export const auth = {
-  logout: defineAction({
-    handler: async (_input, context) => {
-      context.cookies.delete(SESSION_COOKIE, { path: '/' });
-
-      return { message: 'Abgemeldet.' };
-    },
-  }),
 };

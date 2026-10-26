@@ -1,0 +1,14 @@
+---
+import { readAdminOverview } from '@lib/server/admin-data';
+
+import EventList from '../../../components/admin/EventList';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+
+export const prerender = false;
+
+const data = await readAdminOverview();
+---
+
+<AdminLayout title="Termine">
+  <EventList client:load initial={data} />
+</AdminLayout>

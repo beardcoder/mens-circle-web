@@ -1,17 +1,21 @@
 ---
-/** Admin shell — the public design system, in its dark mode. */
+/**
+ * Admin shell — the public design system, in its dark mode. A sidebar from `lg`,
+ * a top bar and a bottom tab bar below it.
+ */
 import '../styles/admin.css';
 
 import { Font } from 'astro:assets';
-import { Icon } from 'astro-icon/components';
+import { Icon as Logo } from 'astro-icon/components';
 
-import { label } from '@lib/ui';
+import site from '@data/site.json';
+import { button, label } from '@lib/ui';
 
-import LogoutButton from '../components/admin/LogoutButton';
+import { Icon, type IconName } from '../components/admin/icons';
 
 interface Props {
   title: string;
-  /** Hide the bar (used by the login page). */
+  /** Hide the shell (used by the login page). */
   bare?: boolean;
 }
 const { title, bare = false } = Astro.props;
@@ -19,10 +23,15 @@ const admin = Astro.locals.admin;
 
 const path = Astro.url.pathname;
 
-const links = [
-  { href: '/admin', label: 'Veranstaltungen', active: path === '/admin' || path.startsWith('/admin/events') },
-  { href: '/admin/testimonials', label: 'Stimmen', active: path.startsWith('/admin/testimonials') },
+const links: { href: string; label: string; icon: IconName; active: boolean }[] = [
+  { href: '/admin', label: 'Übersicht', icon: 'dashboard', active: path === '/admin' },
+  { href: '/admin/events', label: 'Termine', icon: 'calendar', active: path.startsWith('/admin/events') },
+  { href: '/admin/testimonials', label: 'Stimmen', icon: 'quote', active: path.startsWith('/admin/testimonials') },
 ];
+
+/** Signing out is a plain form post: it works before (and without) any island. */
+const logoutButton =
+  'inline-flex size-10 items-center justify-center rounded-full text-fg-muted transition-colors duration-180 hover:bg-fg/8 hover:text-fg';
 ---
 
 <!doctype html>
@@ -32,45 +41,92 @@ const links = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#151210" />
-    <title>{title} · Admin · Männerkreis</title>
+    <meta name="theme-color" content="#24221f" />
+    <title>{title} · Admin · {site.siteName}</title>
     <Font cssVariable="--font-dm-sans" preload={[{ weight: '100 1000', style: 'normal' }]} />
     <Font cssVariable="--font-playfair" />
   </head>
   <body class="text-base">
-    {!bare && (
-      <header class="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-line bg-ground px-[clamp(1rem,4vw,2rem)] py-2">
-        <nav class="flex flex-wrap items-center gap-x-8 gap-y-1" aria-label="Admin">
-          <a href="/admin" class="flex items-center gap-2.5">
-            <Icon name="logo" aria-hidden="true" class="size-7 text-flame" />
-            <span class="font-serif text-lg">Männerkreis</span>
-            <span class={label}>Admin</span>
-          </a>
-          <div class="flex items-center gap-6">
+    {bare ? (
+      <main class="grid min-h-dvh place-items-center px-5 py-10">
+        <slot />
+      </main>
+    ) : (
+      <div class="lg:grid lg:min-h-dvh lg:grid-cols-[16rem_minmax(0,1fr)]">
+        <aside class="sticky top-0 z-30 border-b border-line bg-ground-alt lg:flex lg:h-dvh lg:flex-col lg:border-r lg:border-b-0">
+          <div class="flex h-16 items-center justify-between gap-3 px-4 lg:h-auto lg:px-5 lg:pt-6 lg:pb-8">
+            <a href="/admin" class="flex min-w-0 items-center gap-2.5">
+              <Logo name="logo" aria-hidden="true" class="size-8 shrink-0 text-flame" />
+              <span class="grid min-w-0 leading-tight">
+                <span class="font-serif text-[1.0625rem] text-balance">{site.siteName}</span>
+                <span class={label}>Admin</span>
+              </span>
+            </a>
+            <form method="post" action="/auth/logout" class="lg:hidden">
+              <button type="submit" class={logoutButton} aria-label="Abmelden" title="Abmelden">
+                <Icon name="logout" />
+              </button>
+            </form>
+          </div>
+          <nav aria-label="Admin" class="max-lg:hidden lg:grid lg:gap-1 lg:px-3">
             {links.map((link) => (
               <a
                 href={link.href}
                 aria-current={link.active ? 'page' : undefined}
-                class="relative flex min-h-11 items-center text-sm font-semibold text-fg-muted transition-colors duration-150 after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-fg aria-[current=page]:text-fg aria-[current=page]:after:bg-accent"
+                class="group flex min-h-11 items-center gap-3 rounded-full px-4 text-[0.9375rem] font-semibold text-fg-muted transition-colors duration-180 hover:bg-fg/6 hover:text-fg aria-[current=page]:bg-fg/10 aria-[current=page]:text-fg"
               >
+                <Icon name={link.icon} class="size-5 group-aria-[current=page]:text-accent" />
                 {link.label}
               </a>
             ))}
+          </nav>
+          <div class="max-lg:hidden lg:mt-6 lg:px-3">
+            <a href="/admin/events/new" class={button({ size: 'sm', block: true })}>
+              <Icon name="plus" class="size-4.5" />
+              Neuer Termin
+            </a>
           </div>
+          <div class="max-lg:hidden lg:mt-auto lg:grid lg:gap-1 lg:border-t lg:border-line lg:p-3">
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener"
+              class="flex min-h-11 items-center gap-3 rounded-full px-4 text-sm text-fg-muted transition-colors duration-180 hover:bg-fg/6 hover:text-fg"
+            >
+              <Icon name="external" class="size-4.5" />
+              Website öffnen
+            </a>
+            <div class="flex items-center justify-between gap-2 py-1 pr-0 pl-4">
+              <span class="min-w-0 truncate text-sm text-fg-muted" title={admin}>
+                {admin}
+              </span>
+              <form method="post" action="/auth/logout">
+                <button type="submit" class={logoutButton} aria-label="Abmelden" title="Abmelden">
+                  <Icon name="logout" />
+                </button>
+              </form>
+            </div>
+          </div>
+        </aside>
+        <main class="mx-auto w-full max-w-[84rem] px-[clamp(1rem,3vw,2.5rem)] pt-[clamp(1.25rem,3vw,2.5rem)] pb-28 lg:pb-16">
+          <slot />
+        </main>
+        <nav
+          aria-label="Admin"
+          class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 border-t border-line bg-ground-alt pb-[env(safe-area-inset-bottom)] lg:hidden"
+        >
+          {links.map((link) => (
+            <a
+              href={link.href}
+              aria-current={link.active ? 'page' : undefined}
+              class="flex min-h-16 flex-col items-center justify-center gap-1 text-xs font-semibold text-fg-muted aria-[current=page]:text-accent"
+            >
+              <Icon name={link.icon} class="size-5.5" />
+              {link.label}
+            </a>
+          ))}
         </nav>
-        <div class="flex min-w-0 items-center gap-3">
-          {admin && <span class="hidden max-w-52 truncate text-sm text-fg-muted md:inline">{admin}</span>}
-          <LogoutButton client:load />
-        </div>
-      </header>
+      </div>
     )}
-    <main
-      class:list={[
-        'mx-auto w-full max-w-[72rem] px-[clamp(1rem,4vw,2rem)]',
-        bare ? 'grid min-h-dvh place-items-center py-10' : 'pt-[clamp(1.5rem,4vw,2.75rem)] pb-20',
-      ]}
-    >
-      <slot />
-    </main>
   </body>
 </html>

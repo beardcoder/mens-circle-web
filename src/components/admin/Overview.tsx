@@ -1,199 +1,228 @@
 import { actions } from 'astro:actions';
 import { useState } from 'preact/hooks';
 
-import { button, card, control } from '@lib/ui';
+import { button, card } from '@lib/ui';
 
+import { Icon, type IconName } from './icons';
 import NextEvent from './NextEvent';
 import type { AdminEvent, OverviewData } from './types';
-import { AdminHead, Badge, ConfirmDialog, Feedback, shortDate } from './ui';
+import {
+  dateParts,
+  EmptyState,
+  Feedback,
+  holdsSeat,
+  Meter,
+  needsConfirmation,
+  PageHeader,
+  Stat,
+  StatusPill,
+} from './ui';
 import { useAdminTask } from './useAdminTask';
 
+interface Todo {
+  href: string;
+  icon: IconName;
+  text: string;
+}
+
+/** The dashboard: what is next, what is open, and the dates after it. */
 export default function Overview({ initial }: { initial: OverviewData }) {
   const [data, setData] = useState(initial);
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('upcoming');
-  const [remove, setRemove] = useState<AdminEvent | null>(null);
   const task = useAdminTask();
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = data.events.filter((event) => event.eventDate.slice(0, 10) >= today);
+
+  const upcoming = data.events
+    .filter((event) => event.eventDate.slice(0, 10) >= today)
+    .sort((a, b) => a.eventDate.localeCompare(b.eventDate));
+
   const next = data.events.find((event) => event.id === data.nextEventId);
-
-  const visible = data.events
-    .filter((event) => matchesFilter(event, filter, today))
-    .filter((event) =>
-      `${event.title} ${event.location} ${event.city} ${shortDate(event.eventDate)}`
-        .toLocaleLowerCase('de')
-        .includes(search.toLocaleLowerCase('de')),
-    )
-    .sort((a, b) =>
-      filter === 'past' ? b.eventDate.localeCompare(a.eventDate) : a.eventDate.localeCompare(b.eventDate),
-    );
-
-  async function refresh() {
-    const result = await actions.loadAdminOverview();
-
-    if (result.error) throw new Error(result.error.message);
-
-    setData(result.data);
-  }
+  const seated = data.people.filter((person) => holdsSeat(person.status)).length;
+  const waiting = data.people.filter((person) => person.status === 'waitlist').length;
+  const drafts = upcoming.filter((event) => !event.isPublished).length;
 
   return (
     <>
-      <AdminHead
-        title="Veranstaltungen"
-        description={`Kommende Termine: ${upcoming.length} · Entwürfe: ${data.events.filter((event) => !event.isPublished).length}`}
-      >
+      <PageHeader title="Übersicht" description="Was als Nächstes ansteht und was noch offen ist.">
         <button
           type="button"
           disabled={!!task.busy}
           class={button({ variant: 'secondary', size: 'sm' })}
           onClick={() => void task.run('refresh', () => actions.loadAdminOverview(), setData)}
         >
+          <Icon name="refresh" class="size-4.5" />
           Aktualisieren
         </button>
-        <a href="/admin/events/new" class={button({ size: 'sm' })}>
-          Neuer Termin
-        </a>
-      </AdminHead>
+      </PageHeader>
       <Feedback notice={task.notice} />
-      {next && <NextEvent event={next} people={data.people} />}
-      <section aria-label="Termine durchsuchen">
-        <div class="mb-5 grid gap-3 sm:grid-cols-[1fr_15rem]">
-          <label class="grid gap-2 text-sm font-semibold">
-            Suchen
-            <input
-              type="search"
-              value={search}
-              onInput={(event) => setSearch(event.currentTarget.value)}
-              placeholder="Titel, Ort oder Datum"
-              class={control('sm')}
-            />
-          </label>
-          <label class="grid gap-2 text-sm font-semibold">
-            Zeitraum und Status
-            <select value={filter} onChange={(event) => setFilter(event.currentTarget.value)} class={control('sm')}>
-              <option value="upcoming">Kommende Termine ({upcoming.length})</option>
-              <option value="draft">Entwürfe</option>
-              <option value="published">Veröffentlicht</option>
-              <option value="past">Vergangene Termine</option>
-              <option value="all">Alle Termine</option>
-            </select>
-          </label>
+      <div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+        <Stat
+          label="Kommende Termine"
+          icon="calendar"
+          value={upcoming.length}
+          hint={drafts ? `davon ${drafts} Entwurf${drafts > 1 ? 'e' : ''}` : 'alle veröffentlicht'}
+          href="/admin/events"
+        />
+        <Stat
+          label="Plätze belegt"
+          icon="users"
+          value={next ? `${seated}/${next.maxParticipants}` : '–'}
+          hint={next ? `${Math.max(0, next.maxParticipants - seated)} frei am nächsten Abend` : 'kein Termin geplant'}
+          href={next && `/admin/events/${next.id}/registrations`}
+        />
+        <Stat
+          label="Warteliste"
+          icon="clock"
+          value={waiting}
+          hint={next ? 'am nächsten Abend' : '–'}
+          href={next && `/admin/events/${next.id}/registrations`}
+        />
+        <Stat
+          label="Stimmen zur Prüfung"
+          icon="quote"
+          value={data.pendingTestimonials}
+          tone={data.pendingTestimonials ? 'accent' : undefined}
+          hint={data.pendingTestimonials ? 'warten auf Freigabe' : 'nichts offen'}
+          href="/admin/testimonials"
+        />
+      </div>
+      <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div class="grid min-w-0 gap-6">
+          {next ? (
+            <NextEvent event={next} people={data.people} />
+          ) : (
+            <EmptyState
+              action={
+                <a href="/admin/events/new" class={button({ size: 'sm' })}>
+                  <Icon name="plus" class="size-4.5" />
+                  Termin anlegen
+                </a>
+              }
+            >
+              Kein Abend geplant.
+            </EmptyState>
+          )}
+          <Upcoming events={upcoming.filter((event) => event.id !== data.nextEventId).slice(0, 5)} />
         </div>
-        <p role="status" class="mb-3 text-sm text-fg-muted">
-          {visible.length} von {data.events.length} Terminen
-        </p>
-        {!visible.length && (
-          <div class="grid justify-items-start gap-3 border border-dashed border-line-strong p-8 text-fg-muted">
-            <p>{data.events.length ? 'Keine Termine für diese Auswahl.' : 'Noch keine Termine angelegt.'}</p>
-            <a href="/admin/events/new" class={button({ variant: 'secondary', size: 'sm' })}>
-              Neuen Termin anlegen
-            </a>
-          </div>
-        )}
-        <ul class="grid gap-3" aria-label="Veranstaltungen">
-          {visible.map((event) => (
-            <li key={event.id} class={`${card} flex flex-wrap items-center justify-between gap-5 p-5`}>
-              <div class="min-w-0 flex-[1_1_18rem]">
-                <div class="mb-2 flex flex-wrap items-center gap-3">
-                  <Badge active={event.isPublished}>{event.isPublished ? 'Veröffentlicht' : 'Entwurf'}</Badge>
-                  <span class="text-sm text-fg-muted tabular-nums">
-                    {shortDate(event.eventDate)}
-                    {event.startTime && ` · ${event.startTime} Uhr`}
-                  </span>
-                </div>
-                <a href={`/admin/events/${event.id}`} class="font-serif text-xl text-fg hover:text-accent">
-                  {event.title}
-                </a>
-                <p class="mt-2 text-sm text-fg-muted">
-                  {event.activeCount} / {event.maxParticipants} Plätze belegt{event.city && ` · ${event.city}`}
-                </p>
-              </div>
-              <div class="flex flex-wrap items-center gap-2 max-sm:w-full">
-                <a
-                  href={`/admin/events/${event.id}/registrations`}
-                  class={button({ variant: 'secondary', size: 'sm' })}
-                >
-                  Anmeldungen
-                </a>
-                <a href={`/admin/events/${event.id}`} class={button({ variant: 'secondary', size: 'sm' })}>
-                  Bearbeiten
-                </a>
-                <details class="relative">
-                  <summary class="cursor-pointer px-3 py-3 text-sm text-fg-muted hover:text-fg">Mehr</summary>
-                  <div class="absolute right-0 z-10 mt-2 grid min-w-52 gap-1 border border-line-strong bg-raised p-2 shadow-overlay">
-                    <a
-                      class="px-3 py-2 text-sm hover:bg-fg/5"
-                      href={`/admin/events/new?from=${encodeURIComponent(event.id)}`}
-                    >
-                      Duplizieren
-                    </a>
-                    {event.isPublished && (
-                      <a
-                        class="px-3 py-2 text-sm hover:bg-fg/5"
-                        href={`/event/${event.slug}`}
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        Öffentliche Seite öffnen
-                      </a>
-                    )}
-                    <button
-                      disabled={!!task.busy}
-                      class="px-3 py-2 text-left text-sm hover:bg-fg/5"
-                      onClick={() =>
-                        void task.run(
-                          event.id,
-                          () => actions.setEventPublished({ id: event.id, published: !event.isPublished }),
-                          refresh,
-                        )
-                      }
-                    >
-                      {event.isPublished ? 'Als Entwurf speichern' : 'Veröffentlichen'}
-                    </button>
-                    <button
-                      disabled={!!task.busy}
-                      class="px-3 py-2 text-left text-sm text-danger hover:bg-fg/5"
-                      onClick={() => setRemove(event)}
-                    >
-                      Löschen
-                    </button>
-                  </div>
-                </details>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
-      {remove && (
-        <ConfirmDialog
-          title="Termin löschen?"
-          actionLabel="Termin löschen"
-          danger
-          busy={!!task.busy}
-          error={task.notice?.tone === 'error' ? task.notice.text : undefined}
-          onCancel={() => setRemove(null)}
-          onConfirm={async () => {
-            const result = await task.run('delete', () => actions.deleteEvent({ id: remove.id }), refresh);
-
-            if (result) setRemove(null);
-          }}
-        >
-          <p>„{remove.title}“ wird ausgeblendet. Bestehende Anmeldungen bleiben gespeichert.</p>
-        </ConfirmDialog>
-      )}
+        <Todos items={todos(data, next, upcoming)} />
+      </div>
     </>
   );
 }
 
-function matchesFilter(event: AdminEvent, filter: string, today: string) {
-  if (filter === 'upcoming') return event.eventDate.slice(0, 10) >= today;
+function Upcoming({ events }: { events: AdminEvent[] }) {
+  if (!events.length) return null;
 
-  if (filter === 'past') return event.eventDate.slice(0, 10) < today;
+  return (
+    <section aria-labelledby="upcoming-title" class={card}>
+      <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-4">
+        <h2 id="upcoming-title" class="font-sans text-base font-semibold">
+          Danach
+        </h2>
+        <a href="/admin/events" class="inline-flex items-center gap-1 text-sm text-fg-muted hover:text-fg">
+          Alle Termine
+          <Icon name="arrowRight" class="size-4" />
+        </a>
+      </div>
+      <ul class="divide-y divide-line">
+        {events.map((event) => {
+          const date = dateParts(event.eventDate);
 
-  if (filter === 'draft') return !event.isPublished;
+          return (
+            <li key={event.id}>
+              <a
+                href={`/admin/events/${event.id}/registrations`}
+                class="grid grid-cols-[3rem_minmax(0,1fr)_7rem] items-center gap-4 px-5 py-3 transition-colors duration-180 hover:bg-fg/4"
+              >
+                <span class="grid justify-items-center leading-none">
+                  <span class="text-lg font-semibold tabular-nums">{date.day}</span>
+                  <span class="mt-1 text-xs text-fg-muted">{date.month}</span>
+                </span>
+                <span class="min-w-0">
+                  <span class="block truncate font-semibold">{event.title}</span>
+                  <span class="mt-0.5 flex items-center gap-2 text-sm text-fg-muted">
+                    {!event.isPublished && <StatusPill>Entwurf</StatusPill>}
+                    <span class="truncate">{event.city || event.location}</span>
+                  </span>
+                </span>
+                <span class="grid gap-1.5 text-right text-sm tabular-nums">
+                  {event.activeCount} / {event.maxParticipants}
+                  <Meter
+                    value={event.activeCount}
+                    max={event.maxParticipants}
+                    label={`Plätze belegt: ${event.title}`}
+                  />
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
 
-  if (filter === 'published') return event.isPublished;
+function Todos({ items }: { items: Todo[] }) {
+  return (
+    <section aria-labelledby="todo-title" class={`${card} lg:sticky lg:top-6`}>
+      <h2 id="todo-title" class="border-b border-line px-5 py-4 font-sans text-base font-semibold">
+        Zu erledigen
+      </h2>
+      {items.length ? (
+        <ul class="divide-y divide-line">
+          {items.map((item) => (
+            <li key={item.href + item.text}>
+              <a
+                href={item.href}
+                class="flex items-start gap-3 px-5 py-3.5 text-sm transition-colors duration-180 hover:bg-fg/4"
+              >
+                <span class="grid size-8 shrink-0 place-items-center rounded-full bg-accent/14 text-accent">
+                  <Icon name={item.icon} class="size-4" />
+                </span>
+                <span class="min-w-0 self-center">{item.text}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="flex items-center gap-3 px-5 py-5 text-sm text-fg-muted">
+          <span class="grid size-8 shrink-0 place-items-center rounded-full bg-success/12 text-success">
+            <Icon name="check" class="size-4" />
+          </span>
+          Alles erledigt.
+        </p>
+      )}
+    </section>
+  );
+}
 
-  return true;
+function todos(data: OverviewData, next: AdminEvent | undefined, upcoming: AdminEvent[]): Todo[] {
+  const items: Todo[] = [];
+  const missing = data.people.filter(needsConfirmation).length;
+
+  if (next && !next.isPublished)
+    items.push({ href: `/admin/events/${next.id}`, icon: 'eye', text: 'Nächsten Abend veröffentlichen' });
+
+  if (next && missing)
+    items.push({
+      href: `/admin/events/${next.id}/registrations`,
+      icon: 'mail',
+      text: missing > 1 ? `${missing} Anmeldebestätigungen fehlen` : 'Eine Anmeldebestätigung fehlt',
+    });
+
+  if (data.pendingTestimonials)
+    items.push({
+      href: '/admin/testimonials',
+      icon: 'quote',
+      text: `${data.pendingTestimonials} Stimme${data.pendingTestimonials > 1 ? 'n' : ''} prüfen`,
+    });
+
+  upcoming
+    .filter((event) => !event.isPublished && event.id !== next?.id)
+    .forEach((event) =>
+      items.push({ href: `/admin/events/${event.id}`, icon: 'edit', text: `Entwurf fertigstellen: ${event.title}` }),
+    );
+
+  if (!upcoming.length) items.push({ href: '/admin/events/new', icon: 'plus', text: 'Nächsten Termin anlegen' });
+
+  return items;
 }
