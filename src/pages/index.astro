@@ -30,6 +30,7 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
   title="Männerkreis Niederbayern · Straubing und Umgebung"
   description="Männerkreis in Straubing, Niederbayern: Männer sitzen im Kreis, hören zu und sprechen offen, dazu einfache Atemübungen. Auf Spendenbasis, ohne Vorerfahrung."
   schemas={[eventSeriesSchema(Astro.site!)]}
+  preloadData={['/api/public/events']}
 >
   <Hero kicker="Männerkreis in Straubing · Niederbayern" secondaryLabel="Wie ein Abend abläuft" secondaryLink="#reise">
     <Fragment slot="title">

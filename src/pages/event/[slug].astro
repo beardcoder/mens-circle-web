@@ -53,6 +53,7 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
   ogImageAlt={meta.imageAlt}
   socialDetails={meta.details}
   schemas={[eventSchema, breadcrumbs]}
+  preloadData={[`/api/public/events/${encodeURIComponent(event.slug)}`]}
 >
   {/* The date and its facts, then what the page is for: the description beside the registration. */}
   <EventIntro event={event} />

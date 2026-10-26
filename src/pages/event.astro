@@ -23,6 +23,7 @@ const canonical = new URL('/event', siteUrl).href;
   title={`Termine & Anmeldung – ${site.siteName}`}
   description="Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis."
   schemas={[eventSeriesSchema(siteUrl), breadcrumbSchema(siteUrl, [['Termine', canonical]])]}
+  preloadData={['/api/public/events']}
 >
   <PageIntro eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung">
     <Fragment slot="lead">
