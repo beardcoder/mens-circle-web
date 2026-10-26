@@ -1,13 +1,15 @@
 ---
-import { eventView, splitFee } from '@lib/event-status';
-import { publicEvent } from '@lib/server/public-data';
+import { Image } from 'astro:assets';
+
+import { eventView } from '@lib/event-status';
+import { timeRange } from '@lib/server/format';
 import type { EventDTO } from '@lib/types';
 import { link } from '@lib/ui';
 
+import photo from '../../assets/images/markus-sommer.jpg';
 import Button from '../ui/Button.astro';
 import Container from '../ui/Container.astro';
 import CalendarButton from './CalendarButton.astro';
-import LiveSummary from './LiveSummary';
 
 interface Props {
   event: EventDTO;
@@ -22,67 +24,108 @@ const hasPlace = !!(event.location || event.street || event.city);
 
 <section
   aria-labelledby="event-title"
-  class="event-opening pt-[calc(var(--spacing-header)+2rem)] pb-8 sm:pt-[calc(var(--spacing-header)+3rem)] lg:pb-12"
+  class="pt-[calc(var(--spacing-header)+1.5rem)] pb-0 sm:pb-8 lg:pt-[calc(var(--spacing-header)+3.5rem)] lg:pb-12"
 >
-  <Container>
-    <a href="/event" class={`${link} inline-flex min-h-11 items-center text-sm`}>
-      Alle Termine
-    </a>
-    <div class="mt-5 grid items-start gap-x-grid gap-y-8 lg:mt-10 lg:grid-cols-12">
-      <div class="min-w-0 lg:col-span-7">
-        <p class="mb-4 text-sm text-fg-muted entrance:animate-rise">
-          {event.is_past ? 'Ein vergangener Abend im Kreis' : 'Ein Abend im Kreis'}
-        </p>
-        <h1
-          id="event-title"
-          class="max-w-[12em] text-page text-fg sm:text-hero entrance:animate-rise entrance:animate-delay-90"
-        >
-          {event.title}
-          {event.city && <span class="block">in {event.city}</span>}
-        </h1>
-        <p class="mt-6 max-w-[28em] text-lg text-fg-soft entrance:animate-rise entrance:animate-delay-180">
-          {event.is_past
-            ? 'Dieser Abend hat bereits stattgefunden. Bei den aktuellen Terminen findest du die nächsten Treffen.'
-            : 'Zeit für ehrliche Gespräche unter Männern. Darüber, was dich im Alltag beschäftigt und was sonst oft unausgesprochen bleibt.'}
-        </p>
-        <div class="mt-7 flex flex-wrap items-center gap-3 entrance:animate-rise entrance:animate-delay-260">
-          {event.is_past ? (
-            <Button href="/event" size="lg" class="max-sm:w-full">
-              Aktuelle Termine ansehen
-            </Button>
-          ) : (
-            <>
-              <Button href="#anmeldung" size="lg" class="max-sm:w-full">
-                {event.is_full ? 'Zur Warteliste' : 'Zur Anmeldung'}
-              </Button>
-              <CalendarButton event={event} />
-            </>
-          )}
+  <Container class="grid items-start gap-x-grid gap-y-7 lg:grid-cols-12 lg:gap-y-0">
+    <div class="min-w-0 lg:col-span-6 lg:pr-4">
+      <time datetime={view.datetime} class="flex items-center gap-4 lg:gap-6">
+        <span class="block shrink-0 font-serif text-[clamp(3.75rem,12vw,8rem)] leading-none tracking-display text-fg">
+          {day}
+        </span>
+        <span class="block border-l border-line-strong pl-4 text-sm text-fg-muted lg:pl-6 lg:text-base">
+          <span class="block text-fg">{monthYear.join(' ')}</span>
+          <span class="block">
+            {weekday.replace(',', '')}
+            {event.start_time && ` · ${timeRange(event.start_time, event.end_time)}`}
+          </span>
+        </span>
+      </time>
+      <h1 id="event-title" class="mt-5 text-page text-fg lg:mt-9 lg:text-hero">
+        <span class="block font-serif">{event.title}</span>
+        {event.city && (
+          <span class="mt-2 block text-xl font-normal tracking-normal lg:mt-4 lg:text-quote">in {event.city}</span>
+        )}
+      </h1>
+      <p class="mt-4 max-w-[25em] text-md text-fg-soft lg:mt-7 lg:text-lg">
+        {event.is_past
+          ? 'Dieser Abend hat bereits stattgefunden. Bei den aktuellen Terminen findest du die nächsten Treffen.'
+          : 'Ein Abend für das, was dich gerade beschäftigt. Mit Männern, die dir zuhören.'}
+      </p>
+      <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm lg:mt-7 lg:text-base">
+        <a href="#ueber-den-abend" class={`${link} inline-flex min-h-9 items-center`}>
+          Was dich erwartet
+        </a>
+        {hasPlace && (
+          <a href="#anfahrt" class={`${link} inline-flex min-h-9 items-center`}>
+            Adresse &amp; Anfahrt
+          </a>
+        )}
+      </div>
+      {event.is_past && (
+        <Button href="/event" class="mt-5">
+          Aktuelle Termine ansehen
+        </Button>
+      )}
+    </div>
+
+    <div class="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2">
+      <slot />
+    </div>
+
+    <div class="min-w-0 border-t border-line pt-6 pb-7 sm:pb-0 lg:col-span-6 lg:col-start-1 lg:row-start-2 lg:mt-10 lg:pt-8">
+      <div class="mb-6 flex items-start gap-5">
+        <Image
+          data-event-portrait
+          src={photo}
+          alt="Markus Sommer, der den Männerkreis leitet"
+          width={128}
+          height={160}
+          densities={[1, 2]}
+          position="left"
+          class="-mt-10 block h-28 w-22 shrink-0 object-cover lg:h-40 lg:w-32"
+        />
+        <div class="min-w-0">
+          <p class="max-w-[22em] text-base text-fg">Ich halte den Rahmen, damit du in Ruhe sprechen kannst.</p>
+          <a href="/warum-ich-den-maennerkreis-leite" class={`${link} mt-2 inline-flex min-h-9 items-center text-sm`}>
+            Markus Sommer · Über mich
+          </a>
         </div>
       </div>
-      <div class="event-date-parallax min-w-0 lg:col-span-4 lg:col-start-9 lg:mt-14">
-        <time
-          datetime={view.datetime}
-          class="flex items-center gap-5 border-t border-line pt-5 lg:block lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8 entrance:animate-rise entrance:animate-delay-180"
-        >
-          <span class="block font-serif text-[clamp(5rem,15vw,11rem)] leading-none tracking-display text-fg">
-            {day}
-          </span>
-          <span class="block text-md text-fg-muted lg:mt-4">
-            <span class="block text-fg">{monthYear.join(' ')}</span>
-            <span class="block">{weekday.replace(',', '')}</span>
-          </span>
-        </time>
-      </div>
-    </div>
-    <div class="mt-9 lg:mt-14">
-      <LiveSummary
-        client:load
-        initial={publicEvent(event)}
-        venue={event.location || event.city}
-        feeNote={splitFee(event.cost_basis).note}
-        hasPlace={hasPlace}
-      />
+      {event.location && (
+        <p class="mb-5 max-w-measure text-sm text-fg-muted">
+          Treffpunkt: <span class="text-fg">{event.location}</span>
+        </p>
+      )}
+      {!event.is_past && <CalendarButton event={event} />}
     </div>
   </Container>
 </section>
+
+<script>
+  // Morph only the portrait's mask. Its box and every reading/interaction target stay fixed.
+  const portrait = document.querySelector<HTMLElement>('[data-event-portrait]');
+
+  if (portrait && typeof ViewTimeline !== 'undefined') {
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let morph: Animation | undefined;
+
+    function updateMorph() {
+      morph?.cancel();
+
+      if (reducedMotion.matches) return;
+
+      morph = portrait!.animate(
+        { clipPath: ['inset(0 round 0%)', 'inset(0 round 50% 50% 8% 8%)'] },
+        {
+          timeline: new ViewTimeline({ subject: portrait!, axis: 'block' }),
+          rangeStart: 'entry 0%',
+          rangeEnd: 'cover 60%',
+          fill: 'both',
+        },
+      );
+    }
+
+    updateMorph();
+    reducedMotion.addEventListener('change', updateMorph);
+  }
+</script>

@@ -7,6 +7,7 @@ import LinkBand from '../../components/blocks/LinkBand.astro';
 import EventIntro from '../../components/event/EventIntro.astro';
 import EventMapSection from '../../components/event/EventMapSection.astro';
 import EventRegister from '../../components/event/EventRegister.astro';
+import EventStory from '../../components/event/EventStory.astro';
 import Layout from '../../layouts/Layout.astro';
 
 // One SSR page per event, read per request, so a new or edited event is live with no rebuild.
@@ -60,10 +61,13 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
   socialDetails={meta.details}
   schemas={[eventSchema, breadcrumbs]}
   preloadData={[`/api/public/events/${encodeURIComponent(event.slug)}`]}
+  headerAction={event.is_past ? undefined : { href: '#anmeldung', label: event.is_full ? 'Warteliste' : 'Anmelden' }}
 >
   {/* Invitation and date, the conversation beside the signup, then the meeting place. */}
-  <EventIntro event={event} />
-  <EventRegister event={event} />
+  <EventIntro event={event}>
+    <EventRegister event={event} />
+  </EventIntro>
+  <EventStory event={event} />
 
   {hasPlace && <EventMapSection event={event} />}
   <LinkBand
@@ -72,7 +76,6 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
     titleId="weiter-title"
     items={[
       ...(event.is_past ? [{ href: '/event#benachrichtigung', title: 'Termine per E-Mail erhalten' }] : []),
-      { href: '/event', title: 'Alle Termine' },
       { href: '/#reise', title: 'So läuft ein Abend ab' },
       { href: '/warum-ich-den-maennerkreis-leite', title: 'Warum ich den Männerkreis leite', prefetch: true },
     ]}
