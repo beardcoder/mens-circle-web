@@ -1,29 +1,16 @@
-import { button, card } from '@lib/ui';
-
-import EventSummary, { LoadError, LoadingSummary } from './EventSummary';
+import EventSummary, { LoadError } from './EventSummary';
 import type { PublicEvents } from './types';
 import { usePublicData } from './usePublicData';
 
-interface Props {
-  emptyTitle: string;
-  emptyText: string;
-  emptyButtonLabel: string;
-}
-
-export default function NextDate({ emptyTitle, emptyText, emptyButtonLabel }: Props) {
+export default function NextDate() {
   const { data, error, retry } = usePublicData<PublicEvents>('/api/public/events');
+  const next = data?.events[0];
 
-  if (!data) return error ? <LoadError retry={retry} /> : <LoadingSummary />;
-
-  if (data.events[0]) return <EventSummary view={data.events[0].view} location="home-dates" />;
+  if (!next && !error) return null;
 
   return (
-    <div class={`${card} grid min-h-80 content-center gap-4 p-6 sm:p-8`}>
-      <h3 class="text-sub text-fg">{emptyTitle}</h3>
-      <p class="text-md text-fg-soft">{emptyText}</p>
-      <a href="#newsletter" class={`${button({ variant: 'secondary' })} justify-self-start max-sm:w-full`}>
-        {emptyButtonLabel}
-      </a>
+    <div class="min-w-0 lg:col-span-5 lg:col-start-8">
+      {next ? <EventSummary view={next.view} location="home-dates" /> : <LoadError retry={retry} />}
     </div>
   );
 }

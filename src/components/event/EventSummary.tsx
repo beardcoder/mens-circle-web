@@ -56,25 +56,9 @@ export default function EventSummary({ view, showAction = true, showTitle = true
   );
 }
 
-export function LoadingSummary() {
-  return (
-    <div aria-busy="true" role="status" class={`${card} grid min-h-80 content-start gap-5 p-6 sm:p-8`}>
-      <p class={label}>Termine werden geladen …</p>
-      <div aria-hidden="true" class="grid gap-3 motion-safe:animate-pulse">
-        <span class="h-8 w-3/4 bg-fg/10" />
-        <span class="h-8 w-2/3 bg-fg/10" />
-        <span class="mt-3 h-px bg-line" />
-        {[0, 1, 2, 3].map((i) => (
-          <span key={i} class="h-5 w-full bg-fg/10" />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function LoadError({ retry }: { retry: () => unknown }) {
   return (
-    <div role="status" class={`${card} grid min-h-80 content-center gap-4 p-6 sm:p-8`}>
+    <div role="status" class="grid justify-items-start gap-3">
       <p class="text-md text-fg-soft">Die Daten sind gerade nicht abrufbar. Bitte versuche es erneut.</p>
       <button type="button" class={button({ variant: 'secondary' })} onClick={() => void retry()}>
         Erneut versuchen

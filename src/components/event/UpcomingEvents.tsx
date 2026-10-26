@@ -1,24 +1,16 @@
-import { card } from '@lib/ui';
-
-import EventSummary, { LoadError, LoadingSummary } from './EventSummary';
+import EventSummary, { LoadError } from './EventSummary';
 import type { PublicEvents } from './types';
 import { usePublicData } from './usePublicData';
 
 export default function UpcomingEvents() {
   const { data, error, retry } = usePublicData<PublicEvents>('/api/public/events');
 
-  if (!data) return <div class="mt-6">{error ? <LoadError retry={retry} /> : <LoadingSummary />}</div>;
-
-  if (!data.events.length)
-    return (
-      <div class={`${card} mt-6 grid min-h-80 content-center gap-3 p-6 sm:p-8`}>
-        <h3 class="text-sub text-fg">Zurzeit steht kein Termin fest</h3>
-        <p class="max-w-measure text-md text-fg-soft">
-          Sobald der nächste Abend geplant ist, steht er hier. Trag dich für die Benachrichtigung ein, dann bekommst du
-          eine kurze E-Mail.
-        </p>
+  if (!data?.events.length)
+    return error ? (
+      <div class="mt-6">
+        <LoadError retry={retry} />
       </div>
-    );
+    ) : null;
 
   return (
     <>

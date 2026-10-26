@@ -72,7 +72,9 @@ replica on the same SQLite file is not supported.
 **Rendering.** Home and `/event` are prerendered, with Preact client islands for
 next-date summaries, event facts, the upcoming list and moderated testimonials.
 They use shared browser requests in `components/event/usePublicData.ts`; no polling.
-Date widgets hydrate on load, testimonials and the closing date near the viewport.
+Date widgets hydrate on load; testimonials hydrate near the viewport. Date cards
+render only after a successful read with an upcoming event; loading and empty states
+render no card. Failed reads show a compact message with retry.
 Single event pages retain SSR for metadata, JSON-LD and event copy, with live capacity
 and a client-only registration island. `lib/server/public-data.ts` coalesces and caches
 reads for 30 seconds (testimonials: five minutes); mutations invalidate its bounded
@@ -151,8 +153,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   footer and the phone menu. The boot script drops a stored `mc-theme`. Every text
   token ≥ 4.5:1 on every ground in both modes, `line-bold` ≥ 3:1; `line` never
   outlines a control alone. Check new pairs in both modes.
-- Cards: with no date planned the home hero shows no date card and the closing
-  invitation offers email notification; `unavailable` keeps its own error state.
+- Cards: with no date planned all upcoming-date islands render no card;
+  failed reads keep their own compact error message.
 - Grounds: `Section ground` is `default` (paper), `alt` (the quiet secondary ground:
   facts, agreements, the breath panel, the closing invitation, compact bands) or
   `dark` (`surface-dark`: the home opening and the footer only). No other bands.
