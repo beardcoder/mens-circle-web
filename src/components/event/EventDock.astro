@@ -1,16 +1,18 @@
 ---
-import { formatDateShortDE, formatDayMonthYearDE, isoDay, timeRange } from '@lib/server/format';
+import { isoDay } from '@lib/server/format';
 import type { EventDTO } from '@lib/types';
 
 import Container from '../ui/Container.astro';
 
 interface Props {
   event: EventDTO;
+  /** The intro's date line and hours, word for word: the intro's copies fly into these. */
+  dateLabel: string;
+  hours: string;
 }
 
-const { event } = Astro.props;
+const { event, dateLabel, hours } = Astro.props;
 const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
-const hours = timeRange(event.start_time, event.end_time);
 ---
 
 {/* A visual continuation of the existing heading, never a second heading or focus target. */}
@@ -18,98 +20,178 @@ const hours = timeRange(event.start_time, event.end_time);
   data-event-dock
   hidden
   aria-hidden="true"
-  class="fixed inset-x-0 top-header z-30 overflow-clip border-b border-line bg-ground text-fg print:hidden"
+  class="pointer-events-none fixed inset-x-0 top-header z-30 overflow-clip text-fg print:hidden"
 >
-  <Container class="flex min-h-14 items-center justify-between gap-4 py-2">
+  <div data-event-dock-ground class="absolute inset-0 border-b border-line bg-ground"></div>
+  <Container class="relative flex min-h-14 items-center justify-between gap-4 py-2">
     <p
       data-event-dock-title
-      class="min-w-0 max-w-[50%] origin-left truncate text-xl font-medium tracking-[-0.035em] sm:text-2xl"
+      class="min-w-0 truncate text-sub leading-[1.02] font-medium tracking-[-0.065em]"
     >
       {isCircleTitle ? (
         <span>
-          Männer<span class="font-serif font-normal tracking-normal text-accent italic">kreis</span>
+          Männer<span class="font-serif font-normal tracking-[-0.035em] text-accent italic">kreis</span>
         </span>
       ) : (
-        event.title
+        <span class="font-serif font-normal tracking-normal italic">{event.title}</span>
       )}
     </p>
-    <p data-event-dock-date class="shrink-0 origin-right text-right text-xs leading-snug text-fg-muted sm:text-sm">
-      <time datetime={isoDay(event.event_date)} class="text-fg">
-        <span class="sm:hidden">{formatDateShortDE(event.event_date)}</span>
-        <span class="hidden sm:inline">{formatDayMonthYearDE(event.event_date)}</span>
+    <p class="shrink-0 text-right text-xs leading-snug sm:text-sm">
+      <time data-event-dock-date datetime={isoDay(event.event_date)} class="inline-block text-fg">
+        {dateLabel}
       </time>
-      {hours && <span class="mt-0.5 block sm:mt-0 sm:ml-4 sm:inline">{hours}</span>}
+      {hours && (
+        <span data-event-dock-hours class="mt-0.5 block text-fg-muted sm:mt-0 sm:ml-5 sm:inline-block">
+          {hours}
+        </span>
+      )}
     </p>
   </Container>
 </div>
 
 <script>
-  const source = document.querySelector<HTMLElement>('[data-event-title]');
+  /**
+   * The intro's date, hours and title fly into the dock as the page scrolls, one
+   * after the other, on a scroll timeline: each copy moves and shrinks onto its
+   * twin in the dock, then the twin takes over. Without scroll timelines or with
+   * reduced motion the dock simply appears once the title has left.
+   */
   const dock = document.querySelector<HTMLElement>('[data-event-dock]');
-  const title = dock?.querySelector<HTMLElement>('[data-event-dock-title]');
-  const date = dock?.querySelector<HTMLElement>('[data-event-dock-date]');
-  const header = document.querySelector<HTMLElement>('#header');
+  const title = document.querySelector<HTMLElement>('[data-event-title]');
 
-  if (source && dock && title && date && header) {
+  interface Box {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  }
+
+  /** Layout position at scroll 0, unaffected by transforms (the fixed dock is its own origin). */
+  function pageBox(element: HTMLElement): Box {
+    let top = 0;
+    let left = 0;
+
+    for (let node: HTMLElement | null = element; node; node = node.offsetParent as HTMLElement | null) {
+      top += node.offsetTop;
+      left += node.offsetLeft;
+    }
+
+    return { top, left, width: element.offsetWidth, height: element.offsetHeight };
+  }
+
+  const fontSize = (element: HTMLElement) => parseFloat(getComputedStyle(element).fontSize);
+
+  if (dock && title) {
+    const ground = dock.querySelector<HTMLElement>('[data-event-dock-ground]')!;
+    const dockTitle = dock.querySelector<HTMLElement>('[data-event-dock-title]')!;
+
+    const pieces: [HTMLElement | null, HTMLElement | null, number, number][] = [
+      // [intro copy, dock twin, start, end] as fractions of the flight.
+      // The hours go first, so the date never crosses them on its way right.
+      [document.querySelector('[data-event-hours]'), dock.querySelector('[data-event-dock-hours]'), 0, 0.45],
+      [document.querySelector('[data-event-date]'), dock.querySelector('[data-event-dock-date]'), 0.15, 0.75],
+      [title, dockTitle, 0, 1],
+    ];
+
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-    const headerHeight = header.getBoundingClientRect().height;
+    const supported = typeof ScrollTimeline !== 'undefined';
     let animations: Animation[] = [];
+    let observer: IntersectionObserver | undefined;
 
-    // Unsupported browsers and reduced motion get the same bar, with an instant switch.
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        dock.hidden = entry.boundingClientRect.bottom > headerHeight;
-      },
-      { rootMargin: `-${headerHeight}px 0px 0px 0px` },
-    );
+    const visible = [{ opacity: 0 }, { opacity: 0, offset: 0.999 }, { opacity: 1 }];
+    const hidden = [{ opacity: 1 }, { opacity: 1, offset: 0.999 }, { opacity: 0 }];
 
-    function updateDock() {
+    function reset() {
       animations.forEach((animation) => animation.cancel());
       animations = [];
-      observer.disconnect();
+      observer?.disconnect();
+    }
 
-      if (
-        reducedMotion.matches ||
-        typeof ViewTimeline === 'undefined' ||
-        !CSS.supports('animation-range', 'exit 0% exit 100%')
-      ) {
-        dock!.hidden = source!.getBoundingClientRect().bottom > headerHeight;
-        observer.observe(source!);
+    /** The plain dock: shown once the title has passed under the bar. */
+    function staticDock(headerBottom: number) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          dock!.hidden = entry.boundingClientRect.bottom > headerBottom;
+        },
+        { rootMargin: `-${headerBottom}px 0px 0px 0px` },
+      );
+      observer.observe(title!);
+    }
+
+    function setup() {
+      reset();
+      dock!.hidden = false;
+
+      const dockBox = pageBox(dock!);
+      const headerBottom = dockBox.top;
+
+      if (reducedMotion.matches || !supported) {
+        dock!.hidden = true;
+        staticDock(headerBottom);
 
         return;
       }
 
-      const options: KeyframeAnimationOptions = {
-        timeline: new ViewTimeline({ subject: source!, axis: 'block', inset: `${headerHeight}px 0px` }),
-        rangeStart: 'exit 0%',
-        rangeEnd: 'exit 100%',
-        fill: 'both',
-      };
+      const titleBox = pageBox(title!);
+      const dockBottom = dockBox.top + dockBox.height;
+      // The flight ends as the title's own space has scrolled up to the dock.
+      const flight = Math.max(titleBox.top + titleBox.height - dockBottom, 160);
+      // The content under the title must not show through before the ground is in.
+      const next = title!.nextElementSibling as HTMLElement | null;
+      const arrival = next ? Math.max(pageBox(next).top - dockBottom, 1) : flight;
+      const timeline = new ScrollTimeline({ source: document.documentElement, axis: 'block' });
 
-      dock!.hidden = false;
-      animations = [
-        dock!.animate({ opacity: [0, 1], pointerEvents: ['none', 'auto'] }, options),
-        source!.animate([{ opacity: 1 }, { opacity: 0, offset: 0.45 }, { opacity: 0 }], options),
-        title!.animate(
-          [
-            { opacity: 0, transform: 'translateY(12px) scale(1.12)' },
-            { opacity: 0, transform: 'translateY(8px) scale(1.08)', offset: 0.45 },
-            { opacity: 1, transform: 'translateY(0) scale(1)' },
-          ],
-          options,
-        ),
-        date!.animate(
-          [
-            { opacity: 0, transform: 'translateY(8px)' },
-            { opacity: 0, transform: 'translateY(6px)', offset: 0.45 },
-            { opacity: 1, transform: 'translateY(0)' },
-          ],
-          options,
-        ),
-      ];
+      const range = (start: number, end: number): KeyframeAnimationOptions => ({
+        timeline,
+        rangeStart: `${Math.round(start)}px`,
+        rangeEnd: `${Math.round(end)}px`,
+        fill: 'both',
+      });
+
+      // A title that wraps cannot land on one truncated line; it scrolls away and the dock fades in.
+      const titleFlies = titleBox.height < fontSize(title!) * 1.6;
+
+      for (const [copy, twin, from, to] of pieces) {
+        if (!copy || !twin) continue;
+
+        const start = from * flight;
+        const end = to * flight;
+
+        if (copy === title && !titleFlies) {
+          animations.push(twin.animate([{ opacity: 0 }, { opacity: 1 }], range(flight * 0.6, flight)));
+          continue;
+        }
+
+        const a = pageBox(copy);
+        const b = pageBox(twin);
+        const scale = fontSize(twin) / fontSize(copy);
+        // Where the copy must sit, relative to its own place, when the page has scrolled `end`.
+        const x = b.left - a.left;
+        const y = b.top + (b.height - a.height * scale) / 2 + end - a.top;
+
+        animations.push(
+          copy.animate({ translate: ['0 0', `${x}px ${y}px`], scale: ['1', `${scale}`] }, range(start, end)),
+          copy.animate(hidden, range(start, end)),
+          twin.animate(visible, range(start, end)),
+        );
+      }
+
+      animations.push(
+        ground.animate({ opacity: [0, 1] }, range(Math.min(arrival, flight) * 0.7, Math.min(arrival, flight))),
+      );
     }
 
-    updateDock();
-    reducedMotion.addEventListener('change', updateDock);
+    let frame = 0;
+
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(setup);
+    };
+
+    setup();
+    // Widths change once the web fonts are in, and with the window.
+    void document.fonts.ready.then(schedule);
+    addEventListener('resize', schedule);
+    reducedMotion.addEventListener('change', schedule);
   }
 </script>

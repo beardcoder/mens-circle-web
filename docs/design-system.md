@@ -178,6 +178,14 @@ thin lines. `shadow-overlay` is reserved for admin dialogs, action menus and the
 - No parallax (nothing moves at its own speed against the page), no scroll-tied
   size changes, no `content-visibility` (anchors land where they should). Under
   `prefers-reduced-motion` everything rests and the timed breath guide hides.
+- The exception is an event page, which carries its own scroll choreography:
+  the hours, the date and the giant title fly one after another into the dock
+  under the header (`EventDock`, a scroll timeline on WAAPI, measured from the
+  layout); the question's words light up (`word-reveal`) beside a circle that
+  closes as it is read (`ring-close`, `ring-turn`); the map frame opens from its
+  middle (`unveil`) beside a gently offset text column (`parallax`). Without
+  scroll timelines or under reduced motion the dock simply appears and the rest
+  stands.
 
 ## Components
 

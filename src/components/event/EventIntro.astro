@@ -15,79 +15,89 @@ interface Props {
 
 const { event } = Astro.props;
 const view = eventView(event, 'Dieser Abend', false);
+const dateLabel = view.title.join(' ');
+const hours = timeRange(event.start_time, event.end_time);
 const hasPlace = !!(event.location || event.street || event.city);
 const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
 ---
 
+{/* The date line and the title fly into the dock as the page scrolls (EventDock's script). */}
 <section
   aria-labelledby="event-title"
-  class="pt-[calc(var(--spacing-header)+1.25rem)] pb-0 sm:pb-8 lg:pt-[calc(var(--spacing-header)+2.75rem)] lg:pb-12"
+  class="pt-[calc(var(--spacing-header)+1.25rem)] pb-8 lg:pt-[calc(var(--spacing-header)+2.75rem)] lg:pb-14"
 >
-  <Container class="grid items-start gap-x-grid gap-y-6 lg:grid-cols-12 lg:grid-rows-[min-content_1fr] lg:gap-y-0">
-    <div class="min-w-0 lg:col-span-7 lg:pr-8">
-      <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line-strong pt-3 text-sm lg:pt-4">
-        <time datetime={view.datetime} class="text-fg">
-          {view.title.join(' ')}
-        </time>
-        {event.start_time && <p class="text-fg-muted">{timeRange(event.start_time, event.end_time)}</p>}
-      </div>
-      <h1
-        id="event-title"
-        data-event-title
-        aria-label={event.title}
-        class:list={[
-          'mt-5 font-sans font-medium tracking-[-0.065em] text-fg lg:mt-8 print:opacity-100!',
-          isCircleTitle
-            ? 'text-[clamp(3rem,16.5vw,5.75rem)] leading-[1.05] whitespace-nowrap lg:text-[clamp(2.5rem,6.4vw,5.75rem)]'
-            : 'text-page wrap-anywhere hyphens-auto lg:text-hero',
-        ]}
-      >
-        {isCircleTitle ? (
-          <span>
-            Männer<span class="font-serif font-normal tracking-[-0.035em] text-accent italic">kreis</span>
-          </span>
-        ) : (
-          <span class="font-serif font-normal tracking-normal italic">{event.title}</span>
-        )}
-      </h1>
-      {event.city && <p class="mt-3 text-base text-fg-muted lg:mt-6 lg:text-xl">in {event.city}</p>}
-      <p class="mt-4 max-w-[25em] text-base text-fg-soft lg:mt-6 lg:text-lg">
-        {event.is_past
-          ? 'Dieser Abend hat bereits stattgefunden. Bei den aktuellen Terminen findest du die nächsten Treffen.'
-          : 'Ein Abend für das, was dich gerade beschäftigt. Mit Männern, die dir zuhören.'}
-      </p>
-      <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm lg:mt-6 lg:text-base">
-        <a href="#ueber-den-abend" class={`${link} inline-flex min-h-9 items-center`}>
-          Was dich erwartet
-        </a>
-        {hasPlace && (
-          <a href="#anfahrt" class={`${link} inline-flex min-h-9 items-center`}>
-            Adresse &amp; Anfahrt
-          </a>
-        )}
-      </div>
-      {event.is_past && (
-        <Button href="/event" class="mt-5">
-          Aktuelle Termine ansehen
-        </Button>
+  <Container>
+    <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line-strong pt-3 text-sm entrance:animate-rise lg:pt-4">
+      <time data-event-date datetime={view.datetime} class="relative z-31 inline-block origin-top-left text-fg">
+        {dateLabel}
+      </time>
+      {hours && (
+        <p data-event-hours class="relative z-31 origin-top-left text-fg-muted">
+          {hours}
+        </p>
       )}
     </div>
+    <h1
+      id="event-title"
+      data-event-title
+      aria-label={event.title}
+      class:list={[
+        'relative z-31 mt-4 origin-top-left font-sans font-medium tracking-[-0.065em] text-fg lg:mt-6 print:scale-100! print:translate-none! print:opacity-100!',
+        isCircleTitle
+          ? 'w-fit text-[clamp(3rem,16.5vw,15.5rem)] leading-[1.02] whitespace-nowrap'
+          : 'text-page wrap-anywhere hyphens-auto lg:text-hero',
+      ]}
+    >
+      {isCircleTitle ? (
+        <span>
+          <span class="inline-block entrance:animate-rise entrance:animate-delay-[60ms]">Männer</span>
+          <span class="inline-block font-serif font-normal tracking-[-0.035em] text-accent italic entrance:animate-rise entrance:animate-delay-[180ms]">
+            kreis
+          </span>
+        </span>
+      ) : (
+        <span class="font-serif font-normal tracking-normal italic">{event.title}</span>
+      )}
+    </h1>
 
-    <div class="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2">
-      <slot />
-    </div>
-
-    <div class="min-w-0 pt-4 pb-8 sm:pb-0 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-10 lg:pt-0 lg:pr-8">
-      <div class="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
-        {event.location && (
-          <p class="max-w-[22em] text-sm text-fg-muted">
-            Treffpunkt: <span class="text-fg">{event.location}</span>
-          </p>
+    <div class="mt-8 grid items-start gap-x-grid gap-y-8 lg:mt-14 lg:grid-cols-12">
+      <div class="min-w-0 entrance:animate-rise entrance:animate-delay-[260ms] lg:col-span-6">
+        {event.city && <p class="text-base text-fg-muted lg:text-xl">in {event.city}</p>}
+        <p class="mt-4 max-w-[25em] text-md text-fg-soft lg:mt-6 lg:text-lg">
+          {event.is_past
+            ? 'Dieser Abend hat bereits stattgefunden. Bei den aktuellen Terminen findest du die nächsten Treffen.'
+            : 'Ein Abend für das, was dich gerade beschäftigt. Mit Männern, die dir zuhören.'}
+        </p>
+        <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm lg:mt-6 lg:text-base">
+          <a href="#ueber-den-abend" class={`${link} inline-flex min-h-9 items-center`}>
+            Was dich erwartet
+          </a>
+          {hasPlace && (
+            <a href="#anfahrt" class={`${link} inline-flex min-h-9 items-center`}>
+              Adresse &amp; Anfahrt
+            </a>
+          )}
+        </div>
+        {event.is_past && (
+          <Button href="/event" class="mt-5">
+            Aktuelle Termine ansehen
+          </Button>
         )}
-        {!event.is_past && <CalendarButton event={event} />}
+        <div class="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5 lg:mt-12">
+          {event.location && (
+            <p class="max-w-[22em] text-sm text-fg-muted">
+              Treffpunkt: <span class="text-fg">{event.location}</span>
+            </p>
+          )}
+          {!event.is_past && <CalendarButton event={event} />}
+        </div>
+      </div>
+
+      <div class="min-w-0 lg:col-span-5 lg:col-start-8">
+        <slot />
       </div>
     </div>
   </Container>
 </section>
 
-<EventDock event={event} />
+<EventDock event={event} dateLabel={dateLabel} hours={hours} />
