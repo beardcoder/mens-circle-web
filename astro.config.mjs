@@ -24,8 +24,10 @@ export default defineConfig({
     // The cache policy for files on disk; HTML keeps what the page set at prerender time.
     staticHeaders: (pathname, { assets }) => {
       const cacheControl = cacheControlForFile(pathname, assets);
+      // The listmonk mails load these fonts from another origin (browser view, mail clients).
+      const cors = pathname.startsWith('/fonts/mail/') ? { 'access-control-allow-origin': '*' } : null;
 
-      return cacheControl ? { 'cache-control': cacheControl } : null;
+      return cacheControl || cors ? { ...(cacheControl && { 'cache-control': cacheControl }), ...cors } : null;
     },
   }),
   vite: {

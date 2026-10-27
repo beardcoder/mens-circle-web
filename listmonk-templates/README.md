@@ -22,13 +22,21 @@ adds the greeting, signature, footer and unsubscribe link.
 
 Design as on the site (`docs/design-system.md`): a masthead on the dark focus ground
 with the mark in the light text colour (`/images/logo-mail.png`, loaded by URL; mails
-already sent still load `/images/logo-flame.png`), paper sheet, Playfair Display at the
+already sent still load `/images/logo-flame.png`) and the wordmark as in the site
+header (DM Sans, medium, tracked in), paper sheet, Playfair Display at the
 regular weight for titles and the date, titles in one colour (the italic accent only
 in the campaign's statement and breath line), DM Sans for text, labels as small
 spaced capitals without ornaments. The date is the site's summary card: flat, square,
 a thin line, the date over its facts as rows. What you press is round (the calendar
 and registration actions); everything that holds content is square. No shadows, no
 bulleted or numbered lists. The footer is compact on the dark ground and carries no
-slogan. Webfonts load where the client allows (Apple Mail, iOS); elsewhere Georgia
-and Helvetica stand in, and Outlook on Windows shows square buttons. Every style is
-inline except the campaign's `.em-prose` rules for authored content.
+slogan; it links Impressum and Datenschutz. Webfonts load where the client allows
+(Apple Mail, iOS), from `public/fonts/mail/` on the site (stable names, CORS open),
+never from Google: a third-party font would hand every reader's IP to that party.
+Elsewhere Georgia and Helvetica stand in, and Outlook on Windows shows square
+buttons. Every style is inline except the campaign's `.em-prose` rules for authored
+content.
+
+Privacy: no `TrackView` pixel and no `TrackLink`; the privacy policy promises no
+tracking, and listmonk's global setting that disables view and click tracking
+(Settings → Privacy, v6.1+) should stay on as well.
