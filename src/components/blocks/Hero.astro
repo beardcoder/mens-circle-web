@@ -15,18 +15,18 @@ const { kicker, secondaryLabel, secondaryLink } = Astro.props;
 <section
   data-hero
   aria-labelledby="hero-title"
-  class="surface-dark hero-gradient relative flex min-h-[90svh] items-center overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group)+1rem)] pb-[calc(var(--spacing-section)+1.5rem)] lg:min-h-[min(58rem,100svh)] lg:pt-[calc(var(--spacing-header)+var(--spacing-section)+1.5rem)]"
+  class="surface-dark hero-gradient relative flex [view-timeline:--hero] min-h-[90svh] items-center overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group)+1rem)] pb-[calc(var(--spacing-section)+1.5rem)] lg:min-h-[min(58rem,100svh)] lg:pt-[calc(var(--spacing-header)+var(--spacing-section)+1.5rem)]"
 >
   {/* Thin rings breathe slowly, without adding visual weight. */}
   <div
     aria-hidden="true"
-    class="pointer-events-none absolute -right-56 -bottom-60 aspect-square w-120 lg:top-[calc(50%-22rem)] lg:-right-64 lg:bottom-auto lg:w-176"
+    class="rings-drift pointer-events-none absolute -right-56 -bottom-60 aspect-square w-120 lg:top-[calc(50%-22rem)] lg:-right-64 lg:bottom-auto lg:w-176"
   >
     <span class="absolute inset-0 rounded-[48%_52%_46%_54%/54%_45%_55%_46%] border border-line-strong motion-safe:animate-ring"></span>
     <span class="absolute inset-[23%] rounded-[54%_46%_52%_48%/46%_55%_45%_54%] border border-line motion-safe:animate-ring-slow motion-safe:animate-delay-[-7s]"></span>
   </div>
 
-  <Container class="relative grid gap-x-grid gap-y-8 lg:grid-cols-12">
+  <Container class="hero-leave relative grid gap-x-grid gap-y-8 lg:grid-cols-12">
     <div class="grid min-w-0 justify-items-start lg:col-span-7 lg:row-start-1">
       {kicker && <Eyebrow class="mb-4 entrance:animate-rise">{kicker}</Eyebrow>}
       <h1

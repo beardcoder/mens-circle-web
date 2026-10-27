@@ -33,7 +33,7 @@ with its text and circle aligned to the shared content grid.
 
 Motion update: section headings and rows rise into view over a longer scroll
 range; facts, phases and agreements are staggered by scroll position. The photo
-settles from a subtle zoom, and the hero actions enter last. FAQ answers fade in. A thin reading-progress line follows the
+moves slower than its frame, and the hero actions enter last. FAQ answers fade in. A thin reading-progress line follows the
 page scroll. Scroll effects use native CSS timelines and fall back to visible,
 static content. All additions respect reduced motion and require no JavaScript.
 
@@ -186,6 +186,12 @@ thin lines. `shadow-overlay` is reserved for admin dialogs, action menus and the
   middle (`unveil`) beside a gently offset text column (`parallax`). Without
   scroll timelines or under reduced motion the dock simply appears and the rest
   stands.
+- The home page adds scroll motion of its own: the opening's content sinks and
+  fades as the hero leaves while its rings drift, turn and widen (`hero-leave`,
+  `rings-drift`); section titles light up word by word (`word-light`, home
+  only, since every section head there starts below the first screen); the two
+  lines of the breath statement slide in from opposite sides (`slide-in`); the
+  portrait moves slower than its frame (`photo-parallax`).
 
 ## Components
 

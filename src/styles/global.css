@@ -97,15 +97,6 @@
   }
 }
 
-@keyframes photo-settle {
-  from {
-    transform: scale(1.06);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
 @keyframes reading-progress {
   from {
     scale: 0 1;
@@ -119,16 +110,6 @@
 @utility reveal-stagger {
   --reveal-start: calc(var(--motion-order, 0) * 7%);
   --reveal-end: calc(75% + var(--motion-order, 0) * 7%);
-}
-
-@utility photo-reveal {
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      animation: photo-settle linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 100%;
-    }
-  }
 }
 
 /* ── Event page: scroll-driven motion ─────────────────────────────────────────
@@ -236,6 +217,95 @@
     animation: unveil linear both;
     animation-timeline: view();
     animation-range: entry 0% cover 40%;
+  }
+}
+
+/* ── Home page: scroll-driven motion ──────────────────────────────────────── */
+
+@keyframes hero-leave {
+  to {
+    opacity: 0.15;
+    translate: 0 6rem;
+  }
+}
+
+@keyframes rings-drift {
+  to {
+    translate: -4rem 10rem;
+    rotate: 25deg;
+    scale: 1.2;
+  }
+}
+
+@keyframes word-light {
+  from {
+    opacity: 0.18;
+  }
+}
+
+@keyframes slide-in-x {
+  from {
+    opacity: 0;
+    translate: var(--slide-from, -12%) 0;
+  }
+}
+
+@keyframes photo-drift {
+  from {
+    translate: 0 -6%;
+  }
+  to {
+    translate: 0 6%;
+  }
+}
+
+/* The opening's text sinks slower than the page and fades as the hero leaves. */
+@utility hero-leave {
+  @variant scroll-motion {
+    animation: hero-leave linear both;
+    animation-timeline: --hero;
+    animation-range: exit 0% exit 80%;
+  }
+}
+
+/* The opening's rings drift, turn and widen at their own pace as the hero leaves. */
+@utility rings-drift {
+  @variant scroll-motion {
+    animation: rings-drift linear both;
+    animation-timeline: --hero;
+    animation-range: exit 0% exit 100%;
+  }
+}
+
+/* A section title's words light up one after another (`--words` on the title,
+   `--word` on each word). Only on the home page, where every section head starts
+   below the first screen; inline, so long words still wrap and hyphenate. */
+@utility word-light {
+  @variant scroll-motion {
+    :where(body:has([data-hero])) & {
+      animation: word-light linear both;
+      animation-timeline: --words;
+      animation-range: entry calc(var(--word, 0) * 8%) cover calc(30% + var(--word, 0) * 4%);
+    }
+  }
+}
+
+/* A line that slides in from the side (`--slide-from`) as it enters. */
+@utility slide-in {
+  @variant scroll-motion {
+    animation: slide-in-x linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 45%;
+  }
+}
+
+/* A photo that moves slower than its frame, which clips it. */
+@utility photo-parallax {
+  @variant scroll-motion {
+    scale: 1.14;
+    animation: photo-drift linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
   }
 }
 

@@ -24,7 +24,11 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
       {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
       <h2 id="statement-title" class="text-section text-fg">
         {lines.map((line, i) =>
-          i > 0 ? <em class="block font-serif font-normal text-accent">{line}</em> : <span class="block">{line}</span>,
+          i > 0 ? (
+            <em class="slide-in block font-serif font-normal text-accent [--slide-from:12%]">{line}</em>
+          ) : (
+            <span class="slide-in block">{line}</span>
+          ),
         )}
       </h2>
       {text && <p class="mt-6 max-w-measure text-md text-fg-soft">{text}</p>}
