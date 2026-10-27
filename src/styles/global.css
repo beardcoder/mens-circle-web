@@ -131,6 +131,114 @@
   }
 }
 
+/* ── Event page: scroll-driven motion ─────────────────────────────────────────
+   All on native timelines and gated by `scroll-motion`; without support or with
+   reduced motion everything simply stands. */
+
+@keyframes word-in {
+  from {
+    opacity: 0.12;
+    translate: 0 0.3em;
+  }
+}
+
+@keyframes parallax-y {
+  from {
+    translate: 0 var(--parallax, 3rem);
+  }
+  to {
+    translate: 0 calc(var(--parallax, 3rem) * -1);
+  }
+}
+
+@keyframes draw-y {
+  from {
+    scale: 1 0;
+  }
+}
+
+@keyframes ring-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes turn {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@keyframes unveil {
+  from {
+    clip-path: inset(10% 6%);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/* A title's words light up one after another as it crosses the screen; the
+   title carries the timeline (`view-timeline: --words`), each word its `--word`. */
+@utility word-reveal {
+  display: inline-block;
+
+  @variant scroll-motion {
+    animation: word-in linear both;
+    animation-timeline: --words;
+    animation-range: entry calc(20% + var(--word, 0) * 12%) cover calc(35% + var(--word, 0) * 6%);
+  }
+}
+
+/* Moves at its own speed against the page: down-to-up by twice `--parallax`. */
+@utility parallax {
+  @variant scroll-motion {
+    animation: parallax-y linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
+  }
+}
+
+/* A vertical line that draws down as it enters. */
+@utility draw-down {
+  transform-origin: center top;
+
+  @variant scroll-motion {
+    animation: draw-y linear both;
+    animation-timeline: view();
+    animation-range: entry 20% cover 45%;
+  }
+}
+
+/* The story's circle closes as the reader moves through it (`--story`). */
+@utility ring-close {
+  @variant scroll-motion {
+    animation: ring-draw linear both;
+    animation-timeline: --story;
+    animation-range: entry 40% exit 10%;
+  }
+}
+
+@utility ring-turn {
+  @variant scroll-motion {
+    animation: turn linear both;
+    animation-timeline: --story;
+    animation-range: entry 40% exit 10%;
+  }
+}
+
+/* A frame opens from its middle as it scrolls in. */
+@utility unveil {
+  @variant scroll-motion {
+    animation: unveil linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 40%;
+  }
+}
+
 /* Warm rust light stays to the right; the text sits on the dark base. */
 @utility hero-gradient {
   background-image:
