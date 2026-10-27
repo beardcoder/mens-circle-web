@@ -11,7 +11,14 @@
   <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
   <style>.em-serif { font-family: Georgia, serif !important; } .em-sans { font-family: Arial, sans-serif !important; }</style>
   <![endif]-->
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600&amp;family=Playfair+Display:ital@0;1&amp;display=swap" rel="stylesheet">
+  <!-- Webfonts from the site itself, never from a third party: no recipient IP leaves our server -->
+  <!--[if !mso]><!-->
+  <style>
+    @font-face { font-family:'Playfair Display'; font-style:normal; font-weight:400; font-display:swap; src:url(https://mens-circle.de/fonts/mail/playfair-display-400.woff2) format('woff2'); }
+    @font-face { font-family:'Playfair Display'; font-style:italic; font-weight:400; font-display:swap; src:url(https://mens-circle.de/fonts/mail/playfair-display-400-italic.woff2) format('woff2'); }
+    @font-face { font-family:'DM Sans'; font-style:normal; font-weight:100 1000; font-display:swap; src:url(https://mens-circle.de/fonts/mail/dm-sans.woff2) format('woff2'); }
+  </style>
+  <!--<![endif]-->
   <style>
     body { margin:0 !important; padding:0 !important; width:100% !important; -webkit-text-size-adjust:100%; }
     table { border-collapse:collapse !important; }
@@ -37,13 +44,12 @@
     <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
     <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8F5EF" style="width:600px;max-width:600px;background-color:#F8F5EF;">
 
-      <!-- Masthead: the dark focus ground, the mark in the light text colour -->
+      <!-- Masthead: the dark focus ground, the mark and the wordmark as in the site header -->
       <tr><td class="em-pad" bgcolor="#24221F" style="padding:22px 40px;background-color:#24221F;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
           <td style="padding-right:12px;vertical-align:middle;"><a href="https://mens-circle.de" target="_blank"><img src="https://mens-circle.de/images/logo-mail.png" width="36" height="36" alt="" style="display:block;width:36px;height:36px;"></a></td>
           <td style="vertical-align:middle;">
-            <div class="em-serif" style="font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:22px;font-weight:400;line-height:1.1;color:#F8F5EF;">Männerkreis</div>
-            <div class="em-sans" style="margin-top:4px;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;font-weight:600;line-height:1.2;letter-spacing:0.14em;text-transform:uppercase;color:#C7BFB3;">Straubing&nbsp;·&nbsp;Niederbayern</div>
+            <div class="em-sans" style="font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:500;line-height:1.2;letter-spacing:-0.025em;color:#F8F5EF;">Männerkreis</div>
           </td>
         </tr></table>
       </td></tr>
