@@ -24,10 +24,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
 >
   <div data-event-dock-ground class="absolute inset-0 border-b border-line bg-ground"></div>
   <Container class="relative flex min-h-14 items-center justify-between gap-4 py-2">
-    <p
-      data-event-dock-title
-      class="min-w-0 truncate text-sub leading-[1.02] font-medium tracking-[-0.065em]"
-    >
+    <p data-event-dock-title class="min-w-0 truncate text-sub leading-[1.02] font-medium tracking-[-0.065em]">
       {isCircleTitle ? (
         <span>
           Männer<span class="font-serif font-normal tracking-[-0.035em] text-accent italic">kreis</span>
