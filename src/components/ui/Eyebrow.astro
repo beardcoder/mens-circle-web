@@ -9,6 +9,6 @@ interface Props {
 const { class: className }: Props = Astro.props;
 ---
 
-<p class:list={[label, className]}>
+<p class:list={[label, 'tracking-in', className]}>
   <slot />
 </p>

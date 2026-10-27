@@ -63,7 +63,7 @@ const { preloadData = [], headerAction, ...props } = Astro.props;
     ))}
     <SeoHead {...props} />
   </head>
-  <body>
+  <body class="[timeline-scope:--page]">
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top; it
         takes the focus there, so the next Tab starts at the top (BackToTop.astro). */}
     <span id="top" tabindex="-1"></span>
@@ -81,7 +81,8 @@ const { preloadData = [], headerAction, ...props } = Astro.props;
       class="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 origin-left scale-x-0 bg-fill scroll-motion:animate-[reading-progress_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
     ></span>
 
-    <main id="main">
+    {/* On the home page the page lifts off the footer like a curtain (desktop). */}
+    <main id="main" class="[view-timeline:--page] lg:over-hero:relative lg:over-hero:z-1 lg:over-hero:bg-ground">
       <slot />
 
       {/* Fixed to the corner, but inside a landmark, on the page's own colours. */}

@@ -309,6 +309,94 @@
   }
 }
 
+@keyframes mask-rise {
+  from {
+    translate: 0 105%;
+  }
+}
+
+@keyframes tracking-in {
+  from {
+    opacity: 0;
+    letter-spacing: 0.6em;
+  }
+}
+
+@keyframes orbit-in {
+  from {
+    opacity: 0.3;
+    scale: 0.6;
+    rotate: -40deg;
+  }
+}
+
+@keyframes band-widen {
+  from {
+    clip-path: inset(0 var(--space-gutter));
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes footer-rise {
+  from {
+    opacity: 0.2;
+    translate: 0 -4rem;
+    scale: 0.96;
+  }
+}
+
+/* Rises out of its own box, which clips it (`overflow-clip` on the parent). */
+@utility mask-rise {
+  @variant scroll-motion {
+    animation: mask-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 30%;
+  }
+}
+
+/* A label's letters gather from wide spacing as it enters (home only). */
+@utility tracking-in {
+  @variant scroll-motion {
+    :where(body:has([data-hero])) & {
+      animation: tracking-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+/* The breath circle widens and turns into place as it enters. */
+@utility orbit-in {
+  @variant scroll-motion {
+    animation: orbit-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 45%;
+  }
+}
+
+/* A band on the secondary ground grows from the page's edges to the full width. */
+@utility band-widen {
+  @variant scroll-motion {
+    animation: band-widen linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
+  }
+}
+
+/* The footer's content settles as the page lifts off it (home only): on the
+   end of `<main>` (`--page`, scoped on the body), since the footer itself stands still. */
+@utility footer-rise {
+  @variant scroll-motion {
+    :where(body:has([data-hero])) & {
+      animation: footer-rise linear both;
+      animation-timeline: --page;
+      animation-range: exit 0% exit 20rem;
+    }
+  }
+}
+
 /* Warm rust light stays to the right; the text sits on the dark base. */
 @utility hero-gradient {
   background-image:

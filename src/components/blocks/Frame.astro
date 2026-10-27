@@ -20,7 +20,7 @@ interface Props {
 const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props;
 ---
 
-<Section id={anchor} ground="alt" labelledby="rahmen-title">
+<Section id={anchor} ground="alt" labelledby="rahmen-title" class="band-widen">
   <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} />
 
   {agreements.length > 0 && (

@@ -191,7 +191,13 @@ thin lines. `shadow-overlay` is reserved for admin dialogs, action menus and the
   `rings-drift`); section titles light up word by word (`word-light`, home
   only, since every section head there starts below the first screen); the two
   lines of the breath statement slide in from opposite sides (`slide-in`); the
-  portrait moves slower than its frame (`photo-parallax`).
+  portrait moves slower than its frame (`photo-parallax`); Markus's quote lights
+  up word by word; the step numbers rise out of their own box (`mask-rise`);
+  labels gather from wide spacing (`tracking-in`, home only); the breath circle
+  widens and turns into place (`orbit-in`); the bands on the secondary ground grow
+  from the page's edges to full width (`band-widen`); and on the desktop the page
+  lifts off the footer like a curtain, the footer's content settling as it shows
+  (`footer-rise`, on the `--page` timeline of `<main>`).
 
 ## Components
 
