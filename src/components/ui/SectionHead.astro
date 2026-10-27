@@ -18,14 +18,27 @@ const { eyebrow, title, titleId, lead, leadHtml = false, size = 'section', class
 const leadClass =
   'mt-6 max-w-measure text-lg text-fg-muted [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong';
 
-const titleClass = ['max-w-[14.4em] text-fg wrap-anywhere hyphens-auto', size === 'sub' ? 'text-sub' : 'text-section'];
+const titleClass = [
+  'max-w-[14.4em] text-fg wrap-anywhere hyphens-auto [view-timeline:--words]',
+  size === 'sub' ? 'text-sub' : 'text-section',
+];
+
+// Each word its own span, so the home page can light them up one after another (`word-light`).
+const words = title?.split(' ') ?? [];
 ---
 
 <div class:list={['reveal grid justify-items-start', className]}>
   {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
   {title && (
     <h2 id={titleId} class:list={titleClass}>
-      {title}
+      {words.map((word, index) => (
+        <>
+          <span class="word-light" style={`--word: ${index}`}>
+            {word}
+          </span>
+          {index < words.length - 1 && ' '}
+        </>
+      ))}
     </h2>
   )}
   {lead && (leadHtml ? <p class:list={leadClass} set:html={lead} /> : <p class:list={leadClass}>{lead}</p>)}
