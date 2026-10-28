@@ -6,7 +6,7 @@ import Container from '../ui/Container.astro';
 
 interface Props {
   event: EventDTO;
-  /** The intro's date line and hours, word for word: the intro's copies fly into these. */
+  /** The intro's date line and hours, word for word: they mark where the intro's own elements land. */
   dateLabel: string;
   hours: string;
 }
@@ -48,10 +48,12 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
 
 <script>
   /**
-   * The intro's date, hours and title fly into the dock as the page scrolls, one
-   * after the other, on a scroll timeline: each copy moves and shrinks onto its
-   * twin in the dock, then the twin takes over. Without scroll timelines or with
-   * reduced motion the dock simply appears once the title has left.
+   * The intro's date, hours and title morph into the dock as the page scrolls, one
+   * after the other, on one scroll timeline (the browser runs it, no scroll
+   * handler): each element moves and shrinks onto its place in the dock and stays
+   * pinned there, so there is never a second copy to hand over to. The dock's own
+   * copies are only the fallback: without scroll timelines, with reduced motion or
+   * for a title that wraps, they simply appear once the title has left.
    */
   const dock = document.querySelector<HTMLElement>('[data-event-dock]');
   const title = document.querySelector<HTMLElement>('[data-event-title]');
@@ -83,7 +85,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     const dockTitle = dock.querySelector<HTMLElement>('[data-event-dock-title]')!;
 
     const pieces: [HTMLElement | null, HTMLElement | null, number, number][] = [
-      // [intro copy, dock twin, start, end] as fractions of the flight.
+      // [intro element, its place in the dock, start, end] as fractions of the flight.
       // The hours go first, so the date never crosses them on its way right.
       [document.querySelector('[data-event-hours]'), dock.querySelector('[data-event-dock-hours]'), 0, 0.45],
       [document.querySelector('[data-event-date]'), dock.querySelector('[data-event-dock-date]'), 0.15, 0.75],
@@ -95,13 +97,13 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     let animations: Animation[] = [];
     let observer: IntersectionObserver | undefined;
 
-    const visible = [{ opacity: 0 }, { opacity: 0, offset: 0.999 }, { opacity: 1 }];
-    const hidden = [{ opacity: 1 }, { opacity: 1, offset: 0.999 }, { opacity: 0 }];
+    const visible = [{ opacity: 0 }, { opacity: 1 }];
 
     function reset() {
       animations.forEach((animation) => animation.cancel());
       animations = [];
       observer?.disconnect();
+      pieces.forEach(([, twin]) => twin?.style.removeProperty('visibility'));
     }
 
     /** The plain dock: shown once the title has passed under the bar. */
@@ -136,6 +138,8 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       // The content under the title must not show through before the ground is in.
       const next = title!.nextElementSibling as HTMLElement | null;
       const arrival = next ? Math.max(pageBox(next).top - dockBottom, 1) : flight;
+      // Past the flight a piece moves down exactly as far as the page scrolls up: it rests in the dock.
+      const pinned = Math.max(document.documentElement.scrollHeight, flight) * 4;
       const timeline = new ScrollTimeline({ source: document.documentElement, axis: 'block' });
 
       const range = (start: number, end: number): KeyframeAnimationOptions => ({
@@ -145,31 +149,37 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
         fill: 'both',
       });
 
-      // A title that wraps cannot land on one truncated line; it scrolls away and the dock fades in.
+      // A title that wraps cannot land on one truncated line; it scrolls away and the dock's copy fades in.
       const titleFlies = titleBox.height < fontSize(title!) * 1.6;
 
-      for (const [copy, twin, from, to] of pieces) {
-        if (!copy || !twin) continue;
+      for (const [piece, twin, from, to] of pieces) {
+        if (!piece || !twin) continue;
 
-        const start = from * flight;
-        const end = to * flight;
-
-        if (copy === title && !titleFlies) {
-          animations.push(twin.animate([{ opacity: 0 }, { opacity: 1 }], range(flight * 0.6, flight)));
+        if (piece === title && !titleFlies) {
+          animations.push(twin.animate(visible, range(flight * 0.6, flight)));
           continue;
         }
 
-        const a = pageBox(copy);
+        const start = Math.round(from * flight);
+        const end = Math.round(to * flight);
+        const a = pageBox(piece);
         const b = pageBox(twin);
-        const scale = fontSize(twin) / fontSize(copy);
-        // Where the copy must sit, relative to its own place, when the page has scrolled `end`.
-        const x = b.left - a.left;
-        const y = b.top + (b.height - a.height * scale) / 2 + end - a.top;
+        const scale = fontSize(twin) / fontSize(piece);
+        // Where the piece must sit, relative to its own place, when the page has scrolled `end`.
+        const x = Math.round(b.left - a.left);
+        const y = Math.round(b.top + (b.height - a.height * scale) / 2 + end - a.top);
+        const landed = (end - start) / (pinned - start);
 
+        twin.style.visibility = 'hidden';
         animations.push(
-          copy.animate({ translate: ['0 0', `${x}px ${y}px`], scale: ['1', `${scale}`] }, range(start, end)),
-          copy.animate(hidden, range(start, end)),
-          twin.animate(visible, range(start, end)),
+          piece.animate(
+            [
+              { translate: '0 0', scale: '1' },
+              { translate: `${x}px ${y}px`, scale: `${scale}`, offset: landed },
+              { translate: `${x}px ${y + pinned - end}px`, scale: `${scale}` },
+            ],
+            range(start, pinned),
+          ),
         );
       }
 
@@ -186,9 +196,17 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     };
 
     setup();
-    // Widths change once the web fonts are in, and with the window.
+    // Widths change once the web fonts are in, and with the window. A phone's
+    // toolbar changes only the height while scrolling: that needs no new flight.
+    let width = innerWidth;
+
     void document.fonts.ready.then(schedule);
-    addEventListener('resize', schedule);
+    addEventListener('resize', () => {
+      if (innerWidth === width) return;
+
+      width = innerWidth;
+      schedule();
+    });
     reducedMotion.addEventListener('change', schedule);
   }
 </script>

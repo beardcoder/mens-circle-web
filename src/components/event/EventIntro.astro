@@ -21,18 +21,22 @@ const hasPlace = !!(event.location || event.street || event.city);
 const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
 ---
 
-{/* The date line and the title fly into the dock as the page scrolls (EventDock's script). */}
+{/* The date line and the title morph into the dock as the page scrolls (EventDock's script). */}
 <section
   aria-labelledby="event-title"
   class="pt-[calc(var(--spacing-header)+1.25rem)] pb-8 lg:pt-[calc(var(--spacing-header)+2.75rem)] lg:pb-14"
 >
   <Container>
     <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line-strong pt-3 text-sm lg:pt-4">
-      <time data-event-date datetime={view.datetime} class="relative z-31 inline-block origin-top-left text-fg">
+      <time
+        data-event-date
+        datetime={view.datetime}
+        class="relative z-31 inline-block origin-top-left text-fg print:scale-100! print:translate-none!"
+      >
         {dateLabel}
       </time>
       {hours && (
-        <p data-event-hours class="relative z-31 origin-top-left text-fg-muted">
+        <p data-event-hours class="relative z-31 origin-top-left text-fg-muted print:scale-100! print:translate-none!">
           {hours}
         </p>
       )}
