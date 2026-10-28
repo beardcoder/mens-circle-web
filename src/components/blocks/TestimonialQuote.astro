@@ -1,0 +1,26 @@
+---
+import type { TestimonialDTO } from '@lib/types';
+
+interface Props {
+  item: TestimonialDTO;
+  featured?: boolean;
+}
+
+const { item, featured = false } = Astro.props;
+---
+
+<figure class="grid content-start gap-4">
+  <blockquote
+    class:list={[
+      featured ? 'font-serif text-quote text-fg' : 'max-w-measure text-md text-fg-soft',
+      'whitespace-pre-line wrap-anywhere',
+    ]}
+  >
+    „{item.quote}“
+  </blockquote>
+  {(item.author || item.role) && (
+    <figcaption class="text-sm text-fg-muted">
+      <cite class="font-semibold text-fg not-italic">{[item.author, item.role].filter(Boolean).join(' · ')}</cite>
+    </figcaption>
+  )}
+</figure>

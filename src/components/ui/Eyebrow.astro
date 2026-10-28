@@ -1,7 +1,7 @@
 ---
 import { label } from '@lib/ui';
 
-/** A short section label above a title: small spaced capitals in the secondary text colour, no ornament. */
+/** A short section label above a title: a compact sentence-case label in the secondary text colour, no ornament. */
 interface Props {
   class?: string;
 }
@@ -9,6 +9,6 @@ interface Props {
 const { class: className }: Props = Astro.props;
 ---
 
-<p class:list={[label, 'tracking-in', className]}>
+<p class:list={[label, className]}>
   <slot />
 </p>

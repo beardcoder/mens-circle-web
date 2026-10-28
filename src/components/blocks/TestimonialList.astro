@@ -1,0 +1,41 @@
+---
+import type { TestimonialDTO } from '@lib/types';
+
+import TestimonialQuote from './TestimonialQuote.astro';
+
+interface Props {
+  items: TestimonialDTO[];
+}
+
+const { items } = Astro.props;
+const [first, ...others] = items;
+const featured = first && first.quote.length <= 160;
+const rest = featured ? others : items;
+---
+
+{featured && (
+  <div class="mt-group max-w-176">
+    <TestimonialQuote item={first} featured />
+  </div>
+)}
+<ul role="list" class="mt-group grid items-start gap-x-grid gap-y-8 md:grid-cols-2">
+  {rest.map((item) => (
+    <li class="min-w-0 border-t border-line pt-6">
+      {item.quote.length > 360 ? (
+        <details class="group/quote">
+          <summary class="cursor-pointer text-base font-semibold text-accent underline underline-offset-4 marker:text-accent">
+            <span class="inline-flex min-h-11 items-center group-open/quote:hidden">
+              Erfahrung von {item.author || 'einem Teilnehmer'} lesen
+            </span>
+            <span class="hidden min-h-11 items-center group-open/quote:inline-flex">Erfahrung einklappen</span>
+          </summary>
+          <div class="mt-3">
+            <TestimonialQuote item={item} />
+          </div>
+        </details>
+      ) : (
+        <TestimonialQuote item={item} />
+      )}
+    </li>
+  ))}
+</ul>

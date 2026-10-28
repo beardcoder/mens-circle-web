@@ -4,7 +4,15 @@ import { link } from '@lib/ui';
 
 import NewsletterForm from '../forms/NewsletterForm.astro';
 import Section from '../ui/Section.astro';
-import UpcomingEvents from './UpcomingEvents';
+import EventAvailability from './EventAvailability.astro';
+import EventSummary from './EventSummary.astro';
+import type { PublicEvents } from './types';
+
+interface Props {
+  events: PublicEvents | null;
+}
+
+const { events } = Astro.props;
 
 /**
  * The dates on /event — what the page is for: every upcoming date as the same
@@ -27,7 +35,22 @@ const whatsapp = site.whatsappCommunityLink;
     <h2 id="termine-liste-title" class="text-sub text-fg">
       Kommende Termine
     </h2>
-    <UpcomingEvents client:load />
+    {events?.events.length ? (
+      <ul role="list" class="mt-6 grid gap-6">
+        {events.events.map((event, i) => (
+          <li>
+            <EventSummary
+              view={{ ...event.view, kicker: i === 0 ? 'Nächster Termin' : 'Weiterer Termin' }}
+              location="event-landing"
+            />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="mt-6">
+        <EventAvailability data={events} location="event-landing" />
+      </div>
+    )}
   </div>
 
   <aside

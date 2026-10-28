@@ -18,16 +18,16 @@ interface Props {
 const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.props;
 ---
 
-<Section id={anchor} ground="alt" labelledby="statement-title" class="band-widen">
-  <div class="reveal grid items-center gap-x-grid gap-y-8 lg:grid-cols-12">
+<Section id={anchor} ground="alt" labelledby="statement-title">
+  <div class="grid items-center gap-x-grid gap-y-8 lg:grid-cols-12">
     <div class="grid justify-items-start lg:col-span-7">
       {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
       <h2 id="statement-title" class="text-section text-fg">
         {lines.map((line, i) =>
           i > 0 ? (
-            <em class="slide-in block font-serif font-normal text-accent [--slide-from:12%]">{line}</em>
+            <em class="block font-serif font-normal text-accent [--slide-from:12%]">{line}</em>
           ) : (
-            <span class="slide-in block">{line}</span>
+            <span class="block">{line}</span>
           ),
         )}
       </h2>
@@ -44,10 +44,7 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
         data-breath
         class="group/breath flex flex-wrap items-center gap-6 lg:col-span-4 lg:col-start-9 lg:flex-col lg:text-center"
       >
-        <span
-          class="breath-orbit orbit-in relative grid size-28 shrink-0 place-items-center lg:size-44"
-          aria-hidden="true"
-        >
+        <span class="breath-orbit relative grid size-28 shrink-0 place-items-center lg:size-44" aria-hidden="true">
           <span class="breath-ring absolute inset-0 rounded-full border border-fill/50 [--alpha:1] [--rest:0.62]"></span>
           <span class="breath-ring absolute inset-[14%] rounded-full border border-fill/40 [--alpha:1] [--rest:0.55]"></span>
           <span class="breath-ring absolute inset-[30%] rounded-full bg-fill/15 [--alpha:1] [--rest:0.5]"></span>

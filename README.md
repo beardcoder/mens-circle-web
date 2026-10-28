@@ -14,6 +14,7 @@ bun run dev            # http://localhost:4321 (daemon: bunx astro dev status|lo
 
 ```bash
 bun run check && bun run lint && bun test   # types, lint, tests
+bun run test:pages                          # production HTML, disposable DB; builds first
 bun run format                              # prettier
 bun run build                               # runs Astro on Bun; images through Sharp
 bun run db:generate                         # migration after editing db/schema.ts
@@ -49,8 +50,9 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Page content and section order: directly in `src/pages/*.astro`
 - Section markup: `src/components/blocks/`; content arrives as explicit props and slots at its page location
 - Static FAQ answers, journey steps and facts use slotted items; FAQ/journey microdata comes from the visible HTML
-- Home and `/event`: prerendered HTML; Preact islands load dates, seats and testimonials
+- Home and `/event`: server-rendered dates, seats and approved testimonials from bounded cached reads; no content hydration or browser JSON request
 - Event details: SSR metadata and copy, cached reads plus live Preact capacity and registration
+- Public CSS: shared hashed stylesheets, cached between pages; portraits use responsive Astro images
 - Public JSON, cache durations and privacy boundary: `docs/public-api.md`
 - Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)
 - Public component behavior: `<script>` in the owning Astro component; shared public form helpers stay in `src/lib/`

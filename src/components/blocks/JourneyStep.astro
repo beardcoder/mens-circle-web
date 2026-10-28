@@ -11,16 +11,15 @@ const { title, number } = Astro.props;
   itemprop="itemListElement"
   itemscope
   itemtype="https://schema.org/ListItem"
-  class="reveal reveal-stagger group/step grid content-start gap-3"
-  style={`--motion-order: ${number - 1}`}
+  class="group/step grid content-start gap-3"
 >
   <meta itemprop="position" content={String(number)} />
-  <span aria-hidden="true" class="draw mb-2 block h-px bg-line-strong"></span>
+  <span aria-hidden="true" class="mb-2 block h-px bg-line-strong"></span>
   <span
     class="overflow-clip font-sans text-sub font-medium text-accent tabular-nums motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover/step:translate-x-1"
     aria-hidden="true"
   >
-    <span class="mask-rise block">{String(number).padStart(2, '0')}</span>
+    <span class="block">{String(number).padStart(2, '0')}</span>
   </span>
   <h3 itemprop="name" class="text-sub text-fg">
     {title}

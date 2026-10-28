@@ -19,7 +19,7 @@ const { items, class: className } = Astro.props;
 
 <ul class:list={['grid border-t border-line-strong', className]} role="list">
   {items.map((item) => (
-    <li class="reveal border-b border-line-strong">
+    <li class="border-b border-line-strong">
       <a
         href={item.href}
         data-astro-prefetch={item.prefetch ? 'hover' : undefined}

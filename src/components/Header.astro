@@ -102,12 +102,44 @@ const roundButton =
       data-nav-open
       aria-controls="nav"
       aria-haspopup="dialog"
+      aria-expanded="false"
       class:list={[roundButton, 'nav:hidden max-[26rem]:px-2.5']}
     >
       <Icon name="menu" aria-hidden="true" class="size-5" />
       <span class="max-[26rem]:sr-only">Menü</span>
     </button>
   </Container>
+
+  <noscript>
+    <style is:inline>
+      #header {
+        background: var(--color-ground);
+        color: var(--color-fg);
+      }
+      [data-nav-open] {
+        display: none;
+      }
+      @media (width < 68.75rem) {
+        body {
+          padding-top: 3.25rem;
+        }
+        html {
+          scroll-padding-top: 9.25rem;
+        }
+      }
+    </style>
+    <nav aria-label="Seitennavigation" class="border-b border-line bg-ground px-gutter py-2 text-fg nav:hidden">
+      <ul role="list" class="flex gap-4 overflow-x-auto">
+        {links.map((link) => (
+          <li class="shrink-0">
+            <a href={link.url} class="inline-flex min-h-11 items-center text-base underline underline-offset-4">
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </noscript>
 
   {/* The phone menu: the content links, the action, then the display option. It
       opens as a circle from the menu button (`--nav-origin`, set by
@@ -224,13 +256,25 @@ const roundButton =
    * and closes as a circle from the menu button.
    */
   const initMenu = (menu: HTMLDialogElement): void => {
-    for (const opener of document.querySelectorAll<HTMLButtonElement>('[data-nav-open]')) {
+    const openers = document.querySelectorAll<HTMLButtonElement>('[data-nav-open]');
+
+    menu.addEventListener('close', () => {
+      openers.forEach((opener) => opener.setAttribute('aria-expanded', 'false'));
+    });
+
+    // A hidden modal still makes the document inert; close it when desktop navigation takes over.
+    matchMedia('(min-width: 68.75rem)').addEventListener('change', (event) => {
+      if (event.matches && menu.open) menu.close();
+    });
+
+    for (const opener of openers) {
       opener.addEventListener('click', () => {
         // The menu opens as a circle from the button's centre (`--nav-origin` in Header.astro).
         const { left, top, width, height } = opener.getBoundingClientRect();
 
         menu.style.setProperty('--nav-origin', `${left + width / 2}px ${top + height / 2}px`);
         menu.showModal();
+        opener.setAttribute('aria-expanded', 'true');
         // `showModal()` focuses the first link, the mark, and Safari rings it even
         // after a tap: the dialog itself takes the focus, Tab moves on from there.
         menu.focus();
@@ -248,6 +292,12 @@ const roundButton =
         event.preventDefault();
         menu.close();
         const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+
+        if (target) {
+          if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+
+          target.focus({ preventScroll: true });
+        }
 
         target?.scrollIntoView({ behavior: scrollBehavior() });
         history.pushState(null, '', hash);

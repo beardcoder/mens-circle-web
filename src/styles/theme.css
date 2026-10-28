@@ -13,17 +13,6 @@
 /* The mode toggle picks its label from the mode the boot script resolved. */
 @custom-variant dark (&:where([data-mode-resolved='dark'], [data-mode-resolved='dark'] *));
 
-/* A one-time entrance: only with motion allowed, and never after a view
-   transition, which already cross-fades the new page in (Layout.astro sets
-   `.vt-arrival` before the first paint). */
-@custom-variant entrance {
-  @media (prefers-reduced-motion: no-preference) {
-    :root:not(.vt-arrival) & {
-      @slot;
-    }
-  }
-}
-
 /* Under a page that opens on the dark focus ground (`data-hero` on it): the
    header starts clear with light text over it. */
 @custom-variant over-hero (&:where(body:has([data-hero]) *));
@@ -131,9 +120,6 @@
   --text-hero--line-height: 1.08;
   --text-hero--letter-spacing: -0.02em;
 
-  /* Short section labels: spaced capitals, never on controls. */
-  --tracking-label: 0.14em;
-
   /* Space. `section` the vertical space of a section, `band` that of a compact
      band, `group` from an explanation to the module after it, `grid` the column
      gap, `gutter` the page's side margin. Values per width on :root below. */
@@ -164,60 +150,24 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
 
-  /* Motion. Interactions take ~180ms (`duration-180`) and may move a little
-     (a button rises 2px, an arrow slides). Openings enter with a short rise
-     (`animate-rise`, staggered with `animate-delay-*`); blocks rise into view as
-     they scroll in (`reveal`); lines draw across (`draw`); the circles breathe
-     (`animate-ring`, `animate-ring-slow`, the breath guide). Under reduced
-     motion everything rests. */
-  --animate-rise: rise 720ms var(--ease-out) both;
-  --animate-fade-in: fade-in 480ms var(--ease-out) both;
-  --animate-ring: ring-breathe 16s var(--ease-in-out) infinite;
-  --animate-ring-slow: ring-breathe 23s var(--ease-in-out) infinite;
-  --animate-breathe: breathe 10s infinite both;
+  /* Motion is reserved for opening controls and loading indicators. */
+  --animate-rise: rise 240ms var(--ease-out) both;
+  --animate-fade-in: fade-in 180ms var(--ease-out) both;
   --animate-skeleton: pulse 2s ease-in-out infinite;
 }
 
-/* The hero's ring: a slow widening and settling. */
-@keyframes ring-breathe {
-  0%,
-  100% {
-    opacity: 0.55;
-    scale: 0.96;
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
-
-  50% {
+  to {
     opacity: 1;
-    scale: 1.04;
   }
 }
 
-/* Breath — one cycle of 10 s: in 4 s, hold 0.5 s, out 5 s, rest 0.5 s. The guide
-   beside it says "vier Sekunden ein, fünf aus"; keep both in step. Elements set
-   --rest (scale when empty) and --alpha (opacity when full). */
-@keyframes breathe {
-  0% {
-    opacity: calc(var(--alpha, 1) * 0.45);
-    transform: scale(var(--rest, 0.88));
-    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
-  }
-
-  40% {
-    opacity: var(--alpha, 1);
-    transform: scale(1);
-    animation-timing-function: linear;
-  }
-
-  45% {
-    opacity: var(--alpha, 1);
-    transform: scale(1);
-    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
-  }
-
-  95%,
-  100% {
-    opacity: calc(var(--alpha, 1) * 0.45);
-    transform: scale(var(--rest, 0.88));
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
   }
 }
 
@@ -245,13 +195,6 @@
   from {
     opacity: 0;
     translate: 0 1.25rem;
-  }
-}
-
-/* A line drawn across from its start edge. */
-@keyframes draw-x {
-  from {
-    scale: 0 1;
   }
 }
 
@@ -287,34 +230,6 @@
   --color-danger: #f0a197;
   color: var(--color-fg);
   background-color: var(--color-surface);
-}
-
-/* ── Scroll-driven utilities ──────────────────────────────────────────────── */
-
-/* Rises into view as it scrolls in, tied to the scroll position: an element
-   already on screen is already complete, and nothing waits on a script. Gated,
-   so where timelines or motion are unavailable the content simply stands. */
-@utility reveal {
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      animation: scroll-reveal linear both;
-      animation-timeline: view();
-      animation-range: entry var(--reveal-start, 0%) entry var(--reveal-end, 85%);
-    }
-  }
-}
-
-/* A line that draws itself across as it enters (from the start edge). */
-@utility draw {
-  transform-origin: left center;
-
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      animation: draw-x linear both;
-      animation-timeline: view();
-      animation-range: entry 10% cover 40%;
-    }
-  }
 }
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
@@ -399,7 +314,7 @@
     /* Anchors clear the fixed bar. */
     scroll-padding-top: var(--spacing-clearance);
     scrollbar-gutter: stable;
-    text-size-adjust: none;
+    text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
   }
 

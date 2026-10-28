@@ -77,8 +77,8 @@ export const formStatus =
 
 export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer accent-fill';
 
-/** A short section label: small spaced capitals in the secondary text colour. */
-export const label = 'font-sans text-xs font-semibold tracking-label text-fg-muted uppercase';
+/** A short section label: sentence case in the secondary text colour. */
+export const label = 'font-sans text-sm font-semibold text-fg-muted';
 
 /** A card: a self-contained module (a date, a form). Square and flat: a thin line, no shadow. */
 export const card = 'border border-line-strong bg-raised';
