@@ -1,7 +1,7 @@
 ---
 import site from '@data/site.json';
-import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
 import { breadcrumbSchema, eventSeriesSchema } from '@lib/event-schema';
+import { readPublicEvents } from '@lib/server/public-data';
 import { link } from '@lib/ui';
 
 import Faq from '../components/blocks/Faq.astro';
@@ -11,9 +11,12 @@ import PageIntro from '../components/PageIntro.astro';
 import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
-export const prerender = true;
+const events = await readPublicEvents().catch(() => null);
 
-Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
+if (!events) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Cache-Control', 'no-store');
+}
 
 const siteUrl = Astro.site!;
 const canonical = new URL('/event', siteUrl).href;
@@ -23,7 +26,6 @@ const canonical = new URL('/event', siteUrl).href;
   title={`Termine & Anmeldung – ${site.siteName}`}
   description="Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis."
   schemas={[eventSeriesSchema(siteUrl), breadcrumbSchema(siteUrl, [['Termine', canonical]])]}
-  preloadData={['/api/public/events']}
 >
   <PageIntro eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung">
     <Fragment slot="lead">
@@ -38,7 +40,7 @@ const canonical = new URL('/event', siteUrl).href;
   </PageIntro>
 
   {/* The dates are what this page is for; the notification stands beside them, smaller. */}
-  <EventList />
+  <EventList events={events} />
 
   <Faq anchor="fragen-zum-termin" eyebrow="Vor dem Termin" title="Fragen zu Termin und Anmeldung">
     <AccordionItem question="Wann findet der nächste Männerkreis statt?">

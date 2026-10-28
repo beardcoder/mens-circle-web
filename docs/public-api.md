@@ -23,10 +23,15 @@ admin edits and registrations clear this cache. CDN copies may remain for up to
 30 seconds (testimonials: 5 minutes). Registration always checks capacity in its
 existing database transaction; a displayed seat count never guarantees a seat.
 
-Pages whose islands hydrate on load preload their JSON in the head (`Layout`
-`preloadData`), so the read starts with the HTML rather than after the island scripts.
-The browser shares each request across islands, retains loaded data during refresh,
-and revalidates on focus/visibility after 30 seconds. There is no interval polling.
-Testimonials load near the viewport. Retry is explicit after a failed read. Posting
-forms still uses the existing Astro Actions and their field validation, CSRF,
-honeypot and per-IP rate limits.
+Home and `/event` render cached public data on the server. Dates and approved
+quotes are present in the initial HTML, with no hydration or browser JSON reads.
+Their HTML revalidates on every navigation; the process read cache still applies.
+A failed event read produces a 503 page with `Cache-Control: no-store` and a reload
+link. A testimonial-only failure leaves the home page usable but disables caching.
+An empty successful read shows a notification invitation, never an error.
+
+The event registration island still preloads its public event JSON through
+`Layout`'s `preloadData`. Its browser resource retains data during refresh and
+revalidates on focus/visibility after 30 seconds. There is no interval polling.
+Posting forms still uses the existing Astro Actions and their field validation,
+CSRF, honeypot and per-IP rate limits. The endpoint contracts are unchanged.

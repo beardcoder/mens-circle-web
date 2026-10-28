@@ -1,0 +1,35 @@
+---
+import { button, card, label } from '@lib/ui';
+
+import EventSummary from './EventSummary.astro';
+import type { PublicEvents } from './types';
+
+interface Props {
+  /** null means unavailable; an empty list means no published dates. */
+  data: PublicEvents | null;
+  location: string;
+  showAction?: boolean;
+}
+
+const { data, location, showAction = true } = Astro.props;
+const next = data?.events[0];
+---
+
+{next ? (
+  <EventSummary view={next.view} location={location} showAction={showAction} />
+) : (
+  <div class:list={[card, 'grid content-start gap-4 p-6 sm:p-8']}>
+    <p class={label}>Nächster Termin</p>
+    <p class="font-serif text-sub text-fg">
+      {data ? 'Der nächste Abend ist in Planung.' : 'Die Termine sind gerade nicht abrufbar.'}
+    </p>
+    <p class="text-base text-fg-muted">
+      {data
+        ? 'Sobald ein Termin feststeht, findest du ihn hier. Lass dich auf Wunsch per E-Mail informieren.'
+        : 'Bitte lade die Seite erneut oder versuche es später noch einmal.'}
+    </p>
+    <a class={button({ variant: 'secondary' })} href={data ? '/event#benachrichtigung' : Astro.url.pathname}>
+      {data ? 'Über neue Termine informieren' : 'Seite erneut laden'}
+    </a>
+  </div>
+)}

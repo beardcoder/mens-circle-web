@@ -17,8 +17,7 @@ interface Props {
 
 const { eyebrow, title, id, titleId } = Astro.props;
 
-const titleClass =
-  'max-w-[12em] text-page text-fg wrap-anywhere hyphens-auto entrance:animate-rise entrance:animate-delay-[90ms]';
+const titleClass = 'max-w-[12em] text-page text-fg wrap-anywhere hyphens-auto';
 
 const hasLead = Astro.slots.has('lead');
 const hasAction = Astro.slots.has('default');
@@ -28,23 +27,23 @@ const hasMedia = Astro.slots.has('media');
 <section id={id} aria-labelledby={titleId} class="pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group">
   <Container class:list={['grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
     <div class:list={['grid justify-items-start', hasMedia && 'lg:col-span-7']}>
-      {eyebrow && <Eyebrow class="mb-3 entrance:animate-rise">{eyebrow}</Eyebrow>}
+      {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
       <h1 id={titleId} class={titleClass}>
         {title}
       </h1>
       {hasLead && (
-        <div class="mt-6 max-w-measure text-lg text-fg-muted entrance:animate-rise entrance:animate-delay-[180ms]">
+        <div class="mt-6 max-w-measure text-lg text-fg-muted">
           <slot name="lead" />
         </div>
       )}
       {hasAction && (
-        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 entrance:animate-rise entrance:animate-delay-[260ms]">
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
           <slot />
         </div>
       )}
     </div>
     {hasMedia && (
-      <div class="lg:col-span-4 lg:col-start-9 entrance:animate-rise entrance:animate-delay-[200ms]">
+      <div class="lg:col-span-4 lg:col-start-9">
         <slot name="media" />
       </div>
     )}

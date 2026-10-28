@@ -1,7 +1,7 @@
 ---
 import site from '@data/site.json';
-import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
 import { eventSeriesSchema } from '@lib/event-schema';
+import { readPublicEvents, readPublicTestimonials } from '@lib/server/public-data';
 
 import photo from '../assets/images/markus-sommer.jpg';
 import Dates from '../components/blocks/Dates.astro';
@@ -17,53 +17,51 @@ import Moderator from '../components/blocks/Moderator.astro';
 import Newsletter from '../components/blocks/Newsletter.astro';
 import Statement from '../components/blocks/Statement.astro';
 import Testimonials from '../components/blocks/Testimonials.astro';
-import NextEventFact from '../components/event/NextEventFact';
 import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
-export const prerender = true;
+// Runtime reads share the existing bounded cache; no event data is frozen at build time.
+const [eventsResult, testimonialsResult] = await Promise.allSettled([readPublicEvents(), readPublicTestimonials()]);
+const events = eventsResult.status === 'fulfilled' ? eventsResult.value : null;
+const testimonials = testimonialsResult.status === 'fulfilled' ? testimonialsResult.value.testimonials : null;
 
-Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
+if (!events) Astro.response.status = 503;
+
+if (!events || !testimonials) Astro.response.headers.set('Cache-Control', 'no-store');
 ---
 
 <Layout
   title="Männerkreis Niederbayern · Straubing und Umgebung"
   description="Männerkreis in Straubing, Niederbayern: Männer sitzen im Kreis, hören zu und sprechen offen, dazu einfache Atemübungen. Auf Spendenbasis, ohne Vorerfahrung."
   schemas={[eventSeriesSchema(Astro.site!)]}
-  preloadData={['/api/public/events']}
 >
-  <Hero kicker="Männerkreis in Straubing · Niederbayern" secondaryLabel="Wie ein Abend abläuft" secondaryLink="#reise">
-    <Fragment slot="title">
-      Ein Abend, an dem du <em class="font-serif font-normal text-accent">nichts darstellen</em> musst.
-    </Fragment>
+  <Hero
+    events={events}
+    kicker="Männerkreis in Straubing · Niederbayern"
+    secondaryLabel="Wie ein Abend abläuft"
+    secondaryLink="#reise"
+  >
+    <Fragment slot="title">Ein Abend, an dem du nichts darstellen musst.</Fragment>
     Wir sitzen im Kreis und sprechen über das, was uns gerade beschäftigt. Die anderen hören zu, ohne zu bewerten oder
     Ratschläge zu geben. Je nach Abend kommen einfache Atem- und Körperübungen dazu. Du entscheidest, ob du mitmachst.
   </Hero>
 
   <Facts anchor="praktisches" eyebrow="Auf einen Blick">
-    <Fact label="Wo" order={0}>
-      <NextEventFact client:load slot="value" kind="place">
-        {site.geo.locality}
-      </NextEventFact>
+    <Fact label="Wo">
+      <Fragment slot="value">{events?.next?.place || site.geo.locality}</Fragment>
       Adresse und Anfahrt stehen beim jeweiligen Termin
     </Fact>
-    <Fact label="Wie oft" order={1}>
+    <Fact label="Wie oft">
       <Fragment slot="value">Alle 2–4 Wochen</Fragment>
       Ohne Mitgliedschaft – du kommst, wann es passt
     </Fact>
-    <Fact label="Dauer" order={2}>
+    <Fact label="Dauer">
       <Fragment slot="value">2–3 Stunden</Fragment>
-      <NextEventFact client:load kind="time">
-        Ein Abend, kein Seminar
-      </NextEventFact>
+      {events?.next?.timeRange ? `Nächster Termin: ${events.next.timeRange}` : 'Ein Abend, kein Seminar'}
     </Fact>
-    <Fact label="Beitrag" order={3}>
-      <NextEventFact client:load slot="value" kind="fee">
-        Spendenbasis
-      </NextEventFact>
-      <NextEventFact client:load kind="feeNote">
-        Du gibst, was für dich machbar ist
-      </NextEventFact>
+    <Fact label="Beitrag">
+      <Fragment slot="value">{events?.fee.main || 'Spendenbasis'}</Fragment>
+      {events?.fee.note ?? 'Du gibst, was für dich machbar ist'}
     </Fact>
   </Facts>
 
@@ -187,6 +185,7 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
   />
 
   <Testimonials
+    items={testimonials}
     anchor="stimmen"
     eyebrow="Aus dem Kreis"
     title="Was Teilnehmer geschrieben haben"
@@ -226,6 +225,7 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
   </Faq>
 
   <Dates
+    events={events}
     anchor="termine"
     eyebrow=""
     lede={

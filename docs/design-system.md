@@ -2,72 +2,25 @@
 
 ## Public design update — October 2026
 
-Organic refinements: section transitions keep their straight edges.
-Hero rings have subtly uneven contours. On desktop the four
-evening phases sit at different heights; on smaller screens they keep their regular
-reading order. The intro questions use the existing staggered scroll reveal.
+A calm invitation to a real meeting. The existing paper, charcoal and rust palette
+stays; Playfair Display carries headings and quotes, DM Sans carries explanations,
+controls and data. Public headings scale fluidly: hero 44–80px, section 30–52px.
+Labels use sentence case. The home statement is a single, continuous heading.
 
-The breath illustration now rests until its button starts it. Rings and phase
-labels share an exact nine-second cycle (four seconds in, five out, no holds).
-The button stops it, as do leaving the viewport, hiding the tab or enabling reduced
-motion. Under reduced motion the illustration and instruction remain static and
-the controls hide. No additional dependencies are used.
+The hero puts the invitation and actions on the left and a server-rendered next
+date on the right. On phones they stack in that order. An empty schedule offers
+email notifications; unavailable data shows an explicit reload action. Dates and
+approved quotes are rendered on the server, using the existing bounded read cache.
+Long quotes use native `details`, and long venue or fee values wrap without clipping.
 
-The public site uses medium-weight DM Sans headings with Playfair italic for the
-hero emphasis and the breath statement. Hero titles scale from 44–80px, section
-titles from 30–52px. These typography overrides live in `src/styles/global.css`;
-admin typography stays unchanged.
+Static circle outlines recall the seating arrangement. Reading text, headings,
+photos and the footer stay still. Motion is limited to interactions, the reading
+progress indicator and the existing event dock. The optional breath guide starts
+only on request; leaving its viewport, hiding the tab or enabling reduced motion
+stops it. FAQ and menu transitions respect reduced motion.
 
-All colours come from the shared tokens in `src/styles/theme.css`: warm paper,
-warm charcoal and one rust accent. The hero and footer are the dark anchors;
-content sections stay on paper or the quiet secondary paper. Two slowly breathing circle outlines,
-moderately sized phase numbers and generous space bring movement without heavy
-colour blocks, thick frames or oversized decoration.
-
-The hero adds soft rust radial gradients over warm charcoal. Its minimum height
-scales from 90svh on phones to the smaller of 58rem or 100svh on desktops;
-content can always expand it. Extra vertical padding gives the opening more air.
-
-The breath invitation spans the full viewport width on the secondary paper,
-with its text and circle aligned to the shared content grid.
-
-Motion update: section headings and rows rise into view over a longer scroll
-range; facts, phases and agreements are staggered by scroll position. The photo
-moves slower than its frame, and the hero actions enter last. FAQ answers fade in. A thin reading-progress line follows the
-page scroll. Scroll effects use native CSS timelines and fall back to visible,
-static content. All additions respect reduced motion and require no JavaScript.
-
-Review refinements: personal-page text sections use the shared heading/content
-split on desktop and stack on mobile. Navigation marks the current page. The footer
-uses the same sans wordmark as the header, with two-column navigation on phones.
-Long legal headings wrap and hyphenate. When no next date is scheduled, the home
-close displays a notification invitation instead of an empty column. Back-to-top
-visibility follows the existing scroll handler in all motion modes.
-
-The reference below describes the shared foundations; the public typography
-above takes precedence over the original serif heading specification.
-
-Calm, warm, clear and contemporary: the site reads like a carefully made
-invitation to a real meeting — personal, approachable, precise. It keeps its
-identity (the mark and the circle, Playfair Display and DM Sans, a warm ground, a
-restrained rust, the photograph) and gets its modernity from proportion, clear
-navigation, fluid type, steady spacing and careful interaction. It is flat — clear
-grounds and thin lines, no shadows — and it moves: openings rise in, blocks rise
-into view as they scroll in, lines draw across, the circles breathe.
-Built on Tailwind CSS v4 utilities over the tokens in `src/styles/theme.css`; there
-are no component stylesheets.
-
-Four rules decide:
-
-1. **Meaning sets size.** The home statement carries the page; section titles
-   support the reading.
-2. **What belongs together stays together.** An explanation and its questions share
-   one ground; a date's facts stand in one summary.
-3. **Decoration has one place.** The circle: the rings behind the home opening,
-   the breathing circle of the breath invitation, the phone menu that opens as a
-   circle. Everything you press is round; everything that holds is square.
-4. **Same function, same design.** Fields, buttons, dates and states come from
-   shared components.
+Four principles: make the next step visible, group related information, keep
+reading lines short, and reuse the same components for the same function.
 
 ## Files
 
@@ -76,9 +29,8 @@ Four rules decide:
 | `src/styles/theme.css`    | Tokens (`@theme`), primitives, variants, the two surfaces, keyframes, base rules. Shared.                                                    |
 | `src/styles/global.css`   | Public entry: Tailwind, theme, view transitions. Excludes the admin sources (`@source not`).                                                 |
 | `src/styles/admin.css`    | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                                                             |
-| `tailwind-animations`     | Animation utilities (`animate-delay-*`) and keyframes (`fade-in`, `pulse`), imported by both entries before `theme.css`.                     |
 | `src/lib/ui.ts`           | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
-| `src/lib/event-status.ts` | The view model every date summary renders (`nextDateView`, `eventView`, `splitFee`).                                                         |
+| `src/lib/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
 | `src/components/ui/`      | The components built on them.                                                                                                                |
 
 ## Tokens
@@ -126,14 +78,11 @@ named by role:
 | `text-base`    | 16px      | controls, buttons, data                 |
 | `text-sm`/`xs` | 14 / 13px | hints, captions / labels                |
 
-Titles are one colour. The italic in the accent colour appears twice on the whole
-site: the phrase of the home statement (`titleEmphasis` in `home.json`) and the
-second line of the breath invitation. Section labels are small spaced capitals
-(`label`, `tracking-label` 0.14em) with no rule beside them; buttons, labels of
-fields and navigation are in normal case. Running text stays on `max-w-measure`
-(~62 characters), set left; centring is for nothing longer than a short line. A
-long word in a title hyphenates or wraps (`hyphens-auto wrap-anywhere`), and a
-known long one carries a soft hyphen (`Datenschutz&shy;erklärung`).
+Headings use one colour. Section labels use sentence case (`label`) without added
+letter spacing. Running text stays on `max-w-measure` (~62 characters), aligned
+left. Long words wrap or hyphenate. Upright serif and sans faces preload; italics
+load only when used. The CSS is shared in hashed assets rather than inlined in
+every document.
 
 **Grid and space.** One content width: 1200px between the side margins
 (`max-w-page`, `Container`); margins 20 / 32 / 48px (`px-gutter`). Header,
@@ -156,48 +105,9 @@ raised ground), never a shadow; a card carries at most one emphasis — no colou
 cap, no glow, no frame around a photo. Lists and quotes stand without cards, under
 thin lines. `shadow-overlay` is reserved for admin dialogs, action menus and the save bar.
 
-**Motion.** It carries the site's energy; it never carries content.
-
-- Interactions take ~180ms (`duration-180`): a button changes colour and rises 2px
-  (pressed, it settles), its arrow slides; a header link draws a line under itself;
-  the FAQ's round plus turns into a minus; the mark turns a little on hover.
-- Openings rise in, one after the other (`entrance:animate-rise` with
-  `animate-delay-*`, ≤ 260ms in all; never after a view transition): the home
-  statement, a sub-page's title, an event's date.
-- Blocks rise into view as they scroll in (`reveal`: section heads, list items,
-  the breath panel, the date cards), and the lines over facts, phases, agreements
-  and positions draw across (`draw`). Both are tied to the scroll position on a
-  `view()` timeline: what is already on screen is already complete, and without
-  timeline support or with reduced motion the content simply stands.
-- The circles breathe: the hero's three rings out of phase (`animate-ring`,
-  `animate-ring-slow`); the breath guide (`animate-breathe`, 4 s in, 5 s out — the
-  words beside it say the same).
-- The phone menu opens as a circle from its button (`clip-path`, `--nav-origin`),
-  its links rising in; the scroll-to-top button appears past the first screen
-  (`data-visible`, set by the existing scroll handler).
-- No parallax (nothing moves at its own speed against the page), no scroll-tied
-  size changes, no `content-visibility` (anchors land where they should). Under
-  `prefers-reduced-motion` everything rests and the timed breath guide hides.
-- The exception is an event page, which carries its own scroll choreography:
-  the hours, the date and the giant title fly one after another into the dock
-  under the header (`EventDock`, a scroll timeline on WAAPI, measured from the
-  layout); the question's words light up (`word-reveal`) beside a circle that
-  closes as it is read (`ring-close`, `ring-turn`); the map frame opens from its
-  middle (`unveil`) beside a gently offset text column (`parallax`). Without
-  scroll timelines or under reduced motion the dock simply appears and the rest
-  stands.
-- The home page adds scroll motion of its own: the opening's content sinks and
-  fades as the hero leaves while its rings drift, turn and widen (`hero-leave`,
-  `rings-drift`); section titles light up word by word (`word-light`, home
-  only, since every section head there starts below the first screen); the two
-  lines of the breath statement slide in from opposite sides (`slide-in`); the
-  portrait moves slower than its frame (`photo-parallax`); Markus's quote lights
-  up word by word; the step numbers rise out of their own box (`mask-rise`);
-  labels gather from wide spacing (`tracking-in`, home only); the breath circle
-  widens and turns into place (`orbit-in`); the bands on the secondary ground grow
-  from the page's edges to full width (`band-widen`); and on the desktop the page
-  lifts off the footer like a curtain, the footer's content settling as it shows
-  (`footer-rise`, on the `--page` timeline of `<main>`).
+**Motion.** Short transitions answer interactions. Content never depends on an
+entrance or a scroll reveal. Shared keyframes live in `theme.css`; no animation
+dependency is needed. Reduced motion disables transitions and animated movement.
 
 ## Components
 
@@ -212,7 +122,7 @@ thin lines. `shadow-overlay` is reserved for admin dialogs, action menus and the
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                       |
 | `Field`, `control()`, `FormStatus`                | Label, a pill control (the buttons' heights), hint, field error; the result line under its button |
 | `EventSummary`                                    | One date: label, the date on two fixed lines, time / place / fee / seats, the action that fits    |
-| `TestimonialList` (Preact)                        | `short` at the quote size (one per section), `text` as running text; long voices fold             |
+| `TestimonialList` (Astro)                         | `short` at the quote size (one per section), `text` as running text; long voices fold             |
 | `Accordion`                                       | Questions in DM Sans, a plus that becomes a minus, answers on the measure                         |
 | `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                            |
 | `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                     |
@@ -232,7 +142,7 @@ that ends on one sets it itself.
 
 - **Home.** The opening on the dark ground: statement, explanation, the main action
   with the link to the evening's course, the next date beside them (on phones:
-  statement, explanation, date, action); at 1440 × 900 the action is in the first
+  statement, explanation, action, date); at 1440 × 900 the action is in the first
   screen. Then the facts band (`alt`, 4 / 2 / 1 columns, a long fee split into a
   short value and a note), the intro (text 7 columns, the questions 4 columns behind
   a line), the course in four phases (4 / 2 / 1) with the breath panel (`#haltung`)

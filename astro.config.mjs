@@ -58,13 +58,11 @@ export default defineConfig({
   prefetch: { prefetchAll: false },
   build: {
     assets: 'assets',
-    inlineStylesheets: 'always',
+    inlineStylesheets: 'auto',
   },
   fonts: [
-    // Playfair Display speaks: titles at its regular weight, tracked in, with
-    // the italic as the accent; quotes in the italic. DM Sans explains: text,
-    // UI, labels. Both variable. Tailwind maps them to `font-serif` and
-    // `font-sans`; the admin uses the same two.
+    // Playfair Display for headings and quotes; DM Sans for prose, UI and labels.
+    // Both variable, mapped to font-serif and font-sans in the shared theme.
     {
       name: 'Playfair Display',
       cssVariable: '--font-playfair',
@@ -88,6 +86,8 @@ export default defineConfig({
     preact(),
     icon(),
     sitemap({
+      // These public entry pages now render current data on demand.
+      customPages: [new URL('/', siteUrl).href, new URL('/event', siteUrl).href],
       // The event pages are SSR; their sitemap is a route, listed in the index here.
       customSitemaps: [new URL('/sitemap-events.xml', siteUrl).href],
       // The testimonial form is for people who were there, not for search (noindex too).

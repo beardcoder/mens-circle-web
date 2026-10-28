@@ -1,10 +1,13 @@
 ---
+import type { TestimonialDTO } from '@lib/types';
+
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
 import TextLink from '../ui/TextLink.astro';
-import TestimonialList from './TestimonialList';
+import TestimonialList from './TestimonialList.astro';
 
 interface Props {
+  items: TestimonialDTO[] | null;
   anchor: string;
   eyebrow: string;
   title: string;
@@ -14,13 +17,17 @@ interface Props {
   linkLabel: string;
 }
 
-const { anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel } = Astro.props;
+const { items, anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel } = Astro.props;
 ---
 
 <Section id={anchor} labelledby="testimonials-title">
   <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" />
 
-  <TestimonialList client:visible={{ rootMargin: '300px' }} emptyText={emptyText} errorText={errorText} />
+  {items?.length ? (
+    <TestimonialList items={items} />
+  ) : (
+    <p class="mt-6 text-md text-fg-muted">{items ? emptyText : errorText}</p>
+  )}
   <p class="mt-6">
     <TextLink href={linkUrl}>{linkLabel}</TextLink>
   </p>

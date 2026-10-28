@@ -72,7 +72,7 @@ export const splitFee = (costBasis = ''): { main: string; note: string } => {
   return { main: fee, note: '' };
 };
 
-/** One row of an event summary: a term and its value, each one line. */
+/** One row of an event summary: a term and its value, wrapping when needed. */
 interface SummaryRow {
   label: string;
   value: string;
@@ -80,8 +80,8 @@ interface SummaryRow {
 
 /**
  * Everything an event summary shows, in every state. Scheduled and past dates
- * name time, place, fee and seats in the same four rows. Loading and error states
- * are rendered by the client islands, separate from event data.
+ * name time, place, fee and seats in the same four rows. Empty and error states
+ * are rendered separately by EventAvailability.
  */
 export interface SummaryView {
   state: 'open' | 'full' | 'past';

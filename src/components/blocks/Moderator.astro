@@ -19,8 +19,6 @@ interface Props {
 }
 
 const { anchor, eyebrow, name, quote, image, imageAlt, linkLabel, linkUrl } = Astro.props;
-// The quote lights up word by word (`word-light`), its marks on the first and last word.
-const quoteWords = quote ? `„${quote}“`.split(' ') : [];
 ---
 
 <Section id={anchor} labelledby="person-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
@@ -31,7 +29,7 @@ const quoteWords = quote ? `„${quote}“`.split(' ') : [];
     class="lg:col-span-7 lg:col-start-6 lg:row-start-1"
   />
 
-  <figure class="reveal aspect-4/3 overflow-clip lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-4/5 lg:self-start">
+  <figure class="aspect-4/3 overflow-clip lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-4/5 lg:self-start">
     <Image
       src={image}
       alt={imageAlt}
@@ -39,23 +37,16 @@ const quoteWords = quote ? `„${quote}“`.split(' ') : [];
       width={800}
       height={1000}
       position="left"
-      class="photo-parallax block size-full object-cover"
+      widths={[400, 640, 800]}
+      sizes="(min-width: 80rem) 480px, (min-width: 64rem) 42vw, (min-width: 48rem) calc(100vw - 4rem), calc(100vw - 2.5rem)"
+      class="block size-full object-cover"
     />
   </figure>
 
   <div class="grid content-start justify-items-start gap-6 lg:col-span-7 lg:col-start-6 lg:row-start-2">
     {quote && (
       <blockquote class="max-w-measure border-l-2 border-line-strong pl-5 font-serif text-quote text-fg">
-        <p class="[view-timeline:--words]">
-          {quoteWords.map((word, index) => (
-            <>
-              <span class="word-light" style={`--word: ${((index / quoteWords.length) * 6).toFixed(2)}`}>
-                {word}
-              </span>
-              {index < quoteWords.length - 1 && ' '}
-            </>
-          ))}
-        </p>
+        <p>„{quote}“</p>
       </blockquote>
     )}
     <Prose>

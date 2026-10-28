@@ -27,7 +27,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
   class="pt-[calc(var(--spacing-header)+1.25rem)] pb-8 lg:pt-[calc(var(--spacing-header)+2.75rem)] lg:pb-14"
 >
   <Container>
-    <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line-strong pt-3 text-sm entrance:animate-rise lg:pt-4">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line-strong pt-3 text-sm lg:pt-4">
       <time data-event-date datetime={view.datetime} class="relative z-31 inline-block origin-top-left text-fg">
         {dateLabel}
       </time>
@@ -50,10 +50,8 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     >
       {isCircleTitle ? (
         <span>
-          <span class="inline-block entrance:animate-rise entrance:animate-delay-[60ms]">Männer</span>
-          <span class="inline-block font-serif font-normal tracking-[-0.035em] text-accent italic entrance:animate-rise entrance:animate-delay-[180ms]">
-            kreis
-          </span>
+          <span class="inline-block">Männer</span>
+          <span class="inline-block font-serif font-normal tracking-[-0.035em] text-accent italic">kreis</span>
         </span>
       ) : (
         <span class="font-serif font-normal tracking-normal italic">{event.title}</span>
@@ -61,7 +59,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     </h1>
 
     <div class="mt-8 grid items-start gap-x-grid gap-y-8 lg:mt-14 lg:grid-cols-12">
-      <div class="min-w-0 entrance:animate-rise entrance:animate-delay-[260ms] lg:col-span-6">
+      <div class="min-w-0 lg:col-span-6">
         {event.city && <p class="text-base text-fg-muted lg:text-xl">in {event.city}</p>}
         <p class="mt-4 max-w-[25em] text-md text-fg-soft lg:mt-6 lg:text-lg">
           {event.is_past
