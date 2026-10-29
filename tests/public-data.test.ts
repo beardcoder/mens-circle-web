@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from 'bun:test';
 
-test('public island data: coalescing, invalidation, bounds, visibility, ETags and failures', () => {
+test('public data: visibility, ETags and failures', () => {
   const sandbox = realpathSync(mkdtempSync(join(tmpdir(), 'mens-circle-public-test-')));
 
   try {

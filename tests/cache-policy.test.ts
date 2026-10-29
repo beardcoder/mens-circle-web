@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { cacheControlForFile, cacheControlForRoute } from '../src/lib/cache-policy';
+import { cacheControlForRoute } from '../src/lib/cache-policy';
 
 // Pure string assertions: no server, no database, no build output.
 
@@ -35,59 +35,5 @@ test('public HTML is stored but revalidated, never served stale', () => {
     // The seat count on an event page must never come out of a shared cache.
     expect(value).toContain('max-age=0');
     expect(value).toContain('must-revalidate');
-  }
-});
-
-test('hashed bundles keep the adapter`s immutable policy', () => {
-  // Returning a value here would overwrite `public, max-age=31536000, immutable`
-  // on every hashed asset and every self-hosted font.
-  expect(cacheControlForFile('/assets/page.Cd1e2f3g.js', 'assets')).toBeNull();
-  expect(cacheControlForFile('/assets/fonts/2ba7ad3501f95450.woff2', 'assets')).toBeNull();
-  expect(cacheControlForFile('/assets/markus-sommer.abc_ZcEGH6.webp', 'assets')).toBeNull();
-  // …and the prefix is read from the build config, not assumed.
-  expect(cacheControlForFile('/_astro/page.js', '_astro')).toBeNull();
-});
-
-test('unhashed files from public/ are cached for a week, refreshed in the background', () => {
-  for (const pathname of [
-    '/favicon.svg',
-    '/favicon.ico',
-    '/favicon-512x512.png',
-    '/images/og-default.png',
-    '/images/og-markus.jpg',
-    '/images/logo.svg',
-    '/images/logo-color.png',
-  ]) {
-    const value = cacheControlForFile(pathname, 'assets');
-
-    expect(value).toBe('public, max-age=604800, stale-while-revalidate=2592000');
-    // Not `immutable`: these names carry no hash, so a replaced file has to be
-    // able to reach a cache that already holds the old bytes.
-    expect(value).not.toContain('immutable');
-    expect(value).toContain('stale-while-revalidate');
-  }
-});
-
-test('the retirement service worker is never pinned', () => {
-  // public/sw.js unregisters the removed breathing app's worker. A cached copy
-  // is a worker that cannot retire itself.
-  expect(cacheControlForFile('/sw.js', 'assets')).toBe('no-cache');
-});
-
-test('crawler and installer files stay changeable within the hour', () => {
-  expect(cacheControlForFile('/robots.txt', 'assets')).toBe('public, max-age=3600, must-revalidate');
-  expect(cacheControlForFile('/manifest.webmanifest', 'assets')).toBe('public, max-age=3600, must-revalidate');
-});
-
-test('crawler files are regenerated per build and stay changeable within the hour', () => {
-  for (const pathname of ['/llms.txt', '/sitemap-0.xml', '/sitemap-index.xml']) {
-    expect(cacheControlForFile(pathname, 'assets')).toBe('public, max-age=3600, must-revalidate');
-  }
-});
-
-test('HTML is left to the page that rendered it', () => {
-  // Prerendered HTML carries what Astro.response.headers held at prerender time.
-  for (const pathname of ['/impressum/index.html', '/index.html']) {
-    expect(cacheControlForFile(pathname, 'assets')).toBeNull();
   }
 });

@@ -10,7 +10,7 @@ Labels use sentence case. The home statement is a single, continuous heading.
 The hero puts the invitation and actions on the left and a server-rendered next
 date on the right. On phones they stack in that order. An empty schedule offers
 email notifications; unavailable data shows an explicit reload action. Dates and
-approved quotes are rendered on the server, using the existing bounded read cache.
+approved quotes are rendered on the server, using native Astro route caching.
 Long quotes use native `details`, and long venue or fee values wrap without clipping.
 
 Circle outlines recall the seating arrangement. On the home page they morph in

@@ -1,7 +1,6 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
-import { invalidatePublicData } from '@lib/server/public-data';
 import {
   setTestimonialPublished,
   setTestimonialSortOrder,
@@ -25,7 +24,7 @@ export const testimonials = {
         if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Nicht gefunden.' });
       }
 
-      await invalidatePublicData(context.cache);
+      await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
 
       return { message: 'Gespeichert.' };
     },
@@ -48,7 +47,7 @@ export const testimonials = {
 
       if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Nicht gefunden.' });
 
-      await invalidatePublicData(context.cache);
+      await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
 
       return { message: 'Stimme gespeichert.' };
     },
@@ -60,7 +59,7 @@ export const testimonials = {
       await requireAdmin(context);
       await softDeleteTestimonial(id);
 
-      await invalidatePublicData(context.cache);
+      await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
 
       return { message: 'Gelöscht.' };
     },
