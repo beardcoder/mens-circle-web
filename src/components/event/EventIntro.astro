@@ -31,12 +31,12 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       <time
         data-event-date
         datetime={view.datetime}
-        class="relative z-31 inline-block origin-top-left text-fg print:scale-100! print:translate-none!"
+        class="relative z-31 inline-block origin-top-left text-fg print:opacity-100!"
       >
         {dateLabel}
       </time>
       {hours && (
-        <p data-event-hours class="relative z-31 origin-top-left text-fg-muted print:scale-100! print:translate-none!">
+        <p data-event-hours class="relative z-31 origin-top-left text-fg-muted print:opacity-100!">
           {hours}
         </p>
       )}
@@ -46,7 +46,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       data-event-title
       aria-label={event.title}
       class:list={[
-        'relative z-31 mt-4 origin-top-left font-sans font-medium tracking-[-0.065em] text-fg lg:mt-6 print:scale-100! print:translate-none! print:opacity-100!',
+        'relative z-31 mt-4 origin-top-left font-sans font-medium tracking-[-0.065em] text-fg lg:mt-6 print:opacity-100! print:opacity-100!',
         isCircleTitle
           ? 'w-fit text-[clamp(3rem,16.5vw,15.5rem)] leading-[1.02] whitespace-nowrap'
           : 'text-page wrap-anywhere hyphens-auto lg:text-hero',
