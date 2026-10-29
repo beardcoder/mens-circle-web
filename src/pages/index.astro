@@ -28,6 +28,12 @@ const testimonials = testimonialsResult.status === 'fulfilled' ? testimonialsRes
 if (!events) Astro.response.status = 503;
 
 if (!events || !testimonials) Astro.response.headers.set('Cache-Control', 'no-store');
+
+Astro.cache.set({
+  maxAge: 120,
+  swr: 60,
+  tags: ['home'],
+});
 ---
 
 <Layout
@@ -46,7 +52,10 @@ if (!events || !testimonials) Astro.response.headers.set('Cache-Control', 'no-st
     Ratschläge zu geben. Je nach Abend kommen einfache Atem- und Körperübungen dazu. Du entscheidest, ob du mitmachst.
   </Hero>
 
-  <Facts anchor="praktisches" eyebrow="Auf einen Blick">
+  <Facts
+    anchor="praktisches"
+    eyebrow="Auf einen Blick"
+  >
     <Fact label="Wo">
       <Fragment slot="value">{events?.next?.place || site.geo.locality}</Fragment>
       Adresse und Anfahrt stehen beim jeweiligen Termin
@@ -95,19 +104,31 @@ if (!events || !testimonials) Astro.response.headers.set('Cache-Control', 'no-st
     subtitle="Die Abende haben einen ähnlichen Ablauf, auch wenn wir uns nicht an einen festen Minutenplan halten. Wir sitzen im Kreis und jeder hat das gleiche Recht, zu sprechen und gehört zu werden."
   >
     <Fragment slot="steps">
-      <JourneyStep number={1} title="Ankommen">
+      <JourneyStep
+        number={1}
+        title="Ankommen"
+      >
         Wir nehmen uns Zeit zum Ankommen. Manchmal beginnen wir mit ein paar bewussten Atemzügen oder damit, kurz zu
         spüren, wie wir gerade dasitzen.
       </JourneyStep>
-      <JourneyStep number={2} title="Zuhören">
+      <JourneyStep
+        number={2}
+        title="Zuhören"
+      >
         Während einer spricht, hören die anderen zu. Wir lassen ihn ausreden und versuchen zu verstehen, was ihn
         beschäftigt. Lösungen und Diskussionen stehen dabei nicht im Vordergrund.
       </JourneyStep>
-      <JourneyStep number={3} title="Teilen">
+      <JourneyStep
+        number={3}
+        title="Teilen"
+      >
         Wenn du dran bist, erzählst du, was dich gerade beschäftigt&nbsp;– so persönlich, wie du möchtest. Auch nichts
         zu sagen ist in Ordnung.
       </JourneyStep>
-      <JourneyStep number={4} title="Mitnehmen">
+      <JourneyStep
+        number={4}
+        title="Mitnehmen"
+      >
         Du musst keine große Erkenntnis mit nach Hause nehmen. Oft ist es ein Gedanke, eine andere Sicht&nbsp;– oder die
         Erfahrung, mit etwas nicht allein zu sein.
       </JourneyStep>
@@ -195,7 +216,11 @@ if (!events || !testimonials) Astro.response.headers.set('Cache-Control', 'no-st
     errorText="Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei."
   />
 
-  <Faq anchor="faq" eyebrow="" title="Was Männer vorher wissen wollen">
+  <Faq
+    anchor="faq"
+    eyebrow=""
+    title="Was Männer vorher wissen wollen"
+  >
     <AccordionItem question="Was ist ein Männerkreis?">
       Ein Männerkreis ist eine feste Runde von Männern, die sich regelmäßig trifft, im Kreis sitzt und offen über das
       spricht, was gerade da ist. Einer spricht, die anderen hören zu&nbsp;– ohne Bewertung und ohne Ratschläge. In

@@ -8,26 +8,51 @@ import Layout from '../layouts/Layout.astro';
 
 // Prerendered: no live data. The adapter reads 404.html from disk for unmatched routes.
 export const prerender = true;
+
+Astro.cache.set({
+  maxAge: 120,
+  swr: 60,
+  tags: ['404'],
+});
 ---
 
-<Layout title={`Seite nicht gefunden – ${site.siteName}`} robots="noindex, nofollow">
-  <PageIntro eyebrow="Fehler 404" title="Diese Seite gibt es nicht" titleId="error-title">
+<Layout
+  title={`Seite nicht gefunden – ${site.siteName}`}
+  robots="noindex, nofollow"
+>
+  <PageIntro
+    eyebrow="Fehler 404"
+    title="Diese Seite gibt es nicht"
+    titleId="error-title"
+  >
     <Fragment slot="lead">
       Die Seite, die du suchst, wurde verschoben, umbenannt oder hat es nie gegeben.
       {site.contactEmail && (
         <>
           {' '}
           Du vermisst hier etwas?{' '}
-          <a class={link} href={`mailto:${site.contactEmail}`}>
+          <a
+            class={link}
+            href={`mailto:${site.contactEmail}`}
+          >
             Schreib mir kurz.
           </a>
         </>
       )}
     </Fragment>
-    <Button href="/" size="lg" class="max-sm:w-full">
+    <Button
+      href="/"
+      size="lg"
+      class="max-sm:w-full"
+    >
       Zur Startseite
     </Button>
-    <Button href="/event" variant="secondary" size="lg" class="max-sm:w-full">
+    <Button
+      href="/event"
+      variant="secondary"
+      size="lg"
+      class="max-sm:w-full"
+    >
       Termine &amp; Anmeldung
     </Button>
   </PageIntro>

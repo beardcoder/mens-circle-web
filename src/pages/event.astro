@@ -20,6 +20,12 @@ if (!events) {
 
 const siteUrl = Astro.site!;
 const canonical = new URL('/event', siteUrl).href;
+
+Astro.cache.set({
+  maxAge: 120,
+  swr: 60,
+  tags: ['event'],
+});
 ---
 
 <Layout
@@ -27,12 +33,18 @@ const canonical = new URL('/event', siteUrl).href;
   description="Termine des Männerkreises in Straubing, Niederbayern: aktueller Terminstand, Ort, Dauer, Beitrag und Anmeldung. Ohne Vorerfahrung, auf Spendenbasis."
   schemas={[eventSeriesSchema(siteUrl), breadcrumbSchema(siteUrl, [['Termine', canonical]])]}
 >
-  <PageIntro eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung">
+  <PageIntro
+    eyebrow="Männerkreis · Straubing / Niederbayern"
+    title="Termine und Anmeldung"
+  >
     <Fragment slot="lead">
       Wir treffen uns alle zwei bis vier Wochen im Raum {site.geo.locality} in Niederbayern. Ein Abend dauert zwei bis
       drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was dich
       erwartet, lies zuerst, {/* The period follows the link directly: on its own line Astro sets a space before it. */}
-      <a class={link} href="/#ueber">
+      <a
+        class={link}
+        href="/#ueber"
+      >
         worum es an so einem Abend geht
       </a>
       {'.'}
@@ -42,7 +54,11 @@ const canonical = new URL('/event', siteUrl).href;
   {/* The dates are what this page is for; the notification stands beside them, smaller. */}
   <EventList events={events} />
 
-  <Faq anchor="fragen-zum-termin" eyebrow="Vor dem Termin" title="Fragen zu Termin und Anmeldung">
+  <Faq
+    anchor="fragen-zum-termin"
+    eyebrow="Vor dem Termin"
+    title="Fragen zu Termin und Anmeldung"
+  >
     <AccordionItem question="Wann findet der nächste Männerkreis statt?">
       Die aktuellen Termine stehen oben auf dieser Seite. Sobald ein neuer Abend geplant ist, erfährst du es auch per
       E-Mail oder über die WhatsApp-Gruppe.
