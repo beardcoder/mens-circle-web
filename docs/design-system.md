@@ -13,8 +13,11 @@ email notifications; unavailable data shows an explicit reload action. Dates and
 approved quotes are rendered on the server, using the existing bounded read cache.
 Long quotes use native `details`, and long venue or fee values wrap without clipping.
 
-Static circle outlines recall the seating arrangement. Reading text, headings,
-photos and the footer stay still. Motion is limited to interactions, the reading
+Circle outlines recall the seating arrangement. On the home page they morph in
+shape, rotation and size as the hero scrolls away; the portrait frame opens from
+rounded corners into a rectangle as it enters. Both use native CSS view timelines
+and remain static with reduced motion or without browser support. Reading text,
+headings and the footer stay still. Motion is limited to interactions, the reading
 progress indicator and the existing event dock. The optional breath guide starts
 only on request; leaving its viewport, hiding the tab or enabling reduced motion
 stops it. FAQ and menu transitions respect reduced motion.
