@@ -1,13 +1,11 @@
 // @ts-check
 
+import node from '@astrojs/node';
 import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
-import bun from '@mens-circle/astro-bun';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders, memoryCache } from 'astro/config';
 import icon from 'astro-icon';
-
-import { cacheControlForFile } from './src/lib/cache-policy.ts';
 
 const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
 const { hostname: siteHostname, protocol: siteProtocol } = new URL(siteUrl);
@@ -23,16 +21,8 @@ export default defineConfig({
     provider: memoryCache(),
   },
   output: 'server',
-  adapter: bun({
-    // The cache policy for files on disk; HTML keeps what the page set at prerender time.
-    staticHeaders: (pathname, { assets }) => {
-      const cacheControl = cacheControlForFile(pathname, assets);
-      // The listmonk mails load these fonts from another origin (browser view, mail clients).
-      const cors = pathname.startsWith('/fonts/mail/') ? { 'access-control-allow-origin': '*' } : null;
-
-      return cacheControl || cors ? { ...(cacheControl && { 'cache-control': cacheControl }), ...cors } : null;
-    },
-  }),
+  session: false,
+  adapter: node({ mode: 'standalone', bodySizeLimit: 1_048_576 }),
   vite: {
     // Tailwind v4: the theme lives in src/styles/theme.css (CSS-first).
     plugins: [tailwindcss()],

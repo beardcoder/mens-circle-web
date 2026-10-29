@@ -2,7 +2,7 @@
 
 Website for the Männerkreis. Astro 7 with Preact TSX islands on the Bun runtime, Drizzle on `bun:sqlite`,
 email via an external listmonk, admin sign-in via Pocket ID. One Bun process serves
-static files, SSR pages, actions and the admin UI; one Docker image, deployed with Coolify.
+the official `@astrojs/node` standalone server under Bun: static files, SSR pages, actions and the admin UI; one Docker image, deployed with Coolify.
 
 ## Development
 
@@ -50,10 +50,12 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Page content and section order: directly in `src/pages/*.astro`
 - Section markup: `src/components/blocks/`; content arrives as explicit props and slots at its page location
 - Static FAQ answers, journey steps and facts use slotted items; FAQ/journey microdata comes from the visible HTML
-- Home and `/event`: server-rendered dates, seats and approved testimonials from bounded cached reads; no content hydration or browser JSON request
-- Native Astro HTML cache: home and event overview, 120 seconds + 60 seconds stale-while-revalidate; automatically invalidated after event/testimonial and registration changes
+- Home and `/event`: server-rendered dates, seats and approved testimonials using native Astro route caching; no content hydration or browser JSON request
+- Native Astro HTML cache: home and event overview, 120 seconds + 60 seconds stale-while-revalidate; invalidated directly with context.cache.invalidate after event/testimonial and registration changes
 - Event details: SSR metadata and copy, cached reads plus live Preact capacity and registration
 - Public CSS: shared hashed stylesheets, cached between pages; portraits use responsive Astro images
+- Server adapter: `@astrojs/node` 11.1.9, launched with Bun (required by `bun:sqlite`); no custom adapter or static-header manifest
+- Mail fonts: native cached endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view
 - Public JSON, cache durations and privacy boundary: `docs/public-api.md`
 - Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)
 - Public component behavior: `<script>` in the owning Astro component; shared public form helpers stay in `src/lib/`

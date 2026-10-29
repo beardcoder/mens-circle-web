@@ -3,10 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
-  "description": "Website of the Männerkreis — Astro 7 SSR on the Bun runtime, Drizzle on bun:sqlite, listmonk for email, Pocket ID for the admin sign-in.",
+  "description": "Website of the M\u00e4nnerkreis \u2014 Astro 7 SSR on the Bun runtime, Drizzle on bun:sqlite, listmonk for email, Pocket ID for the admin sign-in.",
   "scripts": {
     "dev": "bun --bun astro dev",
     "build": "bun --bun astro build",
@@ -25,6 +22,7 @@
     "knip": "knip"
   },
   "dependencies": {
+    "@astrojs/node": "^11.1.9",
     "@astrojs/preact": "^6.1.1",
     "drizzle-orm": "^0.45.4",
     "openid-client": "^6.8.8",
@@ -35,7 +33,6 @@
     "@astrojs/check": "^0.9.12",
     "@astrojs/sitemap": "^3.7.4",
     "@eslint/js": "^10.0.1",
-    "@mens-circle/astro-bun": "workspace:*",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/bun": "^1.4.4",

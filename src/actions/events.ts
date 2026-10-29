@@ -3,7 +3,6 @@ import { z } from 'astro/zod';
 
 import { eventInputSchema } from '@lib/event-input';
 import { createEvent, sendEventNewsletter, setEventPublished, softDeleteEvent, updateEvent } from '@lib/server/events';
-import { invalidatePublicData } from '@lib/server/public-data';
 
 import { requireAdmin } from './auth';
 
@@ -19,14 +18,14 @@ export const events = {
 
         if (!event) throw new ActionError({ code: 'NOT_FOUND', message: 'Veranstaltung nicht gefunden.' });
 
-        await invalidatePublicData(context.cache);
+        await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
 
         return { id: event.id, slug: event.slug, message: 'Veranstaltung gespeichert.' };
       }
 
       const event = await createEvent(input);
 
-      await invalidatePublicData(context.cache);
+      await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
 
       return { id: event.id, slug: event.slug, message: 'Veranstaltung erstellt.' };
     },
@@ -40,7 +39,7 @@ export const events = {
 
       if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Veranstaltung nicht gefunden.' });
 
-      await invalidatePublicData(context.cache);
+      await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
 
       return { message: published ? 'Veranstaltung veröffentlicht.' : 'Veranstaltung als Entwurf gespeichert.' };
     },
@@ -51,7 +50,7 @@ export const events = {
     handler: async ({ id }, context) => {
       await requireAdmin(context);
       await softDeleteEvent(id);
-      await invalidatePublicData(context.cache);
+      await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
 
       return { message: 'Veranstaltung gelöscht.' };
     },

@@ -20,7 +20,7 @@ import Testimonials from '../components/blocks/Testimonials.astro';
 import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Runtime reads share the existing bounded cache; no event data is frozen at build time.
+// Read current data on native Astro route-cache misses.
 const [eventsResult, testimonialsResult] = await Promise.allSettled([readPublicEvents(), readPublicTestimonials()]);
 const events = eventsResult.status === 'fulfilled' ? eventsResult.value : null;
 const testimonials = testimonialsResult.status === 'fulfilled' ? testimonialsResult.value.testimonials : null;

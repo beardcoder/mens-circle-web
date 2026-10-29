@@ -3,9 +3,7 @@
 # Always the latest Bun (≥ 1.4).
 FROM oven/bun:latest AS build
 WORKDIR /app
-# The workspace manifests must be present before install.
 COPY package.json bun.lock ./
-COPY packages/astro-bun/package.json ./packages/astro-bun/
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 COPY . .
 ARG PUBLIC_SITE_URL
@@ -18,7 +16,6 @@ RUN bun run build
 FROM oven/bun:latest AS production-deps
 WORKDIR /app
 COPY package.json bun.lock ./
-COPY packages/astro-bun/package.json ./packages/astro-bun/
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --production
 
 FROM oven/bun:latest
@@ -35,6 +32,7 @@ COPY --from=build /app/drizzle ./drizzle
 # Run by Coolify's scheduled task and by hand; they import src/lib/server directly.
 COPY --from=build /app/scripts/schedule.ts /app/scripts/backup-db.ts /app/scripts/send-reminders.ts ./scripts/
 COPY --from=build /app/src/lib/server ./src/lib/server
+COPY --from=build /app/src/assets/mail ./src/assets/mail
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

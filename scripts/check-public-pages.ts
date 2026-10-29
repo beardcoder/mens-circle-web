@@ -145,6 +145,70 @@ try {
     assert(image, 'Home portrait should be rendered');
     assert.equal((await fetch(new URL(image, origin))).status, 200, 'SSR image transformation must work');
 
+    const css =
+      /rel="stylesheet"[^>]*href="([^"]+)"/.exec(home)?.[1] ?? /href="([^"]+)"[^>]*rel="stylesheet"/.exec(home)?.[1];
+
+    assert(css, 'Shared CSS must be present');
+    const asset = await fetch(new URL(css, origin));
+
+    assert.match(asset.headers.get('cache-control') ?? '', /max-age=31536000.*immutable/);
+    await asset.arrayBuffer();
+    const etag = asset.headers.get('etag');
+
+    assert(etag, 'Node static server should provide ETags');
+    assert.equal((await fetch(new URL(css, origin), { headers: { 'If-None-Match': etag } })).status, 304);
+
+    for (const path of ['/api/public/events', '/api/public/events/testabend', '/api/public/testimonials']) {
+      const first = await fetch(`${origin}${path}`);
+
+      assert.equal(first.status, 200);
+      assert.equal(first.headers.get('X-Astro-Cache'), 'MISS');
+      await first.json();
+      const hit = await fetch(`${origin}${path}`);
+
+      assert.equal(hit.headers.get('X-Astro-Cache'), 'HIT');
+      await hit.json();
+    }
+
+    for (const font of ['dm-sans.woff2', 'playfair-display-400.woff2', 'playfair-display-400-italic.woff2']) {
+      const response = await fetch(`${origin}/fonts/mail/${font}`, { headers: { Origin: 'https://listmonk.example' } });
+
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get('Access-Control-Allow-Origin'), '*');
+      assert.equal(response.headers.get('Content-Type'), 'font/woff2');
+      assert((await response.arrayBuffer()).byteLength > 1000);
+    }
+
+    assert.equal((await fetch(`${origin}/fonts/mail/not-a-font.woff2`)).status, 404);
+    assert.equal((await fetch(`${origin}/health`, { method: 'HEAD' })).status, 200);
+    const admin = await fetch(`${origin}/admin`, { redirect: 'manual' });
+
+    assert.equal(admin.status, 302);
+    assert.match(admin.headers.get('location') ?? '', /admin\/login/);
+    assert.equal(admin.headers.get('cache-control'), 'private, no-store');
+    const crossSite = await fetch(`${origin}/_actions/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Origin: 'https://evil.example',
+        'Sec-Fetch-Site': 'cross-site',
+      },
+      body: '',
+    });
+
+    assert.equal(crossSite.status, 403);
+    const sameSite = await fetch(`${origin}/_actions/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: origin, 'Sec-Fetch-Site': 'same-origin' },
+      body: '',
+    });
+
+    assert.equal(sameSite.status, 400, 'Same-site Action POST must reach input validation');
+    const redirect = await fetch(`${origin}/events`, { redirect: 'manual' });
+
+    assert([301, 302, 308].includes(redirect.status));
+    assert.match(redirect.headers.get('location') ?? '', /\/event$/);
+
     const sitemap = await fetch(`${origin}/sitemap-0.xml`).then((r) => r.text());
 
     const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]).pathname);

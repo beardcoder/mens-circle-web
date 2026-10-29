@@ -3,7 +3,6 @@ import { z } from 'astro/zod';
 
 import { accepted, type FormResult, rejected } from '@lib/server/form-submission';
 import { subscribeToNewsletter } from '@lib/server/listmonk';
-import { invalidatePublicData } from '@lib/server/public-data';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';
 import { confirmationMessage, register } from '@lib/server/registrations';
 import { submitTestimonial, SUCCESS_MESSAGE as TESTIMONIAL_SUCCESS } from '@lib/server/testimonials';
@@ -41,7 +40,7 @@ const publicForm =
       throw new ActionError({ code: ActionError.statusToCode(result.status), message: result.body.message });
     }
 
-    if (key === 'event-register') await invalidatePublicData(context.cache);
+    if (key === 'event-register') await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
 
     return { message: result.body.message };
   };

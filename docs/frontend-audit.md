@@ -7,7 +7,7 @@ image pipeline were already current. The main bottleneck was rendering public
 content through client islands on otherwise prerendered pages.
 
 - Home started six event islands and one testimonial island. These now render as
-  Astro components using cached server reads. The event overview also ships its
+  Astro components using server reads on native route-cache misses. The event overview also ships its
   dates in HTML. Empty schedules and failed reads have distinct states.
 - All styles were embedded in every document. `inlineStylesheets: 'auto'` now
   emits larger stylesheets as shared, hashed assets. Only upright fonts preload.
@@ -55,9 +55,10 @@ clear the `home` and `event` cache tags alongside the data cache; failure pages
 explicitly disable Astro caching. See `docs/public-api.md` for details.
 
 Home and the overview now require the existing Bun server and database at request
-time. Event reads share the existing 30-second process cache; approved testimonials
-use five minutes. HTML revalidates on navigation. Failed event reads return a
-usable 503 page with `no-store`; quote-only failures preserve the available dates.
+time. Native Astro caches complete route responses: home/overview for 120 seconds
+plus 60 seconds stale-while-revalidate, event detail/JSON for 30 seconds, testimonial
+JSON for five minutes. There is no separate data-read cache. Actions directly purge
+the associated tags; failure pages disable caching.
 Already open pages update on navigation. Registration continues refreshing its
 capacity and checking availability transactionally when submitted.
 
