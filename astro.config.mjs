@@ -4,7 +4,7 @@ import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
 import bun from '@mens-circle/astro-bun';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, fontProviders, memoryCache } from 'astro/config';
 import icon from 'astro-icon';
 
 import { cacheControlForFile } from './src/lib/cache-policy.ts';
@@ -18,6 +18,9 @@ export default defineConfig({
   // Never disable checkOrigin instead.
   security: {
     allowedDomains: [{ hostname: siteHostname, protocol: siteProtocol.replace(':', '') }],
+  },
+  cache: {
+    provider: memoryCache(),
   },
   output: 'server',
   adapter: bun({

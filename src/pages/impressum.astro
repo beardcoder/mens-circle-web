@@ -9,6 +9,12 @@ import Layout from '../layouts/Layout.astro';
 export const prerender = true;
 
 Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
+
+Astro.cache.set({
+  maxAge: 120,
+  swr: 60,
+  tags: ['impressum'],
+});
 ---
 
 <Layout
