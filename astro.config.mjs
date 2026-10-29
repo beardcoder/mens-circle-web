@@ -42,12 +42,10 @@ export default defineConfig({
   trailingSlash: 'never',
   redirects: {
     '/events': '/event',
-    // Redirects to `/` live in src/middleware.ts (Astro emits nothing for them here).
     '/events/[slug]': '/event/[slug]',
     '/ueber-uns': '/#ueber',
     '/sitemap.xml': '/sitemap-index.xml',
   },
-  // Prefetch only explicitly marked links; private admin pages use native navigation.
   prefetch: { prefetchAll: false },
   build: {
     assets: 'assets',
