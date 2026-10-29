@@ -164,7 +164,7 @@ const resolveSubscriber = (email: string, name: string): Promise<SubscriberIdent
   return pending;
 };
 
-export const ensureSubscriber = async (email: string, name: string): Promise<number> => {
+const ensureSubscriber = async (email: string, name: string): Promise<number> => {
   if (!listmonkApiConfigured()) return 0;
 
   return (await resolveSubscriber(email, name))?.subscriber.id ?? 0;

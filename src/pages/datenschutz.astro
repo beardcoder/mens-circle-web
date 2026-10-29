@@ -1,14 +1,10 @@
 ---
-import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
-
 import PageIntro from '../components/PageIntro.astro';
 import Container from '../components/ui/Container.astro';
 import Prose from '../components/ui/Prose.astro';
 import Layout from '../layouts/Layout.astro';
 
 export const prerender = true;
-
-Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 
 Astro.cache.set({
   maxAge: 120,

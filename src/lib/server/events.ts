@@ -113,20 +113,6 @@ export const getEventById = async (id: string): Promise<Event | null> => {
 type NextEventState =
   { status: 'scheduled'; event: EventDTO } | { status: 'none'; event: null } | { status: 'unavailable'; event: null };
 
-export const fetchNextEventState = async (): Promise<NextEventState> => {
-  try {
-    const [row] = await upcomingQuery(1);
-
-    return row
-      ? { status: 'scheduled', event: eventDtoWithCount(row.event, row.activeCount) }
-      : { status: 'none', event: null };
-  } catch (err) {
-    console.error('[events] fetchNextEventState failed', String(err));
-
-    return { status: 'unavailable', event: null };
-  }
-};
-
 /** Every upcoming published event, soonest first, for the overview; `unavailable` when they cannot be read. */
 export const fetchUpcomingEventsState = async (
   limit = 12,
@@ -163,8 +149,6 @@ export const fetchEventState = async (
     return { status: 'unavailable', event: null };
   }
 };
-
-export const getEventBySlug = async (slug: string): Promise<EventDTO | null> => (await fetchEventState(slug)).event;
 
 const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
   const base = String(eventDate).slice(0, 10);

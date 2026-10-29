@@ -1,6 +1,5 @@
 ---
 import site from '@data/site.json';
-import { PRERENDERED_CACHE_CONTROL } from '@lib/cache-policy';
 import { breadcrumbSchema } from '@lib/event-schema';
 
 import TestimonialForm from '../components/forms/TestimonialForm.astro';
@@ -8,11 +7,7 @@ import PageIntro from '../components/PageIntro.astro';
 import Container from '../components/ui/Container.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Prerendered: the form posts to the submitTestimonial action client-side
-// (see src/lib/form.ts), so nothing here needs server rendering.
 export const prerender = true;
-
-Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
 ---
 
 <Layout
@@ -23,7 +18,10 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
     breadcrumbSchema(Astro.site!, [['Teile deine Erfahrung', new URL('/teile-deine-erfahrung', Astro.site!).href]]),
   ]}
 >
-  <PageIntro eyebrow="Aus dem Kreis" title="Teile deine Erfahrung">
+  <PageIntro
+    eyebrow="Aus dem Kreis"
+    title="Teile deine Erfahrung"
+  >
     <Fragment slot="lead">
       Wenn du beim Männerkreis warst und etwas dazu sagen möchtest: Dein Text hilft anderen Männern einzuschätzen,
       worauf sie sich einlassen.
@@ -31,10 +29,16 @@ Astro.response.headers.set('Cache-Control', PRERENDERED_CACHE_CONTROL);
   </PageIntro>
 
   {/* One column of a readable width: the notes stand at the form, not beside it. */}
-  <section aria-labelledby="teilen-title" class="pb-section">
+  <section
+    aria-labelledby="teilen-title"
+    class="pb-section"
+  >
     <Container>
       <div class="max-w-form">
-        <h2 id="teilen-title" class="text-sub text-fg">
+        <h2
+          id="teilen-title"
+          class="text-sub text-fg"
+        >
           Was du schreibst, lese ich zuerst
         </h2>
         <p class="mt-3 text-md text-fg-soft">
