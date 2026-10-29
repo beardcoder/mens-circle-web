@@ -130,3 +130,57 @@
     opacity: 1;
   }
 }
+
+/* Home morphs follow scrolling in both directions. Layout and reading text stay stable. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-hero] {
+      view-timeline: --home-opening;
+    }
+
+    .home-orbit {
+      animation: home-orbit-turn linear both;
+      animation-timeline: --home-opening;
+      animation-range: exit 0% exit 100%;
+    }
+
+    .home-orbit > span {
+      animation: home-circle-shape linear both;
+      animation-timeline: --home-opening;
+      animation-range: exit 0% exit 100%;
+    }
+
+    .home-portrait {
+      animation: home-portrait-open linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+
+@keyframes home-orbit-turn {
+  from {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  to {
+    transform: translate(-8%, -12%) rotate(65deg) scale(0.78);
+  }
+}
+
+@keyframes home-circle-shape {
+  from {
+    border-radius: 48% 52% 46% 54% / 54% 45% 55% 46%;
+  }
+  to {
+    border-radius: 30% 70% 64% 36% / 42% 32% 68% 58%;
+  }
+}
+
+@keyframes home-portrait-open {
+  from {
+    clip-path: inset(0 0 0 0 round 36% 36% 4% 4%);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0% 0% 0% 0%);
+  }
+}
