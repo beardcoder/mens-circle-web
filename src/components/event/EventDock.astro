@@ -6,7 +6,7 @@ import Container from '../ui/Container.astro';
 
 interface Props {
   event: EventDTO;
-  /** The intro's date line and hours, word for word: they mark where the intro's own elements land. */
+  /** The intro's date line and hours, word for word: they mark where the intro's pieces land. */
   dateLabel: string;
   hours: string;
 }
@@ -45,15 +45,19 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     </p>
   </Container>
 </div>
+{/* The intro's pieces in flight: fixed copies, so once they land they stand still while the page scrolls. */}
+<div data-event-flight aria-hidden="true" class="pointer-events-none fixed inset-0 z-31 print:hidden"></div>
 
 <script>
   /**
    * The intro's date, hours and title morph into the dock as the page scrolls, one
    * after the other, on one scroll timeline (the browser runs it, no scroll
-   * handler): each element moves and shrinks onto its place in the dock and stays
-   * pinned there, so there is never a second copy to hand over to. The dock's own
-   * copies are only the fallback: without scroll timelines, with reduced motion or
-   * for a title that wraps, they simply appear once the title has left.
+   * handler). What flies is a fixed copy of each piece, laid exactly over it: it
+   * moves and shrinks onto its place in the dock and then stands still, as only a
+   * fixed element can while the page scrolls under it; the piece itself stays in
+   * the page, invisible, for screen readers and print. The dock's own copies are
+   * the fallback: without scroll timelines, with reduced motion or for a title
+   * that wraps, they simply appear once the title has left.
    */
   const dock = document.querySelector<HTMLElement>('[data-event-dock]');
   const title = document.querySelector<HTMLElement>('[data-event-title]');
@@ -83,6 +87,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
   if (dock && title) {
     const ground = dock.querySelector<HTMLElement>('[data-event-dock-ground]')!;
     const dockTitle = dock.querySelector<HTMLElement>('[data-event-dock-title]')!;
+    const flightLayer = document.querySelector<HTMLElement>('[data-event-flight]')!;
 
     const pieces: [HTMLElement | null, HTMLElement | null, number, number][] = [
       // [intro element, its place in the dock, start, end] as fractions of the flight.
@@ -103,7 +108,36 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       animations.forEach((animation) => animation.cancel());
       animations = [];
       observer?.disconnect();
-      pieces.forEach(([, twin]) => twin?.style.removeProperty('visibility'));
+      flightLayer.replaceChildren();
+      pieces.forEach(([piece, twin]) => {
+        piece?.style.removeProperty('opacity');
+        twin?.style.removeProperty('visibility');
+      });
+    }
+
+    /** A copy of a piece in the fixed layer, exactly over the piece at scroll 0. */
+    function flyer(piece: HTMLElement, box: Box): HTMLElement {
+      const copy = piece.cloneNode(true) as HTMLElement;
+      const style = getComputedStyle(piece);
+
+      copy.removeAttribute('id');
+      copy.removeAttribute('aria-label');
+      Object.assign(copy.style, {
+        position: 'absolute',
+        top: `${box.top}px`,
+        left: `${box.left}px`,
+        // Every piece that flies is one line; a rounded width must not wrap it.
+        width: 'max-content',
+        whiteSpace: 'nowrap',
+        margin: '0',
+        fontSize: style.fontSize,
+        lineHeight: style.lineHeight,
+        letterSpacing: style.letterSpacing,
+        willChange: 'translate, scale',
+      });
+      flightLayer.append(copy);
+
+      return copy;
     }
 
     /** The plain dock: shown once the title has passed under the bar. */
@@ -138,8 +172,6 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       // The content under the title must not show through before the ground is in.
       const next = title!.nextElementSibling as HTMLElement | null;
       const arrival = next ? Math.max(pageBox(next).top - dockBottom, 1) : flight;
-      // Past the flight a piece moves down exactly as far as the page scrolls up: it rests in the dock.
-      const pinned = Math.max(document.documentElement.scrollHeight, flight) * 4;
       const timeline = new ScrollTimeline({ source: document.documentElement, axis: 'block' });
 
       const range = (start: number, end: number): KeyframeAnimationOptions => ({
@@ -165,20 +197,22 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
         const a = pageBox(piece);
         const b = pageBox(twin);
         const scale = fontSize(twin) / fontSize(piece);
-        // Where the piece must sit, relative to its own place, when the page has scrolled `end`.
+        // Where the copy rests in the dock, relative to the piece's place at scroll 0.
         const x = Math.round(b.left - a.left);
-        const y = Math.round(b.top + (b.height - a.height * scale) / 2 + end - a.top);
-        const landed = (end - start) / (pinned - start);
+        const y = Math.round(b.top + (b.height - a.height * scale) / 2 - a.top);
+        const copy = flyer(piece, a);
 
+        piece.style.opacity = '0';
         twin.style.visibility = 'hidden';
+        // Until its start the copy scrolls with the page, then it flies to the dock and rests there.
         animations.push(
-          piece.animate(
+          copy.animate(
             [
               { translate: '0 0', scale: '1' },
-              { translate: `${x}px ${y}px`, scale: `${scale}`, offset: landed },
-              { translate: `${x}px ${y + pinned - end}px`, scale: `${scale}` },
+              { translate: `0 ${-start}px`, scale: '1', offset: end ? start / end : 0 },
+              { translate: `${x}px ${y}px`, scale: `${scale}` },
             ],
-            range(start, pinned),
+            range(0, Math.max(end, 1)),
           ),
         );
       }
