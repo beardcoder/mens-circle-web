@@ -51,6 +51,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Section markup: `src/components/blocks/`; content arrives as explicit props and slots at its page location
 - Static FAQ answers, journey steps and facts use slotted items; FAQ/journey microdata comes from the visible HTML
 - Home and `/event`: server-rendered dates, seats and approved testimonials from bounded cached reads; no content hydration or browser JSON request
+- Native Astro HTML cache: home and event overview, 120 seconds + 60 seconds stale-while-revalidate; automatically invalidated after event/testimonial and registration changes
 - Event details: SSR metadata and copy, cached reads plus live Preact capacity and registration
 - Public CSS: shared hashed stylesheets, cached between pages; portraits use responsive Astro images
 - Public JSON, cache durations and privacy boundary: `docs/public-api.md`

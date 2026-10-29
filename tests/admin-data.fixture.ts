@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { mock } from 'bun:test';
 
+import memoryProvider from 'astro/cache/memory';
+
 import { createSession } from '../src/lib/server/auth';
 import { db } from '../src/lib/server/db';
 import { events, participants, registrations, testimonials } from '../src/lib/server/db/schema';
@@ -22,7 +24,27 @@ mock.module('astro:actions', () => ({
 const { admin } = await import('../src/actions/admin');
 const { events: eventActions } = await import('../src/actions/events');
 const token = await createSession('admin@example.invalid');
-const context = (value?: string) => ({ cookies: { get: () => (value ? { value } : undefined) } });
+const provider = memoryProvider({});
+
+const context = (value?: string) => ({
+  cookies: { get: () => (value ? { value } : undefined) },
+  cache: { enabled: true, invalidate: provider.invalidate },
+});
+
+const homeRequest = new Request('https://mens-circle.de/');
+
+const renderHome = () =>
+  provider.onRequest!(
+    {
+      request: homeRequest,
+      url: new URL(homeRequest.url),
+      logger: { info() {}, warn() {}, error() {} },
+    },
+    async () =>
+      new Response('home', {
+        headers: { 'Content-Type': 'text/html', 'CDN-Cache-Control': 'max-age=120', 'Cache-Tag': 'home' },
+      }),
+  );
 
 const invoke = (action: unknown, input: unknown, value?: string) =>
   (action as (input: unknown, context: unknown) => Promise<unknown>)(input, context(value));
@@ -94,7 +116,29 @@ const moderation = (await invoke(admin.loadAdminTestimonials, undefined, token))
 assert.equal(moderation.testimonials.length, 1);
 assert.equal(moderation.testimonials[0].id, 'pending');
 assert.equal(moderation.testimonials[0].email, 'review@example.invalid');
+assert.equal((await renderHome()).headers.get('X-Astro-Cache'), 'MISS');
+assert.equal((await renderHome()).headers.get('X-Astro-Cache'), 'HIT');
 await invoke(eventActions.setEventPublished, { id: 'event', published: true }, token);
+assert.equal((await renderHome()).headers.get('X-Astro-Cache'), 'MISS');
+
+const { testimonials: testimonialActions } = await import('../src/actions/testimonials');
+
+await invoke(testimonialActions.moderateTestimonial, { id: 'pending', publish: true }, token);
+assert.equal((await renderHome()).headers.get('X-Astro-Cache'), 'MISS');
+await invoke(
+  testimonialActions.updateTestimonial,
+  {
+    id: 'pending',
+    quote: 'Überarbeitet.',
+    authorName: 'Test',
+    role: '',
+    email: 'review@example.invalid',
+  },
+  token,
+);
+assert.equal((await renderHome()).headers.get('X-Astro-Cache'), 'MISS');
+await invoke(testimonialActions.deleteTestimonial, { id: 'pending' }, token);
+assert.equal((await renderHome()).headers.get('X-Astro-Cache'), 'MISS');
 const published = await getEventById('event');
 
 assert.equal(published?.isPublished, true);

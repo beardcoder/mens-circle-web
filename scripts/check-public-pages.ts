@@ -64,6 +64,9 @@ async function readPage(origin: string, path: string, status = 200): Promise<str
   const html = await response.text();
 
   assert.equal(response.status, status, `${path}: expected ${status}`);
+
+  if (status === 503) assert.equal(response.headers.has('X-Astro-Cache'), false);
+
   assert.match(response.headers.get('cache-control') ?? '', status === 503 ? /no-store/ : /must-revalidate/);
   assert(!html.includes('<astro-island'), `${path}: public content must not hydrate`);
   assert(!html.includes('as="fetch"'), `${path}: no client data preload`);
@@ -115,6 +118,18 @@ try {
   ]);
 
   await withServer(async (origin) => {
+    const first = await fetch(origin);
+
+    assert.equal(first.headers.get('X-Astro-Cache'), 'MISS');
+    await first.text();
+    const cached = await fetch(origin);
+
+    assert.equal(cached.headers.get('X-Astro-Cache'), 'HIT');
+    await cached.text();
+    const personalized = await fetch(origin, { headers: { Cookie: 'test=1' } });
+
+    assert.equal(personalized.headers.get('X-Astro-Cache'), 'HIT');
+    await personalized.text();
     const home = await readPage(origin, '/');
     const overview = await readPage(origin, '/event');
 

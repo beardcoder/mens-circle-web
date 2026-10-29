@@ -21,11 +21,15 @@ if (!events) {
 const siteUrl = Astro.site!;
 const canonical = new URL('/event', siteUrl).href;
 
-Astro.cache.set({
-  maxAge: 120,
-  swr: 60,
-  tags: ['event'],
-});
+if (events) {
+  Astro.cache.set({
+    maxAge: 120,
+    swr: 60,
+    tags: ['event'],
+  });
+} else {
+  Astro.cache.set(false);
+}
 ---
 
 <Layout
