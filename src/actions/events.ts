@@ -19,14 +19,14 @@ export const events = {
 
         if (!event) throw new ActionError({ code: 'NOT_FOUND', message: 'Veranstaltung nicht gefunden.' });
 
-        invalidatePublicData();
+        await invalidatePublicData(context.cache);
 
         return { id: event.id, slug: event.slug, message: 'Veranstaltung gespeichert.' };
       }
 
       const event = await createEvent(input);
 
-      invalidatePublicData();
+      await invalidatePublicData(context.cache);
 
       return { id: event.id, slug: event.slug, message: 'Veranstaltung erstellt.' };
     },
@@ -40,7 +40,7 @@ export const events = {
 
       if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Veranstaltung nicht gefunden.' });
 
-      invalidatePublicData();
+      await invalidatePublicData(context.cache);
 
       return { message: published ? 'Veranstaltung veröffentlicht.' : 'Veranstaltung als Entwurf gespeichert.' };
     },
@@ -51,7 +51,7 @@ export const events = {
     handler: async ({ id }, context) => {
       await requireAdmin(context);
       await softDeleteEvent(id);
-      invalidatePublicData();
+      await invalidatePublicData(context.cache);
 
       return { message: 'Veranstaltung gelöscht.' };
     },

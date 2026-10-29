@@ -29,11 +29,15 @@ if (!events) Astro.response.status = 503;
 
 if (!events || !testimonials) Astro.response.headers.set('Cache-Control', 'no-store');
 
-Astro.cache.set({
-  maxAge: 120,
-  swr: 60,
-  tags: ['home'],
-});
+if (events && testimonials) {
+  Astro.cache.set({
+    maxAge: 120,
+    swr: 60,
+    tags: ['home'],
+  });
+} else {
+  Astro.cache.set(false);
+}
 ---
 
 <Layout

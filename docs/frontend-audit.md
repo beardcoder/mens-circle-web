@@ -49,6 +49,11 @@ in the browser.
 
 ## Runtime considerations
 
+Update, 29 October: native Astro memory caching now serves home and overview
+HTML (120 seconds plus 60 seconds stale-while-revalidate). Application mutations
+clear the `home` and `event` cache tags alongside the data cache; failure pages
+explicitly disable Astro caching. See `docs/public-api.md` for details.
+
 Home and the overview now require the existing Bun server and database at request
 time. Event reads share the existing 30-second process cache; approved testimonials
 use five minutes. HTML revalidates on navigation. Failed event reads return a

@@ -25,7 +25,7 @@ export const testimonials = {
         if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Nicht gefunden.' });
       }
 
-      invalidatePublicData();
+      await invalidatePublicData(context.cache);
 
       return { message: 'Gespeichert.' };
     },
@@ -48,7 +48,7 @@ export const testimonials = {
 
       if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Nicht gefunden.' });
 
-      invalidatePublicData();
+      await invalidatePublicData(context.cache);
 
       return { message: 'Stimme gespeichert.' };
     },
@@ -60,7 +60,7 @@ export const testimonials = {
       await requireAdmin(context);
       await softDeleteTestimonial(id);
 
-      invalidatePublicData();
+      await invalidatePublicData(context.cache);
 
       return { message: 'Gelöscht.' };
     },

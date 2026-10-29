@@ -28,7 +28,15 @@ export function cachedPublicRead<T>(key: string, ttl: number, read: () => Promis
   return value;
 }
 
-export const invalidatePublicData = (): void => cache.clear();
+/** Clear data and the native Astro HTML entries before completing a mutation. */
+export async function invalidatePublicData(htmlCache?: {
+  enabled: boolean;
+  invalidate: (input: { tags: string[] }) => Promise<void>;
+}): Promise<void> {
+  cache.clear();
+
+  if (htmlCache?.enabled) await htmlCache.invalidate({ tags: ['home', 'event'] });
+}
 
 export class PublicDataError extends Error {
   constructor(

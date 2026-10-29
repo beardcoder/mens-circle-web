@@ -41,7 +41,7 @@ const publicForm =
       throw new ActionError({ code: ActionError.statusToCode(result.status), message: result.body.message });
     }
 
-    if (key === 'event-register') invalidatePublicData();
+    if (key === 'event-register') await invalidatePublicData(context.cache);
 
     return { message: result.body.message };
   };

@@ -63,7 +63,7 @@ export const registrations = {
 
       if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Anmeldung nicht gefunden.' });
 
-      invalidatePublicData();
+      await invalidatePublicData(context.cache);
 
       return { message: 'Status aktualisiert.' };
     },
@@ -74,7 +74,7 @@ export const registrations = {
     handler: async ({ id }, context) => {
       await requireAdmin(context);
       await softDeleteRegistration(id);
-      invalidatePublicData();
+      await invalidatePublicData(context.cache);
 
       return { message: 'Anmeldung entfernt.' };
     },

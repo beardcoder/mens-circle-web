@@ -25,7 +25,21 @@ existing database transaction; a displayed seat count never guarantees a seat.
 
 Home and `/event` render cached public data on the server. Dates and approved
 quotes are present in the initial HTML, with no hydration or browser JSON reads.
-Their HTML revalidates on every navigation; the process read cache still applies.
+Their browser HTML revalidates on navigation; the process read cache still applies.
+The native Astro `memoryCache()` provider also stores full home and event-overview
+HTML for 120 seconds with 60 seconds stale-while-revalidate, tagged `home` and
+`event`. `X-Astro-Cache: MISS`, `HIT` or `STALE` identifies its state. Application
+mutations await invalidation of both tags through their Astro Action context:
+event save/publication/deletion, testimonial publication/order/content/deletion,
+new registrations and registration status/deletion. The same function clears the
+public-data read cache first. Unavailable and partial-failure pages explicitly
+disable `Astro.cache`, in addition to sending `no-store`.
+
+This cache is process-local, matching the single Bun server deployment. A restart
+clears it; multiple replicas would require shared invalidation. Direct database
+changes outside application actions rely on cache expiry. Durations across HTML
+and data layers can add up. Invalidation affects subsequent requests; documents
+already open in a browser are not pushed updates.
 A failed event read produces a 503 page with `Cache-Control: no-store` and a reload
 link. A testimonial-only failure leaves the home page usable but disables caching.
 An empty successful read shows a notification invitation, never an error.
