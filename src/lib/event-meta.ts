@@ -45,7 +45,7 @@ const eventWhen = (event: EventDTO): string =>
   [formatDateLongDE(event.event_date), timeRange(event.start_time, event.end_time)].filter(Boolean).join(', ');
 
 /** The single line answering "when and where" for a forwarded link. */
-const eventWhenWhere = (event: EventDTO): string => {
+export const eventWhenWhere = (event: EventDTO): string => {
   const when = eventWhen(event);
   const place = eventPlace(event);
 
