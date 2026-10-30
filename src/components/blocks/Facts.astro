@@ -9,7 +9,8 @@ interface Props {
 const { anchor, eyebrow } = Astro.props;
 ---
 
-<Section id={anchor} space="band" labelledby="praktisches-title" class="pt-[calc(var(--spacing-band)+1.5rem)]">
+{/* Close under the opening, and no bottom space of its own: the next section brings it. */}
+<Section id={anchor} space="none" labelledby="praktisches-title" class="pt-[calc(var(--spacing-band)+1.5rem)]">
   <h2 id="praktisches-title" class="sr-only">
     {eyebrow}
   </h2>

@@ -16,38 +16,12 @@ const description = event.description?.trim() ?? '';
 ---
 
 <Section ground="alt" labelledby="ueber-den-abend" innerClass="grid items-start gap-x-grid gap-y-8 lg:grid-cols-12">
-  {/* The question stays beside the text while it is read; the circle repeats the seating motif. */}
+  {/* The question stays beside the text while it is read. */}
   <div class="min-w-0 lg:sticky lg:top-[calc(var(--spacing-header)+5.5rem)] lg:col-span-5">
     <h2 id="ueber-den-abend" class="max-w-[10em] scroll-mt-14 text-page text-fg">
       Was beschäftigt dich gerade?
     </h2>
-    <div aria-hidden="true" class="relative mt-10 hidden size-44 lg:block xl:size-52">
-      <svg viewBox="0 0 100 100" class="size-full -rotate-90 overflow-visible">
-        <circle
-          cx="50"
-          cy="50"
-          r="49"
-          pathLength="1"
-          fill="none"
-          class="stroke-line"
-          vector-effect="non-scaling-stroke"
-        />
-        <circle
-          cx="50"
-          cy="50"
-          r="49"
-          pathLength="1"
-          fill="none"
-          stroke-dasharray="1"
-          class="stroke-accent"
-          vector-effect="non-scaling-stroke"
-        />
-      </svg>
-      <span class="absolute inset-0">
-        <span class="absolute top-0 left-1/2 size-2.5 -translate-1/2 rounded-full bg-accent"></span>
-      </span>
-    </div>
-    <p class="mt-8 text-base text-fg-muted lg:mt-10">
+    <p class="mt-6 text-base text-fg-muted lg:mt-8">
       Noch eine Frage vor dem Abend?{' '}
       <a class={link} href={`mailto:${site.contactEmail}`}>
         Schreib mir.

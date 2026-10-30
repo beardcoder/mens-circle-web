@@ -162,7 +162,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   leader who holds the space instead of performing. Quiet, the frame visible
   (course, five agreements, consent: every exercise is an offer, "no" is a good
   answer, no therapy), grounded rather than lofty, open to every man. Copy: "du",
-  plain German, no jargon, no "brother" tone, no promises of healing.
+  plain German, no jargon, no "brother" tone, no promises of healing; no dashes for
+  effect, slogan contrasts, triads or therapy phrases, and each point once per page
+  (design-system.md, "Voice").
 - Colours are roles (`ground`, `ground-alt`, `tint`, `raised`, `fg`, `fg-soft`,
   `fg-muted`, `line`, `line-strong`, `line-bold`, `accent`, `accent-soft`,
   `fill`/`fill-strong`/`on-fill`, `glow` for decoration, `success`/`danger` for

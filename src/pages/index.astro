@@ -63,7 +63,7 @@ if (events && testimonials) {
     </Fact>
     <Fact label="Wie oft" icon="calendar">
       <Fragment slot="value">Alle 2–4 Wochen</Fragment>
-      Ohne Mitgliedschaft – du kommst, wann es passt
+      Ohne Mitgliedschaft. Du kommst, wann es dir passt.
     </Fact>
     <Fact label="Dauer" icon="clock">
       <Fragment slot="value">2–3 Stunden</Fragment>
@@ -81,9 +81,9 @@ if (events && testimonials) {
     title="Worum es an so einem Abend geht"
     questionsLabel="Fragen aus der ersten Runde"
     questions={[
-      'Wie geht es dir gerade\u00a0– ehrlich?',
+      'Wie geht es dir gerade wirklich?',
       'Was spürst du, und wo im Körper?',
-      'Was trägt dich, was kostet dich Kraft?',
+      'Was läuft gut, was kostet dich Kraft?',
       'Was schiebst du schon länger vor dir her?',
     ]}
     close="Einen besonderen Grund zu kommen brauchst du nicht. Manchmal reicht Neugier."
@@ -93,8 +93,8 @@ if (events && testimonials) {
       Gespräche unter Männern landen oft schnell bei Job, Sport oder dem nächsten Ratschlag.
     </p>
     <p>
-      Im Kreis ist Platz für das, was darunter liegt. Du brauchst keine fertigen Antworten und musst nichts leisten. Es
-      reicht, den anderen zuzuhören und ehrlich zu erzählen, wenn du dran bist.
+      Im Kreis geht es auch um das, was sonst keinen Platz hat. Fertige Antworten brauchst du dafür nicht. Es reicht,
+      den anderen zuzuhören und ehrlich zu erzählen, wenn du dran bist.
     </p>
   </Intro>
 
@@ -102,29 +102,28 @@ if (events && testimonials) {
     anchor="reise"
     eyebrow=""
     title="Wie ein Abend abläuft"
-    subtitle="Jeder Abend folgt einem ruhigen Bogen, ohne festen Minutenplan. Wir sitzen im Kreis, und jeder hat das gleiche Recht, zu sprechen und gehört zu werden."
+    subtitle="Die Abende laufen ähnlich ab, aber nicht nach Minutenplan. Wir sitzen im Kreis, und jeder hat das gleiche Recht, zu sprechen und gehört zu werden."
   >
     <Fragment slot="steps">
       <JourneyStep number={1} title="Ankommen">
-        Ein paar ruhige Atemzüge, die Füße auf dem Boden: Wir lassen den Tag hinter uns. Ich erkläre den Rahmen und
-        frage, ob alle damit einverstanden sind.
+        Wir kommen an, oft mit ein paar ruhigen Atemzügen. Dann erkläre ich die Absprachen und frage, ob alle damit
+        einverstanden sind.
       </JourneyStep>
       <JourneyStep number={2} title="Die erste Runde">
-        Reihum sagt jeder kurz, wie es ihm gerade geht und was er heute mitbringt. So ist jeder einmal gehört worden,
-        bevor es tiefer geht. Am Anfang fühlt sich das für viele ungewohnt an&nbsp;– das darf so sein.
+        Reihum sagt jeder kurz, wie es ihm gerade geht und was er mitbringt. So kommt jeder einmal zu Wort, bevor wir
+        ins Gespräch gehen.
       </JourneyStep>
       <JourneyStep number={3} title="Teilen und zuhören">
         Wer spricht, hat die ganze Aufmerksamkeit der anderen. Wir lassen ausreden, bewerten nicht und geben keine
-        ungefragten Ratschläge. Du erzählst so viel, wie du möchtest; auch nur zuzuhören ist in Ordnung.
+        ungefragten Ratschläge. Du erzählst so viel, wie du möchtest. Nur zuzuhören ist auch in Ordnung.
       </JourneyStep>
-      <JourneyStep number={4} title="Den Kreis schließen">
-        Zum Schluss sagt jeder in ein, zwei Worten, was er mitnimmt. Oft ist es ein Gedanke, eine andere Sicht&nbsp;–
-        oder die Erfahrung, mit etwas nicht allein zu sein.
+      <JourneyStep number={4} title="Abschlussrunde">
+        Zum Schluss sagt jeder in ein, zwei Worten, was er mitnimmt. Oft ist es ein Gedanke oder eine andere Sicht auf
+        etwas, manchmal einfach das Gefühl, mit etwas nicht allein zu sein.
       </JourneyStep>
     </Fragment>
     <p slot="close">
-      Vorerfahrung mit Männerkreisen, Meditation oder Atemarbeit brauchst du nicht, vorbereiten musst du nichts. Den
-      Rahmen erkläre ich zu Beginn jedes Abends.
+      Vorerfahrung mit Männerkreisen, Meditation oder Atemarbeit brauchst du nicht, und vorbereiten musst du nichts.
     </p>
   </JourneySteps>
 
@@ -132,7 +131,7 @@ if (events && testimonials) {
     anchor="haltung"
     eyebrow="Atem und Körper"
     lines={['Aus dem Kopf.', 'In den Körper.']}
-    text="Nach einem Tag voller Pläne und Aufgaben hilft es, wieder im Körper anzukommen. Wir bleiben dabei auf dem Boden: ruhig atmen, dem Atem folgen, spüren, wie wir dasitzen. Nichts Abgehobenes und nichts, was du können musst. Du entscheidest bei jeder Übung, ob und wie weit du mitmachst."
+    text="Nach einem vollen Tag hilft es, kurz auf den Körper zu achten. Dafür nehmen wir uns zu Beginn Zeit: ruhig atmen, die Füße auf dem Boden spüren. Die Übungen sind einfach, und du entscheidest bei jeder, ob du mitmachst."
     linkLabel="Was wir miteinander vereinbaren"
     linkUrl="#rahmen"
     breathGuide="Atme ein paar Züge mit: langsam ein und langsam aus, je gut fünf Sekunden."
@@ -142,9 +141,7 @@ if (events && testimonials) {
     anchor="moderator"
     eyebrow="Wer den Kreis leitet"
     name="Ich bin Markus."
-    quote={
-      'Ich halte den Rahmen, damit du in Ruhe sprechen kannst. Ich führe durch den Abend\u00a0– aber ich führe nichts vor.'
-    }
+    quote="Ich sorge dafür, dass jeder in Ruhe sprechen kann und die anderen zuhören. Mit Ratschlägen halte ich mich zurück."
     avatar={avatar}
     imageAlt="Markus Sommer"
     signature="Markus Sommer"
@@ -157,12 +154,11 @@ if (events && testimonials) {
       hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.
     </p>
     <p>
-      Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis
-      mit&nbsp;– einfach, ruhig und ohne große Worte.
+      Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit.
     </p>
     <p>
-      Ich sitze mit im Kreis, nicht davor. Zu Beginn erkläre ich die Absprachen, frage, ob alle sie mittragen, und achte
-      darauf, dass sie gelten. Jeder kann zu Wort kommen, keiner muss.
+      Ich sitze mit im Kreis. Zu Beginn erkläre ich die Absprachen, frage, ob alle sie mittragen, und achte darauf, dass
+      sie gelten. Jeder kann zu Wort kommen, keiner muss.
     </p>
     <p>
       Übungen mit Atem oder Körperwahrnehmung leite ich als Angebot an. Bevor wir etwas gemeinsam machen, frage ich, ob
@@ -175,7 +171,7 @@ if (events && testimonials) {
     eyebrow="Der Rahmen"
     title="Was wir vereinbaren"
     intro={
-      'Zu Beginn jedes Abends benennen wir fünf Absprachen und fragen, ob alle sie mittragen. Niemand kontrolliert sie\u00a0– sie machen es leichter, ehrlich zu sein.'
+      'Zu Beginn jedes Abends gehen wir fünf Absprachen durch und fragen, ob alle sie mittragen. Sie machen es leichter, offen zu sprechen.'
     }
     agreements={[
       {
@@ -184,7 +180,7 @@ if (events && testimonials) {
       },
       {
         title: 'Ehrlichkeit',
-        text: 'Du sagst, was wirklich da ist, nicht, was gut klingt. Auch „Ich möchte gerade nichts sagen“ ist ehrlich.',
+        text: 'Du erzählst, wie es dir wirklich geht. Auch „Ich möchte heute nichts sagen“ ist eine ehrliche Antwort.',
       },
       {
         title: 'Annehmen statt bewerten',
@@ -195,13 +191,13 @@ if (events && testimonials) {
         text: 'Jeder spricht von sich: „ich“ statt „man“. Was du erzählst und wobei du mitmachst, entscheidest du selbst.',
       },
       {
-        title: 'Ein geschützter Ort',
-        text: 'Für diese Stunden ist der Kreis ein besonderer Ort. Wir sind ganz da und gehen behutsam mit dem um, was sich zeigt.',
+        title: 'Respekt',
+        text: 'Wir nehmen ernst, was jemand erzählt. Niemand wird belächelt, unterbrochen oder kommentiert.',
       },
     ]}
     boundaryTitle="Gut zu wissen"
     boundaryText={
-      'Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Im Kreis sitzen Männer, die einander zuhören\u00a0– ohne Lehre, ohne Glaubensrichtung und ohne Vorstellung davon, wie ein Mann zu sein hat.'
+      'Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Es gibt im Kreis keine Lehre und kein festes Bild davon, wie ein Mann zu sein hat.'
     }
   />
 
@@ -219,7 +215,7 @@ if (events && testimonials) {
   <Faq anchor="faq" eyebrow="" title="Was Männer vorher wissen wollen">
     <AccordionItem question="Was ist ein Männerkreis?">
       Ein Männerkreis ist eine feste Runde von Männern, die sich regelmäßig trifft, im Kreis sitzt und offen über das
-      spricht, was gerade da ist. Einer spricht, die anderen hören zu&nbsp;– ohne Bewertung und ohne Ratschläge. In
+      spricht, was gerade da ist. Einer spricht, die anderen hören zu, ohne zu bewerten oder Ratschläge zu geben. In
       Straubing treffen wir uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne
       Vorerfahrung.
     </AccordionItem>
@@ -233,18 +229,16 @@ if (events && testimonials) {
       wie sprechen.
     </AccordionItem>
     <AccordionItem question="Muss ich bei den Atem- und Körperübungen mitmachen?">
-      Nein. Die Übungen sind einfach und ein Angebot. Du machst mit, soweit es für dich passt&nbsp;– oder bleibst
-      einfach sitzen und bist dabei.
+      Nein. Die Übungen sind einfach und ein Angebot. Du machst mit, soweit es für dich passt, oder bleibst einfach
+      sitzen.
     </AccordionItem>
     <AccordionItem question="Ich war noch nie in einem Männerkreis. Ist das ein Problem?">
       Nein. Du brauchst keine Vorerfahrung und musst nichts vorbereiten. Der Rahmen wird zu Beginn erklärt, damit du
-      weißt, worauf du dich einlässt. Wenn es sich am Anfang ungewohnt anfühlt: Das geht fast jedem so, und es darf so
-      sein.
+      weißt, worauf du dich einlässt. Ungewohnt ist der erste Abend für fast jeden.
     </AccordionItem>
     <AccordionItem question="Ist das spirituell?">
-      Bodenständig. Wir sitzen zusammen, atmen, sprechen, hören zu und halten manchmal einen Moment Stille. Es gibt
-      keine Lehre, keinen Glauben, dem du folgen musst, und keine abgehobene Sprache. Was du aus einem Abend mitnimmst,
-      bleibt deine Sache.
+      Nein, eher bodenständig. Wir sitzen zusammen, atmen, sprechen und hören zu, manchmal halten wir auch einen Moment
+      Stille. Es gibt keine Lehre und keinen Glauben, dem du folgen musst.
     </AccordionItem>
     <AccordionItem question="Gibt es Körperkontakt?">
       Nur, wenn du zustimmst. Wenn wir etwas mit Berührung machen, etwa den Kreis zum Schluss Schulter an Schulter im
@@ -252,8 +246,8 @@ if (events && testimonials) {
       dabeistehen.
     </AccordionItem>
     <AccordionItem question="Wie vertraulich ist das, was ich erzähle?">
-      Vertraulichkeit ist die erste Absprache jedes Abends: Was hier erzählt wird, bleibt hier. Sie ist eine Zusage der
-      Anwesenden untereinander&nbsp;– wie viel du erzählst, entscheidest deshalb immer du.
+      Vertraulichkeit ist die erste Absprache jedes Abends: Was hier erzählt wird, bleibt hier. Sie ist eine Zusage
+      unter den Anwesenden, keine Garantie. Wie viel du erzählst, entscheidest deshalb immer du.
     </AccordionItem>
   </Faq>
 
@@ -261,9 +255,7 @@ if (events && testimonials) {
     events={events}
     anchor="termine"
     eyebrow=""
-    lede={
-      'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin. Du brauchst keine Vorerfahrung.'
-    }
+    lede={'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin.'}
     title="Dabei sein."
   />
 
