@@ -6,7 +6,6 @@ interface Item {
   href: string;
   title: string;
   text?: string;
-  prefetch?: boolean;
 }
 
 interface Props {
@@ -22,7 +21,6 @@ const { items, class: className } = Astro.props;
     <li class="border-b border-line-strong">
       <a
         href={item.href}
-        data-astro-prefetch={item.prefetch ? 'hover' : undefined}
         class="group/row grid min-h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1 py-4"
       >
         <span class="text-xl font-semibold text-fg transition-colors duration-180 group-hover/row:text-accent">

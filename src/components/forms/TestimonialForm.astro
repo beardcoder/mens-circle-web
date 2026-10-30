@@ -111,11 +111,9 @@ const { class: className } = Astro.props;
 </form>
 
 <script>
-  import { actions } from 'astro:actions';
-
   import { enhanceForms } from '@lib/form';
 
-  enhanceForms('testimonial', actions.submitTestimonial);
+  enhanceForms('testimonial', 'submitTestimonial');
 
   // Live character count under the textarea; reset with the form.
   const quote = document.querySelector<HTMLTextAreaElement>('#quote');

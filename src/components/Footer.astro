@@ -25,9 +25,6 @@ const socialLinks = site.socialLinks.map((link) => {
   return { ...link, href: `${scheme}${link.value}`, internal, text };
 });
 
-// Only these prerendered pages are safe to fetch before a click.
-const prefetchPaths = new Set(['/warum-ich-den-maennerkreis-leite', '/impressum', '/datenschutz']);
-
 const footerLink =
   'inline-flex min-h-11 items-center gap-3 text-base text-fg transition-colors duration-180 hover:text-accent sm:min-h-10';
 ---
@@ -48,12 +45,7 @@ const footerLink =
         <ul role="list" class="grid grid-cols-2 gap-x-5 sm:grid-cols-1">
           {nav.footerPrimary.map((item) => (
             <li>
-              <a
-                href={item.url}
-                class={footerLink}
-                data-umami-event="footer-link"
-                data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
-              >
+              <a href={item.url} class={footerLink} data-umami-event="footer-link">
                 {item.label}
               </a>
             </li>
@@ -101,7 +93,6 @@ const footerLink =
             <a
               href={item.url}
               data-umami-event="footer-link"
-              data-astro-prefetch={prefetchPaths.has(item.url) ? 'hover' : undefined}
               class="inline-flex min-h-11 items-center text-sm text-fg-muted transition-colors duration-180 hover:text-fg"
             >
               {item.label}

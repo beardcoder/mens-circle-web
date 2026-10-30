@@ -54,19 +54,19 @@ export default defineConfig({
     '/atemuebung': '/',
     '/atemuebung/app': '/',
   },
-  prefetch: { prefetchAll: false },
   build: {
     assets: 'assets',
     inlineStylesheets: 'auto',
   },
   fonts: [
-    // Playfair Display for headings and quotes; DM Sans for prose, UI and labels.
-    // Both variable, mapped to font-serif and font-sans in the shared theme.
+    // Playfair Display for headings and quotes; DM Sans for prose, UI and labels, mapped
+    // to font-serif and font-sans in the shared theme. Playfair only ever sets 400, so its
+    // static faces (~22 kB) beat the variable file (~38 kB); DM Sans uses 400–700.
     {
       name: 'Playfair Display',
       cssVariable: '--font-playfair',
       provider: fontProviders.fontsource(),
-      weights: ['400 900'],
+      weights: [400],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],

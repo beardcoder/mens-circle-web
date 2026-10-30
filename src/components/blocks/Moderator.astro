@@ -54,10 +54,6 @@ const largest = images.at(-1)!;
     <Prose>
       <slot />
     </Prose>
-    {linkLabel && linkUrl && (
-      <TextLink href={linkUrl} data-astro-prefetch="hover">
-        {linkLabel}
-      </TextLink>
-    )}
+    {linkLabel && linkUrl && <TextLink href={linkUrl}>{linkLabel}</TextLink>}
   </div>
 </Section>
