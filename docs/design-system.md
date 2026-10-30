@@ -39,10 +39,17 @@ then stepping back. Translated into design:
 German, "du", short sentences, first person where Markus speaks. Describe what
 happens, not what it should make you feel. Name the frame in plain words: the five
 agreements are Vertraulichkeit, Ehrlichkeit, Annehmen statt bewerten, Von sich
-sprechen and Ein geschützter Ort (the training's CHAOS: confidentiality, honesty,
+sprechen and Respekt (after the training's CHAOS: confidentiality, honesty,
 acceptance, ownership, sacred). The evening's arc is Ankommen, die erste Runde,
-Teilen und zuhören, Den Kreis schließen. Every invitation to take part comes with
-the permission not to. No promises of healing; the circle is no therapy and says so.
+Teilen und zuhören, Abschlussrunde. Every invitation to take part comes with the
+permission not to. No promises of healing; the circle is no therapy and says so.
+
+What reads as written by a machine stays out: no dash for effect (a dash only where
+a comma or full stop cannot do), no slogan contrasts ("nicht X, sondern Y", "Ich
+führe, aber ich führe nichts vor"), no lists of three for rhythm, no therapy phrases
+("das darf so sein", "was sich zeigt", "was dich trägt"), no "Raum", "Reise" or
+"Bogen" as images. Say a thing once per page: "keine Vorerfahrung" belongs in the
+facts and the FAQ, not in every section.
 
 ## Files
 
