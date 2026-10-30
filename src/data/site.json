@@ -38,5 +38,6 @@
     "postalCode": "94315",
     "country": "DE"
   },
-  "themeColor": "#f6f2ea"
+  "themeColor": "#f6f2ea",
+  "themeColorDark": "#111915"
 }

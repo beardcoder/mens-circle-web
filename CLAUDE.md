@@ -169,8 +169,11 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `fg-muted`, `line`, `line-strong`, `line-bold`, `accent`, `accent-soft`,
   `fill`/`fill-strong`/`on-fill`, `glow` for decoration, `success`/`danger` for
   states only); hex primitives (`--p-*`) live on `:root` only, never in markup. Day
-  and night are `data-mode` (`light-dark()` tokens), switched by `ModeToggle` in the
-  footer and the phone menu; the boot script drops a stored `mc-theme`. Every text
+  and night follow the system by default (`light-dark()` tokens, no `data-mode`);
+  `ModeToggle` (footer and phone menu) offers Auto · Hell · Dunkel and pins a choice
+  as `data-mode` (stored as `mc-appearance`). The boot script drops the old keys
+  `mc-theme` and `mc-mode`, so earlier pins return to Auto once. `theme-color` comes
+  as a light and a dark tag by `media`. Every text
   pair ≥ 4.5:1 on every ground in both modes, control lines ≥ 3:1; `line` never
   outlines a control alone. Check new pairs in both modes.
 - Grounds: `Section ground` is `default` (linen), `alt` (sand: facts that belong

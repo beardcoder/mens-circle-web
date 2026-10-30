@@ -66,8 +66,9 @@ facts and the FAQ, not in every section.
 ## Colour
 
 Primitives (`--p-*`) are plain hex values on `:root`; the roles pick them with
-`light-dark()`, so day and night (`data-mode`, set before first paint, switched by
-`ModeToggle`) keep the same roles. Never a hex value in markup.
+`light-dark()`, so day and night keep the same roles. The page follows the system
+(Auto); `ModeToggle` offers Auto · Hell · Dunkel and pins a choice as `data-mode`,
+set before first paint. Never a hex value in markup.
 
 | Role            | Light                        | Night                 | Token                            | Use                                           |
 | --------------- | ---------------------------- | --------------------- | -------------------------------- | --------------------------------------------- |
@@ -182,7 +183,7 @@ never waits for motion. Under reduced motion everything rests.
 | `TestimonialList`                                 | One short featured quote behind an ember rule; the rest under a line each; long ones fold        |
 | `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                    |
 | `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                           |
-| `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                    |
+| `ModeToggle`                                      | Auto · Hell · Dunkel (Auto follows the system), in the footer and the phone menu                 |
 
 **Header.** 72px: the mark in ember and the word mark in Fraunces; from `nav` five
 links and one filled action; below `nav` the action and a menu button. Over the home
