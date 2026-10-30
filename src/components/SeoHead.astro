@@ -176,7 +176,9 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <link rel="alternate" hreflang="de" href={canonical} />
 <link rel="alternate" hreflang="x-default" href={canonical} />
 
-<meta name="theme-color" content={site.themeColor} />
+{/* The browser chrome follows the system; a pinned mode overrides both (ModeToggle). */}
+<meta name="theme-color" media="(prefers-color-scheme: light)" content={site.themeColor} />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content={site.themeColorDark} />
 <meta name="color-scheme" content="light dark" />
 <meta name="msapplication-TileColor" content={site.themeColor} />
 

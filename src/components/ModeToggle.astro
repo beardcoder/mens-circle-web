@@ -2,49 +2,63 @@
 import { Icon } from 'astro-icon/components';
 
 /**
- * The one display option: day or night, as a quiet text button. It sits in the
- * footer and, on phones, at the end of the menu; its script keeps every
- * instance in sync (`aria-pressed` while dark).
+ * The one display option: Auto (the system's setting), Hell or Dunkel, as three
+ * quiet pressed-state buttons. It sits in the footer and, on phones, at the end of
+ * the menu; its script keeps every instance in sync. Hidden until the script runs,
+ * so nothing without it looks clickable.
  */
 interface Props {
   class?: string;
 }
 
 const { class: className } = Astro.props;
+
+const OPTIONS = [
+  { mode: 'auto', label: 'Auto', icon: 'theme-auto', title: 'Wie das System' },
+  { mode: 'light', label: 'Hell', icon: 'theme-light', title: 'Immer hell' },
+  { mode: 'dark', label: 'Dunkel', icon: 'theme-dark', title: 'Immer dunkel' },
+] as const;
 ---
 
-<button
-  type="button"
-  data-mode-toggle
-  aria-pressed="false"
-  class:list={[
-    'inline-flex min-h-11 items-center gap-2 text-sm text-fg-muted transition-colors duration-180 hover:text-fg',
-    className,
-  ]}
+<div
+  role="group"
+  aria-label="Darstellung"
+  data-mode-picker
+  hidden
+  class:list={['flex w-fit items-center gap-1 rounded-full border border-line p-1 text-sm', className]}
 >
-  <Icon name="theme-dark" aria-hidden="true" class="size-4.5 dark:hidden" />
-  <Icon name="theme-light" aria-hidden="true" class="hidden size-4.5 dark:block" />
-  <span class="dark:hidden">Dunkle Darstellung</span>
-  <span class="hidden dark:inline">Helle Darstellung</span>
-</button>
+  {OPTIONS.map((option) => (
+    <button
+      type="button"
+      data-mode-option={option.mode}
+      aria-pressed={option.mode === 'auto' ? 'true' : 'false'}
+      title={option.title}
+      class="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 text-fg-muted transition-colors duration-180 hover:text-fg aria-pressed:bg-raised aria-pressed:text-fg"
+    >
+      <Icon name={option.icon} aria-hidden="true" class="size-4" />
+      {option.label}
+    </button>
+  ))}
+</div>
 
 <script>
   /**
-   * Day and night — `data-mode` on <html>, "light" | "dark" or absent (follow the
-   * OS), persisted across visits. Layout.astro applies it before first paint; this
-   * keeps the toggles and the browser chrome colour in sync.
+   * Day and night: `data-mode` on <html> is "light" | "dark" when pinned, absent for
+   * Auto (the OS decides, live). Layout.astro applies it before first paint; this
+   * keeps the pickers and the browser chrome colour in sync.
    */
 
   type Mode = 'light' | 'dark';
+  type Choice = Mode | 'auto';
 
-  const STORAGE_KEY = 'mc-mode';
+  const STORAGE_KEY = 'mc-appearance';
 
   /** Mobile browser chrome colour per resolved mode (the page's ground). */
   const THEME_COLOR: Record<Mode, string> = { light: '#f6f2ea', dark: '#111915' };
 
   const darkQuery = matchMedia('(prefers-color-scheme: dark)');
 
-  /** The explicit mode the user pinned, or `null` when following the OS. */
+  /** The mode the visitor pinned, or `null` for Auto. */
   const storedMode = (): Mode | null => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -57,40 +71,51 @@ const { class: className } = Astro.props;
 
   const resolvedMode = (): Mode => storedMode() ?? (darkQuery.matches ? 'dark' : 'light');
 
-  /** Rendered in the footer and the phone menu; all stay in sync. */
-  const toggles = (): NodeListOf<HTMLButtonElement> => document.querySelectorAll('[data-mode-toggle]');
-
-  /** Push the current mode onto <html>, the meta tag and the toggles. */
+  /** Push the current mode onto <html>, the theme-color tags and the pickers. */
   function apply(): void {
     const root = document.documentElement;
     const stored = storedMode();
-    const resolved = resolvedMode();
+    const choice: Choice = stored ?? 'auto';
 
-    root.setAttribute('data-mode-resolved', resolved);
+    root.setAttribute('data-mode-resolved', resolvedMode());
 
     if (stored) root.setAttribute('data-mode', stored);
     else root.removeAttribute('data-mode');
 
-    document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[resolved]);
+    // One tag per system scheme; pinned, both show the pinned ground.
+    for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+      const scheme: Mode = meta.media.includes('dark') ? 'dark' : 'light';
 
-    for (const toggle of toggles()) toggle.setAttribute('aria-pressed', String(resolved === 'dark'));
+      meta.content = THEME_COLOR[stored ?? scheme];
+    }
+
+    for (const option of document.querySelectorAll<HTMLButtonElement>('[data-mode-option]')) {
+      option.setAttribute('aria-pressed', String(option.dataset.modeOption === choice));
+    }
+  }
+
+  function choose(choice: Choice): void {
+    try {
+      if (choice === 'auto') localStorage.removeItem(STORAGE_KEY);
+      else localStorage.setItem(STORAGE_KEY, choice);
+    } catch {
+      // Storage unavailable (private mode): the choice holds for this page only.
+      if (choice !== 'auto') document.documentElement.setAttribute('data-mode', choice);
+    }
+
+    apply();
   }
 
   function initTheme(): void {
     apply();
 
-    for (const toggle of toggles()) {
-      toggle.addEventListener('click', () => {
-        try {
-          localStorage.setItem(STORAGE_KEY, resolvedMode() === 'dark' ? 'light' : 'dark');
-        } catch {
-          // Storage unavailable (private mode) — the choice just will not persist.
-        }
+    for (const picker of document.querySelectorAll<HTMLElement>('[data-mode-picker]')) picker.hidden = false;
 
-        apply();
-      });
+    for (const option of document.querySelectorAll<HTMLButtonElement>('[data-mode-option]')) {
+      option.addEventListener('click', () => choose(option.dataset.modeOption as Choice));
     }
 
+    // Auto follows the system live, e.g. when it switches at sunset.
     darkQuery.addEventListener('change', () => {
       if (storedMode() === null) apply();
     });

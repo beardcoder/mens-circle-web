@@ -39,9 +39,12 @@ const speculationRules = JSON.stringify({
         try {
           const root = document.documentElement;
 
-          // The cool palette is gone: drop a stored choice of it.
+          // Earlier keys: the cool palette is gone, and the old day/night switch pinned a
+          // mode for good. Everyone starts on Auto (the system) once; a choice made in the
+          // picker is kept under the new key.
           localStorage.removeItem('mc-theme');
-          const stored = localStorage.getItem('mc-mode');
+          localStorage.removeItem('mc-mode');
+          const stored = localStorage.getItem('mc-appearance');
           const mode = stored === 'light' || stored === 'dark' ? stored : null;
           const resolved = mode || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
