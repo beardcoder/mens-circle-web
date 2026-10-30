@@ -57,21 +57,6 @@
   }
 }
 
-/* Public typography: a clear hierarchy with a lighter editorial weight.
-   Colours come exclusively from the shared warm-paper / charcoal / rust palette
-   in theme.css, including the light and dark surfaces. */
-@theme {
-  --text-hero: clamp(2.75rem, 1.65rem + 4vw, 5rem);
-  --text-hero--line-height: 1.08;
-  --text-hero--letter-spacing: -0.035em;
-  --text-section: clamp(1.875rem, 1.4rem + 1.9vw, 3.25rem);
-  --text-section--line-height: 1.14;
-  --text-section--letter-spacing: -0.03em;
-  --text-page: clamp(2.25rem, 1.6rem + 2.6vw, 4rem);
-  --text-page--line-height: 1.12;
-  --text-page--letter-spacing: -0.03em;
-}
-
 /* Progress is useful feedback; reading content itself stays still. */
 @keyframes reading-progress {
   from {
@@ -85,8 +70,8 @@
 /* The shape rests until the visitor explicitly starts the rhythm. Text and
    rings share one clock: four seconds in, five out, without live announcements. */
 .breath-orbit {
-  border-radius: 47% 53% 58% 42% / 53% 43% 57% 47%;
-  background: radial-gradient(ellipse, color-mix(in srgb, var(--color-fill) 9%, transparent), transparent 72%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-glow) 16%, transparent), transparent);
 }
 
 [data-breath][data-running] .breath-ring {
@@ -133,56 +118,15 @@
   }
 }
 
-/* Home morphs follow scrolling in both directions. Layout and reading text stay stable. */
+/* The hero's ring turns once a minute and a half; under reduced motion it rests. */
 @media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    [data-hero] {
-      view-timeline: --home-opening;
-    }
-
-    .home-orbit {
-      animation: home-orbit-turn linear both;
-      animation-timeline: --home-opening;
-      animation-range: exit 0% exit 100%;
-    }
-
-    .home-orbit > span {
-      animation: home-circle-shape linear both;
-      animation-timeline: --home-opening;
-      animation-range: exit 0% exit 100%;
-    }
-
-    .home-portrait {
-      animation: home-portrait-open linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 45%;
-    }
+  .hero-orbit {
+    animation: orbit-turn 90s linear infinite;
   }
 }
 
-@keyframes home-orbit-turn {
-  from {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-  }
+@keyframes orbit-turn {
   to {
-    transform: translate(-8%, -12%) rotate(65deg) scale(0.78);
-  }
-}
-
-@keyframes home-circle-shape {
-  from {
-    border-radius: 48% 52% 46% 54% / 54% 45% 55% 46%;
-  }
-  to {
-    border-radius: 30% 70% 64% 36% / 42% 32% 68% 58%;
-  }
-}
-
-@keyframes home-portrait-open {
-  from {
-    clip-path: inset(0 0 0 0 round 36% 36% 4% 4%);
-  }
-  to {
-    clip-path: inset(0 0 0 0 round 0% 0% 0% 0%);
+    rotate: 360deg;
   }
 }

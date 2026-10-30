@@ -1,15 +1,24 @@
 ---
+import { Icon } from 'astro-icon/components';
+
 interface Props {
   label: string;
+  /** An icon from src/icons: place, calendar, clock, heart. */
+  icon: string;
 }
 
-const { label } = Astro.props;
+const { label, icon } = Astro.props;
 ---
 
-<div class="grid content-start gap-1">
-  <span aria-hidden="true" class="mb-3 block h-px bg-line-strong"></span>
-  <dt class="text-sm text-fg-muted">{label}</dt>
-  <dd class="text-xl font-semibold text-fg">
+<div class="grid min-w-0 content-start gap-1 rounded-xl border border-line bg-raised p-4 shadow-card sm:p-6">
+  <span
+    aria-hidden="true"
+    class="mb-2 grid size-10 place-items-center rounded-full bg-accent-soft text-accent sm:mb-3 sm:size-11"
+  >
+    <Icon name={icon} class="size-5.5" />
+  </span>
+  <dt class="text-sm font-semibold text-fg-muted">{label}</dt>
+  <dd class="font-display text-xl text-fg hyphens-auto sm:text-sub">
     <slot name="value" />
   </dd>
   <dd class="text-sm text-fg-muted">

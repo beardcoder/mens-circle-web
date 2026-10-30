@@ -14,16 +14,16 @@ const rest = featured ? others : items;
 ---
 
 {featured && (
-  <div class="mt-group max-w-176">
+  <div class="mt-group max-w-4xl border-l-4 border-fill pl-6 sm:pl-10">
     <TestimonialQuote item={first} featured />
   </div>
 )}
-<ul role="list" class="mt-group grid items-start gap-x-grid gap-y-8 md:grid-cols-2">
+<ul role="list" class="mt-group grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
   {rest.map((item) => (
-    <li class="min-w-0 border-t border-line pt-6">
+    <li class="min-w-0 rounded-xl border border-line bg-raised p-6 shadow-card sm:p-7">
       {item.quote.length > 360 ? (
         <details class="group/quote">
-          <summary class="cursor-pointer text-base font-semibold text-accent underline underline-offset-4 marker:text-accent">
+          <summary class="cursor-pointer list-none text-base font-semibold text-accent underline underline-offset-4 [&::-webkit-details-marker]:hidden">
             <span class="inline-flex min-h-11 items-center group-open/quote:hidden">
               Erfahrung von {item.author || 'einem Teilnehmer'} lesen
             </span>

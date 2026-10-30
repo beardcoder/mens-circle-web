@@ -50,9 +50,9 @@ const roundButton =
   id="header"
   class:list={[
     'group/header fixed inset-x-0 top-0 z-40 h-header text-fg print:hidden',
-    // The bar's ground: the page's paper, opaque, with a thin line. It switches
-    // at once, ground and text together.
-    'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:border-b before:border-line before:bg-ground',
+    // The bar's ground: the page's linen, a little translucent over a blur, with a
+    // thin line. It switches at once, ground and text together.
+    'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:border-b before:border-line before:bg-ground/88 before:backdrop-blur-xl',
     // Over the dark opening: clear with light text until the page moves.
     'over-hero:text-bone over-hero:before:opacity-0 over-hero:data-[scrolled]:text-fg over-hero:data-[scrolled]:before:opacity-100',
   ]}
@@ -61,9 +61,9 @@ const roundButton =
     <a
       href="/"
       aria-label={`${site.siteName} – Startseite`}
-      class="group/logo flex min-h-11 min-w-0 items-center gap-3 font-sans text-xl font-medium tracking-[-0.025em]"
+      class="group/logo flex min-h-11 min-w-0 items-center gap-2.5 font-display text-[1.1875rem] tracking-[-0.01em] sm:gap-3 sm:text-[1.375rem]"
     >
-      <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+      <Icon name="logo" aria-hidden="true" class="size-9 shrink-0 text-flame" />
       <span class="max-[22.5rem]:sr-only">Männerkreis</span>
     </a>
 
@@ -149,7 +149,7 @@ const roundButton =
     aria-label="Menü"
     tabindex="-1"
     class:list={[
-      'group/menu m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain bg-ground p-0 text-fg outline-none backdrop:bg-transparent nav:hidden',
+      'group/menu surface-dark m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto overscroll-contain p-0 outline-none backdrop:bg-transparent nav:hidden',
       '[--nav-origin:100%_0]',
       'motion-safe:[clip-path:circle(0_at_var(--nav-origin))] motion-safe:transition-[clip-path,display,overlay] motion-safe:transition-discrete motion-safe:duration-[560ms] motion-safe:ease-in-out',
       'motion-safe:open:[clip-path:circle(150vmax_at_var(--nav-origin))] motion-safe:starting:open:[clip-path:circle(0_at_var(--nav-origin))]',
@@ -159,10 +159,10 @@ const roundButton =
     <Container class="flex h-header items-center gap-4 border-b border-line">
       <a
         href="/"
-        class="flex min-h-11 min-w-0 items-center gap-3 font-sans text-xl font-medium tracking-[-0.025em]"
+        class="flex min-h-11 min-w-0 items-center gap-3 font-display text-[1.375rem] tracking-[-0.01em]"
         data-nav-link
       >
-        <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+        <Icon name="logo" aria-hidden="true" class="size-9 shrink-0 text-flame" />
         <span>Männerkreis</span>
       </a>
       <button type="button" data-nav-close class:list={[roundButton, 'ml-auto']}>
@@ -181,7 +181,7 @@ const roundButton =
                 data-nav-link
                 data-umami-event="nav-click"
                 data-umami-event-target={link.umamiTarget}
-                class="group/link flex min-h-16 items-center justify-between text-xl font-medium transition-colors duration-180 hover:text-accent group-open/menu:animate-rise group-open/menu:[animation-delay:calc(180ms+var(--i)*60ms)] aria-[current=page]:text-accent"
+                class="group/link flex min-h-16 items-center justify-between font-display text-sub transition-colors duration-180 hover:text-accent group-open/menu:animate-rise group-open/menu:[animation-delay:calc(180ms+var(--i)*60ms)] aria-[current=page]:text-accent"
               >
                 {link.label}
                 <Icon

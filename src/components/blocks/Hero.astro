@@ -1,4 +1,6 @@
 ---
+import type { ImageMetadata } from 'astro';
+
 import { button } from '@lib/ui';
 
 import EventAvailability from '../event/EventAvailability.astro';
@@ -11,55 +13,80 @@ interface Props {
   kicker: string;
   secondaryLabel: string;
   secondaryLink: string;
+  /** The photograph, square and ascending by width; the home page is SSR, so these are pre-sized files. */
+  images: ImageMetadata[];
+  imageAlt: string;
 }
 
-const { events, kicker, secondaryLabel, secondaryLink } = Astro.props;
+const { events, kicker, secondaryLabel, secondaryLink, images, imageAlt } = Astro.props;
 const action = events?.events[0]?.view.action ?? { href: '/event', label: 'Termine ansehen' };
+const largest = images.at(-1)!;
 ---
 
 <section
   data-hero
   aria-labelledby="hero-title"
-  class="surface-dark relative flex min-h-[min(46rem,90svh)] items-center overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group)+1rem)] pb-[calc(var(--spacing-section)+1.5rem)] lg:min-h-[min(48rem,90svh)] lg:pt-[calc(var(--spacing-header)+var(--spacing-section)+1.5rem)]"
+  class="surface-dark relative mx-2 mt-2 overflow-clip rounded-2xl pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section sm:mx-3 sm:mt-3 lg:pt-[calc(var(--spacing-header)+var(--spacing-band))]"
 >
-  {/* A quiet circle recalls the seating arrangement without competing with the date. */}
+  {/* Firelight: a warm glow where the circle sits. */}
   <div
     aria-hidden="true"
-    class="home-orbit pointer-events-none absolute -right-56 -bottom-60 aspect-square w-120 lg:top-[calc(50%-22rem)] lg:-right-64 lg:bottom-auto lg:w-176"
-  >
-    <span class="absolute inset-0 rounded-[48%_52%_46%_54%/54%_45%_55%_46%] border border-line-strong"></span>
-    <span class="absolute inset-[23%] rounded-[54%_46%_52%_48%/46%_55%_45%_54%] border border-line"></span>
-  </div>
+    class="pointer-events-none absolute top-[38%] -right-[30%] aspect-square w-[110%] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-fill)_30%,transparent),transparent)] lg:top-[-12%] lg:-right-[10%] lg:w-[62%]"
+  ></div>
 
-  <Container class="relative grid gap-x-grid gap-y-8 lg:grid-cols-12">
+  <Container class="relative grid items-center gap-x-grid gap-y-14 lg:grid-cols-12">
     <div class="grid min-w-0 justify-items-start lg:col-span-7">
-      {kicker && <Eyebrow class="mb-4">{kicker}</Eyebrow>}
-      <h1 id="hero-title" class="max-w-[12em] text-hero text-fg wrap-anywhere hyphens-auto">
+      {kicker && <Eyebrow class="mb-5">{kicker}</Eyebrow>}
+      <h1 id="hero-title" class="max-w-[11em] text-hero text-fg wrap-anywhere hyphens-auto">
         <slot name="title" />
       </h1>
       <p class="mt-6 max-w-measure text-lg text-fg-muted">
         <slot />
       </p>
+      <div class="mt-9 flex w-full flex-wrap items-center gap-x-7 gap-y-3">
+        <a
+          href={action.href}
+          class:list={[button({ size: 'lg' }), 'max-sm:w-full sm:min-w-52']}
+          data-umami-event="cta-click"
+          data-umami-event-location="home-hero"
+        >
+          {action.label}
+        </a>
+        <a
+          href={secondaryLink}
+          class="inline-flex min-h-11 items-center text-base font-semibold text-accent underline decoration-1 underline-offset-4 hover:text-accent-strong"
+        >
+          {secondaryLabel}
+        </a>
+      </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 lg:col-span-7 lg:row-start-2">
-      <a
-        href={action.href}
-        class:list={[button({ size: 'lg' }), 'max-sm:w-full sm:min-w-52']}
-        data-umami-event="cta-click"
-        data-umami-event-location="home-hero"
-      >
-        {action.label}
-      </a>
-      <a
-        href={secondaryLink}
-        class="inline-flex min-h-11 items-center text-base font-semibold text-accent underline underline-offset-4"
-      >
-        {secondaryLabel}
-      </a>
-    </div>
-    <div class="min-w-0 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:self-center">
-      <EventAvailability data={events} location="home-hero" showAction={false} />
+    <div class="relative mx-auto w-full max-w-[21rem] sm:max-w-[26rem] lg:col-span-5 lg:max-w-none">
+      <div class="relative">
+        <img
+          src={largest.src}
+          srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
+          sizes="(min-width: 80rem) 30rem, (min-width: 64rem) 36vw, (min-width: 36rem) 26rem, 21rem"
+          width={largest.width}
+          height={largest.height}
+          alt={imageAlt}
+          fetchpriority="high"
+          decoding="async"
+          class="aspect-square w-full rounded-full object-cover"
+        />
+        {/* The circle of the logo: a thin ring with three warm points, turning slowly. */}
+        <div
+          aria-hidden="true"
+          class="hero-orbit pointer-events-none absolute -inset-[6%] rounded-full border border-line-strong"
+        >
+          <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-glow"></span>
+          <span class="absolute top-3/4 left-[93.3%] size-3 -translate-1/2 rounded-full bg-fill"></span>
+          <span class="absolute top-3/4 left-[6.7%] size-3 -translate-1/2 rounded-full bg-accent"></span>
+        </div>
+      </div>
+      <div class="relative z-1 -mt-14 sm:-mt-20 lg:absolute lg:-right-4 lg:-bottom-20 lg:mt-0 lg:w-[20rem]">
+        <EventAvailability data={events} location="home-hero" showAction={false} />
+      </div>
     </div>
   </Container>
 </section>

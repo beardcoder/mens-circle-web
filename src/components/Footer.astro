@@ -29,12 +29,18 @@ const footerLink =
   'inline-flex min-h-11 items-center gap-3 text-base text-fg transition-colors duration-180 hover:text-accent sm:min-h-10';
 ---
 
-<footer class="surface-dark pt-section pb-8 print:hidden">
-  <Container>
+<footer class="surface-dark relative mx-2 mb-2 overflow-clip rounded-2xl pt-section pb-8 sm:mx-3 sm:mb-3 print:hidden">
+  {/* The circle of the logo, large and faint, behind the footer's columns. */}
+  <Icon
+    name="logo"
+    aria-hidden="true"
+    class="pointer-events-none absolute -right-24 -bottom-28 size-[26rem] text-bone opacity-[0.04] sm:size-[34rem]"
+  />
+  <Container class="relative">
     <div class="grid gap-x-grid gap-y-10 pb-group sm:grid-cols-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]">
       <div class="max-w-[38ch] sm:col-span-2 lg:col-span-1">
-        <a href="/" class="mb-4 inline-flex min-h-11 items-center gap-3 font-sans text-xl font-medium tracking-tight">
-          <Icon name="logo" aria-hidden="true" class="size-9 shrink-0" />
+        <a href="/" class="mb-4 inline-flex min-h-11 items-center gap-3 font-display text-sub">
+          <Icon name="logo" aria-hidden="true" class="size-9 shrink-0 text-accent" />
           <span>{site.siteName}</span>
         </a>
         <p class="text-base text-fg-muted">{site.footerDescription}</p>

@@ -15,26 +15,31 @@ interface Props {
 const { anchor, eyebrow, title, questionsLabel, questions, close } = Astro.props;
 ---
 
-<Section id={anchor} labelledby="ueber-title" innerClass="grid gap-x-grid gap-y-6 lg:grid-cols-12">
-  <SectionHead eyebrow={eyebrow} title={title} titleId="ueber-title" class="lg:col-span-12" />
-  <div class="lg:col-span-7">
-    <Prose>
+<Section id={anchor} labelledby="ueber-title" innerClass="grid gap-x-grid gap-y-10 lg:grid-cols-12">
+  <div class="lg:col-span-6">
+    <SectionHead eyebrow={eyebrow} title={title} titleId="ueber-title" />
+    <Prose class="mt-6">
       <slot />
     </Prose>
-    {close && <p class="mt-6 max-w-measure text-md font-semibold text-fg">{close}</p>}
+    {close && <p class="mt-6 max-w-measure font-display text-sub text-fg">{close}</p>}
   </div>
 
   {questions.length > 0 && (
-    <aside
-      aria-labelledby="ueber-questions-label"
-      class="border-line max-lg:mt-4 max-lg:border-t max-lg:pt-8 lg:col-span-4 lg:col-start-9 lg:self-start lg:border-l lg:pl-8"
-    >
-      <h3 id="ueber-questions-label" class="font-sans text-base font-semibold text-fg">
+    <aside aria-labelledby="ueber-questions-label" class="lg:col-span-5 lg:col-start-8 lg:self-center">
+      <h3 id="ueber-questions-label" class="font-sans text-sm font-semibold text-fg-muted">
         {questionsLabel}
       </h3>
-      <ul role="list" class="mt-4 grid gap-3">
-        {questions.map((question) => (
-          <li class="text-md text-fg-soft">{question}</li>
+      {/* Spoken in the round: one voice after the other, left and right. */}
+      <ul role="list" class="mt-5 grid gap-3">
+        {questions.map((question, i) => (
+          <li
+            class:list={[
+              'w-fit max-w-[85%] rounded-xl px-5 py-3.5 text-md text-fg',
+              i % 2 ? 'justify-self-end rounded-br-sm bg-accent-soft' : 'rounded-bl-sm bg-tint',
+            ]}
+          >
+            {question}
+          </li>
         ))}
       </ul>
     </aside>

@@ -1,7 +1,5 @@
 ---
-import { label } from '@lib/ui';
-
-/** A short section label above a title: a compact sentence-case label in the secondary text colour, no ornament. */
+/** A short label above a title: sentence case in the accent, after a small ember dot (the circle, once more). */
 interface Props {
   class?: string;
 }
@@ -9,6 +7,11 @@ interface Props {
 const { class: className }: Props = Astro.props;
 ---
 
-<p class:list={[label, className]}>
+<p
+  class:list={[
+    'inline-flex items-center gap-2.5 font-sans text-sm font-semibold text-accent before:size-2 before:shrink-0 before:rounded-full before:bg-fill',
+    className,
+  ]}
+>
   <slot />
 </p>

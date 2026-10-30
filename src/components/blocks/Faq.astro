@@ -25,8 +25,8 @@ const { anchor, eyebrow, title, intro } = Astro.props;
 <Section id={anchor} labelledby={`${anchor}-title`}>
   <div itemscope itemtype="https://schema.org/FAQPage">
     <Split>
-      <div slot="head" class="grid justify-items-start gap-6">
-        <SectionHead eyebrow={eyebrow} title={title} titleId={`${anchor}-title`} lead={intro} leadHtml size="sub" />
+      <div slot="head" class="grid justify-items-start gap-6 lg:sticky lg:top-(--spacing-clearance)">
+        <SectionHead eyebrow={eyebrow} title={title} titleId={`${anchor}-title`} lead={intro} leadHtml />
         {site.contactEmail && (
           <p class="max-w-measure text-base text-fg-muted">
             Deine Frage ist nicht dabei? Schreib mir an{' '}

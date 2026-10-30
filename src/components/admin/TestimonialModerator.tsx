@@ -213,7 +213,7 @@ function TestimonialCard({
         />
       ) : (
         <>
-          <blockquote class="max-w-[48rem] font-serif text-lg leading-relaxed whitespace-pre-wrap">
+          <blockquote class="max-w-[48rem] font-display text-lg leading-relaxed whitespace-pre-wrap">
             „{row.quote}“
           </blockquote>
           <p class="mt-3 min-w-0 text-sm break-words text-fg-muted">

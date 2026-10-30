@@ -1,11 +1,11 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
- * utilities cannot express. Calm, warm and clear: one paper ground, a quiet
- * secondary ground, one dark focus ground (the home opening and the footer), a
- * restrained rust accent; Playfair Display for chosen titles and short quotes,
- * DM Sans for everything that explains. Shared by the two entry files:
- * global.css (public site) and admin.css (back office). docs/design-system.md
- * describes the system.
+ * utilities cannot express. "A fire circle at the edge of the forest": a linen
+ * ground, deep forest green for what draws you in (the opening, the breath, the
+ * footer), ember from the logo for the one thing to do, soft round shapes.
+ * Fraunces for titles, quotes and dates; Figtree for everything that explains.
+ * Shared by the two entry files: global.css (public site) and admin.css (back
+ * office). docs/design-system.md describes the system.
  */
 
 /* ── Variants ─────────────────────────────────────────────────────────────── */
@@ -13,8 +13,8 @@
 /* The mode toggle picks its label from the mode the boot script resolved. */
 @custom-variant dark (&:where([data-mode-resolved='dark'], [data-mode-resolved='dark'] *));
 
-/* Under a page that opens on the dark focus ground (`data-hero` on it): the
-   header starts clear with light text over it. */
+/* Under a page that opens on the forest ground (`data-hero` on it): the header
+   starts clear with light text over it. */
 @custom-variant over-hero (&:where(body:has([data-hero]) *));
 
 /* Scroll-driven, where scroll timelines exist and motion is allowed; without
@@ -38,8 +38,8 @@
   --shadow-*: initial;
   --breakpoint-*: initial;
 
-  /* Breakpoints: `md` is the tablet, `lg` the desktop (four columns), `nav` the
-     width from which the header shows its links, `xl` the wide desktop. */
+  /* Breakpoints: `md` is the tablet, `lg` the desktop, `nav` the width from which
+     the header shows its links, `xl` the wide desktop. */
   --breakpoint-sm: 36rem;
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;
@@ -47,78 +47,82 @@
   --breakpoint-xl: 80rem;
 
   /* Colour roles, built from the primitives on :root (base layer below).
-     `light-dark()` follows the page's color-scheme; the two surfaces re-declare
-     what changes on their ground. */
-  --color-ground: light-dark(var(--p-paper), var(--p-night)); /* the page */
-  --color-ground-alt: light-dark(var(--p-paper-alt), var(--p-night-alt)); /* the quiet secondary ground */
-  --color-raised: light-dark(var(--p-paper-raised), var(--p-night-raised)); /* cards, popovers */
-  --color-surface: light-dark(var(--p-paper), var(--p-night)); /* the ground of the current block */
-  --color-fg: light-dark(var(--p-text), var(--p-text-on-dark));
-  --color-fg-soft: light-dark(var(--p-text), var(--p-text-on-dark)); /* running text */
-  --color-fg-muted: light-dark(var(--p-text-muted), var(--p-text-muted-dark)); /* secondary information */
-  /* Links and rare highlights: the dark rust on light grounds, the light rust on dark ones. */
-  --color-accent: light-dark(var(--p-rust-text), var(--p-rust-light));
-  --color-accent-strong: light-dark(var(--p-rust-hover), var(--p-text-on-dark));
-  --color-accent-soft: light-dark(var(--p-rust-tint), var(--p-rust-tint-dark));
-  --color-on-accent: light-dark(var(--p-paper), var(--p-night));
-  /* The primary action: rust under a light label, in both modes. */
-  --color-fill: var(--p-rust);
-  --color-fill-strong: var(--p-rust-hover);
-  --color-on-fill: var(--p-on-rust);
+     `light-dark()` follows the page's color-scheme; the surfaces re-declare what
+     changes on their ground. */
+  --color-ground: light-dark(var(--p-linen), var(--p-night)); /* the page */
+  --color-ground-alt: light-dark(var(--p-sand), var(--p-night-alt)); /* a warm band */
+  --color-tint: light-dark(var(--p-sage), var(--p-sage-night)); /* a quiet green note */
+  --color-raised: light-dark(var(--p-cream), var(--p-night-raised)); /* cards */
+  --color-surface: light-dark(var(--p-linen), var(--p-night)); /* the ground of the current block */
+  --color-fg: light-dark(var(--p-ink), var(--p-night-text));
+  --color-fg-soft: light-dark(var(--p-ink-soft), var(--p-night-text)); /* running text */
+  --color-fg-muted: light-dark(var(--p-muted), var(--p-night-muted)); /* secondary information */
+  /* Links, labels and highlighted words: ember dark enough to read on linen, light on the night. */
+  --color-accent: light-dark(var(--p-ember-text), var(--p-ember-light));
+  --color-accent-strong: light-dark(var(--p-ember-deep), var(--p-night-text));
+  --color-accent-soft: light-dark(var(--p-ember-tint), var(--p-ember-tint-night));
+  --color-on-accent: light-dark(var(--p-linen), var(--p-night));
+  /* The one thing to do: ember under a light label, in both modes. */
+  --color-fill: var(--p-ember);
+  --color-fill-strong: var(--p-ember-deep);
+  --color-on-fill: var(--p-on-ember);
+  /* The warm light of the circle motif and the breath; decoration, never text. */
+  --color-glow: var(--p-gold);
   /* Lines: `line` parts things quietly and never alone outlines a control;
      `line-bold` outlines inputs and controls (3:1). */
-  --color-line: light-dark(var(--p-line), var(--p-line-dark));
-  --color-line-strong: light-dark(var(--p-line-strong), var(--p-line-strong-dark));
-  --color-line-bold: var(--p-control);
-  --color-field: light-dark(var(--p-paper-raised), var(--p-night-alt));
+  --color-line: light-dark(var(--p-line), var(--p-night-line));
+  --color-line-strong: light-dark(var(--p-line-strong), var(--p-night-line-strong));
+  --color-line-bold: light-dark(var(--p-control), var(--p-night-control));
+  --color-field: light-dark(var(--p-cream), var(--p-night-alt));
   --color-overlay: light-dark(
-    color-mix(in srgb, var(--p-text) 55%, transparent),
+    color-mix(in srgb, var(--p-ink) 55%, transparent),
     color-mix(in srgb, black 70%, transparent)
   );
   /* States only: always with words, never a decorative colour. */
   --color-success: light-dark(#2f6b3a, #8fcb97);
   --color-danger: light-dark(#a3261b, #f0a197);
-  --color-alert: light-dark(#f6e4de, #3a2420);
+  --color-alert: light-dark(#f6e2d9, #3a2420);
   --color-on-alert: light-dark(#8a2a1c, #f6cfc6);
-  /* The rust of the circle motif and the admin's marks. */
-  --color-flame: var(--p-rust);
-  /* Constants of the dark focus ground. */
-  --color-bone: var(--p-text-on-dark);
-  --color-ink: var(--p-focus);
+  /* The ember of the logo and the admin's marks. */
+  --color-flame: var(--p-ember);
+  /* Constants of the forest ground. */
+  --color-bone: var(--p-bone);
+  --color-ink: var(--p-forest);
 
-  /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). Playfair Display
-     for chosen titles and short quotes, DM Sans for text, navigation, forms and data. */
-  --font-sans: var(--font-dm-sans);
-  --font-serif: var(--font-playfair);
+  /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). */
+  --font-sans: var(--font-figtree);
+  --font-display: var(--font-fraunces);
 
   /* Type scale. Small sizes for labels and data, the reading size, then the
-     titles by role: `sub` (subheadings), `section` (section titles), `page`
-     (a sub-page's title) and `hero` (the home statement). */
-  --text-xs: 0.8125rem; /* 13px: labels, the small print */
+     titles by role: `sub` (subheadings), `section` (section titles), `page` (a
+     sub-page's title) and `hero` (the home statement). Titles are Fraunces 500. */
+  --text-xs: 0.8125rem; /* 13px: the small print */
   --text-xs--line-height: 1.45;
-  --text-sm: 0.875rem; /* 14px: hints, captions */
+  --text-sm: 0.875rem; /* 14px: labels, hints, captions */
   --text-sm--line-height: 1.5;
   --text-base: 1rem; /* 16px: controls, data, buttons */
   --text-base--line-height: 1.55;
-  --text-md: clamp(1.0625rem, 1rem + 0.2vw, 1.1875rem); /* 17–19px: running text */
+  --text-md: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem); /* 17–19px: running text */
   --text-md--line-height: 1.65;
-  --text-lg: clamp(1.125rem, 1.05rem + 0.25vw, 1.25rem); /* 18–20px: a short lead */
-  --text-lg--line-height: 1.6;
+  --text-lg: clamp(1.125rem, 1.04rem + 0.35vw, 1.3125rem); /* 18–21px: a lead */
+  --text-lg--line-height: 1.55;
   --text-xl: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem); /* 18–22px: FAQ questions, data values */
   --text-xl--line-height: 1.4;
-  --text-quote: clamp(1.375rem, 1.25rem + 0.45vw, 1.75rem); /* 22–28px: one short quote */
-  --text-quote--line-height: 1.4;
-  --text-sub: clamp(1.375rem, 1.2rem + 0.6vw, 1.875rem); /* 22–30px */
-  --text-sub--line-height: 1.25;
-  --text-section: clamp(1.875rem, 1.45rem + 1.6vw, 3rem); /* 30–48px */
-  --text-section--line-height: 1.18;
-  --text-section--letter-spacing: -0.01em;
-  --text-page: clamp(2.25rem, 1.6rem + 2.6vw, 4rem); /* 36–64px */
-  --text-page--line-height: 1.12;
-  --text-page--letter-spacing: -0.015em;
-  --text-hero: clamp(2.75rem, 1.75rem + 4.4vw, 5.5rem); /* 44–88px */
-  --text-hero--line-height: 1.08;
-  --text-hero--letter-spacing: -0.02em;
+  --text-quote: clamp(1.5rem, 1.3rem + 0.8vw, 2.125rem); /* 24–34px: one short quote */
+  --text-quote--line-height: 1.3;
+  --text-quote--letter-spacing: -0.01em;
+  --text-sub: clamp(1.375rem, 1.2rem + 0.7vw, 1.875rem); /* 22–30px */
+  --text-sub--line-height: 1.2;
+  --text-sub--letter-spacing: -0.01em;
+  --text-section: clamp(2rem, 1.45rem + 2.1vw, 3.25rem); /* 32–52px */
+  --text-section--line-height: 1.08;
+  --text-section--letter-spacing: -0.02em;
+  --text-page: clamp(2.375rem, 1.55rem + 3.1vw, 4.25rem); /* 38–68px */
+  --text-page--line-height: 1.04;
+  --text-page--letter-spacing: -0.025em;
+  --text-hero: clamp(2.625rem, 1.55rem + 4.3vw, 5rem); /* 42–80px */
+  --text-hero--line-height: 1.02;
+  --text-hero--letter-spacing: -0.03em;
 
   /* Space. `section` the vertical space of a section, `band` that of a compact
      band, `group` from an explanation to the module after it, `grid` the column
@@ -138,14 +142,22 @@
   --container-column: 45rem; /* a reading column (legal pages, essays) */
   --container-measure: 38rem; /* a line of running text, ~62 characters */
 
-  /* Shapes have no radius token: a thing is either fully round or square.
-     Round (`rounded-full`) is what you press — buttons, icon buttons, toggles —
-     and the circle itself; square is everything that holds — fields, cards,
-     panels, photographs, the map. Flat: no shadow on the page; one for what
-     floats over it (the admin's toast). */
+  /* Soft and round. `full` is what you press (buttons, chips, toggles) and the
+     circle; fields take `md`; cards and panels `xl`; the large grounds (the
+     opening, the bands, the footer) `2xl`. */
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-2xl: 2.5rem;
+
+  /* A card rests on the page with a soft shadow; an overlay floats above it. */
+  --shadow-card:
+    0 1px 2px light-dark(rgb(27 36 30 / 6%), rgb(0 0 0 / 30%)),
+    0 18px 40px -26px light-dark(rgb(27 36 30 / 30%), rgb(0 0 0 / 70%));
   --shadow-overlay:
-    0 2px 6px light-dark(rgb(40 37 31 / 8%), rgb(0 0 0 / 35%)),
-    0 24px 48px -16px light-dark(rgb(40 37 31 / 28%), rgb(0 0 0 / 60%));
+    0 2px 6px light-dark(rgb(27 36 30 / 8%), rgb(0 0 0 / 35%)),
+    0 24px 48px -16px light-dark(rgb(27 36 30 / 28%), rgb(0 0 0 / 60%));
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
@@ -203,29 +215,38 @@
 /* A ground re-declares the colour roles, so text, lines, buttons, focus rings
    and form controls inside follow it. */
 
-/* The quiet secondary ground: information that belongs together (the facts,
-   the agreements, the closing invitation). */
+/* The warm band: information that belongs together (the facts, the dates). */
 @utility surface-alt {
   --color-surface: var(--color-ground-alt);
-  --color-raised: light-dark(var(--p-paper), var(--p-night-raised));
+  --color-raised: light-dark(var(--p-cream), var(--p-night-raised));
   color: var(--color-fg);
   background-color: var(--color-surface);
 }
 
-/* The dark focus ground: the home opening and the footer, in both modes. */
+/* The quiet green note: agreements, a boundary, a hint beside the work. */
+@utility surface-tint {
+  --color-surface: var(--color-tint);
+  --color-raised: light-dark(var(--p-cream), var(--p-night-raised));
+  color: var(--color-fg);
+  background-color: var(--color-surface);
+}
+
+/* The forest ground: the opening, the breath, the registration and the footer,
+   in both modes. */
 @utility surface-dark {
-  --color-surface: var(--p-focus);
-  --color-raised: var(--p-focus-raised);
-  --color-fg: var(--p-text-on-dark);
-  --color-fg-soft: var(--p-text-on-dark);
-  --color-fg-muted: var(--p-text-muted-on-dark);
-  --color-accent: var(--p-rust-light);
-  --color-accent-strong: var(--p-text-on-dark);
-  --color-accent-soft: var(--p-focus-raised);
-  --color-on-accent: var(--p-focus);
-  --color-line: color-mix(in srgb, var(--p-text-on-dark) 16%, transparent);
-  --color-line-strong: color-mix(in srgb, var(--p-text-on-dark) 26%, transparent);
-  --color-field: var(--p-focus-raised);
+  --color-surface: var(--p-forest);
+  --color-raised: var(--p-forest-raised);
+  --color-fg: var(--p-bone);
+  --color-fg-soft: var(--p-bone);
+  --color-fg-muted: var(--p-bone-muted);
+  --color-accent: var(--p-ember-light);
+  --color-accent-strong: var(--p-bone);
+  --color-accent-soft: var(--p-forest-raised);
+  --color-on-accent: var(--p-forest);
+  --color-line: color-mix(in srgb, var(--p-bone) 14%, transparent);
+  --color-line-strong: color-mix(in srgb, var(--p-bone) 24%, transparent);
+  --color-line-bold: var(--p-forest-control);
+  --color-field: var(--p-forest-raised);
   --color-success: #8fcb97;
   --color-danger: #f0a197;
   color: var(--color-fg);
@@ -240,53 +261,60 @@
     color-scheme: light dark;
     interpolate-size: allow-keywords;
 
-    /* The primitives. Light: paper, a quiet secondary paper, dark text, a warm
-       grey for secondary text, a rust that reads as text and one that carries a
-       light label. Dark mode keeps the roles: a dark ground, a slightly lighter
-       secondary one, light text, the light rust. */
-    --p-paper: #f8f5ef;
-    --p-paper-alt: #efeae2;
-    --p-paper-raised: #fdfbf7;
-    --p-text: #28251f;
-    --p-text-muted: #71685e;
-    --p-line: #d8d0c4;
-    --p-line-strong: #c3b9ab;
-    --p-control: #8a8175;
-    --p-rust-text: #a54829;
-    --p-rust: #9f4429;
-    --p-rust-hover: #813621;
-    --p-on-rust: #fff9f3;
-    --p-rust-tint: #f3e3da;
-    --p-night: #1b1917;
-    --p-night-alt: #24221f;
-    --p-night-raised: #2a2724;
-    --p-text-on-dark: #f8f5ef;
-    --p-text-muted-dark: #b5ac9f;
-    --p-line-dark: #3a3631;
-    --p-line-strong-dark: #4d4842;
-    --p-rust-light: #e6aa83;
-    --p-rust-tint-dark: #3a2a22;
-    --p-focus: light-dark(#24221f, #121110);
-    --p-focus-raised: light-dark(#302d29, #1f1d1b);
-    --p-text-muted-on-dark: #c7bfb3;
+    /* The primitives. Light: linen, a warm sand band, a pale sage note, cream
+       cards, green-black text, a moss grey for secondary text, ember that reads
+       as text and ember that carries a light label. Dark: the forest at night
+       keeps the roles. Every text pair is ≥ 4.5:1, every control line ≥ 3:1. */
+    --p-linen: #f6f2ea;
+    --p-sand: #ece4d4;
+    --p-sage: #e2e7d8;
+    --p-cream: #fffcf6;
+    --p-ink: #1b241e;
+    --p-ink-soft: #2e372f;
+    --p-muted: #5a6255;
+    --p-line: #ddd5c5;
+    --p-line-strong: #c8bfac;
+    --p-control: #7a8072;
+    --p-ember: #b4532a;
+    --p-ember-deep: #953f1c;
+    --p-ember-text: #9a421d;
+    --p-on-ember: #fff8f0;
+    --p-ember-light: #f2a56c;
+    --p-ember-tint: #f5dfcd;
+    --p-ember-tint-night: #3a2619;
+    --p-gold: #e8b65a;
+    --p-night: #111915;
+    --p-night-alt: #17201a;
+    --p-night-raised: #1e2922;
+    --p-night-text: #ece7dc;
+    --p-night-muted: #a6ae9f;
+    --p-night-line: #2a362e;
+    --p-night-line-strong: #3b4940;
+    --p-night-control: #7e8878;
+    --p-sage-night: #1c2720;
+    --p-forest: light-dark(#16221b, #0c130f);
+    --p-forest-raised: light-dark(#213029, #18221c);
+    --p-forest-control: #768379;
+    --p-bone: #f2ede3;
+    --p-bone-muted: #b4bbad;
 
-    /* Space per width: 20 / 32 / 48px side margins; sections 64px on phones,
-       96px on the desktop. */
+    /* Space per width: 20 / 32 / 48px side margins; sections 72px on phones,
+       112px on the desktop. */
     --space-gutter: 1.25rem;
-    --space-section: 4rem;
+    --space-section: 4.5rem;
     --space-band: 2.5rem;
     --space-group: 2rem;
     --space-grid: 2rem;
 
     @media (width >= 48rem) {
       --space-gutter: 2rem;
-      --space-section: 5rem;
+      --space-section: 5.5rem;
       --space-band: 3rem;
       --space-group: 2.5rem;
     }
 
     @media (width >= 64rem) {
-      --space-section: 6rem;
+      --space-section: 7rem;
       --space-band: 3.5rem;
       --space-group: 3rem;
     }
@@ -333,13 +361,11 @@
     color: var(--color-fg);
     background-color: var(--color-ground);
     font-kerning: normal;
-    /* Dates, times and prices read clearer on lining figures. */
-    font-variant-numeric: lining-nums;
     font-synthesis: none;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Titles in the serif at its regular weight; sizes come from the components.
+  /* Titles in Fraunces at its one weight; sizes come from the components.
      Plain selectors, not :where(): preflight's `font-weight: inherit` on headings
      has element specificity and would win over a zero-specificity rule. */
   h1,
@@ -348,15 +374,15 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-serif);
-    font-weight: 400;
+    font-family: var(--font-display);
+    font-weight: 500;
     text-wrap: balance;
   }
 
-  /* An italic phrase in a title stays the title's colour; the two places that
-     colour it (the home statement and the breath) say so themselves. */
+  /* A highlighted phrase in a title glows in the accent, upright. */
   :where(h1, h2, h3) em {
-    font-style: italic;
+    font-style: normal;
+    color: var(--color-accent);
   }
 
   p {
