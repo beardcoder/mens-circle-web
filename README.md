@@ -55,7 +55,8 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Event details: SSR metadata and copy; the Preact registration island re-reads live seats when the page returns into view
 - Admin guard and default `Cache-Control`: `src/middleware.ts`, `src/lib/cache-policy.ts`
 - Public CSS: shared hashed stylesheets; the SSR home portrait is pre-sized WebP (no `/_image` at runtime)
-- Fonts: Playfair as static 400 faces, DM Sans variable; prefetch through Speculation Rules (no script)
+- Design: forest, ember and linen; Fraunces 500 (static) and Figtree (variable), ~37 kB of fonts; see [design system](docs/design-system.md)
+- Prefetch through Speculation Rules (no script)
 - Server adapter: `@astrojs/node` standalone, launched with Bun (required by `bun:sqlite`); see [runtime](docs/runtime.md)
 - Mail fonts: endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view
 - Live-seat JSON, cache lifetimes and privacy boundary: `docs/public-api.md`
