@@ -16,7 +16,7 @@ bun run dev            # http://localhost:4321 (daemon: bunx astro dev status|lo
 bun run check && bun run lint && bun test   # types, lint, tests
 bun run test:pages                          # production HTML, disposable DB; builds first
 bun run format                              # prettier
-bun run build                               # runs Astro on Bun; images through Sharp
+bun run build                               # runs Astro on Bun; Sharp sizes images at build time
 bun run db:generate                         # migration after editing db/schema.ts
 ```
 
@@ -50,13 +50,14 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Page content and section order: directly in `src/pages/*.astro`
 - Section markup: `src/components/blocks/`; content arrives as explicit props and slots at its page location
 - Static FAQ answers, journey steps and facts use slotted items; FAQ/journey microdata comes from the visible HTML
-- Home and `/event`: server-rendered dates, seats and approved testimonials using native Astro route caching; no content hydration or browser JSON request
-- Native Astro HTML cache: home and event overview, 120 seconds + 60 seconds stale-while-revalidate; invalidated directly with context.cache.invalidate after event/testimonial and registration changes
-- Event details: SSR metadata and copy, cached reads plus live Preact capacity and registration
-- Public CSS: shared hashed stylesheets, cached between pages; portraits use responsive Astro images
-- Server adapter: `@astrojs/node` 11.1.9, launched with Bun (required by `bun:sqlite`); no custom adapter or static-header manifest
-- Mail fonts: native cached endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view
-- Public JSON, cache durations and privacy boundary: `docs/public-api.md`
+- Home, `/event` and event pages: server-rendered dates, seats and approved testimonials; no content hydration
+- Route cache: Astro's `memoryCache()` (path-keyed, 64 entries), 5 minutes + 5 minutes stale-while-revalidate; every action that changes public data purges it (`purgePublicCache`)
+- Event details: SSR metadata and copy; the Preact registration island re-reads live seats when the page returns into view
+- Admin guard and default `Cache-Control`: `src/middleware.ts`, `src/lib/cache-policy.ts`
+- Public CSS: shared hashed stylesheets; the SSR home portrait is pre-sized WebP (no `/_image` at runtime)
+- Server adapter: `@astrojs/node` standalone, launched with Bun (required by `bun:sqlite`); see [runtime](docs/runtime.md)
+- Mail fonts: endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view
+- Live-seat JSON, cache lifetimes and privacy boundary: `docs/public-api.md`
 - Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)
 - Public component behavior: `<script>` in the owning Astro component; shared public form helpers stay in `src/lib/`
 - Admin: Preact TSX workspaces with local state, protected Astro Actions and native page navigation; see [admin UI](docs/admin-ui.md)

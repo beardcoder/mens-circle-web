@@ -1,49 +1,50 @@
-# Public island data
+# Public data and route cache
 
-Same-origin GET endpoints, no authentication or cookies required. Responses are JSON.
-No participant records, email addresses or precise meeting-address fields are returned.
-Approved testimonial author names and roles remain public.
-The TypeScript response contract is in `src/components/event/types.ts`.
+## Live seats
 
-| Route                       | 200 response                                                                                                               | Freshness  |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| `/api/public/events`        | `PublicEvents`: status (`scheduled` or `none`), up to 12 upcoming events, next-date summary or null, fee main/note strings | 30 seconds |
-| `/api/public/events/{slug}` | `PublicEvent`: id, slug, display view, availableSpots, maxParticipants, isPast                                             | 30 seconds |
-| `/api/public/testimonials`  | `{ testimonials: [{ quote, author, role }] }`, up to 200 approved, non-deleted entries in curated order                    | 5 minutes  |
+One same-origin GET endpoint, no authentication or cookies. It feeds the client-only
+registration island on an event page; everything else on the public pages is in the
+server-rendered HTML. No participant records, email addresses or precise meeting-address
+fields are returned. The TypeScript contract is `PublicEvent` in
+`src/components/event/types.ts`.
 
-Failures return `{ message: string }`: 404 for an unknown/unpublished event, 503 for
-unavailable data. A failed read is never an empty successful list. Errors use
-`Cache-Control: no-store`. Successes have ETags; `If-None-Match` may return 304.
-Browsers and external shared caches revalidate; Astro's native `memoryCache()`
-provider retains successful route responses for the intervals above. Public JSON
-routes use `context.cache.set()` directly, tagged `events` or `testimonials`.
-Non-200 JSON responses explicitly disable the route cache. The serialization
-helper only formats responses/ETags; it does not store data.
+| Route                       | 200 response                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| `/api/public/events/{slug}` | `PublicEvent`: id, slug, display view, availableSpots, maxParticipants, isPast |
 
-Home and `/event` deliver initial HTML using `Astro.cache.set()` directly:
-120 seconds plus 60 seconds stale-while-revalidate, tagged `home` and `event`.
-Event details use 30 seconds and the `events` tag. `X-Astro-Cache: MISS`, `HIT`
-or `STALE` identifies native route caching. There is no separate Map/read cache
-and no invalidation wrapper. A cache miss reads the database; a hit reuses the
-whole response. Error and partial-failure HTML explicitly disables Astro caching.
+Failures return `{ message: string }` with `Cache-Control: no-store`: 404 for an
+unknown or unpublished event, 503 when the database cannot be read. A failed read is
+never stored. Successes are `public, max-age=0, must-revalidate`.
 
-Mutation Actions call `context.cache.invalidate()` directly with the tags
-`home`, `event`, `events`, `testimonials`. This covers event create/edit/publication/
-deletion, testimonial moderation/order/content/deletion, and registration changes.
-The purge is awaited before the action completes. Displayed seats remain snapshots;
-registration checks availability in its existing database transaction.
+The island starts from the snapshot the page was rendered with and reads the endpoint
+again only when the page comes back into view after 30 seconds (`usePublicData`). There
+is no preload, no polling and no cache-busting query. The registration action checks
+availability in its own database transaction; a displayed count never reserves a seat.
 
-The provider is process-local, matching the single Bun deployment. A restart clears
-it. Multiple replicas would need shared invalidation; direct database edits outside
-Actions rely on route expiry. Pages already open in a browser receive no pushed
-updates. Authentication, consent and retention behavior remain unchanged.
+`/api/public/events/{slug}/ics` is the calendar file linked from confirmation mails; it
+carries the full address.
 
-A failed event read produces a 503 page with `Cache-Control: no-store` and a reload
-link. A testimonial-only failure leaves the home page usable but disables caching.
-An empty successful read shows a notification invitation, never an error.
+## Route cache
 
-The event registration island still preloads its public event JSON through
-`Layout`'s `preloadData`. Its browser resource retains data during refresh and
-revalidates on focus/visibility after 30 seconds. There is no interval polling.
-Posting forms still uses the existing Astro Actions and their field validation,
-CSRF, honeypot and per-IP rate limits. The endpoint contracts are unchanged.
+Astro's `memoryCache()` holds complete responses in the one server process: home,
+`/event`, every event page, the endpoint above and `/sitemap-events.xml`. It is keyed by
+path alone (`query.include: []`), so a query string can neither bypass nor fragment it,
+and an LRU bound of 64 entries caps it at a few megabytes. `X-Astro-Cache: MISS`, `HIT`
+or `STALE` names the outcome.
+
+Routes opt in with `PUBLIC_CACHE` from `src/lib/server/public-data.ts`: five minutes
+fresh, five more served while one background render replaces it, tag `public`. They opt
+in only after complete reads. A failed event read is a 503 with `no-store`; a
+testimonial-only failure still renders the home page but does not store it.
+
+Every action that changes events, registrations or testimonials awaits
+`purgePublicCache(context)` before it answers, so the next request renders current
+data. The lifetime therefore only bounds what changes with the clock (an evening
+becoming past, the upcoming list moving at midnight). Direct database edits outside the
+actions wait for expiry; a restart empties the cache. The cache is process-local: more
+than one replica would need shared invalidation.
+
+The cache wraps the middleware, so a hit is served with the headers stored on its miss
+and skips the admin guard, which only concerns `/admin` (never cached). Browsers and
+Cloudflare revalidate public HTML; there is no shared-cache lifetime, because the purge
+cannot reach them.
