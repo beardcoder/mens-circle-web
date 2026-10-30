@@ -22,36 +22,43 @@ interface Props {
 const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props;
 ---
 
-<Section id={anchor} ground="tint" labelledby="rahmen-title">
-  <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} />
+<Section id={anchor} ground="tint" labelledby="rahmen-title" innerClass="grid gap-x-grid gap-y-10 lg:grid-cols-12">
+  <div class="min-w-0 lg:col-span-5">
+    <div class="lg:sticky lg:top-[calc(var(--spacing-header)+2rem)]">
+      <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} />
+    </div>
+  </div>
 
-  {agreements.length > 0 && (
-    <ol role="list" class="mt-group grid gap-4 md:grid-cols-2">
-      {agreements.map((rule, i) => (
-        <li class="grid content-start gap-3 rounded-xl bg-raised p-6 shadow-card sm:p-7">
-          <span
-            aria-hidden="true"
-            class="grid size-10 place-items-center rounded-full bg-accent-soft font-display text-lg text-accent"
-          >
-            {i + 1}
-          </span>
-          <h3 class="text-sub text-fg hyphens-auto">{rule.title}</h3>
-          <p class="max-w-measure text-md text-fg-soft">{rule.text}</p>
-        </li>
-      ))}
-    </ol>
-  )}
+  {/* Spoken at the start of every evening, one after the other: a list, not a set of cards. */}
+  <div class="min-w-0 lg:col-span-7">
+    {agreements.length > 0 && (
+      <ol role="list" class="grid border-b border-line-strong">
+        {agreements.map((rule, i) => (
+          <li class="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-4 border-t border-line-strong py-6 sm:grid-cols-[3rem_minmax(0,1fr)] sm:gap-x-6 sm:py-7">
+            <span
+              aria-hidden="true"
+              class="row-span-2 grid size-11 place-items-center rounded-full border border-line-bold font-display text-lg text-accent sm:size-12"
+            >
+              {i + 1}
+            </span>
+            <h3 class="self-center text-sub text-fg hyphens-auto">{rule.title}</h3>
+            {rule.text && <p class="mt-2 max-w-measure text-md text-fg-soft">{rule.text}</p>}
+          </li>
+        ))}
+      </ol>
+    )}
 
-  {boundaryText && (
-    <aside
-      aria-labelledby="rahmen-boundary-title"
-      class="mt-6 grid max-w-3xl grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 rounded-xl border border-line-strong p-6 sm:p-7"
-    >
-      <Icon name="info" aria-hidden="true" class="row-span-2 mt-0.5 size-6 text-accent" />
-      <h3 id="rahmen-boundary-title" class="font-sans text-base font-semibold text-fg">
-        {boundaryTitle}
-      </h3>
-      <p class="text-md text-fg-soft">{boundaryText}</p>
-    </aside>
-  )}
+    {boundaryText && (
+      <aside
+        aria-labelledby="rahmen-boundary-title"
+        class="mt-8 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 rounded-xl bg-raised p-6 sm:p-7"
+      >
+        <Icon name="info" aria-hidden="true" class="row-span-2 mt-0.5 size-6 text-accent" />
+        <h3 id="rahmen-boundary-title" class="font-sans text-base font-semibold text-fg">
+          {boundaryTitle}
+        </h3>
+        <p class="text-md text-fg-soft">{boundaryText}</p>
+      </aside>
+    )}
+  </div>
 </Section>

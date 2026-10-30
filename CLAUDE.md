@@ -155,8 +155,14 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - `docs/design-system.md` is the reference. The idea: a fire circle at the edge of
   the forest — calm, warm, grounded, an invitation to a real evening. Deep forest
   green for what draws you in, the ember of the logo for the one thing to do, linen
-  for reading; the circle (the photo in a ring, three warm points, numbered steps,
-  the date seal, the breath) is the one motif. Same function, same component.
+  for reading; the circle (the photo in a ring, three warm points, the seats around
+  the date, numbered steps, the breath above the hills) is the one motif. Same
+  function, same component.
+- Stance (design-system.md, "Stance" and "Voice"): the page acts like a circle
+  leader who holds the space instead of performing. Quiet, the frame visible
+  (course, five agreements, consent: every exercise is an offer, "no" is a good
+  answer, no therapy), grounded rather than lofty, open to every man. Copy: "du",
+  plain German, no jargon, no "brother" tone, no promises of healing.
 - Colours are roles (`ground`, `ground-alt`, `tint`, `raised`, `fg`, `fg-soft`,
   `fg-muted`, `line`, `line-strong`, `line-bold`, `accent`, `accent-soft`,
   `fill`/`fill-strong`/`on-fill`, `glow` for decoration, `success`/`danger` for
@@ -179,30 +185,37 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Shapes: soft and round. `rounded-full` for what you press and for circles; fields
   `rounded-md` with the buttons' heights (`button()` and `control()` share sizes);
   cards, tiles, panels, the map `rounded-xl`; sheets `rounded-2xl`. A card is cream
-  with a thin line and `shadow-card`; `shadow-overlay` only for what floats.
+  with a thin line and `shadow-card`, for what you act on (a date, a form, an open
+  question); tiles, voices and notes have no shadow; things said in turn are rows
+  between lines. `shadow-overlay` only for what floats.
 - Grid: 1200px of content (`max-w-page`), side margins 20 / 32 / 48px; `py-section`
   72 → 112px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop,
   `nav` (1100px) header links. No section is forced to a screen's height.
-- Shared components: `EventSummary` (every date, with its seal; fed by
-  `lib/event-status.ts`), `PageIntro` (every sub-page opening), `SectionHead`,
-  `Eyebrow`, `Fact`, `Button`, `Field` + `FormStatus`, `TestimonialList`, `Accordion`
-  (every FAQ). Use them; do not restyle a copy.
+- Shared components: `EventSummary` (every date, with its seal in a ring of seats;
+  fed by `lib/event-status.ts`, the ring by `lib/seats.ts`, which the registration
+  panel shares), `PageIntro` (every sub-page opening), `SectionHead`, `Eyebrow`,
+  `Fact`, `Button`, `Field` + `FormStatus`, `TestimonialList`, `Accordion` (every
+  FAQ). Use them; do not restyle a copy.
 - Home: the forest opening holds statement, explanation, the action (in the first
   screen at 1440 × 900), the photo in its ring and the next date overlapping it; then
-  fact tiles, the intro with its questions as speech bubbles, the four steps on a
-  path, the breath (`#haltung`), Markus (quote card signed with his avatar), the
-  agreements, voices, FAQ, taking part (`#termine`), staying in touch (`#newsletter`).
+  fact tiles, the intro with the first round's questions as a quiet list, the four
+  steps on a path, the breath above the hills (`#haltung`), Markus (quote card signed
+  with his avatar), the five agreements as a numbered list, voices, FAQ, taking part
+  (`#termine`), staying in touch (`#newsletter`).
 - Header 72px: links visible from `nav`, one filled action; over the home opening the
   bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then linen over a
   blur. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
 - Motion: interactions ~180ms (a button rises 2px, arrows slide, header links draw a
-  line); the hero's ring turns every 90 s; the breath's 9 s cycle (4 s in, 5 s out)
-  runs only on request; the event title flies into its dock on a scroll timeline.
-  No `content-visibility`. Under reduced motion everything rests.
+  line); the hero's ring turns every 90 s; the breath's 11 s cycle (5.5 s in, 5.5 s
+  out: resonance breathing) runs only on request; the event title flies into its
+  dock on a scroll timeline. No `content-visibility`. Under reduced motion everything
+  rests.
 - Fonts: Fraunces 500 static (~18 kB) and Figtree variable (~20 kB); both upright
   faces preload, Figtree's italic loads when used.
-- No layout shift: every summary line is one line (`truncate`). A title's measure is
-  in `em`, never `ch` (`ch` follows the font in use and re-resolves when it swaps).
+- No layout shift: every summary line is one line (`truncate`); a summary under
+  24rem (container query) puts the seal beside its label and the date below it. A
+  title's measure is in `em`, never `ch` (`ch` follows the font in use and
+  re-resolves when it swaps).
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Styles live in the component's markup as utilities. `global.css` is one stylesheet

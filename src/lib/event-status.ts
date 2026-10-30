@@ -92,6 +92,8 @@ export interface SummaryView {
   /** ISO day for `<time>`, when the title is a date. */
   datetime: string;
   rows: SummaryRow[];
+  /** The circle's seats, drawn around the date; `null` once the evening is past. */
+  seats: { total: number; free: number } | null;
   /** The situational action; `null` where the page already offers it. */
   action: { label: string; href: string } | null;
 }
@@ -125,6 +127,9 @@ export const eventView = (event: EventDTO, kicker: string, withAction = true): S
     title: dateLines(next.dateLabel),
     datetime: next.day,
     rows: dateRows(next, event.is_past ? 'Hat stattgefunden' : undefined),
+    seats: event.is_past
+      ? null
+      : { total: next.maxParticipants, free: event.is_full ? 0 : Math.max(0, next.availableSpots) },
     action:
       withAction && !event.is_past
         ? { label: event.is_full ? 'Auf die Warteliste' : 'Zur Anmeldung', href: `/event/${event.slug}` }
