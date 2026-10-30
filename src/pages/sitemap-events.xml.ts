@@ -3,6 +3,7 @@ import type { APIRoute } from 'astro';
 
 import { listPublishedEventsForSitemap } from '@lib/server/events';
 import { escapeHtml } from '@lib/server/format';
+import { PUBLIC_CACHE } from '@lib/server/public-data';
 
 export const prerender = false;
 
@@ -13,8 +14,10 @@ const lastmod = (iso: string): string => {
   return Number.isNaN(d.getTime()) ? iso : d.toISOString();
 };
 
-export const GET: APIRoute = async ({ site }) => {
+export const GET: APIRoute = async ({ site, cache }) => {
   const events = await listPublishedEventsForSitemap();
+
+  cache.set(PUBLIC_CACHE);
 
   const urls = events
     .map((event) => {
@@ -33,7 +36,7 @@ export const GET: APIRoute = async ({ site }) => {
     status: 200,
     headers: {
       'content-type': 'application/xml; charset=utf-8',
-      // An hour keeps crawlers current without a DB query per request.
+      // The route cache spares the database; crawlers may keep it an hour.
       'cache-control': 'public, max-age=3600, must-revalidate',
     },
   });

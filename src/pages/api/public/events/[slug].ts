@@ -1,17 +1,20 @@
+/** Live seats for the registration island; the page renders the same snapshot first. */
 import type { APIRoute } from 'astro';
 
-import { PublicDataError, publicEvent, publicJson, readPublicEvent } from '@lib/server/public-data';
+import { fetchEventState } from '@lib/server/events';
+import { PUBLIC_CACHE, publicEvent } from '@lib/server/public-data';
 
-export const GET: APIRoute = async ({ request, params, cache }) => {
-  const response = await publicJson(request, async () => {
-    const slug = params.slug ?? '';
+const failure = (status: number, message: string): Response =>
+  Response.json({ message }, { status, headers: { 'Cache-Control': 'no-store' } });
 
-    if (!slug) throw new PublicDataError(404, 'Dieser Termin wurde nicht gefunden.');
+export const GET: APIRoute = async ({ params, cache }) => {
+  const { status, event } = await fetchEventState(params.slug ?? '');
 
-    return publicEvent(await readPublicEvent(slug));
-  });
+  if (status === 'not-found') return failure(404, 'Dieser Termin wurde nicht gefunden.');
 
-  cache.set(response.status === 200 ? { maxAge: 30, tags: ['events'] } : false);
+  if (!event) return failure(503, 'Der Termin ist gerade nicht abrufbar.');
 
-  return response;
+  cache.set(PUBLIC_CACHE);
+
+  return Response.json(publicEvent(event), { headers: { 'X-Content-Type-Options': 'nosniff' } });
 };

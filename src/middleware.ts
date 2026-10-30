@@ -31,6 +31,9 @@ const withCacheControl = (response: Response, value: string): Response => {
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
 
+  // Images are optimised at build time; the server never runs sharp on request.
+  if (import.meta.env.PROD && pathname === '/_image') return new Response(null, { status: 404 });
+
   const policy = cacheControlForRoute(pathname);
 
   if (isAdminPage(pathname)) {

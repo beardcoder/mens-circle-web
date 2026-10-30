@@ -18,10 +18,7 @@ export const prerender = true;
     breadcrumbSchema(Astro.site!, [['Teile deine Erfahrung', new URL('/teile-deine-erfahrung', Astro.site!).href]]),
   ]}
 >
-  <PageIntro
-    eyebrow="Aus dem Kreis"
-    title="Teile deine Erfahrung"
-  >
+  <PageIntro eyebrow="Aus dem Kreis" title="Teile deine Erfahrung">
     <Fragment slot="lead">
       Wenn du beim Männerkreis warst und etwas dazu sagen möchtest: Dein Text hilft anderen Männern einzuschätzen,
       worauf sie sich einlassen.
@@ -29,16 +26,10 @@ export const prerender = true;
   </PageIntro>
 
   {/* One column of a readable width: the notes stand at the form, not beside it. */}
-  <section
-    aria-labelledby="teilen-title"
-    class="pb-section"
-  >
+  <section aria-labelledby="teilen-title" class="pb-section">
     <Container>
       <div class="max-w-form">
-        <h2
-          id="teilen-title"
-          class="text-sub text-fg"
-        >
+        <h2 id="teilen-title" class="text-sub text-fg">
           Was du schreibst, lese ich zuerst
         </h2>
         <p class="mt-3 text-md text-fg-soft">

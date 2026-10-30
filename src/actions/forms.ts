@@ -3,16 +3,24 @@ import { z } from 'astro/zod';
 
 import { accepted, type FormResult, rejected } from '@lib/server/form-submission';
 import { subscribeToNewsletter } from '@lib/server/listmonk';
+import { purgePublicCache } from '@lib/server/public-data';
 import { clientIp, rateLimit } from '@lib/server/ratelimit';
 import { confirmationMessage, register } from '@lib/server/registrations';
 import { submitTestimonial, SUCCESS_MESSAGE as TESTIMONIAL_SUCCESS } from '@lib/server/testimonials';
 
 /**
  * The public forms: rate-limited per IP, answered in the visitor's language, and never
- * leaking an internal error. A filled honeypot (`website`) gets `fakeSuccess` unhandled.
+ * leaking an internal error. A filled honeypot (`website`) gets `fakeSuccess` unhandled;
+ * `onSuccess` runs after an accepted submission (a registration changes the seat counts).
  */
 const publicForm =
-  <T>(key: string, maxPerHour: number, handler: (input: T) => Promise<FormResult>, fakeSuccess: (input: T) => string) =>
+  <T>(
+    key: string,
+    maxPerHour: number,
+    handler: (input: T) => Promise<FormResult>,
+    fakeSuccess: (input: T) => string,
+    onSuccess?: (context: ActionAPIContext) => Promise<void>,
+  ) =>
   async (input: T & { website?: string | null }, context: ActionAPIContext): Promise<{ message: string }> => {
     if (input.website?.trim()) return { message: fakeSuccess(input) };
 
@@ -40,7 +48,7 @@ const publicForm =
       throw new ActionError({ code: ActionError.statusToCode(result.status), message: result.body.message });
     }
 
-    if (key === 'event-register') await context.cache.invalidate({ tags: ['home', 'event', 'events', 'testimonials'] });
+    await onSuccess?.(context);
 
     return { message: result.body.message };
   };
@@ -85,7 +93,13 @@ export const forms = {
       privacy,
       website,
     }),
-    handler: publicForm('event-register', 5, register, (input) => confirmationMessage(input.first_name)),
+    handler: publicForm(
+      'event-register',
+      5,
+      register,
+      (input) => confirmationMessage(input.first_name),
+      purgePublicCache,
+    ),
   }),
 
   subscribeNewsletter: defineAction({

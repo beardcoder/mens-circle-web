@@ -1,7 +1,8 @@
 ---
 import { buildEventMeta } from '@lib/event-meta';
 import { breadcrumbSchema, buildEventSchema } from '@lib/event-schema';
-import { PublicDataError, readPublicEvent } from '@lib/server/public-data';
+import { fetchEventState } from '@lib/server/events';
+import { PUBLIC_CACHE } from '@lib/server/public-data';
 
 import LinkBand from '../../components/blocks/LinkBand.astro';
 import EventIntro from '../../components/event/EventIntro.astro';
@@ -10,23 +11,19 @@ import EventRegister from '../../components/event/EventRegister.astro';
 import EventStory from '../../components/event/EventStory.astro';
 import Layout from '../../layouts/Layout.astro';
 
-// One SSR page per event, read per request, so a new or edited event is live with no rebuild.
-const { slug } = Astro.params;
-let event;
+// One SSR page per event, read on a route-cache miss, so a new or edited event is live with no rebuild.
+const { status, event } = await fetchEventState(Astro.params.slug ?? '');
 
-try {
-  event = await readPublicEvent(slug ?? '');
-} catch (error) {
-  if (error instanceof PublicDataError && error.status === 404) return Astro.redirect('/event', 302);
+if (status === 'not-found') return Astro.redirect('/event', 302);
 
+if (!event) {
   return new Response('Der Termin ist gerade nicht abrufbar. Bitte versuche es später erneut.', {
     status: 503,
     headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'Retry-After': '30' },
   });
 }
 
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
-Astro.cache.set({ maxAge: 30, tags: ['events'] });
+Astro.cache.set(PUBLIC_CACHE);
 
 const siteUrl = Astro.site!;
 
@@ -61,7 +58,6 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
   ogImageAlt={meta.imageAlt}
   socialDetails={meta.details}
   schemas={[eventSchema, breadcrumbs]}
-  preloadData={[`/api/public/events/${encodeURIComponent(event.slug)}`]}
   headerAction={event.is_past ? undefined : { href: '#anmeldung', label: event.is_full ? 'Warteliste' : 'Anmelden' }}
 >
   {/* Invitation and date, the conversation beside the signup, then the meeting place. */}

@@ -1,20 +1,25 @@
-import { createHash } from 'node:crypto';
+import type { APIContext } from 'astro';
 
 import type { PublicEvent, PublicEvents } from '@components/event/types';
 import { dateStatus, eventView, splitFee } from '@lib/event-status';
-import type { EventDTO } from '@lib/types';
+import type { EventDTO, TestimonialDTO } from '@lib/types';
 
-import { fetchEventState, fetchUpcomingEventsState } from './events';
+import { fetchUpcomingEventsState } from './events';
 import { fetchTestimonialsState } from './testimonials';
 
-export class PublicDataError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-  ) {
-    super(message);
-  }
-}
+/** Every cached public response shows database content, so one tag covers them all. */
+const PUBLIC_TAG = 'public';
+
+/**
+ * Route-cache lifetime of public pages and JSON: five minutes fresh, five more served
+ * while a re-render runs. Every mutation purges the tag at once, so the lifetime only
+ * bounds what changes with the clock (an evening passing).
+ */
+export const PUBLIC_CACHE = { maxAge: 300, swr: 300, tags: [PUBLIC_TAG] };
+
+/** Called by every action that changes events, registrations or testimonials. */
+export const purgePublicCache = ({ cache }: Pick<APIContext, 'cache'>): Promise<void> =>
+  cache.invalidate({ tags: [PUBLIC_TAG] });
 
 export const publicEvent = (event: EventDTO): PublicEvent => ({
   id: event.id,
@@ -25,10 +30,11 @@ export const publicEvent = (event: EventDTO): PublicEvent => ({
   isPast: event.is_past,
 });
 
-export async function readPublicEvents(): Promise<PublicEvents> {
+/** Upcoming dates for home and /event; `null` when they cannot be read, never "no date". */
+export async function readPublicEvents(): Promise<PublicEvents | null> {
   const result = await fetchUpcomingEventsState();
 
-  if (result.status === 'unavailable') throw new PublicDataError(503, 'Die Termine sind gerade nicht abrufbar.');
+  if (result.status === 'unavailable') return null;
 
   return {
     fee: splitFee(result.events[0]?.cost_basis),
@@ -38,45 +44,9 @@ export async function readPublicEvents(): Promise<PublicEvents> {
   };
 }
 
-/** Full DTO stays on the server for the event page and JSON-LD. */
-export async function readPublicEvent(slug: string): Promise<EventDTO> {
-  const result = await fetchEventState(slug);
-
-  if (result.status === 'unavailable') throw new PublicDataError(503, 'Der Termin ist gerade nicht abrufbar.');
-
-  if (!result.event) throw new PublicDataError(404, 'Dieser Termin wurde nicht gefunden.');
-
-  return result.event;
-}
-
-export async function readPublicTestimonials() {
+/** Approved testimonials in curated order; `null` when they cannot be read. */
+export async function readPublicTestimonials(): Promise<TestimonialDTO[] | null> {
   const result = await fetchTestimonialsState(200);
 
-  if (result.status === 'unavailable') throw new PublicDataError(503, 'Die Erfahrungen sind gerade nicht abrufbar.');
-
-  return { testimonials: result.testimonials };
-}
-
-/** Conditional HTTP reads; no cookies, identifiers or internal error details. */
-export async function publicJson(request: Request, read: () => Promise<unknown>): Promise<Response> {
-  try {
-    const body = JSON.stringify(await read());
-    const etag = `"${createHash('sha256').update(body).digest('base64url')}"`;
-
-    const headers = {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'public, max-age=0, must-revalidate',
-      ETag: etag,
-      'X-Content-Type-Options': 'nosniff',
-    };
-
-    return request.headers.get('If-None-Match') === etag
-      ? new Response(null, { status: 304, headers })
-      : new Response(body, { headers });
-  } catch (error) {
-    const status = error instanceof PublicDataError ? error.status : 503;
-    const message = error instanceof PublicDataError ? error.message : 'Die Daten sind gerade nicht abrufbar.';
-
-    return Response.json({ message }, { status, headers: { 'Cache-Control': 'no-store' } });
-  }
+  return result.status === 'ok' ? result.testimonials : null;
 }

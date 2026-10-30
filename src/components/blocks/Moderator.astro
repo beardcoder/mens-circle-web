@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
 import Prose from '../ui/Prose.astro';
@@ -12,13 +11,16 @@ interface Props {
   eyebrow: string;
   name: string;
   quote: string;
-  image: ImageMetadata;
+  /** The portrait, pre-sized at 4 : 5 and ascending by width: the home page is SSR, so
+   *  nothing may go through the on-demand image endpoint. */
+  images: ImageMetadata[];
   imageAlt: string;
   linkLabel: string;
   linkUrl: string;
 }
 
-const { anchor, eyebrow, name, quote, image, imageAlt, linkLabel, linkUrl } = Astro.props;
+const { anchor, eyebrow, name, quote, images, imageAlt, linkLabel, linkUrl } = Astro.props;
+const largest = images.at(-1)!;
 ---
 
 <Section id={anchor} labelledby="person-title" innerClass="grid gap-x-grid gap-y-8 lg:grid-cols-12">
@@ -30,15 +32,15 @@ const { anchor, eyebrow, name, quote, image, imageAlt, linkLabel, linkUrl } = As
   />
 
   <figure class="home-portrait aspect-4/3 overflow-clip lg:col-span-5 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:aspect-4/5 lg:self-start">
-    <Image
-      src={image}
-      alt={imageAlt}
-      layout="constrained"
-      width={800}
-      height={1000}
-      position="left"
-      widths={[400, 640, 800]}
+    <img
+      src={largest.src}
+      srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
       sizes="(min-width: 80rem) 480px, (min-width: 64rem) 42vw, (min-width: 48rem) calc(100vw - 4rem), calc(100vw - 2.5rem)"
+      width={largest.width}
+      height={largest.height}
+      alt={imageAlt}
+      loading="lazy"
+      decoding="async"
       class="block size-full object-cover"
     />
   </figure>

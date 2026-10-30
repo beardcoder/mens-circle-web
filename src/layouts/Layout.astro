@@ -10,12 +10,10 @@ import Header from '../components/Header.astro';
 import SeoHead from '../components/SeoHead.astro';
 
 type Props = ComponentProps<typeof SeoHead> & {
-  /** Live registration data fetched alongside the HTML for the interactive island. */
-  preloadData?: string[];
   headerAction?: ComponentProps<typeof Header>['action'];
 };
 
-const { preloadData = [], headerAction, ...props } = Astro.props;
+const { headerAction, ...props } = Astro.props;
 ---
 
 <!doctype html>
@@ -45,10 +43,6 @@ const { preloadData = [], headerAction, ...props } = Astro.props;
     {/* Preload only upright faces used in the first viewport. */}
     <Font cssVariable="--font-playfair" preload={[{ weight: '400 900', style: 'normal' }]} />
     <Font cssVariable="--font-dm-sans" preload={[{ weight: '100 1000', style: 'normal' }]} />
-    {/* `crossorigin` matches the credentials of usePublicData's fetch, or the preload is wasted. */}
-    {preloadData.map((href) => (
-      <link rel="preload" href={href} as="fetch" crossorigin="anonymous" />
-    ))}
     <SeoHead {...props} />
   </head>
   <body>
