@@ -31,7 +31,7 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
   </svg>
   <div class="relative grid items-center gap-x-grid gap-y-8 lg:grid-cols-12">
     <div class="grid justify-items-start lg:col-span-7">
-      {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
+      {eyebrow && <Eyebrow class="mb-4">{eyebrow}</Eyebrow>}
       <h2 id="statement-title" class="text-page text-fg">
         {lines.map((line, i) => (i > 0 ? <em class="block">{line}</em> : <span class="block">{line}</span>))}
       </h2>

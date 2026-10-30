@@ -24,7 +24,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
 {/* The date line and the title morph into the dock as the page scrolls (EventDock's script). */}
 <section
   aria-labelledby="event-title"
-  class="pt-[calc(var(--spacing-header)+1.25rem)] pb-8 lg:pt-[calc(var(--spacing-header)+2.75rem)] lg:pb-14"
+  class="pt-[calc(var(--spacing-header)+1.25rem)] pb-band lg:pt-[calc(var(--spacing-header)+2.75rem)]"
 >
   <Container>
     <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line pt-3 text-sm lg:pt-4">
@@ -85,7 +85,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
             Aktuelle Termine ansehen
           </Button>
         )}
-        <div class="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl bg-ground-alt p-5 lg:mt-12">
+        <div class="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl bg-ground-alt p-card lg:mt-12">
           {event.location && (
             <p class="max-w-[22em] text-sm text-fg-muted">
               Treffpunkt: <span class="text-fg">{event.location}</span>

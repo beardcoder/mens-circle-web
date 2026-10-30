@@ -215,15 +215,14 @@ const introToProse = (text: string): string =>
 
 // The campaign template's palette and type; inline, so the block holds in any template.
 const NL = {
-  text: '#28251f',
-  muted: '#71685e',
-  line: '#d8d0c4',
-  lineStrong: '#c3b9ab',
-  raised: '#fdfbf7',
-  fill: '#9f4429',
-  onFill: '#fff9f3',
-  serif: "'Playfair Display',Georgia,'Times New Roman',serif",
-  sans: "'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif",
+  text: '#1b241e',
+  muted: '#5a6255',
+  lineStrong: '#c8bfac',
+  sand: '#ece4d4',
+  fill: '#b4532a',
+  onFill: '#fff8f0',
+  serif: "'Fraunces',Georgia,'Times New Roman',serif",
+  sans: "'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif",
 };
 
 const newsletterRow = ([label, value]: [string, string]): string =>
@@ -231,7 +230,7 @@ const newsletterRow = ([label, value]: [string, string]): string =>
   `<td style="padding:4px 0;vertical-align:top;font-family:${NL.sans};font-size:16px;line-height:24px;color:${NL.text};">${escapeHtml(value)}</td></tr>`;
 
 /**
- * The event as the site's date summary sets it: a flat, square card with the
+ * The event as the site's date summary sets it: a rounded sand card with the
  * label, the date, the title, the facts as rows and the one round action.
  */
 const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
@@ -249,14 +248,14 @@ const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
   ).filter(([, value]) => value);
 
   const event = [
-    `<div class="em-event" style="margin:10px 0 30px;padding:26px 28px 24px;background-color:${NL.raised};border:1px solid ${NL.lineStrong};">`,
-    `<p style="margin:0 0 10px;font-family:${NL.sans};font-size:12px;font-weight:600;line-height:1.3;letter-spacing:0.14em;text-transform:uppercase;color:${NL.muted};">Nächster Termin</p>`,
+    `<div class="em-event" style="margin:10px 0 30px;padding:26px 28px 24px;background-color:${NL.sand};border-radius:20px;">`,
+    `<p style="margin:0 0 10px;font-family:${NL.sans};font-size:14px;font-weight:600;line-height:1.3;color:${NL.muted};">Nächster Termin</p>`,
     dateLong
-      ? `<p class="em-event__date" style="margin:0;font-family:${NL.serif};font-size:26px;font-weight:400;line-height:1.25;color:${NL.text};">${escapeHtml(dateLong)}</p>`
+      ? `<p class="em-event__date" style="margin:0;font-family:${NL.serif};font-size:26px;font-weight:500;line-height:1.25;color:${NL.text};">${escapeHtml(dateLong)}</p>`
       : '',
     `<h2 style="margin:4px 0 0;font-family:${NL.sans};font-size:16px;font-weight:600;line-height:1.5;letter-spacing:0;color:${NL.text};">${escapeHtml(ev.title)}</h2>`,
     rows.length
-      ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;border-top:1px solid ${NL.line};"><tr><td style="padding-top:12px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${rows.map(newsletterRow).join('')}</table></td></tr></table>`
+      ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;border-top:1px solid ${NL.lineStrong};"><tr><td style="padding-top:12px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${rows.map(newsletterRow).join('')}</table></td></tr></table>`
       : '',
     `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;"><tr><td style="background-color:${NL.fill};border-radius:999px;"><a href="${escapeHtml(url)}" style="display:inline-block;padding:14px 26px;font-family:${NL.sans};font-size:16px;font-weight:600;line-height:1.1;color:${NL.onFill};text-decoration:none;border-radius:999px;">Zur Anmeldung&nbsp;&nbsp;&rarr;</a></td></tr></table>`,
     '</div>',

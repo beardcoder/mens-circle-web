@@ -83,7 +83,7 @@ test('the brand is appended once, never twice', () => {
 });
 
 test('unknown/new events use a real static poster without transformation URLs', () => {
-  expect(buildEventMeta(event(), SITE).image).toBe('https://mens-circle.de/images/og-default.png?v=2');
+  expect(buildEventMeta(event(), SITE).image).toBe('https://mens-circle.de/images/og-default.png?v=3');
   expect(buildEventMeta(event({ available_spots: 3 }), SITE).image).toBe(buildEventMeta(event(), SITE).image);
   expect(buildEventMeta(event(), SITE).extraImage).toBeNull();
 });

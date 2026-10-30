@@ -18,9 +18,9 @@ const rest = featured ? others : items;
     <TestimonialQuote item={first} featured />
   </div>
 )}
-<ul role="list" class="mt-group grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
+<ul role="list" class="mt-group grid items-start gap-stack md:grid-cols-2 lg:grid-cols-3">
   {rest.map((item) => (
-    <li class="min-w-0 rounded-xl border border-line bg-raised p-6 sm:p-7">
+    <li class="min-w-0 rounded-xl border border-line bg-raised p-card">
       {item.quote.length > 360 ? (
         <details class="group/quote">
           <summary class="cursor-pointer list-none text-base font-semibold text-accent underline underline-offset-4 [&::-webkit-details-marker]:hidden">

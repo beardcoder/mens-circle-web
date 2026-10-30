@@ -26,6 +26,8 @@ interface Props {
 const { action } = Astro.props;
 const links = nav.header.links;
 const cta = action ? { url: action.href, label: action.label, umamiTarget: 'event-registration' } : nav.header.cta;
+/** The word mark gives way on narrow phones, a little earlier beside an event's longer action. */
+const wordmark = action ? 'max-[25.5rem]:sr-only' : 'max-[24rem]:sr-only';
 
 const isCurrentPage = (url: string): boolean => {
   const target = new URL(url, Astro.url);
@@ -57,14 +59,14 @@ const roundButton =
     'over-hero:text-bone over-hero:before:opacity-0 over-hero:data-[scrolled]:text-fg over-hero:data-[scrolled]:before:opacity-100',
   ]}
 >
-  <Container class="flex h-full items-center gap-4">
+  <Container class="flex h-full items-center gap-2 sm:gap-4">
     <a
       href="/"
       aria-label={`${site.siteName} – Startseite`}
-      class="group/logo flex min-h-11 min-w-0 items-center gap-2.5 font-display text-[1.1875rem] tracking-[-0.01em] sm:gap-3 sm:text-[1.375rem]"
+      class="group/logo flex min-h-11 min-w-0 items-center gap-2 font-display text-[1.0625rem] tracking-[-0.01em] sm:gap-3 sm:text-[1.375rem]"
     >
-      <Icon name="logo" aria-hidden="true" class="size-9 shrink-0 text-flame" />
-      <span class="max-[22.5rem]:sr-only">Männerkreis</span>
+      <Icon name="logo" aria-hidden="true" class="size-8 shrink-0 text-flame sm:size-9" />
+      <span class={wordmark}>Männerkreis</span>
     </a>
 
     <nav aria-label="Hauptnavigation" class="ml-auto max-nav:hidden">
@@ -103,10 +105,10 @@ const roundButton =
       aria-controls="nav"
       aria-haspopup="dialog"
       aria-expanded="false"
-      class:list={[roundButton, 'nav:hidden max-[26rem]:px-2.5']}
+      class:list={[roundButton, 'nav:hidden max-sm:px-2.5']}
     >
       <Icon name="menu" aria-hidden="true" class="size-5" />
-      <span class="max-[26rem]:sr-only">Menü</span>
+      <span class="max-sm:sr-only">Menü</span>
     </button>
   </Container>
 

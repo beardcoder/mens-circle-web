@@ -14,31 +14,30 @@
   <!-- Webfonts from the site itself, never from a third party: no recipient IP leaves our server -->
   <!--[if !mso]><!-->
   <style>
-    @font-face { font-family:'Playfair Display'; font-style:normal; font-weight:400; font-display:swap; src:url(https://mens-circle.de/fonts/mail/playfair-display-400.woff2) format('woff2'); }
-    @font-face { font-family:'Playfair Display'; font-style:italic; font-weight:400; font-display:swap; src:url(https://mens-circle.de/fonts/mail/playfair-display-400-italic.woff2) format('woff2'); }
-    @font-face { font-family:'DM Sans'; font-style:normal; font-weight:100 1000; font-display:swap; src:url(https://mens-circle.de/fonts/mail/dm-sans.woff2) format('woff2'); }
+    @font-face { font-family:'Fraunces'; font-style:normal; font-weight:500; font-display:swap; src:url(https://mens-circle.de/fonts/mail/fraunces-500.woff2) format('woff2'); }
+    @font-face { font-family:'Figtree'; font-style:normal; font-weight:300 900; font-display:swap; src:url(https://mens-circle.de/fonts/mail/figtree.woff2) format('woff2'); }
   </style>
   <!--<![endif]-->
   <style>
     body { margin:0 !important; padding:0 !important; width:100% !important; -webkit-text-size-adjust:100%; }
     table { border-collapse:collapse !important; }
     img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
-    a { color:#A54829; }
+    a { color:#9A421D; }
     a[x-apple-data-detectors] { color:inherit !important; text-decoration:none !important; font-size:inherit !important; font-family:inherit !important; font-weight:inherit !important; line-height:inherit !important; }
-    .em-link { color:#A54829 !important; text-decoration:underline; text-underline-offset:3px; }
-    .em-prose { font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:17px; line-height:1.65; color:#28251F; }
+    .em-link { color:#9A421D !important; text-decoration:underline; text-underline-offset:3px; }
+    .em-prose { font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:17px; line-height:1.65; color:#1B241E; }
     .em-prose p { margin:0 0 18px; }
-    .em-prose h1, .em-prose h2, .em-prose h3 { font-family:'Playfair Display',Georgia,'Times New Roman',serif; font-weight:400; line-height:1.25; letter-spacing:-0.01em; color:#28251F; margin:36px 0 12px; }
+    .em-prose h1, .em-prose h2, .em-prose h3 { font-family:'Fraunces',Georgia,'Times New Roman',serif; font-weight:500; line-height:1.25; letter-spacing:-0.01em; color:#1B241E; margin:36px 0 12px; }
     .em-prose h1 { font-size:32px; }
     .em-prose h2 { font-size:26px; }
     .em-prose h3 { font-size:21px; }
-    .em-prose strong { font-weight:600; color:#28251F; }
-    .em-prose a { color:#A54829; text-decoration:underline; text-underline-offset:3px; }
+    .em-prose strong { font-weight:600; color:#1B241E; }
+    .em-prose a { color:#9A421D; text-decoration:underline; text-underline-offset:3px; }
     .em-prose ul, .em-prose ol { margin:20px 0; padding-left:22px; }
     .em-prose li { margin:0 0 8px; }
-    .em-prose blockquote { margin:28px 0; padding:2px 0 2px 20px; border-left:2px solid #C3B9AB; font-family:'Playfair Display',Georgia,'Times New Roman',serif; font-size:22px; line-height:1.4; color:#28251F; }
-    .em-prose hr { border:0; border-top:1px solid #D8D0C4; margin:32px 0; }
-    .em-prose .em-event { margin:10px 0 30px; padding:26px 28px 24px; background-color:#FDFBF7; border:1px solid #C3B9AB; }
+    .em-prose blockquote { margin:28px 0; padding:2px 0 2px 20px; border-left:2px solid #C8BFAC; font-family:'Fraunces',Georgia,'Times New Roman',serif; font-size:22px; line-height:1.4; color:#1B241E; }
+    .em-prose hr { border:0; border-top:1px solid #DDD5C5; margin:32px 0; }
+    .em-prose .em-event { margin:10px 0 30px; padding:26px 28px 24px; background-color:#ECE4D4; border-radius:20px; }
     .em-prose .em-event a { text-decoration:none; }
     @media only screen and (max-width:620px) {
       .em-sheet { width:100% !important; }
@@ -50,52 +49,54 @@
     }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#EFEAE2;">
-<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#EFEAE2;opacity:0;">{{ .Campaign.Subject }}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+<body style="margin:0;padding:0;background-color:#ECE4D4;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#ECE4D4;opacity:0;">{{ .Campaign.Subject }}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EFEAE2;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ECE4D4;">
   <tr><td align="center" style="padding:28px 12px;">
     <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-    <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#F8F5EF" style="width:600px;max-width:600px;background-color:#F8F5EF;">
+    <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
 
-      <!-- Masthead: the dark focus ground, the mark and the wordmark as in the site header -->
-      <tr><td class="em-pad" bgcolor="#24221F" style="padding:22px 40px;background-color:#24221F;">
+      <!-- Masthead: a forest sheet, the ember mark and the word mark as in the site header -->
+      <tr><td class="em-pad" bgcolor="#16221B" style="padding:22px 40px;background-color:#16221B;border-radius:28px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
           <td style="padding-right:12px;vertical-align:middle;"><a href="https://mens-circle.de" target="_blank"><img src="https://mens-circle.de/images/logo-mail.png" width="36" height="36" alt="" style="display:block;width:36px;height:36px;"></a></td>
           <td style="vertical-align:middle;">
-            <div class="em-sans" style="font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:500;line-height:1.2;letter-spacing:-0.025em;color:#F8F5EF;">Männerkreis</div>
+            <div class="em-serif" style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#F2EDE3;">Männerkreis</div>
           </td>
         </tr></table>
       </td></tr>
 
-      <!-- Opening: the site's sentence, its phrase in the italic accent as on the home page -->
-      <tr><td class="em-pad" style="padding:40px 40px 6px;">
-        <p class="em-sans" style="margin:0 0 14px;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600;line-height:1.3;letter-spacing:0.14em;text-transform:uppercase;color:#71685E;">Männerkreis Niederbayern</p>
-        <h1 class="em-display em-serif" style="margin:0;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:40px;font-weight:400;line-height:1.12;letter-spacing:-0.015em;color:#28251F;">Ein Abend, an dem du <em style="font-style:italic;color:#A54829;">nichts darstellen</em> musst.</h1>
+      <!-- Opening: the site's sentence, its phrase in the accent as on the home page -->
+      <tr><td height="8" style="height:8px;font-size:0;line-height:0;">&nbsp;</td></tr>
+      <tr><td class="em-pad" bgcolor="#FFFCF6" style="padding:40px 40px 6px;background-color:#FFFCF6;border-radius:28px 28px 0 0;">
+        <p class="em-sans" style="margin:0 0 14px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#9A421D;"><span style="display:inline-block;width:8px;height:8px;margin:0 10px 1px 0;border-radius:4px;background-color:#B4532A;vertical-align:middle;"></span>Männerkreis Niederbayern</p>
+        <h1 class="em-display em-serif" style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:40px;font-weight:500;line-height:1.12;letter-spacing:-0.015em;color:#1B241E;">Ein Abend, an dem du <em style="font-style:normal;color:#9A421D;">nichts darstellen</em> musst.</h1>
       </td></tr>
-      <tr><td class="em-pad" style="padding:28px 40px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="height:1px;background-color:#D8D0C4;font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
+      <tr><td class="em-pad" bgcolor="#FFFCF6" style="padding:28px 40px 0;background-color:#FFFCF6;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="height:1px;background-color:#DDD5C5;font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
       <!-- Content (authored campaign body) -->
-      <tr><td class="em-pad em-prose" style="padding:30px 40px 40px;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#28251F;">
+      <tr><td class="em-pad em-prose" bgcolor="#FFFCF6" style="padding:30px 40px 40px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#1B241E;background-color:#FFFCF6;">
 <p style="margin:0 0 18px;">Hallo,</p>
 {{ template "content" . }}
-<p class="em-sans" style="margin:32px 0 0;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5;color:#28251F;">Herzliche Grüße</p>
-<p class="em-serif" style="margin:4px 0 0;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:26px;font-weight:400;line-height:1.2;color:#28251F;">Markus</p>
+<p class="em-sans" style="margin:32px 0 0;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5;color:#1B241E;">Herzliche Grüße</p>
+<p class="em-serif" style="margin:4px 0 0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.2;color:#1B241E;">Markus</p>
       </td></tr>
-      <!-- Breath: the panel on the quiet secondary ground, as on the home page -->
-      <tr><td class="em-pad" style="padding:0 40px 40px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#EFEAE2" style="padding:28px 30px 30px;background-color:#EFEAE2;">
-          <p class="em-sans" style="margin:0 0 10px;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;font-weight:600;line-height:1.3;letter-spacing:0.14em;text-transform:uppercase;color:#71685E;">Atem und Körper</p>
-          <p class="em-serif" style="margin:0;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:30px;font-weight:400;line-height:1.2;letter-spacing:-0.01em;color:#28251F;">Aus dem Kopf.<br><em style="font-style:italic;color:#A54829;">In den Körper.</em></p>
+      <!-- Breath: the forest panel, as on the home page -->
+      <tr><td class="em-pad" bgcolor="#FFFCF6" style="padding:0 40px 40px;background-color:#FFFCF6;border-radius:0 0 28px 28px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="#16221B" style="padding:28px 30px 30px;background-color:#16221B;border-radius:20px;">
+          <p class="em-sans" style="margin:0 0 10px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#B4BBAD;">Atem und Körper</p>
+          <p class="em-serif" style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:30px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#F2EDE3;">Aus dem Kopf.<br><em style="font-style:normal;color:#F2A56C;">In den Körper.</em></p>
         </td></tr></table>
       </td></tr>
 
-      <!-- Footer: the dark focus ground again, compact, as on the site -->
-      <tr><td class="em-pad" bgcolor="#24221F" style="padding:32px 40px 34px;background-color:#24221F;">
-        <p class="em-sans" style="margin:0;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:20px;font-weight:500;line-height:1.25;letter-spacing:-0.025em;color:#F8F5EF;">Männerkreis Niederbayern</p>
-        <p class="em-sans" style="margin:10px 0 0;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.65;color:#C7BFB3;">Ein Männerkreis in Niederbayern, im Raum Straubing. Wir treffen uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.</p>
-        <p class="em-sans" style="margin:16px 0 0;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.5;"><a href="https://mens-circle.de" target="_blank" style="color:#E6AA83;text-decoration:none;">mens-circle.de</a><span style="color:#C7BFB3;">&nbsp;&nbsp;·&nbsp;&nbsp;</span><a href="{{ MessageURL }}" target="_blank" style="color:#E6AA83;text-decoration:none;">Im Browser ansehen</a></p>
-        <p class="em-sans" style="margin:20px 0 0;padding-top:16px;border-top:1px solid #46433F;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#C7BFB3;">Du bekommst diese E-Mail, weil du dich für Nachrichten über neue Termine eingetragen hast. Mehr wird über diesen Verteiler nicht verschickt.</p>
-        <p class="em-sans" style="margin:10px 0 0;font-family:'DM Sans','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#C7BFB3;"><a href="{{ UnsubscribeURL }}" target="_blank" style="color:#F8F5EF;text-decoration:underline;">Vom Verteiler abmelden</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://mens-circle.de/impressum" target="_blank" style="color:#F8F5EF;text-decoration:underline;">Impressum</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://mens-circle.de/datenschutz" target="_blank" style="color:#F8F5EF;text-decoration:underline;">Datenschutz</a></p>
+      <!-- Footer: a forest sheet again, compact, as on the site -->
+      <tr><td height="8" style="height:8px;font-size:0;line-height:0;">&nbsp;</td></tr>
+      <tr><td class="em-pad" bgcolor="#16221B" style="padding:32px 40px 34px;background-color:#16221B;border-radius:28px;">
+        <p class="em-serif" style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#F2EDE3;">Männerkreis Niederbayern</p>
+        <p class="em-sans" style="margin:10px 0 0;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.65;color:#B4BBAD;">Ein Männerkreis in Niederbayern, im Raum Straubing. Wir treffen uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.</p>
+        <p class="em-sans" style="margin:16px 0 0;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.5;"><a href="https://mens-circle.de" target="_blank" style="color:#F2A56C;text-decoration:none;">mens-circle.de</a><span style="color:#B4BBAD;">&nbsp;&nbsp;·&nbsp;&nbsp;</span><a href="{{ MessageURL }}" target="_blank" style="color:#F2A56C;text-decoration:none;">Im Browser ansehen</a></p>
+        <p class="em-sans" style="margin:20px 0 0;padding-top:16px;border-top:1px solid #353E37;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#B4BBAD;">Du bekommst diese E-Mail, weil du dich für Nachrichten über neue Termine eingetragen hast. Mehr wird über diesen Verteiler nicht verschickt.</p>
+        <p class="em-sans" style="margin:10px 0 0;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#B4BBAD;"><a href="{{ UnsubscribeURL }}" target="_blank" style="color:#F2EDE3;text-decoration:underline;">Vom Verteiler abmelden</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://mens-circle.de/impressum" target="_blank" style="color:#F2EDE3;text-decoration:underline;">Impressum</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://mens-circle.de/datenschutz" target="_blank" style="color:#F2EDE3;text-decoration:underline;">Datenschutz</a></p>
       </td></tr>
 
     </table>

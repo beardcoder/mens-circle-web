@@ -4,7 +4,14 @@ import { resolve } from 'node:path';
 
 import type { APIRoute } from 'astro';
 
-const fonts = new Set(['dm-sans.woff2', 'playfair-display-400.woff2', 'playfair-display-400-italic.woff2']);
+// Fraunces 500 and Figtree for the current templates; the older three stay for mails already sent.
+const fonts = new Set([
+  'fraunces-500.woff2',
+  'figtree.woff2',
+  'dm-sans.woff2',
+  'playfair-display-400.woff2',
+  'playfair-display-400-italic.woff2',
+]);
 
 // Read per request (rare: only mail views load them) instead of held in the route cache.
 export const GET: APIRoute = async ({ params }) => {
