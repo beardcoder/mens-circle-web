@@ -1,9 +1,11 @@
 ---
 import site from '@data/site.json';
 import { eventSeriesSchema } from '@lib/event-schema';
-import { readPublicEvents, readPublicTestimonials } from '@lib/server/public-data';
+import { PUBLIC_CACHE, readPublicEvents, readPublicTestimonials } from '@lib/server/public-data';
 
-import photo from '../assets/images/markus-sommer.jpg';
+import portrait400 from '../assets/images/markus-sommer-400.webp';
+import portrait640 from '../assets/images/markus-sommer-640.webp';
+import portrait800 from '../assets/images/markus-sommer-800.webp';
 import Dates from '../components/blocks/Dates.astro';
 import Fact from '../components/blocks/Fact.astro';
 import Facts from '../components/blocks/Facts.astro';
@@ -20,23 +22,16 @@ import Testimonials from '../components/blocks/Testimonials.astro';
 import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Read current data on native Astro route-cache misses.
-const [eventsResult, testimonialsResult] = await Promise.allSettled([readPublicEvents(), readPublicTestimonials()]);
-const events = eventsResult.status === 'fulfilled' ? eventsResult.value : null;
-const testimonials = testimonialsResult.status === 'fulfilled' ? testimonialsResult.value.testimonials : null;
+// Rendered on a route-cache miss; actions purge the cache when the data changes.
+const [events, testimonials] = await Promise.all([readPublicEvents(), readPublicTestimonials()]);
 
 if (!events) Astro.response.status = 503;
 
-if (!events || !testimonials) Astro.response.headers.set('Cache-Control', 'no-store');
-
+// A partial page is shown, but never stored.
 if (events && testimonials) {
-  Astro.cache.set({
-    maxAge: 120,
-    swr: 60,
-    tags: ['home'],
-  });
+  Astro.cache.set(PUBLIC_CACHE);
 } else {
-  Astro.cache.set(false);
+  Astro.response.headers.set('Cache-Control', 'no-store');
 }
 ---
 
@@ -56,10 +51,7 @@ if (events && testimonials) {
     Ratschläge zu geben. Je nach Abend kommen einfache Atem- und Körperübungen dazu. Du entscheidest, ob du mitmachst.
   </Hero>
 
-  <Facts
-    anchor="praktisches"
-    eyebrow="Auf einen Blick"
-  >
+  <Facts anchor="praktisches" eyebrow="Auf einen Blick">
     <Fact label="Wo">
       <Fragment slot="value">{events?.next?.place || site.geo.locality}</Fragment>
       Adresse und Anfahrt stehen beim jeweiligen Termin
@@ -108,31 +100,19 @@ if (events && testimonials) {
     subtitle="Die Abende haben einen ähnlichen Ablauf, auch wenn wir uns nicht an einen festen Minutenplan halten. Wir sitzen im Kreis und jeder hat das gleiche Recht, zu sprechen und gehört zu werden."
   >
     <Fragment slot="steps">
-      <JourneyStep
-        number={1}
-        title="Ankommen"
-      >
+      <JourneyStep number={1} title="Ankommen">
         Wir nehmen uns Zeit zum Ankommen. Manchmal beginnen wir mit ein paar bewussten Atemzügen oder damit, kurz zu
         spüren, wie wir gerade dasitzen.
       </JourneyStep>
-      <JourneyStep
-        number={2}
-        title="Zuhören"
-      >
+      <JourneyStep number={2} title="Zuhören">
         Während einer spricht, hören die anderen zu. Wir lassen ihn ausreden und versuchen zu verstehen, was ihn
         beschäftigt. Lösungen und Diskussionen stehen dabei nicht im Vordergrund.
       </JourneyStep>
-      <JourneyStep
-        number={3}
-        title="Teilen"
-      >
+      <JourneyStep number={3} title="Teilen">
         Wenn du dran bist, erzählst du, was dich gerade beschäftigt&nbsp;– so persönlich, wie du möchtest. Auch nichts
         zu sagen ist in Ordnung.
       </JourneyStep>
-      <JourneyStep
-        number={4}
-        title="Mitnehmen"
-      >
+      <JourneyStep number={4} title="Mitnehmen">
         Du musst keine große Erkenntnis mit nach Hause nehmen. Oft ist es ein Gedanke, eine andere Sicht&nbsp;– oder die
         Erfahrung, mit etwas nicht allein zu sein.
       </JourneyStep>
@@ -161,7 +141,7 @@ if (events && testimonials) {
     imageAlt="Markus Sommer, von der Seite, auf einem Felsen sitzend."
     linkLabel="Warum ich den Männerkreis leite"
     linkUrl="/warum-ich-den-maennerkreis-leite"
-    image={photo}
+    images={[portrait400, portrait640, portrait800]}
   >
     <p>
       Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt
@@ -220,11 +200,7 @@ if (events && testimonials) {
     errorText="Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei."
   />
 
-  <Faq
-    anchor="faq"
-    eyebrow=""
-    title="Was Männer vorher wissen wollen"
-  >
+  <Faq anchor="faq" eyebrow="" title="Was Männer vorher wissen wollen">
     <AccordionItem question="Was ist ein Männerkreis?">
       Ein Männerkreis ist eine feste Runde von Männern, die sich regelmäßig trifft, im Kreis sitzt und offen über das
       spricht, was gerade da ist. Einer spricht, die anderen hören zu&nbsp;– ohne Bewertung und ohne Ratschläge. In

@@ -17,8 +17,11 @@ export default defineConfig({
   security: {
     allowedDomains: [{ hostname: siteHostname, protocol: siteProtocol.replace(':', '') }],
   },
+  // Rendered public pages and the event JSON, held in this one process. Keyed by path
+  // alone (none of them reads the query), so `?x=1` can neither bypass nor bloat it;
+  // the LRU bound keeps a few dozen pages at most (~70 kB each).
   cache: {
-    provider: memoryCache(),
+    provider: memoryCache({ max: 64, query: { include: [] } }),
   },
   output: 'server',
   session: false,
@@ -27,7 +30,7 @@ export default defineConfig({
     // Tailwind v4: the theme lives in src/styles/theme.css (CSS-first).
     plugins: [tailwindcss()],
     // Bundle everything for the build only; in dev, CommonJS deps break Vite's module runner.
-    // Sharp stays external: its native binding resolves from node_modules, not from the bundle.
+    // Sharp stays external: it only runs at build time (the server answers /_image with 404).
     ssr: { noExternal: process.argv.includes('build') || undefined, external: ['bun:sqlite', 'sharp'] },
     optimizeDeps: { exclude: ['bun:sqlite'] },
     css: {
@@ -40,11 +43,16 @@ export default defineConfig({
   },
   // Astro 301s `/a/` to `/a`; the adapter leaves that form of a static page to it.
   trailingSlash: 'never',
+  // Retired URLs. Unknown paths never reach the middleware (they render the 404 page).
   redirects: {
     '/events': '/event',
     '/events/[slug]': '/event/[slug]',
     '/ueber-uns': '/#ueber',
     '/sitemap.xml': '/sitemap-index.xml',
+    // The breathing exercise and its app are gone; the home page is the closest.
+    '/home': '/',
+    '/atemuebung': '/',
+    '/atemuebung/app': '/',
   },
   prefetch: { prefetchAll: false },
   build: {

@@ -5,12 +5,6 @@ import Prose from '../components/ui/Prose.astro';
 import Layout from '../layouts/Layout.astro';
 
 export const prerender = true;
-
-Astro.cache.set({
-  maxAge: 120,
-  swr: 60,
-  tags: ['impressum'],
-});
 ---
 
 <Layout

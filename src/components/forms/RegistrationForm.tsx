@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { button, checkbox, control, fieldError, fieldHint, fieldLabel, formStatus, link } from '@lib/ui';
 
 import type { PublicEvent } from '../event/types';
-import { refreshPublicData, usePublicData } from '../event/usePublicData';
+import { usePublicData } from '../event/usePublicData';
 
 function trackRegistration(name: string, eventId: string): void {
   try {
@@ -21,8 +21,7 @@ export default function RegistrationForm({
   initial: PublicEvent;
   contribution: { main: string; note: string };
 }) {
-  const url = `/api/public/events/${encodeURIComponent(initial.slug)}`;
-  const { data = initial, error } = usePublicData<PublicEvent>(url, initial);
+  const { data, error } = usePublicData<PublicEvent>(`/api/public/events/${encodeURIComponent(initial.slug)}`, initial);
   const form = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState('');
@@ -100,8 +99,6 @@ export default function RegistrationForm({
             if (result.data) {
               trackRegistration('success', data.id);
               setSuccess(result.data.message);
-              void refreshPublicData(url, true);
-              void refreshPublicData('/api/public/events', true);
             } else {
               trackRegistration('error', data.id);
               setErrors(

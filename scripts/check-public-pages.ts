@@ -76,6 +76,33 @@ async function readPage(origin: string, path: string, status = 200): Promise<str
   return html;
 }
 
+/** The portrait and the stylesheet are hashed build files; nothing is transformed on request. */
+async function checkAssets(origin: string, home: string): Promise<void> {
+  const image = /<img[^>]+src="([^"]+)"/.exec(home)?.[1] ?? '';
+
+  assert(image.startsWith('/assets/'), 'Home portrait must be a build asset, not /_image');
+  const portrait = await fetch(new URL(image, origin));
+
+  assert.equal(portrait.status, 200);
+  assert.match(portrait.headers.get('cache-control') ?? '', /immutable/);
+  await portrait.arrayBuffer();
+  assert(!home.includes('/_image'), 'SSR pages must not use the on-demand image endpoint');
+  assert.equal((await fetch(`${origin}/_image?href=${encodeURIComponent(image)}&w=300&f=webp`)).status, 404);
+
+  const css =
+    /rel="stylesheet"[^>]*href="([^"]+)"/.exec(home)?.[1] ?? /href="([^"]+)"[^>]*rel="stylesheet"/.exec(home)?.[1];
+
+  assert(css, 'Shared CSS must be present');
+  const asset = await fetch(new URL(css, origin));
+
+  assert.match(asset.headers.get('cache-control') ?? '', /max-age=31536000.*immutable/);
+  await asset.arrayBuffer();
+  const etag = asset.headers.get('etag');
+
+  assert(etag, 'Node static server should provide ETags');
+  assert.equal((await fetch(new URL(css, origin), { headers: { 'If-None-Match': etag } })).status, 304);
+}
+
 try {
   await withServer(async (origin) => {
     for (const path of ['/', '/event']) {
@@ -130,6 +157,10 @@ try {
 
     assert.equal(personalized.headers.get('X-Astro-Cache'), 'HIT');
     await personalized.text();
+    const queried = await fetch(`${origin}/?nocache=${Date.now()}`);
+
+    assert.equal(queried.headers.get('X-Astro-Cache'), 'HIT', 'A query string must not bypass or fragment the cache');
+    await queried.text();
     const home = await readPage(origin, '/');
     const overview = await readPage(origin, '/event');
 
@@ -140,35 +171,19 @@ try {
     assert.match(overview, /Auf die Warteliste/);
     assert.match(overview, /href="\/event\/testabend"/);
 
-    const image = /<img[^>]+src="([^"]+)"/.exec(home)?.[1]?.replaceAll('&amp;', '&');
+    await checkAssets(origin, home);
 
-    assert(image, 'Home portrait should be rendered');
-    assert.equal((await fetch(new URL(image, origin))).status, 200, 'SSR image transformation must work');
+    const json = await fetch(`${origin}/api/public/events/testabend`);
 
-    const css =
-      /rel="stylesheet"[^>]*href="([^"]+)"/.exec(home)?.[1] ?? /href="([^"]+)"[^>]*rel="stylesheet"/.exec(home)?.[1];
+    assert.equal(json.status, 200);
+    assert.equal(json.headers.get('X-Astro-Cache'), 'MISS');
+    assert.equal((await json.json()).availableSpots, 8);
+    assert.equal((await fetch(`${origin}/api/public/events/testabend`)).headers.get('X-Astro-Cache'), 'HIT');
+    const missing = await fetch(`${origin}/api/public/events/private`);
 
-    assert(css, 'Shared CSS must be present');
-    const asset = await fetch(new URL(css, origin));
-
-    assert.match(asset.headers.get('cache-control') ?? '', /max-age=31536000.*immutable/);
-    await asset.arrayBuffer();
-    const etag = asset.headers.get('etag');
-
-    assert(etag, 'Node static server should provide ETags');
-    assert.equal((await fetch(new URL(css, origin), { headers: { 'If-None-Match': etag } })).status, 304);
-
-    for (const path of ['/api/public/events', '/api/public/events/testabend', '/api/public/testimonials']) {
-      const first = await fetch(`${origin}${path}`);
-
-      assert.equal(first.status, 200);
-      assert.equal(first.headers.get('X-Astro-Cache'), 'MISS');
-      await first.json();
-      const hit = await fetch(`${origin}${path}`);
-
-      assert.equal(hit.headers.get('X-Astro-Cache'), 'HIT');
-      await hit.json();
-    }
+    assert.equal(missing.status, 404);
+    assert.equal(missing.headers.get('cache-control'), 'no-store');
+    assert.equal((await fetch(`${origin}/api/public/events`)).status, 404);
 
     for (const font of ['dm-sans.woff2', 'playfair-display-400.woff2', 'playfair-display-400-italic.woff2']) {
       const response = await fetch(`${origin}/fonts/mail/${font}`, { headers: { Origin: 'https://listmonk.example' } });
@@ -186,6 +201,18 @@ try {
     assert.equal(admin.status, 302);
     assert.match(admin.headers.get('location') ?? '', /admin\/login/);
     assert.equal(admin.headers.get('cache-control'), 'private, no-store');
+
+    for (const path of ['/admin/events', '/admin/events/open/registrations', '/admin/testimonials']) {
+      const page = await fetch(`${origin}${path}`, { redirect: 'manual' });
+
+      assert.equal(page.status, 302, `${path} must require a session`);
+      assert.match(page.headers.get('location') ?? '', /admin\/login/);
+    }
+
+    const retired = await fetch(`${origin}/atemuebung`, { redirect: 'manual' });
+
+    assert.equal(retired.status, 301);
+    assert.equal(new URL(retired.headers.get('location') ?? '', origin).pathname, '/');
     const crossSite = await fetch(`${origin}/_actions/register`, {
       method: 'POST',
       headers: {
