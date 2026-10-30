@@ -1,5 +1,5 @@
 ---
-import { link, panelPadding } from '@lib/ui';
+import { link } from '@lib/ui';
 
 import NewsletterForm from '../forms/NewsletterForm.astro';
 import Section from '../ui/Section.astro';
@@ -16,13 +16,8 @@ interface Props {
 const { title, text, whatsappTitle, whatsappText, whatsappLink, whatsappLabel } = Astro.props;
 ---
 
-<Section id="newsletter" labelledby="newsletter-title" space="band">
-  <div
-    class:list={[
-      'grid gap-x-grid gap-y-10 rounded-2xl border border-line bg-raised shadow-card lg:grid-cols-12',
-      panelPadding,
-    ]}
-  >
+<Section id="newsletter" labelledby="newsletter-title">
+  <div class="grid gap-x-grid gap-y-10 lg:grid-cols-12">
     <div class="lg:col-span-7">
       <h2 id="newsletter-title" class="text-section text-fg">
         {title}
@@ -30,7 +25,7 @@ const { title, text, whatsappTitle, whatsappText, whatsappLink, whatsappLabel } 
       <p class="mt-5 max-w-measure text-md text-fg-soft">{text}</p>
       <NewsletterForm context={{ location: 'home-dates' }} variant="primary" class="mt-8" />
     </div>
-    {/* Beside the form, parted by a line: a second way to stay in touch, not a second card. */}
+    {/* Beside the form, parted by a line: a second way to stay in touch. */}
     {whatsappLink && (
       <div class="grid content-start gap-3 border-t border-line pt-10 lg:col-span-4 lg:col-start-9 lg:self-center lg:border-t-0 lg:border-l lg:pt-0 lg:pl-grid">
         <h2 class="font-sans text-base font-semibold text-fg">{whatsappTitle}</h2>

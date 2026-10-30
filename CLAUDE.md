@@ -174,7 +174,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Grounds: `Section ground` is `default` (linen), `alt` (sand: facts that belong
   together, the course, the dates), `tint` (sage: agreements, quiet notes) or `dark`
   (`surface-dark`, forest: the opening, the breath, the registration, the menu, the
-  footer). Every ground but `default` is a sheet: `rounded-2xl`, inset 8 / 12px.
+  footer). Grounds run from edge to edge: square, no inset, no sheet.
 - Type: Fraunces 500 (`font-display`, one static face) for titles, quotes, dates,
   numbers in circles; Figtree (`font-sans`, variable) for text, navigation, forms,
   data. Role tokens `text-hero`, `text-page`, `text-section`, `text-sub`, `text-quote`,
@@ -184,18 +184,19 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   to the word before it (`\u00a0–`).
 - Shapes: soft and round. `rounded-full` for what you press and for circles; fields
   `rounded-md` with the buttons' heights (`button()` and `control()` share sizes);
-  cards, tiles, panels, the map `rounded-xl`; sheets `rounded-2xl`. A card is cream
-  with a thin line and `shadow-card`, for what you act on (a date, a form, an open
-  question); tiles, voices and notes have no shadow; things said in turn are rows
-  between lines. `shadow-overlay` only for what floats.
-- Grid: 1200px of content and one edge, 28 / 44 / 60px from the window in every
-  section (`Container` pads by `--page-pad`; a `sheet` stands 8 / 12px in and pads
-  the rest, and consecutive sheets keep that inset between them). Two paddings
-  inside: `p-card` (24 → 32px) for every card and tile, `panelPadding` (28 → 48px;
-  on phones it reaches the sheet inset) for a large card with a form or the quote;
-  `gap-stack` between cards in a list; no card inside a card. `py-section` 72 →
-  112px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop, `nav`
-  (1100px) header links. No section is forced to a screen's height.
+  the date card and the map `rounded-xl`; the registration panel `rounded-2xl`. A
+  card (cream, thin line, `shadow-card`) only for what you act on: a date, the
+  registration. Everything else stands open on its ground: facts, questions,
+  agreements, FAQ and voices are rows or columns between lines, a quote stands
+  behind an ember rule, a note is a heading and its text. Never wrap content in a
+  box to group it; part it by a line or space. `shadow-overlay` only for what floats.
+- Grid: 1200px of content and one edge, 28 / 40 / 56px from the window in every
+  section (`Container`, `px-gutter`). `p-card` (24 → 32px) for the date card and
+  the calendar dialog, `p-panel` (28 → 48px) for the registration, which below `lg`
+  becomes a full-width forest band; `gap-stack` between date cards; no card inside
+  a card. `py-section` 72 → 112px, `py-band` for compact bands; breakpoints `md`
+  tablet, `lg` desktop, `nav` (1100px) header links. No section is forced to a
+  screen's height.
 - Shared components: `EventSummary` (every date, with its seal in a ring of seats;
   fed by `lib/event-status.ts`, the ring by `lib/seats.ts`, which the registration
   panel shares), `PageIntro` (every sub-page opening), `SectionHead`, `Eyebrow`,
@@ -203,10 +204,11 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   FAQ). Use them; do not restyle a copy.
 - Home: the forest opening holds statement, explanation, the action (in the first
   screen at 1440 × 900), the photo in its ring and the next date overlapping it; then
-  fact tiles, the intro with the first round's questions as a quiet list, the four
-  steps on a path, the breath above the hills (`#haltung`), Markus (quote card signed
-  with his avatar), the five agreements as a numbered list, voices, FAQ, taking part
-  (`#termine`), staying in touch (`#newsletter`).
+  the facts between lines, the intro with the first round's questions as a quiet
+  list, the four steps on a path, the breath above the hills (`#haltung`), Markus
+  (quote behind an ember rule, signed with his avatar), the five agreements as a
+  numbered list, voices, FAQ, taking part (`#termine`), staying in touch
+  (`#newsletter`).
 - Header 72px: links visible from `nav`, one filled action; over the home opening the
   bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then linen over a
   blur. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.

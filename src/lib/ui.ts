@@ -81,14 +81,8 @@ export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer accent-fill';
 /** A short label over data or a group: sentence case in the secondary text colour. */
 export const label = 'font-sans text-sm font-semibold text-fg-muted';
 
-/** A card: a self-contained module (a date, a form). Rounded, raised a little off the page. */
+/** A card: only for what you act on (a date). Rounded, raised a little off the page; everything else stands on its ground. */
 export const card = 'rounded-xl border border-line bg-raised shadow-card';
-
-/**
- * A large card's padding (a form, the quote). On phones it reaches out to a sheet's
- * inset, so what it holds keeps the page's edge instead of a second indent.
- */
-export const panelPadding = 'p-panel max-sm:-mx-sheet max-sm:px-sheet';
 
 /** A card with its padding, for the cards that hold a form (the admin's panels). */
 export const panel = `${card} p-card`;

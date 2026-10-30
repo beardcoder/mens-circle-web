@@ -126,19 +126,14 @@
 
   /* Space. `section` the vertical space of a section, `band` that of a compact
      band, `group` from an explanation to the module after it, `grid` the column
-     gap, `gutter` the content's edge from the window (the same in every section,
-     sheet or not), `inset` a sheet's distance from the window and from the next
-     sheet, `sheet` a sheet's own side padding (gutter minus inset), `card` the
-     padding of a card or tile, `panel` that of a large card that holds a form or
-     a quote, `stack` the gap between cards in a list. Values per width on :root
-     below. */
+     gap, `gutter` the content's edge from the window (the same in every section),
+     `card` the padding of a card, `panel` that of the registration panel, `stack`
+     the gap between cards in a list. Values per width on :root below. */
   --spacing-section: var(--space-section);
   --spacing-band: var(--space-band);
   --spacing-group: var(--space-group);
   --spacing-grid: var(--space-grid);
   --spacing-gutter: var(--space-gutter);
-  --spacing-inset: var(--space-inset);
-  --spacing-sheet: calc(var(--space-gutter) - var(--space-inset));
   --spacing-card: var(--space-card);
   --spacing-panel: var(--space-panel);
   --spacing-stack: var(--space-stack);
@@ -146,8 +141,8 @@
   --spacing-clearance: 6rem; /* the bar plus air, for anchors and sticky columns */
 
   /* 1200px of content between the side margins: every section, the header and the
-     footer share these edges (Container adds its own padding, `--page-pad`). */
-  --container-content: 75rem;
+     footer share these edges. */
+  --container-page: calc(75rem + 2 * var(--space-gutter));
   --container-form: 42rem; /* a form's column */
   --container-column: 45rem; /* a reading column (legal pages, essays) */
   --container-measure: 38rem; /* a line of running text, ~62 characters */
@@ -224,15 +219,6 @@
 
 /* A ground re-declares the colour roles, so text, lines, buttons, focus rings
    and form controls inside follow it. */
-
-/* A sheet: a rounded ground standing `inset` from the window and from the next
-   sheet (block margins collapse to one inset). Its Container pads the rest, so
-   the content keeps the page's edge. */
-@utility sheet {
-  margin: var(--space-inset);
-  border-radius: var(--radius-2xl);
-  --page-pad: calc(var(--space-gutter) - var(--space-inset));
-}
 
 /* The warm band: information that belongs together (the facts, the dates). */
 @utility surface-alt {
@@ -317,11 +303,9 @@
     --p-bone: #f2ede3;
     --p-bone-muted: #b4bbad;
 
-    /* Space per width. The content's edge sits 28 / 44 / 60px from the window in
-       every section: a sheet stands 8 / 12px in and pads the rest (20 / 32 / 48px).
-       Sections 72px on phones, 112px on the desktop; cards 24 → 32px inside,
-       panels 28 → 48px. */
-    --space-inset: 0.5rem;
+    /* Space per width. The content's edge sits 28 / 40 / 56px from the window in
+       every section; grounds run from edge to edge. Sections 72px on phones, 112px
+       on the desktop; cards 24 → 32px inside, the registration panel 28 → 48px. */
     --space-gutter: 1.75rem;
     --space-section: 4.5rem;
     --space-band: 3rem;
@@ -330,11 +314,9 @@
     --space-card: 1.5rem;
     --space-panel: 1.75rem;
     --space-stack: 1rem;
-    --page-pad: var(--space-gutter);
 
     @media (width >= 48rem) {
-      --space-inset: 0.75rem;
-      --space-gutter: 2.75rem;
+      --space-gutter: 2.5rem;
       --space-section: 5.5rem;
       --space-band: 3.5rem;
       --space-group: 2.5rem;
@@ -353,7 +335,7 @@
     }
 
     @media (width >= 80rem) {
-      --space-gutter: 3.75rem;
+      --space-gutter: 3.5rem;
       --space-grid: 3rem;
     }
   }

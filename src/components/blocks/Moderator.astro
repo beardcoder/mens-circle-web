@@ -1,8 +1,6 @@
 ---
 import type { ImageMetadata } from 'astro';
 
-import { panelPadding } from '@lib/ui';
-
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -26,12 +24,10 @@ const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote
 ---
 
 <Section id={anchor} labelledby="person-title" innerClass="grid items-start gap-x-grid gap-y-10 lg:grid-cols-12">
+  {/* A quote behind an ember rule, as every quote on the site. */}
   {quote && (
-    <figure class:list={['grid content-start rounded-2xl bg-accent-soft lg:col-span-5 lg:mt-2', panelPadding]}>
-      <span aria-hidden="true" class="h-10 font-display text-[5.5rem] leading-[0.85] text-accent">
-        “
-      </span>
-      <blockquote class="mt-3 font-display text-quote text-fg">
+    <figure class="grid content-start border-l-4 border-fill pl-6 sm:pl-8 lg:col-span-5 lg:mt-2">
+      <blockquote class="font-display text-quote text-fg">
         <p>{quote}</p>
       </blockquote>
       <figcaption class="mt-8 flex items-center gap-4">
@@ -42,7 +38,7 @@ const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote
           alt={imageAlt}
           loading="lazy"
           decoding="async"
-          class="size-14 shrink-0 rounded-full object-cover ring-2 ring-raised"
+          class="size-14 shrink-0 rounded-full object-cover"
         />
         <span class="grid">
           <span class="font-semibold text-fg">{signature}</span>
