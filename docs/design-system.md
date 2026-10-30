@@ -1,193 +1,196 @@
 # Design system
 
-## Public design update — October 2026
+## Idea — a fire circle at the edge of the forest
 
-A calm invitation to a real meeting. The existing paper, charcoal and rust palette
-stays; Playfair Display carries headings and quotes, DM Sans carries explanations,
-controls and data. Public headings scale fluidly: hero 44–80px, section 30–52px.
-Labels use sentence case. The home statement is a single, continuous heading.
+A men's circle meets in the evening, sits in a ring and listens. The site looks like
+that evening: deep forest green for what draws you in, the warm ember of the logo
+for the one thing to do, linen daylight for reading. The circle is the one motif —
+the photograph in a ring, three warm points on it (the three figures of the logo),
+numbered steps on a path, the date in a seal, the breath. Shapes are soft and round;
+cards rest a little above the page.
 
-The hero puts the invitation and actions on the left and a server-rendered next
-date on the right. On phones they stack in that order. An empty schedule offers
-email notifications; unavailable data shows an explicit reload action. Dates and
-approved quotes are rendered on the server, using native Astro route caching.
-Long quotes use native `details`, and long venue or fee values wrap without clipping.
-
-Circle outlines recall the seating arrangement. On the home page they morph in
-shape, rotation and size as the hero scrolls away; the portrait frame opens from
-rounded corners into a rectangle as it enters. Both use native CSS view timelines
-and remain static with reduced motion or without browser support. Reading text,
-headings and the footer stay still. Motion is limited to interactions, the reading
-progress indicator and the existing event dock. The optional breath guide starts
-only on request; leaving its viewport, hiding the tab or enabling reduced motion
-stops it. FAQ and menu transitions respect reduced motion.
-
-Four principles: make the next step visible, group related information, keep
-reading lines short, and reuse the same components for the same function.
+Four principles: make the next step visible, group what belongs together, keep
+reading lines short, use the same component for the same function. Everything is
+fast: two font files (~37 kB), one stylesheet, images sized at build time.
 
 ## Files
 
 | File                      | Role                                                                                                                                         |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/styles/theme.css`    | Tokens (`@theme`), primitives, variants, the two surfaces, keyframes, base rules. Shared.                                                    |
-| `src/styles/global.css`   | Public entry: Tailwind, theme, view transitions. Excludes the admin sources (`@source not`).                                                 |
-| `src/styles/admin.css`    | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                                                             |
+| `src/styles/theme.css`    | Tokens (`@theme`), primitives, variants, the three surfaces, keyframes, base rules. Shared.                                                  |
+| `src/styles/global.css`   | Public entry: Tailwind (classes from `src/` only), theme, view transitions, the breath and the hero's turning ring.                          |
+| `src/styles/admin.css`    | Admin entry: Tailwind and theme; AdminLayout pins the dark mode (the forest at night).                                                       |
 | `src/lib/ui.ts`           | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
 | `src/lib/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
-| `src/components/ui/`      | The components built on them.                                                                                                                |
+| `src/components/ui/`      | The components built on them; `src/icons/` the line icons (24px grid, 1.7 stroke).                                                           |
 
-## Tokens
+## Colour
 
-**Colour roles.** Primitives (`--p-*`) are plain hex values on `:root`; the
-semantic tokens pick them with `light-dark()`, so day and night (`data-mode`, set
-before first paint, switched by `ModeToggle`) keep the same roles. There is one
-palette: the earlier warm/cool switch is gone, and the boot script removes a stored
-`mc-theme`.
+Primitives (`--p-*`) are plain hex values on `:root`; the roles pick them with
+`light-dark()`, so day and night (`data-mode`, set before first paint, switched by
+`ModeToggle`) keep the same roles. Never a hex value in markup.
 
-| Role                  | Light                             | Token                             | Use                                                    |
-| --------------------- | --------------------------------- | --------------------------------- | ------------------------------------------------------ |
-| Ground                | `#F8F5EF`                         | `ground`                          | the page                                               |
-| Secondary ground      | `#EFEAE2`                         | `ground-alt` (`surface-alt`)      | information that belongs together; sparingly           |
-| Dark focus ground     | `#24221F`                         | `surface-dark`                    | the home opening and the footer only                   |
-| Text / secondary text | `#28251F` / `#71685E`             | `fg`, `fg-soft` / `fg-muted`      | text on light grounds / readable secondary information |
-| Line                  | `#D8D0C4`                         | `line`, `line-strong`             | quiet structure; never alone the outline of a control  |
-| Control outline       | `#8A8175`                         | `line-bold`                       | inputs, secondary buttons, the FAQ indicator (≥ 3:1)   |
-| Accent on light       | `#A54829`                         | `accent`, `accent-strong` (hover) | links and rare highlights                              |
-| Primary button        | `#9F4429` / `#813621` / `#FFF9F3` | `fill`, `fill-strong`, `on-fill`  | the main action of a module, its hover, its label      |
-| On the dark ground    | `#F8F5EF`, `#C7BFB3`, `#E6AA83`   | (re-declared by `surface-dark`)   | text, secondary text, accent                           |
+| Role            | Light                        | Night                 | Token                            | Use                                          |
+| --------------- | ---------------------------- | --------------------- | -------------------------------- | -------------------------------------------- |
+| Page            | `#F6F2EA` linen              | `#111915`             | `ground`                         | the page                                     |
+| Warm band       | `#ECE4D4` sand               | `#17201A`             | `ground-alt` (`surface-alt`)     | information that belongs together            |
+| Quiet note      | `#E2E7D8` sage               | `#1C2720`             | `tint` (`surface-tint`)          | agreements, a hint beside the work, a bubble |
+| Card            | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | cards, tiles, panels                         |
+| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, breath, registration, menu, footer  |
+| Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                        |
+| Secondary text  | `#5A6255` moss               | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                      |
+| Lines           | `#DDD5C5` / `#C8BFAC`        | `#2A362E` / `#3B4940` | `line`, `line-strong`            | quiet structure; never alone a control       |
+| Control outline | `#7A8072`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)            |
+| Accent          | `#9A421D` (hover `#953F1C`)  | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word in a title |
+| Accent tint     | `#F5DFCD`                    | `#3A2619`             | `accent-soft`                    | icon discs, the date seal, the quote card    |
+| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module                   |
+| Glow            | `#E8B65A`                    | same                  | `glow`                           | the warm point of the circle; never text     |
 
-Night keeps the roles: a dark ground (`#1B1917`), a slightly lighter secondary
-ground (`#24221F`), light text, the light rust as accent; the focus ground goes
-darker (`#121110`). `success`, `danger` and `alert` exist for real states only and
-always come with words. Every text token holds at least 4.5:1 on every ground in
-both modes, `line-bold` at least 3:1 (measured with a contrast audit over all page
-types).
+On the forest, `surface-dark` re-declares text (`#F2EDE3` bone, `#B4BBAD` muted),
+accent (`#F2A56C`), lines (bone at 14 / 24 %) and the control outline (`#768379`).
+`success`, `danger` and `alert` are for real states only and always come with words.
+Every text pair holds at least 4.5:1 on every ground in both modes, every control
+line at least 3:1 (checked pair by pair; the tightest are the control outline on sand,
+3.2:1, and white on ember, 4.7:1). Check any new pair in both modes.
 
-**Type.** `font-serif` (Playfair Display, weight 400) for chosen titles, short
-quotes and the date in a summary; `font-sans` (DM Sans) for running text,
-navigation, forms, data, FAQ questions and list titles. Sizes are `clamp()` tokens
-named by role:
+## Type
 
-| Token          | Size      | Use                                     |
-| -------------- | --------- | --------------------------------------- |
-| `text-hero`    | 44–88px   | the home statement                      |
-| `text-page`    | 36–64px   | a sub-page's title                      |
-| `text-section` | 30–48px   | a section's title                       |
-| `text-sub`     | 22–30px   | subheadings, the date in a summary      |
-| `text-quote`   | 22–28px   | one short highlighted quote             |
-| `text-xl`      | 18–22px   | FAQ questions, list titles, data values |
-| `text-lg`      | 18–20px   | a short lead                            |
-| `text-md`      | 17–19px   | running text (the body)                 |
-| `text-base`    | 16px      | controls, buttons, data                 |
-| `text-sm`/`xs` | 14 / 13px | hints, captions / labels                |
+`font-display` is Fraunces at its one weight, 500 — warm, a little old-fashioned,
+steady: titles, the quote, the date, numbers in circles, the menu. `font-sans` is
+Figtree (variable, 400–700) — clear and friendly: running text, navigation, forms,
+data, FAQ questions. Fraunces ships as one static face (~18 kB), Figtree as one
+variable file (~20 kB); both upright faces preload, Figtree's italic loads when used.
+There is no italic display face: a highlighted phrase in a title (`<em>`) turns the
+accent colour and stays upright.
 
-Headings use one colour. Section labels use sentence case (`label`) without added
-letter spacing. Running text stays on `max-w-measure` (~62 characters), aligned
-left. Long words wrap or hyphenate. Upright serif and sans faces preload; italics
-load only when used. Playfair ships as static 400 faces (the only weight set), DM Sans
-as one variable file. The CSS is shared in hashed assets rather than inlined in
-every document.
+| Token          | Size      | Use                                       |
+| -------------- | --------- | ----------------------------------------- |
+| `text-hero`    | 42–80px   | the home statement                        |
+| `text-page`    | 38–68px   | a sub-page's title, the breath line       |
+| `text-section` | 32–52px   | a section's title                         |
+| `text-sub`     | 22–30px   | subheadings, card titles, a fact's value  |
+| `text-quote`   | 24–34px   | one short highlighted quote               |
+| `text-xl`      | 18–22px   | FAQ questions, data values                |
+| `text-lg`      | 18–21px   | a lead                                    |
+| `text-md`      | 17–19px   | running text (the body)                   |
+| `text-base`    | 16px      | controls, buttons, data                   |
+| `text-sm`/`xs` | 14 / 13px | labels, hints, captions / the small print |
 
-**Grid and space.** One content width: 1200px between the side margins
-(`max-w-page`, `Container`); margins 20 / 32 / 48px (`px-gutter`). Header,
-sections and footer share these edges; full-width grounds keep their content on
-them. Space per width on `:root`: `py-section` 64 → 96px, `py-band` (compact bands)
-40 → 56px, `group` 32 → 48px (an explanation to the module after it), `grid` 32 →
-48px (column gap). Label to title 12px, title to lead 24px. Breakpoints: `sm` 36rem,
-`md` 48rem (tablet: two columns), `lg` 64rem (desktop: four columns), `nav` 68.75rem
-(the header shows its links), `xl` 80rem. No section is forced to a screen's height.
+Titles tighten their tracking as they grow (−1 % to −3 %). Labels are sentence case:
+the section label (`Eyebrow`) in the accent after a small ember dot, data labels
+(`label`) in the secondary colour. Running text stays on `max-w-measure` (~62
+characters), aligned left. Long words hyphenate; a hyphenated word that must not
+break at its hyphen uses U+2011 ("E‑Mail" in a big title).
 
-**Shape.** Either fully round or square; there is no radius token. Round
-(`rounded-full`) is every control: buttons and fields alike, as pills of the same
-heights (`button()` and `control()` share 36 / 44 / 48px), the same outline
-(`line-bold`) and the site's focus outline; a textarea keeps the curve at its
-corners (`rounded-[1.5rem]`). Also round: icon buttons, the menu and close buttons, the
-FAQ indicator, the scroll-to-top button — and the circle itself (rings, the
-breath, the mark). Square is everything that holds: cards, panels, the breath
-panel, photographs, the map, the calendar popover. Flat: cards are a thin line (`card`: `border-line-strong` on the
-raised ground), never a shadow; a card carries at most one emphasis — no coloured
-cap, no glow, no frame around a photo. Lists and quotes stand without cards, under
-thin lines. `shadow-overlay` is reserved for admin dialogs, action menus and the save bar.
+## Space and grid
 
-**Motion.** Short transitions answer interactions. Content never depends on an
-entrance or a scroll reveal. Shared keyframes live in `theme.css`; no animation
-dependency is needed. Reduced motion disables transitions and animated movement.
+One content width: 1200px between the side margins (`max-w-page`, `Container`);
+margins 20 / 32 / 48px (`px-gutter`). Space per width on `:root`: `py-section` 72 →
+112px, `py-band` 40 → 56px, `group` 32 → 48px (an explanation to the module after
+it), `grid` 32 → 48px (column gap). Breakpoints: `sm` 36rem, `md` 48rem, `lg` 64rem,
+`nav` 68.75rem (the header shows its links), `xl` 80rem. No section is forced to a
+screen's height.
+
+## Shape and depth
+
+Soft and round. `rounded-full` is what you press (buttons, chips, icon buttons, the
+FAQ disc) and the circle (the photograph, the seal, the numbered steps, the avatar,
+the rings). Fields take `rounded-md` (14px) — inputs and textareas alike — with the
+buttons' heights (48 / 44 / 36px). Cards, tiles, panels and the map take
+`rounded-xl` (28px); the large grounds — the opening, the bands (`Section ground`
+other than `default`), the registration and the footer — are sheets with
+`rounded-2xl` (40px), inset 8 / 12px from the window's edge.
+
+A card (`card`) is cream with a thin `line` and `shadow-card`: soft, wide, low.
+`shadow-overlay` is for what floats (dialogs, menus, the admin's save bar). The
+forest and the sage carry no shadow. A primary button glows a little in its own
+colour on hover.
+
+## Motion
+
+Short transitions answer interactions (a button rises 2px, arrows slide, header
+links draw a line). The hero's ring turns once every 90 seconds; the breath circle's
+9-second cycle (4 s in, 5 s out) runs only when started and stops off screen, in a
+hidden tab or under reduced motion. The phone menu opens as a circle and its links
+rise in (`rise`); the event title flies into its dock on a scroll timeline. Content
+never waits for motion. Under reduced motion everything rests.
 
 ## Components
 
-| Component                                         | Purpose                                                                                           |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `Container`                                       | The 1200px width and the side margins                                                             |
-| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `dark` ground, `default` / `band` space                              |
-| `SectionHead` (`size`)                            | Label, section title (`section` / `sub`), lead                                                    |
-| `PageIntro` (`lead`, `media` slots)               | The compact light opening of every sub-page, a photo beside it where there is one                 |
-| `Eyebrow`                                         | A short section label (`label` recipe)                                                            |
-| `Button` (`variant`, `size`, `block`, `decorate`) | Fully round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                    |
-| `TextLink`                                        | A quiet, underlined link with a small arrow                                                       |
-| `Field`, `control()`, `FormStatus`                | Label, a pill control (the buttons' heights), hint, field error; the result line under its button |
-| `EventSummary`                                    | One date: label, the date on two fixed lines, time / place / fee / seats, the action that fits    |
-| `TestimonialList` (Astro)                         | `short` at the quote size (one per section), `text` as running text; long voices fold             |
-| `Accordion`                                       | Questions in DM Sans, a plus that becomes a minus, answers on the measure                         |
-| `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                            |
-| `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                     |
+| Component                                         | Purpose                                                                                          |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `Container`                                       | The 1200px width and the side margins                                                            |
+| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `tint` / `dark`; every ground but the page is a rounded sheet       |
+| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead                                                         |
+| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; without a photo the circle motif stands at its right                       |
+| `Eyebrow`                                         | The section label: ember dot, accent text                                                        |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                         |
+| `TextLink`                                        | A quiet, underlined link with a small arrow                                                      |
+| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                    |
+| `EventSummary`                                    | One date: label, the seal (day and month in a circle), the date, four rows, the fitting action   |
+| `Fact` (`icon`)                                   | A tile: an icon in an accent disc, label, value in Fraunces, a note                              |
+| `TestimonialList`                                 | One short featured quote behind an ember rule; the rest as cards with an initial; long ones fold |
+| `Accordion`                                       | Questions as rounded cards; an accent disc whose plus turns into a minus                         |
+| `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                           |
+| `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                    |
 
-**Header.** 72px: the mark, from `nav` five content links and one filled action
-("Termine"); below `nav` the action and a menu button. The phone menu is a native
-modal `<dialog>` (focus trap, Escape, the focus returns to the button; the page holds
-still under `:root:has(dialog:modal)`) that opens as a circle from its button, with
-the links, the action and the display option. Over the home opening the bar is clear with light text and turns to the
-opaque paper at once when the page moves (`over-hero:`, `data-scrolled`).
+**Header.** 72px: the mark in ember and the word mark in Fraunces; from `nav` five
+links and one filled action; below `nav` the action and a menu button. Over the home
+opening the bar is clear with light text; once the page moves it is linen over a
+blur (`data-scrolled`). The phone menu is a native modal `<dialog>` on the forest,
+opening as a circle from its button, its links in Fraunces.
 
-**Footer.** Compact on the dark focus ground on every page: the mark and one line,
-navigation, contact, legal links and `ModeToggle`. It carries no invitation; a page
-that ends on one sets it itself.
+**Footer.** A forest sheet on every page: the mark and word mark, one line about the
+circle, navigation, contact, legal links and `ModeToggle`; the logo's ring stands
+large and faint behind it.
 
 ## Compositions
 
-- **Home.** The opening on the dark ground: statement, explanation, the main action
-  with the link to the evening's course, the next date beside them (on phones:
-  statement, explanation, action, date); at 1440 × 900 the action is in the first
-  screen. Then the facts band (`alt`, 4 / 2 / 1 columns, a long fee split into a
-  short value and a note), the intro (text 7 columns, the questions 4 columns behind
-  a line), the course in four phases (4 / 2 / 1) with the breath panel (`#haltung`)
-  right under it, Markus (photo and text 5 : 7; on phones title, photo, text), the
-  agreements (`alt`, two columns), the voices, the FAQ, and the close: taking part
-  (`#termine`, `alt`, invitation and date summary), then staying in touch
-  (`#newsletter`, the form "Termine per E-Mail erhalten" and the WhatsApp group as a
-  link).
+- **Home.** The opening on the forest: eyebrow, statement (its key phrase in the
+  accent), explanation, the main action and the link to the evening's course; beside
+  it the photograph in a circle with the turning ring, the next date overlapping its
+  edge (on phones under the text). Then four fact tiles (two columns on phones), the
+  circle's topic beside its questions as alternating speech bubbles (sage and ember),
+  the evening's four steps on a path (sand), the breath (forest), Markus (his quote
+  in an ember-tint card signed with his avatar, beside his text), the agreements as
+  four numbered cards with the boundary note (sage), the voices, the FAQ, taking part
+  (`#termine`, sand, invitation beside the date) and staying in touch (`#newsletter`,
+  a card with the form and the WhatsApp note in sage).
 - **`/event`.** `PageIntro`, then every upcoming date as the same `EventSummary`
-  (the soonest first; a full one says "ausgebucht" and offers the waiting list as the
-  secondary action) beside the e-mail notification (`#benachrichtigung`); the FAQ;
-  a compact where-next band. No closing call back to the same page.
-- **Event page.** The date as the title with the action and the calendar, the
-  summary beside it; the evening's description (plain text rendered with real
-  paragraphs and lists, `plainTextToHtml`) beside the registration card; the map;
-  where next. A past date offers no registration.
-- **Personal page.** `PageIntro` with the photo, split heading/text sections, the positions
-  and the FAQ in the same components, one closing invitation (a compact `alt`
-  band).
-- **Testimonial form.** `PageIntro`, then the notes and the form in one column of
+  beside the e-mail notification in a sage card; the FAQ; a where-next band.
+- **Event page.** The date line and the title — "Männer**kreis**", its second half in
+  the accent — which fly into the dock as the page scrolls; the place, the calendar
+  and the registration on the forest; the evening's description (sand) with its
+  question and a note card; the map; where next. A past date offers no registration.
+- **Personal page.** `PageIntro` with the rounded photograph, split heading/text
+  sections, the FAQ, one closing invitation.
+- **Testimonial form.** `PageIntro`, then the notes and the form in one card of
   ~672px (`max-w-form`).
-- **Legal pages, 404.** `PageIntro` and the text in one ~720px column; nothing else.
+- **Legal pages, 404.** `PageIntro` and the text in one ~720px column.
+- **Admin.** The same tokens at night: forest grounds, rounded cards, ember for the
+  one action.
 
 ## Rules
 
 - Complete class strings only (no `bg-${x}`); variants are maps of full strings
   (`ui.ts`, `Section`, `SectionHead`). Conditional classes with `class:list`.
 - Never pass a class that sets the same property a component already sets: add a
-  prop instead (`SectionHead size`, `Button size`, `Prose width`, `control('xs')`).
+  prop instead (`SectionHead size`, `Button size`, `Prose width`, `control('xs')`,
+  `NewsletterForm variant`).
 - Scripts find elements by `data-*` attributes and switch states with them
-  (`data-state`, `data-tone`, `data-scrolled`, `data-collapsed`); styles read the
-  same attributes through `data-[…]:` and `group-data-[…]:` variants.
-- Arbitrary values are for one-off geometry (where the hero's ring sits); anything
-  used twice becomes a token or a recipe. No local values to patch a single section.
+  (`data-state`, `data-tone`, `data-scrolled`, `data-running`); styles read the same
+  attributes through `data-[…]:` and `group-data-[…]:` variants.
+- Arbitrary values are for one-off geometry (where the hero's ring and glow sit, the
+  points on a ring at 120°); anything used twice becomes a token or a recipe.
 - Allowed outside utilities, each with its reason in `theme.css`/`global.css`: font
-  tokens, primitives, the two surfaces, the reduced-motion floor, the scroll lock
-  under a modal, the focus ring default, view-transition pseudo-elements, keyframes.
-- No layout shift: every line of a date summary is one line (`truncate`; below 360px
-  a row stacks its label over its value). Titles measure in `em`, never `ch`.
+  tokens, primitives, the surfaces, the reduced-motion floor, the scroll lock under a
+  modal, the focus ring default, view-transition pseudo-elements, keyframes.
+- Images on SSR pages are pre-sized files (`<img srcset>`); `<Image />` only on
+  prerendered pages. The hero photograph is AVIF, eager and `fetchpriority="high"`.
+- No layout shift: a date summary's lines are one line (`truncate`); titles measure
+  in `em`, never `ch`.
 - Forms: labels always visible, placeholders never instead; a field's message under
   the field, the form's result under its button (`FormStatus`), never a toast;
   entries survive an error; success says what actually happened.
-- Focus is always visible (2px accent outline, offset; inputs add a 2px ring).
-  Buttons and fields are 48–52px high; touch targets at least 44px.
+- Focus is always visible (2px accent outline, offset 3px). Buttons and fields are
+  44–52px high; touch targets at least 44px.

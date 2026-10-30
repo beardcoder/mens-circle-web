@@ -106,9 +106,10 @@ wrapper component: `layout="constrained"` with `width`/`height` (Astro writes `s
 and `sizes`), `position` for the crop, Tailwind for the box (`image.responsiveStyles`
 stays off). Photos live in `src/assets/images/`. SSR pages never use `<Image />`: it
 would run sharp per request through `/_image`, which the middleware answers with 404 in
-production. The home portrait is three pre-sized WebP files beside the original
-(`markus-sommer-{400,640,800}.webp`: 4 : 5, cropped left, sharp's WebP defaults) with a
-written `srcset`; regenerate them when the photo changes. Sharp is a build-time dev
+production. The home page uses pre-sized files beside the original with a written
+`srcset`: the photo in its ring (`markus-kreis-{480,720,960}.avif`, square, AVIF q52)
+and Markus's avatar (`markus-avatar-192.webp`); regenerate them when the photo
+changes. Sharp is a build-time dev
 dependency. All events use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; the two schedules
@@ -151,75 +152,62 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Design
 
-- `docs/design-system.md` is the reference; the brief behind it (DESIGN.md, 12 Oct
-  2026): calm, warm, clear and contemporary — an invitation to a real meeting, never
-  a stage. Meaning sets size; what belongs together stays together; decoration has
-  one place (the circle); same function, same design. Flat and moving: clear
-  grounds and thin lines, no shadows; openings rise in, blocks rise into view.
-- Colours are roles (`ground`, `ground-alt`, `fg`, `fg-muted`, `line`, `line-bold`,
-  `accent`, `fill`/`fill-strong`/`on-fill`, `success`/`danger` for states only); hex
-  primitives (`--p-*`) live on `:root` only, never in markup. One palette; day and
-  night are `data-mode` (`light-dark()` tokens), switched by `ModeToggle` in the
-  footer and the phone menu. The boot script drops a stored `mc-theme`. Every text
-  token ≥ 4.5:1 on every ground in both modes, `line-bold` ≥ 3:1; `line` never
+- `docs/design-system.md` is the reference. The idea: a fire circle at the edge of
+  the forest — calm, warm, grounded, an invitation to a real evening. Deep forest
+  green for what draws you in, the ember of the logo for the one thing to do, linen
+  for reading; the circle (the photo in a ring, three warm points, numbered steps,
+  the date seal, the breath) is the one motif. Same function, same component.
+- Colours are roles (`ground`, `ground-alt`, `tint`, `raised`, `fg`, `fg-soft`,
+  `fg-muted`, `line`, `line-strong`, `line-bold`, `accent`, `accent-soft`,
+  `fill`/`fill-strong`/`on-fill`, `glow` for decoration, `success`/`danger` for
+  states only); hex primitives (`--p-*`) live on `:root` only, never in markup. Day
+  and night are `data-mode` (`light-dark()` tokens), switched by `ModeToggle` in the
+  footer and the phone menu; the boot script drops a stored `mc-theme`. Every text
+  pair ≥ 4.5:1 on every ground in both modes, control lines ≥ 3:1; `line` never
   outlines a control alone. Check new pairs in both modes.
-- Cards: with no date planned, a date summary is one "in Planung" card with the
-  notification link; failed reads keep their own compact message with a reload link.
-- Grounds: `Section ground` is `default` (paper), `alt` (the quiet secondary ground:
-  facts, agreements, the breath panel, the closing invitation, compact bands) or
-  `dark` (`surface-dark`: the home opening and the footer only). No other bands.
-- Type: Playfair Display (400) for chosen titles, short quotes and the date in a
-  summary; DM Sans for text, navigation, forms, data, FAQ questions, list titles.
-  Role tokens: `text-hero`, `text-page`, `text-section`, `text-sub`, `text-quote`,
-  `text-md` (body), `text-base` (controls, data). Titles are one colour; the italic
-  accent appears only in the home statement and the breath line.
-  Labels are small spaced capitals (`label`) with no rules; buttons and navigation in
-  normal case. Running text on `max-w-measure`. A dash in running copy is bound to
-  the word before it (`\u00a0–`).
+- Grounds: `Section ground` is `default` (linen), `alt` (sand: facts that belong
+  together, the course, the dates), `tint` (sage: agreements, quiet notes) or `dark`
+  (`surface-dark`, forest: the opening, the breath, the registration, the menu, the
+  footer). Every ground but `default` is a sheet: `rounded-2xl`, inset 8 / 12px.
+- Type: Fraunces 500 (`font-display`, one static face) for titles, quotes, dates,
+  numbers in circles; Figtree (`font-sans`, variable) for text, navigation, forms,
+  data. Role tokens `text-hero`, `text-page`, `text-section`, `text-sub`, `text-quote`,
+  `text-md` (body), `text-base` (controls). No italic display face: `<em>` in a title
+  turns the accent, upright. Labels in sentence case: `Eyebrow` (ember dot, accent),
+  `label` (muted). Running text on `max-w-measure`. A dash in running copy is bound
+  to the word before it (`\u00a0–`).
+- Shapes: soft and round. `rounded-full` for what you press and for circles; fields
+  `rounded-md` with the buttons' heights (`button()` and `control()` share sizes);
+  cards, tiles, panels, the map `rounded-xl`; sheets `rounded-2xl`. A card is cream
+  with a thin line and `shadow-card`; `shadow-overlay` only for what floats.
 - Grid: 1200px of content (`max-w-page`), side margins 20 / 32 / 48px; `py-section`
-  64 → 96px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop, `nav`
-  (1100px) header links. No section is forced to a screen's height.
-- Shapes: fully round or square (no radius token). Round (`rounded-full`) is every
-  control — buttons and fields as pills of the same heights, outline and focus
-  (`button()` and `control()` share their sizes; a textarea keeps the curve at its
-  corners, `rounded-[1.5rem]`), icon buttons, the FAQ indicator — and the circle itself;
-  square is what holds — cards, panels, photos, the map, popovers. Flat: a card is a thin line (`card`), never a shadow,
-  and carries one emphasis at most (no cap bar, no glow, no photo frame).
-- Shared components: `EventSummary` (every date, fed by `lib/event-status.ts`),
-  `PageIntro` (every sub-page opening, light), `SectionHead`, `Button`, `Field` +
-  `FormStatus`, the testimonial island (one short featured quote, long voices fold), `Accordion`
+  72 → 112px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop,
+  `nav` (1100px) header links. No section is forced to a screen's height.
+- Shared components: `EventSummary` (every date, with its seal; fed by
+  `lib/event-status.ts`), `PageIntro` (every sub-page opening), `SectionHead`,
+  `Eyebrow`, `Fact`, `Button`, `Field` + `FormStatus`, `TestimonialList`, `Accordion`
   (every FAQ). Use them; do not restyle a copy.
-- Home: the dark opening holds statement, explanation, the action (in the first
-  screen at 1440 × 900) and the next date; then facts, intro with its questions,
-  the four phases with the breath panel (`#haltung`), Markus at 5 : 7, agreements,
-  voices, FAQ, taking part (`#termine`), staying in touch (`#newsletter`, WhatsApp as
-  a link). `/event` lists every upcoming date; an event page puts the description
-  beside the registration; legal pages are a title and one column.
-- Header 72px: links visible from `nav`, "Termine" the one filled action; the phone
-  menu is a native modal `<dialog>`. Over the home opening the bar is clear
-  (`over-hero:`) until the page moves (`data-scrolled`), then opaque paper at once.
-  The footer is compact and the same everywhere; it carries no invitation.
-- Motion: interactions ~180ms (a button rises 2px, arrows slide, header links draw
-  a line); openings rise in staggered (`entrance:animate-rise`, ≤ 260ms); blocks
-  rise into view (`reveal`) and list lines draw across (`draw`), both on `view()`
-  timelines, so what is on screen is complete and nothing waits on a script; the
-  hero's rings breathe (no parallax, except on the event and home pages: see the
-  design system); the breath circle's 10 s cycle matches its words (4 s in, 5 s
-  out); the phone menu opens as a circle from its button.
-  No `content-visibility`.
-  Under reduced motion everything rests and the timed guide hides.
-- Fonts: Playfair as static 400 faces (normal and italic, ~22 kB each; no other weight
-  is set), DM Sans as one variable file (400–700 in use; static weights would add
-  requests and save nothing). Only the upright faces preload; the italic loads when used.
-- No layout shift: every summary line is one line (`truncate`). A title's
-  measure is in `em`, never `ch`: `ch` follows the font in use (0.5em in the fallback,
-  0.6em in Playfair) and Chrome re-resolves it late, so the hero title broke onto a
-  fourth line and back while the fonts swapped (CLS 0.27).
+- Home: the forest opening holds statement, explanation, the action (in the first
+  screen at 1440 × 900), the photo in its ring and the next date overlapping it; then
+  fact tiles, the intro with its questions as speech bubbles, the four steps on a
+  path, the breath (`#haltung`), Markus (quote card signed with his avatar), the
+  agreements, voices, FAQ, taking part (`#termine`), staying in touch (`#newsletter`).
+- Header 72px: links visible from `nav`, one filled action; over the home opening the
+  bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then linen over a
+  blur. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
+- Motion: interactions ~180ms (a button rises 2px, arrows slide, header links draw a
+  line); the hero's ring turns every 90 s; the breath's 9 s cycle (4 s in, 5 s out)
+  runs only on request; the event title flies into its dock on a scroll timeline.
+  No `content-visibility`. Under reduced motion everything rests.
+- Fonts: Fraunces 500 static (~18 kB) and Figtree variable (~20 kB); both upright
+  faces preload, Figtree's italic loads when used.
+- No layout shift: every summary line is one line (`truncate`). A title's measure is
+  in `em`, never `ch` (`ch` follows the font in use and re-resolves when it swaps).
 - View transitions are native; the cross-fade needs linear curves and one duration.
   The header has no `view-transition-name`.
 - Styles live in the component's markup as utilities. `global.css` is one stylesheet
-  for every public page (`inlineStylesheets: 'auto'`), so keep one-off arbitrary values
-  few.
+  for every public page (`inlineStylesheets: 'auto'`), so keep one-off arbitrary
+  values few.
 
 ## Conventions
 
