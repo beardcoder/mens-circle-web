@@ -354,7 +354,7 @@ export function ConfirmDialog({
       }}
       class="m-auto w-[min(92vw,32rem)] border border-line-strong bg-raised p-6 text-fg shadow-overlay backdrop:bg-black/70 sm:p-8"
     >
-      <h2 id="confirm-title" class="font-serif text-2xl">
+      <h2 id="confirm-title" class="font-display text-2xl">
         {title}
       </h2>
       <div id="confirm-description" class="mt-4 grid gap-3 text-sm leading-relaxed text-fg-muted">

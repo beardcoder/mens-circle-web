@@ -31,7 +31,7 @@ const destination = hasMap ? `${lat},${lng}` : address || event.location;
   id="anfahrt"
   labelledby="anfahrt-title"
   class="scroll-mt-14"
-  innerClass="grid items-start gap-x-grid gap-y-8 border-t border-line pt-10 lg:grid-cols-12 lg:pt-16"
+  innerClass="grid items-start gap-x-grid gap-y-8 lg:grid-cols-12"
 >
   <div
     class:list={[
@@ -72,7 +72,7 @@ const destination = hasMap ? `${lat},${lng}` : address || event.location;
   {hasMap && (
     <div class="min-w-0 lg:col-span-7 lg:row-start-1">
       {/* A fixed frame so the map can never push the page around as it loads. */}
-      <div class="aspect-4/3 overflow-clip border border-line-strong has-data-[state=failed]:aspect-auto sm:aspect-video">
+      <div class="aspect-4/3 overflow-clip rounded-xl border border-line has-data-[state=failed]:aspect-auto sm:aspect-video">
         <div
           data-map
           data-state="idle"

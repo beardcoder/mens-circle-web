@@ -15,16 +15,10 @@ const { event } = Astro.props;
 const description = event.description?.trim() ?? '';
 ---
 
-<Section
-  labelledby="ueber-den-abend"
-  innerClass="grid items-start gap-x-grid gap-y-8 border-t border-line pt-10 lg:grid-cols-12 lg:pt-16"
->
+<Section ground="alt" labelledby="ueber-den-abend" innerClass="grid items-start gap-x-grid gap-y-8 lg:grid-cols-12">
   {/* The question stays beside the text while it is read; the circle repeats the seating motif. */}
   <div class="min-w-0 lg:sticky lg:top-[calc(var(--spacing-header)+5.5rem)] lg:col-span-5">
-    <h2
-      id="ueber-den-abend"
-      class="max-w-[10em] scroll-mt-14 text-[clamp(2.5rem,5.5vw,5rem)] leading-[1.03] tracking-[-0.045em] text-fg"
-    >
+    <h2 id="ueber-den-abend" class="max-w-[10em] scroll-mt-14 text-page text-fg">
       Was beschäftigt dich gerade?
     </h2>
     <div aria-hidden="true" class="relative mt-10 hidden size-44 lg:block xl:size-52">
@@ -76,9 +70,8 @@ const description = event.description?.trim() ?? '';
         </p>
       </Prose>
     )}
-    <div class="relative mt-8 pl-5 sm:mt-10 sm:pl-6">
-      <span aria-hidden="true" class="absolute inset-y-0 left-0 w-0.5 bg-accent"></span>
-      <h3 class="text-xl font-semibold text-fg">Du kannst erst einmal zuhören.</h3>
+    <div class="mt-8 rounded-xl bg-raised p-6 shadow-card sm:mt-10 sm:p-7">
+      <h3 class="text-sub text-fg">Du kannst erst einmal zuhören.</h3>
       <p class="mt-3 max-w-measure text-md text-fg-soft">
         Du brauchst keine Vorerfahrung und musst nichts vorbereiten. Ich erkläre den Rahmen zu Beginn. Wie viel du
         erzählst und ob du bei einer Atem- oder Körperübung mitmachst, entscheidest du selbst.

@@ -13,13 +13,14 @@ interface Props {
 const { anchor, eyebrow, title, subtitle } = Astro.props;
 ---
 
-<Section id={anchor} labelledby="ablauf-title">
+<Section id={anchor} ground="alt" labelledby="ablauf-title">
   <div itemscope itemtype="https://schema.org/ItemList">
     <meta itemprop="name" content={title} />
     <meta itemprop="description" content={subtitle} />
     <SectionHead eyebrow={eyebrow} title={title} titleId="ablauf-title" lead={subtitle} />
 
-    <ol role="list" class="journey-flow mt-group grid items-start gap-x-grid gap-y-8 md:grid-cols-2 lg:grid-cols-4">
+    {/* One path through the evening: a line through the numbered circles, down on phones, across on the desktop. */}
+    <ol role="list" class="mt-group grid gap-y-8 lg:grid-cols-4 lg:gap-x-grid">
       <slot name="steps" />
     </ol>
 

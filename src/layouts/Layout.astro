@@ -53,9 +53,9 @@ const speculationRules = JSON.stringify({
         }
       })();
     </script>
-    {/* Preload only upright faces used in the first viewport. */}
-    <Font cssVariable="--font-playfair" preload={[{ weight: 400, style: 'normal' }]} />
-    <Font cssVariable="--font-dm-sans" preload={[{ weight: '100 1000', style: 'normal' }]} />
+    {/* Both upright faces are in the first viewport; the italic loads when used. */}
+    <Font cssVariable="--font-fraunces" preload />
+    <Font cssVariable="--font-figtree" preload={[{ weight: '300 900', style: 'normal' }]} />
     <script is:inline type="speculationrules" set:html={speculationRules} />
     <SeoHead {...props} />
   </head>

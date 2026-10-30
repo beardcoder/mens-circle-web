@@ -18,18 +18,12 @@ interface Props {
 const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.props;
 ---
 
-<Section id={anchor} ground="alt" labelledby="statement-title">
+<Section id={anchor} ground="dark" labelledby="statement-title" class="overflow-clip">
   <div class="grid items-center gap-x-grid gap-y-8 lg:grid-cols-12">
     <div class="grid justify-items-start lg:col-span-7">
       {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
-      <h2 id="statement-title" class="text-section text-fg">
-        {lines.map((line, i) =>
-          i > 0 ? (
-            <em class="block font-serif font-normal text-accent [--slide-from:12%]">{line}</em>
-          ) : (
-            <span class="block">{line}</span>
-          ),
-        )}
+      <h2 id="statement-title" class="text-page text-fg">
+        {lines.map((line, i) => (i > 0 ? <em class="block">{line}</em> : <span class="block">{line}</span>))}
       </h2>
       {text && <p class="mt-6 max-w-measure text-md text-fg-soft">{text}</p>}
       {linkLabel && linkUrl && (
@@ -44,11 +38,11 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
         data-breath
         class="group/breath flex flex-wrap items-center gap-6 lg:col-span-4 lg:col-start-9 lg:flex-col lg:text-center"
       >
-        <span class="breath-orbit relative grid size-28 shrink-0 place-items-center lg:size-44" aria-hidden="true">
-          <span class="breath-ring absolute inset-0 rounded-full border border-fill/50 [--alpha:1] [--rest:0.62]"></span>
-          <span class="breath-ring absolute inset-[14%] rounded-full border border-fill/40 [--alpha:1] [--rest:0.55]"></span>
-          <span class="breath-ring absolute inset-[30%] rounded-full bg-fill/15 [--alpha:1] [--rest:0.5]"></span>
-          <span class="size-2 rounded-full bg-fill"></span>
+        <span class="breath-orbit relative grid size-32 shrink-0 place-items-center lg:size-56" aria-hidden="true">
+          <span class="breath-ring absolute inset-0 rounded-full border border-glow/40 [--rest:0.62]"></span>
+          <span class="breath-ring absolute inset-[14%] rounded-full border border-glow/50 [--rest:0.55]"></span>
+          <span class="breath-ring absolute inset-[30%] rounded-full bg-fill/25 [--rest:0.5]"></span>
+          <span class="size-3 rounded-full bg-glow shadow-[0_0_24px_4px_var(--color-glow)]"></span>
         </span>
         <div class="grid flex-1 justify-items-start gap-3 lg:justify-items-center">
           <p id="breath-guide" class="max-w-[25ch] text-base text-fg-soft">
@@ -56,7 +50,7 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
           </p>
           <span
             aria-hidden="true"
-            class="breath-phase invisible grid font-serif text-xl text-accent group-data-running/breath:visible motion-reduce:hidden"
+            class="breath-phase invisible grid font-display text-xl text-accent group-data-running/breath:visible motion-reduce:hidden"
           >
             <span class="breath-in col-start-1 row-start-1">Einatmen</span>
             <span class="breath-out col-start-1 row-start-1">Ausatmen</span>

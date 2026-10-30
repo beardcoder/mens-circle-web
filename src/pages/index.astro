@@ -3,9 +3,10 @@ import site from '@data/site.json';
 import { eventSeriesSchema } from '@lib/event-schema';
 import { PUBLIC_CACHE, readPublicEvents, readPublicTestimonials } from '@lib/server/public-data';
 
-import portrait400 from '../assets/images/markus-sommer-400.webp';
-import portrait640 from '../assets/images/markus-sommer-640.webp';
-import portrait800 from '../assets/images/markus-sommer-800.webp';
+import avatar from '../assets/images/markus-avatar-192.webp';
+import circle480 from '../assets/images/markus-kreis-480.avif';
+import circle720 from '../assets/images/markus-kreis-720.avif';
+import circle960 from '../assets/images/markus-kreis-960.avif';
 import Dates from '../components/blocks/Dates.astro';
 import Fact from '../components/blocks/Fact.astro';
 import Facts from '../components/blocks/Facts.astro';
@@ -45,26 +46,30 @@ if (events && testimonials) {
     kicker="Männerkreis in Straubing · Niederbayern"
     secondaryLabel="Wie ein Abend abläuft"
     secondaryLink="#reise"
+    images={[circle480, circle720, circle960]}
+    imageAlt="Markus Sommer sitzt auf einem Felsen und blickt in der Abendsonne über den Bayerischen Wald."
   >
-    <Fragment slot="title">Ein Abend, an dem du nichts darstellen musst.</Fragment>
+    <Fragment slot="title">
+      Ein Abend, an dem du <em>nichts darstellen</em> musst.
+    </Fragment>
     Wir sitzen im Kreis und sprechen über das, was uns gerade beschäftigt. Die anderen hören zu, ohne zu bewerten oder
     Ratschläge zu geben. Je nach Abend kommen einfache Atem- und Körperübungen dazu. Du entscheidest, ob du mitmachst.
   </Hero>
 
   <Facts anchor="praktisches" eyebrow="Auf einen Blick">
-    <Fact label="Wo">
+    <Fact label="Wo" icon="place">
       <Fragment slot="value">{events?.next?.place || site.geo.locality}</Fragment>
       Adresse und Anfahrt stehen beim jeweiligen Termin
     </Fact>
-    <Fact label="Wie oft">
+    <Fact label="Wie oft" icon="calendar">
       <Fragment slot="value">Alle 2–4 Wochen</Fragment>
       Ohne Mitgliedschaft – du kommst, wann es passt
     </Fact>
-    <Fact label="Dauer">
+    <Fact label="Dauer" icon="clock">
       <Fragment slot="value">2–3 Stunden</Fragment>
       {events?.next?.timeRange ? `Nächster Termin: ${events.next.timeRange}` : 'Ein Abend, kein Seminar'}
     </Fact>
-    <Fact label="Beitrag">
+    <Fact label="Beitrag" icon="heart">
       <Fragment slot="value">{events?.fee.main || 'Spendenbasis'}</Fragment>
       {events?.fee.note ?? 'Du gibst, was für dich machbar ist'}
     </Fact>
@@ -138,10 +143,12 @@ if (events && testimonials) {
     eyebrow="Wer den Kreis leitet"
     name="Ich bin Markus."
     quote="Ich sorge dafür, dass du in Ruhe reden kannst und die anderen dir zuhören. Mit Ratschlägen halte ich mich zurück."
-    imageAlt="Markus Sommer, von der Seite, auf einem Felsen sitzend."
+    avatar={avatar}
+    imageAlt="Markus Sommer"
+    signature="Markus Sommer"
+    signatureNote="hat den Kreis gegründet und leitet ihn"
     linkLabel="Warum ich den Männerkreis leite"
     linkUrl="/warum-ich-den-maennerkreis-leite"
-    images={[portrait400, portrait640, portrait800]}
   >
     <p>
       Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt
@@ -240,7 +247,7 @@ if (events && testimonials) {
   />
 
   <Newsletter
-    title="Termine per E-Mail erhalten"
+    title="Termine per E‑Mail erhalten"
     text="Du bekommst eine kurze Nachricht, sobald der nächste Männerkreis feststeht. Mehr wird über diesen Verteiler nicht verschickt."
     whatsappTitle="Zwischen den Abenden"
     whatsappText="Für den Austausch zwischen den Abenden gibt es außerdem eine WhatsApp-Gruppe."

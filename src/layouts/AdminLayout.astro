@@ -41,10 +41,10 @@ const logoutButton =
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#24221f" />
+    <meta name="theme-color" content="#111915" />
     <title>{title} · Admin · {site.siteName}</title>
-    <Font cssVariable="--font-dm-sans" preload={[{ weight: '100 1000', style: 'normal' }]} />
-    <Font cssVariable="--font-playfair" />
+    <Font cssVariable="--font-figtree" preload={[{ weight: '300 900', style: 'normal' }]} />
+    <Font cssVariable="--font-fraunces" />
   </head>
   <body class="text-base">
     {bare ? (
@@ -58,7 +58,7 @@ const logoutButton =
             <a href="/admin" class="flex min-w-0 items-center gap-2.5">
               <Logo name="logo" aria-hidden="true" class="size-8 shrink-0 text-flame" />
               <span class="grid min-w-0 leading-tight">
-                <span class="font-serif text-[1.0625rem] text-balance">{site.siteName}</span>
+                <span class="font-display text-[1.0625rem] text-balance">{site.siteName}</span>
                 <span class={label}>Admin</span>
               </span>
             </a>

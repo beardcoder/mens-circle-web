@@ -59,23 +59,24 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
   fonts: [
-    // Playfair Display for headings and quotes; DM Sans for prose, UI and labels, mapped
-    // to font-serif and font-sans in the shared theme. Playfair only ever sets 400, so its
-    // static faces (~22 kB) beat the variable file (~38 kB); DM Sans uses 400–700.
+    // Fraunces for titles, quotes and dates; Figtree for everything that explains,
+    // mapped to font-display and font-sans in the shared theme. Titles only ever set
+    // Fraunces 500, so one static face (~18 kB) does; Figtree is one variable file
+    // (~20 kB) for 400–700.
     {
-      name: 'Playfair Display',
-      cssVariable: '--font-playfair',
+      name: 'Fraunces',
+      cssVariable: '--font-fraunces',
       provider: fontProviders.fontsource(),
-      weights: [400],
-      styles: ['normal', 'italic'],
+      weights: [500],
+      styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
     },
     {
-      name: 'DM Sans',
-      cssVariable: '--font-dm-sans',
+      name: 'Figtree',
+      cssVariable: '--font-figtree',
       provider: fontProviders.fontsource(),
-      weights: ['100 1000'],
+      weights: ['300 900'],
       styles: ['normal', 'italic'],
       subsets: ['latin'],
       fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],

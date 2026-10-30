@@ -1,6 +1,4 @@
 ---
-import { label } from '@lib/ui';
-
 import Section from '../ui/Section.astro';
 
 interface Props {
@@ -11,11 +9,11 @@ interface Props {
 const { anchor, eyebrow } = Astro.props;
 ---
 
-<Section id={anchor} ground="alt" space="band" labelledby="praktisches-title">
-  <h2 id="praktisches-title" class:list={[label, 'mb-6']}>
+<Section id={anchor} space="band" labelledby="praktisches-title" class="pt-[calc(var(--spacing-band)+1.5rem)]">
+  <h2 id="praktisches-title" class="sr-only">
     {eyebrow}
   </h2>
-  <dl class="grid gap-x-grid gap-y-6 md:grid-cols-2 lg:grid-cols-4">
+  <dl class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
     <slot />
   </dl>
 </Section>

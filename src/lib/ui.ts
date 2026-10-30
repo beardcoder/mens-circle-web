@@ -10,11 +10,12 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 /** One shape for every button: fully round, the label in normal case at weight 600. On hover it changes colour and rises 2px; pressed, it settles. */
 const BUTTON_BASE =
-  'group/btn relative inline-flex items-center justify-center rounded-full border text-center font-sans font-semibold leading-tight no-underline transition-[background-color,color,border-color,translate,scale] duration-180 ease-out active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [@media(hover:hover)]:hover:-translate-y-0.5 motion-reduce:active:scale-100 motion-reduce:[@media(hover:hover)]:hover:translate-y-0';
+  'group/btn relative inline-flex items-center justify-center rounded-full border text-center font-sans font-semibold leading-tight no-underline transition-[background-color,color,border-color,box-shadow,translate,scale] duration-180 ease-out active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [@media(hover:hover)]:hover:-translate-y-0.5 motion-reduce:active:scale-100 motion-reduce:[@media(hover:hover)]:hover:translate-y-0';
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
-  /** The one main action of a module: rust under a light label. */
-  primary: 'border-transparent bg-fill text-on-fill hover:bg-fill-strong',
+  /** The one main action of a module: ember under a light label, glowing a little on hover. */
+  primary:
+    'border-transparent bg-fill text-on-fill hover:bg-fill-strong [@media(hover:hover)]:hover:shadow-[0_10px_24px_-12px_var(--color-fill)]',
   /** A further action beside it: outlined in the control colour. */
   secondary: 'border-line-bold bg-transparent text-fg hover:border-fg hover:bg-fg/6',
   danger: 'border-danger bg-transparent text-danger hover:bg-danger hover:text-surface',
@@ -44,19 +45,19 @@ export const link =
 type ControlSize = 'md' | 'sm' | 'xs';
 
 /**
- * Fields share the buttons' shape, outline, focus and motion: fully round (a
- * textarea, which cannot be a pill, keeps the same curve at its corners), the
- * control outline, the site's focus outline.
+ * Fields share the buttons' heights, outline, focus and motion, in a softer shape:
+ * rounded corners (`md`), so a textarea and an input look alike; the control
+ * outline, the site's focus outline.
  */
 const CONTROL_BASE =
-  'rounded-[1.5rem] border border-line-bold bg-field font-sans text-fg placeholder:text-fg-muted transition-[border-color,background-color] duration-180 ease-out not-[textarea]:rounded-full hover:not-focus:not-disabled:border-fg focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger';
+  'rounded-md border border-line-bold bg-field font-sans text-fg placeholder:text-fg-muted transition-[border-color,background-color] duration-180 ease-out hover:not-focus:not-disabled:border-fg focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger';
 
 /** The buttons' heights and text sizes; 16px at least on the public forms, anything smaller makes iOS zoom on focus. */
 const CONTROL_SIZES: Record<ControlSize, string> = {
-  md: 'block min-h-12 w-full px-6 py-2.5 text-base leading-normal',
-  sm: 'block min-h-11 w-full px-5 py-2 text-[0.9375rem] leading-normal',
+  md: 'block min-h-12 w-full px-4 py-2.5 text-base leading-normal',
+  sm: 'block min-h-11 w-full px-3.5 py-2 text-[0.9375rem] leading-normal',
   /** A select inside a dense admin row. */
-  xs: 'inline-block min-h-9 w-auto px-4 py-1.5 text-sm leading-normal',
+  xs: 'inline-block min-h-9 w-auto px-3 py-1.5 text-sm leading-normal',
 };
 
 /** Text inputs, textareas and selects: one family everywhere. `md` on the public forms, `sm` and `xs` in the admin. */
@@ -77,11 +78,11 @@ export const formStatus =
 
 export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer accent-fill';
 
-/** A short section label: sentence case in the secondary text colour. */
+/** A short label over data or a group: sentence case in the secondary text colour. */
 export const label = 'font-sans text-sm font-semibold text-fg-muted';
 
-/** A card: a self-contained module (a date, a form). Square and flat: a thin line, no shadow. */
-export const card = 'border border-line-strong bg-raised';
+/** A card: a self-contained module (a date, a form). Rounded, raised a little off the page. */
+export const card = 'rounded-xl border border-line bg-raised shadow-card';
 
 /** A card's padding, for the cards that hold a form (the admin's panels). */
 export const panel = `${card} p-6 sm:p-8`;

@@ -24,8 +24,24 @@ const hasAction = Astro.slots.has('default');
 const hasMedia = Astro.slots.has('media');
 ---
 
-<section id={id} aria-labelledby={titleId} class="pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group">
-  <Container class:list={['grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
+<section
+  id={id}
+  aria-labelledby={titleId}
+  class="relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
+>
+  {!hasMedia && (
+    /* The circle of the logo, quietly, where a photograph would stand. */
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute top-[calc(var(--spacing-header)+1rem)] right-[max(var(--spacing-gutter),calc((100vw-75rem)/2))] hidden size-64 rounded-full border border-line-strong lg:block xl:size-72"
+    >
+      <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-glow" />
+      <span class="absolute top-3/4 left-[93.3%] size-3 -translate-1/2 rounded-full bg-fill" />
+      <span class="absolute top-3/4 left-[6.7%] size-3 -translate-1/2 rounded-full bg-accent" />
+      <span class="absolute inset-[22%] rounded-full bg-accent-soft" />
+    </div>
+  )}
+  <Container class:list={['relative grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
     <div class:list={['grid justify-items-start', hasMedia && 'lg:col-span-7']}>
       {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
       <h1 id={titleId} class={titleClass}>

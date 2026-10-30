@@ -91,7 +91,7 @@ function SeatCircle({ event, registered }: { event: AdminEvent; registered: Regi
           y="160"
           text-anchor="middle"
           dominant-baseline="central"
-          class="fill-fg font-serif text-[3.5rem] tabular-nums"
+          class="fill-fg font-display text-[3.5rem] tabular-nums"
         >
           {registered.length}/{event.maxParticipants}
         </text>

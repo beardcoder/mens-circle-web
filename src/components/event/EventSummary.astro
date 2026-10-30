@@ -9,22 +9,40 @@ interface Props {
 }
 
 const { view, showAction = true, location } = Astro.props;
+
+/** The date's seal: the day and a short month in a circle ("01" / "Jan."). */
+const day = new Date(`${view.datetime}T12:00:00Z`);
+const valid = !Number.isNaN(day.getTime());
+const dayNumber = valid ? String(day.getUTCDate()).padStart(2, '0') : '';
+const month = valid ? new Intl.DateTimeFormat('de-DE', { month: 'short', timeZone: 'UTC' }).format(day) : '';
+const seal = view.state === 'past' ? 'bg-line text-fg-muted' : 'bg-accent-soft text-accent';
 ---
 
-<div data-summary data-state={view.state} class:list={[card, 'grid content-start p-6 sm:p-8']}>
+<div data-summary data-state={view.state} class:list={[card, 'grid content-start p-6 sm:p-7']}>
   <p class={label}>{view.kicker}</p>
-  <p class="mt-3 font-serif text-sub text-fg">
-    <time datetime={view.datetime}>
-      {view.title.map((line) => (
-        <span class="block wrap-anywhere">{line}</span>
-      ))}
-    </time>
-  </p>
-  <dl class="mt-5 grid gap-3 border-t border-line pt-5">
+  <div class="mt-4 flex items-center gap-4">
+    {dayNumber && (
+      <span
+        aria-hidden="true"
+        class:list={['grid size-16 shrink-0 place-content-center rounded-full text-center', seal]}
+      >
+        <span class="font-display text-[1.625rem] leading-none">{dayNumber}</span>
+        <span class="mt-0.5 text-xs leading-none font-semibold">{month}</span>
+      </span>
+    )}
+    <p class="min-w-0 font-display text-sub text-fg">
+      <time datetime={view.datetime}>
+        {view.title.map((line) => (
+          <span class="block truncate">{line}</span>
+        ))}
+      </time>
+    </p>
+  </div>
+  <dl class="mt-5 grid divide-y divide-line border-y border-line">
     {view.rows.map((row) => (
-      <div class="grid min-w-0 gap-x-3 min-[22.5rem]:grid-cols-[4.5rem_minmax(0,1fr)] sm:grid-cols-[5.5rem_minmax(0,1fr)]">
+      <div class="grid min-w-0 gap-x-3 py-2.5 min-[22.5rem]:grid-cols-[4.5rem_minmax(0,1fr)] sm:grid-cols-[5.5rem_minmax(0,1fr)]">
         <dt class="text-sm leading-6 text-fg-muted">{row.label}</dt>
-        <dd class="text-base leading-6 text-fg wrap-anywhere">{row.value}</dd>
+        <dd class="text-base leading-6 font-medium text-fg wrap-anywhere">{row.value}</dd>
       </div>
     ))}
   </dl>

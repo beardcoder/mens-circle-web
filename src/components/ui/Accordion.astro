@@ -6,6 +6,6 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<div class:list={['border-t border-line', className]}>
+<div class:list={['grid gap-3', className]}>
   <slot />
 </div>

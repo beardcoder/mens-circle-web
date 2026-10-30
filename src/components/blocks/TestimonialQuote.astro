@@ -7,20 +7,29 @@ interface Props {
 }
 
 const { item, featured = false } = Astro.props;
+const byline = [item.author, item.role].filter(Boolean).join(' · ');
 ---
 
-<figure class="grid content-start gap-4">
+<figure class="grid content-start gap-5">
   <blockquote
     class:list={[
-      featured ? 'font-serif text-quote text-fg' : 'max-w-measure text-md text-fg-soft',
+      featured ? 'font-display text-quote text-fg' : 'max-w-measure text-md text-fg-soft',
       'whitespace-pre-line wrap-anywhere',
     ]}
   >
     „{item.quote}“
   </blockquote>
-  {(item.author || item.role) && (
-    <figcaption class="text-sm text-fg-muted">
-      <cite class="font-semibold text-fg not-italic">{[item.author, item.role].filter(Boolean).join(' · ')}</cite>
+  {byline && (
+    <figcaption class="flex items-center gap-3 text-sm text-fg-muted">
+      {item.author && (
+        <span
+          aria-hidden="true"
+          class="grid size-9 shrink-0 place-items-center rounded-full bg-tint font-semibold text-fg"
+        >
+          {item.author.trim().charAt(0).toUpperCase()}
+        </span>
+      )}
+      <cite class="font-semibold text-fg not-italic">{byline}</cite>
     </figcaption>
   )}
 </figure>
