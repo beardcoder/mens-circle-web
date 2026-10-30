@@ -49,18 +49,16 @@ in the browser.
 
 ## Runtime considerations
 
-Update, 29 October: native Astro memory caching now serves home and overview
-HTML (120 seconds plus 60 seconds stale-while-revalidate). Application mutations
-clear the `home` and `event` cache tags alongside the data cache; failure pages
-explicitly disable Astro caching. See `docs/public-api.md` for details.
+Update, 30 October: home, overview and event pages share one route-cache policy
+(five minutes plus five stale-while-revalidate, tag `public`), purged by every action
+that changes public data. The unused list and testimonial JSON endpoints are gone; the
+registration island reads only its event's seats, and only when the page returns into
+view. The SSR home portrait no longer goes through `/_image`. See
+`docs/public-api.md` and `docs/runtime.md`.
 
-Home and the overview now require the existing Bun server and database at request
-time. Native Astro caches complete route responses: home/overview for 120 seconds
-plus 60 seconds stale-while-revalidate, event detail/JSON for 30 seconds, testimonial
-JSON for five minutes. There is no separate data-read cache. Actions directly purge
-the associated tags; failure pages disable caching.
-Already open pages update on navigation. Registration continues refreshing its
-capacity and checking availability transactionally when submitted.
+Home and the overview require the Bun server and database at request time. There is
+no separate data-read cache; failure pages are never stored. Already open pages update
+on navigation. Registration checks availability transactionally when submitted.
 
 There are no database migrations, new external services or changes to API,
 authentication, consent, email or retention behavior. Public quotes still contain
