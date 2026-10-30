@@ -1,16 +1,18 @@
 /**
  * Public site entry: Tailwind plus the shared design system (theme.css).
  */
-@import 'tailwindcss';
+@import 'tailwindcss' source('..');
 @import './theme.css';
 
-/* The back office has its own entry (admin.css); its classes stay out of the
-   shared public stylesheet. */
+/* Classes come from src/ only (`source('..')`): words in docs, mail templates or
+   tests never become utilities. The back office has its own entry (admin.css), and
+   server-only code holds no markup. */
 @source not '../layouts/AdminLayout.astro';
 @source not '../components/admin';
 @source not '../pages/admin';
-/* Agent skills quote example classes (`animate-tada`, …); none of them is ours. */
-@source not '../../.claude';
+@source not '../pages/api';
+@source not '../actions';
+@source not '../lib/server';
 
 /* ── View transitions ─────────────────────────────────────────────────────── */
 

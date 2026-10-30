@@ -72,6 +72,8 @@ async function readPage(origin: string, path: string, status = 200): Promise<str
   assert(!html.includes('as="fetch"'), `${path}: no client data preload`);
   assert(!html.includes('PRIVATE'), `${path}: unpublished data must stay private`);
   assert.match(html, /rel="stylesheet"/, 'Shared CSS should be cacheable');
+  assert.match(html, /<script type="speculationrules">/, `${path}: prefetch through speculation rules`);
+  assert(!/<script[^>]+src="[^"]*\/page\.[^"]+\.js"/.test(html), `${path}: no prefetch script`);
 
   return html;
 }

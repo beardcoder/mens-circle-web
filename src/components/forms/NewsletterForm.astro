@@ -54,9 +54,7 @@ const { context = {}, id = 'newsletter-form', class: className } = Astro.props;
 </form>
 
 <script>
-  import { actions } from 'astro:actions';
-
   import { enhanceForms } from '@lib/form';
 
-  enhanceForms('newsletter', actions.subscribeNewsletter);
+  enhanceForms('newsletter', 'subscribeNewsletter');
 </script>

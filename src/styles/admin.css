@@ -2,11 +2,13 @@
  * Back-office entry: the same Tailwind setup and design system as the public site
  * (theme.css), always in the dark mode (AdminLayout.astro pins it).
  */
-@import 'tailwindcss';
+@import 'tailwindcss' source('..');
 @import './theme.css';
 
-/* Agent skills quote example classes (`animate-tada`, …); none of them is ours. */
-@source not '../../.claude';
+/* Classes come from src/ only; server-only code holds no markup. */
+@source not '../pages/api';
+@source not '../actions';
+@source not '../lib/server';
 
 /* Native page navigation; editing itself stays in Preact without page reloads. */
 @view-transition {
