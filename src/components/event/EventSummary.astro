@@ -1,5 +1,6 @@
 ---
 import type { SummaryView } from '@lib/event-status';
+import { seatRing } from '@lib/seats';
 import { button, card, label } from '@lib/ui';
 
 interface Props {
@@ -16,21 +17,35 @@ const valid = !Number.isNaN(day.getTime());
 const dayNumber = valid ? String(day.getUTCDate()).padStart(2, '0') : '';
 const month = valid ? new Intl.DateTimeFormat('de-DE', { month: 'short', timeZone: 'UTC' }).format(day) : '';
 const seal = view.state === 'past' ? 'bg-line text-fg-muted' : 'bg-accent-soft text-accent';
+
+/** Around the seal, the circle: taken seats quiet, free ones in ember; the seats row says it in words. */
+const seats = seatRing(view.seats);
 ---
 
-<div data-summary data-state={view.state} class:list={[card, 'grid content-start p-6 sm:p-7']}>
-  <p class={label}>{view.kicker}</p>
-  <div class="mt-4 flex items-center gap-4">
+{/* A narrow card sets the seal beside its label and the date below; from 24rem the date sits beside the seal. */}
+<div
+  data-summary
+  data-state={view.state}
+  class:list={[card, '@container grid grid-cols-[minmax(0,1fr)] content-start p-6 sm:p-7']}
+>
+  <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4">
+    <p class:list={[label, 'col-start-2 row-start-1 @sm:col-span-2 @sm:col-start-1 @sm:mb-4']}>{view.kicker}</p>
     {dayNumber && (
-      <span
-        aria-hidden="true"
-        class:list={['grid size-16 shrink-0 place-content-center rounded-full text-center', seal]}
-      >
-        <span class="font-display text-[1.625rem] leading-none">{dayNumber}</span>
-        <span class="mt-0.5 text-xs leading-none font-semibold">{month}</span>
+      <span aria-hidden="true" class="relative col-start-1 row-start-1 grid size-20 place-items-center @sm:row-start-2">
+        {seats.length > 0 && (
+          <svg viewBox="0 0 80 80" class="absolute inset-0 size-full">
+            {seats.map((seat) => (
+              <circle cx={seat.x} cy={seat.y} r="2.5" class={seat.free ? 'fill-accent' : 'fill-line-strong'} />
+            ))}
+          </svg>
+        )}
+        <span class:list={['grid size-14 place-content-center rounded-full text-center', seal]}>
+          <span class="font-display text-[1.375rem] leading-none">{dayNumber}</span>
+          <span class="mt-0.5 text-xs leading-none font-semibold">{month}</span>
+        </span>
       </span>
     )}
-    <p class="min-w-0 font-display text-sub text-fg">
+    <p class="col-span-2 row-start-2 mt-4 min-w-0 font-display text-sub text-fg @sm:col-span-1 @sm:col-start-2 @sm:mt-0">
       <time datetime={view.datetime}>
         {view.title.map((line) => (
           <span class="block truncate">{line}</span>

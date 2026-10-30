@@ -1,6 +1,7 @@
 import { actions, isInputError } from 'astro:actions';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
+import { seatRing } from '@lib/seats';
 import { button, checkbox, control, fieldError, fieldHint, fieldLabel, formStatus, link } from '@lib/ui';
 
 import type { PublicEvent } from '../event/types';
@@ -234,16 +235,29 @@ function RegistrationIntro({
   data: PublicEvent;
   contribution: { main: string; note: string };
 }) {
+  const seats = seatRing(data.view.seats);
+
   return (
     <>
-      <p role="status" class="mb-3 text-sm text-fg-muted">
-        {data.view.state === 'full'
-          ? 'Alle Plätze sind belegt'
-          : `${data.availableSpots} von ${data.maxParticipants} Plätzen frei`}
-      </p>
-      <h2 id="anmeldung-title" class="text-sub text-fg">
-        {data.view.state === 'full' ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
-      </h2>
+      <div class="flex items-center gap-4">
+        {seats.length > 0 && (
+          <svg aria-hidden="true" viewBox="0 0 80 80" class="size-16 shrink-0">
+            {seats.map((seat, i) => (
+              <circle key={i} cx={seat.x} cy={seat.y} r="3" class={seat.free ? 'fill-accent' : 'fill-line-strong'} />
+            ))}
+          </svg>
+        )}
+        <div class="min-w-0">
+          <p role="status" class="mb-1.5 text-sm text-fg-muted">
+            {data.view.state === 'full'
+              ? 'Alle Plätze sind belegt'
+              : `${data.availableSpots} von ${data.maxParticipants} Plätzen frei`}
+          </p>
+          <h2 id="anmeldung-title" class="text-sub text-fg">
+            {data.view.state === 'full' ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
+          </h2>
+        </div>
+      </div>
       <p class="mt-3 mb-6 max-w-measure text-md text-fg-soft">
         {data.view.state === 'full'
           ? 'Dieser Abend ist voll. Du kannst dich auf die Warteliste setzen lassen. Sobald du nachrückst, bekommst du eine E-Mail.'

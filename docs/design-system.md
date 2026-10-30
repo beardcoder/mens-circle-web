@@ -6,12 +6,43 @@ A men's circle meets in the evening, sits in a ring and listens. The site looks 
 that evening: deep forest green for what draws you in, the warm ember of the logo
 for the one thing to do, linen daylight for reading. The circle is the one motif —
 the photograph in a ring, three warm points on it (the three figures of the logo),
-numbered steps on a path, the date in a seal, the breath. Shapes are soft and round;
-cards rest a little above the page.
+the seats around the date, numbered steps on a path, the breath above the hills of
+the Bavarian Forest. Shapes are soft and round.
 
 Four principles: make the next step visible, group what belongs together, keep
 reading lines short, use the same component for the same function. Everything is
 fast: two font files (~37 kB), one stylesheet, images sized at build time.
+
+## Stance — hold the space, don't perform
+
+The page acts the way a circle leader does. Leading a circle means holding the
+space instead of performing: listening, explaining the frame, asking for consent,
+then stepping back. Translated into design:
+
+- **Quiet.** Few effects, much air, one action per module. Lists rather than card
+  grids where things are said one after the other (the questions of the first
+  round, the agreements). A shadow only on what you act on: the date card, the
+  forms, an open question.
+- **Safe and clear.** The frame is visible before anyone comes: how an evening
+  runs, what we agree on, that every exercise is an offer, that "no" is always a
+  good answer, that it is no therapy. Nothing is hidden behind a click that a
+  hesitant visitor needs to decide.
+- **Grounded.** Nature, body and breath, never lofty: forest, hills, fire and the
+  breath as concrete things, no cosmic imagery, no gradients for their own sake.
+- **The circle.** The ring is the space everyone shares; the seats around the date
+  show how many seats are taken and how many are still free.
+- **Open to every man.** Language that excludes no one (age, origin, faith, with
+  whom you share your life); "du", plain German, no jargon and no "brother" tone.
+
+## Voice
+
+German, "du", short sentences, first person where Markus speaks. Describe what
+happens, not what it should make you feel. Name the frame in plain words: the five
+agreements are Vertraulichkeit, Ehrlichkeit, Annehmen statt bewerten, Von sich
+sprechen and Ein geschützter Ort (the training's CHAOS: confidentiality, honesty,
+acceptance, ownership, sacred). The evening's arc is Ankommen, die erste Runde,
+Teilen und zuhören, Den Kreis schließen. Every invitation to take part comes with
+the permission not to. No promises of healing; the circle is no therapy and says so.
 
 ## Files
 
@@ -22,6 +53,7 @@ fast: two font files (~37 kB), one stylesheet, images sized at build time.
 | `src/styles/admin.css`    | Admin entry: Tailwind and theme; AdminLayout pins the dark mode (the forest at night).                                                       |
 | `src/lib/ui.ts`           | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
 | `src/lib/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
+| `src/lib/seats.ts`        | The ring of seats (`seatRing`), shared by the date seal and the registration panel; imports nothing, so client code may use it.              |
 | `src/components/ui/`      | The components built on them; `src/icons/` the line icons (24px grid, 1.7 stroke).                                                           |
 
 ## Colour
@@ -30,21 +62,21 @@ Primitives (`--p-*`) are plain hex values on `:root`; the roles pick them with
 `light-dark()`, so day and night (`data-mode`, set before first paint, switched by
 `ModeToggle`) keep the same roles. Never a hex value in markup.
 
-| Role            | Light                        | Night                 | Token                            | Use                                          |
-| --------------- | ---------------------------- | --------------------- | -------------------------------- | -------------------------------------------- |
-| Page            | `#F6F2EA` linen              | `#111915`             | `ground`                         | the page                                     |
-| Warm band       | `#ECE4D4` sand               | `#17201A`             | `ground-alt` (`surface-alt`)     | information that belongs together            |
-| Quiet note      | `#E2E7D8` sage               | `#1C2720`             | `tint` (`surface-tint`)          | agreements, a hint beside the work, a bubble |
-| Card            | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | cards, tiles, panels                         |
-| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, breath, registration, menu, footer  |
-| Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                        |
-| Secondary text  | `#5A6255` moss               | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                      |
-| Lines           | `#DDD5C5` / `#C8BFAC`        | `#2A362E` / `#3B4940` | `line`, `line-strong`            | quiet structure; never alone a control       |
-| Control outline | `#7A8072`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)            |
-| Accent          | `#9A421D` (hover `#953F1C`)  | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word in a title |
-| Accent tint     | `#F5DFCD`                    | `#3A2619`             | `accent-soft`                    | icon discs, the date seal, the quote card    |
-| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module                   |
-| Glow            | `#E8B65A`                    | same                  | `glow`                           | the warm point of the circle; never text     |
+| Role            | Light                        | Night                 | Token                            | Use                                           |
+| --------------- | ---------------------------- | --------------------- | -------------------------------- | --------------------------------------------- |
+| Page            | `#F6F2EA` linen              | `#111915`             | `ground`                         | the page                                      |
+| Warm band       | `#ECE4D4` sand               | `#17201A`             | `ground-alt` (`surface-alt`)     | information that belongs together             |
+| Quiet note      | `#E2E7D8` sage               | `#1C2720`             | `tint` (`surface-tint`)          | agreements, a hint beside the work            |
+| Card            | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | cards, tiles, panels                          |
+| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, breath, registration, menu, footer   |
+| Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                         |
+| Secondary text  | `#5A6255` moss               | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                       |
+| Lines           | `#DDD5C5` / `#C8BFAC`        | `#2A362E` / `#3B4940` | `line`, `line-strong`            | quiet structure; never alone a control        |
+| Control outline | `#7A8072`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)             |
+| Accent          | `#9A421D` (hover `#953F1C`)  | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word, free seats |
+| Accent tint     | `#F5DFCD`                    | `#3A2619`             | `accent-soft`                    | icon discs, the date seal, the quote card     |
+| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module                    |
+| Glow            | `#E8B65A`                    | same                  | `glow`                           | the warm point of the circle; never text      |
 
 On the forest, `surface-dark` re-declares text (`#F2EDE3` bone, `#B4BBAD` muted),
 accent (`#F2A56C`), lines (bone at 14 / 24 %) and the control outline (`#768379`).
@@ -101,17 +133,19 @@ buttons' heights (48 / 44 / 36px). Cards, tiles, panels and the map take
 other than `default`), the registration and the footer — are sheets with
 `rounded-2xl` (40px), inset 8 / 12px from the window's edge.
 
-A card (`card`) is cream with a thin `line` and `shadow-card`: soft, wide, low.
-`shadow-overlay` is for what floats (dialogs, menus, the admin's save bar). The
-forest and the sage carry no shadow. A primary button glows a little in its own
-colour on hover.
+A card (`card`) is cream with a thin `line` and `shadow-card`: soft, wide, low. It
+is for what you act on — a date, a form, an open question. Tiles, voices and notes
+are cream with a line and no shadow; lists of things said in turn (the questions,
+the agreements) are rows between lines. `shadow-overlay` is for what floats
+(dialogs, menus, the admin's save bar). The forest and the sage carry no shadow. A
+primary button glows a little in its own colour on hover.
 
 ## Motion
 
 Short transitions answer interactions (a button rises 2px, arrows slide, header
-links draw a line). The hero's ring turns once every 90 seconds; the breath circle's
-9-second cycle (4 s in, 5 s out) runs only when started and stops off screen, in a
-hidden tab or under reduced motion. The phone menu opens as a circle and its links
+links draw a line). The hero's ring turns once every 90 seconds; the breath circle
+follows resonance breathing — 5.5 s in, 5.5 s out, an 11-second cycle — only when
+started, and stops off screen, in a hidden tab or under reduced motion. The phone menu opens as a circle and its links
 rise in (`rise`); the event title flies into its dock on a scroll timeline. Content
 never waits for motion. Under reduced motion everything rests.
 
@@ -127,7 +161,7 @@ never waits for motion. Under reduced motion everything rests.
 | `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                         |
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                      |
 | `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                    |
-| `EventSummary`                                    | One date: label, the seal (day and month in a circle), the date, four rows, the fitting action   |
+| `EventSummary`                                    | One date: the seal (day and month) in its ring of seats, the date, four rows, the fitting action |
 | `Fact` (`icon`)                                   | A tile: an icon in an accent disc, label, value in Fraunces, a note                              |
 | `TestimonialList`                                 | One short featured quote behind an ember rule; the rest as cards with an initial; long ones fold |
 | `Accordion`                                       | Questions as rounded cards; an accent disc whose plus turns into a minus                         |
@@ -150,17 +184,18 @@ large and faint behind it.
   accent), explanation, the main action and the link to the evening's course; beside
   it the photograph in a circle with the turning ring, the next date overlapping its
   edge (on phones under the text). Then four fact tiles (two columns on phones), the
-  circle's topic beside its questions as alternating speech bubbles (sage and ember),
-  the evening's four steps on a path (sand), the breath (forest), Markus (his quote
-  in an ember-tint card signed with his avatar, beside his text), the agreements as
-  four numbered cards with the boundary note (sage), the voices, the FAQ, taking part
-  (`#termine`, sand, invitation beside the date) and staying in touch (`#newsletter`,
-  a card with the form and the WhatsApp note in sage).
+  circle's topic beside the questions of the first round as a quiet list, the
+  evening's four steps on a path (sand), the breath above the hills (forest), Markus
+  (his quote in an ember-tint card signed with his avatar, beside his text), the
+  five agreements as a numbered list beside their head, with the boundary note
+  (sage), the voices, the FAQ, taking part (`#termine`, sand, invitation beside the
+  date) and staying in touch (`#newsletter`, a card with the form and the WhatsApp
+  note in sage).
 - **`/event`.** `PageIntro`, then every upcoming date as the same `EventSummary`
   beside the e-mail notification in a sage card; the FAQ; a where-next band.
 - **Event page.** The date line and the title — "Männer**kreis**", its second half in
   the accent — which fly into the dock as the page scrolls; the place, the calendar
-  and the registration on the forest; the evening's description (sand) with its
+  and the registration on the forest, headed by the same ring of seats; the evening's description (sand) with its
   question and a note card; the map; where next. A past date offers no registration.
 - **Personal page.** `PageIntro` with the rounded photograph, split heading/text
   sections, the FAQ, one closing invitation.
@@ -188,7 +223,10 @@ large and faint behind it.
 - Images on SSR pages are pre-sized files (`<img srcset>`); `<Image />` only on
   prerendered pages. The hero photograph is AVIF, eager and `fetchpriority="high"`.
 - No layout shift: a date summary's lines are one line (`truncate`); titles measure
-  in `em`, never `ch`.
+  in `em`, never `ch`. A narrow summary (container under 24rem) sets the seal beside
+  its label and the date below, so "17. September 2026" never truncates.
+- The ring of seats is drawn for 2–24 seats, taken first from the top, free ones in
+  the accent; it is decorative (`aria-hidden`) because the seats row says it in words.
 - Forms: labels always visible, placeholders never instead; a field's message under
   the field, the form's result under its button (`FormStatus`), never a toast;
   entries survive an error; success says what actually happened.

@@ -19,7 +19,17 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
 ---
 
 <Section id={anchor} ground="dark" labelledby="statement-title" class="overflow-clip">
-  <div class="grid items-center gap-x-grid gap-y-8 lg:grid-cols-12">
+  {/* The hills of the Bavarian Forest at dusk; the breath rises above them. */}
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 1200 120"
+    preserveAspectRatio="none"
+    class="pointer-events-none absolute inset-x-0 bottom-0 h-14 w-full sm:h-20 lg:h-24"
+  >
+    <path class="fill-raised/50" d="M0 70C120 40 220 38 330 55S520 30 640 42 860 20 980 46 1140 50 1200 36V120H0Z" />
+    <path class="fill-raised" d="M0 92C140 70 260 78 380 88S600 64 760 80 1000 96 1200 70V120H0Z" />
+  </svg>
+  <div class="relative grid items-center gap-x-grid gap-y-8 lg:grid-cols-12">
     <div class="grid justify-items-start lg:col-span-7">
       {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
       <h2 id="statement-title" class="text-page text-fg">
