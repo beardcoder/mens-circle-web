@@ -3,7 +3,7 @@ import site from '@data/site.json';
 import { splitFee } from '@lib/event-status';
 import { publicEvent } from '@lib/server/public-data';
 import type { EventDTO } from '@lib/types';
-import { link, panelPadding } from '@lib/ui';
+import { link } from '@lib/ui';
 
 import RegistrationForm from '../forms/RegistrationForm';
 
@@ -18,8 +18,8 @@ const contribution = splitFee(event.cost_basis);
 <div
   id="anmeldung"
   class:list={[
-    'surface-dark min-w-0 scroll-mt-14 rounded-2xl scheme-dark',
-    panelPadding,
+    // Below lg a forest band from edge to edge; beside the intro a rounded panel.
+    'surface-dark min-w-0 scroll-mt-14 rounded-2xl scheme-dark p-panel max-lg:-mx-gutter max-lg:rounded-none max-lg:px-gutter',
     !event.is_past && 'has-[astro-island[ssr]]:min-h-[51rem]',
   ]}
 >

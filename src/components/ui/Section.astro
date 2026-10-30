@@ -3,10 +3,10 @@ import Container from './Container.astro';
 
 /**
  * A block of the page. Blocks are parted by space, and by their ground only
- * where it means something: the linen page; a rounded sheet inset from the edges
- * in warm sand (`alt`: information that belongs together), pale sage (`tint`: a
- * quiet note) or forest (`dark`: what draws you in). Each ground re-declares the
- * colour roles (`surface-*` in theme.css), so everything inside follows it.
+ * where it means something: the linen page, or a band from edge to edge in warm
+ * sand (`alt`: information that belongs together), pale sage (`tint`: a quiet
+ * note) or forest (`dark`: what draws you in). Each ground re-declares the colour
+ * roles (`surface-*` in theme.css), so everything inside follows it.
  */
 
 type Ground = 'default' | 'alt' | 'tint' | 'dark';
@@ -25,9 +25,9 @@ interface Props {
 
 const GROUNDS: Record<Ground, string> = {
   default: '',
-  alt: 'surface-alt sheet',
-  tint: 'surface-tint sheet',
-  dark: 'surface-dark sheet',
+  alt: 'surface-alt',
+  tint: 'surface-tint',
+  dark: 'surface-dark',
 };
 
 const SPACES: Record<Space, string> = {

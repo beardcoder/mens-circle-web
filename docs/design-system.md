@@ -19,10 +19,10 @@ The page acts the way a circle leader does. Leading a circle means holding the
 space instead of performing: listening, explaining the frame, asking for consent,
 then stepping back. Translated into design:
 
-- **Quiet.** Few effects, much air, one action per module. Lists rather than card
-  grids where things are said one after the other (the questions of the first
-  round, the agreements). A shadow only on what you act on: the date card, the
-  forms, an open question.
+- **Quiet.** Few effects, much air, one action per module. Grounds run from edge
+  to edge; content stands on them, not in boxes. Lists between lines rather than
+  cards (the facts, the questions of the first round, the agreements, the FAQ, the
+  voices). A card only for what you act on: a date, the registration.
 - **Safe and clear.** The frame is visible before anyone comes: how an evening
   runs, what we agree on, that every exercise is an offer, that "no" is always a
   good answer, that it is no therapy. Nothing is hidden behind a click that a
@@ -67,14 +67,14 @@ Primitives (`--p-*`) are plain hex values on `:root`; the roles pick them with
 | Page            | `#F6F2EA` linen              | `#111915`             | `ground`                         | the page                                      |
 | Warm band       | `#ECE4D4` sand               | `#17201A`             | `ground-alt` (`surface-alt`)     | information that belongs together             |
 | Quiet note      | `#E2E7D8` sage               | `#1C2720`             | `tint` (`surface-tint`)          | agreements, a hint beside the work            |
-| Card            | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | cards, tiles, panels                          |
+| Card            | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | the date card, fields                         |
 | Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, breath, registration, menu, footer   |
 | Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                         |
 | Secondary text  | `#5A6255` moss               | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                       |
 | Lines           | `#DDD5C5` / `#C8BFAC`        | `#2A362E` / `#3B4940` | `line`, `line-strong`            | quiet structure; never alone a control        |
 | Control outline | `#7A8072`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)             |
 | Accent          | `#9A421D` (hover `#953F1C`)  | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word, free seats |
-| Accent tint     | `#F5DFCD`                    | `#3A2619`             | `accent-soft`                    | icon discs, the date seal, the quote card     |
+| Accent tint     | `#F5DFCD`                    | `#3A2619`             | `accent-soft`                    | icon discs, the date seal, the FAQ disc       |
 | Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module                    |
 | Glow            | `#E8B65A`                    | same                  | `glow`                           | the warm point of the circle; never text      |
 
@@ -100,7 +100,7 @@ accent colour and stays upright.
 | `text-hero`    | 42–80px   | the home statement                        |
 | `text-page`    | 38–68px   | a sub-page's title, the breath line       |
 | `text-section` | 32–52px   | a section's title                         |
-| `text-sub`     | 22–30px   | subheadings, card titles, a fact's value  |
+| `text-sub`     | 22–30px   | subheadings, list titles, a fact's value  |
 | `text-quote`   | 24–34px   | one short highlighted quote               |
 | `text-xl`      | 18–22px   | FAQ questions, data values                |
 | `text-lg`      | 18–21px   | a lead                                    |
@@ -116,20 +116,16 @@ break at its hyphen uses U+2011 ("E‑Mail" in a big title).
 
 ## Space and grid
 
-One content width, 1200px, and **one edge**: the content sits 28 / 44 / 60px from
-the window (`gutter`) in every section, on the page and in a sheet alike, and the
-header shares it. `Container` pads by `--page-pad`: the gutter on the page; in a
-sheet (`sheet`, which stands `inset` 8 / 12px in) the gutter minus the inset, 20 /
-32 / 48px (`sheet`). Consecutive sheets keep one inset between them, so no two
-grounds touch.
+One content width, 1200px, and **one edge**: the content sits 28 / 40 / 56px from
+the window (`gutter`, `Container`) in every section, and the header shares it. The
+grounds — the opening, the bands and the footer — run from edge to edge.
 
-Inside, two paddings only: `card` 24 / 28 / 32px for every card and tile (a date,
-a fact, a voice, a note, an FAQ item, the calendar dialog), `panel` 28 / 40 / 48px
-for a large card that holds a form or the quote (`panelPadding`: on phones it
-reaches out to the sheet inset and pads by `sheet`, so its content keeps the page's
-edge instead of a second indent). Cards in a list stand `stack` 16 / 20 / 24px
-apart. A card is never nested in a card; a second part of a card is parted by a
-line.
+Content stands on its ground; a second part is parted by a line or by space, never
+by a box. Two paddings remain for the few cards: `card` 24 / 28 / 32px (the date
+card, the calendar dialog), `panel` 28 / 40 / 48px (the registration; below `lg` it
+becomes a forest band from edge to edge with the gutter as its side padding). Date
+cards in a list stand `stack` 16 / 20 / 24px apart. A card is never nested in a
+card.
 
 Space per width on `:root`: `py-section` 72 → 112px, `py-band` 48 → 64px, `group`
 32 → 48px (an explanation to the module after it), `grid` 32 → 48px (column gap).
@@ -142,18 +138,16 @@ to a screen's height.
 Soft and round. `rounded-full` is what you press (buttons, chips, icon buttons, the
 FAQ disc) and the circle (the photograph, the seal, the numbered steps, the avatar,
 the rings). Fields take `rounded-md` (14px) — inputs and textareas alike — with the
-buttons' heights (48 / 44 / 36px). Cards, tiles, panels and the map take
-`rounded-xl` (28px); the large grounds — the opening, the bands (`Section ground`
-other than `default`) and the footer — are sheets (`sheet`): `rounded-2xl` (40px),
-8 / 12px from the window and from each other. Panels (the registration, the
-testimonial form, the newsletter, the quote) are `rounded-2xl` too.
+buttons' heights (48 / 44 / 36px). The date card and the map take `rounded-xl`
+(28px), the registration panel and the photograph on the personal page
+`rounded-2xl` (40px). The grounds are square and run from edge to edge.
 
-A card (`card`) is cream with a thin `line` and `shadow-card`: soft, wide, low. It
-is for what you act on — a date, a form, an open question. Tiles, voices and notes
-are cream with a line and no shadow; lists of things said in turn (the questions,
-the agreements) are rows between lines. `shadow-overlay` is for what floats
-(dialogs, menus, the admin's save bar). The forest and the sage carry no shadow. A
-primary button glows a little in its own colour on hover.
+A card (`card`) is cream with a thin `line` and `shadow-card`: soft, wide, low, and
+only for what you act on (a date). Everything else is open: facts, questions,
+agreements, FAQ and voices are rows or columns between thin lines; a quote stands
+behind an ember rule; a note is a heading with its text. `shadow-overlay` is for
+what floats (dialogs, menus, the admin's save bar). The forest and the sage carry
+no shadow. A primary button glows a little in its own colour on hover.
 
 ## Motion
 
@@ -168,8 +162,8 @@ never waits for motion. Under reduced motion everything rests.
 
 | Component                                         | Purpose                                                                                          |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `Container`                                       | The 1200px width and the page's one edge (`--page-pad`)                                          |
-| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `tint` / `dark`; every ground but the page is a rounded sheet       |
+| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                           |
+| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `tint` / `dark`; every ground runs from edge to edge                |
 | `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead                                                         |
 | `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; without a photo the circle motif stands at its right                       |
 | `Eyebrow`                                         | The section label: ember dot, accent text                                                        |
@@ -177,9 +171,9 @@ never waits for motion. Under reduced motion everything rests.
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                      |
 | `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                    |
 | `EventSummary`                                    | One date: the seal (day and month) in its ring of seats, the date, four rows, the fitting action |
-| `Fact` (`icon`)                                   | A tile: an icon in an accent disc, label, value in Fraunces, a note                              |
-| `TestimonialList`                                 | One short featured quote behind an ember rule; the rest as cards with an initial; long ones fold |
-| `Accordion`                                       | Questions as rounded cards; an accent disc whose plus turns into a minus                         |
+| `Fact` (`icon`)                                   | An icon in an accent disc, label, value in Fraunces, a note; a row, on the desktop a column      |
+| `TestimonialList`                                 | One short featured quote behind an ember rule; the rest under a line each; long ones fold        |
+| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                    |
 | `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                           |
 | `ModeToggle`                                      | Day / night, in the footer and the phone menu                                                    |
 
@@ -189,7 +183,7 @@ opening the bar is clear with light text; once the page moves it is linen over a
 blur (`data-scrolled`). The phone menu is a native modal `<dialog>` on the forest,
 opening as a circle from its button, its links in Fraunces.
 
-**Footer.** A forest sheet on every page: the mark and word mark, one line about the
+**Footer.** A forest band on every page: the mark and word mark, one line about the
 circle, navigation, contact, legal links and `ModeToggle`; the logo's ring stands
 large and faint behind it.
 
@@ -198,24 +192,25 @@ large and faint behind it.
 - **Home.** The opening on the forest: eyebrow, statement (its key phrase in the
   accent), explanation, the main action and the link to the evening's course; beside
   it the photograph in a circle with the turning ring, the next date overlapping its
-  edge (on phones under the text). Then four fact tiles (two columns on phones), the
-  circle's topic beside the questions of the first round as a quiet list, the
-  evening's four steps on a path (sand), the breath above the hills (forest), Markus
-  (his quote in an ember-tint card signed with his avatar, beside his text), the
-  five agreements as a numbered list beside their head, with the boundary note
-  (sage), the voices, the FAQ, taking part (`#termine`, sand, invitation beside the
-  date) and staying in touch (`#newsletter`, a panel with the form and the WhatsApp
-  note beside it, parted by a line).
+  edge (on phones under the text). Then the four facts between lines (columns with
+  rules on the desktop, rows below), the circle's topic beside the questions of the
+  first round as a quiet list, the evening's four steps on a path (sand), the breath
+  above the hills (forest), Markus (his quote behind an ember rule, signed with his
+  avatar, beside his text), the five agreements as a numbered list beside their
+  head, with the boundary note (sage), the voices, the FAQ, taking part
+  (`#termine`, sand, invitation beside the date card) and staying in touch
+  (`#newsletter`, the form and the WhatsApp note beside it, parted by a line).
 - **`/event`.** `PageIntro`, then every upcoming date as the same `EventSummary`
-  beside the e-mail notification in a sage card; the FAQ; a where-next band.
+  beside the e-mail notification, parted by a line; the FAQ; a where-next band.
 - **Event page.** The date line and the title — "Männer**kreis**", its second half in
   the accent — which fly into the dock as the page scrolls; the place, the calendar
-  and the registration on the forest, headed by the same ring of seats; the evening's description (sand) with its
-  question and a note card; the map; where next. A past date offers no registration.
+  between lines and the registration on the forest (a band below `lg`), headed by
+  the same ring of seats; the evening's description (sand) with its question and a
+  note under a line; the map; where next. A past date offers no registration.
 - **Personal page.** `PageIntro` with the rounded photograph, split heading/text
   sections, the FAQ, one closing invitation.
-- **Testimonial form.** `PageIntro`, then the notes and the form in one card of
-  ~672px (`max-w-form`).
+- **Testimonial form.** `PageIntro`, then the notes and the form in one column of
+  ~672px (`max-w-form`), on the page.
 - **Legal pages, 404.** `PageIntro` and the text in one ~720px column.
 - **Admin.** The same tokens at night: forest grounds, rounded cards, ember for the
   one action.

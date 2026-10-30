@@ -10,11 +10,11 @@ interface Props {
 const { label, icon } = Astro.props;
 ---
 
-{/* On phones a row (the icon beside the words), from `sm` a tile (the icon above). */}
-<div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] content-start gap-x-5 rounded-xl border border-line bg-raised p-card sm:grid-cols-1">
+{/* A fact between lines, no box: below `lg` a row (the icon beside the words), on the desktop a column. */}
+<div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] content-start gap-x-5 border-t border-line py-6 first:border-t-0 lg:grid-cols-1 lg:border-t-0 lg:border-l lg:px-8 lg:py-2 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0">
   <span
     aria-hidden="true"
-    class="row-span-3 grid size-11 place-items-center rounded-full bg-accent-soft text-accent sm:row-span-1 sm:mb-5"
+    class="row-span-3 grid size-11 place-items-center rounded-full bg-accent-soft text-accent lg:row-span-1 lg:mb-5"
   >
     <Icon name={icon} class="size-5.5" />
   </span>
