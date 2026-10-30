@@ -47,6 +47,31 @@ are document-size measurements, not field Core Web Vitals or total transfer-size
 claims. Both entry pages have zero hydrated islands and no public-data fetches
 in the browser.
 
+## Update, 30 October: what every page loads
+
+- Tailwind reads classes from `src/` only: words in docs, mail templates, tests and
+  server code no longer become utilities (public CSS 62.6 → 60.3 kB raw).
+- Playfair is two static 400 faces instead of the variable file: the preloaded serif
+  is 21.9 kB instead of 38.4 kB (the italic likewise). Static DM Sans weights were
+  measured too (four files, 4 kB less in total) and rejected.
+- Astro's prefetch script (two module requests on every page) gave way to one inline
+  Speculation Rules block for same-origin links on hover or press.
+- The newsletter and testimonial forms load the actions client on first focus.
+
+First load per page, measured locally against the production build (HTML, CSS, JS
+gzipped; fonts as served; analytics excluded):
+
+| Page                                | Before               | After                |
+| ----------------------------------- | -------------------- | -------------------- |
+| `/`                                 | 133.9 kB, 9 requests | 113.8 kB, 7 requests |
+| `/event`                            | 129.4 kB, 9 requests | 109.3 kB, 7 requests |
+| `/event/<slug>` (before the island) | 129.1 kB, 6 requests | 111.4 kB, 4 requests |
+| `/warum-ich-den-maennerkreis-leite` | 125.2 kB, 6 requests | 107.5 kB, 4 requests |
+| `/impressum`                        | 122.2 kB, 6 requests | 104.5 kB, 4 requests |
+
+Screenshots of home and an event page at 1440 × 900 are pixel-identical before and
+after; forms, field errors and the registration island behave as before.
+
 ## Runtime considerations
 
 Update, 30 October: home, overview and event pages share one route-cache policy

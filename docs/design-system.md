@@ -84,7 +84,8 @@ named by role:
 Headings use one colour. Section labels use sentence case (`label`) without added
 letter spacing. Running text stays on `max-w-measure` (~62 characters), aligned
 left. Long words wrap or hyphenate. Upright serif and sans faces preload; italics
-load only when used. The CSS is shared in hashed assets rather than inlined in
+load only when used. Playfair ships as static 400 faces (the only weight set), DM Sans
+as one variable file. The CSS is shared in hashed assets rather than inlined in
 every document.
 
 **Grid and space.** One content width: 1200px between the side margins
@@ -184,8 +185,7 @@ that ends on one sets it itself.
   tokens, primitives, the two surfaces, the reduced-motion floor, the scroll lock
   under a modal, the focus ring default, view-transition pseudo-elements, keyframes.
 - No layout shift: every line of a date summary is one line (`truncate`; below 360px
-  a row stacks its label over its value). Both serif styles are preloaded: the home
-  statement sets its phrase in the italic. Titles measure in `em`, never `ch`.
+  a row stacks its label over its value). Titles measure in `em`, never `ch`.
 - Forms: labels always visible, placeholders never instead; a field's message under
   the field, the form's result under its button (`FormStatus`), never a toast;
   entries survive an error; success says what actually happened.

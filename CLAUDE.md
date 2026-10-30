@@ -45,7 +45,8 @@ explicit env; config is read at module load, so an in-process import measures `.
 
 **Actions.** Everything is an Astro Action (`src/actions/*`), merged flat in `index.ts`.
 Public forms validate only in their action Zod schemas. `lib/form.ts` owns submit,
-field errors and the result line for newsletter/testimonial forms (`FormStatus`).
+field errors and the result line for newsletter/testimonial forms (`FormStatus`); it
+loads the actions client on the first focus in the form, not with the page.
 The Preact registration form handles its own busy/error/success state and calls the
 same `actions.register`; errors preserve inputs. Forms
 need JS and keep feedback at the form rather than a toast. They
@@ -136,11 +137,11 @@ Keep the attribution line under the map.
 
 **Styling.** Tailwind v4 (`@tailwindcss/vite`), CSS-first. `styles/theme.css` holds the
 tokens, variants, surfaces and keyframes; `global.css` (public, one shared hashed file)
-and `admin.css` are the two entries, and `global.css` keeps the admin sources out with
-`@source not`. Animations come from `tailwind-animations` (CSS only, imported before
-`theme.css`, which re-times the ones in use to the theme's easing; its skill is in
-`.claude/skills/`, which both entries keep out with `@source not`, or its example
-classes would ship). Its `.animate-dialog` block is always emitted (~1 KB).
+and `admin.css` are the two entries. Both read classes from `src/` only
+(`source('..')`, so words in docs, mail templates and tests never become utilities) and
+skip server-only code; `global.css` keeps the admin sources out with `@source not`.
+Animations are the theme's own keyframes and `--animate-*` tokens (`rise`, `fade-in`,
+`skeleton`); there is no animation plugin.
 No `<style>` blocks and no component stylesheets: utilities in the
 markup, recipes in `lib/ui.ts`, components in `components/ui/`. `docs/design-system.md`
 is the reference. Class strings are complete and static; never add a class that sets a
@@ -207,8 +208,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   out); the phone menu opens as a circle from its button.
   No `content-visibility`.
   Under reduced motion everything rests and the timed guide hides.
-- No layout shift: every summary line is one line (`truncate`). Both Playfair styles are preloaded
-  (the statement's phrase is italic); dropping one brings the shift back. A title's
+- Fonts: Playfair as static 400 faces (normal and italic, ~22 kB each; no other weight
+  is set), DM Sans as one variable file (400–700 in use; static weights would add
+  requests and save nothing). Only the upright faces preload; the italic loads when used.
+- No layout shift: every summary line is one line (`truncate`). A title's
   measure is in `em`, never `ch`: `ch` follows the font in use (0.5em in the fallback,
   0.6em in Playfair) and Chrome re-resolves it late, so the hero title broke onto a
   fourth line and back while the fonts swapped (CLS 0.27).
@@ -234,6 +237,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   event answers. `src/data/*.json` is shared site config.
 - The brand name comes from `site.siteName`; never type it out.
 - Canonical URLs come from `lib/canonical.ts`.
+- Prefetch is one Speculation Rules block in `Layout.astro`: same-origin links on hover
+  or press (Chromium), never `/admin`, `/auth` or `/api`. No Astro prefetch script and
+  no per-link attributes.
 - Search: utility pages (`/teile-deine-erfahrung`, `/auth/*`) are `noindex, follow` and
   stay out of the sitemap and llms.txt. An event held outside Straubing names its
   place in the `<title>` (≤ 60 chars, brand dropped first). Structured data states only
