@@ -19,8 +19,11 @@ Playfair for page titles and the next evening. Controls are round, cards square
 and flat. Space actions away from destructive tools, and show feedback at the
 affected workspace. Native modal dialogs confirm deletion and sending.
 
-Signing out is a plain form post to `/auth/logout` (no island), which deletes the
-session cookie and redirects to `/admin/login`.
+The pages themselves are guarded by `src/middleware.ts`: without a valid signed
+session every `/admin` route except `/admin/login` redirects to the login with a
+`redirect` back, before any private data is read; the pages and actions are
+`private, no-store`. Signing out is a plain form post to `/auth/logout` (no island),
+which deletes the session cookie and redirects to `/admin/login`.
 
 | Authenticated action     | Input               | Response                                            |
 | ------------------------ | ------------------- | --------------------------------------------------- |
