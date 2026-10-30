@@ -1,6 +1,8 @@
 ---
 import type { ImageMetadata } from 'astro';
 
+import { panelPadding } from '@lib/ui';
+
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -25,7 +27,7 @@ const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote
 
 <Section id={anchor} labelledby="person-title" innerClass="grid items-start gap-x-grid gap-y-10 lg:grid-cols-12">
   {quote && (
-    <figure class="grid content-start rounded-2xl bg-accent-soft p-7 sm:p-10 lg:col-span-5 lg:mt-2">
+    <figure class:list={['grid content-start rounded-2xl bg-accent-soft lg:col-span-5 lg:mt-2', panelPadding]}>
       <span aria-hidden="true" class="h-10 font-display text-[5.5rem] leading-[0.85] text-accent">
         “
       </span>

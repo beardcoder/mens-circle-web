@@ -15,7 +15,7 @@ type Space = 'default' | 'band' | 'none';
 interface Props {
   id?: string;
   ground?: Ground;
-  /** `default` is a section's space (64 / 96px); `band` the compact space of a band (40 / 56px). */
+  /** `default` is a section's space (72 → 112px); `band` the compact space of a band (48 → 64px). */
   space?: Space;
   labelledby?: string;
   class?: string;
@@ -23,13 +23,11 @@ interface Props {
   innerClass?: string;
 }
 
-const SHEET = 'mx-2 rounded-2xl sm:mx-3';
-
 const GROUNDS: Record<Ground, string> = {
   default: '',
-  alt: `surface-alt ${SHEET}`,
-  tint: `surface-tint ${SHEET}`,
-  dark: `surface-dark ${SHEET}`,
+  alt: 'surface-alt sheet',
+  tint: 'surface-tint sheet',
+  dark: 'surface-dark sheet',
 };
 
 const SPACES: Record<Space, string> = {

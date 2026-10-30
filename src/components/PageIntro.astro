@@ -43,7 +43,7 @@ const hasMedia = Astro.slots.has('media');
   )}
   <Container class:list={['relative grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
     <div class:list={['grid justify-items-start', hasMedia && 'lg:col-span-7']}>
-      {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
+      {eyebrow && <Eyebrow class="mb-4">{eyebrow}</Eyebrow>}
       <h1 id={titleId} class={titleClass}>
         {title}
       </h1>

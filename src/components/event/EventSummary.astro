@@ -26,7 +26,7 @@ const seats = seatRing(view.seats);
 <div
   data-summary
   data-state={view.state}
-  class:list={[card, '@container grid grid-cols-[minmax(0,1fr)] content-start p-6 sm:p-7']}
+  class:list={[card, '@container grid grid-cols-[minmax(0,1fr)] content-start p-card']}
 >
   <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4">
     <p class:list={[label, 'col-start-2 row-start-1 @sm:col-span-2 @sm:col-start-1 @sm:mb-4']}>{view.kicker}</p>
@@ -53,7 +53,7 @@ const seats = seatRing(view.seats);
       </time>
     </p>
   </div>
-  <dl class="mt-5 grid divide-y divide-line border-y border-line">
+  <dl class="mt-6 grid divide-y divide-line border-y border-line">
     {view.rows.map((row) => (
       <div class="grid min-w-0 gap-x-3 py-2.5 min-[22.5rem]:grid-cols-[4.5rem_minmax(0,1fr)] sm:grid-cols-[5.5rem_minmax(0,1fr)]">
         <dt class="text-sm leading-6 text-fg-muted">{row.label}</dt>
@@ -64,7 +64,7 @@ const seats = seatRing(view.seats);
   {showAction && view.action && (
     <a
       href={view.action.href}
-      class:list={[button({ variant: view.state === 'full' ? 'secondary' : 'primary', block: true }), 'mt-6']}
+      class:list={[button({ variant: view.state === 'full' ? 'secondary' : 'primary', block: true }), 'mt-7']}
       data-umami-event="cta-click"
       data-umami-event-location={location}
       data-umami-event-state={view.state}

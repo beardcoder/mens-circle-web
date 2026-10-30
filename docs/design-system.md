@@ -116,12 +116,26 @@ break at its hyphen uses U+2011 ("E‑Mail" in a big title).
 
 ## Space and grid
 
-One content width: 1200px between the side margins (`max-w-page`, `Container`);
-margins 20 / 32 / 48px (`px-gutter`). Space per width on `:root`: `py-section` 72 →
-112px, `py-band` 40 → 56px, `group` 32 → 48px (an explanation to the module after
-it), `grid` 32 → 48px (column gap). Breakpoints: `sm` 36rem, `md` 48rem, `lg` 64rem,
-`nav` 68.75rem (the header shows its links), `xl` 80rem. No section is forced to a
-screen's height.
+One content width, 1200px, and **one edge**: the content sits 28 / 44 / 60px from
+the window (`gutter`) in every section, on the page and in a sheet alike, and the
+header shares it. `Container` pads by `--page-pad`: the gutter on the page; in a
+sheet (`sheet`, which stands `inset` 8 / 12px in) the gutter minus the inset, 20 /
+32 / 48px (`sheet`). Consecutive sheets keep one inset between them, so no two
+grounds touch.
+
+Inside, two paddings only: `card` 24 / 28 / 32px for every card and tile (a date,
+a fact, a voice, a note, an FAQ item, the calendar dialog), `panel` 28 / 40 / 48px
+for a large card that holds a form or the quote (`panelPadding`: on phones it
+reaches out to the sheet inset and pads by `sheet`, so its content keeps the page's
+edge instead of a second indent). Cards in a list stand `stack` 16 / 20 / 24px
+apart. A card is never nested in a card; a second part of a card is parted by a
+line.
+
+Space per width on `:root`: `py-section` 72 → 112px, `py-band` 48 → 64px, `group`
+32 → 48px (an explanation to the module after it), `grid` 32 → 48px (column gap).
+An eyebrow stands 16px above its title. Breakpoints: `sm` 36rem, `md` 48rem, `lg`
+64rem, `nav` 68.75rem (the header shows its links), `xl` 80rem. No section is forced
+to a screen's height.
 
 ## Shape and depth
 
@@ -130,8 +144,9 @@ FAQ disc) and the circle (the photograph, the seal, the numbered steps, the avat
 the rings). Fields take `rounded-md` (14px) — inputs and textareas alike — with the
 buttons' heights (48 / 44 / 36px). Cards, tiles, panels and the map take
 `rounded-xl` (28px); the large grounds — the opening, the bands (`Section ground`
-other than `default`), the registration and the footer — are sheets with
-`rounded-2xl` (40px), inset 8 / 12px from the window's edge.
+other than `default`) and the footer — are sheets (`sheet`): `rounded-2xl` (40px),
+8 / 12px from the window and from each other. Panels (the registration, the
+testimonial form, the newsletter, the quote) are `rounded-2xl` too.
 
 A card (`card`) is cream with a thin `line` and `shadow-card`: soft, wide, low. It
 is for what you act on — a date, a form, an open question. Tiles, voices and notes
@@ -153,7 +168,7 @@ never waits for motion. Under reduced motion everything rests.
 
 | Component                                         | Purpose                                                                                          |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `Container`                                       | The 1200px width and the side margins                                                            |
+| `Container`                                       | The 1200px width and the page's one edge (`--page-pad`)                                          |
 | `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `tint` / `dark`; every ground but the page is a rounded sheet       |
 | `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead                                                         |
 | `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; without a photo the circle motif stands at its right                       |
@@ -189,8 +204,8 @@ large and faint behind it.
   (his quote in an ember-tint card signed with his avatar, beside his text), the
   five agreements as a numbered list beside their head, with the boundary note
   (sage), the voices, the FAQ, taking part (`#termine`, sand, invitation beside the
-  date) and staying in touch (`#newsletter`, a card with the form and the WhatsApp
-  note in sage).
+  date) and staying in touch (`#newsletter`, a panel with the form and the WhatsApp
+  note beside it, parted by a line).
 - **`/event`.** `PageIntro`, then every upcoming date as the same `EventSummary`
   beside the e-mail notification in a sage card; the FAQ; a where-next band.
 - **Event page.** The date line and the title — "Männer**kreis**", its second half in

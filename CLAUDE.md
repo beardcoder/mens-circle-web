@@ -188,9 +188,14 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   with a thin line and `shadow-card`, for what you act on (a date, a form, an open
   question); tiles, voices and notes have no shadow; things said in turn are rows
   between lines. `shadow-overlay` only for what floats.
-- Grid: 1200px of content (`max-w-page`), side margins 20 / 32 / 48px; `py-section`
-  72 → 112px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop,
-  `nav` (1100px) header links. No section is forced to a screen's height.
+- Grid: 1200px of content and one edge, 28 / 44 / 60px from the window in every
+  section (`Container` pads by `--page-pad`; a `sheet` stands 8 / 12px in and pads
+  the rest, and consecutive sheets keep that inset between them). Two paddings
+  inside: `p-card` (24 → 32px) for every card and tile, `panelPadding` (28 → 48px;
+  on phones it reaches the sheet inset) for a large card with a form or the quote;
+  `gap-stack` between cards in a list; no card inside a card. `py-section` 72 →
+  112px, `py-band` for compact bands; breakpoints `md` tablet, `lg` desktop, `nav`
+  (1100px) header links. No section is forced to a screen's height.
 - Shared components: `EventSummary` (every date, with its seal in a ring of seats;
   fed by `lib/event-status.ts`, the ring by `lib/seats.ts`, which the registration
   panel shares), `PageIntro` (every sub-page opening), `SectionHead`, `Eyebrow`,

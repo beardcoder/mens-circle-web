@@ -10,18 +10,19 @@ interface Props {
 const { label, icon } = Astro.props;
 ---
 
-<div class="grid min-w-0 content-start gap-1 rounded-xl border border-line bg-raised p-4 sm:p-6">
+{/* On phones a row (the icon beside the words), from `sm` a tile (the icon above). */}
+<div class="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] content-start gap-x-5 rounded-xl border border-line bg-raised p-card sm:grid-cols-1">
   <span
     aria-hidden="true"
-    class="mb-2 grid size-10 place-items-center rounded-full bg-accent-soft text-accent sm:mb-3 sm:size-11"
+    class="row-span-3 grid size-11 place-items-center rounded-full bg-accent-soft text-accent sm:row-span-1 sm:mb-5"
   >
     <Icon name={icon} class="size-5.5" />
   </span>
   <dt class="text-sm font-semibold text-fg-muted">{label}</dt>
-  <dd class="font-display text-xl text-fg hyphens-auto sm:text-sub">
+  <dd class="mt-1 font-display text-xl text-balance text-fg hyphens-auto sm:text-sub">
     <slot name="value" />
   </dd>
-  <dd class="text-sm text-fg-muted">
+  <dd class="mt-1.5 text-sm text-fg-muted">
     <slot />
   </dd>
 </div>

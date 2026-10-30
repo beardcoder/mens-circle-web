@@ -84,5 +84,11 @@ export const label = 'font-sans text-sm font-semibold text-fg-muted';
 /** A card: a self-contained module (a date, a form). Rounded, raised a little off the page. */
 export const card = 'rounded-xl border border-line bg-raised shadow-card';
 
-/** A card's padding, for the cards that hold a form (the admin's panels). */
-export const panel = `${card} p-6 sm:p-8`;
+/**
+ * A large card's padding (a form, the quote). On phones it reaches out to a sheet's
+ * inset, so what it holds keeps the page's edge instead of a second indent.
+ */
+export const panelPadding = 'p-panel max-sm:-mx-sheet max-sm:px-sheet';
+
+/** A card with its padding, for the cards that hold a form (the admin's panels). */
+export const panel = `${card} p-card`;

@@ -36,7 +36,7 @@ const whatsapp = site.whatsappCommunityLink;
       Kommende Termine
     </h2>
     {events?.events.length ? (
-      <ul role="list" class="mt-6 grid gap-6">
+      <ul role="list" class="mt-6 grid gap-stack">
         {events.events.map((event, i) => (
           <li>
             <EventSummary
@@ -56,18 +56,18 @@ const whatsapp = site.whatsappCommunityLink;
   <aside
     id="benachrichtigung"
     aria-labelledby="benachrichtigung-title"
-    class="scroll-mt-(--spacing-clearance) rounded-2xl bg-tint p-6 sm:p-8 lg:sticky lg:top-(--spacing-clearance) lg:col-span-5 lg:col-start-8"
+    class="scroll-mt-(--spacing-clearance) rounded-2xl bg-tint p-card lg:sticky lg:top-(--spacing-clearance) lg:col-span-5 lg:col-start-8"
   >
     <h2 id="benachrichtigung-title" class="font-sans text-xl font-semibold text-fg">
       Termine per E-Mail erhalten
     </h2>
-    <p class="mt-2 text-base text-fg-soft">
+    <p class="mt-3 text-base text-fg-soft">
       Du bekommst eine kurze Nachricht, sobald ein neuer Termin feststeht. Mehr wird über diesen Verteiler nicht
       verschickt.
     </p>
-    <NewsletterForm id="event-newsletter" context={{ page: 'event-landing' }} class="mt-5" />
+    <NewsletterForm id="event-newsletter" context={{ page: 'event-landing' }} class="mt-6" />
     {whatsapp && (
-      <p class="mt-6 text-base text-fg-soft" id="whatsapp-community">
+      <p class="mt-6 border-t border-line pt-6 text-base text-fg-soft" id="whatsapp-community">
         Lieber zwischendurch austauschen? Es gibt außerdem eine{' '}
         <a
           class={link}
