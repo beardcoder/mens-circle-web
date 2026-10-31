@@ -17,6 +17,10 @@
    starts clear with light text over it. */
 @custom-variant over-hero (&:where(body:has([data-hero]) *));
 
+/* Inside an open FAQ item (`AccordionItem`), but not while it folds shut: the item
+   stays open until its answer has closed, and its marker turns back right away. */
+@custom-variant item-open (&:where(details[open]:not([data-closing]) *));
+
 /* Scroll-driven, where scroll timelines exist and motion is allowed; without
    support the element simply stands. */
 @custom-variant scroll-motion {

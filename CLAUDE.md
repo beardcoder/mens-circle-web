@@ -224,7 +224,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   server by `lib/words.ts`), the rest follows in order (`data-enter`), the photo
   settles (`settle`) and its ring follows (`ring`); sections rise in once in view
   (`data-reveal`, `data-reveal-group`, the steps' path `data-line`), the seat bar
-  fills (`data-seat-fill`), the hero photo trails the scroll (`data-parallax`).
+  fills (`data-seat-fill`), the hero photo trails the scroll (`data-parallax`). FAQ answers unfold and
+  fold on a spring (`AccordionItem`, `item-open:` variant); the phone `ActionBar`
+  glides in and out (its own script).
   Hidden states live in `global.css` under `[data-motion]`, which the boot script
   sets only with motion allowed and drops after 3 s if the script never started.
   CSS keeps the loops: the glow breathes (`data-glow`), the ring turns every 90 s.
