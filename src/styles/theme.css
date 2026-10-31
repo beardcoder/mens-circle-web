@@ -170,6 +170,8 @@
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
+  /* For fading in: a gentle start, so the fade is seen, then a long settle. */
+  --ease-fade: cubic-bezier(0.33, 0, 0.2, 1);
   /* Motion's spring without overshoot (visualDuration 1.1 s, bounce 0), sampled into
      CSS for what moves before any script runs; it takes 1.74 s to rest. */
   --ease-spring: linear(

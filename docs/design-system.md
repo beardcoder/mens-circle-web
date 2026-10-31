@@ -160,15 +160,18 @@ no shadow. A primary button glows a little in its own colour on hover.
 ## Motion
 
 The page moves the way an evening starts: things arrive one after the other and
-settle. Soft rather than snappy: opacity eases out on one long curve
-(`--ease-out`, `[0.22, 1, 0.36, 1]`, about 1.1 s), movement follows Motion's
+settle. Soft rather than snappy: opacity fades in on a gentle curve
+(`--ease-fade`, about 1.3 s), focus comes from a light blur on titles, movement follows Motion's
 springs without overshoot (visualDuration 1.1 s, 1.6 s for the photo), distances
 stay short (a word 0.3em, a section 1.25rem) and things follow one another at
 0.07 s (words) or 0.12 s (a group). A calm site, not a playful one.
 
 Performance comes first, checked with Lighthouse on every motion change (see
-"Lighthouse" below): only opacity and transforms move, so everything runs on the
-compositor (no blur, no height except the FAQ on a press, no parallax); no script reads layout
+"Lighthouse" below): opacity and transforms move, on the compositor, with two
+accepted exceptions Lighthouse lists without scoring: the soft blur the opening's
+title words and the section heads come into focus from (once, ending at
+`filter: none`), and the FAQ height on a press. No parallax. Fades start gently
+(`--ease-fade`, `[0.33, 0, 0.2, 1]`, 1.3 s), so they are seen, and settle long; no script reads layout
 before the page has settled (state at a scroll position comes from an
 `IntersectionObserver` on a sentinel, never from `scrollY`); and the opening never
 waits for a script.
@@ -219,7 +222,8 @@ Run it against a production build (`bun run build`, then the server on a disposa
 database) for the home page on mobile and desktop and for any page whose motion
 changed: `bunx lighthouse <url> --only-categories=performance,accessibility,best-practices,seo`
 (add `--preset=desktop`). Hold: CLS 0, no forced reflow ("Forced reflow" insight
-empty), no non-composited animations, the LCP element's render delay well under
+empty), no non-composited animations beyond the accepted blur on title words and
+section heads, the LCP element's render delay well under
 half a second. Locally the server does not compress (the proxy does in
 production), so the render-blocking stylesheet weighs more in the simulated
 mobile score than it does live.
