@@ -166,15 +166,17 @@ springs without overshoot (visualDuration 1.1 s, 1.6 s for the photo), distances
 stay short (a word 0.3em, a section 1.25rem) and things follow one another at
 0.07 s (words) or 0.12 s (a group). A calm site, not a playful one.
 
-Performance comes first, checked with Lighthouse on every motion change (see
-"Lighthouse" below): opacity and transforms move, on the compositor, with two
-accepted exceptions Lighthouse lists without scoring: the soft blur the opening's
-title words and the section heads come into focus from (once, ending at
-`filter: none`), and the FAQ height on a press. No parallax. Fades start gently
-(`--ease-fade`, `[0.33, 0, 0.2, 1]`, 1.3 s), so they are seen, and settle long; no script reads layout
-before the page has settled (state at a scroll position comes from an
-`IntersectionObserver` on a sentinel, never from `scrollY`); and the opening never
-waits for a script.
+Performance comes first: smooth at 120fps, checked with Lighthouse and a frame
+trace on every motion change (see "Lighthouse" below). Only opacity and transforms
+move, so the compositor carries every frame. The one exception is the soft blur the
+opening's title words come into focus from (CSS, light and 0.8 s, at load); a blur
+is redrawn on the main thread every frame (about 16× a transform), so nothing that
+moves while scrolling blurs. No parallax, no animated height. Fades start gently
+(`--ease-fade`, `[0.33, 0, 0.2, 1]`, 1.3 s), so they are seen, and settle long; no
+script reads layout before the page has settled (state at a scroll position comes
+from an `IntersectionObserver` on a sentinel, never from `scrollY`); state flags go
+on the element that needs them, never on `<html>` (that restyles the whole page);
+and the opening never waits for a script.
 
 - The opening (`data-enter`, global.css, pure CSS from the first paint, because the
   title is the largest paint): the label, then the title word by word
@@ -188,7 +190,8 @@ waits for a script.
 - Below it, Motion (motion.dev; `components/Motion.astro`, `animate` from
   `motion/mini` with `inView`, `scroll`, `spring`, about 9 kB). On scroll (`inView`,
   once): a section rises in as it enters the view (`data-reveal`); a group's
-  children follow one another (`data-reveal-group`; every section head is one), and
+  children follow one another (`data-reveal-group`; every section head is one; what comes into view in one frame is started together,
+  all reads before all writes), and
   the path between the steps draws itself in after the circles (`data-line`). The
   seat bar fills to the taken seats (`data-seat-fill`); in the opening it waits for
   its date line.
@@ -200,15 +203,19 @@ waits for a script.
   erst einmal zuhören" note and its map. On an event page the lower part of the
   intro (lead, links, the registration panel) rises in at load in CSS; the date
   and title stay still, because the dock flies them.
-- FAQ (`AccordionItem`): the answer unfolds on a spring and its text rises in
-  behind it; it folds shut a little faster, the marker turns back at once
-  (`data-closing`, the `item-open:` variant), and a second press turns the motion
-  around mid-way. Under reduced motion the native toggle stays.
+- FAQ (`AccordionItem`) as a FLIP: the layout changes once, at the press; then what
+  follows the item (its siblings, the sections below, the footer) slides from where
+  it stood while a clip uncovers the answer on the same spring, so their edges meet,
+  and the text rises in behind. Closing runs it backwards, the marker turns back at
+  once (`data-closing`, the `item-open:` variant). Each item carries its top line
+  and the closing line is its own element, so lines move instead of jumping. Under
+  reduced motion the native toggle stays.
 - The bottom bar on phones (`ActionBar`) glides up on a spring once the opening's
   action has gone, its date and action a beat behind; it slips away faster than it
   came.
 - Loops that never change state stay in CSS: the glow breathes on the 11-second
-  cycle (`data-glow`), the ring turns.
+  cycle (`data-glow`), the ring turns; both pause once the opening is out of view
+  (`data-offscreen`), since a running animation is serviced every frame.
 
 The boot script in `Layout.astro` sets `data-motion` on `<html>` only when motion is
 allowed; `global.css` keeps the scroll hooks hidden under it until they move. If the
@@ -222,8 +229,8 @@ Run it against a production build (`bun run build`, then the server on a disposa
 database) for the home page on mobile and desktop and for any page whose motion
 changed: `bunx lighthouse <url> --only-categories=performance,accessibility,best-practices,seo`
 (add `--preset=desktop`). Hold: CLS 0, no forced reflow ("Forced reflow" insight
-empty), no non-composited animations beyond the accepted blur on title words and
-section heads, the LCP element's render delay well under
+empty), no non-composited animations beyond the accepted blur on the opening's
+title words, the LCP element's render delay well under
 half a second. Locally the server does not compress (the proxy does in
 production), so the render-blocking stylesheet weighs more in the simulated
 mobile score than it does live.

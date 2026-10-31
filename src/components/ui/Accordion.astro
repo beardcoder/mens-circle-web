@@ -6,6 +6,9 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<div data-reveal-group class:list={['grid border-t border-line', className]}>
+{/* Each item carries its top line and the closing line is its own element, so an
+    opening answer moves the lines below it rather than making one jump. */}
+<div data-reveal-group class:list={['grid', className]}>
   <slot />
+  <span aria-hidden="true" class="border-t border-line"></span>
 </div>

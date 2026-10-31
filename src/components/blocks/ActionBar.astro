@@ -68,6 +68,7 @@ const date = next?.view.title.join(' ').replace(/,$/, '');
     if (!bar || watched.length === 0) return;
 
     const items = bar.querySelectorAll('[data-action-bar-item]');
+    const lift = document.querySelector('[data-scroll-top]');
     const onScreen = new Set<Element>();
     let shown = false;
 
@@ -112,7 +113,9 @@ const date = next?.view.title.join(' ').replace(/,$/, '');
 
       for (const link of bar.querySelectorAll('a')) link.tabIndex = show ? 0 : -1;
 
-      document.documentElement.toggleAttribute('data-action-bar-open', show);
+      // The back-to-top link steps up above the bar. Set on the link itself: a flag on
+      // <html> would make the browser restyle the whole page.
+      lift?.toggleAttribute('data-lifted', show);
     };
 
     const observer = new IntersectionObserver((entries) => {
