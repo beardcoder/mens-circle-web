@@ -247,8 +247,7 @@ function RegistrationIntro({
         {fill !== null && (
           <span aria-hidden="true" class="block h-1.5 overflow-hidden rounded-full bg-line">
             <span
-              data-seat-fill
-              class="block h-full origin-left scale-x-(--fill) rounded-full bg-fill"
+              class="block h-full origin-left scale-x-(--fill) rounded-full bg-fill transition-[scale] duration-700 ease-out"
               style={{ '--fill': fill.toFixed(3) }}
             />
           </span>

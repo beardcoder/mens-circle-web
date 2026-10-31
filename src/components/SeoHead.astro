@@ -185,7 +185,7 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 {import.meta.env.PROD && (
   <>
     <link rel="preconnect" href={umamiOrigin} crossorigin />
-    <script is:inline defer src={`${umamiOrigin}/script.js`} data-website-id={umamiWebsiteId} data-performance="true" />
+    <script is:inline async src={`${umamiOrigin}/script.js`} data-website-id={umamiWebsiteId} data-performance="true" />
   </>
 )}
 

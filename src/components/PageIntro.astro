@@ -1,4 +1,6 @@
 ---
+import { splitText } from '@lib/words';
+
 import Container from './ui/Container.astro';
 import Eyebrow from './ui/Eyebrow.astro';
 
@@ -6,7 +8,8 @@ import Eyebrow from './ui/Eyebrow.astro';
  * The compact opening of a sub-page, on the page's paper: label, title, lead
  * (slot `lead`) and any actions (default slot) on the reading line; a photograph
  * (slot `media`) beside them from `lg`, under them on phones. A long word in the
- * title ("Datenschutzerklärung") hyphenates rather than overflows.
+ * title ("Datenschutzerklärung") hyphenates rather than overflows. On load the
+ * title's words rise in turn and the rest follows (components/Motion.astro).
  */
 interface Props {
   eyebrow?: string;
@@ -33,6 +36,7 @@ const hasMedia = Astro.slots.has('media');
     /* The circle of the logo, quietly, where a photograph would stand. */
     <div
       aria-hidden="true"
+      data-enter="ring"
       class="pointer-events-none absolute top-[calc(var(--spacing-header)+1rem)] right-[max(var(--spacing-gutter),calc((100vw-75rem)/2))] hidden size-64 rounded-full border border-line-strong lg:block xl:size-72"
     >
       <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-glow" />
@@ -43,23 +47,25 @@ const hasMedia = Astro.slots.has('media');
   )}
   <Container class:list={['relative grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
     <div class:list={['grid justify-items-start', hasMedia && 'lg:col-span-7']}>
-      {eyebrow && <Eyebrow class="mb-4">{eyebrow}</Eyebrow>}
-      <h1 id={titleId} class={titleClass}>
-        {title}
-      </h1>
+      {eyebrow && (
+        <Eyebrow class="mb-4" data-enter>
+          {eyebrow}
+        </Eyebrow>
+      )}
+      <h1 id={titleId} data-enter="words" class={titleClass} set:html={splitText(title)} />
       {hasLead && (
-        <div class="mt-6 max-w-measure text-lg text-fg-muted">
+        <div data-enter class="mt-6 max-w-measure text-lg text-fg-muted">
           <slot name="lead" />
         </div>
       )}
       {hasAction && (
-        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div data-enter class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
           <slot />
         </div>
       )}
     </div>
     {hasMedia && (
-      <div class="lg:col-span-4 lg:col-start-9">
+      <div data-enter="settle" class="lg:col-span-4 lg:col-start-9">
         <slot name="media" />
       </div>
     )}

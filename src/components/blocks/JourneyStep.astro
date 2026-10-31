@@ -11,8 +11,14 @@ const { title, number } = Astro.props;
   itemprop="itemListElement"
   itemscope
   itemtype="https://schema.org/ListItem"
-  class="relative grid grid-cols-[3rem_minmax(0,1fr)] content-start gap-x-5 not-last:before:absolute not-last:before:top-12 not-last:before:-bottom-8 not-last:before:left-6 not-last:before:w-px not-last:before:bg-line-strong lg:grid-cols-1 lg:gap-y-5 lg:not-last:before:top-6 lg:not-last:before:-right-(--spacing-grid) lg:not-last:before:bottom-auto lg:not-last:before:left-12 lg:not-last:before:h-px lg:not-last:before:w-auto"
+  class="group/step relative grid grid-cols-[3rem_minmax(0,1fr)] content-start gap-x-5 lg:grid-cols-1 lg:gap-y-5"
 >
+  {/* The path to the next step: down on phones, across on the desktop; it draws itself in after the circles (Motion.astro). */}
+  <span
+    aria-hidden="true"
+    data-line
+    class="absolute top-12 -bottom-8 left-6 w-px origin-top-left bg-line-strong group-last/step:hidden lg:top-6 lg:-right-(--spacing-grid) lg:bottom-auto lg:left-12 lg:h-px lg:w-auto"
+  ></span>
   <meta itemprop="position" content={String(number)} />
   <span
     aria-hidden="true"
