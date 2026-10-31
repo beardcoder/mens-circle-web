@@ -3,13 +3,12 @@
  * The page's motion below the opening, with Motion (motion.dev). The opening itself
  * moves in CSS (global.css, "Motion: the opening"), so the largest paint never waits
  * for this script. Soft rather than snappy: opacity eases out on a long curve,
- * movement follows springs without overshoot, distances stay short, and besides
- * the heads' focus only opacity and transforms move, on the compositor. Hooks:
+ * movement follows springs without overshoot, distances stay short, and only
+ * opacity and transforms move, so scrolling stays on the compositor. Hooks:
  *
  * - `data-reveal` / `data-reveal-group`: rises in once it enters the view; a group
  *   staggers its children, and a step's path (`data-line`) draws itself in after.
- *   `data-reveal-group="focus"` (section heads) also comes into focus out of a soft
- *   blur, the one non-composited piece, once and gone when it rests.
+ * - Work found in view is batched per frame, reads before writes.
  * - `data-seat-fill`: the capacity bar fills once it is in view.
  *
  * The boot script in Layout sets `data-motion` only when motion is allowed; global.css
@@ -30,10 +29,44 @@
   const ease = [0.22, 1, 0.36, 1] as const;
   /** Fading in: a gentle start, so the fade is seen, then a long settle (`--ease-fade`). */
   const fade = { duration: 1.3, ease: [0.33, 0, 0.2, 1] as const };
-  /** Movement on a soft spring that settles without overshoot. */
-  const drift = { type: spring, visualDuration: 1.1, bounce: 0 } as const;
+
+  /**
+   * Movement on a soft spring that settles without overshoot. The curve is worked
+   * out once, here, and handed to every animation as an easing, instead of building
+   * a spring for each element when a whole list starts at once.
+   */
+  const springEase = (visualDuration: number) => {
+    const curve = spring({ keyframes: [0, 1], visualDuration, bounce: 0 });
+    let end = 0;
+
+    while (!curve.next(end).done && end < 4000) end += 10;
+
+    return { duration: end / 1000, ease: (progress: number) => curve.next(progress * end).value };
+  };
+
+  const drift = springEase(1.1);
   /** Below the fold things move once they are a little way above the bottom edge. */
   const inViewOptions = { margin: '0px 0px -8% 0px' } as const;
+
+  /**
+   * Work found in view is batched per frame: every check reads first, then every
+   * animation starts, so reading never follows a write (no style or layout thrash).
+   * A job reads and returns the writes to run.
+   */
+  let pending: (() => () => void)[] = [];
+
+  const flush = () => {
+    const writes = pending.map((read) => read());
+
+    pending = [];
+    writes.forEach((write) => write());
+  };
+
+  const schedule = (read: () => () => void) => {
+    if (pending.length === 0) requestAnimationFrame(flush);
+
+    pending.push(read);
+  };
 
   /**
    * Elements hidden at this width (`hidden`, `lg:hidden`) are left to CSS; they cannot
@@ -41,56 +74,51 @@
    */
   const shown = (el: Element) => el.checkVisibility?.() ?? true;
 
-  const rendered = (el: Element) => {
-    if (shown(el)) return true;
-
-    (el as HTMLElement).style.opacity = '1';
-
-    return false;
-  };
-
   /**
-   * Fades in and rises a short way and, with `blur`, comes into focus; several
-   * targets follow one another by `step` seconds. Opacity and focus take the fade,
-   * the rise the spring, so each needs its own delay.
+   * Fades in and rises a short way; several targets follow one another by `step`
+   * seconds. Opacity takes the fade, the rise the spring: both on the compositor.
    */
-  const rise = (targets: Targets, distance: string, start: number, step = 0, blur = 0) => {
-    const list = (targets instanceof Element ? [targets] : [...targets]).filter(rendered);
+  const rise = (targets: Targets, distance: string, step = 0) =>
+    schedule(() => {
+      const all = targets instanceof Element ? [targets] : [...targets];
+      const visible = all.filter(shown);
+      const hidden = all.filter((el) => !visible.includes(el));
 
-    list.forEach((target, i) => {
-      const delay = start + i * step;
+      return () => {
+        for (const el of hidden) (el as HTMLElement).style.opacity = '1';
 
-      animate(
-        target,
-        {
-          opacity: [0, 1],
-          transform: [`translateY(${distance})`, 'none'],
-          ...(blur > 0 && { filter: [`blur(${blur}px)`, 'none'] }),
-        },
-        { ...drift, delay, opacity: { ...fade, delay }, filter: { ...fade, delay } },
-      );
+        visible.forEach((target, i) => {
+          const delay = i * step;
+
+          animate(
+            target,
+            { opacity: [0, 1], transform: [`translateY(${distance})`, 'none'] },
+            { ...drift, delay, opacity: { ...fade, delay } },
+          );
+        });
+      };
     });
-  };
 
   /** Sections rise in as they enter the view; a group's children follow one another. */
   const reveal = () => {
-    inView('[data-reveal]', (el) => rise(el, '1.25rem', 0), inViewOptions);
+    inView('[data-reveal]', (el) => rise(el, '1.25rem'), inViewOptions);
     inView(
       '[data-reveal-group]',
       (el) => {
-        const focus = (el as HTMLElement).dataset.revealGroup === 'focus';
+        rise(el.children, '1.25rem', 0.12);
+        schedule(() => {
+          const lines = [...el.querySelectorAll('[data-line]')].filter(shown);
 
-        rise(el.children, '1.25rem', 0, 0.12, focus ? 6 : 0);
+          return () => {
+            if (lines.length === 0) return;
 
-        const lines = [...el.querySelectorAll('[data-line]')].filter(shown);
-
-        if (lines.length > 0) {
-          animate(
-            lines,
-            { transform: ['scale(0)', 'none'] },
-            { duration: 1.4, ease, delay: stagger(0.2, { startDelay: 0.5 }) },
-          );
-        }
+            animate(
+              lines,
+              { transform: ['scale(0)', 'none'] },
+              { duration: 1.4, ease, delay: stagger(0.2, { startDelay: 0.5 }) },
+            );
+          };
+        });
       },
       inViewOptions,
     );
@@ -109,6 +137,20 @@
     );
   };
 
+  /**
+   * The opening's loops (the glow, the ring) pause once it is out of view: a running
+   * animation is still serviced every frame, seen or not.
+   */
+  const rest = () => {
+    const hero = document.querySelector('[data-hero]');
+
+    if (!hero) return;
+
+    new IntersectionObserver(([entry]) => {
+      hero.toggleAttribute('data-offscreen', !entry.isIntersecting);
+    }).observe(hero);
+  };
+
   const root = document.documentElement;
 
   if (root.hasAttribute('data-motion')) {
@@ -116,4 +158,6 @@
     reveal();
     seats();
   }
+
+  rest();
 </script>

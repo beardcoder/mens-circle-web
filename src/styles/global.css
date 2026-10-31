@@ -141,33 +141,33 @@
    `--enter-delay`; the photo settles from a little larger and the ring follows.
    Opacity and focus take a gentle fade (`--ease-fade`), the movement Motion's
    spring (`--ease-spring`). The blur is the one non-composited piece: on the
-   title's words only, once, and gone when they rest. */
+   title's words only, light and short (0.8 s), so the main thread is soon free. */
 @media (prefers-reduced-motion: no-preference) {
   [data-enter]:not([data-enter='words'], [data-enter='settle'], [data-enter='ring']) {
     animation:
-      enter-fade 1.3s var(--ease-fade) both,
-      enter-rise 1.74s var(--ease-spring) both;
+      enter-fade 1.3s var(--ease-fade) backwards,
+      enter-rise 1.74s var(--ease-spring) backwards;
     animation-delay: var(--enter-delay, 0s);
   }
 
   [data-word] {
     animation:
-      enter-fade 1.3s var(--ease-fade) both,
-      enter-focus 1.3s var(--ease-fade) both,
-      enter-word 1.74s var(--ease-spring) both;
+      enter-fade 1.3s var(--ease-fade) backwards,
+      enter-focus 0.8s var(--ease-fade) backwards,
+      enter-word 1.74s var(--ease-spring) backwards;
     animation-delay: calc(0.08s + var(--i, 0) * 70ms);
   }
 
   [data-enter='settle'] {
     animation:
-      enter-fade 1.8s var(--ease-fade) 0.15s both,
-      enter-settle 2.4s var(--ease-spring-slow) 0.15s both;
+      enter-fade 1.8s var(--ease-fade) 0.15s backwards,
+      enter-settle 2.4s var(--ease-spring-slow) 0.15s backwards;
   }
 
   [data-enter='ring'] {
     animation:
-      enter-fade 1.8s var(--ease-fade) 0.6s both,
-      enter-ring 2.4s var(--ease-spring-slow) 0.6s both;
+      enter-fade 1.8s var(--ease-fade) 0.6s backwards,
+      enter-ring 2.4s var(--ease-spring-slow) 0.6s backwards;
   }
 }
 
@@ -182,7 +182,7 @@
 
 @keyframes enter-focus {
   from {
-    filter: blur(8px);
+    filter: blur(6px);
   }
 }
 
@@ -237,7 +237,7 @@
    fades in once instead of appearing at a stroke. */
 @media (prefers-reduced-motion: no-preference) {
   [data-motion-failed] :is([data-reveal], [data-reveal-group] > *) {
-    animation: enter-fade 0.8s var(--ease-fade) both;
+    animation: enter-fade 0.8s var(--ease-fade) backwards;
   }
 }
 
@@ -245,6 +245,11 @@
   [data-glow] {
     animation: glow-breathe 11s ease-in-out infinite;
   }
+}
+
+/* Out of view the opening's loops pause (Motion.astro sets `data-offscreen`). */
+[data-hero][data-offscreen] :is([data-glow], .hero-orbit) {
+  animation-play-state: paused;
 }
 
 @keyframes glow-breathe {

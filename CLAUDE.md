@@ -232,21 +232,28 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   the one scroll-linked piece). Every page reveals its sections: `Prose reveal`,
   `LinkList`, `ValueItems`, the newsletter, the event story and map, the event
   intro's lower part (`data-enter`, not the title, which the dock flies). FAQ
-  answers unfold and fold on a spring (`AccordionItem`, `item-open:` variant); the
+  answers unfold and fold on a spring as a FLIP (`AccordionItem`, `item-open:`
+  variant); the
   phone `ActionBar` glides in and out (its own script). Scroll hidden states live
   in `global.css` under `[data-motion]`, which the boot script sets only with
   motion allowed and drops after 3 s if the script never started (then
   `data-motion-failed` fades the waiting sections in once). CSS keeps the
   loops: the glow breathes (`data-glow`), the ring turns every 90 s.
 - Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
-  forced reflow. Only opacity and transforms move, with two accepted exceptions
-  that Lighthouse lists but does not score: the soft blur the opening's title words
-  and the section heads (`data-reveal-group="focus"`) come into focus from, once,
-  ending at `filter: none`, and the FAQ height on a press. Fades use `--ease-fade`
-  (a gentle start, so the fade is seen); the springs fall back to `--ease-out`
-  where `linear()` is missing (Safari < 17.2). Never read layout or
-  `scrollY` at load: header tone, back-to-top and the like watch a sentinel with an
-  `IntersectionObserver`. Nothing that holds the LCP waits for a script.
+  forced reflow. 120fps means the compositor: only opacity and transforms move. The
+  one exception is the soft blur the opening's title words come into focus from
+  (CSS, 0.8 s, at load); a blur costs ~16× the main-thread work of a transform, so
+  nothing that runs while scrolling blurs. Fades use `--ease-fade` (a gentle start,
+  so the fade is seen); the springs fall back to `--ease-out` where `linear()` is
+  missing (Safari < 17.2). Motion.astro batches what comes into view per frame
+  (all reads, then all writes) and builds its spring curve once. The FAQ unfolds as
+  a FLIP: one layout at the press, then what follows slides and a clip uncovers the
+  answer, no animated height. The hero's loops pause out of view
+  (`data-offscreen`). Never set a state attribute on `<html>` while the page moves
+  (it restyles the whole page): flag the element itself (`data-lifted` on the
+  back-to-top link). Never read layout or `scrollY` at load: header tone,
+  back-to-top and the like watch a sentinel with an `IntersectionObserver`.
+  Nothing that holds the LCP waits for a script.
   Third-party scripts are `async`, so nothing queues before the opening. On phones
   the home page has a bottom `ActionBar` with the next date once the hero's action
   is gone. Interactions ~180ms (a button rises 2px, arrows slide, header links draw
