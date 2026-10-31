@@ -162,8 +162,11 @@ no shadow. A primary button glows a little in its own colour on hover.
 The page moves the way an evening starts: things arrive one after the other and
 settle. It is done with Motion (motion.dev; `components/Motion.astro`, one small
 script on every public page: `animate` from `motion/mini` with `inView`, `scroll`,
-`spring` and `stagger`, about 9 kB). Springs settle without overshoot: a calm
-site, not a playful one.
+`spring` and `stagger`, about 9 kB). Soft rather than snappy: opacity and focus
+ease out on one long curve (`[0.22, 1, 0.36, 1]`, about 1.1 s), movement follows
+springs without overshoot (about 1.1 s, 1.6 s for the photo), distances stay short
+(a word 0.3em, a section 1.25rem) and things follow one another at 0.07 s (words)
+or 0.12 s (a group). A calm site, not a playful one.
 
 - On load (`data-enter`, in document order): the label, then the title word by word
   (`data-enter="words"`; `lib/words.ts` wraps the words on the server, so the lines
@@ -173,11 +176,14 @@ site, not a playful one.
   and every sub-page opening (`PageIntro`) work this way.
 - On scroll (`inView`, once): a section rises in as it enters the view
   (`data-reveal`); a group's children follow one another (`data-reveal-group`;
-  every section head is one), and the path between the steps draws itself in after
+  every section head is one and also comes into focus out of a light blur,
+  `data-reveal-group="focus"`), and the path between the steps draws itself in after
   the circles (`data-line`). The seat bar fills to the taken seats
   (`data-seat-fill`); in the opening it waits for its date line.
-- Scroll-linked: the hero photo trails the scroll a little (`data-parallax`; Motion
-  runs it on the browser's scroll timeline where there is one).
+- Scroll-linked depth (`data-parallax="<distance>"`; Motion runs it on the
+  browser's scroll timeline where there is one): as the opening scrolls away the
+  glow drifts most, the photo a little, the words drift up and dim slightly
+  (`data-parallax-dim`); under the breath the far hill moves against the near one.
 - FAQ (`AccordionItem`): the answer unfolds on a spring and its text rises in
   behind it; it folds shut a little faster, the marker turns back at once
   (`data-closing`, the `item-open:` variant), and a second press turns the motion

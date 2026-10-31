@@ -1,14 +1,20 @@
 ---
 /**
  * The page's motion, with Motion (motion.dev): things arrive one after the other and
- * settle, the way an evening starts. Hooks are data attributes:
+ * settle, the way an evening starts. Soft rather than snappy: opacity and focus ease
+ * out on a long curve, movement follows springs without overshoot, distances stay
+ * short. Hooks are data attributes:
  *
  * - `data-enter`: on load, in document order; `words` raises a title's words in turn
  *   (`lib/words.ts` wraps them), `settle` lets a photo settle from a little larger,
  *   `ring` brings in the circle of the logo.
  * - `data-reveal` / `data-reveal-group`: rises in once it enters the view; a group
  *   staggers its children, and a step's path (`data-line`) draws itself in after.
- * - `data-parallax`: trails the scroll a little (the hero photo).
+ *   `data-reveal-group="focus"` (section heads) also comes into focus out of a blur.
+ * - `data-parallax="<distance>"`: a depth layer that drifts by that distance while its
+ *   section passes; in the opening, as the opening scrolls away (the photo, the glow
+ *   behind it, the words drifting up and dimming a little), elsewhere across the
+ *   whole pass (the hills under the breath).
  * - `data-seat-fill`: the capacity bar fills once it is in view.
  *
  * The boot script in Layout sets `data-motion` only when motion is allowed; global.css
@@ -21,59 +27,97 @@
   import { inView, scroll, spring, stagger } from 'motion';
   import { animate } from 'motion/mini';
 
-  type Targets = Element | Element[] | NodeListOf<Element>;
+  type Targets = Element | Iterable<Element>;
 
-  /** Calm and grounded: a firm spring that settles without overshoot. */
-  const settle = { type: spring, visualDuration: 0.9, bounce: 0 } as const;
-  const slow = { type: spring, visualDuration: 1.4, bounce: 0 } as const;
-  /** Elements below the fold move once a fair part of them is above the bottom edge. */
-  const inViewOptions = { margin: '0px 0px -12% 0px' } as const;
+  /** A long ease-out: fast at first, then a slow settle (opacity, focus, fills). */
+  const ease = [0.22, 1, 0.36, 1] as const;
+  const fade = { duration: 1.1, ease };
+  /** Movement on a soft spring that settles without overshoot. */
+  const drift = { type: spring, visualDuration: 1.1, bounce: 0 } as const;
+  const sink = { type: spring, visualDuration: 1.6, bounce: 0 } as const;
+  /** Below the fold things move once they are a little way above the bottom edge. */
+  const inViewOptions = { margin: '0px 0px -8% 0px' } as const;
 
-  const rise = (targets: Targets, distance: string, delay: number | ReturnType<typeof stagger>) =>
-    animate(targets, { opacity: [0, 1], transform: [`translateY(${distance})`, 'none'] }, { ...settle, delay });
+  /** Elements hidden at this width (`hidden`, `lg:hidden`) are left to CSS; they cannot be animated. */
+  const rendered = (el: Element) => {
+    if (el.getClientRects().length > 0) return true;
+
+    (el as HTMLElement).style.opacity = '1';
+
+    return false;
+  };
+
+  /**
+   * Fades in, rises a short way and, with `blur`, comes into focus; several targets
+   * follow one another by `step` seconds. Opacity and focus take the long ease, the
+   * rise the spring, so each needs its own delay.
+   */
+  const rise = (targets: Targets, distance: string, start: number, step = 0, blur = 0) => {
+    const list = (targets instanceof Element ? [targets] : [...targets]).filter(rendered);
+
+    list.forEach((target, i) => {
+      const delay = start + i * step;
+
+      animate(
+        target,
+        {
+          opacity: [0, 1],
+          transform: [`translateY(${distance})`, 'none'],
+          ...(blur > 0 && { filter: [`blur(${blur}px)`, 'none'] }),
+        },
+        { ...drift, delay, opacity: { ...fade, delay }, filter: { ...fade, delay } },
+      );
+    });
+  };
 
   /** The opening: label, title word by word, lead, action and date, each a beat after the last. */
   const enter = () => {
-    let at = 0.05;
+    let at = 0.1;
 
     for (const el of document.querySelectorAll<HTMLElement>('[data-enter]')) {
       const kind = el.dataset.enter;
 
       if (kind === 'settle') {
-        animate(el, { opacity: [0, 1], transform: ['scale(1.08)', 'none'] }, { ...slow, delay: 0.1 });
+        animate(
+          el,
+          { opacity: [0, 1], transform: ['scale(1.06)', 'none'] },
+          { ...sink, delay: 0.15, opacity: { duration: 1.6, ease, delay: 0.15 } },
+        );
       } else if (kind === 'ring') {
-        animate(el, { opacity: [0, 1], transform: ['scale(0.88)', 'none'] }, { ...slow, delay: 0.45 });
+        animate(
+          el,
+          { opacity: [0, 1], transform: ['scale(0.92)', 'none'] },
+          { ...sink, delay: 0.6, opacity: { duration: 1.6, ease, delay: 0.6 } },
+        );
       } else if (kind === 'words') {
         const words = el.querySelectorAll('[data-word]');
 
-        animate(
-          words,
-          { opacity: [0, 1], transform: ['translateY(0.45em)', 'none'], filter: ['blur(6px)', 'blur(0px)'] },
-          { ...settle, delay: stagger(0.055, { startDelay: at }) },
-        );
-        at += words.length * 0.055 + 0.1;
+        rise(words, '0.3em', at, 0.07, 8);
+        at += words.length * 0.07 + 0.15;
       } else {
-        rise(el, '1rem', at);
-        at += 0.09;
+        rise(el, '0.75rem', at);
+        at += 0.12;
       }
     }
   };
 
   /** Sections rise in as they enter the view; a group's children follow one another. */
   const reveal = () => {
-    inView('[data-reveal]', (el) => void rise(el, '2rem', 0), inViewOptions);
+    inView('[data-reveal]', (el) => rise(el, '1.25rem', 0), inViewOptions);
     inView(
       '[data-reveal-group]',
       (el) => {
-        rise([...el.children], '1.5rem', stagger(0.09));
+        const focus = (el as HTMLElement).dataset.revealGroup === 'focus';
 
-        const lines = el.querySelectorAll('[data-line]');
+        rise(el.children, '1.25rem', 0, 0.12, focus ? 6 : 0);
+
+        const lines = [...el.querySelectorAll('[data-line]')].filter((line) => line.getClientRects().length > 0);
 
         if (lines.length > 0) {
           animate(
             lines,
             { transform: ['scale(0)', 'none'] },
-            { duration: 0.9, ease: 'easeInOut', delay: stagger(0.15, { startDelay: 0.35 }) },
+            { duration: 1.4, ease, delay: stagger(0.2, { startDelay: 0.5 }) },
           );
         }
       },
@@ -86,22 +130,34 @@
     inView(
       '[data-seat-fill]',
       (el) => {
-        const delay = el.closest('[data-hero]') ? 1.1 : 0.3;
+        const delay = el.closest('[data-hero]') ? 1.4 : 0.4;
 
-        animate(el, { transform: ['scaleX(0)', 'none'] }, { ...slow, delay });
+        animate(el, { transform: ['scaleX(0)', 'none'] }, { duration: 1.8, ease, delay });
       },
       inViewOptions,
     );
   };
 
-  /** The hero photo drifts down a little while the opening scrolls away. */
+  /**
+   * Depth: each layer drifts by its own distance while its section passes, so the
+   * glow, the photo and the words part a little as the opening scrolls away.
+   * Motion runs these on the browser's scroll timeline where there is one.
+   */
   const parallax = () => {
-    for (const el of document.querySelectorAll('[data-parallax]')) {
+    for (const el of document.querySelectorAll<HTMLElement>('[data-parallax]')) {
+      const distance = el.dataset.parallax || '12%';
       const target = el.closest('section') ?? el;
+      const opening = !!el.closest('[data-hero]');
 
-      scroll(animate(el, { transform: ['none', 'translateY(12%)'] }, { ease: 'linear' }), {
+      const keyframes = opening
+        ? { transform: ['none', `translateY(${distance})`] }
+        : { transform: [`translateY(${distance})`, `translateY(calc(${distance} * -1))`] };
+
+      const fadeOut = el.hasAttribute('data-parallax-dim') ? { opacity: [1, 0.35] } : {};
+
+      scroll(animate(el, { ...keyframes, ...fadeOut }, { ease: 'linear' }), {
         target,
-        offset: ['start start', 'end start'],
+        offset: opening ? ['start start', 'end start'] : ['start end', 'end start'],
       });
     }
   };

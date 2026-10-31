@@ -219,12 +219,16 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then linen over a
   blur. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
 - Motion: motion.dev in `components/Motion.astro` (`motion/mini` `animate`,
-  `inView`, `scroll`, `spring`, `stagger`; springs without overshoot). On load the
+  `inView`, `scroll`, `spring`, `stagger`; soft: opacity and focus on a long
+  ease-out, movement on springs without overshoot, short distances). On load the
   opening's title rises word by word (`data-enter="words"`, words wrapped on the
   server by `lib/words.ts`), the rest follows in order (`data-enter`), the photo
   settles (`settle`) and its ring follows (`ring`); sections rise in once in view
-  (`data-reveal`, `data-reveal-group`, the steps' path `data-line`), the seat bar
-  fills (`data-seat-fill`), the hero photo trails the scroll (`data-parallax`). FAQ answers unfold and
+  (`data-reveal`, `data-reveal-group`, the steps' path `data-line`), section heads
+  come into focus (`data-reveal-group="focus"`), the seat bar fills
+  (`data-seat-fill`); depth layers drift as their section passes
+  (`data-parallax="<distance>"`: glow, photo, the hero's words with
+  `data-parallax-dim`, the far hill under the breath). FAQ answers unfold and
   fold on a spring (`AccordionItem`, `item-open:` variant); the phone `ActionBar`
   glides in and out (its own script).
   Hidden states live in `global.css` under `[data-motion]`, which the boot script
