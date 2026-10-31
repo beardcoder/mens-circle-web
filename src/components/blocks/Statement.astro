@@ -30,7 +30,7 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
     <path class="fill-raised" d="M0 92C140 70 260 78 380 88S600 64 760 80 1000 96 1200 70V120H0Z" />
   </svg>
   <div class="relative grid items-center gap-x-grid gap-y-8 lg:grid-cols-12">
-    <div class="grid justify-items-start lg:col-span-7">
+    <div data-reveal class="grid justify-items-start lg:col-span-7">
       {eyebrow && <Eyebrow class="mb-4">{eyebrow}</Eyebrow>}
       <h2 id="statement-title" class="text-page text-fg">
         {lines.map((line, i) => (i > 0 ? <em class="block">{line}</em> : <span class="block">{line}</span>))}
@@ -46,6 +46,7 @@ const { anchor, eyebrow, lines, text, linkLabel, linkUrl, breathGuide } = Astro.
     {breathGuide && (
       <div
         data-breath
+        data-reveal
         class="group/breath flex flex-wrap items-center gap-6 lg:col-span-4 lg:col-start-9 lg:flex-col lg:text-center"
       >
         <span class="breath-orbit relative grid size-32 shrink-0 place-items-center lg:size-56" aria-hidden="true">

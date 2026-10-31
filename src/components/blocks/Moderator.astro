@@ -26,7 +26,10 @@ const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote
 <Section id={anchor} labelledby="person-title" innerClass="grid items-start gap-x-grid gap-y-10 lg:grid-cols-12">
   {/* A quote behind an ember rule, as every quote on the site; on phones after the introduction. */}
   {quote && (
-    <figure class="grid content-start border-l-4 border-fill pl-6 max-lg:order-last sm:pl-8 lg:col-span-5 lg:mt-2">
+    <figure
+      data-reveal
+      class="grid content-start border-l-4 border-fill pl-6 max-lg:order-last sm:pl-8 lg:col-span-5 lg:mt-2"
+    >
       <blockquote class="font-display text-quote text-fg">
         <p>{quote}</p>
       </blockquote>

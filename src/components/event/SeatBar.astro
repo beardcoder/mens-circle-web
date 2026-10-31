@@ -1,0 +1,30 @@
+---
+/**
+ * How full the circle is: a slim track that fills with the taken seats, beside
+ * the seats in words. The fill grows in when it comes into view (global.css).
+ */
+import { seatFill } from '@lib/seats';
+
+interface Props {
+  seats: { total: number; free: number } | null;
+  /** "5 von 12 Plätzen frei", "Ausgebucht · Warteliste". */
+  text: string;
+  class?: string;
+}
+
+const { seats, text, class: className } = Astro.props;
+const fill = seatFill(seats);
+---
+
+<div class:list={['grid gap-2', className]}>
+  {fill !== null && (
+    <span aria-hidden="true" class="block h-1.5 overflow-hidden rounded-full bg-line">
+      <span
+        data-seat-fill
+        class="block h-full origin-left scale-x-(--fill) rounded-full bg-fill"
+        style={`--fill: ${fill.toFixed(3)}`}
+      />
+    </span>
+  )}
+  <p class="text-sm text-fg-muted">{text}</p>
+</div>

@@ -155,8 +155,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - `docs/design-system.md` is the reference. The idea: a fire circle at the edge of
   the forest — calm, warm, grounded, an invitation to a real evening. Deep forest
   green for what draws you in, the ember of the logo for the one thing to do, linen
-  for reading; the circle (the photo in a ring, three warm points, the seats around
-  the date, numbered steps, the breath above the hills) is the one motif. Same
+  for reading; the circle (the photo in a ring, three warm points, the date's seal,
+  numbered steps, the breath above the hills) is the one motif. Same
   function, same component.
 - Stance (design-system.md, "Stance" and "Voice"): the page acts like a circle
   leader who holds the space instead of performing. Quiet, the frame visible
@@ -189,22 +189,22 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   to the word before it (`\u00a0–`).
 - Shapes: soft and round. `rounded-full` for what you press and for circles; fields
   `rounded-md` with the buttons' heights (`button()` and `control()` share sizes);
-  the date card and the map `rounded-xl`; the registration panel `rounded-2xl`. A
-  card (cream, thin line, `shadow-card`) only for what you act on: a date, the
-  registration. Everything else stands open on its ground: facts, questions,
+  the map `rounded-xl`; the registration panel `rounded-2xl` (runs out to the right
+  window edge beside the intro). No cards on public pages, not even for a date: the
+  date is open too (seal, facts as small columns, seat bar). Everything stands open
+  on its ground: facts, questions,
   agreements, FAQ and voices are rows or columns between lines, a quote stands
   behind an ember rule, a note is a heading and its text. Never wrap content in a
   box to group it; part it by a line or space. `shadow-overlay` only for what floats.
 - Grid: 1200px of content and one edge, 28 / 40 / 56px from the window in every
-  section (`Container`, `px-gutter`). `p-card` (24 → 32px) for the date card and
-  the calendar dialog, `p-panel` (28 → 48px) for the registration, which below `lg`
-  becomes a full-width forest band; `gap-stack` between date cards; no card inside
-  a card. `py-section` 72 → 112px, `py-band` for compact bands; breakpoints `md`
-  tablet, `lg` desktop, `nav` (1100px) header links. No section is forced to a
-  screen's height.
-- Shared components: `EventSummary` (every date, with its seal in a ring of seats;
-  fed by `lib/event-status.ts`, the ring by `lib/seats.ts`, which the registration
-  panel shares), `PageIntro` (every sub-page opening), `SectionHead`, `Eyebrow`,
+  section (`Container`, `px-gutter`), and wide, open space: `py-section` 88 → 144px.
+  `p-card` for the calendar dialog, `p-panel` (28 → 48px) for the registration,
+  which below `lg` becomes a full-width forest band. `py-band` for compact bands;
+  breakpoints `md` tablet, `lg` desktop, `nav` (1100px) header links. No section is
+  forced to a screen's height.
+- Shared components: `EventSummary` (every date, open: seal, facts, `SeatBar`; fed
+  by `lib/event-status.ts`, the bar by `lib/seats.ts`, which the registration panel
+  shares), `PageIntro` (every sub-page opening), `SectionHead`, `Eyebrow`,
   `Fact`, `Button`, `Field` + `FormStatus`, `TestimonialList`, `Accordion` (every
   FAQ). Use them; do not restyle a copy.
 - Home: the forest opening holds statement, explanation, the action (in the first
@@ -217,8 +217,13 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Header 72px: links visible from `nav`, one filled action; over the home opening the
   bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then linen over a
   blur. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
-- Motion: interactions ~180ms (a button rises 2px, arrows slide, header links draw a
-  line); the hero's ring turns every 90 s; the breath's 11 s cycle (5.5 s in, 5.5 s
+- Motion (global.css): on load the opening's words drift up in turn and the photo
+  settles (`data-enter`); sections rise in on scroll (`data-reveal`,
+  `data-reveal-group`, CSS view timelines); the hero photo trails the scroll
+  (`data-parallax`), its glow breathes (`data-glow`), the seat bar fills
+  (`data-seat-fill`). On phones the home page has a bottom `ActionBar` with the next
+  date once the hero's action is gone. Interactions ~180ms (a button rises 2px,
+  arrows slide, header links draw a line); the hero's ring turns every 90 s; the breath's 11 s cycle (5.5 s in, 5.5 s
   out: resonance breathing) runs only on request; the event title flies into its
   dock on a scroll timeline. No `content-visibility`. Under reduced motion everything
   rests.

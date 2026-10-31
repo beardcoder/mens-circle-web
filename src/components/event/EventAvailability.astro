@@ -1,5 +1,5 @@
 ---
-import { button, card, label } from '@lib/ui';
+import { button, label } from '@lib/ui';
 
 import EventSummary from './EventSummary.astro';
 import type { PublicEvents } from './types';
@@ -18,7 +18,7 @@ const next = data?.events[0];
 {next ? (
   <EventSummary view={next.view} location={location} showAction={showAction} />
 ) : (
-  <div class:list={[card, 'grid content-start gap-4 p-card']}>
+  <div data-reveal class="grid content-start justify-items-start gap-4">
     <p class={label}>Nächster Termin</p>
     <p class="font-display text-sub text-fg">
       {data ? 'Der nächste Abend ist in Planung.' : 'Die Termine sind gerade nicht abrufbar.'}

@@ -14,7 +14,7 @@ const { anchor, eyebrow } = Astro.props;
   <h2 id="praktisches-title" class="sr-only">
     {eyebrow}
   </h2>
-  <dl class="grid border-y border-line lg:grid-cols-4 lg:py-8">
+  <dl data-reveal-group class="grid gap-y-8 lg:grid-cols-4 lg:gap-x-grid">
     <slot />
   </dl>
 </Section>
