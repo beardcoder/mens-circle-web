@@ -279,8 +279,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Prefetch is one Speculation Rules block in `Layout.astro`: same-origin links on hover
   or press (Chromium), never `/admin`, `/auth` or `/api`. No Astro prefetch script and
   no per-link attributes.
-- Search: utility pages (`/teile-deine-erfahrung`, `/auth/*`) are `noindex, follow` and
-  stay out of the sitemap and llms.txt. An event held outside Straubing names its
+- Search: every public page is indexed and in the sitemap, the legal pages and
+  `/teile-deine-erfahrung` included; only `/admin`, `/auth/*` (redirect endpoints)
+  and the 404 stay out (`noindex` on the admin and the 404). llms.txt lists the
+  three content pages. An event held outside Straubing names its
   place in the `<title>` (≤ 60 chars, brand dropped first). Structured data states only
   what the pages say (Person, `areaServed`); no FAQPage for rich results.
 - JSON-LD ids (`#organization`, `#markus`, `#website`, `#series`) are defined once.

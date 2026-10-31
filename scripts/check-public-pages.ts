@@ -244,6 +244,12 @@ try {
 
     assert(paths.includes('/'));
     assert(paths.includes('/event'));
+
+    for (const path of ['/impressum', '/datenschutz', '/teile-deine-erfahrung']) {
+      assert(paths.includes(path), `${path} is public and belongs in the sitemap`);
+    }
+
+    assert(!paths.some((path) => path.startsWith('/admin') || path.startsWith('/auth')));
     console.info(
       `Public HTML: home ${Buffer.byteLength(home)} bytes, overview ${Buffer.byteLength(overview)} bytes; zero hydrated islands.`,
     );
