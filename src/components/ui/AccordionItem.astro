@@ -53,7 +53,7 @@ const { question } = Astro.props;
   type Controls = ReturnType<typeof animate>;
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const unfold = { type: spring, visualDuration: 0.45, bounce: 0 } as const;
+  const unfold = { type: spring, visualDuration: 0.6, bounce: 0 } as const;
 
   for (const item of document.querySelectorAll<HTMLDetailsElement>('details[data-accordion]')) {
     const summary = item.querySelector('summary');
@@ -83,7 +83,7 @@ const { question } = Astro.props;
 
       if (closing) {
         item.setAttribute('data-closing', '');
-        running = animate(panel, { height: [`${from}px`, '0px'] }, { ...unfold, visualDuration: 0.35 });
+        running = animate(panel, { height: [`${from}px`, '0px'] }, { ...unfold, visualDuration: 0.45 });
         void running.then(() => {
           if (!item.hasAttribute('data-closing')) return;
 
@@ -100,7 +100,11 @@ const { question } = Astro.props;
 
       const to = text.getBoundingClientRect().height;
 
-      animate(text, { opacity: [0, 1], transform: ['translateY(-0.5rem)', 'none'] }, unfold);
+      animate(
+        text,
+        { opacity: [0, 1], transform: ['translateY(-0.375rem)', 'none'] },
+        { ...unfold, opacity: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } },
+      );
       running = animate(panel, { height: [`${from}px`, `${to}px`] }, unfold);
       void running.then(() => {
         if (item.open && !item.hasAttribute('data-closing')) finish();
