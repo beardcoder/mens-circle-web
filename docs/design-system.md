@@ -160,26 +160,35 @@ no shadow. A primary button glows a little in its own colour on hover.
 ## Motion
 
 The page moves the way an evening starts: things arrive one after the other and
-settle. It is done with Motion (motion.dev; `components/Motion.astro`, one small
-script on every public page: `animate` from `motion/mini` with `inView`, `scroll`,
-`spring` and `stagger`, about 9 kB). Soft rather than snappy: opacity and focus
-ease out on one long curve (`[0.22, 1, 0.36, 1]`, about 1.1 s), movement follows
-springs without overshoot (about 1.1 s, 1.6 s for the photo), distances stay short
-(a word 0.3em, a section 1.25rem) and things follow one another at 0.07 s (words)
-or 0.12 s (a group). A calm site, not a playful one.
+settle. Soft rather than snappy: opacity eases out on one long curve
+(`--ease-out`, `[0.22, 1, 0.36, 1]`, about 1.1 s), movement follows Motion's
+springs without overshoot (visualDuration 1.1 s, 1.6 s for the photo), distances
+stay short (a word 0.3em, a section 1.25rem) and things follow one another at
+0.07 s (words) or 0.12 s (a group). A calm site, not a playful one.
 
-- On load (`data-enter`, in document order): the label, then the title word by word
-  (`data-enter="words"`; `lib/words.ts` wraps the words on the server, so the lines
-  break the same before and after) rising out of a soft blur, then the lead, the
-  action and the next date, each a beat after the last. The photo settles from a
-  little larger (`settle`), the ring of the logo follows (`ring`). The home opening
-  and every sub-page opening (`PageIntro`) work this way.
-- On scroll (`inView`, once): a section rises in as it enters the view
-  (`data-reveal`); a group's children follow one another (`data-reveal-group`;
-  every section head is one and also comes into focus out of a light blur,
-  `data-reveal-group="focus"`), and the path between the steps draws itself in after
-  the circles (`data-line`). The seat bar fills to the taken seats
-  (`data-seat-fill`); in the opening it waits for its date line.
+Performance comes first, checked with Lighthouse on every motion change (see
+"Lighthouse" below): only opacity and transforms move, so everything runs on the
+compositor (no blur, no height except the FAQ on a press); no script reads layout
+before the page has settled (state at a scroll position comes from an
+`IntersectionObserver` on a sentinel, never from `scrollY`); and the opening never
+waits for a script.
+
+- The opening (`data-enter`, global.css, pure CSS from the first paint, because the
+  title is the largest paint): the label, then the title word by word
+  (`data-enter="words"`; `lib/words.ts` wraps the words on the server with their
+  index, so the lines break the same with and without motion), then the lead, the
+  action and the next date at their `--enter-delay` (`afterWords()`). The photo
+  settles from a little larger (`settle`), the ring of the logo follows (`ring`).
+  The springs are Motion's, sampled into `linear()` (`--ease-spring`,
+  `--ease-spring-slow` in theme.css). The home opening and every sub-page opening
+  (`PageIntro`) work this way.
+- Below it, Motion (motion.dev; `components/Motion.astro`, `animate` from
+  `motion/mini` with `inView`, `scroll`, `spring`, about 9 kB). On scroll (`inView`,
+  once): a section rises in as it enters the view (`data-reveal`); a group's
+  children follow one another (`data-reveal-group`; every section head is one), and
+  the path between the steps draws itself in after the circles (`data-line`). The
+  seat bar fills to the taken seats (`data-seat-fill`); in the opening it waits for
+  its date line.
 - Scroll-linked depth (`data-parallax="<distance>"`; Motion runs it on the
   browser's scroll timeline where there is one): as the opening scrolls away the
   glow drifts most, the photo a little, the words drift up and dim slightly
@@ -195,10 +204,21 @@ or 0.12 s (a group). A calm site, not a playful one.
   cycle (`data-glow`), the ring turns.
 
 The boot script in `Layout.astro` sets `data-motion` on `<html>` only when motion is
-allowed; `global.css` keeps hooked elements hidden under it until they move. If the
+allowed; `global.css` keeps the scroll hooks hidden under it until they move. If the
 script has not started within three seconds the flag is dropped and everything
 stands. Without the flag (reduced motion, no script, print) nothing hides. Third-party
-scripts load `async`, so nothing queues in front of the opening.
+scripts load `async`, so nothing queues in front of the page's own.
+
+### Lighthouse
+
+Run it against a production build (`bun run build`, then the server on a disposable
+database) for the home page on mobile and desktop and for any page whose motion
+changed: `bunx lighthouse <url> --only-categories=performance,accessibility,best-practices,seo`
+(add `--preset=desktop`). Hold: CLS 0, no forced reflow ("Forced reflow" insight
+empty), no non-composited animations, the LCP element's render delay well under
+half a second. Locally the server does not compress (the proxy does in
+production), so the render-blocking stylesheet weighs more in the simulated
+mobile score than it does live.
 
 Short transitions answer interactions (a button rises 2px, arrows slide, header
 links draw a line). The hero's ring turns once every 90 seconds; the breath circle

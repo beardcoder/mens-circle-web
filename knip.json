@@ -5,5 +5,6 @@
     ".": {
       "entry": ["scripts/schedule.ts", "scripts/send-reminders.ts", "public/sw.js"]
     }
-  }
+  },
+  "ignore": [".claude/**"]
 }

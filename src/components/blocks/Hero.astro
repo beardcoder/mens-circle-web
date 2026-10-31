@@ -2,7 +2,7 @@
 import type { ImageMetadata } from 'astro';
 
 import { button, label } from '@lib/ui';
-import { splitWords } from '@lib/words';
+import { afterWords, splitWords } from '@lib/words';
 
 import SeatBar from '../event/SeatBar.astro';
 import type { PublicEvents } from '../event/types';
@@ -24,6 +24,7 @@ const next = events?.events[0];
 const action = next?.view.action ?? { href: '/event', label: 'Termine ansehen' };
 const largest = images.at(-1)!;
 const title = splitWords(await Astro.slots.render('title'));
+const beat = (n: number) => afterWords(title.count, n);
 
 /** The next evening in one open line under the action: date, time and place, how full it is. */
 const nextLine = next
@@ -66,12 +67,12 @@ const nextLine = next
         id="hero-title"
         data-enter="words"
         class="max-w-[11em] text-hero text-fg wrap-anywhere hyphens-auto"
-        set:html={title}
+        set:html={title.html}
       />
-      <p data-enter class="mt-7 max-w-measure text-lg text-fg-muted">
+      <p data-enter style={beat(0)} class="mt-7 max-w-measure text-lg text-fg-muted">
         <slot />
       </p>
-      <div data-enter class="mt-10 flex w-full flex-wrap items-center gap-x-8 gap-y-3">
+      <div data-enter style={beat(1)} class="mt-10 flex w-full flex-wrap items-center gap-x-8 gap-y-3">
         <a
           href={action.href}
           class:list={[button({ size: 'lg' }), 'max-sm:w-full sm:min-w-56']}
@@ -95,6 +96,7 @@ const nextLine = next
         <a
           href={action.href}
           data-enter
+          style={beat(2)}
           class="group/next mt-14 grid w-full max-w-md gap-3"
           data-umami-event="cta-click"
           data-umami-event-location="home-hero-date"
@@ -113,7 +115,7 @@ const nextLine = next
         </a>
       )}
       {events && !next && (
-        <p data-enter class="mt-14 max-w-md text-base text-fg-muted">
+        <p data-enter style={beat(2)} class="mt-14 max-w-md text-base text-fg-muted">
           Der nächste Abend ist in Planung.{' '}
           <a href="/event#benachrichtigung" class="font-semibold text-accent underline underline-offset-4">
             Über neue Termine informieren
@@ -136,14 +138,12 @@ const nextLine = next
           class="aspect-square w-full rounded-full object-cover"
         />
         {/* The circle of the logo: a thin ring with three warm points, turning slowly. */}
-        <div
-          aria-hidden="true"
-          data-enter="ring"
-          class="hero-orbit pointer-events-none absolute -inset-[7%] rounded-full border border-line-strong"
-        >
-          <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-glow"></span>
-          <span class="absolute top-3/4 left-[93.3%] size-3 -translate-1/2 rounded-full bg-fill"></span>
-          <span class="absolute top-3/4 left-[6.7%] size-3 -translate-1/2 rounded-full bg-accent"></span>
+        <div aria-hidden="true" data-enter="ring" class="pointer-events-none absolute -inset-[7%]">
+          <div class="hero-orbit absolute inset-0 rounded-full border border-line-strong">
+            <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-glow"></span>
+            <span class="absolute top-3/4 left-[93.3%] size-3 -translate-1/2 rounded-full bg-fill"></span>
+            <span class="absolute top-3/4 left-[6.7%] size-3 -translate-1/2 rounded-full bg-accent"></span>
+          </div>
         </div>
       </div>
     </div>

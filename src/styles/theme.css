@@ -170,6 +170,63 @@
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
+  /* Motion's spring without overshoot (visualDuration 1.1 s, bounce 0), sampled into
+     CSS for what moves before any script runs; it takes 1.74 s to rest. */
+  --ease-spring: linear(
+    0,
+    0.0475,
+    0.1524,
+    0.2772,
+    0.4014,
+    0.5146,
+    0.6128,
+    0.695,
+    0.7622,
+    0.8161,
+    0.8588,
+    0.8923,
+    0.9182,
+    0.9382,
+    0.9535,
+    0.9651,
+    0.9739,
+    0.9806,
+    0.9855,
+    0.9893,
+    0.9921,
+    0.9941,
+    0.9957,
+    0.9968,
+    1
+  );
+  /* The same, slower (visualDuration 1.6 s; 2.4 s to rest): the photo and the ring. */
+  --ease-spring-slow: linear(
+    0,
+    0.0432,
+    0.1402,
+    0.2575,
+    0.3764,
+    0.4867,
+    0.584,
+    0.667,
+    0.7361,
+    0.7925,
+    0.838,
+    0.8743,
+    0.9029,
+    0.9254,
+    0.9428,
+    0.9564,
+    0.9668,
+    0.9748,
+    0.9809,
+    0.9856,
+    0.9892,
+    0.9918,
+    0.9939,
+    0.9954,
+    1
+  );
 
   /* Motion is reserved for opening controls and loading indicators. */
   --animate-rise: rise 240ms var(--ease-out) both;

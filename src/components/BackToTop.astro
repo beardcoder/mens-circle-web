@@ -2,6 +2,8 @@
 import { Icon } from 'astro-icon/components';
 ---
 
+{/* Four fifths of a screen down the page: once it has scrolled past, the link shows. */}
+<span data-top-sentinel aria-hidden="true" class="pointer-events-none absolute top-[80svh] left-0 size-px"></span>
 <a
   href="#top"
   data-scroll-top
@@ -24,22 +26,13 @@ import { Icon } from 'astro-icon/components';
       document.getElementById('top')?.focus({ preventScroll: true });
     });
 
-    let frame = 0;
+    // Watched, not measured: reading the scroll position could force a layout.
+    const sentinel = document.querySelector('[data-top-sentinel]');
 
-    const update = (): void => {
-      frame = 0;
-      link.toggleAttribute('data-visible', window.scrollY > window.innerHeight * 0.8);
-    };
-
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!frame) frame = requestAnimationFrame(update);
-      },
-      { passive: true },
-    );
-    window.addEventListener('resize', update, { passive: true });
-    window.addEventListener('pageshow', update);
-    update();
+    if (sentinel) {
+      new IntersectionObserver(([entry]) => {
+        link.toggleAttribute('data-visible', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+      }).observe(sentinel);
+    }
   }
 </script>

@@ -1,5 +1,5 @@
 ---
-import { splitText } from '@lib/words';
+import { afterWords, splitText } from '@lib/words';
 
 import Container from './ui/Container.astro';
 import Eyebrow from './ui/Eyebrow.astro';
@@ -19,6 +19,8 @@ interface Props {
 }
 
 const { eyebrow, title, id, titleId } = Astro.props;
+
+const words = splitText(title);
 
 const titleClass = 'max-w-[12em] text-page text-fg wrap-anywhere hyphens-auto';
 
@@ -52,14 +54,14 @@ const hasMedia = Astro.slots.has('media');
           {eyebrow}
         </Eyebrow>
       )}
-      <h1 id={titleId} data-enter="words" class={titleClass} set:html={splitText(title)} />
+      <h1 id={titleId} data-enter="words" class={titleClass} set:html={words.html} />
       {hasLead && (
-        <div data-enter class="mt-6 max-w-measure text-lg text-fg-muted">
+        <div data-enter style={afterWords(words.count, 0)} class="mt-6 max-w-measure text-lg text-fg-muted">
           <slot name="lead" />
         </div>
       )}
       {hasAction && (
-        <div data-enter class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div data-enter style={afterWords(words.count, 1)} class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
           <slot />
         </div>
       )}
