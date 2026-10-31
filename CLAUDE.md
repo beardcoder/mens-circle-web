@@ -222,7 +222,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Motion: the opening moves in pure CSS from the first paint (`data-enter`,
   global.css; the title is the LCP): the title rises word by word
   (`data-enter="words"`, words and their index `--i` wrapped on the server by
-  `lib/words.ts`), the rest follows at `--enter-delay` (`afterWords()`), the photo
+  `lib/words.ts`, out of a soft blur), the rest follows at `--enter-delay` (`afterWords()`), the photo
   settles (`settle`), its ring follows (`ring`), on Motion's springs sampled into
   `--ease-spring`/`--ease-spring-slow`. Below it motion.dev in
   `components/Motion.astro` (`motion/mini` `animate`, `inView`, `scroll`, `spring`;
@@ -239,8 +239,12 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `data-motion-failed` fades the waiting sections in once). CSS keeps the
   loops: the glow breathes (`data-glow`), the ring turns every 90 s.
 - Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
-  forced reflow, no non-composited animation. Only opacity and transforms move (no
-  blur, no animated layout except the FAQ height on a press). Never read layout or
+  forced reflow. Only opacity and transforms move, with two accepted exceptions
+  that Lighthouse lists but does not score: the soft blur the opening's title words
+  and the section heads (`data-reveal-group="focus"`) come into focus from, once,
+  ending at `filter: none`, and the FAQ height on a press. Fades use `--ease-fade`
+  (a gentle start, so the fade is seen); the springs fall back to `--ease-out`
+  where `linear()` is missing (Safari < 17.2). Never read layout or
   `scrollY` at load: header tone, back-to-top and the like watch a sentinel with an
   `IntersectionObserver`. Nothing that holds the LCP waits for a script.
   Third-party scripts are `async`, so nothing queues before the opening. On phones

@@ -3,11 +3,13 @@
  * The page's motion below the opening, with Motion (motion.dev). The opening itself
  * moves in CSS (global.css, "Motion: the opening"), so the largest paint never waits
  * for this script. Soft rather than snappy: opacity eases out on a long curve,
- * movement follows springs without overshoot, distances stay short, and only
- * opacity and transforms move, so everything runs on the compositor. Hooks:
+ * movement follows springs without overshoot, distances stay short, and besides
+ * the heads' focus only opacity and transforms move, on the compositor. Hooks:
  *
  * - `data-reveal` / `data-reveal-group`: rises in once it enters the view; a group
  *   staggers its children, and a step's path (`data-line`) draws itself in after.
+ *   `data-reveal-group="focus"` (section heads) also comes into focus out of a soft
+ *   blur, the one non-composited piece, once and gone when it rests.
  * - `data-seat-fill`: the capacity bar fills once it is in view.
  *
  * The boot script in Layout sets `data-motion` only when motion is allowed; global.css
@@ -24,9 +26,10 @@
 
   type Targets = Element | Iterable<Element>;
 
-  /** A long ease-out: fast at first, then a slow settle (opacity, fills). */
+  /** A long ease-out: fast at first, then a slow settle (fills, lines). */
   const ease = [0.22, 1, 0.36, 1] as const;
-  const fade = { duration: 1.1, ease };
+  /** Fading in: a gentle start, so the fade is seen, then a long settle (`--ease-fade`). */
+  const fade = { duration: 1.3, ease: [0.33, 0, 0.2, 1] as const };
   /** Movement on a soft spring that settles without overshoot. */
   const drift = { type: spring, visualDuration: 1.1, bounce: 0 } as const;
   /** Below the fold things move once they are a little way above the bottom edge. */
@@ -47,11 +50,11 @@
   };
 
   /**
-   * Fades in and rises a short way; several targets follow one another by `step`
-   * seconds. Opacity takes the long ease and the rise the spring, so each needs its
-   * own delay.
+   * Fades in and rises a short way and, with `blur`, comes into focus; several
+   * targets follow one another by `step` seconds. Opacity and focus take the fade,
+   * the rise the spring, so each needs its own delay.
    */
-  const rise = (targets: Targets, distance: string, start: number, step = 0) => {
+  const rise = (targets: Targets, distance: string, start: number, step = 0, blur = 0) => {
     const list = (targets instanceof Element ? [targets] : [...targets]).filter(rendered);
 
     list.forEach((target, i) => {
@@ -59,8 +62,12 @@
 
       animate(
         target,
-        { opacity: [0, 1], transform: [`translateY(${distance})`, 'none'] },
-        { ...drift, delay, opacity: { ...fade, delay } },
+        {
+          opacity: [0, 1],
+          transform: [`translateY(${distance})`, 'none'],
+          ...(blur > 0 && { filter: [`blur(${blur}px)`, 'none'] }),
+        },
+        { ...drift, delay, opacity: { ...fade, delay }, filter: { ...fade, delay } },
       );
     });
   };
@@ -71,7 +78,9 @@
     inView(
       '[data-reveal-group]',
       (el) => {
-        rise(el.children, '1.25rem', 0, 0.12);
+        const focus = (el as HTMLElement).dataset.revealGroup === 'focus';
+
+        rise(el.children, '1.25rem', 0, 0.12, focus ? 6 : 0);
 
         const lines = [...el.querySelectorAll('[data-line]')].filter(shown);
 
