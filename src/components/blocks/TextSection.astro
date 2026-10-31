@@ -16,7 +16,7 @@ const { anchor, eyebrow, title } = Astro.props;
 <Section id={anchor} space="band">
   <Split>
     <SectionHead slot="head" eyebrow={eyebrow} title={title} size="sub" />
-    <Prose>
+    <Prose reveal>
       <slot />
     </Prose>
   </Split>

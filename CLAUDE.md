@@ -228,9 +228,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `components/Motion.astro` (`motion/mini` `animate`, `inView`, `scroll`, `spring`;
   soft: opacity on a long ease-out, movement on springs without overshoot, short
   distances): sections rise in once in view (`data-reveal`, `data-reveal-group`,
-  the steps' path `data-line`), the seat bar fills (`data-seat-fill`); depth layers
-  drift as their section passes (`data-parallax="<distance>"`: glow, photo, the
-  hero's words with `data-parallax-dim`, the far hill under the breath). FAQ
+  the steps' path `data-line`), the seat bar fills (`data-seat-fill`). No parallax: nothing moves with the scroll itself (the event title's dock is
+  the one scroll-linked piece). Every page reveals its sections: `Prose reveal`,
+  `LinkList`, `ValueItems`, the newsletter, the event story and map, the event
+  intro's lower part (`data-enter`, not the title, which the dock flies). FAQ
   answers unfold and fold on a spring (`AccordionItem`, `item-open:` variant); the
   phone `ActionBar` glides in and out (its own script). Scroll hidden states live
   in `global.css` under `[data-motion]`, which the boot script sets only with

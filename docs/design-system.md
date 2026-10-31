@@ -168,7 +168,7 @@ stay short (a word 0.3em, a section 1.25rem) and things follow one another at
 
 Performance comes first, checked with Lighthouse on every motion change (see
 "Lighthouse" below): only opacity and transforms move, so everything runs on the
-compositor (no blur, no height except the FAQ on a press); no script reads layout
+compositor (no blur, no height except the FAQ on a press, no parallax); no script reads layout
 before the page has settled (state at a scroll position comes from an
 `IntersectionObserver` on a sentinel, never from `scrollY`); and the opening never
 waits for a script.
@@ -189,10 +189,14 @@ waits for a script.
   the path between the steps draws itself in after the circles (`data-line`). The
   seat bar fills to the taken seats (`data-seat-fill`); in the opening it waits for
   its date line.
-- Scroll-linked depth (`data-parallax="<distance>"`; Motion runs it on the
-  browser's scroll timeline where there is one): as the opening scrolls away the
-  glow drifts most, the photo a little, the words drift up and dim slightly
-  (`data-parallax-dim`); under the breath the far hill moves against the near one.
+- No parallax: nothing moves with the scroll itself; things arrive once and then
+  stand. The event title flying into its dock is the one scroll-linked piece.
+- Every page reveals its sections the same way: section heads, `Prose reveal`
+  (text sections, legal pages, the close under the steps), `LinkList`,
+  `ValueItems`, the newsletter's two columns, the event's story, its "Du kannst
+  erst einmal zuhören" note and its map. On an event page the lower part of the
+  intro (lead, links, the registration panel) rises in at load in CSS; the date
+  and title stay still, because the dock flies them.
 - FAQ (`AccordionItem`): the answer unfolds on a spring and its text rises in
   behind it; it folds shut a little faster, the marker turns back at once
   (`data-closing`, the `item-open:` variant), and a second press turns the motion

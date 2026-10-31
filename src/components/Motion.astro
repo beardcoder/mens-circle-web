@@ -8,21 +8,18 @@
  *
  * - `data-reveal` / `data-reveal-group`: rises in once it enters the view; a group
  *   staggers its children, and a step's path (`data-line`) draws itself in after.
- * - `data-parallax="<distance>"`: a depth layer that drifts by that distance while its
- *   section passes; in the opening, as the opening scrolls away (the photo, the glow
- *   behind it, the words drifting up and dimming a little), elsewhere across the
- *   whole pass (the hills under the breath).
  * - `data-seat-fill`: the capacity bar fills once it is in view.
  *
  * The boot script in Layout sets `data-motion` only when motion is allowed; global.css
  * hides the hooked elements under it until they move, and the boot script drops it
  * again if this script has not started within three seconds. Nothing here reads
- * layout before it writes: Motion's `inView` and `scroll` observe, they do not measure.
+ * layout: Motion's `inView` observes, it does not measure. No parallax: nothing
+ * moves with the scroll itself.
  */
 ---
 
 <script>
-  import { inView, scroll, spring, stagger } from 'motion';
+  import { inView, spring, stagger } from 'motion';
   import { animate } from 'motion/mini';
 
   type Targets = Element | Iterable<Element>;
@@ -103,36 +100,11 @@
     );
   };
 
-  /**
-   * Depth: each layer drifts by its own distance while its section passes, so the
-   * glow, the photo and the words part a little as the opening scrolls away.
-   * Motion runs these on the browser's scroll timeline where there is one.
-   */
-  const parallax = () => {
-    for (const el of document.querySelectorAll<HTMLElement>('[data-parallax]')) {
-      const distance = el.dataset.parallax || '12%';
-      const target = el.closest('section') ?? el;
-      const opening = !!el.closest('[data-hero]');
-
-      const keyframes = opening
-        ? { transform: ['none', `translateY(${distance})`] }
-        : { transform: [`translateY(${distance})`, `translateY(calc(${distance} * -1))`] };
-
-      const fadeOut = el.hasAttribute('data-parallax-dim') ? { opacity: [1, 0.35] } : {};
-
-      scroll(animate(el, { ...keyframes, ...fadeOut }, { ease: 'linear' }), {
-        target,
-        offset: opening ? ['start start', 'end start'] : ['start end', 'end start'],
-      });
-    }
-  };
-
   const root = document.documentElement;
 
   if (root.hasAttribute('data-motion')) {
     root.setAttribute('data-motion-ready', '');
     reveal();
     seats();
-    parallax();
   }
 </script>

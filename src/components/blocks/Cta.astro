@@ -16,7 +16,7 @@ const { eyebrow, title, text, buttonLink, buttonText } = Astro.props;
 
 <Section ground="alt" space="band" innerClass="grid items-end gap-x-grid gap-y-6 py-4 lg:grid-cols-12">
   <SectionHead eyebrow={eyebrow} title={title} lead={text} size="sub" class="lg:col-span-8" />
-  <p class="flex flex-wrap items-center gap-x-6 gap-y-2 lg:col-span-4 lg:justify-end">
+  <p data-reveal class="flex flex-wrap items-center gap-x-6 gap-y-2 lg:col-span-4 lg:justify-end">
     <Button
       href={buttonLink}
       size="lg"

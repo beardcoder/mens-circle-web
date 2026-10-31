@@ -22,7 +22,7 @@ const { anchor, eyebrow, title, intro, items } = Astro.props;
   <SectionHead eyebrow={eyebrow} title={title} lead={intro} size="sub" />
 
   {items.length > 0 && (
-    <ul role="list" class="mt-8 grid gap-x-grid gap-y-6 md:grid-cols-2">
+    <ul role="list" data-reveal-group class="mt-8 grid gap-x-grid gap-y-6 md:grid-cols-2">
       {items.map((item) => (
         <li class="grid content-start gap-2">
           <span aria-hidden="true" class="mb-3 block h-px bg-line-strong"></span>
