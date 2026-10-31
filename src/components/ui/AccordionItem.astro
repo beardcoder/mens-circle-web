@@ -10,7 +10,8 @@ const { question } = Astro.props;
   itemprop="mainEntity"
   itemscope
   itemtype="https://schema.org/Question"
-  class="group/item border-b border-line [&::details-content]:h-0 [&::details-content]:overflow-clip [&::details-content]:transition-[height,content-visibility] [&::details-content]:duration-200 [&::details-content]:[transition-behavior:allow-discrete] open:[&::details-content]:h-auto"
+  data-accordion
+  class="group/item border-b border-line"
 >
   <summary
     class="group/q flex min-h-18 list-none items-center justify-between gap-6 py-5 text-left [&::-webkit-details-marker]:hidden"
@@ -26,15 +27,84 @@ const { question } = Astro.props;
     {/* A plus whose upright bar folds away into a minus when open. */}
     <span
       aria-hidden="true"
-      class="relative grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent transition-[background-color,color,rotate] duration-200 ease-out group-open/item:rotate-180 group-open/item:bg-fill group-open/item:text-on-fill before:absolute before:h-[1.5px] before:w-3 before:bg-current after:absolute after:h-3 after:w-[1.5px] after:bg-current after:transition-[scale] after:duration-180 group-open/item:after:scale-y-0"
+      class="relative grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent transition-[background-color,color,rotate] duration-200 ease-out item-open:rotate-180 item-open:bg-fill item-open:text-on-fill before:absolute before:h-[1.5px] before:w-3 before:bg-current after:absolute after:h-3 after:w-[1.5px] after:bg-current after:transition-[scale] after:duration-180 item-open:after:scale-y-0"
     />
   </summary>
-  <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
+  <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer" data-accordion-panel>
     <div
       itemprop="text"
-      class="motion-safe:group-open/item:animate-fade-in max-w-measure pb-7 text-md text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px]"
+      class="max-w-measure pb-7 text-md text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px]"
     >
       <slot />
     </div>
   </div>
 </details>
+
+<script>
+  /**
+   * The answer unfolds and folds with Motion: its height follows a spring, the text
+   * rises in a little behind it. The item stays open until the answer has closed
+   * (`data-closing` turns the marker back at once); a second press mid-way turns the
+   * motion around from where it is. Under reduced motion the native toggle stays.
+   */
+  import { spring } from 'motion';
+  import { animate } from 'motion/mini';
+
+  type Controls = ReturnType<typeof animate>;
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const unfold = { type: spring, visualDuration: 0.45, bounce: 0 } as const;
+
+  for (const item of document.querySelectorAll<HTMLDetailsElement>('details[data-accordion]')) {
+    const summary = item.querySelector('summary');
+    const panel = item.querySelector<HTMLElement>('[data-accordion-panel]');
+    const text = panel?.firstElementChild;
+    let running: Controls | undefined;
+
+    if (!summary || !panel || !text) continue;
+
+    const finish = () => {
+      running = undefined;
+      panel.style.removeProperty('height');
+      panel.style.removeProperty('overflow');
+    };
+
+    summary.addEventListener('click', (event) => {
+      if (reduced.matches) return;
+
+      event.preventDefault();
+
+      // A closed item's answer is not rendered, yet still measures its full height.
+      const from = item.open ? panel.getBoundingClientRect().height : 0;
+      const closing = item.open && !item.hasAttribute('data-closing');
+
+      running?.stop();
+      panel.style.overflow = 'clip';
+
+      if (closing) {
+        item.setAttribute('data-closing', '');
+        running = animate(panel, { height: [`${from}px`, '0px'] }, { ...unfold, visualDuration: 0.35 });
+        void running.then(() => {
+          if (!item.hasAttribute('data-closing')) return;
+
+          item.removeAttribute('data-closing');
+          item.open = false;
+          finish();
+        });
+
+        return;
+      }
+
+      item.removeAttribute('data-closing');
+      item.open = true;
+
+      const to = text.getBoundingClientRect().height;
+
+      animate(text, { opacity: [0, 1], transform: ['translateY(-0.5rem)', 'none'] }, unfold);
+      running = animate(panel, { height: [`${from}px`, `${to}px`] }, unfold);
+      void running.then(() => {
+        if (item.open && !item.hasAttribute('data-closing')) finish();
+      });
+    });
+  }
+</script>

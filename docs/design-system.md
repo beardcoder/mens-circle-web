@@ -178,6 +178,13 @@ site, not a playful one.
   (`data-seat-fill`); in the opening it waits for its date line.
 - Scroll-linked: the hero photo trails the scroll a little (`data-parallax`; Motion
   runs it on the browser's scroll timeline where there is one).
+- FAQ (`AccordionItem`): the answer unfolds on a spring and its text rises in
+  behind it; it folds shut a little faster, the marker turns back at once
+  (`data-closing`, the `item-open:` variant), and a second press turns the motion
+  around mid-way. Under reduced motion the native toggle stays.
+- The bottom bar on phones (`ActionBar`) glides up on a spring once the opening's
+  action has gone, its date and action a beat behind; it slips away faster than it
+  came.
 - Loops that never change state stay in CSS: the glow breathes on the 11-second
   cycle (`data-glow`), the ring turns.
 
