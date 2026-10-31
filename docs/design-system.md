@@ -6,7 +6,7 @@ A men's circle meets in the evening, sits in a ring and listens. The site looks 
 that evening: deep forest green for what draws you in, the warm ember of the logo
 for the one thing to do, linen daylight for reading. The circle is the one motif —
 the photograph in a ring, three warm points on it (the three figures of the logo),
-the seats around the date, numbered steps on a path, the breath above the hills of
+the date in its seal, numbered steps on a path, the breath above the hills of
 the Bavarian Forest. Shapes are soft and round.
 
 Four principles: make the next step visible, group what belongs together, keep
@@ -29,8 +29,8 @@ then stepping back. Translated into design:
   hesitant visitor needs to decide.
 - **Grounded.** Nature, body and breath, never lofty: forest, hills, fire and the
   breath as concrete things, no cosmic imagery, no gradients for their own sake.
-- **The circle.** The ring is the space everyone shares; the seats around the date
-  show how many seats are taken and how many are still free.
+- **The circle.** The ring is the space everyone shares; under every date a slim
+  bar shows how full the circle already is.
 - **Open to every man.** Language that excludes no one (age, origin, faith, with
   whom you share your life); "du", plain German, no jargon and no "brother" tone.
 
@@ -60,7 +60,7 @@ facts and the FAQ, not in every section.
 | `src/styles/admin.css`    | Admin entry: Tailwind and theme; AdminLayout pins the dark mode (the forest at night).                                                       |
 | `src/lib/ui.ts`           | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
 | `src/lib/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
-| `src/lib/seats.ts`        | The ring of seats (`seatRing`), shared by the date seal and the registration panel; imports nothing, so client code may use it.              |
+| `src/lib/seats.ts`        | How full a circle is (`seatFill`), shared by the date's bar and the registration panel; imports nothing.                                     |
 | `src/components/ui/`      | The components built on them; `src/icons/` the line icons (24px grid, 1.7 stroke).                                                           |
 
 ## Colour
@@ -128,15 +128,15 @@ One content width, 1200px, and **one edge**: the content sits 28 / 40 / 56px fro
 the window (`gutter`, `Container`) in every section, and the header shares it. The
 grounds — the opening, the bands and the footer — run from edge to edge.
 
-Content stands on its ground; a second part is parted by a line or by space, never
-by a box. Two paddings remain for the few cards: `card` 24 / 28 / 32px (the date
-card, the calendar dialog), `panel` 28 / 40 / 48px (the registration; below `lg` it
-becomes a forest band from edge to edge with the gutter as its side padding). Date
-cards in a list stand `stack` 16 / 20 / 24px apart. A card is never nested in a
-card.
+Content stands on its ground, with plenty of air; a second part is parted by space,
+rarely by a line, never by a box. The dates are open too: no card, the facts as small
+columns and a seat bar. Two paddings remain: `card` 24 / 28 / 32px (the calendar
+dialog), `panel` 28 / 40 / 48px (the registration: beside the intro it runs out to
+the window's right edge with a rounded inner corner; below `lg` it is a forest band
+from edge to edge).
 
-Space per width on `:root`: `py-section` 72 → 112px, `py-band` 48 → 64px, `group`
-32 → 48px (an explanation to the module after it), `grid` 32 → 48px (column gap).
+Space per width on `:root`: `py-section` 88 → 144px, `py-band` 56 → 80px, `group`
+40 → 64px (an explanation to the module after it), `grid` 32 → 48px (column gap).
 An eyebrow stands 16px above its title. Breakpoints: `sm` 36rem, `md` 48rem, `lg`
 64rem, `nav` 68.75rem (the header shows its links), `xl` 80rem. No section is forced
 to a screen's height.
@@ -159,31 +159,44 @@ no shadow. A primary button glows a little in its own colour on hover.
 
 ## Motion
 
+The page moves the way an evening starts: things arrive one after the other and
+settle. On load the opening's words drift up in turn and the photo settles from a
+slightly larger scale (`data-enter`, staggered by `--enter-delay`); on scroll every
+section head, list and quote rises in as it enters the view (`data-reveal`,
+`data-reveal-group` staggers children; CSS view timelines, no script); the hero
+photo trails the scroll a little (`data-parallax`), its glow breathes on the 11-second
+cycle (`data-glow`), and the seat bar fills as it comes into view (`data-seat-fill`).
+All of it lives in `global.css` and runs only with motion allowed; nothing hides
+content where view timelines are unsupported.
+
 Short transitions answer interactions (a button rises 2px, arrows slide, header
 links draw a line). The hero's ring turns once every 90 seconds; the breath circle
-follows resonance breathing — 5.5 s in, 5.5 s out, an 11-second cycle — only when
-started, and stops off screen, in a hidden tab or under reduced motion. The phone menu opens as a circle and its links
-rise in (`rise`); the event title flies into its dock on a scroll timeline. Content
-never waits for motion. Under reduced motion everything rests.
+follows resonance breathing (5.5 s in, 5.5 s out) only when started, and stops off
+screen, in a hidden tab or under reduced motion. The phone menu opens as a circle
+and its links rise in (`rise`); the event title flies into its dock on a scroll
+timeline. On phones the home page keeps the next date and its action in a bottom bar
+(`ActionBar`) once the opening's action has scrolled away; it steps back at the
+dates and the footer. Content never waits for motion. Under reduced motion
+everything rests.
 
 ## Components
 
-| Component                                         | Purpose                                                                                          |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                           |
-| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `tint` / `dark`; every ground runs from edge to edge                |
-| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead                                                         |
-| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; without a photo the circle motif stands at its right                       |
-| `Eyebrow`                                         | The section label: ember dot, accent text                                                        |
-| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                         |
-| `TextLink`                                        | A quiet, underlined link with a small arrow                                                      |
-| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                    |
-| `EventSummary`                                    | One date: the seal (day and month) in its ring of seats, the date, four rows, the fitting action |
-| `Fact` (`icon`)                                   | An icon in an accent disc, label, value in Fraunces, a note; a row, on the desktop a column      |
-| `TestimonialList`                                 | One short featured quote behind an ember rule; the rest under a line each; long ones fold        |
-| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                    |
-| `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                           |
-| `ModeToggle`                                      | Auto · Hell · Dunkel (Auto follows the system), in the footer and the phone menu                 |
+| Component                                         | Purpose                                                                                                |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                                 |
+| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `tint` / `dark`; every ground runs from edge to edge                      |
+| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead                                                               |
+| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; without a photo the circle motif stands at its right                             |
+| `Eyebrow`                                         | The section label: ember dot, accent text                                                              |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                               |
+| `TextLink`                                        | A quiet, underlined link with a small arrow                                                            |
+| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                          |
+| `EventSummary`                                    | One date, open on its ground: the seal, the date, the facts as small columns, the seat bar, the action |
+| `Fact` (`icon`)                                   | An icon in an accent disc, label, value in Fraunces, a note; a row, on the desktop a column            |
+| `TestimonialList`                                 | One short featured quote behind an ember rule; the rest under a line each; long ones fold              |
+| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                          |
+| `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                                 |
+| `ModeToggle`                                      | Auto · Hell · Dunkel (Auto follows the system), in the footer and the phone menu                       |
 
 **Header.** 72px: the mark in ember and the word mark in Fraunces; from `nav` five
 links and one filled action; below `nav` the action and a menu button. Over the home
@@ -213,7 +226,7 @@ large and faint behind it.
 - **Event page.** The date line and the title — "Männer**kreis**", its second half in
   the accent — which fly into the dock as the page scrolls; the place, the calendar
   between lines and the registration on the forest (a band below `lg`), headed by
-  the same ring of seats; the evening's description (sand) with its question and a
+  the same seat bar; the evening's description (sand) with its question and a
   note under a line; the map; where next. A past date offers no registration.
 - **Personal page.** `PageIntro` with the rounded photograph, split heading/text
   sections, the FAQ, one closing invitation.
@@ -243,8 +256,8 @@ large and faint behind it.
 - No layout shift: a date summary's lines are one line (`truncate`); titles measure
   in `em`, never `ch`. A narrow summary (container under 24rem) sets the seal beside
   its label and the date below, so "17. September 2026" never truncates.
-- The ring of seats is drawn for 2–24 seats, taken first from the top, free ones in
-  the accent; it is decorative (`aria-hidden`) because the seats row says it in words.
+- The seat bar (`SeatBar`) is decorative (`aria-hidden`): the line under it says the
+  seats in words.
 - Forms: labels always visible, placeholders never instead; a field's message under
   the field, the form's result under its button (`FormStatus`), never a toast;
   entries survive an error; success says what actually happened.

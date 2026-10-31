@@ -7,6 +7,7 @@ import avatar from '../assets/images/markus-avatar-192.webp';
 import circle480 from '../assets/images/markus-kreis-480.avif';
 import circle720 from '../assets/images/markus-kreis-720.avif';
 import circle960 from '../assets/images/markus-kreis-960.avif';
+import ActionBar from '../components/blocks/ActionBar.astro';
 import Dates from '../components/blocks/Dates.astro';
 import Fact from '../components/blocks/Fact.astro';
 import Facts from '../components/blocks/Facts.astro';
@@ -267,4 +268,6 @@ if (events && testimonials) {
     whatsappLabel="Zur WhatsApp-Gruppe"
     whatsappLink={site.whatsappCommunityLink}
   />
+
+  <ActionBar events={events} />
 </Layout>

@@ -131,3 +131,132 @@
     rotate: 360deg;
   }
 }
+
+/* ── Motion: arrival and scroll ───────────────────────────────────────────── */
+
+/* The page moves the way an evening starts: things arrive one after the other and
+   settle. Everything here only runs with motion allowed; content is always in the
+   HTML and readable without it. Hooks are data attributes:
+   - `data-enter`: on load, drifts up (the default), fades in (`fade`) or settles
+     from a slightly larger scale (`settle`); `--enter-delay` staggers.
+   - `data-reveal` / `data-reveal-group`: rises in as it scrolls into view (a view
+     timeline, no script); a group staggers its children.
+   - `data-parallax`: trails the scroll a little (the hero photo).
+   - `data-glow`: breathes on the breath's 11-second cycle.
+   - `data-seat-fill`: the capacity bar fills as it comes into view. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-enter] {
+    animation: enter-rise 800ms var(--ease-out) both;
+    animation-delay: var(--enter-delay, 0ms);
+  }
+
+  [data-enter='fade'] {
+    animation-name: enter-fade;
+  }
+
+  [data-enter='settle'] {
+    animation: enter-settle 1400ms var(--ease-out) both;
+  }
+
+  [data-glow] {
+    animation: glow-breathe 11s ease-in-out infinite;
+  }
+
+  [data-seat-fill] {
+    animation: seat-fill 1100ms var(--ease-out) 350ms both;
+  }
+
+  @supports (animation-timeline: view()) {
+    [data-reveal],
+    [data-reveal-group] > * {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    [data-reveal-group] > :nth-child(2) {
+      animation-range: entry 8% entry 78%;
+    }
+
+    [data-reveal-group] > :nth-child(3) {
+      animation-range: entry 16% entry 86%;
+    }
+
+    [data-reveal-group] > :nth-child(n + 4) {
+      animation-range: entry 24% entry 94%;
+    }
+
+    /* Below the first screen the bar fills as it scrolls in. */
+    [data-seat-fill]:not([data-hero] *) {
+      animation: seat-fill linear both;
+      animation-timeline: view();
+      animation-range: entry 30% cover 45%;
+    }
+  }
+
+  @supports (animation-timeline: scroll()) {
+    [data-parallax] {
+      animation:
+        enter-settle 1400ms var(--ease-out) both,
+        parallax linear both;
+      animation-timeline: auto, scroll(root block);
+      animation-range:
+        normal,
+        0 100svh;
+    }
+  }
+}
+
+@media print {
+  [data-enter],
+  [data-reveal],
+  [data-reveal-group] > * {
+    animation: none !important;
+  }
+}
+
+@keyframes enter-rise {
+  from {
+    translate: 0 1.5rem;
+  }
+}
+
+@keyframes enter-fade {
+  from {
+    opacity: 0;
+    translate: 0 1rem;
+  }
+}
+
+@keyframes enter-settle {
+  from {
+    scale: 1.06;
+    opacity: 0.4;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 2.5rem;
+  }
+}
+
+@keyframes parallax {
+  to {
+    translate: 0 14%;
+  }
+}
+
+@keyframes glow-breathe {
+  50% {
+    scale: 1.08;
+    opacity: 0.75;
+  }
+}
+
+@keyframes seat-fill {
+  from {
+    scale: 0 1;
+  }
+}

@@ -1,9 +1,9 @@
 ---
 import type { ImageMetadata } from 'astro';
 
-import { button } from '@lib/ui';
+import { button, label } from '@lib/ui';
 
-import EventAvailability from '../event/EventAvailability.astro';
+import SeatBar from '../event/SeatBar.astro';
 import type { PublicEvents } from '../event/types';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
@@ -19,34 +19,59 @@ interface Props {
 }
 
 const { events, kicker, secondaryLabel, secondaryLink, images, imageAlt } = Astro.props;
-const action = events?.events[0]?.view.action ?? { href: '/event', label: 'Termine ansehen' };
+const next = events?.events[0];
+const action = next?.view.action ?? { href: '/event', label: 'Termine ansehen' };
 const largest = images.at(-1)!;
+
+/** The next evening in one open line under the action: date, time and place, how full it is. */
+const nextLine = next
+  ? {
+      date: next.view.title.join(' ').replace(/,$/, ''),
+      datetime: next.view.datetime,
+      meta: next.view.rows
+        .filter((row) => row.label === 'Zeit' || row.label === 'Ort')
+        .map((row) => row.value)
+        .join(' · '),
+      seats: next.view.rows.find((row) => row.label === 'Plätze')?.value ?? '',
+    }
+  : null;
 ---
 
+{/* The opening, from edge to edge on the forest. On load the words drift up one after
+     the other and the photo settles; on scroll the photo trails a little (global.css). */}
 <section
   data-hero
   aria-labelledby="hero-title"
-  class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section lg:pt-[calc(var(--spacing-header)+var(--spacing-band))]"
+  class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section"
 >
-  {/* Firelight: a warm glow where the circle sits. */}
+  {/* Firelight: a warm glow where the circle sits, breathing slowly. */}
   <div
     aria-hidden="true"
-    class="pointer-events-none absolute top-[38%] -right-[30%] aspect-square w-[110%] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-fill)_30%,transparent),transparent)] lg:top-[-12%] lg:-right-[10%] lg:w-[62%]"
+    data-glow
+    class="pointer-events-none absolute top-[38%] -right-[30%] aspect-square w-[110%] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-fill)_32%,transparent),transparent)] lg:top-[-14%] lg:-right-[12%] lg:w-[66%]"
   ></div>
 
-  <Container class="relative grid items-center gap-x-grid gap-y-14 lg:grid-cols-12">
+  <Container class="relative grid items-center gap-x-grid gap-y-16 lg:grid-cols-12">
     <div class="grid min-w-0 justify-items-start lg:col-span-7">
-      {kicker && <Eyebrow class="mb-5">{kicker}</Eyebrow>}
-      <h1 id="hero-title" class="max-w-[11em] text-hero text-fg wrap-anywhere hyphens-auto">
+      {kicker && (
+        <Eyebrow class="mb-6" data-enter="fade">
+          {kicker}
+        </Eyebrow>
+      )}
+      <h1
+        id="hero-title"
+        data-enter
+        class="max-w-[11em] text-hero text-fg wrap-anywhere hyphens-auto [--enter-delay:60ms]"
+      >
         <slot name="title" />
       </h1>
-      <p class="mt-6 max-w-measure text-lg text-fg-muted">
+      <p data-enter class="mt-7 max-w-measure text-lg text-fg-muted [--enter-delay:140ms]">
         <slot />
       </p>
-      <div class="mt-9 flex w-full flex-wrap items-center gap-x-7 gap-y-3">
+      <div data-enter="fade" class="mt-10 flex w-full flex-wrap items-center gap-x-8 gap-y-3 [--enter-delay:220ms]">
         <a
           href={action.href}
-          class:list={[button({ size: 'lg' }), 'max-sm:w-full sm:min-w-52']}
+          class:list={[button({ size: 'lg' }), 'max-sm:w-full sm:min-w-56']}
           data-umami-event="cta-click"
           data-umami-event-location="home-hero"
         >
@@ -54,19 +79,52 @@ const largest = images.at(-1)!;
         </a>
         <a
           href={secondaryLink}
-          class="inline-flex min-h-11 items-center text-base font-semibold text-accent underline decoration-1 underline-offset-4 hover:text-accent-strong"
+          class="group/link inline-flex min-h-11 items-center gap-2 text-base font-semibold text-accent hover:text-accent-strong"
         >
           {secondaryLabel}
+          <span aria-hidden="true" class="transition-transform duration-180 group-hover/link:translate-y-0.5">
+            ↓
+          </span>
         </a>
       </div>
+
+      {nextLine && (
+        <a
+          href={action.href}
+          data-enter="fade"
+          class="group/next mt-14 grid w-full max-w-md gap-3 [--enter-delay:300ms]"
+          data-umami-event="cta-click"
+          data-umami-event-location="home-hero-date"
+        >
+          <span class={label}>Nächster Termin</span>
+          <span class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <time
+              datetime={nextLine.datetime}
+              class="font-display text-sub text-fg transition-colors duration-180 group-hover/next:text-accent"
+            >
+              {nextLine.date}
+            </time>
+            <span class="text-sm text-fg-muted">{nextLine.meta}</span>
+          </span>
+          <SeatBar seats={next!.view.seats} text={nextLine.seats} />
+        </a>
+      )}
+      {events && !next && (
+        <p data-enter="fade" class="mt-14 max-w-md text-base text-fg-muted [--enter-delay:300ms]">
+          Der nächste Abend ist in Planung.{' '}
+          <a href="/event#benachrichtigung" class="font-semibold text-accent underline underline-offset-4">
+            Über neue Termine informieren
+          </a>
+        </p>
+      )}
     </div>
 
-    <div class="relative mx-auto w-full max-w-[21rem] sm:max-w-[26rem] lg:col-span-5 lg:max-w-none">
-      <div class="relative">
+    <div class="relative mx-auto w-full max-w-[22rem] sm:max-w-[28rem] lg:col-span-5 lg:max-w-none">
+      <div data-parallax data-enter="settle" class="relative">
         <img
           src={largest.src}
           srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
-          sizes="(min-width: 80rem) 30rem, (min-width: 64rem) 36vw, (min-width: 36rem) 26rem, 21rem"
+          sizes="(min-width: 80rem) 30rem, (min-width: 64rem) 36vw, (min-width: 36rem) 28rem, 22rem"
           width={largest.width}
           height={largest.height}
           alt={imageAlt}
@@ -77,15 +135,12 @@ const largest = images.at(-1)!;
         {/* The circle of the logo: a thin ring with three warm points, turning slowly. */}
         <div
           aria-hidden="true"
-          class="hero-orbit pointer-events-none absolute -inset-[6%] rounded-full border border-line-strong"
+          class="hero-orbit pointer-events-none absolute -inset-[7%] rounded-full border border-line-strong"
         >
           <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-glow"></span>
           <span class="absolute top-3/4 left-[93.3%] size-3 -translate-1/2 rounded-full bg-fill"></span>
           <span class="absolute top-3/4 left-[6.7%] size-3 -translate-1/2 rounded-full bg-accent"></span>
         </div>
-      </div>
-      <div class="relative z-1 -mt-14 sm:-mt-20 lg:absolute lg:-right-4 lg:-bottom-20 lg:mt-0 lg:w-[21rem]">
-        <EventAvailability data={events} location="home-hero" showAction={false} />
       </div>
     </div>
   </Container>

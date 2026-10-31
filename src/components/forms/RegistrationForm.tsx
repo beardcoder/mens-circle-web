@@ -1,7 +1,7 @@
 import { actions, isInputError } from 'astro:actions';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
-import { seatRing } from '@lib/seats';
+import { seatFill } from '@lib/seats';
 import { button, checkbox, control, fieldError, fieldHint, fieldLabel, formStatus, link } from '@lib/ui';
 
 import type { PublicEvent } from '../event/types';
@@ -235,35 +235,36 @@ function RegistrationIntro({
   data: PublicEvent;
   contribution: { main: string; note: string };
 }) {
-  const seats = seatRing(data.view.seats);
+  const fill = seatFill(data.view.seats);
 
   return (
     <>
-      <div class="flex items-center gap-4">
-        {seats.length > 0 && (
-          <svg aria-hidden="true" viewBox="0 0 80 80" class="size-16 shrink-0">
-            {seats.map((seat, i) => (
-              <circle key={i} cx={seat.x} cy={seat.y} r="3" class={seat.free ? 'fill-accent' : 'fill-line-strong'} />
-            ))}
-          </svg>
+      <h2 id="anmeldung-title" class="text-sub text-fg">
+        {data.view.state === 'full' ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
+      </h2>
+      {/* How full the circle is, live: the same bar as under every date. */}
+      <div class="mt-4 grid gap-2">
+        {fill !== null && (
+          <span aria-hidden="true" class="block h-1.5 overflow-hidden rounded-full bg-line">
+            <span
+              data-seat-fill
+              class="block h-full origin-left scale-x-(--fill) rounded-full bg-fill"
+              style={{ '--fill': fill.toFixed(3) }}
+            />
+          </span>
         )}
-        <div class="min-w-0">
-          <p role="status" class="mb-1.5 text-sm text-fg-muted">
-            {data.view.state === 'full'
-              ? 'Alle Plätze sind belegt'
-              : `${data.availableSpots} von ${data.maxParticipants} Plätzen frei`}
-          </p>
-          <h2 id="anmeldung-title" class="text-sub text-fg">
-            {data.view.state === 'full' ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
-          </h2>
-        </div>
+        <p role="status" class="text-sm text-fg-muted">
+          {data.view.state === 'full'
+            ? 'Alle Plätze sind belegt'
+            : `${data.availableSpots} von ${data.maxParticipants} Plätzen frei`}
+        </p>
       </div>
-      <p class="mt-3 mb-6 max-w-measure text-md text-fg-soft">
+      <p class="mt-6 mb-6 max-w-measure text-md text-fg-soft">
         {data.view.state === 'full'
           ? 'Dieser Abend ist voll. Du kannst dich auf die Warteliste setzen lassen. Sobald du nachrückst, bekommst du eine E-Mail.'
           : 'Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.'}
       </p>
-      <dl class="mb-6 border-y border-line py-3 text-sm">
+      <dl class="mb-8 text-sm">
         <div class="flex items-baseline justify-between gap-4">
           <dt class="text-fg-muted">Beitrag</dt>
           <dd class="text-right text-fg">

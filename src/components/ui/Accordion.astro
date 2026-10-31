@@ -6,6 +6,6 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<div class:list={['grid border-t border-line', className]}>
+<div data-reveal-group class:list={['grid border-t border-line', className]}>
   <slot />
 </div>

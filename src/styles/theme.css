@@ -114,13 +114,13 @@
   --text-sub: clamp(1.375rem, 1.2rem + 0.7vw, 1.875rem); /* 22–30px */
   --text-sub--line-height: 1.2;
   --text-sub--letter-spacing: -0.01em;
-  --text-section: clamp(2rem, 1.45rem + 2.1vw, 3.25rem); /* 32–52px */
+  --text-section: clamp(2.125rem, 1.45rem + 2.6vw, 3.75rem); /* 34–60px */
   --text-section--line-height: 1.08;
   --text-section--letter-spacing: -0.02em;
   --text-page: clamp(2.375rem, 1.55rem + 3.1vw, 4.25rem); /* 38–68px */
   --text-page--line-height: 1.04;
   --text-page--letter-spacing: -0.025em;
-  --text-hero: clamp(2.625rem, 1.55rem + 4.3vw, 5rem); /* 42–80px */
+  --text-hero: clamp(2.75rem, 1.55rem + 4.8vw, 5.5rem); /* 44–88px */
   --text-hero--line-height: 1.02;
   --text-hero--letter-spacing: -0.03em;
 
@@ -304,12 +304,13 @@
     --p-bone-muted: #b4bbad;
 
     /* Space per width. The content's edge sits 28 / 40 / 56px from the window in
-       every section; grounds run from edge to edge. Sections 72px on phones, 112px
-       on the desktop; cards 24 → 32px inside, the registration panel 28 → 48px. */
+       every section; grounds run from edge to edge. Sections 88px on phones, 144px
+       on the desktop: room to breathe. Cards 24 → 32px inside, the registration
+       panel 28 → 48px. */
     --space-gutter: 1.75rem;
-    --space-section: 4.5rem;
-    --space-band: 3rem;
-    --space-group: 2rem;
+    --space-section: 5.5rem;
+    --space-band: 3.5rem;
+    --space-group: 2.5rem;
     --space-grid: 2rem;
     --space-card: 1.5rem;
     --space-panel: 1.75rem;
@@ -317,18 +318,18 @@
 
     @media (width >= 48rem) {
       --space-gutter: 2.5rem;
-      --space-section: 5.5rem;
-      --space-band: 3.5rem;
-      --space-group: 2.5rem;
+      --space-section: 7rem;
+      --space-band: 4rem;
+      --space-group: 3rem;
       --space-card: 1.75rem;
       --space-panel: 2.5rem;
       --space-stack: 1.25rem;
     }
 
     @media (width >= 64rem) {
-      --space-section: 7rem;
-      --space-band: 4rem;
-      --space-group: 3rem;
+      --space-section: 9rem;
+      --space-band: 5rem;
+      --space-group: 4rem;
       --space-card: 2rem;
       --space-panel: 3rem;
       --space-stack: 1.5rem;

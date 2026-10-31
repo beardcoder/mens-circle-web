@@ -1,7 +1,8 @@
 ---
 import type { SummaryView } from '@lib/event-status';
-import { seatRing } from '@lib/seats';
-import { button, card, label } from '@lib/ui';
+import { button, label } from '@lib/ui';
+
+import SeatBar from './SeatBar.astro';
 
 interface Props {
   view: SummaryView;
@@ -18,34 +19,26 @@ const dayNumber = valid ? String(day.getUTCDate()).padStart(2, '0') : '';
 const month = valid ? new Intl.DateTimeFormat('de-DE', { month: 'short', timeZone: 'UTC' }).format(day) : '';
 const seal = view.state === 'past' ? 'bg-line text-fg-muted' : 'bg-accent-soft text-accent';
 
-/** Around the seal, the circle: taken seats quiet, free ones in ember; the seats row says it in words. */
-const seats = seatRing(view.seats);
+/** With seats to show, the seats row becomes the bar; a past evening keeps it in words. */
+const seatsRow = view.seats ? view.rows.find((row) => row.label === 'Plätze') : undefined;
+const rows = seatsRow ? view.rows.filter((row) => row !== seatsRow) : view.rows;
 ---
 
-{/* A narrow card sets the seal beside its label and the date below; from 24rem the date sits beside the seal. */}
-<div
-  data-summary
-  data-state={view.state}
-  class:list={[card, '@container grid grid-cols-[minmax(0,1fr)] content-start p-card']}
->
-  <div class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4">
-    <p class:list={[label, 'col-start-2 row-start-1 @sm:col-span-2 @sm:col-start-1 @sm:mb-4']}>{view.kicker}</p>
+{/* Open on its ground, no card: the seal and the date, the facts as small columns,
+     how full the circle is, and the fitting action. */}
+<div data-summary data-state={view.state} data-reveal class="@container grid grid-cols-[minmax(0,1fr)] content-start">
+  <p class={label}>{view.kicker}</p>
+  <div class="mt-4 flex items-center gap-4">
     {dayNumber && (
-      <span aria-hidden="true" class="relative col-start-1 row-start-1 grid size-20 place-items-center @sm:row-start-2">
-        {seats.length > 0 && (
-          <svg viewBox="0 0 80 80" class="absolute inset-0 size-full">
-            {seats.map((seat) => (
-              <circle cx={seat.x} cy={seat.y} r="2.5" class={seat.free ? 'fill-accent' : 'fill-line-strong'} />
-            ))}
-          </svg>
-        )}
-        <span class:list={['grid size-14 place-content-center rounded-full text-center', seal]}>
-          <span class="font-display text-[1.375rem] leading-none">{dayNumber}</span>
-          <span class="mt-0.5 text-xs leading-none font-semibold">{month}</span>
-        </span>
+      <span
+        aria-hidden="true"
+        class:list={['grid size-16 shrink-0 place-content-center rounded-full text-center', seal]}
+      >
+        <span class="font-display text-[1.5rem] leading-none">{dayNumber}</span>
+        <span class="mt-0.5 text-xs leading-none font-semibold">{month}</span>
       </span>
     )}
-    <p class="col-span-2 row-start-2 mt-4 min-w-0 font-display text-sub text-fg @sm:col-span-1 @sm:col-start-2 @sm:mt-0">
+    <p class="min-w-0 font-display text-sub text-fg">
       <time datetime={view.datetime}>
         {view.title.map((line) => (
           <span class="block truncate">{line}</span>
@@ -53,18 +46,22 @@ const seats = seatRing(view.seats);
       </time>
     </p>
   </div>
-  <dl class="mt-6 grid divide-y divide-line border-y border-line">
-    {view.rows.map((row) => (
-      <div class="grid min-w-0 gap-x-3 py-2.5 min-[22.5rem]:grid-cols-[4.5rem_minmax(0,1fr)] sm:grid-cols-[5.5rem_minmax(0,1fr)]">
-        <dt class="text-sm leading-6 text-fg-muted">{row.label}</dt>
+  <dl class="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 @md:grid-cols-3">
+    {rows.map((row) => (
+      <div class="grid min-w-0 content-start gap-1">
+        <dt class="text-sm text-fg-muted">{row.label}</dt>
         <dd class="text-base leading-6 font-medium text-fg wrap-anywhere">{row.value}</dd>
       </div>
     ))}
   </dl>
+  {seatsRow && <SeatBar seats={view.seats} text={seatsRow.value} class="mt-6" />}
   {showAction && view.action && (
     <a
       href={view.action.href}
-      class:list={[button({ variant: view.state === 'full' ? 'secondary' : 'primary', block: true }), 'mt-7']}
+      class:list={[
+        button({ variant: view.state === 'full' ? 'secondary' : 'primary', size: 'lg' }),
+        'mt-8 w-fit max-sm:w-full',
+      ]}
       data-umami-event="cta-click"
       data-umami-event-location={location}
       data-umami-event-state={view.state}
