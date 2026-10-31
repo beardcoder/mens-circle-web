@@ -8,10 +8,13 @@ interface Props {
   html?: string;
   /** `measure` a line of running text (~62 characters); `column` the wider reading column of the legal pages. */
   width?: 'measure' | 'column';
+  /** Rises in once it enters the view (`data-reveal`), where no parent does. */
+  reveal?: boolean;
   class?: string;
 }
 
-const { html, width = 'measure', class: className }: Props = Astro.props;
+const { html, width = 'measure', reveal = false, class: className }: Props = Astro.props;
+const hook = reveal ? { 'data-reveal': '' } : {};
 
 const WIDTHS = { measure: 'max-w-measure', column: 'max-w-column' } as const;
 
@@ -30,9 +33,9 @@ const PROSE = [
 ---
 
 {html !== undefined ? (
-  <div class:list={[PROSE, className]} set:html={html} />
+  <div {...hook} class:list={[PROSE, className]} set:html={html} />
 ) : (
-  <div class:list={[PROSE, className]}>
+  <div {...hook} class:list={[PROSE, className]}>
     <slot />
   </div>
 )}
