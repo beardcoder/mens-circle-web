@@ -75,7 +75,7 @@ const date = next?.view.title.join(' ').replace(/,$/, '');
 
     const move = (show: boolean): void => {
       // Under reduced motion, and on the desktop where the bar is not shown at all.
-      if (reduced.matches || bar.getClientRects().length === 0) {
+      if (reduced.matches || !(bar.checkVisibility?.() ?? true)) {
         bar.toggleAttribute('data-visible', show);
 
         if (!reduced.matches) bar.style.transform = show ? 'none' : 'translateY(100%)';

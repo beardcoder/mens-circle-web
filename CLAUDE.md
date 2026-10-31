@@ -141,8 +141,9 @@ tokens, variants, surfaces and keyframes; `global.css` (public, one shared hashe
 and `admin.css` are the two entries. Both read classes from `src/` only
 (`source('..')`, so words in docs, mail templates and tests never become utilities) and
 skip server-only code; `global.css` keeps the admin sources out with `@source not`.
-Entrances and scroll reveals are Motion (`components/Motion.astro`, a dev dependency
-bundled into the client); loops and state transitions are the theme's own keyframes
+Scroll reveals, depth and the FAQ are Motion (`components/Motion.astro`, a dev
+dependency bundled into the client); the opening, loops and state transitions are
+the theme's own keyframes
 and `--animate-*` tokens (`rise`, `fade-in`, `skeleton`); there is no animation plugin.
 No `<style>` blocks and no component stylesheets: utilities in the
 markup, recipes in `lib/ui.ts`, components in `components/ui/`. `docs/design-system.md`
@@ -218,22 +219,28 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Header 72px: links visible from `nav`, one filled action; over the home opening the
   bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then linen over a
   blur. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
-- Motion: motion.dev in `components/Motion.astro` (`motion/mini` `animate`,
-  `inView`, `scroll`, `spring`, `stagger`; soft: opacity and focus on a long
-  ease-out, movement on springs without overshoot, short distances). On load the
-  opening's title rises word by word (`data-enter="words"`, words wrapped on the
-  server by `lib/words.ts`), the rest follows in order (`data-enter`), the photo
-  settles (`settle`) and its ring follows (`ring`); sections rise in once in view
-  (`data-reveal`, `data-reveal-group`, the steps' path `data-line`), section heads
-  come into focus (`data-reveal-group="focus"`), the seat bar fills
-  (`data-seat-fill`); depth layers drift as their section passes
-  (`data-parallax="<distance>"`: glow, photo, the hero's words with
-  `data-parallax-dim`, the far hill under the breath). FAQ answers unfold and
-  fold on a spring (`AccordionItem`, `item-open:` variant); the phone `ActionBar`
-  glides in and out (its own script).
-  Hidden states live in `global.css` under `[data-motion]`, which the boot script
-  sets only with motion allowed and drops after 3 s if the script never started.
-  CSS keeps the loops: the glow breathes (`data-glow`), the ring turns every 90 s.
+- Motion: the opening moves in pure CSS from the first paint (`data-enter`,
+  global.css; the title is the LCP): the title rises word by word
+  (`data-enter="words"`, words and their index `--i` wrapped on the server by
+  `lib/words.ts`), the rest follows at `--enter-delay` (`afterWords()`), the photo
+  settles (`settle`), its ring follows (`ring`), on Motion's springs sampled into
+  `--ease-spring`/`--ease-spring-slow`. Below it motion.dev in
+  `components/Motion.astro` (`motion/mini` `animate`, `inView`, `scroll`, `spring`;
+  soft: opacity on a long ease-out, movement on springs without overshoot, short
+  distances): sections rise in once in view (`data-reveal`, `data-reveal-group`,
+  the steps' path `data-line`), the seat bar fills (`data-seat-fill`); depth layers
+  drift as their section passes (`data-parallax="<distance>"`: glow, photo, the
+  hero's words with `data-parallax-dim`, the far hill under the breath). FAQ
+  answers unfold and fold on a spring (`AccordionItem`, `item-open:` variant); the
+  phone `ActionBar` glides in and out (its own script). Scroll hidden states live
+  in `global.css` under `[data-motion]`, which the boot script sets only with
+  motion allowed and drops after 3 s if the script never started. CSS keeps the
+  loops: the glow breathes (`data-glow`), the ring turns every 90 s.
+- Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
+  forced reflow, no non-composited animation. Only opacity and transforms move (no
+  blur, no animated layout except the FAQ height on a press). Never read layout or
+  `scrollY` at load: header tone, back-to-top and the like watch a sentinel with an
+  `IntersectionObserver`. Nothing that holds the LCP waits for a script.
   Third-party scripts are `async`, so nothing queues before the opening. On phones
   the home page has a bottom `ActionBar` with the next date once the hero's action
   is gone. Interactions ~180ms (a button rises 2px, arrows slide, header links draw

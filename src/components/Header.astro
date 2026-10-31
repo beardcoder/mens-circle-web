@@ -48,6 +48,8 @@ const roundButton =
   'inline-flex min-h-11 items-center gap-2 rounded-full border border-current/25 px-4 text-base font-medium transition-[border-color,background-color] duration-180 hover:border-current/60 hover:bg-current/6';
 ---
 
+{/* 24px down the page: once it has scrolled out of view, the bar turns to the paper. */}
+<span data-scroll-sentinel aria-hidden="true" class="pointer-events-none absolute top-6 left-0 size-px"></span>
 <header
   id="header"
   class:list={[
@@ -230,25 +232,17 @@ const roundButton =
    * Over the home opening (`[data-hero]`) the bar starts clear with light text and
    * turns to the page's paper once the page moves (`data-scrolled`, styled in
    * Header.astro). A script, not a scroll timeline, so every engine gets a readable bar.
+   * It watches a point 24px down the page instead of reading the scroll position,
+   * so it never forces a layout.
    */
   const initHeaderTone = (header: HTMLElement): void => {
-    let frame = 0;
+    const sentinel = document.querySelector('[data-scroll-sentinel]');
 
-    const update = (): void => {
-      frame = 0;
-      header.toggleAttribute('data-scrolled', window.scrollY > 24);
-    };
+    if (!sentinel) return;
 
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!frame) frame = requestAnimationFrame(update);
-      },
-      { passive: true },
-    );
-    window.addEventListener('resize', update, { passive: true });
-    window.addEventListener('pageshow', update);
-    update();
+    new IntersectionObserver(([entry]) => {
+      header.toggleAttribute('data-scrolled', !entry.isIntersecting);
+    }).observe(sentinel);
   };
 
   /**

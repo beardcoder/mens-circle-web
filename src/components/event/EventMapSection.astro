@@ -79,6 +79,7 @@ const destination = hasMap ? `${lat},${lng}` : address || event.location;
           data-lat={lat}
           data-lng={lng}
           data-title={event.location}
+          role="region"
           aria-label="Karte zum Veranstaltungsort"
           class="group/map relative isolate block h-full overflow-hidden bg-ground-alt [contain:paint]"
         >
