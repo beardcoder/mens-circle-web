@@ -160,14 +160,32 @@ no shadow. A primary button glows a little in its own colour on hover.
 ## Motion
 
 The page moves the way an evening starts: things arrive one after the other and
-settle. On load the opening's words drift up in turn and the photo settles from a
-slightly larger scale (`data-enter`, staggered by `--enter-delay`); on scroll every
-section head, list and quote rises in as it enters the view (`data-reveal`,
-`data-reveal-group` staggers children; CSS view timelines, no script); the hero
-photo trails the scroll a little (`data-parallax`), its glow breathes on the 11-second
-cycle (`data-glow`), and the seat bar fills as it comes into view (`data-seat-fill`).
-All of it lives in `global.css` and runs only with motion allowed; nothing hides
-content where view timelines are unsupported.
+settle. It is done with Motion (motion.dev; `components/Motion.astro`, one small
+script on every public page: `animate` from `motion/mini` with `inView`, `scroll`,
+`spring` and `stagger`, about 9 kB). Springs settle without overshoot: a calm
+site, not a playful one.
+
+- On load (`data-enter`, in document order): the label, then the title word by word
+  (`data-enter="words"`; `lib/words.ts` wraps the words on the server, so the lines
+  break the same before and after) rising out of a soft blur, then the lead, the
+  action and the next date, each a beat after the last. The photo settles from a
+  little larger (`settle`), the ring of the logo follows (`ring`). The home opening
+  and every sub-page opening (`PageIntro`) work this way.
+- On scroll (`inView`, once): a section rises in as it enters the view
+  (`data-reveal`); a group's children follow one another (`data-reveal-group`;
+  every section head is one), and the path between the steps draws itself in after
+  the circles (`data-line`). The seat bar fills to the taken seats
+  (`data-seat-fill`); in the opening it waits for its date line.
+- Scroll-linked: the hero photo trails the scroll a little (`data-parallax`; Motion
+  runs it on the browser's scroll timeline where there is one).
+- Loops that never change state stay in CSS: the glow breathes on the 11-second
+  cycle (`data-glow`), the ring turns.
+
+The boot script in `Layout.astro` sets `data-motion` on `<html>` only when motion is
+allowed; `global.css` keeps hooked elements hidden under it until they move. If the
+script has not started within three seconds the flag is dropped and everything
+stands. Without the flag (reduced motion, no script, print) nothing hides. Third-party
+scripts load `async`, so nothing queues in front of the opening.
 
 Short transitions answer interactions (a button rises 2px, arrows slide, header
 links draw a line). The hero's ring turns once every 90 seconds; the breath circle
@@ -176,8 +194,7 @@ screen, in a hidden tab or under reduced motion. The phone menu opens as a circl
 and its links rise in (`rise`); the event title flies into its dock on a scroll
 timeline. On phones the home page keeps the next date and its action in a bottom bar
 (`ActionBar`) once the opening's action has scrolled away; it steps back at the
-dates and the footer. Content never waits for motion. Under reduced motion
-everything rests.
+dates and the footer. Under reduced motion everything rests.
 
 ## Components
 

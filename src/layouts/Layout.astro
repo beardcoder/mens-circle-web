@@ -7,6 +7,7 @@ import type { ComponentProps } from 'astro/types';
 import BackToTop from '../components/BackToTop.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import Motion from '../components/Motion.astro';
 import SeoHead from '../components/SeoHead.astro';
 
 type Props = ComponentProps<typeof SeoHead> & {
@@ -36,9 +37,22 @@ const speculationRules = JSON.stringify({
     <script is:inline>
       // Resolve the mode before first paint so nothing flashes.
       (() => {
-        try {
-          const root = document.documentElement;
+        const root = document.documentElement;
 
+        // Motion (components/Motion.astro) hides what it will move; if its script has
+        // not started within three seconds, everything simply stands still.
+        try {
+          if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+            root.setAttribute('data-motion', '');
+            setTimeout(() => {
+              if (!root.hasAttribute('data-motion-ready')) root.removeAttribute('data-motion');
+            }, 3000);
+          }
+        } catch {
+          /* matchMedia unavailable — no motion. */
+        }
+
+        try {
           // Earlier keys: the cool palette is gone, and the old day/night switch pinned a
           // mode for good. Everyone starts on Auto (the system) once; a choice made in the
           // picker is kept under the new key.
@@ -88,5 +102,6 @@ const speculationRules = JSON.stringify({
     </main>
 
     <Footer />
+    <Motion />
   </body>
 </html>

@@ -1,0 +1,118 @@
+---
+/**
+ * The page's motion, with Motion (motion.dev): things arrive one after the other and
+ * settle, the way an evening starts. Hooks are data attributes:
+ *
+ * - `data-enter`: on load, in document order; `words` raises a title's words in turn
+ *   (`lib/words.ts` wraps them), `settle` lets a photo settle from a little larger,
+ *   `ring` brings in the circle of the logo.
+ * - `data-reveal` / `data-reveal-group`: rises in once it enters the view; a group
+ *   staggers its children, and a step's path (`data-line`) draws itself in after.
+ * - `data-parallax`: trails the scroll a little (the hero photo).
+ * - `data-seat-fill`: the capacity bar fills once it is in view.
+ *
+ * The boot script in Layout sets `data-motion` only when motion is allowed; global.css
+ * hides the hooked elements under it until they move, and drops it again if this
+ * script has not started within three seconds. Without it everything stands still.
+ */
+---
+
+<script>
+  import { inView, scroll, spring, stagger } from 'motion';
+  import { animate } from 'motion/mini';
+
+  type Targets = Element | Element[] | NodeListOf<Element>;
+
+  /** Calm and grounded: a firm spring that settles without overshoot. */
+  const settle = { type: spring, visualDuration: 0.9, bounce: 0 } as const;
+  const slow = { type: spring, visualDuration: 1.4, bounce: 0 } as const;
+  /** Elements below the fold move once a fair part of them is above the bottom edge. */
+  const inViewOptions = { margin: '0px 0px -12% 0px' } as const;
+
+  const rise = (targets: Targets, distance: string, delay: number | ReturnType<typeof stagger>) =>
+    animate(targets, { opacity: [0, 1], transform: [`translateY(${distance})`, 'none'] }, { ...settle, delay });
+
+  /** The opening: label, title word by word, lead, action and date, each a beat after the last. */
+  const enter = () => {
+    let at = 0.05;
+
+    for (const el of document.querySelectorAll<HTMLElement>('[data-enter]')) {
+      const kind = el.dataset.enter;
+
+      if (kind === 'settle') {
+        animate(el, { opacity: [0, 1], transform: ['scale(1.08)', 'none'] }, { ...slow, delay: 0.1 });
+      } else if (kind === 'ring') {
+        animate(el, { opacity: [0, 1], transform: ['scale(0.88)', 'none'] }, { ...slow, delay: 0.45 });
+      } else if (kind === 'words') {
+        const words = el.querySelectorAll('[data-word]');
+
+        animate(
+          words,
+          { opacity: [0, 1], transform: ['translateY(0.45em)', 'none'], filter: ['blur(6px)', 'blur(0px)'] },
+          { ...settle, delay: stagger(0.055, { startDelay: at }) },
+        );
+        at += words.length * 0.055 + 0.1;
+      } else {
+        rise(el, '1rem', at);
+        at += 0.09;
+      }
+    }
+  };
+
+  /** Sections rise in as they enter the view; a group's children follow one another. */
+  const reveal = () => {
+    inView('[data-reveal]', (el) => void rise(el, '2rem', 0), inViewOptions);
+    inView(
+      '[data-reveal-group]',
+      (el) => {
+        rise([...el.children], '1.5rem', stagger(0.09));
+
+        const lines = el.querySelectorAll('[data-line]');
+
+        if (lines.length > 0) {
+          animate(
+            lines,
+            { transform: ['scale(0)', 'none'] },
+            { duration: 0.9, ease: 'easeInOut', delay: stagger(0.15, { startDelay: 0.35 }) },
+          );
+        }
+      },
+      inViewOptions,
+    );
+  };
+
+  /** The bar fills to the taken seats; in the opening it waits for its date line. */
+  const seats = () => {
+    inView(
+      '[data-seat-fill]',
+      (el) => {
+        const delay = el.closest('[data-hero]') ? 1.1 : 0.3;
+
+        animate(el, { transform: ['scaleX(0)', 'none'] }, { ...slow, delay });
+      },
+      inViewOptions,
+    );
+  };
+
+  /** The hero photo drifts down a little while the opening scrolls away. */
+  const parallax = () => {
+    for (const el of document.querySelectorAll('[data-parallax]')) {
+      const target = el.closest('section') ?? el;
+
+      scroll(animate(el, { transform: ['none', 'translateY(12%)'] }, { ease: 'linear' }), {
+        target,
+        offset: ['start start', 'end start'],
+      });
+    }
+  };
+
+  const root = document.documentElement;
+
+  if (root.hasAttribute('data-motion')) {
+    root.setAttribute('data-motion-ready', '');
+    enter();
+    reveal();
+    seats();
+    parallax();
+  }
+</script>

@@ -141,8 +141,9 @@ tokens, variants, surfaces and keyframes; `global.css` (public, one shared hashe
 and `admin.css` are the two entries. Both read classes from `src/` only
 (`source('..')`, so words in docs, mail templates and tests never become utilities) and
 skip server-only code; `global.css` keeps the admin sources out with `@source not`.
-Animations are the theme's own keyframes and `--animate-*` tokens (`rise`, `fade-in`,
-`skeleton`); there is no animation plugin.
+Entrances and scroll reveals are Motion (`components/Motion.astro`, a dev dependency
+bundled into the client); loops and state transitions are the theme's own keyframes
+and `--animate-*` tokens (`rise`, `fade-in`, `skeleton`); there is no animation plugin.
 No `<style>` blocks and no component stylesheets: utilities in the
 markup, recipes in `lib/ui.ts`, components in `components/ui/`. `docs/design-system.md`
 is the reference. Class strings are complete and static; never add a class that sets a
@@ -217,16 +218,22 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Header 72px: links visible from `nav`, one filled action; over the home opening the
   bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then linen over a
   blur. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
-- Motion (global.css): on load the opening's words drift up in turn and the photo
-  settles (`data-enter`); sections rise in on scroll (`data-reveal`,
-  `data-reveal-group`, CSS view timelines); the hero photo trails the scroll
-  (`data-parallax`), its glow breathes (`data-glow`), the seat bar fills
-  (`data-seat-fill`). On phones the home page has a bottom `ActionBar` with the next
-  date once the hero's action is gone. Interactions ~180ms (a button rises 2px,
-  arrows slide, header links draw a line); the hero's ring turns every 90 s; the breath's 11 s cycle (5.5 s in, 5.5 s
-  out: resonance breathing) runs only on request; the event title flies into its
-  dock on a scroll timeline. No `content-visibility`. Under reduced motion everything
-  rests.
+- Motion: motion.dev in `components/Motion.astro` (`motion/mini` `animate`,
+  `inView`, `scroll`, `spring`, `stagger`; springs without overshoot). On load the
+  opening's title rises word by word (`data-enter="words"`, words wrapped on the
+  server by `lib/words.ts`), the rest follows in order (`data-enter`), the photo
+  settles (`settle`) and its ring follows (`ring`); sections rise in once in view
+  (`data-reveal`, `data-reveal-group`, the steps' path `data-line`), the seat bar
+  fills (`data-seat-fill`), the hero photo trails the scroll (`data-parallax`).
+  Hidden states live in `global.css` under `[data-motion]`, which the boot script
+  sets only with motion allowed and drops after 3 s if the script never started.
+  CSS keeps the loops: the glow breathes (`data-glow`), the ring turns every 90 s.
+  Third-party scripts are `async`, so nothing queues before the opening. On phones
+  the home page has a bottom `ActionBar` with the next date once the hero's action
+  is gone. Interactions ~180ms (a button rises 2px, arrows slide, header links draw
+  a line); the breath's 11 s cycle (5.5 s in, 5.5 s out: resonance breathing) runs
+  only on request; the event title flies into its dock on a scroll timeline. No
+  `content-visibility`. Under reduced motion everything rests.
 - Fonts: Fraunces 500 static (~18 kB) and Figtree variable (~20 kB); both upright
   faces preload, Figtree's italic loads when used.
 - No layout shift: every summary line is one line (`truncate`); a summary under
@@ -247,7 +254,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   pass their content explicitly as props and rich-text slots. Load dynamic data in
   server code or through the public JSON endpoints; blocks only render their inputs. Component-specific
   browser behavior belongs in its own `<script>` (Header, ModeToggle, Statement,
-  BackToTop), with no global client entry. Public form helpers stay
+  BackToTop, Motion), with no global client entry. Public form helpers stay
   in `lib/form.ts`; admin helpers live beside their Preact components. `Prose` accepts inline markup in its slot or
   an `html` prop for dynamic content. Static FAQ answers, journey steps and facts
   use slotted item components at their page location, rather than frontmatter arrays.
