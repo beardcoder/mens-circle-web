@@ -209,8 +209,8 @@ waits for a script.
 
 The boot script in `Layout.astro` sets `data-motion` on `<html>` only when motion is
 allowed; `global.css` keeps the scroll hooks hidden under it until they move. If the
-script has not started within three seconds the flag is dropped and everything
-stands. Without the flag (reduced motion, no script, print) nothing hides. Third-party
+script has not started within three seconds (a slow network, a deploy swapping
+files) the flag is dropped and `data-motion-failed` fades what waited in once. Without the flag (reduced motion, no script, print) nothing hides. Third-party
 scripts load `async`, so nothing queues in front of the page's own.
 
 ### Lighthouse

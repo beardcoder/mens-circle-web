@@ -216,6 +216,14 @@
   }
 }
 
+/* The script never started (a slow network, a deploy swapping files): what waited
+   fades in once instead of appearing at a stroke. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion-failed] :is([data-reveal], [data-reveal-group] > *) {
+    animation: enter-fade 0.8s var(--ease-out) both;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   [data-glow] {
     animation: glow-breathe 11s ease-in-out infinite;

@@ -235,7 +235,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   answers unfold and fold on a spring (`AccordionItem`, `item-open:` variant); the
   phone `ActionBar` glides in and out (its own script). Scroll hidden states live
   in `global.css` under `[data-motion]`, which the boot script sets only with
-  motion allowed and drops after 3 s if the script never started. CSS keeps the
+  motion allowed and drops after 3 s if the script never started (then
+  `data-motion-failed` fades the waiting sections in once). CSS keeps the
   loops: the glow breathes (`data-glow`), the ring turns every 90 s.
 - Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
   forced reflow, no non-composited animation. Only opacity and transforms move (no

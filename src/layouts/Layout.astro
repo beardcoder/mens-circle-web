@@ -40,12 +40,16 @@ const speculationRules = JSON.stringify({
         const root = document.documentElement;
 
         // Motion (components/Motion.astro) hides what it will move; if its script has
-        // not started within three seconds, everything simply stands still.
+        // not started within three seconds, what waited fades in once and then stands.
         try {
           if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
             root.setAttribute('data-motion', '');
             setTimeout(() => {
-              if (!root.hasAttribute('data-motion-ready')) root.removeAttribute('data-motion');
+              if (root.hasAttribute('data-motion-ready')) return;
+
+              // Fade in what was waiting (global.css), rather than let it pop up at once.
+              root.removeAttribute('data-motion');
+              root.setAttribute('data-motion-failed', '');
             }, 3000);
           }
         } catch {
