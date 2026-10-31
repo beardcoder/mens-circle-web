@@ -90,9 +90,8 @@ export default defineConfig({
       customPages: [new URL('/', siteUrl).href, new URL('/event', siteUrl).href],
       // The event pages are SSR; their sitemap is a route, listed in the index here.
       customSitemaps: [new URL('/sitemap-events.xml', siteUrl).href],
-      // The testimonial form is for people who were there, not for search (noindex too).
-      filter: (page) =>
-        !['/admin', '/impressum', '/datenschutz', '/teile-deine-erfahrung', '/auth'].some((p) => page.includes(p)),
+      // Every public page is indexed; only the back office and sign-in stay out.
+      filter: (page) => !['/admin', '/auth'].some((p) => page.includes(p)),
       // Slash-less, matching the canonicals.
       serialize(item) {
         const url = new URL(item.url);
