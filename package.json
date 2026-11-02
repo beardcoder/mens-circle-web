@@ -34,8 +34,8 @@
     "@stylistic/eslint-plugin": "^5.10.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/bun": "^1.4.4",
-    "@types/node": "^26.6.5",
-    "astro": "7.4.2",
+    "@types/node": "^26.6.6",
+    "astro": "7.4.4",
     "astro-icon": "^1.2.0",
     "drizzle-kit": "^0.31.11",
     "eslint": "^10.13.0",
@@ -44,14 +44,14 @@
     "eslint-plugin-simple-import-sort": "^14.0.0",
     "globals": "^17.13.0",
     "jiti": "^2.7.0",
-    "knip": "^6.42.1",
+    "knip": "^6.44.0",
     "motion": "^14.9.0",
-    "preact": "^11.0.2",
+    "preact": "^11.1.0",
     "prettier": "^3.9.10",
-    "prettier-plugin-astro": "^1.1.1",
+    "prettier-plugin-astro": "^1.1.2",
     "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.0"
+    "typescript-eslint": "^8.72.1"
   }
 }
