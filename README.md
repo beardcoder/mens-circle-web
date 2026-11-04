@@ -2,7 +2,7 @@
 
 Website for the Männerkreis. Astro 7 with Preact TSX islands on the Bun runtime, Drizzle on `bun:sqlite`,
 email via an external listmonk, admin sign-in via Pocket ID. One Bun process serves
-the official `@astrojs/node` standalone server under Bun: static files, SSR pages, actions and the admin UI; one Docker image, deployed with Coolify.
+everything through `@igloczek/astro-bun-adapter` on Bun's native HTTP server (`server.ts`): static files, SSR pages, actions and the admin UI; one Docker image, deployed with Coolify.
 
 ## Development
 
@@ -57,7 +57,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Public CSS: shared hashed stylesheets; the SSR home portrait is pre-sized WebP (no `/_image` at runtime)
 - Design: forest, ember and linen; Fraunces 500 (static) and Figtree (variable), ~37 kB of fonts; see [design system](docs/design-system.md)
 - Prefetch through Speculation Rules (no script)
-- Server adapter: `@astrojs/node` standalone, launched with Bun (required by `bun:sqlite`); see [runtime](docs/runtime.md)
+- Server adapter: `@igloczek/astro-bun-adapter` (standalone, bundled), served by `server.ts` on `Bun.serve()`; see [runtime](docs/runtime.md)
 - Mail fonts: endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view
 - Live-seat JSON, cache lifetimes and privacy boundary: `docs/public-api.md`
 - Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)

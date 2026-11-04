@@ -28,9 +28,11 @@ refuse TS 7. Dependabot auto-merges minor and patch bumps. For Astro questions, 
 
 ## Rules
 
-**Runtime.** One Bun process runs the official `@astrojs/node` standalone server
-(`dist/server/entry.mjs`; Bun because of `bun:sqlite`, the bundle needs no Node): static
-files (ETag/304, hashed `/assets/` immutable), SSR, actions and admin. The build bundles
+**Runtime.** One Bun process runs `server.ts`: `Bun.serve()` around the handler of
+`@igloczek/astro-bun-adapter` (standalone, autostart off; `dist/server/entry.mjs`): static
+files (ETag/304, hashed `/assets/` immutable, the rest `public, max-age=0` added by
+`server.ts`), SSR, actions and admin. The adapter is bundled and stays a dev
+dependency (as a dependency its `astro` peer bloats the image). The build bundles
 everything but `bun:sqlite`. No compression in the app: the Coolify proxy and Cloudflare
 do it. `404.astro` is prerendered; unmatched paths get it from disk and never reach the
 middleware. `src/middleware.ts` guards `/admin` (a signed session, else the login; sets

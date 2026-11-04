@@ -1,6 +1,6 @@
 /**
  * The cache policy of rendered responses, applied by src/middleware.ts unless a route
- * sets its own. Static files keep the Node adapter's: hashed assets immutable, the
+ * sets its own. Static files keep the server's (server.ts): hashed assets immutable, the
  * rest revalidated by ETag.
  */
 

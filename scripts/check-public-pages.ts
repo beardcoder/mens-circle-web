@@ -17,7 +17,7 @@ async function withServer(check: (origin: string) => Promise<void>): Promise<voi
 
   await reservation.stop(true);
 
-  const child = Bun.spawn([process.execPath, '--no-env-file', 'dist/server/entry.mjs'], {
+  const child = Bun.spawn([process.execPath, '--no-env-file', 'server.ts'], {
     env: {
       PATH: process.env.PATH,
       NODE_ENV: 'test',

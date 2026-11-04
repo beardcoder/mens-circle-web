@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "bun --bun astro dev",
     "build": "bun --bun astro build",
-    "start": "bun run dist/server/entry.mjs",
+    "start": "bun server.ts",
     "preview": "bun run build && bun run start",
     "check": "astro check",
     "test": "bun test",
@@ -27,10 +27,10 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
-    "@astrojs/node": "^11.1.9",
     "@astrojs/preact": "^6.1.1",
     "@astrojs/sitemap": "^3.7.4",
     "@eslint/js": "^10.0.1",
+    "@igloczek/astro-bun-adapter": "^1.2.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/bun": "^1.4.4",

@@ -1,8 +1,8 @@
 // @ts-check
 
-import node from '@astrojs/node';
 import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
+import bun from '@igloczek/astro-bun-adapter';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders, memoryCache } from 'astro/config';
 import icon from 'astro-icon';
@@ -25,7 +25,7 @@ export default defineConfig({
   },
   output: 'server',
   session: false,
-  adapter: node({ mode: 'standalone', bodySizeLimit: 1_048_576 }),
+  adapter: bun({ mode: 'standalone', bodySizeLimit: 1_048_576 }),
   vite: {
     // Tailwind v4: the theme lives in src/styles/theme.css (CSS-first).
     plugins: [tailwindcss()],

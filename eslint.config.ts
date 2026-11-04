@@ -39,9 +39,9 @@ export default defineConfig([
     },
   },
 
-  // CLI scripts log to the console by design.
+  // CLI scripts and the server entry log to the console by design.
   {
-    files: ['scripts/**'],
+    files: ['scripts/**', 'server.ts'],
     rules: { 'no-console': 'off' },
   },
 

@@ -28,6 +28,7 @@ WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY --from=production-deps /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/server.ts ./server.ts
 COPY --from=build /app/drizzle ./drizzle
 # Run by Coolify's scheduled task and by hand; they import src/lib/server directly.
 COPY --from=build /app/scripts/schedule.ts /app/scripts/backup-db.ts /app/scripts/send-reminders.ts ./scripts/
