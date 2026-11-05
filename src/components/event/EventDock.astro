@@ -233,12 +233,21 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       frame = requestAnimationFrame(setup);
     };
 
-    setup();
-    // Widths change once the web fonts are in, and with the window. A phone's
-    // toolbar changes only the height while scrolling: that needs no new flight.
+    // Setting up measures the page. While a page transition slides it in, that work
+    // would cost frames; the title stands in place until then, as the flight starts
+    // at the top. Widths change once the web fonts are in (the boot script loads
+    // them before the first frame, so mostly they are), and with the window. A
+    // phone's toolbar changes only the height while scrolling: no new flight.
+    const fontsPending = document.fonts.status !== 'loaded';
+
+    void (document.activeViewTransition?.finished ?? Promise.resolve()).then(() => {
+      setup();
+
+      if (fontsPending) void document.fonts.ready.then(schedule);
+    });
+
     let width = innerWidth;
 
-    void document.fonts.ready.then(schedule);
     addEventListener('resize', () => {
       if (innerWidth === width) return;
 

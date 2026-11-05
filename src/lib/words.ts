@@ -2,7 +2,7 @@
  * The opening's beat (global.css, "Motion: the opening"). A title's words rise in
  * turn: each word gets its index (`--i`), and global.css starts word `i` at
  * 0.06 s + i × 0.055 s. The pieces after the title follow 0.1 s after the last word,
- * 0.1 s apart (`--enter-delay`; global.css scales it by `--enter-pace`). Wrapping happens on the server, so the lines break
+ * 0.1 s apart (`--enter-delay`). Wrapping happens on the server, so the lines break
  * the same with and without the motion; it splits on ordinary white space only, so a
  * no-break space keeps a dash bound to its word, and tags pass through untouched.
  */

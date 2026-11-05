@@ -17,6 +17,9 @@
  *   there after a short fade: nothing rises against the direction of reading.
  * - `data-seat-fill`: the capacity bar fills once it is in view. In the opening it
  *   fills in CSS with its date line (global.css).
+ * - A page reached from another page of the site arrives composed, like an app's
+ *   next screen (`data-arrival="next"`): what is in view as it arrives is simply
+ *   there; only what scrolls into view later arrives as above.
  *
  * The boot script in Layout sets `data-motion` only when motion is allowed; global.css
  * hides the hooked elements under it until they move, and the boot script drops it
@@ -27,7 +30,7 @@
 ---
 
 <script>
-  import { inView, spring } from 'motion';
+  import { spring } from 'motion';
   import { animate } from 'motion/mini';
 
   /** A long ease-out: fast at first, then a slow settle (fills, lines, short fades). */
@@ -53,13 +56,20 @@
   /** Pieces that arrive together follow one another by this much, and none waits longer than `wait`. */
   const step = 0.07;
   const wait = 0.42;
-  /** A piece moves once it is a little way above the bottom edge. */
-  const inViewOptions = { margin: '0px 0px -6% 0px' } as const;
 
   interface Arrival {
-    el: Element;
+    el: HTMLElement;
     fromAbove: boolean;
   }
+
+  const root = document.documentElement;
+  /**
+   * Arrived from another page of the site: the page came composed, nothing was
+   * hidden. What lies below the view waits from here on (`data-waiting`), out of sight.
+   */
+  const composed = root.getAttribute('data-arrival') === 'next';
+  /** Each piece's first report: in view, above or below the view. */
+  const seen = new WeakSet<Element>();
 
   /**
    * One observer reports every piece that entered in a frame, in the order of the
@@ -73,6 +83,10 @@
     if (lines.length > 0) animate(lines, { transform: ['scale(0)', 'none'] }, { duration, ease, delay });
   };
 
+  /** The bar fills to the taken seats. */
+  const fill = (el: HTMLElement) =>
+    animate(el, { transform: ['scaleX(0)', 'none'] }, { duration: 1.2, ease, delay: 0.25 });
+
   const flush = () => {
     const batch = arrivals;
     let order = 0;
@@ -80,6 +94,13 @@
     arrivals = [];
 
     for (const { el, fromAbove } of batch) {
+      el.removeAttribute('data-waiting');
+
+      if (el.hasAttribute('data-seat-fill')) {
+        fill(el);
+        continue;
+      }
+
       if (fromAbove) {
         animate(el, { opacity: [0, 1] }, { duration: 0.35, ease });
         draw(el, 0, 0.35);
@@ -97,26 +118,46 @@
     }
   };
 
-  const arrive = (el: Element, entry: IntersectionObserverEntry) => {
+  const queue = (el: Element, fromAbove: boolean) => {
     if (arrivals.length === 0) queueMicrotask(flush);
 
-    arrivals.push({ el, fromAbove: entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0) });
+    arrivals.push({ el: el as HTMLElement, fromAbove });
   };
 
-  /** The bar fills to the taken seats; the opening's bars fill in CSS. */
-  const seats = () => {
-    const bars = [...document.querySelectorAll('[data-seat-fill]')].filter((bar) => !bar.closest('[data-enter]'));
+  /**
+   * On a composed page the first report decides: a piece wholly below the screen
+   * waits out of sight (`data-waiting`), anything else simply stays. Then, as
+   * everywhere, a piece moves once it is a little way above the bottom edge.
+   * `innerHeight` is not a layout read.
+   */
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const { target, isIntersecting, boundingClientRect, rootBounds } of entries) {
+        const first = !seen.has(target);
 
-    if (bars.length === 0) return;
+        seen.add(target);
 
-    inView(
-      bars,
-      (el) => {
-        animate(el, { transform: ['scaleX(0)', 'none'] }, { duration: 1.2, ease, delay: 0.25 });
-      },
-      inViewOptions,
-    );
-  };
+        if (composed && first) {
+          if (boundingClientRect.top >= innerHeight) target.setAttribute('data-waiting', '');
+          else observer.unobserve(target);
+
+          continue;
+        }
+
+        if (!isIntersecting) continue;
+
+        observer.unobserve(target);
+        queue(target, boundingClientRect.top < (rootBounds?.top ?? 0));
+      }
+    },
+    { rootMargin: '0px 0px -6% 0px' },
+  );
+
+  /** What moves: the reveal hooks, and the seat bars outside an opening (those fill in CSS). */
+  const pieces = () => [
+    ...document.querySelectorAll('[data-reveal], [data-reveal-group] > *'),
+    ...[...document.querySelectorAll('[data-seat-fill]')].filter((bar) => !bar.closest('[data-enter]')),
+  ];
 
   /**
    * The opening's loops (the glow, the ring) pause once it is out of view: a running
@@ -132,12 +173,10 @@
     }).observe(hero);
   };
 
-  const root = document.documentElement;
-
-  if (root.hasAttribute('data-motion')) {
+  if (root.hasAttribute('data-motion') || (composed && matchMedia('(prefers-reduced-motion: no-preference)').matches)) {
     root.setAttribute('data-motion-ready', '');
-    inView('[data-reveal], [data-reveal-group] > *', arrive, inViewOptions);
-    seats();
+
+    for (const piece of pieces()) observer.observe(piece);
   }
 
   rest();

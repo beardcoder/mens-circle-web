@@ -71,16 +71,26 @@ const OPTIONS = [
 
   const resolvedMode = (): Mode => storedMode() ?? (darkQuery.matches ? 'dark' : 'light');
 
-  /** Push the current mode onto <html>, the theme-color tags and the pickers. */
-  function apply(): void {
+  /** Set an attribute on <html> only when it changes: every write restyles the whole page. */
+  const mark = (name: string, value: string | null): void => {
     const root = document.documentElement;
+
+    if (root.getAttribute(name) === value) return;
+
+    if (value === null) root.removeAttribute(name);
+    else root.setAttribute(name, value);
+  };
+
+  /**
+   * Push the current mode onto <html>, the theme-color tags and the pickers. At load
+   * the boot script has set the same mode already, so <html> stays untouched.
+   */
+  function apply(): void {
     const stored = storedMode();
     const choice: Choice = stored ?? 'auto';
 
-    root.setAttribute('data-mode-resolved', resolvedMode());
-
-    if (stored) root.setAttribute('data-mode', stored);
-    else root.removeAttribute('data-mode');
+    mark('data-mode-resolved', resolvedMode());
+    mark('data-mode', stored);
 
     // One tag per system scheme; pinned, both show the pinned ground.
     for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {

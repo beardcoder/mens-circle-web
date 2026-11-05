@@ -193,9 +193,10 @@ waits for a script.
   and every sub-page opening (`PageIntro`) work this way. On an event page the date
   line and the title rise in first, then the lead and the registration panel; the
   dock's flight layer enters on the same beat, so the copies that fly the title
-  show the same moment of it.
+  show the same moment of it. The opening plays when the site is opened; a page
+  reached from another page of the site arrives composed (see "Page transitions").
 - Below it, Motion (motion.dev; `components/Motion.astro`, `animate` from
-  `motion/mini` with `inView` and `spring`, about 9 kB). Like an app's list, each
+  `motion/mini` and `spring`, with one `IntersectionObserver`). Like an app's list, each
   piece arrives as it comes into view, once: an element (`data-reveal`) or each
   child of a group (`data-reveal-group`: a section head's label, title and lead; a
   list's rows; a text's paragraphs, `Prose reveal`), so a long list on a phone
@@ -233,32 +234,57 @@ waits for a script.
 Native cross-document view transitions (global.css, "Page transitions"), like an
 app's navigation stack. Going forward, the next page comes in from the right while
 the current one drifts left and fades; going back mirrors it. The page that leaves
-fades quickly (0.2 s), the one that comes fades in a beat later (0.36 s) and slides
-3.5rem on Motion's spring, so the two never sit on top of each other at half
-strength. The frame holds still: the bar (`site-header`) and the reading line
-(`reading-progress`) stay in place while the page moves under them. They are named
-only while a transition runs (`in-transition:` in theme.css), because a
-view-transition-name makes its element a backdrop root and a permanent name would
-take the blur from the bar. Leaving through the open phone menu, the menu
+fades quickly (0.18 s), the one that comes fades in a beat later (0.32 s) and slides
+3.5rem on Motion's spring (0.52 s), so the two never sit on top of each other at
+half strength. The frame holds still: the bar (`site-header`) stays in place while
+the page moves under it; leaving through the open phone menu, the menu
 (`nav-menu`) fades away over the next page and the page that lay under it is never
 shown.
 
-The boot script in `Layout.astro` names the direction as the page is revealed
-(`pagereveal`; `forward`, `back`, `menu` as view-transition types, from the
-Navigation API, the navigation timing as the fallback) and how the page arrived
-(`data-arrival`): one that slides in forward opens at a quicker pace and without
-the title's blur (`slide`); one reached again through the history stands as it was
-left, with no opening and nothing waiting to rise in (`return`). A browser without
-types cross-fades (`plus-lighter`, one duration, linear), and so does reduced
-motion; a browser without cross-document transitions simply loads the page.
+A page that arrives this way is composed, like an app's next screen: no opening
+and nothing hidden in its first frame; only what lies wholly below the screen
+waits (`data-waiting`, set by Motion.astro) and arrives as it scrolls into view. A
+page reached again through the history stands as it was left.
 
-The boot script in `Layout.astro` sets `data-motion` on `<html>` only when motion is
-allowed and the page is not a return; `global.css` keeps the scroll hooks hidden
-under it until they move. If the script has not started within three seconds (a
-slow network, a deploy swapping files) the flag is dropped and `data-motion-failed`
-fades what waited in once. Without the flag (reduced motion, no script, print, a
-return) nothing hides. Third-party scripts load `async`, so nothing queues in front
-of the page's own.
+Smooth on a phone means the main thread stays free while the page moves, because
+Chrome updates a transition on it every frame:
+
+- Only opacity and translation move, and no group animates its size (that runs on
+  the main thread), since nothing named changes place.
+- Names go on the elements themselves, only while a transition runs (`pageswap`,
+  `pagereveal`): a view-transition-name makes its element a backdrop root (the bar
+  would lose its blur), and a selector that switched names for the whole page would
+  restyle every element as a transition starts and ends.
+- The first frame waits until the page is parsed up to the footer
+  (`<link rel="expect" href="#footer" blocking="render">`, only when arriving from
+  the site), so the page is laid out once before it moves.
+- The upright fonts load while the page parses (Layout.astro), not at the first
+  layout; otherwise they swap in a frame later and the page is laid out again.
+- Nothing restyles the whole page on its own: the bar over the opening is an
+  attribute (`data-over-hero`), not `body:has()` (that reacts to every node the
+  parser or an island adds); scripts write an attribute on `<html>` only when it
+  changes (`ModeToggle`); the event dock measures the page only once the
+  transition has finished (`document.activeViewTransition`).
+
+Measured with Chrome at a 6× slower CPU, the work on the main thread while the page
+moves fell from about 170 ms of style to about 30 ms (home → `/event`) and from
+about 280–430 ms to about 40–50 ms (`/event` → a date).
+
+The boot script in `Layout.astro` names the direction as the page is revealed
+(`pagereveal`; `forward`, `back`, `menu` as view-transition types) and, while the
+page parses, how it arrived (`data-arrival`: `next` from another page of the site,
+`return` through the history; from the Navigation API, else the navigation timing
+and the referrer). A browser without types cross-fades (`plus-lighter`, one
+duration, linear), and so does reduced motion; a browser without cross-document
+transitions simply loads the page, composed all the same.
+
+The boot script sets `data-motion` on `<html>` only when the site is opened and
+motion is allowed; `global.css` keeps the scroll hooks hidden under it until they
+move. If the script has not started within three seconds (a slow network, a deploy
+swapping files) the flag is dropped and `data-motion-failed` fades what waited in
+once. Without the flag (reduced motion, no script, print, an arrival from the site)
+nothing hides. Third-party scripts load `async`, so nothing queues in front of the
+page's own.
 
 ### Lighthouse
 

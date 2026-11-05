@@ -13,18 +13,15 @@
 /* The mode toggle picks its label from the mode the boot script resolved. */
 @custom-variant dark (&:where([data-mode-resolved='dark'], [data-mode-resolved='dark'] *));
 
-/* Under a page that opens on the forest ground (`data-hero` on it): the header
-   starts clear with light text over it. */
-@custom-variant over-hero (&:where(body:has([data-hero]) *));
+/* On a page that opens on the forest ground (`data-over-hero` on the bar, set by
+   the page): the header starts clear with light text over it. An attribute, not
+   `body:has([data-hero])`: that would restyle the whole page whenever nodes are
+   added to it (the parser, an island, the event dock). */
+@custom-variant over-hero (&:where([data-over-hero], [data-over-hero] *));
 
 /* Inside an open FAQ item (`AccordionItem`), but not while it folds shut: the item
    stays open until its answer has closed, and its marker turns back right away. */
 @custom-variant item-open (&:where(details[open]:not([data-closing]) *));
-
-/* While a page transition runs: the frame that holds still is named only then
-   (global.css, "Page transitions"), since a view-transition-name makes its element
-   a backdrop root and would take the blur from the bar. */
-@custom-variant in-transition (&:where(:root:active-view-transition *));
 
 /* Scroll-driven, where scroll timelines exist and motion is allowed; without
    support the element simply stands. */

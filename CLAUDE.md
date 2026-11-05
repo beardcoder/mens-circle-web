@@ -227,7 +227,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `lib/words.ts`, out of a soft blur), the rest follows at `--enter-delay` (`afterWords()`), the photo
   settles (`settle`), its ring follows (`ring`), on Motion's springs sampled into
   `--ease-spring`/`--ease-spring-slow`; the opening's seat bars fill in CSS. Below it
-  motion.dev in `components/Motion.astro` (`motion/mini` `animate`, `inView`,
+  motion.dev in `components/Motion.astro` (`motion/mini` `animate`, one observer,
   `spring`; app-like: quick fades on `--ease-fade`, movement on springs without
   overshoot, short distances): each piece arrives once as it comes into view
   (`data-reveal`, or every child of a `data-reveal-group`), what enters together
@@ -278,15 +278,20 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Page transitions are native cross-document view transitions, like an app's stack
   (global.css, "Page transitions"; design-system.md): forward the next page comes in
   from the right, back from the left; the boot script names the direction in
-  `pagereveal` (types `forward`, `back`, and `menu` when the last page left through
-  its open menu, which Header.astro notes in `pageswap`). The bar and the reading
-  line hold still, the open menu fades over the next page; they carry a
-  `view-transition-name` only while a transition runs (`in-transition:`), since a
-  permanent one makes the bar a backdrop root and takes its blur. A page that slides
-  in opens quicker without the blur (`data-arrival="slide"`); one reached again
-  through the history stands as it was, no opening, no reveals
-  (`data-arrival="return"`). Without types and under reduced motion: a cross-fade,
-  linear curves and one duration (`plus-lighter`).
+  `pagereveal` (types `forward`, `back`, `menu` when the last page left through its
+  open menu). A page reached from the site arrives composed (`data-arrival="next"`:
+  no opening, nothing hidden in its first frame; Motion.astro marks only what lies
+  below the screen, `data-waiting`); one reached through the history stands as it
+  was (`return`). Keep the main thread free while a page slides in: only opacity and
+  translation move, no group animates; the bar (and an open menu on the way out)
+  gets its `view-transition-name` inline only while a transition runs (a permanent
+  one makes it a backdrop root and takes its blur, a page-wide selector restyles
+  every element); arrivals from the site wait for `#footer` (`rel="expect"`); the
+  upright fonts load while the page parses; no `:has()` on `body` or `html` that
+  every inserted node re-evaluates (the bar over the opening is `data-over-hero`);
+  write `<html>` attributes only when they change; defer layout reads until
+  `document.activeViewTransition` has finished. Without types and under reduced
+  motion: a cross-fade, linear curves and one duration (`plus-lighter`).
 - Styles live in the component's markup as utilities. `global.css` is one stylesheet
   for every public page (`inlineStylesheets: 'auto'`), so keep one-off arbitrary
   values few.

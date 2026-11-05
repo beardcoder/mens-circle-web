@@ -12,9 +12,11 @@ import SeoHead from '../components/SeoHead.astro';
 
 type Props = ComponentProps<typeof SeoHead> & {
   headerAction?: ComponentProps<typeof Header>['action'];
+  /** The page opens on the forest (the home opening): the bar starts clear over it. */
+  overHero?: boolean;
 };
 
-const { headerAction, ...props } = Astro.props;
+const { headerAction, overHero = false, ...props } = Astro.props;
 
 /**
  * Chromium fetches a same-origin page when its link is hovered or pressed, with no
@@ -39,26 +41,36 @@ const speculationRules = JSON.stringify({
       (() => {
         const root = document.documentElement;
 
-        /** Reached again through the history (back or forward)? */
-        const isReturn = () => {
+        /**
+         * How the page arrived: reached again through the history (`return`), from
+         * another page of the site (`next`), or opened (none). The Navigation API
+         * knows; without it the navigation timing and the referrer tell.
+         */
+        const arrivalOf = () => {
           const activation = window.navigation?.activation;
+          const entry = performance.getEntriesByType('navigation')[0];
 
-          return activation
-            ? activation.navigationType === 'traverse'
-            : performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
+          if (activation ? activation.navigationType === 'traverse' : entry?.type === 'back_forward') return 'return';
+
+          const fromSite = activation
+            ? Boolean(activation.from) && activation.navigationType !== 'reload'
+            : entry?.type === 'navigate' && document.referrer.startsWith(`${location.origin}/`);
+
+          return fromSite ? 'next' : '';
         };
 
-        // A page reached again through the history stands as it was left, like an
-        // app's previous screen: no opening, nothing waiting to rise in
-        // (`data-arrival="return"`, global.css).
-        const returning = isReturn();
+        // A page reached from the site arrives composed, like an app's next screen, and
+        // one reached again through the history stands as it was left: no opening,
+        // nothing hidden in the first frame (`data-arrival`, global.css). The opening
+        // plays when the site is opened.
+        const arrival = arrivalOf();
 
-        if (returning) root.setAttribute('data-arrival', 'return');
+        if (arrival) root.setAttribute('data-arrival', arrival);
 
         // Motion (components/Motion.astro) hides what it will move; if its script has
         // not started within three seconds, what waited fades in once and then stands.
         const startMotion = () => {
-          if (returning || !matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
+          if (arrival || !matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
 
           root.setAttribute('data-motion', '');
           setTimeout(() => {
@@ -77,19 +89,35 @@ const speculationRules = JSON.stringify({
         }
 
         // Page transitions (global.css, "Page transitions") move like an app's stack:
-        // forward from the right, back from the left. The direction is named as the
-        // page is revealed, which only a script in the head hears in time. A page that
-        // arrives forward this way opens at a quicker pace (`data-arrival="slide"`), set
-        // before its first frame. Left through the open phone menu, the last page says
-        // so (Header.astro), and the menu fades over this one (`menu`).
+        // forward from the right, back from the left. Only a script in the head hears
+        // the page revealed in time to name the direction; a page left through its open
+        // phone menu lets the menu fade over the next (`menu`). Arriving from the site,
+        // the first frame waits until the page is parsed up to the footer: it is laid
+        // out once before anything moves, instead of piece by piece while it slides in.
         let restored = false;
-        let first = true;
+
+        if (arrival) {
+          const expect = Object.assign(document.createElement('link'), { rel: 'expect', href: '#footer' });
+
+          expect.setAttribute('blocking', 'render');
+          document.head.append(expect);
+        }
+
+        /**
+         * The frame that holds still: the bar, and an open menu on the way out. Named
+         * only while a transition runs, on the elements themselves: a name makes its
+         * element a backdrop root, and the bar keeps its blur only without one.
+         */
+        const frame = (on, menuOpen = false) => {
+          document.getElementById('header')?.style.setProperty('view-transition-name', on ? 'site-header' : '');
+          document.getElementById('nav')?.style.setProperty('view-transition-name', on && menuOpen ? 'nav-menu' : '');
+        };
 
         /** Back through the history: the entry we arrived at lies before the one we left. */
         const isBack = () => {
           const now = window.navigation?.activation;
 
-          if (!now?.from || !now.entry) return restored || returning;
+          if (!now?.from || !now.entry) return restored || arrival === 'return';
 
           return now.navigationType === 'traverse' && now.entry.index < now.from.index;
         };
@@ -107,19 +135,43 @@ const speculationRules = JSON.stringify({
           }
         };
 
+        /** A page restored with the menu it was left through comes back without it, at once. */
+        const closeMenu = () => {
+          const menu = document.getElementById('nav');
+
+          if (!restored || !menu?.open) return;
+
+          menu.style.transition = 'none';
+          menu.close();
+          requestAnimationFrame(() => requestAnimationFrame(() => menu.style.removeProperty('transition')));
+        };
+
+        addEventListener('pageswap', (event) => {
+          if (!event.viewTransition) return;
+
+          const viaMenu = document.getElementById('nav')?.open === true;
+
+          frame(true, viaMenu);
+
+          try {
+            if (viaMenu) sessionStorage.setItem('mc-transition', 'menu');
+          } catch {
+            /* sessionStorage unavailable — the plain transition. */
+          }
+        });
         addEventListener('pageshow', (event) => {
           restored = event.persisted;
         });
         addEventListener('pagereveal', (event) => {
           const transition = event.viewTransition;
-          const arrival = first;
           const menu = leftMenu();
 
-          first = false;
+          closeMenu();
+          frame(Boolean(transition));
 
           if (!transition) return;
 
-          if (arrival && !returning) root.setAttribute('data-arrival', 'slide');
+          void transition.finished.then(() => frame(false));
 
           if (!transition.types) return;
 
@@ -149,6 +201,15 @@ const speculationRules = JSON.stringify({
     {/* Both upright faces are in the first viewport; the italic loads when used. */}
     <Font cssVariable="--font-fraunces" preload />
     <Font cssVariable="--font-figtree" preload={[{ weight: '300 900', style: 'normal' }]} />
+    <script is:inline>
+      // The upright faces are on every page and preloaded: load them while the page
+      // parses, so its first frame already sets them. Left to the first layout, they
+      // swap in a frame later and the whole page is styled and laid out again, during
+      // a page transition while the page slides in.
+      document.fonts.forEach((face) => {
+        if (face.style === 'normal' && face.status === 'unloaded') face.load().catch(() => {});
+      });
+    </script>
     <script is:inline type="speculationrules" set:html={speculationRules} />
     <SeoHead {...props} />
   </head>
@@ -164,10 +225,10 @@ const speculationRules = JSON.stringify({
       Zum Inhalt springen
     </a>
 
-    <Header action={headerAction} />
+    <Header action={headerAction} overHero={overHero} />
     <span
       aria-hidden="true"
-      class="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 origin-left scale-x-0 bg-fill in-transition:[view-transition-name:reading-progress] scroll-motion:animate-[reading-progress_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
+      class="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 origin-left scale-x-0 bg-fill scroll-motion:animate-[reading-progress_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
     ></span>
 
     <main id="main" tabindex="-1">
