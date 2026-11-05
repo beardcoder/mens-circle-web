@@ -26,9 +26,11 @@ const { items, anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel 
   {items?.length ? (
     <TestimonialList items={items} />
   ) : (
-    <p class="mt-6 text-md text-fg-muted">{items ? emptyText : errorText}</p>
+    <p data-reveal class="mt-6 text-md text-fg-muted">
+      {items ? emptyText : errorText}
+    </p>
   )}
-  <p class="mt-6">
+  <p data-reveal class="mt-6">
     <TextLink href={linkUrl}>{linkLabel}</TextLink>
   </p>
 </Section>

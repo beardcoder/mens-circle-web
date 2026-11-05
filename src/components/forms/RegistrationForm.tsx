@@ -41,7 +41,7 @@ export default function RegistrationForm({
 
   if (data.isPast)
     return (
-      <div>
+      <div class="motion-safe:animate-rise">
         <h2 id="anmeldung-title" class="text-sub text-fg">
           Dieser Abend hat stattgefunden
         </h2>
@@ -54,7 +54,7 @@ export default function RegistrationForm({
 
   if (success)
     return (
-      <div role="status">
+      <div role="status" class="motion-safe:animate-rise">
         <h2 id="anmeldung-title" class="text-sub text-fg">
           Vielen Dank für deine Anmeldung
         </h2>
@@ -62,8 +62,9 @@ export default function RegistrationForm({
       </div>
     );
 
+  // The form takes the place of the loading line: it settles in rather than appearing at a stroke.
   return (
-    <>
+    <div class="motion-safe:animate-rise">
       <RegistrationIntro data={data} contribution={contribution} />
       {error && (
         <p role="status" class="mb-4 text-sm text-fg-muted">
@@ -224,7 +225,7 @@ export default function RegistrationForm({
           </p>
         )}
       </form>
-    </>
+    </div>
   );
 }
 
@@ -247,6 +248,7 @@ function RegistrationIntro({
         {fill !== null && (
           <span aria-hidden="true" class="block h-1.5 overflow-hidden rounded-full bg-line">
             <span
+              data-seat-fill
               class="block h-full origin-left scale-x-(--fill) rounded-full bg-fill transition-[scale] duration-700 ease-out"
               style={{ '--fill': fill.toFixed(3) }}
             />

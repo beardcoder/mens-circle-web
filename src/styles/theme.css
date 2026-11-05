@@ -21,6 +21,11 @@
    stays open until its answer has closed, and its marker turns back right away. */
 @custom-variant item-open (&:where(details[open]:not([data-closing]) *));
 
+/* While a page transition runs: the frame that holds still is named only then
+   (global.css, "Page transitions"), since a view-transition-name makes its element
+   a backdrop root and would take the blur from the bar. */
+@custom-variant in-transition (&:where(:root:active-view-transition *));
+
 /* Scroll-driven, where scroll timelines exist and motion is allowed; without
    support the element simply stands. */
 @custom-variant scroll-motion {
@@ -169,6 +174,8 @@
     0 24px 48px -16px light-dark(rgb(27 36 30 / 28%), rgb(0 0 0 / 60%));
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* For what leaves: a slow start, then away (the page a transition leaves behind). */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
   /* For fading in: a gentle start, so the fade is seen, then a long settle. */
   --ease-fade: cubic-bezier(0.33, 0, 0.2, 1);

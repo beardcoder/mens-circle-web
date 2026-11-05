@@ -14,27 +14,52 @@
 @source not '../actions';
 @source not '../lib/server';
 
-/* ── View transitions ─────────────────────────────────────────────────────── */
+/* ── Page transitions ─────────────────────────────────────────────────────── */
 
-/* Native cross-document fade. Pseudo-elements of the transition cannot carry
-   utilities. `plus-lighter` adds the two snapshots, avoiding the grey sag of a
-   plain cross-fade — only while their opacities sum to 1, so both halves share
-   one duration and a linear curve. No view-transition-name on the header: its
-   snapshot would linger over the new page. */
+/* Native cross-document view transitions, like an app's navigation stack: going
+   forward, the next page comes in from the right while the current one drifts
+   left and fades; going back mirrors it. The boot script in Layout.astro names the
+   direction (`forward`, `back`) as the page is revealed. The frame holds still: the
+   bar (`site-header`), the reading line (`reading-progress`) and an open phone menu
+   (`nav-menu`) are named in their markup only while a transition runs
+   (`in-transition:`): a view-transition-name makes its element a backdrop root, so
+   a permanent name would take the blur from the bar. Pseudo-elements of the
+   transition cannot carry utilities. Without a direction (a browser without types)
+   and under reduced motion the pages cross-fade: `plus-lighter` adds the two
+   snapshots, which avoids the grey sag of a plain cross-fade only while their
+   opacities sum to 1, so both halves share one duration and a linear curve. The
+   slide moves only opacity and translation, on the compositor. */
 @view-transition {
   navigation: auto;
 }
 
-::view-transition-group(root),
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 260ms;
+::view-transition-group(*) {
+  animation-duration: 340ms;
+  animation-timing-function: var(--ease-out);
+}
+
+/* Leaving through the open phone menu (`menu`, named by Header.astro as the page
+   is left): the menu lives in the top layer, but its group would be painted with
+   the bar, under the pages, so it is lifted over them and fades away over the next
+   page. The page that lay under the menu was never seen and is not shown. */
+::view-transition-group(nav-menu) {
+  z-index: 1;
+}
+
+::view-transition-old(nav-menu) {
+  animation: vt-fade-out 380ms var(--ease-in-out) both;
+}
+
+:root:active-view-transition-type(menu)::view-transition-old(root) {
+  animation: none;
+  opacity: 0;
 }
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  mix-blend-mode: plus-lighter;
+  animation-duration: 260ms;
   animation-timing-function: linear;
+  mix-blend-mode: plus-lighter;
 }
 
 ::view-transition-old(root) {
@@ -43,6 +68,33 @@
 
 ::view-transition-new(root) {
   animation-name: vt-fade-in;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The page that leaves fades quickly while it drifts; the one that comes fades in
+     a beat later and settles on Motion's spring, so the two never sit on top of
+     each other at half strength. */
+  :root:active-view-transition-type(forward, back)::view-transition-old(root) {
+    mix-blend-mode: normal;
+    animation:
+      vt-fade-out 200ms var(--ease-in) both,
+      vt-leave 480ms var(--ease-spring) both;
+  }
+
+  :root:active-view-transition-type(forward, back)::view-transition-new(root) {
+    mix-blend-mode: normal;
+    animation:
+      vt-fade-in 360ms var(--ease-fade) 90ms both,
+      vt-arrive 600ms var(--ease-spring) both;
+  }
+
+  :root:active-view-transition-type(back)::view-transition-old(root) {
+    animation-name: vt-fade-out, vt-leave-back;
+  }
+
+  :root:active-view-transition-type(back)::view-transition-new(root) {
+    animation-name: vt-fade-in, vt-arrive-back;
+  }
 }
 
 @keyframes vt-fade-out {
@@ -54,6 +106,30 @@
 @keyframes vt-fade-in {
   from {
     opacity: 0;
+  }
+}
+
+@keyframes vt-leave {
+  to {
+    translate: -2.5rem 0;
+  }
+}
+
+@keyframes vt-arrive {
+  from {
+    translate: 3.5rem 0;
+  }
+}
+
+@keyframes vt-leave-back {
+  to {
+    translate: 2.5rem 0;
+  }
+}
+
+@keyframes vt-arrive-back {
+  from {
+    translate: -3.5rem 0;
   }
 }
 
@@ -137,37 +213,65 @@
 /* The opening of every page moves in CSS, so it starts with the first paint and
    never waits for a script (the title is the largest paint). The label comes
    first, the title's words rise in turn out of a soft blur (word `i` at
-   0.08 s + i × 0.07 s, `lib/words.ts`), the pieces after it follow at their
-   `--enter-delay`; the photo settles from a little larger and the ring follows.
-   Opacity and focus take a gentle fade (`--ease-fade`), the movement Motion's
-   spring (`--ease-spring`). The blur is the one non-composited piece: on the
-   title's words only, light and short (0.8 s), so the main thread is soon free. */
+   0.06 s + i × 0.055 s, `lib/words.ts`), the pieces after it follow at their
+   `--enter-delay`; the photo settles from a little larger and the ring follows;
+   a seat bar in the opening fills after its line. Opacity and focus take a gentle
+   fade (`--ease-fade`), the movement Motion's spring (`--ease-spring`). The blur is
+   the one non-composited piece: on the title's words only, light and short
+   (0.6 s), so the main thread is soon free. The boot script names how a page
+   arrived before its first frame (`data-arrival`): one that slides in through a
+   page transition (`slide`) opens at a quicker pace and without the blur, since
+   the slide already brings it in; one reached again through the history
+   (`return`) stands as it was left, with no opening at all. */
+:root {
+  --enter-pace: 1;
+}
+
+:root[data-arrival='slide'] {
+  --enter-pace: 0.6;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   [data-enter]:not([data-enter='words'], [data-enter='settle'], [data-enter='ring']) {
     animation:
-      enter-fade 1.3s var(--ease-fade) backwards,
-      enter-rise 1.74s var(--ease-spring) backwards;
-    animation-delay: var(--enter-delay, 0s);
+      enter-fade 0.9s var(--ease-fade) backwards,
+      enter-rise 1.3s var(--ease-spring) backwards;
+    animation-delay: calc(var(--enter-delay, 0s) * var(--enter-pace));
   }
 
   [data-word] {
     animation:
-      enter-fade 1.3s var(--ease-fade) backwards,
-      enter-focus 0.8s var(--ease-fade) backwards,
-      enter-word 1.74s var(--ease-spring) backwards;
-    animation-delay: calc(0.08s + var(--i, 0) * 70ms);
+      enter-fade 0.9s var(--ease-fade) backwards,
+      enter-focus 0.6s var(--ease-fade) backwards,
+      enter-word 1.3s var(--ease-spring) backwards;
+    animation-delay: calc((0.06s + var(--i, 0) * 55ms) * var(--enter-pace));
+  }
+
+  :root[data-arrival='slide'] [data-word] {
+    animation-name: enter-fade, none, enter-word;
   }
 
   [data-enter='settle'] {
     animation:
-      enter-fade 1.8s var(--ease-fade) 0.15s backwards,
-      enter-settle 2.4s var(--ease-spring-slow) 0.15s backwards;
+      enter-fade 1.3s var(--ease-fade) backwards,
+      enter-settle 1.9s var(--ease-spring-slow) backwards;
+    animation-delay: calc(0.1s * var(--enter-pace));
   }
 
   [data-enter='ring'] {
     animation:
-      enter-fade 1.8s var(--ease-fade) 0.6s backwards,
-      enter-ring 2.4s var(--ease-spring-slow) 0.6s backwards;
+      enter-fade 1.3s var(--ease-fade) backwards,
+      enter-ring 1.9s var(--ease-spring-slow) backwards;
+    animation-delay: calc(0.4s * var(--enter-pace));
+  }
+
+  [data-enter] [data-seat-fill] {
+    animation: enter-fill 1.2s var(--ease-out) backwards;
+    animation-delay: calc(var(--enter-delay, 0s) * var(--enter-pace) + 0.35s);
+  }
+
+  :root[data-arrival='return'] :is([data-enter], [data-word], [data-seat-fill]) {
+    animation: none;
   }
 }
 
@@ -216,19 +320,25 @@
   }
 }
 
+@keyframes enter-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
 /* ── Motion: scroll ───────────────────────────────────────────────────────── */
 
 /* Motion (components/Motion.astro) moves what carries a scroll hook; the boot
    script sets `data-motion` only when motion is allowed. Until an element moves it
    waits here, hidden or empty; without the flag (reduced motion, no script, print)
-   it simply stands. Loops that never change state stay in CSS: the glow breathes on
-   the breath's 11-second cycle. */
+   it simply stands. The opening's seat bars fill in CSS (above). Loops that never
+   change state stay in CSS: the glow breathes on the breath's 11-second cycle. */
 @media screen {
   [data-motion] :is([data-reveal], [data-reveal-group] > *) {
     opacity: 0;
   }
 
-  [data-motion] :is([data-seat-fill], [data-line]) {
+  [data-motion] :is([data-line], [data-seat-fill]:not([data-enter] *)) {
     transform: scale(0);
   }
 }
@@ -237,7 +347,7 @@
    fades in once instead of appearing at a stroke. */
 @media (prefers-reduced-motion: no-preference) {
   [data-motion-failed] :is([data-reveal], [data-reveal-group] > *) {
-    animation: enter-fade 0.8s var(--ease-fade) backwards;
+    animation: enter-fade 0.6s var(--ease-fade) backwards;
   }
 }
 

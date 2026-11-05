@@ -53,9 +53,13 @@ const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote
 
   <div class="grid content-start justify-items-start gap-6 lg:col-span-6 lg:col-start-7">
     <SectionHead eyebrow={eyebrow} title={name} titleId="person-title" />
-    <Prose>
+    <Prose reveal>
       <slot />
     </Prose>
-    {linkLabel && linkUrl && <TextLink href={linkUrl}>{linkLabel}</TextLink>}
+    {linkLabel && linkUrl && (
+      <TextLink href={linkUrl} data-reveal>
+        {linkLabel}
+      </TextLink>
+    )}
   </div>
 </Section>

@@ -18,15 +18,19 @@ const { anchor, eyebrow, title, questionsLabel, questions, close } = Astro.props
 <Section id={anchor} labelledby="ueber-title" innerClass="grid gap-x-grid gap-y-10 lg:grid-cols-12">
   <div class="lg:col-span-6">
     <SectionHead eyebrow={eyebrow} title={title} titleId="ueber-title" />
-    <Prose class="mt-6">
+    <Prose reveal class="mt-6">
       <slot />
     </Prose>
-    {close && <p class="mt-6 max-w-measure font-display text-sub text-fg">{close}</p>}
+    {close && (
+      <p data-reveal class="mt-6 max-w-measure font-display text-sub text-fg">
+        {close}
+      </p>
+    )}
   </div>
 
   {questions.length > 0 && (
     <aside aria-labelledby="ueber-questions-label" class="lg:col-span-5 lg:col-start-8 lg:self-center">
-      <h3 id="ueber-questions-label" class="font-sans text-sm font-semibold text-fg-muted">
+      <h3 id="ueber-questions-label" data-reveal class="font-sans text-sm font-semibold text-fg-muted">
         {questionsLabel}
       </h3>
       {/* Asked in the first round, one after the other: a quiet list. */}

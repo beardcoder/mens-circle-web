@@ -26,7 +26,12 @@ const rows = seatsRow ? view.rows.filter((row) => row !== seatsRow) : view.rows;
 
 {/* Open on its ground, no card: the seal and the date, the facts as small columns,
      how full the circle is, and the fitting action. */}
-<div data-summary data-state={view.state} data-reveal class="@container grid grid-cols-[minmax(0,1fr)] content-start">
+<div
+  data-summary
+  data-state={view.state}
+  data-reveal-group
+  class="@container grid grid-cols-[minmax(0,1fr)] content-start"
+>
   <p class={label}>{view.kicker}</p>
   <div class="mt-4 flex items-center gap-4">
     {dayNumber && (

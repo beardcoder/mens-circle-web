@@ -35,26 +35,98 @@ const speculationRules = JSON.stringify({
   <head>
     <meta charset="UTF-8" />
     <script is:inline>
-      // Resolve the mode before first paint so nothing flashes.
+      // Before the first paint: how the page arrived, its motion and its mode, so nothing flashes.
       (() => {
         const root = document.documentElement;
 
+        /** Reached again through the history (back or forward)? */
+        const isReturn = () => {
+          const activation = window.navigation?.activation;
+
+          return activation
+            ? activation.navigationType === 'traverse'
+            : performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
+        };
+
+        // A page reached again through the history stands as it was left, like an
+        // app's previous screen: no opening, nothing waiting to rise in
+        // (`data-arrival="return"`, global.css).
+        const returning = isReturn();
+
+        if (returning) root.setAttribute('data-arrival', 'return');
+
         // Motion (components/Motion.astro) hides what it will move; if its script has
         // not started within three seconds, what waited fades in once and then stands.
-        try {
-          if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
-            root.setAttribute('data-motion', '');
-            setTimeout(() => {
-              if (root.hasAttribute('data-motion-ready')) return;
+        const startMotion = () => {
+          if (returning || !matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
 
-              // Fade in what was waiting (global.css), rather than let it pop up at once.
-              root.removeAttribute('data-motion');
-              root.setAttribute('data-motion-failed', '');
-            }, 3000);
-          }
+          root.setAttribute('data-motion', '');
+          setTimeout(() => {
+            if (root.hasAttribute('data-motion-ready')) return;
+
+            // Fade in what was waiting (global.css), rather than let it pop up at once.
+            root.removeAttribute('data-motion');
+            root.setAttribute('data-motion-failed', '');
+          }, 3000);
+        };
+
+        try {
+          startMotion();
         } catch {
           /* matchMedia unavailable — no motion. */
         }
+
+        // Page transitions (global.css, "Page transitions") move like an app's stack:
+        // forward from the right, back from the left. The direction is named as the
+        // page is revealed, which only a script in the head hears in time. A page that
+        // arrives forward this way opens at a quicker pace (`data-arrival="slide"`), set
+        // before its first frame. Left through the open phone menu, the last page says
+        // so (Header.astro), and the menu fades over this one (`menu`).
+        let restored = false;
+        let first = true;
+
+        /** Back through the history: the entry we arrived at lies before the one we left. */
+        const isBack = () => {
+          const now = window.navigation?.activation;
+
+          if (!now?.from || !now.entry) return restored || returning;
+
+          return now.navigationType === 'traverse' && now.entry.index < now.from.index;
+        };
+
+        /** Read once: did the last page leave through its open menu? */
+        const leftMenu = () => {
+          try {
+            const left = sessionStorage.getItem('mc-transition') === 'menu';
+
+            sessionStorage.removeItem('mc-transition');
+
+            return left;
+          } catch {
+            return false;
+          }
+        };
+
+        addEventListener('pageshow', (event) => {
+          restored = event.persisted;
+        });
+        addEventListener('pagereveal', (event) => {
+          const transition = event.viewTransition;
+          const arrival = first;
+          const menu = leftMenu();
+
+          first = false;
+
+          if (!transition) return;
+
+          if (arrival && !returning) root.setAttribute('data-arrival', 'slide');
+
+          if (!transition.types) return;
+
+          if (menu) transition.types.add('menu');
+
+          transition.types.add(isBack() ? 'back' : 'forward');
+        });
 
         try {
           // Earlier keys: the cool palette is gone, and the old day/night switch pinned a
@@ -95,7 +167,7 @@ const speculationRules = JSON.stringify({
     <Header action={headerAction} />
     <span
       aria-hidden="true"
-      class="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 origin-left scale-x-0 bg-fill scroll-motion:animate-[reading-progress_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
+      class="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 origin-left scale-x-0 bg-fill in-transition:[view-transition-name:reading-progress] scroll-motion:animate-[reading-progress_linear_both] scroll-motion:[animation-timeline:scroll(root_block)] print:hidden"
     ></span>
 
     <main id="main" tabindex="-1">

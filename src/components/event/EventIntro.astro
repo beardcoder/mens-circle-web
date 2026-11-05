@@ -21,13 +21,17 @@ const hasPlace = !!(event.location || event.street || event.city);
 const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
 ---
 
-{/* The date line and the title morph into the dock as the page scrolls (EventDock's script). */}
+{/* The date line and the title rise in first, then the rest (global.css, "Motion: the
+     opening"); as the page scrolls they morph into the dock (EventDock's script). */}
 <section
   aria-labelledby="event-title"
   class="@container pt-[calc(var(--spacing-header)+1.25rem)] pb-band lg:pt-[calc(var(--spacing-header)+2.75rem)]"
 >
   <Container>
-    <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line pt-3 text-sm lg:pt-4">
+    <div
+      data-enter
+      class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line pt-3 text-sm lg:pt-4"
+    >
       <time
         data-event-date
         datetime={view.datetime}
@@ -44,6 +48,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     <h1
       id="event-title"
       data-event-title
+      data-enter
       aria-label={event.title}
       class:list={[
         'relative z-31 mt-4 origin-top-left font-display tracking-[-0.045em] text-fg lg:mt-6 print:opacity-100!',
@@ -63,7 +68,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     </h1>
 
     <div class="mt-8 grid items-start gap-x-grid gap-y-8 lg:mt-14 lg:grid-cols-12">
-      <div data-enter style="--enter-delay: 0.1s" class="min-w-0 lg:col-span-6">
+      <div data-enter style="--enter-delay: 0.2s" class="min-w-0 lg:col-span-6">
         {event.city && <p class="text-base text-fg-muted lg:text-xl">in {event.city}</p>}
         <p class="mt-4 max-w-[25em] text-md text-fg-soft lg:mt-6 lg:text-lg">
           {event.is_past
@@ -95,7 +100,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
         </div>
       </div>
 
-      <div data-enter style="--enter-delay: 0.25s" class="min-w-0 lg:col-span-5 lg:col-start-8">
+      <div data-enter style="--enter-delay: 0.32s" class="min-w-0 lg:col-span-5 lg:col-start-8">
         <slot />
       </div>
     </div>

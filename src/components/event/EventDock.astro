@@ -45,8 +45,10 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
     </p>
   </Container>
 </div>
-{/* The intro's pieces in flight: fixed copies, so once they land they stand still while the page scrolls. */}
-<div data-event-flight aria-hidden="true" class="pointer-events-none fixed inset-0 z-31 print:hidden"></div>
+{/* The intro's pieces in flight: fixed copies, so once they land they stand still while the page scrolls.
+     The layer enters with the date line and the title (`data-enter`, the same beat), so a copy laid over its
+     piece during the opening shows the same moment of it. */}
+<div data-event-flight data-enter aria-hidden="true" class="pointer-events-none fixed inset-0 z-31 print:hidden"></div>
 
 <script>
   /**
@@ -122,6 +124,8 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
 
       copy.removeAttribute('id');
       copy.removeAttribute('aria-label');
+      // The layer carries the opening's entrance; the copy must not start its own again.
+      copy.removeAttribute('data-enter');
       Object.assign(copy.style, {
         position: 'absolute',
         top: `${box.top}px`,

@@ -226,14 +226,19 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   (`data-enter="words"`, words and their index `--i` wrapped on the server by
   `lib/words.ts`, out of a soft blur), the rest follows at `--enter-delay` (`afterWords()`), the photo
   settles (`settle`), its ring follows (`ring`), on Motion's springs sampled into
-  `--ease-spring`/`--ease-spring-slow`. Below it motion.dev in
-  `components/Motion.astro` (`motion/mini` `animate`, `inView`, `scroll`, `spring`;
-  soft: opacity on a long ease-out, movement on springs without overshoot, short
-  distances): sections rise in once in view (`data-reveal`, `data-reveal-group`,
-  the steps' path `data-line`), the seat bar fills (`data-seat-fill`). No parallax: nothing moves with the scroll itself (the event title's dock is
-  the one scroll-linked piece). Every page reveals its sections: `Prose reveal`,
-  `LinkList`, `ValueItems`, the newsletter, the event story and map, the event
-  intro's lower part (`data-enter`, not the title, which the dock flies). FAQ
+  `--ease-spring`/`--ease-spring-slow`; the opening's seat bars fill in CSS. Below it
+  motion.dev in `components/Motion.astro` (`motion/mini` `animate`, `inView`,
+  `spring`; app-like: quick fades on `--ease-fade`, movement on springs without
+  overshoot, short distances): each piece arrives once as it comes into view
+  (`data-reveal`, or every child of a `data-reveal-group`), what enters together
+  follows top to bottom, what enters from above only fades; the steps' path draws
+  in (`data-line`), the seat bar fills (`data-seat-fill`). No parallax: nothing moves
+  with the scroll itself (the event title's dock is the one scroll-linked piece).
+  Every text arrives this way, never a heading beside text that already stands:
+  section heads, `Prose reveal` (paragraph by paragraph), `LinkList`, `ValueItems`,
+  date summaries, the newsletter, the event story and map; the footer stands. On an
+  event page the date line, the title and the dock's flight layer enter on one beat
+  (`data-enter`), then the lower part. FAQ
   answers unfold and fold on a spring as a FLIP (`AccordionItem`, `item-open:`
   variant); the
   phone `ActionBar` glides in and out (its own script). Scroll hidden states live
@@ -244,22 +249,24 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
   forced reflow. 120fps means the compositor: only opacity and transforms move. The
   one exception is the soft blur the opening's title words come into focus from
-  (CSS, 0.8 s, at load); a blur costs ~16× the main-thread work of a transform, so
+  (CSS, 0.6 s, at load); a blur costs ~16× the main-thread work of a transform, so
   nothing that runs while scrolling blurs. Fades use `--ease-fade` (a gentle start,
   so the fade is seen); the springs fall back to `--ease-out` where `linear()` is
-  missing (Safari < 17.2). Motion.astro batches what comes into view per frame
-  (all reads, then all writes) and builds its spring curve once. The FAQ unfolds as
+  missing (Safari < 17.2). Motion.astro reads no layout (the observer reports where
+  a piece entered), starts what entered in one frame together and builds its spring
+  curve once. The FAQ unfolds as
   a FLIP: one layout at the press, then what follows slides and a clip uncovers the
   answer, no animated height. The hero's loops pause out of view
   (`data-offscreen`). Never set a state attribute on `<html>` while the page moves
   (it restyles the whole page): flag the element itself (`data-lifted` on the
-  back-to-top link). Never read layout or `scrollY` at load: header tone,
+  back-to-top link); the boot script's flags (`data-motion`, `data-arrival`) are set
+  before the first frame. Never read layout or `scrollY` at load: header tone,
   back-to-top and the like watch a sentinel with an `IntersectionObserver`.
   Nothing that holds the LCP waits for a script.
   Third-party scripts are `async`, so nothing queues before the opening. On phones
   the home page has a bottom `ActionBar` with the next date once the hero's action
-  is gone. Interactions ~180ms (a button rises 2px, arrows slide, header links draw
-  a line); the breath's 11 s cycle (5.5 s in, 5.5 s out: resonance breathing) runs
+  is gone. Interactions ~180ms (a button rises 2px and settles when pressed, arrows
+  slide and nudge on a press, header links draw a line); the breath's 11 s cycle (5.5 s in, 5.5 s out: resonance breathing) runs
   only on request; the event title flies into its dock on a scroll timeline. No
   `content-visibility`. Under reduced motion everything rests.
 - Fonts: Fraunces 500 static (~18 kB) and Figtree variable (~20 kB); both upright
@@ -268,8 +275,18 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   24rem (container query) puts the seal beside its label and the date below it. A
   title's measure is in `em`, never `ch` (`ch` follows the font in use and
   re-resolves when it swaps).
-- View transitions are native; the cross-fade needs linear curves and one duration.
-  The header has no `view-transition-name`.
+- Page transitions are native cross-document view transitions, like an app's stack
+  (global.css, "Page transitions"; design-system.md): forward the next page comes in
+  from the right, back from the left; the boot script names the direction in
+  `pagereveal` (types `forward`, `back`, and `menu` when the last page left through
+  its open menu, which Header.astro notes in `pageswap`). The bar and the reading
+  line hold still, the open menu fades over the next page; they carry a
+  `view-transition-name` only while a transition runs (`in-transition:`), since a
+  permanent one makes the bar a backdrop root and takes its blur. A page that slides
+  in opens quicker without the blur (`data-arrival="slide"`); one reached again
+  through the history stands as it was, no opening, no reveals
+  (`data-arrival="return"`). Without types and under reduced motion: a cross-fade,
+  linear curves and one duration (`plus-lighter`).
 - Styles live in the component's markup as utilities. `global.css` is one stylesheet
   for every public page (`inlineStylesheets: 'auto'`), so keep one-off arbitrary
   values few.

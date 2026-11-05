@@ -56,7 +56,7 @@ facts and the FAQ, not in every section.
 | File                      | Role                                                                                                                                         |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/styles/theme.css`    | Tokens (`@theme`), primitives, variants, the three surfaces, keyframes, base rules. Shared.                                                  |
-| `src/styles/global.css`   | Public entry: Tailwind (classes from `src/` only), theme, view transitions, the breath and the hero's turning ring.                          |
+| `src/styles/global.css`   | Public entry: Tailwind (classes from `src/` only), theme, page transitions, the breath, the hero's ring, the opening and the scroll hooks.   |
 | `src/styles/admin.css`    | Admin entry: Tailwind and theme; AdminLayout pins the dark mode (the forest at night).                                                       |
 | `src/lib/ui.ts`           | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
 | `src/lib/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
@@ -159,50 +159,59 @@ no shadow. A primary button glows a little in its own colour on hover.
 
 ## Motion
 
-The page moves the way an evening starts: things arrive one after the other and
-settle. Soft rather than snappy: opacity fades in on a gentle curve
-(`--ease-fade`, about 1.3 s), focus comes from a light blur on titles, movement follows Motion's
-springs without overshoot (visualDuration 1.1 s, 1.6 s for the photo), distances
-stay short (a word 0.3em, a section 1.25rem) and things follow one another at
-0.07 s (words) or 0.12 s (a group). A calm site, not a playful one.
+The page moves the way an evening starts, at the pace of an app: things arrive one
+after the other, quickly, and settle. Opacity fades in on a gentle curve
+(`--ease-fade`, 0.7 s below the opening, 0.9 s in it), focus comes from a light blur
+on titles, movement follows Motion's springs without overshoot (visualDuration
+0.65 s on scroll, the opening's sampled spring over 1.3 s, 1.9 s for the photo),
+distances stay short (a word 0.3em, a piece 1.125rem) and things follow one another
+at 0.055 s (words) or 0.07 s (what arrives together). Calm, never playful: no
+bounce, no scale on text.
 
 Performance comes first: smooth at 120fps, checked with Lighthouse and a frame
 trace on every motion change (see "Lighthouse" below). Only opacity and transforms
 move, so the compositor carries every frame. The one exception is the soft blur the
-opening's title words come into focus from (CSS, light and 0.8 s, at load); a blur
+opening's title words come into focus from (CSS, light and 0.6 s, at load); a blur
 is redrawn on the main thread every frame (about 16× a transform), so nothing that
 moves while scrolling blurs. No parallax, no animated height. Fades start gently
-(`--ease-fade`, `[0.33, 0, 0.2, 1]`, 1.3 s), so they are seen, and settle long; no
-script reads layout before the page has settled (state at a scroll position comes
-from an `IntersectionObserver` on a sentinel, never from `scrollY`); state flags go
-on the element that needs them, never on `<html>` (that restyles the whole page);
-and the opening never waits for a script.
+(`--ease-fade`, `[0.33, 0, 0.2, 1]`), so they are seen; no script reads layout
+before the page has settled (state at a scroll position comes from an
+`IntersectionObserver`, never from `scrollY`); state flags go on the element that
+needs them, never on `<html>` while the page moves (that restyles the whole page;
+the boot script's flags are set before the first frame); and the opening never
+waits for a script.
 
 - The opening (`data-enter`, global.css, pure CSS from the first paint, because the
   title is the largest paint): the label, then the title word by word
   (`data-enter="words"`; `lib/words.ts` wraps the words on the server with their
   index, so the lines break the same with and without motion), then the lead, the
-  action and the next date at their `--enter-delay` (`afterWords()`). The photo
-  settles from a little larger (`settle`), the ring of the logo follows (`ring`).
-  The springs are Motion's, sampled into `linear()` (`--ease-spring`,
-  `--ease-spring-slow` in theme.css). The home opening and every sub-page opening
-  (`PageIntro`) work this way.
+  action and the next date at their `--enter-delay` (`afterWords()`), the seat bar
+  filling after its line. The photo settles from a little larger (`settle`), the
+  ring of the logo follows (`ring`). The springs are Motion's, sampled into
+  `linear()` (`--ease-spring`, `--ease-spring-slow` in theme.css). The home opening
+  and every sub-page opening (`PageIntro`) work this way. On an event page the date
+  line and the title rise in first, then the lead and the registration panel; the
+  dock's flight layer enters on the same beat, so the copies that fly the title
+  show the same moment of it.
 - Below it, Motion (motion.dev; `components/Motion.astro`, `animate` from
-  `motion/mini` with `inView`, `scroll`, `spring`, about 9 kB). On scroll (`inView`,
-  once): a section rises in as it enters the view (`data-reveal`); a group's
-  children follow one another (`data-reveal-group`; every section head is one; what comes into view in one frame is started together,
-  all reads before all writes), and
-  the path between the steps draws itself in after the circles (`data-line`). The
-  seat bar fills to the taken seats (`data-seat-fill`); in the opening it waits for
-  its date line.
+  `motion/mini` with `inView` and `spring`, about 9 kB). Like an app's list, each
+  piece arrives as it comes into view, once: an element (`data-reveal`) or each
+  child of a group (`data-reveal-group`: a section head's label, title and lead; a
+  list's rows; a text's paragraphs, `Prose reveal`), so a long list on a phone
+  arrives row by row. What enters in one frame starts together, top to bottom,
+  0.07 s apart (at most 0.42 s). What enters from above (scrolling back up, after a
+  jump to an anchor) is simply there after a short fade; nothing rises against the
+  reading direction. The path between the steps draws itself in after its step
+  (`data-line`); a seat bar below the opening fills once in view
+  (`data-seat-fill`).
+- Every text on a page arrives this way, never a heading beside text that already
+  stands: section heads, the intro's text and its questions, Markus's text and link,
+  the steps and their close, the agreements, the voices and their link, the FAQ and
+  its contact line, every date summary piece by piece, the newsletter, the event's
+  story, note and map, the legal pages paragraph by paragraph. The footer is the
+  frame and stands.
 - No parallax: nothing moves with the scroll itself; things arrive once and then
   stand. The event title flying into its dock is the one scroll-linked piece.
-- Every page reveals its sections the same way: section heads, `Prose reveal`
-  (text sections, legal pages, the close under the steps), `LinkList`,
-  `ValueItems`, the newsletter's two columns, the event's story, its "Du kannst
-  erst einmal zuhören" note and its map. On an event page the lower part of the
-  intro (lead, links, the registration panel) rises in at load in CSS; the date
-  and title stay still, because the dock flies them.
 - FAQ (`AccordionItem`) as a FLIP: the layout changes once, at the press; then what
   follows the item (its siblings, the sections below, the footer) slides from where
   it stood while a clip uncovers the answer on the same spring, so their edges meet,
@@ -212,16 +221,43 @@ and the opening never waits for a script.
   reduced motion the native toggle stays.
 - The bottom bar on phones (`ActionBar`) glides up on a spring once the opening's
   action has gone, its date and action a beat behind; it slips away faster than it
-  came.
+  came. The registration form settles in where its loading line stood (`rise`), and
+  so does its answer.
 - Loops that never change state stay in CSS: the glow breathes on the 11-second
   cycle (`data-glow`), the ring turns; both pause once the opening is out of view
   (`data-offscreen`), since a running animation is serviced every frame.
 
+### Page transitions
+
+Native cross-document view transitions (global.css, "Page transitions"), like an
+app's navigation stack. Going forward, the next page comes in from the right while
+the current one drifts left and fades; going back mirrors it. The page that leaves
+fades quickly (0.2 s), the one that comes fades in a beat later (0.36 s) and slides
+3.5rem on Motion's spring, so the two never sit on top of each other at half
+strength. The frame holds still: the bar (`site-header`) and the reading line
+(`reading-progress`) stay in place while the page moves under them. They are named
+only while a transition runs (`in-transition:` in theme.css), because a
+view-transition-name makes its element a backdrop root and a permanent name would
+take the blur from the bar. Leaving through the open phone menu, the menu
+(`nav-menu`) fades away over the next page and the page that lay under it is never
+shown.
+
+The boot script in `Layout.astro` names the direction as the page is revealed
+(`pagereveal`; `forward`, `back`, `menu` as view-transition types, from the
+Navigation API, the navigation timing as the fallback) and how the page arrived
+(`data-arrival`): one that slides in forward opens at a quicker pace and without
+the title's blur (`slide`); one reached again through the history stands as it was
+left, with no opening and nothing waiting to rise in (`return`). A browser without
+types cross-fades (`plus-lighter`, one duration, linear), and so does reduced
+motion; a browser without cross-document transitions simply loads the page.
+
 The boot script in `Layout.astro` sets `data-motion` on `<html>` only when motion is
-allowed; `global.css` keeps the scroll hooks hidden under it until they move. If the
-script has not started within three seconds (a slow network, a deploy swapping
-files) the flag is dropped and `data-motion-failed` fades what waited in once. Without the flag (reduced motion, no script, print) nothing hides. Third-party
-scripts load `async`, so nothing queues in front of the page's own.
+allowed and the page is not a return; `global.css` keeps the scroll hooks hidden
+under it until they move. If the script has not started within three seconds (a
+slow network, a deploy swapping files) the flag is dropped and `data-motion-failed`
+fades what waited in once. Without the flag (reduced motion, no script, print, a
+return) nothing hides. Third-party scripts load `async`, so nothing queues in front
+of the page's own.
 
 ### Lighthouse
 
@@ -235,8 +271,9 @@ half a second. Locally the server does not compress (the proxy does in
 production), so the render-blocking stylesheet weighs more in the simulated
 mobile score than it does live.
 
-Short transitions answer interactions (a button rises 2px, arrows slide, header
-links draw a line). The hero's ring turns once every 90 seconds; the breath circle
+Short transitions answer interactions (a button rises 2px and settles as it is
+pressed, arrows slide and nudge on a press, the FAQ disc gives a little under the
+finger, header links draw a line). The hero's ring turns once every 90 seconds; the breath circle
 follows resonance breathing (5.5 s in, 5.5 s out) only when started, and stops off
 screen, in a hidden tab or under reduced motion. The phone menu opens as a circle
 and its links rise in (`rise`); the event title flies into its dock on a scroll

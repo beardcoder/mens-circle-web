@@ -1,8 +1,8 @@
 /**
  * The opening's beat (global.css, "Motion: the opening"). A title's words rise in
  * turn: each word gets its index (`--i`), and global.css starts word `i` at
- * 0.08 s + i × 0.07 s. The pieces after the title follow 0.15 s after the last word,
- * 0.12 s apart (`--enter-delay`). Wrapping happens on the server, so the lines break
+ * 0.06 s + i × 0.055 s. The pieces after the title follow 0.1 s after the last word,
+ * 0.1 s apart (`--enter-delay`; global.css scales it by `--enter-pace`). Wrapping happens on the server, so the lines break
  * the same with and without the motion; it splits on ordinary white space only, so a
  * no-break space keeps a dash bound to its word, and tags pass through untouched.
  */
@@ -37,4 +37,4 @@ export const splitText = (text: string): Words =>
 
 /** `--enter-delay` for the `n`th piece (from 0) after a title of `count` words. */
 export const afterWords = (count: number, n: number): string =>
-  `--enter-delay: ${(0.08 + count * 0.07 + 0.15 + n * 0.12).toFixed(2)}s`;
+  `--enter-delay: ${(0.06 + count * 0.055 + 0.1 + n * 0.1).toFixed(2)}s`;
