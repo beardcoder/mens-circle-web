@@ -58,8 +58,18 @@ go through `publicForm()` in `actions/forms.ts`: an in-process per-IP rate limit
 ever shown. Admin pages mount Preact workspaces with local state and native navigation.
 `components/admin/useAdminTask.ts` handles busy state and inline feedback. All private
 admin reads and mutations call `requireAdmin`; see `docs/admin-ui.md`.
-Other endpoints: `/health`, `/sitemap-events.xml`, `/auth/*`, `/api/public/events/<slug>`
-(live seats), `/api/public/events/<slug>/ics`, `/fonts/mail/*` (CORS for listmonk).
+Other endpoints: `/health`, `/sitemap-events.xml`, `/auth/*`, `/api/public/events`
+(the upcoming dates, for WebMCP), `/api/public/events/<slug>` (live seats),
+`/api/public/events/<slug>/ics`, `/fonts/mail/*` (CORS for listmonk).
+
+**WebMCP.** The pages offer tools to an AI agent in the visitor's browser
+(`document.modelContext.registerTool()`; `docs/webmcp.md`): `list-events` everywhere
+(read-only), and a fill tool beside each public form. Form tools only fill a form in;
+the person agrees to the privacy policy and submits it themselves. Never let a tool
+consent, register or send on an agent's word, never expose the honeypot, and answer
+problems as text (a thrown error reaches the agent only as "invocation failed").
+Plumbing in `lib/webmcp.ts`, loaded only behind `'modelContext' in document`. Chrome
+needs the origin-trial token `PUBLIC_WEBMCP_ORIGIN_TRIAL` (build variable).
 
 **Auth.** Pocket ID via `openid-client` (`lib/server/oidc.ts`): code flow with PKCE +
 state, `client_secret_post` (Basic would form-encode the UUID client id). The callback

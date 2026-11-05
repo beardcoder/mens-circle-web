@@ -115,6 +115,52 @@ const { class: className } = Astro.props;
 
   enhanceForms('testimonial', 'submitTestimonial');
 
+  // An agent can fill the person's own account in (lib/webmcp.ts); the person reads it,
+  // agrees to the privacy policy and sends it themselves.
+  const form = document.querySelector<HTMLFormElement>('form[data-form="testimonial"]');
+
+  if (form && 'modelContext' in document) {
+    const { formTool, provideTool } = await import('@lib/webmcp');
+
+    provideTool(
+      formTool({
+        form,
+        name: 'fill-testimonial-form',
+        title: 'Erfahrung vorbereiten',
+        description:
+          "Fills in the form on this page with which a participant shares their experience of the men's circle, in their own words, and moves the focus to the privacy consent. The person reads it, agrees to the privacy policy and sends it themselves; it is published only after review.",
+        fields: [
+          {
+            name: 'quote',
+            description: 'The experience in the words the person chose, 10 to 1000 characters.',
+            required: true,
+            minLength: 10,
+            maxLength: 1000,
+          },
+          {
+            name: 'author_name',
+            description: 'Optional: the name to show with it; leave empty to stay anonymous.',
+            maxLength: 255,
+          },
+          {
+            name: 'role',
+            description: 'Optional: a short description, such as "Teilnehmer seit 2023".',
+            maxLength: 255,
+          },
+          {
+            name: 'email',
+            description: 'For questions only; never published.',
+            required: true,
+            maxLength: 255,
+            email: true,
+          },
+        ],
+        next: form.querySelector<HTMLElement>('input[name="privacy"]'),
+        done: 'Der Text steht im Formular. Die Person liest ihn, stimmt der Datenschutzerklärung zu und tippt auf „Erfahrung teilen“.',
+      }),
+    );
+  }
+
   // Live character count under the textarea; reset with the form.
   const quote = document.querySelector<HTMLTextAreaElement>('#quote');
   const count = document.querySelector('[data-char-count]');

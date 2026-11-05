@@ -2,15 +2,19 @@
 
 ## Live seats
 
-One same-origin GET endpoint, no authentication or cookies. It feeds the client-only
-registration island on an event page; everything else on the public pages is in the
-server-rendered HTML. No participant records, email addresses or precise meeting-address
+Two same-origin GET endpoints, no authentication or cookies. One feeds the client-only
+registration island on an event page, the other the WebMCP tool that lists the dates;
+everything else on the public pages is in the server-rendered HTML. No participant records, email addresses or precise meeting-address
 fields are returned. The TypeScript contract is `PublicEvent` in
 `src/components/event/types.ts`.
 
 | Route                       | 200 response                                                                   |
 | --------------------------- | ------------------------------------------------------------------------------ |
 | `/api/public/events/{slug}` | `PublicEvent`: id, slug, display view, availableSpots, maxParticipants, isPast |
+| `/api/public/events`        | `PublicEvents`: the upcoming dates as home and `/event` show them              |
+
+The list feeds the `list-events` WebMCP tool (`docs/webmcp.md`); it is route-cached and
+purged like the pages.
 
 Failures return `{ message: string }` with `Cache-Control: no-store`: 404 for an
 unknown or unpublished event, 503 when the database cannot be read. A failed read is
