@@ -22,7 +22,8 @@ then stepping back. Translated into design:
 - **Quiet.** Few effects, much air, one action per module. Grounds run from edge
   to edge; content stands on them, not in boxes. Lists between lines rather than
   cards (the facts, the questions of the first round, the agreements, the FAQ, the
-  voices). A card only for what you act on: a date, the registration.
+  voices). No cards on public pages, not even for a date; the registration is a
+  forest panel.
 - **Safe and clear.** The frame is visible before anyone comes: how an evening
   runs, what we agree on, that every exercise is an offer, that "no" is always a
   good answer, that it is no therapy. Nothing is hidden behind a click that a
@@ -70,25 +71,25 @@ Primitives (`--p-*`) are plain hex values on `:root`; the roles pick them with
 (Auto); `ModeToggle` offers Auto · Hell · Dunkel and pins a choice as `data-mode`,
 set before first paint. Never a hex value in markup.
 
-| Role            | Light                        | Night                 | Token                            | Use                                           |
-| --------------- | ---------------------------- | --------------------- | -------------------------------- | --------------------------------------------- |
-| Page            | `#F6F2EA` linen              | `#111915`             | `ground`                         | the page                                      |
-| Warm band       | `#ECE4D4` sand               | `#17201A`             | `ground-alt` (`surface-alt`)     | information that belongs together             |
-| Quiet note      | `#E2E7D8` sage               | `#1C2720`             | `tint` (`surface-tint`)          | agreements, a hint beside the work            |
-| Card            | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | the date card, fields                         |
-| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, breath, registration, menu, footer   |
-| Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                         |
-| Secondary text  | `#5A6255` moss               | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                       |
-| Lines           | `#DDD5C5` / `#C8BFAC`        | `#2A362E` / `#3B4940` | `line`, `line-strong`            | quiet structure; never alone a control        |
-| Control outline | `#7A8072`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)             |
-| Accent          | `#9A421D` (hover `#953F1C`)  | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word, free seats |
-| Accent tint     | `#F5DFCD`                    | `#3A2619`             | `accent-soft`                    | icon discs, the date seal, the FAQ disc       |
-| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module                    |
-| Glow            | `#E8B65A`                    | same                  | `glow`                           | the warm point of the circle; never text      |
+| Role            | Light                        | Night                 | Token                            | Use                                            |
+| --------------- | ---------------------------- | --------------------- | -------------------------------- | ---------------------------------------------- |
+| Page            | `#F6F2EA` linen              | `#111915`             | `ground`                         | the page                                       |
+| Warm band       | `#ECE4D4` sand               | `#17201A`             | `ground-alt` (`surface-alt`)     | information that belongs together              |
+| Quiet note      | `#E2E7D8` sage               | `#1C2720`             | `tint` (`surface-tint`)          | agreements, a hint beside the work             |
+| Raised          | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | the step circles, the hills, the admin's cards |
+| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, breath, registration, menu, footer    |
+| Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                          |
+| Secondary text  | `#5A6255` moss               | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                        |
+| Lines           | `#DDD5C5` / `#C8BFAC`        | `#2A362E` / `#3B4940` | `line`, `line-strong`            | quiet structure; never alone a control         |
+| Control outline | `#7A8072`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)              |
+| Accent          | `#9A421D` (hover `#953F1C`)  | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word, free seats  |
+| Accent tint     | `#F5DFCD`                    | `#3A2619`             | `accent-soft`                    | icon discs, the date seal, the FAQ disc        |
+| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module                     |
+| Glow            | `#E8B65A`                    | same                  | `glow`                           | the warm point of the circle; never text       |
 
 On the forest, `surface-dark` re-declares text (`#F2EDE3` bone, `#B4BBAD` muted),
 accent (`#F2A56C`), lines (bone at 14 / 24 %) and the control outline (`#768379`).
-`success`, `danger` and `alert` are for real states only and always come with words.
+`success` and `danger` are for real states only and always come with words.
 Every text pair holds at least 4.5:1 on every ground in both modes, every control
 line at least 3:1 (checked pair by pair; the tightest are the control outline on sand,
 3.2:1, and white on ember, 4.7:1). Check any new pair in both modes.
@@ -105,9 +106,9 @@ accent colour and stays upright.
 
 | Token          | Size      | Use                                       |
 | -------------- | --------- | ----------------------------------------- |
-| `text-hero`    | 42–80px   | the home statement                        |
+| `text-hero`    | 44–88px   | the home statement                        |
 | `text-page`    | 38–68px   | a sub-page's title, the breath line       |
-| `text-section` | 32–52px   | a section's title                         |
+| `text-section` | 34–60px   | a section's title                         |
 | `text-sub`     | 22–30px   | subheadings, list titles, a fact's value  |
 | `text-quote`   | 24–34px   | one short highlighted quote               |
 | `text-xl`      | 18–22px   | FAQ questions, data values                |
@@ -146,12 +147,12 @@ to a screen's height.
 Soft and round. `rounded-full` is what you press (buttons, chips, icon buttons, the
 FAQ disc) and the circle (the photograph, the seal, the numbered steps, the avatar,
 the rings). Fields take `rounded-md` (14px) — inputs and textareas alike — with the
-buttons' heights (48 / 44 / 36px). The date card and the map take `rounded-xl`
-(28px), the registration panel and the photograph on the personal page
-`rounded-2xl` (40px). The grounds are square and run from edge to edge.
+buttons' heights (48 / 44 / 36px). The map, the calendar dialog and the admin's
+cards take `rounded-xl` (28px), the registration panel and the photograph on the
+personal page `rounded-2xl` (40px). The grounds are square and run from edge to edge.
 
 A card (`card`) is cream with a thin `line` and `shadow-card`: soft, wide, low, and
-only for what you act on (a date). Everything else is open: facts, questions,
+only in the admin. On public pages everything is open: facts, questions,
 agreements, FAQ and voices are rows or columns between thin lines; a quote stands
 behind an ember rule; a note is a heading with its text. `shadow-overlay` is for
 what floats (dialogs, menus, the admin's save bar). The forest and the sage carry
@@ -321,7 +322,7 @@ large and faint behind it.
   above the hills (forest), Markus (his quote behind an ember rule, signed with his
   avatar, beside his text), the five agreements as a numbered list beside their
   head, with the boundary note (sage), the voices, the FAQ, taking part
-  (`#termine`, sand, invitation beside the date card) and staying in touch
+  (`#termine`, sand, invitation beside the next date) and staying in touch
   (`#newsletter`, the form and the WhatsApp note beside it, parted by a line).
 - **`/event`.** `PageIntro`, then every upcoming date as the same `EventSummary`
   beside the e-mail notification, parted by a line; the FAQ; a where-next band.

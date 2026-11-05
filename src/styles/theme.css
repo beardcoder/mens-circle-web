@@ -90,13 +90,10 @@
   /* States only: always with words, never a decorative colour. */
   --color-success: light-dark(#2f6b3a, #8fcb97);
   --color-danger: light-dark(#a3261b, #f0a197);
-  --color-alert: light-dark(#f6e2d9, #3a2420);
-  --color-on-alert: light-dark(#8a2a1c, #f6cfc6);
   /* The ember of the logo and the admin's marks. */
   --color-flame: var(--p-ember);
-  /* Constants of the forest ground. */
+  /* The light text over the forest, where the bar lies on the opening. */
   --color-bone: var(--p-bone);
-  --color-ink: var(--p-forest);
 
   /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). */
   --font-sans: var(--font-figtree);
@@ -136,8 +133,8 @@
   /* Space. `section` the vertical space of a section, `band` that of a compact
      band, `group` from an explanation to the module after it, `grid` the column
      gap, `gutter` the content's edge from the window (the same in every section),
-     `card` the padding of a card, `panel` that of the registration panel, `stack`
-     the gap between cards in a list. Values per width on :root below. */
+     `card` the padding of a card or a dialog, `panel` that of the registration
+     panel. Values per width on :root below. */
   --spacing-section: var(--space-section);
   --spacing-band: var(--space-band);
   --spacing-group: var(--space-group);
@@ -145,7 +142,6 @@
   --spacing-gutter: var(--space-gutter);
   --spacing-card: var(--space-card);
   --spacing-panel: var(--space-panel);
-  --spacing-stack: var(--space-stack);
   --spacing-header: 4.5rem; /* the fixed bar, 72px */
   --spacing-clearance: 6rem; /* the bar plus air, for anchors and sticky columns */
 
@@ -157,11 +153,9 @@
   --container-measure: 38rem; /* a line of running text, ~62 characters */
 
   /* Soft and round. `full` is what you press (buttons, chips, toggles) and the
-     circle; fields take `md`; cards and panels `xl`; the large grounds (the
-     opening, the bands, the footer) `2xl`. */
-  --radius-sm: 0.625rem;
+     circle; fields take `md`; the map, dialogs and the admin's cards `xl`; the
+     registration panel and the personal photograph `2xl`. The grounds are square. */
   --radius-md: 0.875rem;
-  --radius-lg: 1.25rem;
   --radius-xl: 1.75rem;
   --radius-2xl: 2.5rem;
 
@@ -179,8 +173,9 @@
   --ease-in-out: cubic-bezier(0.45, 0, 0.4, 1);
   /* For fading in: a gentle start, so the fade is seen, then a long settle. */
   --ease-fade: cubic-bezier(0.33, 0, 0.2, 1);
-  /* Motion's spring without overshoot (visualDuration 1.1 s, bounce 0), sampled into
-     CSS for what moves before any script runs; it takes 1.74 s to rest. */
+  /* Motion's spring without overshoot (bounce 0), sampled into CSS for what moves
+     without a script: the opening and the page transitions. A shape only; each use
+     sets its duration (sampled at visualDuration 1.1 s, 1.74 s to rest). */
   --ease-spring: linear(
     0,
     0.0475,
@@ -208,7 +203,7 @@
     0.9968,
     1
   );
-  /* The same, slower (visualDuration 1.6 s; 2.4 s to rest): the photo and the ring. */
+  /* A softer spring (sampled at visualDuration 1.6 s): the photo and the ring. */
   --ease-spring-slow: linear(
     0,
     0.0432,
@@ -237,19 +232,10 @@
     1
   );
 
-  /* Motion is reserved for opening controls and loading indicators. */
+  /* Short CSS animations: what opens or replaces itself rises in (the phone menu's
+     links, the registration form), a placeholder pulses while it loads. */
   --animate-rise: rise 240ms var(--ease-out) both;
-  --animate-fade-in: fade-in 180ms var(--ease-out) both;
   --animate-skeleton: pulse 2s ease-in-out infinite;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 @keyframes pulse {
@@ -258,26 +244,8 @@
   }
 }
 
-/* The scroll-to-top button appears once the reader is past the first screen.
-   `visibility`, not `pointer-events`: every engine animates it, so a button that
-   shows is always one that takes a tap. */
-@keyframes appear-late {
-  0%,
-  10% {
-    visibility: hidden;
-    opacity: 0;
-  }
-
-  18%,
-  100% {
-    visibility: visible;
-    opacity: 1;
-  }
-}
-
-/* A short rise into place: openings on load, blocks as they scroll in. `translate`
-   and `opacity` only, which the compositor runs. Kept here, outside @theme, so it
-   is always emitted. */
+/* A short rise into place (`animate-rise`). `translate` and `opacity` only, which
+   the compositor runs. Kept here, outside @theme, so it is always emitted. */
 @keyframes rise {
   from {
     opacity: 0;
@@ -334,7 +302,6 @@
   :root {
     /* `data-mode` absent follows the OS; "light"/"dark" pins it (Layout.astro). */
     color-scheme: light dark;
-    interpolate-size: allow-keywords;
 
     /* The primitives. Light: linen, a warm sand band, a pale sage note, cream
        cards, green-black text, a moss grey for secondary text, ember that reads
@@ -384,7 +351,6 @@
     --space-grid: 2rem;
     --space-card: 1.5rem;
     --space-panel: 1.75rem;
-    --space-stack: 1rem;
 
     @media (width >= 48rem) {
       --space-gutter: 2.5rem;
@@ -393,7 +359,6 @@
       --space-group: 3rem;
       --space-card: 1.75rem;
       --space-panel: 2.5rem;
-      --space-stack: 1.25rem;
     }
 
     @media (width >= 64rem) {
@@ -402,7 +367,6 @@
       --space-group: 4rem;
       --space-card: 2rem;
       --space-panel: 3rem;
-      --space-stack: 1.5rem;
     }
 
     @media (width >= 80rem) {

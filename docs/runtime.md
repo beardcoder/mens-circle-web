@@ -29,7 +29,7 @@ toolchain into the image (256 MB instead of 30 MB).
   `locals.admin`) and the default `Cache-Control` from `src/lib/cache-policy.ts`.
   Actions additionally call `requireAdmin` themselves.
 - **`/_image`** answers 404 in production. Prerendered pages get their image variants
-  at build time; the SSR home page uses pre-sized WebP files. Sharp never loads in the
+  at build time; the SSR home page uses pre-sized AVIF and WebP files. Sharp never loads in the
   server process, and nobody can make it transform arbitrary sizes.
 
 Mail templates load three self-hosted fonts from another origin. Their URLs remain

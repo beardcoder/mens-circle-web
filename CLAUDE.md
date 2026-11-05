@@ -143,10 +143,10 @@ tokens, variants, surfaces and keyframes; `global.css` (public, one shared hashe
 and `admin.css` are the two entries. Both read classes from `src/` only
 (`source('..')`, so words in docs, mail templates and tests never become utilities) and
 skip server-only code; `global.css` keeps the admin sources out with `@source not`.
-Scroll reveals, depth and the FAQ are Motion (`components/Motion.astro`, a dev
-dependency bundled into the client); the opening, loops and state transitions are
-the theme's own keyframes
-and `--animate-*` tokens (`rise`, `fade-in`, `skeleton`); there is no animation plugin.
+Scroll reveals, the FAQ and the phone action bar are Motion (`components/Motion.astro`,
+a dev dependency bundled into the client); the opening, page transitions, loops and
+state transitions are the theme's own keyframes and `--animate-*` tokens (`rise`,
+`skeleton`); there is no animation plugin.
 No `<style>` blocks and no component stylesheets: utilities in the
 markup, recipes in `lib/ui.ts`, components in `components/ui/`. `docs/design-system.md`
 is the reference. Class strings are complete and static; never add a class that sets a

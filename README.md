@@ -54,8 +54,9 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Route cache: Astro's `memoryCache()` (path-keyed, 64 entries), 5 minutes + 5 minutes stale-while-revalidate; every action that changes public data purges it (`purgePublicCache`)
 - Event details: SSR metadata and copy; the Preact registration island re-reads live seats when the page returns into view
 - Admin guard and default `Cache-Control`: `src/middleware.ts`, `src/lib/cache-policy.ts`
-- Public CSS: shared hashed stylesheets; the SSR home portrait is pre-sized WebP (no `/_image` at runtime)
+- Public CSS: shared hashed stylesheets; the SSR home photo and avatar are pre-sized AVIF/WebP files (no `/_image` at runtime)
 - Design: forest, ember and linen; Fraunces 500 (static) and Figtree (variable), ~37 kB of fonts; see [design system](docs/design-system.md)
+- Motion and page transitions: the opening in CSS, scroll reveals with Motion (`src/components/Motion.astro`), native view transitions like an app's stack; see the design system's "Motion" and "Page transitions"
 - Prefetch through Speculation Rules (no script)
 - Server adapter: `@igloczek/astro-bun-adapter` (standalone, bundled), served by `server.ts` on `Bun.serve()`; see [runtime](docs/runtime.md)
 - Mail fonts: endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view
