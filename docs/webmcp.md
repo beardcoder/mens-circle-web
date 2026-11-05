@@ -1,6 +1,6 @@
 # WebMCP
 
-The pages offer a few tools to an AI agent working in the visitor's browser, through
+The pages offer two tools to an AI agent working in the visitor's browser, through
 WebMCP: `document.modelContext.registerTool()`, a draft of the W3C Web Machine
 Learning Community Group ([spec](https://webmachinelearning.github.io/webmcp/),
 [Chrome docs](https://developer.chrome.com/docs/ai/webmcp)). An agent asks the page
@@ -10,31 +10,34 @@ nothing happens: each page loads a module of about 0.6 kB (gzip) that checks for
 
 ## Tools
 
-| Tool                     | Where                            | What it does                                                                                                                       |
-| ------------------------ | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `list-events`            | every page                       | Reads `/api/public/events` and answers with the upcoming evenings: date, time, place, contribution, seats, the page to register on |
-| `fill-registration-form` | an event page, while it is open  | Fills first name, last name, email and an optional mobile number into the registration form                                        |
-| `fill-newsletter-form`   | pages with the notification form | Fills the email address into the form for news about dates                                                                         |
-| `fill-testimonial-form`  | `/teile-deine-erfahrung`         | Fills the experience, an optional name and role, and the email address into the form                                               |
+| Tool                     | Where                           | What it does                                                                                                                       |
+| ------------------------ | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `list-events`            | every page                      | Reads `/api/public/events` and answers with the upcoming evenings: date, time, place, contribution, seats, the page to register on |
+| `fill-registration-form` | an event page, while it is open | Fills first name, last name, email and an optional mobile number into the registration form                                        |
 
 `list-events` carries `readOnlyHint: true`. It answers from the same public view the
 pages render (`readPublicEvents()`, route-cached, purged with every change); never
 addresses or participant data.
 
-The form tools only fill a form in, as if typed, then scroll it into view and wait at
-the privacy consent (or at the button). **The person agrees to the privacy policy and
+The registration tool only fills the form in, as if typed, then scrolls it into view
+and waits at the privacy consent. **The person agrees to the privacy policy and
 submits the form themselves**: no agent gives consent in someone's name or signs
-anyone up, and the honeypot (`website`) is never part of a tool. The registration tool
-is registered only while its form is shown (not for a past evening, gone after the
-registration) and names the evening in its description; for a full evening it speaks
-of the waiting list.
+anyone up, and the honeypot (`website`) is never part of the tool. It is registered
+only while its form is shown (not for a past evening, gone after the registration)
+and names the evening in its description; for a full evening it speaks of the
+waiting list.
+
+These two answer what a visitor comes for: when and where the next evening is, and a
+seat at it. The other forms get no tool. The testimonial form is for a participant's
+own words, and an agent should not write them; the notification form is one field an
+agent fills as easily by typing. A tool belongs where it saves the person a real step
+and leaves every decision with them.
 
 ## Rules for tools
 
 - One file holds the plumbing: `src/lib/webmcp.ts` (`provideTool()`, `formTool()`,
   `readInput()`, `eventsText()`). A tool is registered where its subject is: the
-  global one in `components/WebMcp.astro`, a form's in that form's own script or
-  island. Scripts import it only behind `'modelContext' in document`. `provideTool()`
+  global one in `components/WebMcp.astro`, the registration form's in its island. Scripts import it only behind `'modelContext' in document`. `provideTool()`
   returns the function that unregisters it (an `AbortSignal`, as the spec has it).
 - Names are verbs for what happens (`list-…`, `fill-…`), titles German (shown to the
   person), descriptions English for the model: what the tool does and when to use it,

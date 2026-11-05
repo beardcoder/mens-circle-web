@@ -9,7 +9,7 @@ import { eventsText, type Field, readInput } from '../src/lib/webmcp';
 const fields: Field[] = [
   { name: 'first_name', description: '', required: true, maxLength: 5 },
   { name: 'email', description: '', required: true, maxLength: 254, email: true },
-  { name: 'note', description: '', minLength: 3, maxLength: 20 },
+  { name: 'note', description: '', maxLength: 20 },
 ];
 
 test('valid input is trimmed and optional fields may stay empty', () => {
@@ -20,12 +20,17 @@ test('valid input is trimmed and optional fields may stay empty', () => {
 });
 
 test('every problem is named at once, in words to correct', () => {
-  const { problems } = readInput(fields, { first_name: 'Maximilian', email: 'kein-at', note: 'ja', extra: 1 });
+  const { problems } = readInput(fields, {
+    first_name: 'Maximilian',
+    email: 'kein-at',
+    note: 'x'.repeat(21),
+    extra: 1,
+  });
 
   expect(problems).toEqual([
     'first_name darf höchstens 5 Zeichen haben.',
     'email ist keine gültige E-Mail-Adresse.',
-    'note braucht mindestens 3 Zeichen.',
+    'note darf höchstens 20 Zeichen haben.',
   ]);
   expect(readInput(fields, { email: 42 }).problems).toEqual(['first_name fehlt.', 'email fehlt.']);
 });

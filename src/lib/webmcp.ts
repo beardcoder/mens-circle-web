@@ -47,12 +47,11 @@ export function provideTool(tool: Tool): () => void {
   return () => controller.abort();
 }
 
-/** A text field a form tool fills: the control's `name`, and how to describe and bound it. */
+/** A text field the form tool fills: the control's `name`, and how to describe and bound it. */
 export interface Field {
   name: string;
   description: string;
   required?: boolean;
-  minLength?: number;
   maxLength: number;
   email?: boolean;
 }
@@ -62,9 +61,6 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /** What is wrong with one value, in words the agent can act on; `null` when it fits. */
 function problem(field: Field, value: string): string | null {
   if (!value) return field.required ? `${field.name} fehlt.` : null;
-
-  if (field.minLength && value.length < field.minLength)
-    return `${field.name} braucht mindestens ${field.minLength} Zeichen.`;
 
   if (value.length > field.maxLength) return `${field.name} darf höchstens ${field.maxLength} Zeichen haben.`;
 
@@ -102,7 +98,6 @@ const schema = (fields: Field[]): InputSchema => ({
         type: 'string',
         description: field.description,
         maxLength: field.maxLength,
-        ...(field.minLength ? { minLength: field.minLength } : {}),
         ...(field.email ? { format: 'email' } : {}),
       },
     ]),

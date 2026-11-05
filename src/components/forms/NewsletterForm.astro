@@ -59,33 +59,4 @@ const { context = {}, id = 'newsletter-form', variant = 'secondary', class: clas
   import { enhanceForms } from '@lib/form';
 
   enhanceForms('newsletter', 'subscribeNewsletter');
-
-  // An agent can fill the address in (lib/webmcp.ts); the person sends the form and
-  // confirms the subscription by email.
-  const form = document.querySelector<HTMLFormElement>('form[data-form="newsletter"]');
-
-  if (form && 'modelContext' in document) {
-    const { formTool, provideTool } = await import('@lib/webmcp');
-
-    provideTool(
-      formTool({
-        form,
-        name: 'fill-newsletter-form',
-        title: 'Benachrichtigung vorbereiten',
-        description:
-          "Fills an email address into the form on this page for notifications about new dates of the men's circle, and moves the focus to its button. The person sends the form themselves and confirms the subscription in the email that follows.",
-        fields: [
-          {
-            name: 'email',
-            description: 'The address that should receive the notifications.',
-            required: true,
-            maxLength: 254,
-            email: true,
-          },
-        ],
-        next: form.querySelector<HTMLElement>('button[type="submit"]'),
-        done: 'Die Adresse steht im Formular. Die Person tippt auf „Termine per E-Mail erhalten“ und bestätigt danach die Anmeldung in der E-Mail.',
-      }),
-    );
-  }
 </script>
