@@ -1,3 +1,4 @@
+import site from '../../data/site.json';
 import { fullAddress } from '../shared/format';
 import { formatDateLong, formatDateShort, formatTimeRange } from '../shared/time';
 import { cancelUrlFor } from './cancel-token';
@@ -13,7 +14,7 @@ const fullName = (p: Participant): string => `${p.firstName || ''} ${p.lastName 
 const participantCtx = (p: Participant) => ({
   firstName: p.firstName || '',
   recipientEmail: p.email,
-  siteName: config.SITE_NAME,
+  siteName: site.siteName,
   contactEmail: config.CONTACT_EMAIL,
 });
 

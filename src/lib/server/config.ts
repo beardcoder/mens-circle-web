@@ -42,7 +42,6 @@ export function loadConfig(source: Env = process.env) {
 
   return {
     APP_URL: env('APP_URL', env('PUBLIC_SITE_URL', 'https://mens-circle.de')).replace(/\/+$/, ''),
-    SITE_NAME: env('SITE_NAME', 'Männerkreis Niederbayern'),
     MAIL_FROM_ADDRESS: env('MAIL_FROM_ADDRESS', 'hallo@mens-circle.de'),
     MAIL_FROM_NAME: env('MAIL_FROM_NAME', 'Männerkreis Niederbayern'),
     MAIL_ADMIN_ADDRESS: env('MAIL_ADMIN_ADDRESS', 'hallo@mens-circle.de'),

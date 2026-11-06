@@ -41,6 +41,7 @@ COPY --from=build /app/drizzle ./drizzle
 COPY --from=build /app/scripts/schedule.ts /app/scripts/backup-db.ts /app/scripts/send-reminders.ts ./scripts/
 COPY --from=build /app/src/lib/server ./src/lib/server
 COPY --from=build /app/src/lib/shared ./src/lib/shared
+COPY --from=build /app/src/data ./src/data
 COPY --from=build /app/src/assets/mail ./src/assets/mail
 COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 

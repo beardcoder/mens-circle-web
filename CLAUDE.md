@@ -156,7 +156,7 @@ published testimonials' addresses; change the period in `lib/shared/retention.ts
 and the policy together. Logs never carry an address (`logId()` in `listmonk.ts`).
 No in-process timer and no `Bun.cron` (throws at
 boot). Beside `dist/` and `drizzle/`, the Docker image keeps only the three scheduled
-scripts, `src/lib/server/`, `src/lib/shared/` (pure helpers), the mail fonts (`src/assets/mail`) and the production
+scripts, `src/lib/server/`, `src/lib/shared/` (pure helpers), `src/data/` (site config), the mail fonts (`src/assets/mail`) and the production
 `dependencies` (the build bundles the rest): what those scripts and the server lib
 import at runtime must be in there (other `src` files as types only).
 
@@ -168,7 +168,10 @@ fall back to "write to us"). A public sign-up never overwrites a stored particip
 name or phone (the address is unverified): it fills empty fields and keeps what
 differs on the registration (`submitted_*`) for the admin.
 `listmonk-templates/` holds the versioned copies of the listmonk templates: edit
-there, then paste into listmonk. The `template-contract` email test fails when a
+there, then paste into listmonk. The newsletter body is built in
+`lib/server/mail/newsletter.ts`; mail colours come from `lib/shared/brand.ts`, which
+`tests/brand.test.ts` holds equal to the `--p-*` primitives and to every hex in the
+templates. The brand name comes from `src/data/site.json` only. The `template-contract` email test fails when a
 template reads a `.Tx.Data` field its payload does not send. The templates load the
 mail mark from `/images/logo-mail.png` by URL; mails already sent still load
 `/images/logo-flame.png`, so keep both files.

@@ -17,10 +17,12 @@ IDs in the environment stay as they are.
 The data each transactional template reads (`{{ .Tx.Data.* }}`) is the payload built
 in `src/lib/server/email.ts`; `tests/email-backend` (scenario `template-contract`)
 fails when a template reads a field the payload does not send. The campaign template
-wraps the body built by `buildEventNewsletterHtml` in `src/lib/server/events.ts` and
+wraps the body built by `buildEventNewsletterHtml` in `src/lib/server/mail/newsletter.ts` and
 adds the greeting, signature, footer and unsubscribe link.
 
-Design as on the site (`docs/design-system.md`): three rounded sheets on the sand
+Colours come from `src/lib/shared/brand.ts` (the `--p-*` primitives of `theme.css` by
+name, plus the mail-only footer rule); `tests/brand.test.ts` fails when a template
+uses a hex value that is not there. Design as on the site (`docs/design-system.md`): three rounded sheets on the sand
 page, 8px apart — a forest masthead with the ember mark (`/images/logo-mail.png`,
 loaded by URL; mails already sent still load `/images/logo-flame.png`) and the word
 mark in Fraunces, a cream content sheet, a compact forest footer that links Impressum
