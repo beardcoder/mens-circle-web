@@ -221,8 +221,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   states only); hex primitives (`--p-*`) live on `:root` only, never in markup. Day
   and night follow the system by default (`light-dark()` tokens, no `data-mode`);
   `ModeToggle` (footer and phone menu) offers Auto · Hell · Dunkel and pins a choice
-  as `data-mode` (stored as `mc-appearance`). The boot script drops the old keys
-  `mc-theme` and `mc-mode`, so earlier pins return to Auto once. `theme-color` comes
+  as `data-mode` (stored as `mc-appearance`; keys of older versions are simply
+  ignored). `theme-color` comes
   as a light and a dark tag by `media`. Every text
   pair ≥ 4.5:1 on every ground in both modes, control lines ≥ 3:1; `line` never
   outlines a control alone. Check new pairs in both modes.
@@ -301,7 +301,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   answer, no animated height. The hero's loops pause out of view
   (`data-offscreen`). Never set a state attribute on `<html>` while the page moves
   (it restyles the whole page): flag the element itself (`data-lifted` on the
-  back-to-top link); the boot script's flag (`data-arrival`) is set
+  back-to-top link); the boot script's mode flags are set
   before the first frame. Never read layout or `scrollY` at load: header tone,
   back-to-top and the like watch a sentinel with an `IntersectionObserver`.
   Nothing that holds the LCP waits for a script.
@@ -317,22 +317,12 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   24rem (container query) puts the seal beside its label and the date below it. A
   title's measure is in `em`, never `ch` (`ch` follows the font in use and
   re-resolves when it swaps).
-- Page transitions are native cross-document view transitions, like an app's stack
-  (global.css, "Page transitions"; design-system.md): forward the next page comes in
-  from the right, back from the left; the boot script names the direction in
-  `pagereveal` (types `forward`, `back`, `menu` when the last page left through its
-  open menu). A page reached from the site arrives composed (`data-arrival="next"`:
-  no opening); one reached through the history stands as it
-  was (`return`). Keep the main thread free while a page slides in: only opacity and
-  translation move, no group animates; the bar (and an open menu on the way out)
-  gets its `view-transition-name` inline only while a transition runs (a permanent
-  one makes it a backdrop root and takes its blur, a page-wide selector restyles
-  every element); arrivals from the site wait for `#footer` (`rel="expect"`); the
-  upright fonts load while the page parses; no `:has()` on `body` or `html` that
-  every inserted node re-evaluates (the bar over the opening is `data-over-hero`);
-  write `<html>` attributes only when they change; defer layout reads until
-  `document.activeViewTransition` has finished. Without types and under reduced
-  motion: a cross-fade, linear curves and one duration (`plus-lighter`).
+- Page transitions are a native cross-document cross-fade (global.css, "Page
+  transitions": `@view-transition`, `plus-lighter`, one duration, linear). No
+  script names directions or arrivals; the boot script in the head only sets the
+  colour mode (`data-mode`, `data-mode-resolved`). No `:has()` on `body` or `html`
+  (the bar over the opening is `data-over-hero`); write `<html>` attributes only
+  when they change.
 - Styles live in the component's markup as utilities. `global.css` is one stylesheet
   for every public page (`inlineStylesheets: 'auto'`), so keep one-off arbitrary
   values few.

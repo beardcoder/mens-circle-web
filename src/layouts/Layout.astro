@@ -23,13 +23,14 @@ const { headerAction, overHero = false, ...props } = Astro.props;
 <html lang="de" dir="ltr">
   <head>
     <meta charset="UTF-8" />
+    {/* Viewport and title first, then the scripts that must run before the first paint. */}
+    <SeoHead {...props} />
     <script is:inline set:html={bootScript} />
     {/* Both upright faces are in the first viewport; the italic loads when used. */}
     <Font cssVariable="--font-fraunces" preload />
     <Font cssVariable="--font-figtree" preload={[{ weight: '300 900', style: 'normal' }]} />
     <script is:inline set:html={fontScript} />
     <script is:inline type="speculationrules" set:html={speculationRules} />
-    <SeoHead {...props} />
   </head>
   <body>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top; it

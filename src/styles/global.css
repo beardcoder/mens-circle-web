@@ -16,24 +16,11 @@
 
 /* ── Page transitions ─────────────────────────────────────────────────────── */
 
-/* Native cross-document view transitions, like an app's navigation stack: going
-   forward, the next page comes in from the right while the current one drifts
-   left and fades; going back mirrors it. The boot script in Layout.astro names the
-   direction (`forward`, `back`) as the page is revealed, and names the frame that
-   holds still: the bar (`site-header`) and an open phone menu (`nav-menu`). It
-   sets those names on the elements only while a transition runs: a
-   view-transition-name makes its element a backdrop root (the bar would lose its
-   blur), and a selector that switched them for the whole page would restyle every
-   element as a transition starts and ends. Pseudo-elements of the transition
-   cannot carry utilities.
-
-   Smooth on a phone means nothing in the transition needs the main thread: only
-   opacity and translation move, and no group animates its size (Chrome runs those
-   on the main thread, every frame), since nothing named changes place. Without a
-   direction (a browser without types) and under reduced motion the pages
-   cross-fade: `plus-lighter` adds the two snapshots, which avoids the grey sag of
-   a plain cross-fade only while their opacities sum to 1, so both halves share
-   one duration and a linear curve. */
+/* Native cross-document view transitions: the pages cross-fade, nothing slides and
+   no script names a direction. `plus-lighter` adds the two snapshots, which avoids
+   the grey sag of a plain cross-fade only while their opacities sum to 1, so both
+   halves share one duration and a linear curve. Only opacity moves, on the
+   compositor; no group animates. */
 @view-transition {
   navigation: auto;
 }
@@ -43,67 +30,19 @@
 }
 
 ::view-transition-old(root),
-::view-transition-new(root),
-::view-transition-old(site-header),
-::view-transition-new(site-header) {
-  animation-duration: 260ms;
+::view-transition-new(root) {
+  animation-duration: 220ms;
   animation-timing-function: linear;
   animation-fill-mode: both;
   mix-blend-mode: plus-lighter;
 }
 
-::view-transition-old(root),
-::view-transition-old(site-header) {
+::view-transition-old(root) {
   animation-name: vt-fade-out;
 }
 
-::view-transition-new(root),
-::view-transition-new(site-header) {
+::view-transition-new(root) {
   animation-name: vt-fade-in;
-}
-
-/* Leaving through the open phone menu (`menu`): the menu lives in the top layer,
-   but its group would be painted with the bar, under the pages, so it is lifted
-   over them and fades away over the next page. The page that lay under the menu
-   was never seen and is not shown. */
-::view-transition-group(nav-menu) {
-  z-index: 1;
-}
-
-::view-transition-old(nav-menu) {
-  animation: vt-fade-out 340ms var(--ease-in-out) both;
-}
-
-:root:active-view-transition-type(menu)::view-transition-old(root) {
-  animation: none;
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* The page that leaves fades quickly while it drifts; the one that comes fades in
-     a beat later and settles on Motion's spring, so the two never sit on top of
-     each other at half strength. */
-  :root:active-view-transition-type(forward, back)::view-transition-old(root) {
-    mix-blend-mode: normal;
-    animation:
-      vt-fade-out 180ms var(--ease-in) both,
-      vt-leave 420ms var(--ease-spring) both;
-  }
-
-  :root:active-view-transition-type(forward, back)::view-transition-new(root) {
-    mix-blend-mode: normal;
-    animation:
-      vt-fade-in 320ms var(--ease-fade) 60ms both,
-      vt-arrive 520ms var(--ease-spring) both;
-  }
-
-  :root:active-view-transition-type(back)::view-transition-old(root) {
-    animation-name: vt-fade-out, vt-leave-back;
-  }
-
-  :root:active-view-transition-type(back)::view-transition-new(root) {
-    animation-name: vt-fade-in, vt-arrive-back;
-  }
 }
 
 @keyframes vt-fade-out {
@@ -115,30 +54,6 @@
 @keyframes vt-fade-in {
   from {
     opacity: 0;
-  }
-}
-
-@keyframes vt-leave {
-  to {
-    translate: -2.5rem 0;
-  }
-}
-
-@keyframes vt-arrive {
-  from {
-    translate: 3.5rem 0;
-  }
-}
-
-@keyframes vt-leave-back {
-  to {
-    translate: 2.5rem 0;
-  }
-}
-
-@keyframes vt-arrive-back {
-  from {
-    translate: -3.5rem 0;
   }
 }
 
@@ -227,11 +142,7 @@
    a seat bar in the opening fills after its line. Opacity and focus take a gentle
    fade (`--ease-fade`), the movement Motion's spring (`--ease-spring`). The blur is
    the one non-composited piece: on the title's words only, light and short
-   (0.6 s), so the main thread is soon free. The opening plays when the site is
-   opened. A page reached from another page of the site arrives composed, like an
-   app's next screen: the boot script names how it arrived before its first frame
-   (`data-arrival`: `next` from another page, `return` through the history), and
-   then nothing in it moves on its own while the page slides in. */
+   (0.6 s), so the main thread is soon free. */
 
 @media (prefers-reduced-motion: no-preference) {
   [data-enter]:not([data-enter='words'], [data-enter='settle'], [data-enter='ring']) {
@@ -266,10 +177,6 @@
   [data-enter] [data-seat-fill] {
     animation: enter-fill 1.2s var(--ease-out) backwards;
     animation-delay: calc(var(--enter-delay, 0s) + 0.35s);
-  }
-
-  :root[data-arrival] :is([data-enter], [data-word], [data-seat-fill]) {
-    animation: none;
   }
 }
 

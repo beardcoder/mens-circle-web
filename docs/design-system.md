@@ -193,8 +193,7 @@ waits for a script.
   and every sub-page opening (`PageIntro`) work this way. On an event page the date
   line and the title rise in first, then the lead and the registration panel. Once the
   title has scrolled under the bar, a dock with title and date fades and slides in
-  below the bar (`EventDock`, one observer, opacity and translation). The opening plays when the site is opened; a page
-  reached from another page of the site arrives composed (see "Page transitions").
+  below the bar (`EventDock`, one observer, opacity and translation). The opening plays on every page load.
 - Below it, CSS scroll-driven animations (global.css, "Motion: scroll"): each piece
   arrives as it comes into view, once, driven by the scroll itself
   (`animation-timeline: view()`, `animation-range: entry`): an element
@@ -230,53 +229,13 @@ waits for a script.
 
 ### Page transitions
 
-Native cross-document view transitions (global.css, "Page transitions"), like an
-app's navigation stack. Going forward, the next page comes in from the right while
-the current one drifts left and fades; going back mirrors it. The page that leaves
-fades quickly (0.18 s), the one that comes fades in a beat later (0.32 s) and slides
-3.5rem on Motion's spring (0.52 s), so the two never sit on top of each other at
-half strength. The frame holds still: the bar (`site-header`) stays in place while
-the page moves under it; leaving through the open phone menu, the menu
-(`nav-menu`) fades away over the next page and the page that lay under it is never
-shown.
-
-A page that arrives this way is composed, like an app's next screen: no opening; what
-lies below the screen arrives as it scrolls into view, like everywhere. A page
-reached again through the history stands as it was left.
-
-Smooth on a phone means the main thread stays free while the page moves, because
-Chrome updates a transition on it every frame:
-
-- Only opacity and translation move, and no group animates its size (that runs on
-  the main thread), since nothing named changes place.
-- Names go on the elements themselves, only while a transition runs (`pageswap`,
-  `pagereveal`): a view-transition-name makes its element a backdrop root (the bar
-  would lose its blur), and a selector that switched names for the whole page would
-  restyle every element as a transition starts and ends.
-- The first frame waits until the page is parsed up to the footer
-  (`<link rel="expect" href="#footer" blocking="render">`, only when arriving from
-  the site), so the page is laid out once before it moves.
-- The upright fonts load while the page parses (Layout.astro), not at the first
-  layout; otherwise they swap in a frame later and the page is laid out again.
-- Nothing restyles the whole page on its own: the bar over the opening is an
-  attribute (`data-over-hero`), not `body:has()` (that reacts to every node the
-  parser or an island adds); scripts write an attribute on `<html>` only when it
-  changes (`ModeToggle`); the event dock reads no layout at all.
-
-Measured with Chrome at a 6× slower CPU, the work on the main thread while the page
-moves fell from about 170 ms of style to about 30 ms (home → `/event`) and from
-about 280–430 ms to about 40–50 ms (`/event` → a date).
-
-The boot script in `Layout.astro` names the direction as the page is revealed
-(`pagereveal`; `forward`, `back`, `menu` as view-transition types) and, while the
-page parses, how it arrived (`data-arrival`: `next` from another page of the site,
-`return` through the history; from the Navigation API, else the navigation timing
-and the referrer). A browser without types cross-fades (`plus-lighter`, one
-duration, linear), and so does reduced motion; a browser without cross-document
-transitions simply loads the page, composed all the same.
-
-Third-party scripts load `async`, so nothing queues in front of the
-page's own.
+Native cross-document view transitions (global.css, "Page transitions"): the two
+pages cross-fade (`plus-lighter`, 220 ms, linear, one duration for both halves, so
+their opacities always sum to 1 and nothing sags grey). Only opacity moves, on the
+compositor; no group animates and nothing is named. Every page plays its own opening
+when it arrives. A browser without cross-document transitions simply loads the
+page. The boot script in the head sets only the colour mode before the first paint.
+Third-party scripts load `async`, so nothing queues in front of the page's own.
 
 ### Lighthouse
 
