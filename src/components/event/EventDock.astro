@@ -1,6 +1,6 @@
 ---
 import type { EventDTO } from '@lib/shared/dto';
-import { isoDay } from '@lib/shared/format';
+import { eventDay } from '@lib/shared/time';
 
 import Container from '../ui/Container.astro';
 
@@ -34,7 +34,7 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       )}
     </p>
     <p class="shrink-0 text-right text-xs leading-snug sm:text-sm">
-      <time data-event-dock-date datetime={isoDay(event.event_date)} class="inline-block text-fg">
+      <time data-event-dock-date datetime={eventDay(event.event_date)} class="inline-block text-fg">
         {dateLabel}
       </time>
       {hours && (

@@ -41,7 +41,7 @@ const clock = text.refine((value) => value === '' || parseClockTime(value) !== n
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-/** A real calendar day ("2026-11-12", also as the stored "…T00:00:00.000Z"). */
+/** A real calendar day ("2026-11-12"; older forms may send "…T00:00:00.000Z"). */
 const isCalendarDay = (value: string): boolean => {
   const match = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.000)?Z)?$/.exec(value);
 
@@ -66,7 +66,7 @@ const eventFields = z.object({
     .trim()
     .min(1, 'Datum ist erforderlich.')
     .refine(isCalendarDay, 'Bitte ein gültiges Datum angeben.')
-    .transform((value) => `${value.slice(0, 10)}T00:00:00.000Z`),
+    .transform((value) => value.slice(0, 10)),
   startTime: clock,
   endTime: clock,
   location: text,

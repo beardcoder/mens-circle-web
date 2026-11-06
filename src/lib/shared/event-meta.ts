@@ -1,7 +1,7 @@
 /** Share and search metadata for one event. */
 import site from '../../data/site.json';
 import type { EventDTO } from './dto';
-import { formatDateLongDE, formatDayMonthYearDE, timeRange } from './format';
+import { formatDateLong, formatDayMonthYear, formatTimeRange } from './time';
 
 /** Chat previews show more than a SERP's ~160 chars, so budget for the preview. */
 const DESCRIPTION_LIMIT = 200;
@@ -42,7 +42,7 @@ export const eventPlace = (event: EventDTO): string =>
 
 /** "Freitag, 16. Oktober 2026, 19:00–21:30 Uhr", or empty without a date and time. */
 const eventWhen = (event: EventDTO): string =>
-  [formatDateLongDE(event.event_date), timeRange(event.start_time, event.end_time)].filter(Boolean).join(', ');
+  [formatDateLong(event.event_date), formatTimeRange(event.start_time, event.end_time)].filter(Boolean).join(', ');
 
 /** The single line answering "when and where" for a forwarded link. */
 export const eventWhenWhere = (event: EventDTO): string => {
@@ -123,8 +123,8 @@ export interface EventMeta {
 export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
   const name = eventName(event);
   const place = eventPlace(event);
-  const day = formatDayMonthYearDE(event.event_date);
-  const longDate = formatDateLongDE(event.event_date);
+  const day = formatDayMonthYear(event.event_date);
+  const longDate = formatDateLong(event.event_date);
   // One static 1200×630 poster for every event — SeoHead's default image.
   const image = new URL('/images/og-default.png?v=3', siteUrl).href;
 

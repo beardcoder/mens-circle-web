@@ -5,7 +5,7 @@ import { config } from '@lib/server/config';
 import { purgePublicCache } from '@lib/server/public-data';
 import { clientIp, peerAddress, rateLimit } from '@lib/server/ratelimit';
 import { cancelOwnRegistration, readRegistrationForCancel } from '@lib/server/registrations';
-import { formatDateLongDE } from '@lib/shared/format';
+import { formatDateLong } from '@lib/shared/time';
 import { link } from '@lib/ui';
 
 import PageIntro from '../../components/PageIntro.astro';
@@ -54,7 +54,7 @@ if (state === 'invalid') Astro.response.status = 404;
 if (state === 'limited') Astro.response.status = 429;
 
 const event = found?.event;
-const when = event ? formatDateLongDE(event.eventDate) : '';
+const when = event ? formatDateLong(event.eventDate) : '';
 const onWaitlist = found?.status === 'waitlist';
 
 const titles: Record<State, string> = {

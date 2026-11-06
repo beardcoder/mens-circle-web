@@ -2,6 +2,7 @@
 import site from '../../data/site.json';
 import type { EventDTO } from './dto';
 import { buildEventMeta, type EventMeta, eventName, stripHtml } from './event-meta';
+import { eventDay, zonedTime } from './time';
 
 type Schema = Record<string, unknown>;
 
@@ -65,30 +66,9 @@ export function breadcrumbSchema(siteUrl: URL, levels: [name: string, url: strin
   };
 }
 
-/** DST-aware Europe/Berlin UTC offset (e.g. "+02:00"). */
-function berlinOffset(date: Date): string {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'Europe/Berlin',
-    timeZoneName: 'longOffset',
-  }).formatToParts(date);
-
-  const tz = parts.find((p) => p.type === 'timeZoneName')?.value ?? 'GMT+01:00';
-  const match = tz.match(/GMT([+-]\d{2}:\d{2})/);
-
-  return match ? match[1] : '+01:00';
-}
-
-/** Combine an ISO date + "HH:MM" into a local ISO datetime with Berlin offset. */
-function localDateTime(isoDate: string, time: string): string {
-  const d = new Date(isoDate);
-
-  if (Number.isNaN(d.getTime())) return isoDate;
-
-  const datePart = d.toISOString().slice(0, 10);
-
-  if (!/^\d{2}:\d{2}$/.test(time)) return datePart;
-
-  return `${datePart}T${time}:00${berlinOffset(d)}`;
+/** An event day and "HH:MM" as a local ISO datetime with the Berlin offset; the day alone without a time. */
+function localDateTime(day: string, time: string): string {
+  return zonedTime(day, time)?.iso ?? eventDay(day);
 }
 
 /** Locality, region and country fall back to the circle's home town so the address is never half-stated; street and postal code are left out instead. */

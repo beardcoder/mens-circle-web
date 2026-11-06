@@ -141,8 +141,10 @@ importing the server lib opens the database and migrates. The
 reminder pass runs every 15 min, the S3 backup at 03:00 UTC when `BACKUP_S3_*` is set.
 Reminders go out in Berlin wall-clock time (`lib/server/reminder-window.ts`): 18:00–22:00
 the evening before ("morgen"), else from 10:00 on the day until the start ("heute"),
-once per registration (`reminder_sent_at`). Never compute local times with `getUTC*`;
-use `lib/shared/time.ts`. At 02:30 UTC `lib/server/retention.ts` anonymises
+once per registration (`reminder_sent_at`). Time: `event_date` is a Berlin calendar day (`"2026-11-12"`), `start_time`/`end_time`
+are `HH:MM`; every label, comparison, `.ics` and JSON-LD time comes from
+`lib/shared/time.ts` (`formatDateLong`, `formatTimeRange` with one spelling,
+`zonedTime`, `isPast`, `todayBerlin`). Never `getUTC*` on an event date. At 02:30 UTC `lib/server/retention.ts` anonymises
 participants `RETENTION_DAYS` after their last event (≤ `DEFAULT_RETENTION_DAYS`, the
 number `/datenschutz` prints), deletes expired event lists in listmonk and clears
 published testimonials' addresses; change the period in `lib/shared/retention.ts`

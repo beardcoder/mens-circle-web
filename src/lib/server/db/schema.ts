@@ -1,4 +1,4 @@
-/** UUID text keys, `deleted` as soft-delete timestamp, ISO-8601 UTC strings, booleans as integers. */
+/** UUID text keys, `deleted` as soft-delete timestamp, ISO-8601 UTC timestamps (event days as "YYYY-MM-DD"), booleans as integers. */
 import { desc, isNull } from 'drizzle-orm';
 import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
@@ -41,7 +41,7 @@ export const events = sqliteTable(
     title: text('title').notNull(),
     slug: text('slug').notNull(),
     description: text('description').notNull().default(''),
-    eventDate: text('event_date').notNull(), // ISO timestamp (UTC)
+    eventDate: text('event_date').notNull(), // calendar day in Berlin, "2026-11-12" (lib/shared/time.ts)
     startTime: text('start_time').notNull().default(''), // "HH:MM"
     endTime: text('end_time').notNull().default(''), // "HH:MM"
     location: text('location').notNull().default(''),

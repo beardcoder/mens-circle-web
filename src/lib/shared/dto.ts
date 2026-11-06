@@ -6,7 +6,7 @@ export interface EventDTO {
   title: string;
   slug: string;
   description: string;
-  event_date: string; // ISO timestamp
+  event_date: string; // calendar day, "2026-11-12" (lib/shared/time.ts)
   start_time: string; // HH:MM
   end_time: string; // HH:MM
   location: string;

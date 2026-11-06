@@ -1,4 +1,4 @@
-import { toDate } from './format';
+import { zonedTime } from './time';
 
 /** What a calendar entry needs; a DB `Event` fits as it is. */
 export interface CalendarEvent {
@@ -20,32 +20,33 @@ const icsEscape = (text: unknown): string =>
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
-/** Wall-clock time as "20260918T190000"; the UTC fields hold Berlin local time. */
-const icsLocal = (d: Date): string =>
+/** An instant in UTC as "20260918T170000Z". */
+const icsUtc = (d: Date): string =>
   `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}` +
-  `T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}`;
+  `T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
 
-const combineDateTime = (eventDateValue: unknown, timeStr: string): Date | null => {
-  const base = toDate(eventDateValue);
+/** A Berlin wall-clock stamp ("20260918T190000") plus `minutes`, still wall-clock. */
+const wallPlus = (wall: string, minutes: number): string => {
+  const at = Date.UTC(
+    +wall.slice(0, 4),
+    +wall.slice(4, 6) - 1,
+    +wall.slice(6, 8),
+    +wall.slice(9, 11),
+    +wall.slice(11, 13),
+  );
 
-  if (!base) return null;
-
-  const [h, m] = /^\d{1,2}:\d{2}/.test(timeStr ?? '')
-    ? timeStr.split(':').map(Number)
-    : [base.getUTCHours(), base.getUTCMinutes()];
-
-  return new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), h, m, 0));
+  return icsUtc(new Date(at + minutes * 60_000)).slice(0, 15);
 };
 
-/** Start and end in Berlin wall-clock time; a missing end time means 90 minutes. */
+/** Start and end in Berlin wall-clock time; without an end, 90 minutes; without a start, no entry. */
 const eventSpan = (ev: CalendarEvent): { start: string; end: string } | null => {
-  const start = combineDateTime(ev.eventDate, ev.startTime);
+  const start = zonedTime(ev.eventDate, ev.startTime);
 
   if (!start) return null;
 
-  const end = combineDateTime(ev.eventDate, ev.endTime) ?? new Date(start.getTime() + 90 * 60 * 1000);
+  const end = zonedTime(ev.eventDate, ev.endTime);
 
-  return { start: icsLocal(start), end: icsLocal(end) };
+  return { start: start.wall, end: end && end.date > start.date ? end.wall : wallPlus(start.wall, 90) };
 };
 
 export const buildIcs = (ev: CalendarEvent): string => {
@@ -78,7 +79,7 @@ export const buildIcs = (ev: CalendarEvent): string => {
     'END:VTIMEZONE',
     'BEGIN:VEVENT',
     `UID:${ev.id}@mens-circle.de`,
-    `DTSTAMP:${icsLocal(new Date())}Z`,
+    `DTSTAMP:${icsUtc(new Date())}`,
     `DTSTART;TZID=Europe/Berlin:${span.start}`,
     `DTEND;TZID=Europe/Berlin:${span.end}`,
     `SUMMARY:${icsEscape(ev.title)}`,

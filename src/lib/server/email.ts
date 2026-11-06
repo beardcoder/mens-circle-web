@@ -1,4 +1,5 @@
-import { formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText } from '../shared/format';
+import { fullAddress } from '../shared/format';
+import { formatDateLong, formatDateShort, formatTimeRange } from '../shared/time';
 import { cancelUrlFor } from './cancel-token';
 import { config } from './config';
 import type { Event, Participant } from './db/schema';
@@ -18,9 +19,9 @@ const participantCtx = (p: Participant) => ({
 
 const eventDetail = (ev: Event, opts: { includeAddress?: boolean } = {}) => ({
   eventUrl: eventUrlFor(ev.slug),
-  dateLong: formatDateLongDE(ev.eventDate),
-  dateShort: formatDateShortDE(ev.eventDate),
-  timeRange: timeRangeText(ev),
+  dateLong: formatDateLong(ev.eventDate),
+  dateShort: formatDateShort(ev.eventDate),
+  timeRange: formatTimeRange(ev.startTime, ev.endTime),
   location: ev.location,
   address: opts.includeAddress ? fullAddress(ev) : '',
   locationDetails: ev.locationDetails,
@@ -76,8 +77,8 @@ export const sendRegistrationEmails = async (
     participantName: fullName(participant),
     participantEmail: participant.email,
     participantPhone: participant.phone,
-    dateShort: formatDateShortDE(ev.eventDate),
-    timeRange: timeRangeText(ev),
+    dateShort: formatDateShort(ev.eventDate),
+    timeRange: formatTimeRange(ev.startTime, ev.endTime),
     location: ev.location,
     activeCount,
     maxParticipants: ev.maxParticipants,

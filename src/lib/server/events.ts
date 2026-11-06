@@ -3,8 +3,9 @@ import { and, asc, desc, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
 
 import type { EventInput } from '../event-input';
 import type { EventDTO } from '../shared/dto';
-import { formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from '../shared/format';
+import { fullAddress } from '../shared/format';
 import { escapeHtml } from '../shared/html';
+import { eventDay, formatDateLong, formatDateShort, formatTimeRange, isPast, todayBerlin } from '../shared/time';
 import { config, listmonkApiConfigured } from './config';
 import { db } from './db';
 import type { Event } from './db/schema';
@@ -27,15 +28,8 @@ export const countActiveRegistrations = async (eventId: string): Promise<number>
 /** Published and not deleted: what the public may see. */
 const isPublic = () => and(eq(events.isPublished, true), isNull(events.deleted));
 
-export const isEventPast = (ev: Pick<Event, 'eventDate'>): boolean => {
-  const d = toDate(ev.eventDate);
-
-  if (!d) return false;
-
-  const endOfDay = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 23, 59, 59));
-
-  return endOfDay.getTime() < Date.now();
-};
+/** Past once the event's day is over in Berlin. */
+export const isEventPast = (ev: Pick<Event, 'eventDate'>): boolean => isPast(ev.eventDate);
 
 const eventDtoWithCount = (ev: Event, activeCount: number): EventDTO => {
   const available = Math.max(0, ev.maxParticipants - activeCount);
@@ -73,16 +67,10 @@ const eventWithCapacityQuery = () =>
     })
     .from(events);
 
-const startOfTodayIso = (): string => {
-  const now = new Date();
-
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0)).toISOString();
-};
-
 /** Upcoming public events with their seat counts, soonest first. */
 const upcomingQuery = (limit: number) =>
   eventWithCapacityQuery()
-    .where(and(isPublic(), gte(events.eventDate, startOfTodayIso())))
+    .where(and(isPublic(), gte(events.eventDate, todayBerlin())))
     .orderBy(asc(events.eventDate))
     .limit(limit);
 
@@ -152,9 +140,9 @@ export const fetchEventState = async (
 };
 
 const generateSlug = async (eventDate: string, excludeId?: string): Promise<string> => {
-  const base = String(eventDate).slice(0, 10);
+  const base = eventDay(eventDate);
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(base)) {
+  if (!base) {
     return `event-${Date.now().toString(36)}`;
   }
 
@@ -186,7 +174,7 @@ export const ensureEventList = async (ev: Event): Promise<number> => {
 
   if (ev.listmonkListId && ev.listmonkListId > 0) return ev.listmonkListId;
 
-  const id = await createList(eventListName(ev.title, formatDateShortDE(ev.eventDate)));
+  const id = await createList(eventListName(ev.title, formatDateShort(ev.eventDate)));
 
   if (!id) return 0;
 
@@ -236,12 +224,12 @@ const newsletterRow = ([label, value]: [string, string]): string =>
  */
 const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
   const url = `${config.APP_URL}/event/${ev.slug}`;
-  const dateLong = formatDateLongDE(ev.eventDate);
+  const dateLong = formatDateLong(ev.eventDate);
   const body = intro.trim() ? intro : DEFAULT_EVENT_NEWSLETTER_INTRO;
 
   const rows = (
     [
-      ['Zeit', timeRangeText(ev)],
+      ['Zeit', formatTimeRange(ev.startTime, ev.endTime)],
       ['Ort', ev.location],
       ['Adresse', fullAddress(ev)],
       ['Beitrag', ev.costBasis],
@@ -276,7 +264,7 @@ export const sendEventNewsletter = async (
 
   if (!ev) return { ok: false, campaignId: 0, error: 'Veranstaltung nicht gefunden.' };
 
-  const dateShort = formatDateShortDE(ev.eventDate);
+  const dateShort = formatDateShort(ev.eventDate);
 
   return sendNewsletterCampaign({
     name: `Event-Newsletter: ${ev.title}${dateShort ? ` (${dateShort})` : ''}`,
@@ -338,7 +326,7 @@ export const updateEvent = async (id: string, input: EventInput): Promise<Event 
     const dateChanged = existing.eventDate !== updated.eventDate;
 
     if (titleChanged || dateChanged) {
-      void renameList(updated.listmonkListId, eventListName(updated.title, formatDateShortDE(updated.eventDate))).catch(
+      void renameList(updated.listmonkListId, eventListName(updated.title, formatDateShort(updated.eventDate))).catch(
         () => {},
       );
     }

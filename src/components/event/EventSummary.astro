@@ -1,5 +1,6 @@
 ---
 import type { SummaryView } from '@lib/shared/event-status';
+import { daySeal } from '@lib/shared/time';
 import { button, label } from '@lib/ui';
 
 import SeatBar from './SeatBar.astro';
@@ -13,10 +14,7 @@ interface Props {
 const { view, showAction = true, location } = Astro.props;
 
 /** The date's seal: the day and a short month in a circle ("01" / "Jan."). */
-const day = new Date(`${view.datetime}T12:00:00Z`);
-const valid = !Number.isNaN(day.getTime());
-const dayNumber = valid ? String(day.getUTCDate()).padStart(2, '0') : '';
-const month = valid ? new Intl.DateTimeFormat('de-DE', { month: 'short', timeZone: 'UTC' }).format(day) : '';
+const { day: dayNumber, month } = daySeal(view.datetime);
 const seal = view.state === 'past' ? 'bg-line text-fg-muted' : 'bg-accent-soft text-accent';
 
 /** With seats to show, the seats become the bar; a past evening keeps them in words. */

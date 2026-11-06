@@ -24,7 +24,7 @@ test('blank optional form controls produce database-ready defaults', () => {
   });
 
   expect(result.title).toBe('Männerkreis');
-  expect(result.eventDate).toBe('2026-11-12T00:00:00.000Z');
+  expect(result.eventDate).toBe('2026-11-12');
   expect(result.slug).toBeUndefined();
   expect(result.description).toBe('');
   expect(result.location).toBe('');
@@ -83,7 +83,7 @@ test('slugs are lowercase words joined by single hyphens, at most 80 characters'
 });
 
 test('the date must be a real calendar day', () => {
-  expect(eventInputSchema.parse({ ...base, eventDate: '2028-02-29' }).eventDate).toBe('2028-02-29T00:00:00.000Z');
+  expect(eventInputSchema.parse({ ...base, eventDate: '2028-02-29' }).eventDate).toBe('2028-02-29');
 
   for (const eventDate of ['2026-02-30', '2026-13-01', '12.11.2026', 'morgen', '2026-11-12T19:00:00Z']) {
     expect(errorsFor({ eventDate }).eventDate).toBeString();

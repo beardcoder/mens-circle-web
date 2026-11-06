@@ -1,6 +1,7 @@
 import { actions } from 'astro:actions';
 import { useState } from 'preact/hooks';
 
+import { todayBerlin } from '@lib/shared/time';
 import { button, card } from '@lib/ui';
 
 import { Icon } from './icons';
@@ -30,7 +31,7 @@ export default function EventList({ initial }: { initial: OverviewData }) {
   const [filter, setFilter] = useState<Filter>('upcoming');
   const [remove, setRemove] = useState<AdminEvent | null>(null);
   const task = useAdminTask();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayBerlin();
   const count = (value: Filter) => data.events.filter((event) => matchesFilter(event, value, today)).length;
 
   const visible = data.events

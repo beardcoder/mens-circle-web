@@ -1,6 +1,7 @@
 import { actions } from 'astro:actions';
 import { useState } from 'preact/hooks';
 
+import { todayBerlin } from '@lib/shared/time';
 import { button, card } from '@lib/ui';
 
 import { Icon, type IconName } from './icons';
@@ -29,7 +30,7 @@ interface Todo {
 export default function Overview({ initial }: { initial: OverviewData }) {
   const [data, setData] = useState(initial);
   const task = useAdminTask();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayBerlin();
 
   const upcoming = data.events
     .filter((event) => event.eventDate.slice(0, 10) >= today)

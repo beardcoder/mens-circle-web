@@ -1,4 +1,5 @@
 import type { OverviewData, RegistrationsData, Testimonial } from '../shared/admin-types';
+import { todayBerlin } from '../shared/time';
 import { getEventById, listEventsForAdmin } from './events';
 import { listRegistrationsForEvent } from './registrations';
 import { listTestimonialsForAdmin } from './testimonials';
@@ -6,7 +7,7 @@ import { listTestimonialsForAdmin } from './testimonials';
 /** Called only behind the page middleware or requireAdmin; never cached. */
 export async function readAdminOverview(): Promise<OverviewData> {
   const [rows, voices] = await Promise.all([listEventsForAdmin(), listTestimonialsForAdmin()]);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayBerlin();
 
   const next = rows
     .filter((event) => event.eventDate.slice(0, 10) >= today)

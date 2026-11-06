@@ -1,7 +1,7 @@
 ---
 import type { EventDTO } from '@lib/shared/dto';
 import { eventView } from '@lib/shared/event-status';
-import { timeRange } from '@lib/shared/format';
+import { formatTimeRange } from '@lib/shared/time';
 import { link } from '@lib/ui';
 
 import Button from '../ui/Button.astro';
@@ -16,7 +16,7 @@ interface Props {
 const { event } = Astro.props;
 const view = eventView(event, 'Dieser Abend', false);
 const dateLabel = view.title.join(' ');
-const hours = timeRange(event.start_time, event.end_time);
+const hours = formatTimeRange(event.start_time, event.end_time);
 const hasPlace = !!(event.location || event.street || event.city);
 const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
 ---

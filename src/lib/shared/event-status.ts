@@ -5,7 +5,7 @@
 
 import type { EventDTO } from './dto';
 import { eventPlace } from './event-meta';
-import { formatDateLongDE, isoDay, timeRange } from './format';
+import { eventDay, formatDateLong, formatTimeRange } from './time';
 
 export type NextEventStatus = 'scheduled' | 'none' | 'unavailable';
 
@@ -30,9 +30,9 @@ interface NextEventSummary {
 const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
   event && {
     slug: event.slug,
-    day: isoDay(event.event_date),
-    dateLabel: formatDateLongDE(event.event_date),
-    timeRange: timeRange(event.start_time, event.end_time),
+    day: eventDay(event.event_date),
+    dateLabel: formatDateLong(event.event_date),
+    timeRange: formatTimeRange(event.start_time, event.end_time),
     place: eventPlace(event),
     costBasis: event.cost_basis?.trim() ?? '',
     isFull: event.is_full,
