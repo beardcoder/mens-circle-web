@@ -69,13 +69,13 @@ const privacy = z.boolean().refine(Boolean, { error: 'Bitte bestätige die Daten
 const website = z.string().nullish();
 
 const NEWSLETTER_SUCCESS =
-  'Vielen Dank! Du hast dich erfolgreich für unseren Newsletter angemeldet. Schau in dein Postfach.';
+  'Danke! Schau in dein Postfach und bestätige die Adresse, dann bekommst du die Termine per E-Mail.';
 
 const subscribe = async (input: { email: string }): Promise<FormResult> => {
   const result = await subscribeToNewsletter(input.email, '');
 
   if (result.status === 'exists')
-    return rejected(409, 'Diese E-Mail-Adresse ist bereits für den Newsletter angemeldet.');
+    return rejected(409, 'Diese E-Mail-Adresse bekommt die Termine bereits per E-Mail.');
 
   if (!result.ok) return rejected(502, 'Die Anmeldung ist momentan nicht möglich. Bitte versuche es später erneut.');
 

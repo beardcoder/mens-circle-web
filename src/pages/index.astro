@@ -68,7 +68,7 @@ if (events && testimonials) {
     </Fact>
     <Fact label="Dauer" icon="clock">
       <Fragment slot="value">2–3 Stunden</Fragment>
-      {events?.next?.timeRange ? `Nächster Termin: ${events.next.timeRange}` : 'Ein Abend, kein Seminar'}
+      {events?.next?.timeRange ? `z.\u00a0B. ${events.next.timeRange}` : 'Ein Abend, kein Seminar'}
     </Fact>
     <Fact label="Beitrag" icon="heart">
       <Fragment slot="value">{events?.fee.main || 'Spendenbasis'}</Fragment>
