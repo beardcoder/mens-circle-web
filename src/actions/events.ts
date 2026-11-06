@@ -1,7 +1,7 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
-import { eventInputSchema } from '@lib/event-input';
+import { saveEventSchema } from '@lib/event-input';
 import { createEvent, sendEventNewsletter, setEventPublished, softDeleteEvent, updateEvent } from '@lib/server/events';
 import { purgePublicCache } from '@lib/server/public-data';
 import { reconcileSeats } from '@lib/server/registrations';
@@ -11,7 +11,7 @@ import { requireAdmin } from './auth';
 export const events = {
   saveEvent: defineAction({
     accept: 'form',
-    input: eventInputSchema.extend({ id: z.string().optional() }),
+    input: saveEventSchema,
     handler: async ({ id, ...input }, context) => {
       await requireAdmin(context);
 

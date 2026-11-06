@@ -36,6 +36,10 @@ All four require the existing signed admin session through `requireAdmin`.
 Missing/expired sessions return `UNAUTHORIZED` without private data. Unknown events
 return `NOT_FOUND`. Responses use the existing `/_actions/*` private/no-store policy.
 Save-event responses now also include the persisted slug: `{ id, slug, message }`.
+`src/lib/event-input.ts` validates the event form and answers in German at the
+fields: slug `a-z0-9` with single hyphens (≤ 80), a real calendar day, times as
+`HH:MM` with the end after the start, 1–200 seats (blank means 8), coordinates in
+range, an `https:` image address.
 The other existing delete, status, moderation and mail actions retain their contracts.
 Server-side transactional seat allocation and promotion remain authoritative:
 `setRegistrationStatus` answers `CONFLICT` when a change would take a seat of a full

@@ -63,3 +63,66 @@ test('required fields cannot be blank, omitted or null', () => {
     expect(eventInputSchema.safeParse({ title: 'Kreis', eventDate: value }).success).toBe(false);
   }
 });
+
+const base = { title: 'Kreis', eventDate: '2026-11-12' };
+
+const errorsFor = (input: Record<string, unknown>) => {
+  const result = eventInputSchema.safeParse({ ...base, ...input });
+
+  return result.success
+    ? {}
+    : Object.fromEntries(result.error.issues.map((issue) => [issue.path.join('.'), issue.message]));
+};
+
+test('slugs are lowercase words joined by single hyphens, at most 80 characters', () => {
+  for (const slug of ['november', '2026-11-12', 'abend-2', 'a'.repeat(80)]) expect(errorsFor({ slug })).toEqual({});
+
+  for (const slug of ['Abend', 'a/b', 'a b', 'a&b', '-a', 'a-', 'a--b', 'männer', 'a'.repeat(81)]) {
+    expect(errorsFor({ slug }).slug).toBeString();
+  }
+});
+
+test('the date must be a real calendar day', () => {
+  expect(eventInputSchema.parse({ ...base, eventDate: '2028-02-29' }).eventDate).toBe('2028-02-29T00:00:00.000Z');
+
+  for (const eventDate of ['2026-02-30', '2026-13-01', '12.11.2026', 'morgen', '2026-11-12T19:00:00Z']) {
+    expect(errorsFor({ eventDate }).eventDate).toBeString();
+  }
+});
+
+test('times are HH:MM and the end comes after the start', () => {
+  expect(errorsFor({ startTime: '19:00', endTime: '21:30' })).toEqual({});
+  expect(errorsFor({ startTime: '19:00' })).toEqual({});
+  expect(errorsFor({ startTime: '7 Uhr' }).startTime).toBeString();
+  expect(errorsFor({ startTime: '25:00' }).startTime).toBeString();
+  expect(errorsFor({ startTime: '19:00', endTime: '18:00' }).endTime).toBe('Das Ende liegt nach dem Beginn.');
+  expect(errorsFor({ startTime: '19:00', endTime: '19:00' }).endTime).toBeString();
+  expect(errorsFor({ endTime: '21:00' }).startTime).toBeString();
+});
+
+test('capacity is a whole number from 1 to 200; blank means 8', () => {
+  expect(eventInputSchema.parse({ ...base, maxParticipants: '' }).maxParticipants).toBe(8);
+  expect(eventInputSchema.parse({ ...base, maxParticipants: '200' }).maxParticipants).toBe(200);
+
+  for (const maxParticipants of ['0', '-3', '2.5', '201', 'acht', 0]) {
+    expect(errorsFor({ maxParticipants }).maxParticipants).toBeString();
+  }
+});
+
+test('coordinates stay in range; a comma decimal is accepted', () => {
+  expect(eventInputSchema.parse({ ...base, latitude: '48,88', longitude: '-12.5' })).toMatchObject({
+    latitude: 48.88,
+    longitude: -12.5,
+  });
+  expect(errorsFor({ latitude: '91' }).latitude).toBeString();
+  expect(errorsFor({ latitude: 'Nord' }).latitude).toBeString();
+  expect(errorsFor({ longitude: '-181' }).longitude).toBeString();
+});
+
+test('an image address must be https', () => {
+  expect(errorsFor({ imageUrl: 'https://example.invalid/a.jpg' })).toEqual({});
+
+  for (const imageUrl of ['http://example.invalid/a.jpg', 'javascript:alert(1)', 'bild.jpg', '//example.invalid/a']) {
+    expect(errorsFor({ imageUrl }).imageUrl).toBeString();
+  }
+});
