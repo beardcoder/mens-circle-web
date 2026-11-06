@@ -7,7 +7,6 @@ import type { ComponentProps } from 'astro/types';
 import BackToTop from '../components/BackToTop.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import Motion from '../components/Motion.astro';
 import SeoHead from '../components/SeoHead.astro';
 import { bootScript, fontScript, speculationRules } from '../scripts/inline';
 
@@ -58,6 +57,5 @@ const { headerAction, overHero = false, ...props } = Astro.props;
     </main>
 
     <Footer />
-    <Motion />
   </body>
 </html>

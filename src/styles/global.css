@@ -326,33 +326,57 @@
 
 /* ── Motion: scroll ───────────────────────────────────────────────────────── */
 
-/* Motion (components/Motion.astro) moves what carries a scroll hook; the boot
-   script sets `data-motion` only when the site is opened and motion is allowed.
-   Until an element moves it waits here, hidden or empty; without the flag (reduced
-   motion, no script, print) it simply stands. A page reached from the site hides
-   nothing: its script marks only what lies wholly below the screen
-   (`data-waiting`). The
-   opening's seat bars fill in CSS (above). Loops that never change state stay in
-   CSS: the glow breathes on the breath's 11-second cycle. */
-@media screen {
-  :is([data-motion] :is([data-reveal], [data-reveal-group] > *), [data-waiting]:not([data-seat-fill])) {
-    opacity: 0;
-  }
+/* Each piece with a scroll hook arrives once as it comes into view, driven by the
+   scroll itself (`animation-timeline: view()`), with no script and nothing hidden
+   up front: a piece that is already in view, or scrolled past, stands at its end
+   state; a browser without scroll timelines, reduced motion and print show
+   everything at once. Only opacity and transforms move. In a group, later children
+   start a little further into their entry, so what enters together follows top to
+   bottom. The steps' path draws in and a seat bar fills the same way. */
+@supports (animation-timeline: view()) {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    :is([data-reveal], [data-reveal-group] > *) {
+      animation: reveal var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
 
-  :is(
-    [data-motion] :is([data-line], [data-seat-fill]:not([data-enter] *)),
-    [data-waiting] [data-line],
-    [data-seat-fill][data-waiting]
-  ) {
-    transform: scale(0);
+    [data-reveal-group] > :nth-child(2) {
+      animation-range: entry 8% entry 63%;
+    }
+
+    [data-reveal-group] > :nth-child(3) {
+      animation-range: entry 16% entry 71%;
+    }
+
+    [data-reveal-group] > :nth-child(n + 4) {
+      animation-range: entry 24% entry 79%;
+    }
+
+    [data-line] {
+      animation: enter-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+    }
+
+    [data-seat-fill]:not([data-enter] *) {
+      animation: enter-fill var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 40% entry 100%;
+    }
   }
 }
 
-/* The script never started (a slow network, a deploy swapping files): what waited
-   fades in once instead of appearing at a stroke. */
-@media (prefers-reduced-motion: no-preference) {
-  [data-motion-failed] :is([data-reveal], [data-reveal-group] > *) {
-    animation: enter-fade 0.6s var(--ease-fade) backwards;
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 1.125rem;
+  }
+}
+
+@keyframes enter-draw {
+  from {
+    transform: scale(0);
   }
 }
 
@@ -362,7 +386,7 @@
   }
 }
 
-/* Out of view the opening's loops pause (Motion.astro sets `data-offscreen`). */
+/* Out of view the opening's loops pause (Hero.astro sets `data-offscreen`). */
 [data-hero][data-offscreen] :is([data-glow], .hero-orbit) {
   animation-play-state: paused;
 }

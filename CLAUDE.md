@@ -189,8 +189,8 @@ tokens, variants, surfaces and keyframes; `global.css` (public, one shared hashe
 and `admin.css` are the two entries. Both read classes from `src/` only
 (`source('..')`, so words in docs, mail templates and tests never become utilities) and
 skip server-only code; `global.css` keeps the admin sources out with `@source not`.
-Scroll reveals, the FAQ and the phone action bar are Motion (`components/Motion.astro`,
-a dev dependency bundled into the client); the opening, page transitions, loops and
+Scroll reveals are CSS scroll-driven animations (`animation-timeline: view()`); the FAQ
+and the phone action bar use Motion (a dev dependency bundled into the client); the opening, page transitions, loops and
 state transitions are the theme's own keyframes and `--animate-*` tokens (`rise`,
 `skeleton`); there is no animation plugin.
 No `<style>` blocks and no component stylesheets: utilities in the
@@ -274,13 +274,12 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `lib/shared/words.ts`, out of a soft blur), the rest follows at `--enter-delay` (`afterWords()`), the photo
   settles (`settle`), its ring follows (`ring`), on Motion's springs sampled into
   `--ease-spring`/`--ease-spring-slow`; the opening's seat bars fill in CSS. Below it
-  motion.dev in `components/Motion.astro` (`motion/mini` `animate`, one observer,
-  `spring`; app-like: quick fades on `--ease-fade`, movement on springs without
-  overshoot, short distances): each piece arrives once as it comes into view
-  (`data-reveal`, or every child of a `data-reveal-group`), what enters together
-  follows top to bottom, what enters from above only fades; the steps' path draws
-  in (`data-line`), the seat bar fills (`data-seat-fill`). No parallax: nothing moves
-  with the scroll itself (the event title's dock is the one scroll-linked piece).
+  each piece arrives once as it comes into view, driven by the scroll in CSS
+  (`animation-timeline: view()`, global.css "Motion: scroll"; no script, nothing
+  hidden up front, a browser without scroll timelines shows everything):
+  `data-reveal`, or every child of a `data-reveal-group` (later children start
+  further into their entry); the steps' path draws in (`data-line`), the seat bar
+  fills (`data-seat-fill`). No parallax.
   Every text arrives this way, never a heading beside text that already stands:
   section heads, `Prose reveal` (paragraph by paragraph), `LinkList`, `ValueItems`,
   date summaries, the newsletter, the event story and map; the footer stands. On an
@@ -288,25 +287,20 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   (`data-enter`), then the lower part. FAQ
   answers unfold and fold on a spring as a FLIP (`AccordionItem`, `item-open:`
   variant); the
-  phone `ActionBar` glides in and out (its own script). Scroll hidden states live
-  in `global.css` under `[data-motion]`, which the boot script sets only with
-  motion allowed and drops after 3 s if the script never started (then
-  `data-motion-failed` fades the waiting sections in once). CSS keeps the
-  loops: the glow breathes (`data-glow`), the ring turns every 90 s.
+  phone `ActionBar` glides in and out (its own script). CSS keeps the
+  loops (paused out of view by Hero.astro's `data-offscreen`): the glow breathes (`data-glow`), the ring turns every 90 s.
 - Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
   forced reflow. 120fps means the compositor: only opacity and transforms move. The
   one exception is the soft blur the opening's title words come into focus from
   (CSS, 0.6 s, at load); a blur costs ~16× the main-thread work of a transform, so
   nothing that runs while scrolling blurs. Fades use `--ease-fade` (a gentle start,
   so the fade is seen); the springs fall back to `--ease-out` where `linear()` is
-  missing (Safari < 17.2). Motion.astro reads no layout (the observer reports where
-  a piece entered), starts what entered in one frame together and builds its spring
-  curve once. The FAQ unfolds as
+  missing (Safari < 17.2). The FAQ unfolds as
   a FLIP: one layout at the press, then what follows slides and a clip uncovers the
   answer, no animated height. The hero's loops pause out of view
   (`data-offscreen`). Never set a state attribute on `<html>` while the page moves
   (it restyles the whole page): flag the element itself (`data-lifted` on the
-  back-to-top link); the boot script's flags (`data-motion`, `data-arrival`) are set
+  back-to-top link); the boot script's flag (`data-arrival`) is set
   before the first frame. Never read layout or `scrollY` at load: header tone,
   back-to-top and the like watch a sentinel with an `IntersectionObserver`.
   Nothing that holds the LCP waits for a script.
@@ -327,8 +321,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   from the right, back from the left; the boot script names the direction in
   `pagereveal` (types `forward`, `back`, `menu` when the last page left through its
   open menu). A page reached from the site arrives composed (`data-arrival="next"`:
-  no opening, nothing hidden in its first frame; Motion.astro marks only what lies
-  below the screen, `data-waiting`); one reached through the history stands as it
+  no opening); one reached through the history stands as it
   was (`return`). Keep the main thread free while a page slides in: only opacity and
   translation move, no group animates; the bar (and an open menu on the way out)
   gets its `view-transition-name` inline only while a transition runs (a permanent

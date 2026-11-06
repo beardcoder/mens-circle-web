@@ -29,27 +29,6 @@
 
   if (arrival) root.setAttribute('data-arrival', arrival);
 
-  // Motion (components/Motion.astro) hides what it will move; if its script has
-  // not started within three seconds, what waited fades in once and then stands.
-  const startMotion = () => {
-    if (arrival || !matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
-
-    root.setAttribute('data-motion', '');
-    setTimeout(() => {
-      if (root.hasAttribute('data-motion-ready')) return;
-
-      // Fade in what was waiting (global.css), rather than let it pop up at once.
-      root.removeAttribute('data-motion');
-      root.setAttribute('data-motion-failed', '');
-    }, 3000);
-  };
-
-  try {
-    startMotion();
-  } catch {
-    /* matchMedia unavailable — no motion. */
-  }
-
   // Page transitions (global.css, "Page transitions") move like an app's stack:
   // forward from the right, back from the left. Only a script in the head hears
   // the page revealed in time to name the direction; a page left through its open

@@ -13,7 +13,7 @@ const { title, number } = Astro.props;
   itemtype="https://schema.org/ListItem"
   class="group/step relative grid grid-cols-[3rem_minmax(0,1fr)] content-start gap-x-5 lg:grid-cols-1 lg:gap-y-5"
 >
-  {/* The path to the next step: down on phones, across on the desktop; it draws itself in after the circles (Motion.astro). */}
+  {/* The path to the next step: down on phones, across on the desktop; it draws itself in as it scrolls into view (global.css). */}
   <span
     aria-hidden="true"
     data-line

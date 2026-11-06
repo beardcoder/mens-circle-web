@@ -195,25 +195,25 @@ waits for a script.
   dock's flight layer enters on the same beat, so the copies that fly the title
   show the same moment of it. The opening plays when the site is opened; a page
   reached from another page of the site arrives composed (see "Page transitions").
-- Below it, Motion (motion.dev; `components/Motion.astro`, `animate` from
-  `motion/mini` and `spring`, with one `IntersectionObserver`). Like an app's list, each
-  piece arrives as it comes into view, once: an element (`data-reveal`) or each
-  child of a group (`data-reveal-group`: a section head's label, title and lead; a
-  list's rows; a text's paragraphs, `Prose reveal`), so a long list on a phone
-  arrives row by row. What enters in one frame starts together, top to bottom,
-  0.07 s apart (at most 0.42 s). What enters from above (scrolling back up, after a
-  jump to an anchor) is simply there after a short fade; nothing rises against the
-  reading direction. The path between the steps draws itself in after its step
-  (`data-line`); a seat bar below the opening fills once in view
-  (`data-seat-fill`).
+- Below it, CSS scroll-driven animations (global.css, "Motion: scroll"): each piece
+  arrives as it comes into view, once, driven by the scroll itself
+  (`animation-timeline: view()`, `animation-range: entry`): an element
+  (`data-reveal`) or each child of a group (`data-reveal-group`: a section head's
+  label, title and lead; a list's rows; a text's paragraphs, `Prose reveal`). Later
+  children of a group start a little further into their entry, so what enters
+  together follows top to bottom. Nothing is hidden up front: what is in view at
+  load, or scrolled past, stands; a browser without scroll timelines, reduced motion
+  and print show everything at once. The path between the steps draws itself in
+  (`data-line`); a seat bar below the opening fills once in view (`data-seat-fill`).
+  No script and no `motion` on this path.
 - Every text on a page arrives this way, never a heading beside text that already
   stands: section heads, the intro's text and its questions, Markus's text and link,
   the steps and their close, the agreements, the voices and their link, the FAQ and
   its contact line, every date summary piece by piece, the newsletter, the event's
   story, note and map, the legal pages paragraph by paragraph. The footer is the
   frame and stands.
-- No parallax: nothing moves with the scroll itself; things arrive once and then
-  stand. The event title flying into its dock is the one scroll-linked piece.
+- No parallax: things arrive once and then stand. The event title flying into its
+  dock is the other scroll-linked piece.
 - FAQ (`AccordionItem`) as a FLIP: the layout changes once, at the press; then what
   follows the item (its siblings, the sections below, the footer) slides from where
   it stood while a clip uncovers the answer on the same spring, so their edges meet,
@@ -227,7 +227,7 @@ waits for a script.
   replaces the fields in place.
 - Loops that never change state stay in CSS: the glow breathes on the 11-second
   cycle (`data-glow`), the ring turns; both pause once the opening is out of view
-  (`data-offscreen`), since a running animation is serviced every frame.
+  (`data-offscreen`, Hero.astro), since a running animation is serviced every frame.
 
 ### Page transitions
 
@@ -241,10 +241,9 @@ the page moves under it; leaving through the open phone menu, the menu
 (`nav-menu`) fades away over the next page and the page that lay under it is never
 shown.
 
-A page that arrives this way is composed, like an app's next screen: no opening
-and nothing hidden in its first frame; only what lies wholly below the screen
-waits (`data-waiting`, set by Motion.astro) and arrives as it scrolls into view. A
-page reached again through the history stands as it was left.
+A page that arrives this way is composed, like an app's next screen: no opening; what
+lies below the screen arrives as it scrolls into view, like everywhere. A page
+reached again through the history stands as it was left.
 
 Smooth on a phone means the main thread stays free while the page moves, because
 Chrome updates a transition on it every frame:
@@ -278,12 +277,7 @@ and the referrer). A browser without types cross-fades (`plus-lighter`, one
 duration, linear), and so does reduced motion; a browser without cross-document
 transitions simply loads the page, composed all the same.
 
-The boot script sets `data-motion` on `<html>` only when the site is opened and
-motion is allowed; `global.css` keeps the scroll hooks hidden under it until they
-move. If the script has not started within three seconds (a slow network, a deploy
-swapping files) the flag is dropped and `data-motion-failed` fades what waited in
-once. Without the flag (reduced motion, no script, print, an arrival from the site)
-nothing hides. Third-party scripts load `async`, so nothing queues in front of the
+Third-party scripts load `async`, so nothing queues in front of the
 page's own.
 
 ### Lighthouse

@@ -144,3 +144,13 @@ const nextLine = next
     </div>
   </Container>
 </section>
+
+<script>
+  // Out of view the opening's loops pause (global.css): a running animation is
+  // serviced every frame even where nobody sees it.
+  const hero = document.querySelector('[data-hero]');
+
+  if (hero) {
+    new IntersectionObserver(([entry]) => hero.toggleAttribute('data-offscreen', !entry.isIntersecting)).observe(hero);
+  }
+</script>
