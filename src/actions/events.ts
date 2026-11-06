@@ -10,7 +10,9 @@ import {
   softDeleteEvent,
   updateEvent,
 } from '@lib/server/events';
+import { geocodeAddress } from '@lib/server/geocode';
 import { purgePublicCache } from '@lib/server/public-data';
+import { rateLimit } from '@lib/server/ratelimit';
 import { reconcileSeats } from '@lib/server/registrations';
 
 import { requireAdmin } from './auth';
@@ -43,6 +45,31 @@ export const events = {
       await purgePublicCache(context);
 
       return { id: event.id, slug: event.slug, message: 'Veranstaltung erstellt.', link: publicLink(event) };
+    },
+  }),
+
+  geocodeVenue: defineAction({
+    input: z.object({
+      street: z.string().trim().max(200),
+      postalCode: z.string().trim().max(20),
+      city: z.string().trim().min(1, 'Bitte zuerst die Stadt angeben.').max(100),
+    }),
+    handler: async ({ street, postalCode, city }, context) => {
+      const admin = await requireAdmin(context);
+
+      if (!rateLimit('geocode', admin, 30, 3600)) {
+        throw new ActionError({ code: 'TOO_MANY_REQUESTS', message: 'Zu viele Anfragen. Bitte später erneut.' });
+      }
+
+      const found = await geocodeAddress([street, `${postalCode} ${city}`.trim()].filter(Boolean).join(', ')).catch(
+        () => {
+          throw new ActionError({ code: 'BAD_GATEWAY', message: 'Der Kartendienst antwortet gerade nicht.' });
+        },
+      );
+
+      if (!found) throw new ActionError({ code: 'NOT_FOUND', message: 'Zu dieser Adresse wurde nichts gefunden.' });
+
+      return { ...found, message: `Gefunden: ${found.label}` };
     },
   }),
 

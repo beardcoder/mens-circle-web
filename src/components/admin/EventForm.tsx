@@ -237,6 +237,7 @@ function EventFields({
             {input('latitude', 'Breitengrad', { type: 'number', step: 'any' })}
             {input('longitude', 'Längengrad', { type: 'number', step: 'any' })}
           </div>
+          <GeocodeButton busy={busy} />
         </div>
       </details>
     </fieldset>
@@ -408,5 +409,50 @@ function EventNewsletter({ eventId, intro, disabled }: { eventId: string; intro:
         </ConfirmDialog>
       )}
     </details>
+  );
+}
+
+/** Fills latitude and longitude from the street, postal code and city above (OpenStreetMap). */
+function GeocodeButton({ busy }: { busy: boolean }) {
+  const task = useAdminTask();
+
+  return (
+    <div class="grid justify-items-start gap-2">
+      <button
+        type="button"
+        disabled={busy || !!task.busy}
+        class={button({ variant: 'secondary', size: 'sm' })}
+        onClick={(event) => {
+          const form = event.currentTarget.form;
+
+          if (!form) return;
+
+          const value = (name: string) => String(new FormData(form).get(name) ?? '');
+
+          void task.run(
+            'geocode',
+            () =>
+              actions.geocodeVenue({ street: value('street'), postalCode: value('postalCode'), city: value('city') }),
+            ({ latitude, longitude }) => {
+              for (const [name, number] of [
+                ['latitude', latitude],
+                ['longitude', longitude],
+              ] as const) {
+                const field = form.elements.namedItem(name) as HTMLInputElement | null;
+
+                if (field) field.value = String(number);
+              }
+
+              // The form counts as changed, so it can be saved or discarded.
+              form.dispatchEvent(new Event('input', { bubbles: true }));
+            },
+          );
+        }}
+      >
+        <Icon name="pin" class="size-4.5" />
+        Koordinaten aus Adresse
+      </button>
+      {task.notice && <p class="text-sm text-fg-muted">{task.notice.text}</p>}
+    </div>
   );
 }

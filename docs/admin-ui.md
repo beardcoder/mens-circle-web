@@ -72,3 +72,8 @@ defused) and a print view (`Drucken`; navigation, filters and the mail panel are
 never shown publicly or mailed), and every waiter has a "Nachrücken lassen" button,
 which takes the same route as a status change (capacity check, overbooking only after
 confirmation).
+
+The event form fills latitude and longitude from the venue's address on request
+(`geocodeVenue`, `lib/server/geocode.ts`): OpenStreetMap's Nominatim, called from the
+server with an identifying User-Agent, at most once a second and 30 times an hour
+per admin. Only the venue's address leaves the server, never a participant's.
