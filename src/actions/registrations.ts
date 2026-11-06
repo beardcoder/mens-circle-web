@@ -7,6 +7,7 @@ import {
   broadcastEventMessage,
   changeRegistrationStatus,
   resendRegistrationConfirmations,
+  setRegistrationNote,
   softDeleteRegistration,
 } from '@lib/server/registrations';
 
@@ -75,6 +76,19 @@ export const registrations = {
       await purgePublicCache(context);
 
       return { message: 'Status aktualisiert.' };
+    },
+  }),
+
+  saveRegistrationNote: defineAction({
+    input: z.object({ id: z.string(), note: z.string().max(2000, 'Höchstens 2000 Zeichen.') }),
+    handler: async ({ id, note }, context) => {
+      await requireAdmin(context);
+
+      if (!(await setRegistrationNote(id, note))) {
+        throw new ActionError({ code: 'NOT_FOUND', message: 'Anmeldung nicht gefunden.' });
+      }
+
+      return { message: 'Notiz gespeichert.' };
     },
   }),
 

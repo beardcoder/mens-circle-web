@@ -92,7 +92,9 @@ function actionNotice(data: object): Notice | null {
   const partial = 'sent' in data && 'total' in data && Number(data.sent) < Number(data.total);
 
   const link =
-    'link' in data && data.link && typeof data.link === 'object' ? (data.link as { href: string; label: string }) : undefined;
+    'link' in data && data.link && typeof data.link === 'object'
+      ? (data.link as { href: string; label: string })
+      : undefined;
 
   return { text: data.message, tone: failed || partial ? 'warning' : 'success', link };
 }

@@ -53,7 +53,7 @@ const logoutButton =
       </main>
     ) : (
       <div class="lg:grid lg:min-h-dvh lg:grid-cols-[16rem_minmax(0,1fr)]">
-        <aside class="sticky top-0 z-30 border-b border-line bg-ground-alt lg:flex lg:h-dvh lg:flex-col lg:border-r lg:border-b-0">
+        <aside class="print:hidden sticky top-0 z-30 border-b border-line bg-ground-alt lg:flex lg:h-dvh lg:flex-col lg:border-r lg:border-b-0">
           <div class="flex h-16 items-center justify-between gap-3 px-4 lg:h-auto lg:px-5 lg:pt-6 lg:pb-8">
             <a href="/admin" class="flex min-w-0 items-center gap-2.5">
               <Logo name="logo" aria-hidden="true" class="size-8 shrink-0 text-flame" />
@@ -113,7 +113,7 @@ const logoutButton =
         </main>
         <nav
           aria-label="Admin"
-          class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 border-t border-line bg-ground-alt pb-[env(safe-area-inset-bottom)] lg:hidden"
+          class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 border-t border-line bg-ground-alt pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden"
         >
           {links.map((link) => (
             <a

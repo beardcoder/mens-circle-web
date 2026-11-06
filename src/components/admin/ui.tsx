@@ -70,7 +70,7 @@ export function PageHeader({
         <h1 class="text-[clamp(1.75rem,1.4rem+1.4vw,2.5rem)] leading-tight">{title}</h1>
         {description && <p class="mt-1.5 max-w-measure text-sm text-fg-muted">{description}</p>}
       </div>
-      {children && <div class="flex flex-wrap items-center gap-2">{children}</div>}
+      {children && <div class="flex flex-wrap items-center gap-2 print:hidden">{children}</div>}
     </header>
   );
 }

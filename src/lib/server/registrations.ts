@@ -273,6 +273,7 @@ export const listRegistrationsForEvent = (eventId: string): Promise<Registration
       submittedFirstName: registrations.submittedFirstName,
       submittedLastName: registrations.submittedLastName,
       submittedPhone: registrations.submittedPhone,
+      note: registrations.note,
     })
     .from(registrations)
     .innerJoin(participants, eq(registrations.participantId, participants.id))
@@ -574,4 +575,15 @@ export const readRegistrationForCancel = async (
   )[0];
 
   return row ? { status: row.registration.status, firstName: row.participant.firstName, event: row.event } : null;
+};
+
+/** Stores the admin's note on a registration; false when there is no such registration. */
+export const setRegistrationNote = async (regId: string, note: string): Promise<boolean> => {
+  const rows = await db
+    .update(registrations)
+    .set({ note: note.trim().slice(0, 2000) })
+    .where(and(eq(registrations.id, regId), isNull(registrations.deleted)))
+    .returning({ id: registrations.id });
+
+  return rows.length > 0;
 };

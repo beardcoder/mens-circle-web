@@ -87,6 +87,8 @@ export const registrations = sqliteTable(
     submittedFirstName: text('submitted_first_name'),
     submittedLastName: text('submitted_last_name'),
     submittedPhone: text('submitted_phone'),
+    /** The admin's own note on this registration; never shown publicly or mailed. */
+    note: text('note').notNull().default(''),
     deleted: text('deleted'),
     createdAt: text('created_at').notNull().$defaultFn(nowIso),
     updatedAt: text('updated_at').notNull().$defaultFn(nowIso).$onUpdateFn(nowIso),

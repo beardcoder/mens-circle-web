@@ -309,6 +309,20 @@ try {
       await checkSecurity(origin, path, session);
     }
 
+    // The attendance list: only signed in, private, formulas defused.
+    assert.equal((await fetch(`${origin}/admin/events/open/registrations.csv`, { redirect: 'manual' })).status, 302);
+    const csv = await fetch(`${origin}/admin/events/open/registrations.csv`, { headers: { Cookie: session } });
+
+    assert.equal(csv.status, 200);
+    assert.equal(csv.headers.get('cache-control'), 'private, no-store');
+    const bytes = new Uint8Array(await csv.arrayBuffer());
+
+    assert.deepEqual([...bytes.slice(0, 3)], [0xef, 0xbb, 0xbf], 'a BOM, so spreadsheets read UTF-8');
+    assert.match(
+      new TextDecoder().decode(bytes),
+      /^Name;Telefon;E-Mail;Status;Notiz\r\nGast;;guest@example\.invalid;Angemeldet;/,
+    );
+
     await checkCancelLink(origin);
     await checkRegistration(origin);
 

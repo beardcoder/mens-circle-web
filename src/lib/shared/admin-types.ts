@@ -19,6 +19,8 @@ export interface RegistrationRow {
   submittedFirstName: string | null;
   submittedLastName: string | null;
   submittedPhone: string | null;
+  /** The admin's own note. */
+  note: string;
 }
 
 export type EventFormData = (Partial<EventInput> & { id?: string }) | null;

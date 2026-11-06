@@ -61,3 +61,14 @@ component memory, and never placed in public caches or localStorage. This change
 adds no new data stores, retention periods or recipients. Existing database backups
 and soft-delete behavior are unchanged. Rollback is reverting these UI/action changes;
 there is no schema migration.
+
+## The evening itself
+
+The registrations workspace offers the attendance list as a file
+(`/admin/events/<id>/registrations.csv`: name, phone, e-mail, status, note; semicolons
+and a BOM for German spreadsheet apps; cells that start with `=`, `+`, `-` or `@` are
+defused) and a print view (`Drucken`; navigation, filters and the mail panel are
+`print:hidden`). Each registration carries a private note (`saveRegistrationNote`,
+never shown publicly or mailed), and every waiter has a "Nachrücken lassen" button,
+which takes the same route as a status change (capacity check, overbooking only after
+confirmation).

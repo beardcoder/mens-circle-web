@@ -143,6 +143,18 @@ export default function RegistrationManager({ initial }: { initial: Registration
           <Icon name="edit" class="size-4.5" />
           Termin bearbeiten
         </a>
+        {/* The attendance list for the evening: as a file, or printed from this page. */}
+        <a
+          class={button({ variant: 'secondary', size: 'sm' })}
+          href={`/admin/events/${data.eventId}/registrations.csv`}
+          download
+        >
+          <Icon name="send" class="size-4.5" />
+          Liste (CSV)
+        </a>
+        <button type="button" class={button({ variant: 'secondary', size: 'sm' })} onClick={() => window.print()}>
+          Drucken
+        </button>
       </PageHeader>
       <div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <Stat
@@ -164,7 +176,7 @@ export default function RegistrationManager({ initial }: { initial: Registration
       <Feedback notice={task.notice} />
       <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
         <section aria-label="Anmeldungen" class="min-w-0">
-          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
             <Tabs
               label="Nach Status filtern"
               value={status}
@@ -261,6 +273,17 @@ export default function RegistrationManager({ initial }: { initial: Registration
                       })
                     }
                     onStatus={(next) => changeStatus(row, next)}
+                    onNote={(note) =>
+                      task.run(
+                        `note-${row.id}`,
+                        () => actions.saveRegistrationNote({ id: row.id, note }),
+                        () =>
+                          setData((current) => ({
+                            ...current,
+                            registrations: current.registrations.map((r) => (r.id === row.id ? { ...r, note } : r)),
+                          })),
+                      )
+                    }
                     onSend={() => confirmations([row.id])}
                     onRemove={() =>
                       prepare({
@@ -281,7 +304,7 @@ export default function RegistrationManager({ initial }: { initial: Registration
             )}
           </div>
         </section>
-        <aside class="grid gap-6 xl:sticky xl:top-6" aria-label="Versand">
+        <aside class="grid gap-6 xl:sticky xl:top-6 print:hidden" aria-label="Versand">
           <ConfirmationPanel
             missing={missing}
             disabled={!!task.busy}
@@ -319,6 +342,7 @@ function RegistrationCard({
   selected,
   onSelect,
   onStatus,
+  onNote,
   onSend,
   onRemove,
 }: {
@@ -327,6 +351,7 @@ function RegistrationCard({
   selected: boolean;
   onSelect: (checked: boolean) => void;
   onStatus: (status: RegistrationStatus) => void;
+  onNote: (note: string) => Promise<unknown>;
   onSend: () => void;
   onRemove: () => void;
 }) {
@@ -356,6 +381,7 @@ function RegistrationCard({
           )}
         </p>
         <SubmittedNote row={row} />
+        <NoteEditor note={row.note} busy={busy} onSave={onNote} />
       </div>
       <select
         value={row.status}
@@ -381,7 +407,19 @@ function RegistrationCard({
           'Keine Bestätigung nötig'
         )}
       </p>
-      <div class="col-start-3 row-start-1 flex items-center justify-end gap-1 lg:col-start-5">
+      <div class="col-start-3 row-start-1 flex items-center justify-end gap-1 lg:col-start-5 print:hidden">
+        {row.status === 'waitlist' && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onStatus('registered')}
+            class={iconButton}
+            aria-label={`${name} nachrücken lassen`}
+            title="Nachrücken lassen"
+          >
+            <Icon name="users" class="size-4.5" />
+          </button>
+        )}
         {eligible && (
           <button
             type="button"
@@ -406,6 +444,67 @@ function RegistrationCard({
         </button>
       </div>
     </li>
+  );
+}
+
+/** The admin's note on a registration: shown when there is one, edited in place. */
+function NoteEditor({
+  note,
+  busy,
+  onSave,
+}: {
+  note: string;
+  busy: boolean;
+  onSave: (note: string) => Promise<unknown>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(note);
+
+  if (!editing) {
+    return (
+      <p class="mt-1 text-xs text-fg-muted">
+        {note && <span class="text-fg">Notiz: {note} </span>}
+        <button
+          type="button"
+          disabled={busy}
+          class="underline hover:text-fg print:hidden"
+          onClick={() => {
+            setDraft(note);
+            setEditing(true);
+          }}
+        >
+          {note ? 'Notiz ändern' : 'Notiz hinzufügen'}
+        </button>
+      </p>
+    );
+  }
+
+  return (
+    <form
+      class="mt-2 grid gap-2"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        await onSave(draft);
+        setEditing(false);
+      }}
+    >
+      <textarea
+        aria-label="Notiz zur Anmeldung"
+        rows={2}
+        maxLength={2000}
+        value={draft}
+        onInput={(event) => setDraft(event.currentTarget.value)}
+        class={`${control('xs')} resize-y`}
+      />
+      <div class="flex gap-2">
+        <button type="submit" disabled={busy} class={button({ size: 'xs' })}>
+          Speichern
+        </button>
+        <button type="button" class={button({ variant: 'secondary', size: 'xs' })} onClick={() => setEditing(false)}>
+          Abbrechen
+        </button>
+      </div>
+    </form>
   );
 }
 
