@@ -124,7 +124,7 @@ admin, `/auth`, actions and server islands `private, no-store`; everything else
 the middleware: a hit is served with the headers stored on its miss. Static files keep
 the adapter's headers. No `s-maxage`: the purge cannot reach Cloudflare. Public API
 errors are `no-store`. `public/sw.js` only retires the old breathing app's service
-worker and is revalidated on every load.
+worker, is revalidated on every load and goes after 2027-04-26 (docs/runtime.md).
 
 **Generated files.** `sitemap()` lists `/sitemap-events.xml` in the index (`customSitemaps`).
 `src/pages/llms.txt.ts` prerenders a short index of the three public content pages.
@@ -323,7 +323,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   transitions": `@view-transition`, `plus-lighter`, one duration, linear). No
   script names directions or arrivals; the boot script in the head only sets the
   colour mode (`data-mode`, `data-mode-resolved`). No `:has()` on `body` or `html`
-  (the bar over the opening is `data-over-hero`); write `<html>` attributes only
+  (the bar over the opening is `data-over-hero`, the open menu `data-menu-open`); write `<html>` attributes only
   when they change.
 - Styles live in the component's markup as utilities. `global.css` is one stylesheet
   for every public page (`inlineStylesheets: 'auto'`), so keep one-off arbitrary

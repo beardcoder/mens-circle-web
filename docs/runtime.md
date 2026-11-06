@@ -32,6 +32,11 @@ toolchain into the image (256 MB instead of 30 MB).
   at build time; the SSR home page uses pre-sized AVIF and WebP files. Sharp never loads in the
   server process, and nobody can make it transform arbitrary sizes.
 
+## Expiring pieces
+
+- `public/sw.js` retires the old breathing app's service worker (added 2026-10-26).
+  Delete it after 2027-04-26.
+
 ## Security headers
 
 `server.ts` adds to every response (static files included) `X-Content-Type-Options:

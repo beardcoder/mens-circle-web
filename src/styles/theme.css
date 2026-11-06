@@ -373,8 +373,9 @@
     color-scheme: dark;
   }
 
-  /* The page holds still behind an open modal (the phone menu). */
-  :root:has(dialog:modal) {
+  /* The page holds still behind the open phone menu (Header.astro sets the flag once
+     on open and close, never while the page moves; no `:has()` on the root). */
+  :root[data-menu-open] {
     overflow: hidden;
   }
 

@@ -258,6 +258,7 @@ const roundButton =
     const openers = document.querySelectorAll<HTMLButtonElement>('[data-nav-open]');
 
     menu.addEventListener('close', () => {
+      document.documentElement.removeAttribute('data-menu-open');
       openers.forEach((opener) => opener.setAttribute('aria-expanded', 'false'));
     });
 
@@ -273,6 +274,7 @@ const roundButton =
 
         menu.style.setProperty('--nav-origin', `${left + width / 2}px ${top + height / 2}px`);
         menu.showModal();
+        document.documentElement.setAttribute('data-menu-open', '');
         opener.setAttribute('aria-expanded', 'true');
         // `showModal()` focuses the first link, the mark, and Safari rings it even
         // after a tap: the dialog itself takes the focus, Tab moves on from there.
