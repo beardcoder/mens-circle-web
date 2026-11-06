@@ -305,7 +305,9 @@ large and faint behind it.
 - **Event page.** The date line and the title — its last word in the accent — which
   the dock repeats once they have scrolled away; the place, the calendar
   between lines and the registration on the forest (a band below `lg`), headed by
-  the same seat bar; the evening's description (sand) with its question and a
+  the same seat bar (on phones it comes straight under the title, before the
+  invitation); its button reads "Anmelden" or "Auf die Warteliste", with a line
+  about the cancel link under it; the evening's description (sand) with its question and a
   note under a line; the map; where next. A past date offers no registration.
 - **Personal page.** `PageIntro` with the rounded photograph, split heading/text
   sections, the FAQ, one closing invitation.
