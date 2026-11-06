@@ -74,8 +74,7 @@ const NEWSLETTER_SUCCESS =
 const subscribe = async (input: { email: string }): Promise<FormResult> => {
   const result = await subscribeToNewsletter(input.email, '');
 
-  if (result.status === 'exists')
-    return rejected(409, 'Diese E-Mail-Adresse bekommt die Termine bereits per E-Mail.');
+  if (result.status === 'exists') return rejected(409, 'Diese E-Mail-Adresse bekommt die Termine bereits per E-Mail.');
 
   if (!result.ok) return rejected(502, 'Die Anmeldung ist momentan nicht möglich. Bitte versuche es später erneut.');
 

@@ -11,6 +11,12 @@ updates:
     labels:
       - 'dependencies'
     groups:
+      # Astro and its adapter come in their own PR: never auto-merged.
+      framework:
+        patterns:
+          - 'astro'
+          - '@astrojs/*'
+          - '@igloczek/astro-bun-adapter'
       minor-and-patch:
         update-types:
           - 'minor'

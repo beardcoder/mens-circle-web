@@ -22,15 +22,18 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # Astro and the Bun adapter (server.ts depends on the adapter's internal shape)
+      # are always reviewed by hand. Auto-merge waits for the required checks, which
+      # include the browser check in CI.
       - name: Enable auto-merge (patch and minor only)
-        if: ${{ steps.metadata.outputs.update-type != 'version-update:semver-major' }}
+        if: ${{ steps.metadata.outputs.update-type != 'version-update:semver-major' && !contains(steps.metadata.outputs.dependency-names, 'astro') }}
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Flag major update for review
-        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-major' }}
+      - name: Flag major or framework update for review
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-major' || contains(steps.metadata.outputs.dependency-names, 'astro') }}
         run: |
           echo "Major update — left open for manual review." >> "$GITHUB_STEP_SUMMARY"
           gh pr edit "$PR_URL" --add-label 'major-update' || true

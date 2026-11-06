@@ -17,13 +17,17 @@ bun run format         # prettier; also run after db:generate (drizzle/meta is f
 bun run format:check   # what CI runs; CLAUDE.md and docs/ are formatted too
 bun test               # each *.fixture.ts case runs in its own Bun process
 bun run test:pages     # builds, then checks production HTML and headers (disposable DB)
+bun run test:browser   # builds, then Chromium: console/CSP errors, axe, forms (fake listmonk)
 bun run db:generate    # after editing src/lib/server/db/schema.ts
 bun run knip           # unused files, exports and dependencies
 ```
 
 Verify with `check` + `lint` + `format:check` + `test`; CI (`.github/workflows/ci.yml`)
-runs those and `build`. TypeScript stays on 6.x: `astro check` and typescript-eslint
-refuse TS 7. Dependabot auto-merges minor and patch bumps. For Astro questions, use the
+runs those, `build`, the production page checks and the browser check (Playwright +
+axe, screenshots as an artifact), plus Lighthouse as an advisory job
+(`lighthouserc.json`: performance ≥ 0.95 mobile, CLS 0, warnings only). TypeScript stays on 6.x: `astro check` and typescript-eslint
+refuse TS 7. Dependabot auto-merges minor and patch bumps once CI is green, except Astro and
+its adapter (their own group, always reviewed by hand). For Astro questions, use the
 `astro-docs` MCP server (`.mcp.json`).
 
 ## Rules
