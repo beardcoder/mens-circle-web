@@ -1,8 +1,11 @@
 ---
+import { actions, isInputError } from 'astro:actions';
+
 import { buildEventMeta } from '@lib/event-meta';
 import { breadcrumbSchema, buildEventSchema } from '@lib/event-schema';
+import { splitFee } from '@lib/event-status';
 import { fetchEventState } from '@lib/server/events';
-import { PUBLIC_CACHE } from '@lib/server/public-data';
+import { PUBLIC_CACHE, publicEvent } from '@lib/server/public-data';
 
 import LinkBand from '../../components/blocks/LinkBand.astro';
 import EventIntro from '../../components/event/EventIntro.astro';
@@ -23,7 +26,37 @@ if (!event) {
   });
 }
 
-Astro.cache.set(PUBLIC_CACHE);
+// The registration posted without JavaScript: answer on this page, never from or into the cache.
+const posted = Astro.getActionResult(actions.register);
+let values: Record<string, string> = {};
+
+if (posted) {
+  Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+  if (posted.error) {
+    const form = await Astro.request
+      .clone()
+      .formData()
+      .catch(() => null);
+
+    values = Object.fromEntries(
+      ['first_name', 'last_name', 'email', 'phone_number', 'privacy'].map((name) => [name, String(form?.get(name) ?? '')]),
+    );
+  }
+} else {
+  Astro.cache.set(PUBLIC_CACHE);
+}
+
+const registration = posted?.data
+  ? { message: posted.data.message }
+  : posted?.error
+    ? {
+        error: posted.error.message,
+        fields: isInputError(posted.error)
+          ? Object.fromEntries(Object.entries(posted.error.fields).map(([key, list]) => [key, list?.[0] ?? '']))
+          : {},
+      }
+    : null;
 
 const siteUrl = Astro.site!;
 
@@ -62,7 +95,12 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
 >
   {/* Invitation and date, the conversation beside the signup, then the meeting place. */}
   <EventIntro event={event}>
-    <EventRegister event={event} />
+    <EventRegister
+      event={publicEvent(event)}
+      contribution={splitFee(event.cost_basis)}
+      result={registration}
+      values={values}
+    />
   </EventIntro>
   <EventStory event={event} />
 

@@ -1,18 +1,42 @@
 ---
-import site from '@data/site.json';
-import { splitFee } from '@lib/event-status';
-import { publicEvent } from '@lib/server/public-data';
-import type { EventDTO } from '@lib/types';
-import { link } from '@lib/ui';
+import { actions } from 'astro:actions';
 
-import RegistrationForm from '../forms/RegistrationForm';
+import { button, checkbox, control, fieldError, formStatus, link } from '@lib/ui';
 
+import FormStatus from '../forms/FormStatus.astro';
+import Honeypot from '../forms/Honeypot.astro';
+import Field from '../ui/Field.astro';
+import SeatBar from './SeatBar.astro';
+import type { PublicEvent } from './types';
+
+/**
+ * The registration: a server-rendered form that posts to the `register` action.
+ * Without JavaScript the page answers the POST itself (`result`, `values`); with it,
+ * lib/form.ts sends the same form and answers in place. Seats are the rendered
+ * snapshot; the action checks capacity again in its transaction.
+ */
 interface Props {
-  event: EventDTO;
+  event: PublicEvent;
+  contribution: { main: string; note: string };
+  /** The action's answer when the form was posted without JavaScript. */
+  result?: { message: string } | { error: string; fields: Record<string, string> } | null;
+  /** What was typed, kept after an error. */
+  values?: Record<string, string>;
 }
 
-const { event } = Astro.props;
-const contribution = splitFee(event.cost_basis);
+const { event, contribution, result = null, values = {} } = Astro.props;
+const full = event.view.state === 'full';
+const id = 'register';
+const errors = result && 'fields' in result ? result.fields : {};
+const failed = result && 'error' in result ? (Object.values(errors).some(Boolean) ? 'Bitte prüfe die markierten Angaben.' : result.error) : '';
+
+const field = (name: string) => ({
+  id: `${id}-${name}`,
+  name,
+  value: values[name] ?? '',
+  'aria-invalid': errors[name] ? ('true' as const) : undefined,
+  'aria-describedby': `${id}-${name}-error`,
+});
 ---
 
 <div
@@ -21,30 +45,139 @@ const contribution = splitFee(event.cost_basis);
     // Below lg a forest band from edge to edge; beside the intro it runs out to the
     // window's right edge (the section is the container that 100cqw measures).
     'surface-dark min-w-0 scroll-mt-14 rounded-2xl scheme-dark p-panel max-lg:-mx-gutter max-lg:rounded-none max-lg:px-gutter lg:-mr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))] lg:rounded-r-none lg:pr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))]',
-    !event.is_past && 'has-[astro-island[ssr]]:min-h-[51rem]',
   ]}
 >
-  <RegistrationForm client:only="preact" initial={publicEvent(event)} contribution={contribution}>
-    <div slot="fallback">
-      <h2 id="anmeldung-title" class="text-sub text-fg">
-        {event.is_past ? 'Dieser Abend hat stattgefunden' : 'Dein Platz im Kreis'}
-      </h2>
-      <p role="status" class="mt-3 text-md text-fg-soft">
-        Die Anmeldung wird geladen …
-      </p>
-      <noscript>
-        <p class="mt-4 text-sm text-fg-muted">
-          Beitrag: {contribution.main}
-          {contribution.note && ` (${contribution.note})`}
+  {
+    event.isPast ? (
+      <>
+        <h2 id="anmeldung-title" class="text-sub text-fg">
+          Dieser Abend hat stattgefunden
+        </h2>
+        <p class="mt-3 text-md text-fg-soft">Eine Anmeldung ist nicht mehr möglich.</p>
+        <a class:list={[button(), 'mt-6']} href="/event#benachrichtigung">
+          Termine per E-Mail erhalten
+        </a>
+      </>
+    ) : result && 'message' in result ? (
+      <div role="status">
+        <h2 id="anmeldung-title" class="text-sub text-fg">
+          Vielen Dank für deine Anmeldung
+        </h2>
+        <p class="mt-4 text-md text-fg-soft">{result.message}</p>
+      </div>
+    ) : (
+      <>
+        <h2 id="anmeldung-title" class="text-sub text-fg">
+          {full ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
+        </h2>
+        <SeatBar
+          class="mt-4"
+          seats={event.view.seats}
+          text={full ? 'Alle Plätze sind belegt' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`}
+        />
+        <p class="mt-6 mb-6 max-w-measure text-md text-fg-soft">
+          {full
+            ? 'Dieser Abend ist voll. Du kannst dich auf die Warteliste setzen lassen. Sobald du nachrückst, bekommst du eine E-Mail.'
+            : 'Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.'}
         </p>
-        <p class="mt-4 text-base">
-          Für die Online-Anmeldung benötigst du JavaScript. Du kannst dich auch per E-Mail an{' '}
-          <a class={link} href={`mailto:${site.contactEmail}`}>
-            {site.contactEmail}
-          </a>{' '}
-          anmelden.
-        </p>
-      </noscript>
-    </div>
-  </RegistrationForm>
+        <dl class="mb-8 text-sm">
+          <div class="flex items-baseline justify-between gap-4">
+            <dt class="text-fg-muted">Beitrag</dt>
+            <dd class="text-right text-fg">
+              {contribution.main}
+              {contribution.note && <span class="mt-1 block text-xs text-fg-muted">{contribution.note}</span>}
+            </dd>
+          </div>
+        </dl>
+        <form
+          id={id}
+          method="post"
+          action={actions.register}
+          autocomplete="on"
+          data-form="register"
+          data-on-success="replace"
+          data-track="event-registration"
+          data-track-context={JSON.stringify({ event_id: event.id })}
+          class="grid gap-6"
+        >
+          <Honeypot />
+          <input type="hidden" name="event_id" value={event.id} />
+          <div data-hide-on-success class="grid gap-6">
+            <div class="grid gap-5 min-[22.5rem]:grid-cols-2 min-[22.5rem]:gap-4">
+              <Field for={`${id}-first_name`} label="Vorname" errorId={`${id}-first_name-error`} error={errors.first_name}>
+                <input {...field('first_name')} autocomplete="given-name" required class={control()} />
+              </Field>
+              <Field for={`${id}-last_name`} label="Nachname" errorId={`${id}-last_name-error`} error={errors.last_name}>
+                <input {...field('last_name')} autocomplete="family-name" required class={control()} />
+              </Field>
+            </div>
+            <Field for={`${id}-email`} label="E-Mail" errorId={`${id}-email-error`} error={errors.email}>
+              <input {...field('email')} type="email" autocomplete="email" inputmode="email" required class={control()} />
+            </Field>
+            <Field
+              for={`${id}-phone_number`}
+              label="Handynummer"
+              optional
+              hint="Falls wir dich am Tag des Abends kurzfristig erreichen müssen."
+              hintId={`${id}-phone_number-hint`}
+            >
+              <input
+                {...field('phone_number')}
+                type="tel"
+                autocomplete="tel"
+                inputmode="tel"
+                aria-describedby={`${id}-phone_number-hint`}
+                class={control()}
+              />
+            </Field>
+            <div>
+              <label class="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  name="privacy"
+                  value="on"
+                  required
+                  checked={values.privacy === 'on'}
+                  class={checkbox}
+                  aria-invalid={errors.privacy ? 'true' : undefined}
+                  aria-describedby={`${id}-privacy-error`}
+                />
+                <span class="text-base text-fg">
+                  Ich habe die{' '}
+                  <a href="/datenschutz" target="_blank" rel="noopener" class={link}>
+                    Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span>
+                  </a>{' '}
+                  gelesen und stimme der Verarbeitung meiner Daten zu.
+                </span>
+              </label>
+              <span id={`${id}-privacy-error`} class={fieldError} hidden={!errors.privacy}>
+                {errors.privacy}
+              </span>
+            </div>
+            <div class="mt-2 grid gap-3">
+              <button type="submit" class={button({ size: 'lg', block: true })}>
+                <span data-label>{full ? 'Auf die Warteliste' : 'Anmelden'}</span>
+              </button>
+              <p class="text-sm text-fg-muted">Du bekommst eine Bestätigung mit einem Link zum Absagen.</p>
+            </div>
+          </div>
+          {
+            failed ? (
+              <p id={`${id}-status`} data-form-status role="alert" data-tone="error" class={formStatus}>
+                {failed}
+              </p>
+            ) : (
+              <FormStatus form={id} />
+            )
+          }
+        </form>
+      </>
+    )
+  }
 </div>
+
+<script>
+  import { enhanceForms } from '@lib/form';
+
+  enhanceForms('register', 'register');
+</script>

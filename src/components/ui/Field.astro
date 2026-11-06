@@ -14,10 +14,12 @@ interface Props {
   hint?: string;
   hintId?: string;
   errorId?: string;
+  /** A message the server already knows (a form posted without JavaScript). */
+  error?: string;
   class?: string;
 }
 
-const { for: htmlFor, label, optional = false, hint, hintId, errorId, class: className } = Astro.props;
+const { for: htmlFor, label, optional = false, hint, hintId, errorId, error = '', class: className } = Astro.props;
 ---
 
 <div class={className}>
@@ -31,5 +33,11 @@ const { for: htmlFor, label, optional = false, hint, hintId, errorId, class: cla
       {hint}
     </span>
   )}
-  {errorId && <span id={errorId} class={fieldError} hidden />}
+  {
+    errorId && (
+      <span id={errorId} class={fieldError} hidden={!error}>
+        {error}
+      </span>
+    )
+  }
 </div>

@@ -2,9 +2,9 @@
 
 ## Live seats
 
-One same-origin GET endpoint, no authentication or cookies. It feeds the client-only
-registration island on an event page; everything else on the public pages is in the
-server-rendered HTML. No participant records, email addresses or precise meeting-address
+One same-origin GET endpoint, no authentication or cookies. No page loads it: the
+event page renders its seats and registration form on the server. It stays for
+integrations (and beside its `.ics` neighbour). No participant records, email addresses or precise meeting-address
 fields are returned. The TypeScript contract is `PublicEvent` in
 `src/components/event/types.ts`.
 
@@ -16,10 +16,10 @@ Failures return `{ message: string }` with `Cache-Control: no-store`: 404 for an
 unknown or unpublished event, 503 when the database cannot be read. A failed read is
 never stored. Successes are `public, max-age=0, must-revalidate`.
 
-The island starts from the snapshot the page was rendered with and reads the endpoint
-again only when the page comes back into view after 30 seconds (`usePublicData`). There
-is no preload, no polling and no cache-busting query. The registration action checks
-availability in its own database transaction; a displayed count never reserves a seat.
+The registration form shows the snapshot the page was rendered with. The registration
+action checks availability in its own database transaction; a displayed count never
+reserves a seat. Posted without JavaScript, the form gets its answer from the event
+page itself, marked `private, no-store` and kept out of the route cache.
 
 `/api/public/events/{slug}/ics` is the calendar file linked from confirmation mails; it
 carries the full address.

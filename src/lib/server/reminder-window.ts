@@ -7,9 +7,9 @@
  */
 import { addDays, berlinClock, eventDay, parseClockTime } from '../shared/time';
 
-export const EVENING_FROM = 18 * 60;
-export const EVENING_UNTIL = 22 * 60;
-export const MORNING_FROM = 10 * 60;
+const EVENING_FROM = 18 * 60;
+const EVENING_UNTIL = 22 * 60;
+const MORNING_FROM = 10 * 60;
 
 export type ReminderKind = 'tomorrow' | 'today';
 

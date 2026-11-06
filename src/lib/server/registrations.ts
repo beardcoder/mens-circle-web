@@ -20,7 +20,7 @@ const fireAndForget = (label: string, promise: Promise<unknown>): void => {
 type ParticipantFields = { firstName?: string; lastName?: string; phone?: string };
 
 /** What a sign-up typed that differs from the stored participant (kept on the registration). */
-export interface SubmittedDetails {
+interface SubmittedDetails {
   submittedFirstName: string | null;
   submittedLastName: string | null;
   submittedPhone: string | null;

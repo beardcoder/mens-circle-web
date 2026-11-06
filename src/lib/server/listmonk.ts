@@ -20,7 +20,7 @@ interface ListmonkResponse {
 }
 
 /** An address as logs may show it: a short hash that matches across lines, never the address. */
-export const logId = (email: string): string =>
+const logId = (email: string): string =>
   `subscriber#${createHash('sha256').update(email.trim().toLowerCase()).digest('hex').slice(0, 10)}`;
 
 /** A request path without its query (the subscriber lookup carries the address there). */

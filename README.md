@@ -1,6 +1,6 @@
 # Männerkreis Niederbayern / Straubing
 
-Website for the Männerkreis. Astro 7 with Preact TSX islands on the Bun runtime, Drizzle on `bun:sqlite`,
+Website for the Männerkreis. Astro 7 (Preact islands in the admin only) on the Bun runtime, Drizzle on `bun:sqlite`,
 email via an external listmonk, admin sign-in via Pocket ID. One Bun process serves
 everything through `@igloczek/astro-bun-adapter` on Bun's native HTTP server (`server.ts`): static files, SSR pages, actions and the admin UI; one Docker image, deployed with Coolify.
 
@@ -60,7 +60,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Static FAQ answers, journey steps and facts use slotted items; FAQ/journey microdata comes from the visible HTML
 - Home, `/event` and event pages: server-rendered dates, seats and approved testimonials; no content hydration
 - Route cache: Astro's `memoryCache()` (path-keyed, 64 entries), 5 minutes + 5 minutes stale-while-revalidate; every action that changes public data purges it (`purgePublicCache`)
-- Event details: SSR metadata and copy; the Preact registration island re-reads live seats when the page returns into view
+- Event details: SSR metadata, copy and a server-rendered registration form that works without JavaScript
 - Admin guard and default `Cache-Control`: `src/middleware.ts`, `src/lib/cache-policy.ts`
 - Public CSS: shared hashed stylesheets; the SSR home photo and avatar are pre-sized AVIF/WebP files (no `/_image` at runtime)
 - Design: forest, ember and linen; Fraunces 500 (static) and Figtree (variable), ~37 kB of fonts; see [design system](docs/design-system.md)

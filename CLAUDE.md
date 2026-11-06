@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Website for the Männerkreis. Astro 7 with Preact TSX islands, Tailwind CSS v4, SSR on the Bun
+Website for the Männerkreis. Astro 7 (Preact TSX islands in the admin only), Tailwind CSS v4, SSR on the Bun
 runtime, Drizzle on `bun:sqlite`, email via external listmonk, admin sign-in via Pocket ID.
 Code, comments and docs are English; user-facing content is German.
 Commit messages are English too, in Conventional Commits form (`fix(seo): …`).
@@ -48,11 +48,12 @@ explicit env; config is read at module load, so an in-process import measures `.
 
 **Actions.** Everything is an Astro Action (`src/actions/*`), merged flat in `index.ts`.
 Public forms validate only in their action Zod schemas. `lib/form.ts` owns submit,
-field errors and the result line for newsletter/testimonial forms (`FormStatus`); it
-loads the actions client on the first focus in the form, not with the page.
-The Preact registration form handles its own busy/error/success state and calls the
-same `actions.register`; errors preserve inputs. Forms
-need JS and keep feedback at the form rather than a toast. They
+field errors and the result line of every public form (`FormStatus`); it loads the
+actions client on the first focus in the form, not with the page. The registration
+(`components/event/EventRegister.astro`) is a server-rendered form posting to
+`actions.register`: without JS the event page answers the POST itself (`private,
+no-store`, never from or into the route cache; errors keep the inputs). Newsletter
+and testimonial need JS. Feedback stays at the form rather than a toast. Public forms
 go through `publicForm()` in `actions/forms.ts`: an in-process per-IP rate limit
 (`lib/server/ratelimit.ts`, one more reason for a single replica; the IP comes from
 `CF-Connecting-IP` with `TRUSTED_PROXY=cloudflare`, else the peer address, never from
@@ -100,10 +101,9 @@ stale-while-revalidate, tag `public`) only after complete reads; every action th
 changes events, registrations or testimonials awaits `purgePublicCache(context)`, so
 the lifetime only bounds what changes with the clock. A failed read is a 503 with
 `no-store`; a testimonial-only failure renders the page without storing it. An empty
-schedule shows the "in Planung" card, never the error. The registration island is
-client-only and starts from the rendered snapshot; `components/event/usePublicData.ts`
-re-reads `/api/public/events/<slug>` when the page returns into view after 30 s (no
-polling, no preload). Public DTOs exclude precise addresses and participant data; see
+schedule shows the "in Planung" card, never the error. No public page hydrates
+an island (Preact is the admin's only); the registration shows the rendered seat
+snapshot. Public DTOs exclude precise addresses and participant data; see
 `docs/public-api.md`. The registration action checks capacity transactionally; cached
 counts do not reserve seats. Legal pages, personal page and testimonial form stay
 prerendered.

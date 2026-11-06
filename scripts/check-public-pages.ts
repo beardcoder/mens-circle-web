@@ -161,6 +161,40 @@ async function checkSecurity(origin: string, path: string, cookie = ''): Promise
   }
 }
 
+/** The registration is a server-rendered form that also works without JavaScript. */
+async function checkRegistration(origin: string): Promise<void> {
+  const page = await readPage(origin, '/event/testabend');
+
+  assert.match(page, /<form id="register" method="post" action="\?_action=register"/);
+  assert.match(page, /Du bekommst eine Bestätigung mit einem Link zum Absagen\./);
+
+  const post = (body: Record<string, string>) =>
+    fetch(`${origin}/event/testabend?_action=register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: origin, 'Sec-Fetch-Site': 'same-origin' },
+      body: new URLSearchParams(body),
+    });
+
+  const invalid = await post({ event_id: 'open', first_name: 'Ohne', last_name: '', email: 'kaputt' });
+  const invalidHtml = await invalid.text();
+
+  assert.equal(invalid.status, 400);
+  assert.equal(invalid.headers.get('cache-control'), 'private, no-store', 'an answer to a POST is never cached');
+  assert.match(invalidHtml, /Bitte gib deinen Nachnamen an\./);
+  assert.match(invalidHtml, /value="Ohne"/, 'what was typed stays');
+
+  const valid = await post({
+    event_id: 'open',
+    first_name: 'Ohne',
+    last_name: 'Skript',
+    email: 'noscript@example.invalid',
+    privacy: 'on',
+  });
+
+  assert.equal(valid.status, 200);
+  assert.match(await valid.text(), /Vielen Dank für deine Anmeldung/);
+}
+
 /** The portrait and the stylesheet are hashed build files; nothing is transformed on request. */
 async function checkAssets(origin: string, home: string): Promise<void> {
   const image = /<img[^>]+src="([^"]+)"/.exec(home)?.[1] ?? '';
@@ -274,12 +308,13 @@ try {
     }
 
     await checkCancelLink(origin);
+    await checkRegistration(origin);
 
     const json = await fetch(`${origin}/api/public/events/testabend`);
 
     assert.equal(json.status, 200);
     assert.equal(json.headers.get('X-Astro-Cache'), 'MISS');
-    assert.equal((await json.json()).availableSpots, 8);
+    assert.equal((await json.json()).availableSpots, 7, 'the seat taken without JavaScript');
     assert.equal((await fetch(`${origin}/api/public/events/testabend`)).headers.get('X-Astro-Cache'), 'HIT');
     const missing = await fetch(`${origin}/api/public/events/private`);
 

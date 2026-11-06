@@ -223,8 +223,8 @@ waits for a script.
   reduced motion the native toggle stays.
 - The bottom bar on phones (`ActionBar`) glides up on a spring once the opening's
   action has gone, its date and action a beat behind; it slips away faster than it
-  came. The registration form settles in where its loading line stood (`rise`), and
-  so does its answer.
+  came. The registration form is in the page from the first frame; its answer
+  replaces the fields in place.
 - Loops that never change state stay in CSS: the glow breathes on the 11-second
   cycle (`data-glow`), the ring turns; both pause once the opening is out of view
   (`data-offscreen`), since a running animation is serviced every frame.

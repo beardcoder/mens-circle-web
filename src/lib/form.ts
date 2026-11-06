@@ -1,11 +1,14 @@
 /**
- * Client side of the newsletter and testimonial forms (the registration form is its
- * Preact island). Every answer stays at the form: a field's message under the field,
- * the form's own result under its button (`<form id>-status`). Entries survive an error.
+ * Client side of the public forms (newsletter, testimonial, registration). Each is a
+ * server-rendered form that posts to its action without JavaScript; this sends it in
+ * place instead. Every answer stays at the form: a field's message under the field,
+ * the form's own result under its button (`<form id>-status`). Entries survive an
+ * error. `data-on-success="replace"` hides `[data-hide-on-success]` after success
+ * instead of clearing the form.
  */
 
 /** The actions these forms call; each takes the form's `FormData`. */
-type FormAction = 'subscribeNewsletter' | 'submitTestimonial';
+type FormAction = 'subscribeNewsletter' | 'submitTestimonial' | 'register';
 
 type Outcome = { message: string; fields: Record<string, string> } | { error: string; fields: Record<string, string> };
 
@@ -124,7 +127,12 @@ function enhance(form: HTMLFormElement, action: FormAction): void {
     if ('message' in outcome) {
       say('success', outcome.message);
       trackEvent(`${track}-success`, context);
-      form.reset();
+
+      if (form.dataset.onSuccess === 'replace') {
+        for (const part of form.querySelectorAll<HTMLElement>('[data-hide-on-success]')) part.hidden = true;
+      } else {
+        form.reset();
+      }
 
       return;
     }

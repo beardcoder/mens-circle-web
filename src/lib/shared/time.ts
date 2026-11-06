@@ -2,7 +2,7 @@
  * Wall-clock time in Europe/Berlin, where every event takes place. Pure functions
  * without Node or Bun imports, so pages, client code and server code share them.
  */
-export const TIME_ZONE = 'Europe/Berlin';
+const TIME_ZONE = 'Europe/Berlin';
 
 const DAY_MS = 86_400_000;
 
