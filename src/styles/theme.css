@@ -23,6 +23,10 @@
    stays open until its answer has closed, and its marker turns back right away. */
 @custom-variant item-open (&:where(details[open]:not([data-closing]) *));
 
+/* A device with a real pointer that hovers (a desktop): the only place a fixed bar
+   may blur what lies behind it, which is redrawn on every scroll frame. */
+@custom-variant hover-device (@media (hover: hover) and (pointer: fine));
+
 /* Scroll-driven, where scroll timelines exist and motion is allowed; without
    support the element simply stands. */
 @custom-variant scroll-motion {

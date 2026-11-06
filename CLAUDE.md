@@ -266,8 +266,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   numbered list, voices, FAQ, taking part (`#termine`), staying in touch
   (`#newsletter`).
 - Header 72px: links visible from `nav`, one filled action; over the home opening the
-  bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then linen over a
-  blur. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
+  bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then 95% linen; fixed bars
+  (header, event dock, action bar) blur what lies behind them only from `lg` on a
+  hovering pointer (`lg:hover-device:`), never on phones. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
 - Motion: the opening moves in pure CSS from the first paint (`data-enter`,
   global.css; the title is the LCP): the title rises word by word
   (`data-enter="words"`, words and their index `--i` wrapped on the server by

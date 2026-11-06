@@ -279,8 +279,9 @@ dates and the footer. Under reduced motion everything rests.
 
 **Header.** 72px: the mark in ember and the word mark in Fraunces; from `nav` five
 links and one filled action; below `nav` the action and a menu button. Over the home
-opening the bar is clear with light text; once the page moves it is linen over a
-blur (`data-scrolled`). The phone menu is a native modal `<dialog>` on the forest,
+opening the bar is clear with light text; once the page moves it is linen at 95% (`data-scrolled`);
+only on a desktop with a hovering pointer does it blur what lies behind
+(`lg:hover-device:`), since a blur behind a fixed bar is redrawn on every scroll frame. The phone menu is a native modal `<dialog>` on the forest,
 opening as a circle from its button, its links in Fraunces.
 
 **Footer.** A forest band on every page: the mark and word mark, one line about the
