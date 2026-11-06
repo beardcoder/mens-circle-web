@@ -233,7 +233,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   numbers in circles; Figtree (`font-sans`, variable) for text, navigation, forms,
   data. Role tokens `text-hero`, `text-page`, `text-section`, `text-sub`, `text-quote`,
   `text-md` (body), `text-base` (controls). No italic display face: `<em>` in a title
-  turns the accent, upright. Labels in sentence case: `Eyebrow` (ember dot, accent),
+  turns the accent, upright; an event title sets its last word in the accent
+  (`accentLastWord`), and no title gets a layout of its own. Labels in sentence case: `Eyebrow` (ember dot, accent),
   `label` (muted). Running text on `max-w-measure`. A dash in running copy is bound
   to the word before it (`\u00a0–`).
 - Shapes: soft and round. `rounded-full` for what you press and for circles; fields

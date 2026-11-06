@@ -2,6 +2,7 @@
 import type { EventDTO } from '@lib/shared/dto';
 import { eventView } from '@lib/shared/event-status';
 import { formatTimeRange } from '@lib/shared/time';
+import { accentLastWord } from '@lib/shared/words';
 import { link } from '@lib/ui';
 
 import Button from '../ui/Button.astro';
@@ -18,7 +19,7 @@ const view = eventView(event, 'Dieser Abend', false);
 const dateLabel = view.title.join(' ');
 const hours = formatTimeRange(event.start_time, event.end_time);
 const hasPlace = !!(event.location || event.street || event.city);
-const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
+const title = accentLastWord(event.title);
 ---
 
 {/* The date line and the title rise in first, then the rest (global.css, "Motion: the
@@ -52,19 +53,13 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
       aria-label={event.title}
       class:list={[
         'relative z-31 mt-4 origin-top-left font-display tracking-[-0.045em] text-fg lg:mt-6 print:opacity-100!',
-        isCircleTitle
-          ? 'w-fit text-[clamp(2.75rem,14vw,13rem)] leading-[1.02] whitespace-nowrap'
-          : 'text-page wrap-anywhere hyphens-auto lg:text-hero',
+        'max-w-[14em] text-page wrap-anywhere hyphens-auto lg:text-hero',
       ]}
     >
-      {isCircleTitle ? (
-        <span>
-          <span class="inline-block">Männer</span>
-          <span class="inline-block text-accent">kreis</span>
-        </span>
-      ) : (
-        <span>{event.title}</span>
-      )}
+      <span>
+        {title.lead}
+        {title.accent && <span class="text-accent">{` ${title.accent}`}</span>}
+      </span>
     </h1>
 
     <div class="mt-8 grid items-start gap-x-grid gap-y-8 lg:mt-14 lg:grid-cols-12">

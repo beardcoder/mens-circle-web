@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 
 import { seatFill } from '../src/lib/shared/seats';
+import { accentLastWord } from '../src/lib/shared/words';
 
 // The bar repeats the seats line in a shape; it must never show more room than exists.
 
@@ -18,4 +19,9 @@ test('free seats are clamped to the circle', () => {
 test('no bar for a past evening or an evening without seats', () => {
   expect(seatFill(null)).toBeNull();
   expect(seatFill({ total: 0, free: 0 })).toBeNull();
+});
+
+test('a title sets its last word in the accent; one word stays plain', () => {
+  expect(accentLastWord('Männerkreis im Advent')).toEqual({ lead: 'Männerkreis im', accent: 'Advent' });
+  expect(accentLastWord(' Männerkreis ')).toEqual({ lead: 'Männerkreis', accent: '' });
 });

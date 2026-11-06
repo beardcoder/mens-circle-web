@@ -1,6 +1,7 @@
 ---
 import type { EventDTO } from '@lib/shared/dto';
 import { eventDay } from '@lib/shared/time';
+import { accentLastWord } from '@lib/shared/words';
 
 import Container from '../ui/Container.astro';
 
@@ -12,7 +13,7 @@ interface Props {
 }
 
 const { event, dateLabel, hours } = Astro.props;
-const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkreis';
+const title = accentLastWord(event.title);
 ---
 
 {/* A visual continuation of the existing heading, never a second heading or focus target. */}
@@ -25,13 +26,10 @@ const isCircleTitle = event.title.trim().toLocaleLowerCase('de') === 'männerkre
   <div data-event-dock-ground class="absolute inset-0 border-b border-line bg-ground/88 backdrop-blur-xl"></div>
   <Container class="relative flex min-h-14 items-center justify-between gap-4 py-2">
     <p data-event-dock-title class="min-w-0 truncate font-display text-sub leading-[1.02] tracking-[-0.045em]">
-      {isCircleTitle ? (
-        <span>
-          Männer<span class="text-accent">kreis</span>
-        </span>
-      ) : (
-        <span>{event.title}</span>
-      )}
+      <span>
+        {title.lead}
+        {title.accent && <span class="text-accent">{` ${title.accent}`}</span>}
+      </span>
     </p>
     <p class="shrink-0 text-right text-xs leading-snug sm:text-sm">
       <time data-event-dock-date datetime={eventDay(event.event_date)} class="inline-block text-fg">

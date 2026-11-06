@@ -38,3 +38,15 @@ export const splitText = (text: string): Words =>
 /** `--enter-delay` for the `n`th piece (from 0) after a title of `count` words. */
 export const afterWords = (count: number, n: number): string =>
   `--enter-delay: ${(0.06 + count * 0.055 + 0.1 + n * 0.1).toFixed(2)}s`;
+
+/**
+ * A title as its lead and its last word, which pages set in the accent, the way an
+ * `<em>` does in the home opening ("Männerkreis in" / "Straubing"). A one-word title
+ * has no accent. Content never decides layout: every title is set the same way.
+ */
+export const accentLastWord = (title: string): { lead: string; accent: string } => {
+  const text = title.trim();
+  const at = text.lastIndexOf(' ');
+
+  return at < 0 ? { lead: text, accent: '' } : { lead: text.slice(0, at), accent: text.slice(at + 1) };
+};
