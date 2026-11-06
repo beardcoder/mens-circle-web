@@ -1,7 +1,7 @@
 ---
 import site from '@data/site.json';
-import { plainTextToHtml } from '@lib/server/format';
-import type { EventDTO } from '@lib/types';
+import type { EventDTO } from '@lib/shared/dto';
+import { plainTextToHtml } from '@lib/shared/html';
 import { link } from '@lib/ui';
 
 import Prose from '../ui/Prose.astro';

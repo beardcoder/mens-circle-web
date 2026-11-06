@@ -1,7 +1,7 @@
 /** Share and search metadata for one event. */
-import site from '../data/site.json';
-import { formatDateLongDE, formatDayMonthYearDE, timeRange } from './server/format';
-import type { EventDTO } from './types';
+import site from '../../data/site.json';
+import type { EventDTO } from './dto';
+import { formatDateLongDE, formatDayMonthYearDE, timeRange } from './format';
 
 /** Chat previews show more than a SERP's ~160 chars, so budget for the preview. */
 const DESCRIPTION_LIMIT = 200;

@@ -3,9 +3,9 @@
  * never read as "no date planned".
  */
 
+import type { EventDTO } from './dto';
 import { eventPlace } from './event-meta';
-import { formatDateLongDE, isoDay, timeRange } from './server/format';
-import type { EventDTO } from './types';
+import { formatDateLongDE, isoDay, timeRange } from './format';
 
 export type NextEventStatus = 'scheduled' | 'none' | 'unavailable';
 
@@ -72,15 +72,20 @@ export const splitFee = (costBasis = ''): { main: string; note: string } => {
   return { main: fee, note: '' };
 };
 
-/** One row of an event summary: a term and its value, wrapping when needed. */
-interface SummaryRow {
-  label: string;
-  value: string;
+/** The facts of a dated summary, as data: components choose labels and layout. */
+interface SummaryFacts {
+  /** "19:00–21:30 Uhr", or "Abends" when no time is set. */
+  time: string;
+  place: string;
+  /** The fee's main value (`splitFee`). */
+  fee: string;
+  /** "5 von 12 Plätzen frei", "Ausgebucht · Warteliste" or "Hat stattgefunden". */
+  seats: string;
 }
 
 /**
  * Everything an event summary shows, in every state. Scheduled and past dates
- * name time, place, fee and seats in the same four rows. Empty and error states
+ * name time, place, fee and seats in the same four facts. Empty and error states
  * are rendered separately by EventAvailability.
  */
 export interface SummaryView {
@@ -91,7 +96,7 @@ export interface SummaryView {
   title: [string, string];
   /** ISO day for `<time>`, when the title is a date. */
   datetime: string;
-  rows: SummaryRow[];
+  facts: SummaryFacts;
   /** The circle's seats, drawn around the date; `null` once the evening is past. */
   seats: { total: number; free: number } | null;
   /** The situational action; `null` where the page already offers it. */
@@ -108,13 +113,13 @@ const dateLines = (dateLabel: string): [string, string] => {
 const seatsText = (event: NextEventSummary): string =>
   event.isFull ? 'Ausgebucht · Warteliste' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`;
 
-/** Time, place, fee and seats: the four rows of a dated summary. */
-const dateRows = (next: NextEventSummary, seats = seatsText(next)): SummaryRow[] => [
-  { label: 'Zeit', value: next.timeRange || 'Abends' },
-  { label: 'Ort', value: next.place },
-  { label: 'Beitrag', value: splitFee(next.costBasis).main },
-  { label: 'Plätze', value: seats },
-];
+/** Time, place, fee and seats of a dated summary. */
+const dateFacts = (next: NextEventSummary, seats = seatsText(next)): SummaryFacts => ({
+  time: next.timeRange || 'Abends',
+  place: next.place,
+  fee: splitFee(next.costBasis).main,
+  seats,
+});
 
 /** The summary of one event, as listed on /event or opening its own page. */
 export const eventView = (event: EventDTO, kicker: string, withAction = true): SummaryView => {
@@ -126,7 +131,7 @@ export const eventView = (event: EventDTO, kicker: string, withAction = true): S
     kicker: state === 'full' ? `${kicker} · ausgebucht` : kicker,
     title: dateLines(next.dateLabel),
     datetime: next.day,
-    rows: dateRows(next, event.is_past ? 'Hat stattgefunden' : undefined),
+    facts: dateFacts(next, event.is_past ? 'Hat stattgefunden' : undefined),
     seats: event.is_past
       ? null
       : { total: next.maxParticipants, free: event.is_full ? 0 : Math.max(0, next.availableSpots) },

@@ -1,5 +1,4 @@
-import type { OverviewData, RegistrationsData, Testimonial } from '@components/admin/types';
-
+import type { OverviewData, RegistrationsData, Testimonial } from '../shared/admin-types';
 import { getEventById, listEventsForAdmin } from './events';
 import { listRegistrationsForEvent } from './registrations';
 import { listTestimonialsForAdmin } from './testimonials';

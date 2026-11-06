@@ -1,5 +1,5 @@
 ---
-import type { SummaryView } from '@lib/event-status';
+import type { SummaryView } from '@lib/shared/event-status';
 import { button, label } from '@lib/ui';
 
 import SeatBar from './SeatBar.astro';
@@ -19,9 +19,13 @@ const dayNumber = valid ? String(day.getUTCDate()).padStart(2, '0') : '';
 const month = valid ? new Intl.DateTimeFormat('de-DE', { month: 'short', timeZone: 'UTC' }).format(day) : '';
 const seal = view.state === 'past' ? 'bg-line text-fg-muted' : 'bg-accent-soft text-accent';
 
-/** With seats to show, the seats row becomes the bar; a past evening keeps it in words. */
-const seatsRow = view.seats ? view.rows.find((row) => row.label === 'Plätze') : undefined;
-const rows = seatsRow ? view.rows.filter((row) => row !== seatsRow) : view.rows;
+/** With seats to show, the seats become the bar; a past evening keeps them in words. */
+const rows = [
+  { label: 'Zeit', value: view.facts.time },
+  { label: 'Ort', value: view.facts.place },
+  { label: 'Beitrag', value: view.facts.fee },
+  ...(view.seats ? [] : [{ label: 'Plätze', value: view.facts.seats }]),
+];
 ---
 
 {/* Open on its ground, no card: the seal and the date, the facts as small columns,
@@ -59,7 +63,7 @@ const rows = seatsRow ? view.rows.filter((row) => row !== seatsRow) : view.rows;
       </div>
     ))}
   </dl>
-  {seatsRow && <SeatBar seats={view.seats} text={seatsRow.value} class="mt-6" />}
+  {view.seats && <SeatBar seats={view.seats} text={view.facts.seats} class="mt-6" />}
   {showAction && view.action && (
     <a
       href={view.action.href}

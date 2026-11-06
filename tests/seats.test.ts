@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { seatFill } from '../src/lib/seats';
+import { seatFill } from '../src/lib/shared/seats';
 
 // The bar repeats the seats line in a shape; it must never show more room than exists.
 

@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, isNull } from 'drizzle-orm';
 
-import type { TestimonialDTO } from '../types';
+import type { TestimonialDTO } from '../shared/dto';
 import { db } from './db';
 import type { Testimonial } from './db/schema';
 import { testimonials } from './db/schema';

@@ -1,8 +1,8 @@
 import type { APIContext } from 'astro';
 
 import type { PublicEvent, PublicEvents } from '@components/event/types';
-import { dateStatus, eventView, splitFee } from '@lib/event-status';
-import type { EventDTO, TestimonialDTO } from '@lib/types';
+import type { EventDTO, TestimonialDTO } from '@lib/shared/dto';
+import { dateStatus, eventView, splitFee } from '@lib/shared/event-status';
 
 import { fetchUpcomingEventsState } from './events';
 import { fetchTestimonialsState } from './testimonials';

@@ -1,7 +1,7 @@
 /** The pages' JSON-LD, embedded via SeoHead: the series, one meeting, FAQ and breadcrumbs. */
-import site from '../data/site.json';
+import site from '../../data/site.json';
+import type { EventDTO } from './dto';
 import { buildEventMeta, type EventMeta, eventName, stripHtml } from './event-meta';
-import type { EventDTO } from './types';
 
 type Schema = Record<string, unknown>;
 

@@ -1,3 +1,5 @@
+/** The shapes public data takes between the server and the pages. */
+
 /** Public event shape. */
 export interface EventDTO {
   id: string;
@@ -26,10 +28,4 @@ export interface TestimonialDTO {
   quote: string;
   author: string | null;
   role: string | null;
-}
-
-declare global {
-  interface Window {
-    umami?: { track: (name: string, data?: Record<string, unknown>) => void };
-  }
 }

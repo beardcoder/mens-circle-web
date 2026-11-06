@@ -2,12 +2,13 @@
 import { and, asc, desc, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
 
 import type { EventInput } from '../event-input';
-import type { EventDTO } from '../types';
+import type { EventDTO } from '../shared/dto';
+import { formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from '../shared/format';
+import { escapeHtml } from '../shared/html';
 import { config, listmonkApiConfigured } from './config';
 import { db } from './db';
 import type { Event } from './db/schema';
 import { ACTIVE_REGISTRATION_STATUSES, events, registrations } from './db/schema';
-import { escapeHtml, formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText, toDate } from './format';
 import { createList, renameList, sendNewsletterCampaign } from './listmonk';
 
 /** The one definition of a seat-holding registration; reused by the seat claim. */

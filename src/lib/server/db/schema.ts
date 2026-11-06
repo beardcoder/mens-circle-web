@@ -2,11 +2,19 @@
 import { desc, isNull } from 'drizzle-orm';
 import { index, integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
+import type { RegistrationStatus as AdminStatus } from '../../shared/admin-types';
+
 const uuid = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
 
 /** Lifecycle of a seat in an event. */
-export const REGISTRATION_STATUSES = ['registered', 'waitlist', 'cancelled', 'attended'] as const;
+export const REGISTRATION_STATUSES = [
+  'registered',
+  'waitlist',
+  'cancelled',
+  'attended',
+] as const satisfies readonly AdminStatus[];
+
 export type RegistrationStatus = (typeof REGISTRATION_STATUSES)[number];
 
 /** Seat-holding statuses; `attended` still counts. */

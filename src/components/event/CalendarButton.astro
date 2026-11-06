@@ -1,8 +1,8 @@
 ---
 import { Icon } from 'astro-icon/components';
 
-import { buildIcs, type CalendarEvent, googleCalendarUrl } from '@lib/server/ics';
-import type { EventDTO } from '@lib/types';
+import type { EventDTO } from '@lib/shared/dto';
+import { buildIcs, type CalendarEvent, googleCalendarUrl } from '@lib/shared/ics';
 
 import Button from '../ui/Button.astro';
 

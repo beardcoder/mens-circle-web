@@ -1,11 +1,11 @@
 ---
 import { actions, isInputError } from 'astro:actions';
 
-import { buildEventMeta } from '@lib/event-meta';
-import { breadcrumbSchema, buildEventSchema } from '@lib/event-schema';
-import { splitFee } from '@lib/event-status';
 import { fetchEventState } from '@lib/server/events';
 import { PUBLIC_CACHE, publicEvent } from '@lib/server/public-data';
+import { buildEventMeta } from '@lib/shared/event-meta';
+import { breadcrumbSchema, buildEventSchema } from '@lib/shared/event-schema';
+import { splitFee } from '@lib/shared/event-status';
 
 import LinkBand from '../../components/blocks/LinkBand.astro';
 import EventIntro from '../../components/event/EventIntro.astro';
@@ -40,7 +40,10 @@ if (posted) {
       .catch(() => null);
 
     values = Object.fromEntries(
-      ['first_name', 'last_name', 'email', 'phone_number', 'privacy'].map((name) => [name, String(form?.get(name) ?? '')]),
+      ['first_name', 'last_name', 'email', 'phone_number', 'privacy'].map((name) => [
+        name,
+        String(form?.get(name) ?? ''),
+      ]),
     );
   }
 } else {

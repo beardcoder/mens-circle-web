@@ -37,7 +37,11 @@ everything but `bun:sqlite`. No compression in the app: the Coolify proxy and Cl
 do it. `404.astro` is prerendered; unmatched paths get it from disk and never reach the
 middleware. `src/middleware.ts` guards `/admin` (a signed session, else the login; sets
 `locals.admin`) and applies `lib/cache-policy.ts`. Migrations run on boot.
-`src/lib/server/*` is server-only; never import it into client scripts. Deployed as one
+Layers: `src/lib/server/*` is server-only (pages, actions, endpoints, scripts);
+`src/lib/shared/*` holds pure functions and types for everyone (no Node or Bun
+imports; dates, HTML escaping, event views, DTOs, admin types); components, layouts
+and shared code never import the server lib (ESLint `no-restricted-imports`). Pages
+load data and pass it as props. Deployed as one
 Docker image on Coolify (Bun pinned to a minor, `oven/bun:1.4-slim`; runs as `bun`;
 port 8090, SQLite on the `/data` volume; `/health` answers 503 when SQLite does not); env vars are in
 `.env.example` and the README. Retired URLs redirect in `astro.config.mjs`
@@ -147,7 +151,7 @@ No in-process timer and no `Bun.cron` (throws at
 boot). Beside `dist/` and `drizzle/`, the Docker image keeps only the three scheduled
 scripts, `src/lib/server/`, `src/lib/shared/` (pure helpers), the mail fonts (`src/assets/mail`) and the production
 `dependencies` (the build bundles the rest): what those scripts and the server lib
-import at runtime must be in there (other `src/lib` files as types only).
+import at runtime must be in there (other `src` files as types only).
 
 **Email.** listmonk is external; this repo only integrates it. `lib/server/email.ts` is
 the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) stable.
@@ -238,7 +242,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   breakpoints `md` tablet, `lg` desktop, `nav` (1100px) header links. No section is
   forced to a screen's height.
 - Shared components: `EventSummary` (every date, open: seal, facts, `SeatBar`; fed
-  by `lib/event-status.ts`, the bar by `lib/seats.ts`, which the registration panel
+  by `lib/shared/event-status.ts`, the bar by `lib/shared/seats.ts`, which the registration panel
   shares), `PageIntro` (every sub-page opening), `SectionHead`, `Eyebrow`,
   `Fact`, `Button`, `Field` + `FormStatus`, `TestimonialList`, `Accordion` (every
   FAQ). Use them; do not restyle a copy.
@@ -255,7 +259,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Motion: the opening moves in pure CSS from the first paint (`data-enter`,
   global.css; the title is the LCP): the title rises word by word
   (`data-enter="words"`, words and their index `--i` wrapped on the server by
-  `lib/words.ts`, out of a soft blur), the rest follows at `--enter-delay` (`afterWords()`), the photo
+  `lib/shared/words.ts`, out of a soft blur), the rest follows at `--enter-delay` (`afterWords()`), the photo
   settles (`settle`), its ring follows (`ring`), on Motion's springs sampled into
   `--ease-spring`/`--ease-spring-slow`; the opening's seat bars fill in CSS. Below it
   motion.dev in `components/Motion.astro` (`motion/mini` `animate`, one observer,

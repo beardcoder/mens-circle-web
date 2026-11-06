@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
 
 import { getPublishedEventBySlug } from '@lib/server/events';
-import { fullAddress } from '@lib/server/format';
-import { buildIcs } from '@lib/server/ics';
+import { fullAddress } from '@lib/shared/format';
+import { buildIcs } from '@lib/shared/ics';
 
 export const prerender = false;
 

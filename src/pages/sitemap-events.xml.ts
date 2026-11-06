@@ -2,8 +2,8 @@
 import type { APIRoute } from 'astro';
 
 import { listPublishedEventsForSitemap } from '@lib/server/events';
-import { escapeHtml } from '@lib/server/format';
 import { PUBLIC_CACHE } from '@lib/server/public-data';
+import { escapeHtml } from '@lib/shared/html';
 
 export const prerender = false;
 

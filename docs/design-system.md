@@ -54,15 +54,15 @@ facts and the FAQ, not in every section.
 
 ## Files
 
-| File                      | Role                                                                                                                                         |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/styles/theme.css`    | Tokens (`@theme`), primitives, variants, the three surfaces, keyframes, base rules. Shared.                                                  |
-| `src/styles/global.css`   | Public entry: Tailwind (classes from `src/` only), theme, page transitions, the breath, the hero's ring, the opening and the scroll hooks.   |
-| `src/styles/admin.css`    | Admin entry: Tailwind and theme; AdminLayout pins the dark mode (the forest at night).                                                       |
-| `src/lib/ui.ts`           | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
-| `src/lib/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
-| `src/lib/seats.ts`        | How full a circle is (`seatFill`), shared by the date's bar and the registration panel; imports nothing.                                     |
-| `src/components/ui/`      | The components built on them; `src/icons/` the line icons (24px grid, 1.7 stroke).                                                           |
+| File                             | Role                                                                                                                                         |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/styles/theme.css`           | Tokens (`@theme`), primitives, variants, the three surfaces, keyframes, base rules. Shared.                                                  |
+| `src/styles/global.css`          | Public entry: Tailwind (classes from `src/` only), theme, page transitions, the breath, the hero's ring, the opening and the scroll hooks.   |
+| `src/styles/admin.css`           | Admin entry: Tailwind and theme; AdminLayout pins the dark mode (the forest at night).                                                       |
+| `src/lib/ui.ts`                  | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
+| `src/lib/shared/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
+| `src/lib/shared/seats.ts`        | How full a circle is (`seatFill`), shared by the date's bar and the registration panel; imports nothing.                                     |
+| `src/components/ui/`             | The components built on them; `src/icons/` the line icons (24px grid, 1.7 stroke).                                                           |
 
 ## Colour
 
@@ -184,7 +184,7 @@ waits for a script.
 
 - The opening (`data-enter`, global.css, pure CSS from the first paint, because the
   title is the largest paint): the label, then the title word by word
-  (`data-enter="words"`; `lib/words.ts` wraps the words on the server with their
+  (`data-enter="words"`; `lib/shared/words.ts` wraps the words on the server with their
   index, so the lines break the same with and without motion), then the lead, the
   action and the next date at their `--enter-delay` (`afterWords()`), the seat bar
   filling after its line. The photo settles from a little larger (`settle`), the

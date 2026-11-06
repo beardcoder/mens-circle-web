@@ -2,10 +2,10 @@
 import site from '@data/site.json';
 import { readCancelToken } from '@lib/server/cancel-token';
 import { config } from '@lib/server/config';
-import { formatDateLongDE } from '@lib/server/format';
 import { purgePublicCache } from '@lib/server/public-data';
 import { clientIp, peerAddress, rateLimit } from '@lib/server/ratelimit';
 import { cancelOwnRegistration, readRegistrationForCancel } from '@lib/server/registrations';
+import { formatDateLongDE } from '@lib/shared/format';
 import { link } from '@lib/ui';
 
 import PageIntro from '../../components/PageIntro.astro';

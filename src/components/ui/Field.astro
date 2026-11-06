@@ -33,11 +33,9 @@ const { for: htmlFor, label, optional = false, hint, hintId, errorId, error = ''
       {hint}
     </span>
   )}
-  {
-    errorId && (
-      <span id={errorId} class={fieldError} hidden={!error}>
-        {error}
-      </span>
-    )
-  }
+  {errorId && (
+    <span id={errorId} class={fieldError} hidden={!error}>
+      {error}
+    </span>
+  )}
 </div>

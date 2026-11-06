@@ -4,7 +4,7 @@
  * the seats in words. The fill grows in when it comes into view (Motion.astro), in
  * an opening after its line (global.css).
  */
-import { seatFill } from '@lib/seats';
+import { seatFill } from '@lib/shared/seats';
 
 interface Props {
   seats: { total: number; free: number } | null;

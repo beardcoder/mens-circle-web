@@ -1,8 +1,8 @@
 ---
 import type { ImageMetadata } from 'astro';
 
+import { afterWords, splitWords } from '@lib/shared/words';
 import { button, label } from '@lib/ui';
-import { afterWords, splitWords } from '@lib/words';
 
 import SeatBar from '../event/SeatBar.astro';
 import type { PublicEvents } from '../event/types';
@@ -31,11 +31,8 @@ const nextLine = next
   ? {
       date: next.view.title.join(' ').replace(/,$/, ''),
       datetime: next.view.datetime,
-      meta: next.view.rows
-        .filter((row) => row.label === 'Zeit' || row.label === 'Ort')
-        .map((row) => row.value)
-        .join(' · '),
-      seats: next.view.rows.find((row) => row.label === 'Plätze')?.value ?? '',
+      meta: [next.view.facts.time, next.view.facts.place].filter(Boolean).join(' · '),
+      seats: next.view.facts.seats,
     }
   : null;
 ---

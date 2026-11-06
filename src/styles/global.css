@@ -222,7 +222,7 @@
 /* The opening of every page moves in CSS, so it starts with the first paint and
    never waits for a script (the title is the largest paint). The label comes
    first, the title's words rise in turn out of a soft blur (word `i` at
-   0.06 s + i × 0.055 s, `lib/words.ts`), the pieces after it follow at their
+   0.06 s + i × 0.055 s, `lib/shared/words.ts`), the pieces after it follow at their
    `--enter-delay`; the photo settles from a little larger and the ring follows;
    a seat bar in the opening fills after its line. Opacity and focus take a gentle
    fade (`--ease-fade`), the movement Motion's spring (`--ease-spring`). The blur is

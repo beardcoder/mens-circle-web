@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { and, asc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 
+import type { RegistrationRow } from '../shared/admin-types';
 import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import type { Event, Participant, Registration, RegistrationStatus } from './db/schema';
@@ -255,23 +256,6 @@ export const register = async (payload: RegistrationInput): Promise<FormResult> 
       : confirmationMessage(fields.firstName),
   );
 };
-
-export interface RegistrationRow {
-  id: string;
-  status: RegistrationStatus;
-  registeredAt: string | null;
-  cancelledAt: string | null;
-  confirmationSentAt: string | null;
-  reminderSentAt: string | null;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  /** Typed at sign-up but not stored on the participant (see `upsertParticipant`). */
-  submittedFirstName: string | null;
-  submittedLastName: string | null;
-  submittedPhone: string | null;
-}
 
 export const listRegistrationsForEvent = (eventId: string): Promise<RegistrationRow[]> =>
   db

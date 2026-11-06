@@ -1,7 +1,7 @@
+import { formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText } from '../shared/format';
 import { cancelUrlFor } from './cancel-token';
 import { config } from './config';
 import type { Event, Participant } from './db/schema';
-import { formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText } from './format';
 import { sendTransactional } from './listmonk';
 
 const icsUrlFor = (slug: string): string => `${config.APP_URL}/api/public/events/${slug}/ics`;

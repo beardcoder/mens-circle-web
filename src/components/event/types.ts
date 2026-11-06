@@ -1,4 +1,4 @@
-import type { DateStatus, SummaryView } from '@lib/event-status';
+import type { DateStatus, SummaryView } from '@lib/shared/event-status';
 
 /** Only fields already displayed publicly; never addresses or participant data. */
 export interface PublicEvent {

@@ -39,6 +39,26 @@ export default defineConfig([
     },
   },
 
+  // Layers: components and the shared helpers never reach into the server lib (it
+  // opens the database on import and must not land in a client bundle). Pages may.
+  {
+    files: ['src/components/**', 'src/lib/shared/**', 'src/layouts/**', 'src/scripts/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@lib/server/*', '**/lib/server/*', '**/server/*'],
+              message:
+                'Server code stays in src/lib/server; pass the data in as props or move pure code to src/lib/shared.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // CLI scripts and the server entry log to the console by design.
   {
     files: ['scripts/**', 'server.ts'],

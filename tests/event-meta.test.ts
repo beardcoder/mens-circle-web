@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test';
 
-import { buildEventMeta, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/event-meta';
-import { buildEventSchema } from '../src/lib/event-schema';
-import type { EventDTO } from '../src/lib/types';
+import type { EventDTO } from '../src/lib/shared/dto';
+import { buildEventMeta, eventPlace, eventWhenWhere, stripHtml } from '../src/lib/shared/event-meta';
+import { buildEventSchema } from '../src/lib/shared/event-schema';
 
 // Pure string and JSON-LD assertions: no database, no server, no fetch.
 
