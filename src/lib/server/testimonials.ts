@@ -117,3 +117,40 @@ export async function softDeleteTestimonial(id: string): Promise<void> {
     .set({ deleted: new Date().toISOString(), isPublished: false })
     .where(and(eq(testimonials.id, id), isNull(testimonials.deleted)));
 }
+
+/**
+ * Moves a voice one place up or down in the curated order (the order the site shows
+ * them in) and renumbers all of them 10, 20, 30, … in one transaction. Resolves to
+ * the new order, or null for an unknown id.
+ */
+export function moveTestimonial(id: string, direction: 'up' | 'down'): Array<{ id: string; sortOrder: number }> | null {
+  return db.transaction(
+    (tx) => {
+      const order = tx
+        .select({ id: testimonials.id })
+        .from(testimonials)
+        .where(isNull(testimonials.deleted))
+        .orderBy(asc(testimonials.sortOrder), desc(testimonials.createdAt))
+        .all()
+        .map((row) => row.id);
+
+      const at = order.indexOf(id);
+
+      if (at < 0) return null;
+
+      const to = direction === 'up' ? at - 1 : at + 1;
+
+      if (to >= 0 && to < order.length) [order[at], order[to]] = [order[to], order[at]];
+
+      return order.map((rowId, i) => {
+        tx.update(testimonials)
+          .set({ sortOrder: (i + 1) * 10 })
+          .where(eq(testimonials.id, rowId))
+          .run();
+
+        return { id: rowId, sortOrder: (i + 1) * 10 };
+      });
+    },
+    { behavior: 'immediate' },
+  );
+}

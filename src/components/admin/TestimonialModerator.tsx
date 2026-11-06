@@ -93,7 +93,7 @@ export default function TestimonialModerator({ initial }: { initial: Testimonial
         <EmptyState>{rows.length ? 'Keine Stimmen für diese Auswahl.' : 'Noch keine Einreichungen.'}</EmptyState>
       )}
       <ul class="grid gap-4" aria-label="Teilnehmerstimmen">
-        {visible.map((row) => (
+        {visible.map((row, index) => (
           <TestimonialCard
             key={row.id}
             row={row}
@@ -113,11 +113,19 @@ export default function TestimonialModerator({ initial }: { initial: Testimonial
                 setEditing(null);
               }
             }}
-            onOrder={(sortOrder) =>
+            first={index === 0}
+            last={index === visible.length - 1}
+            onMove={(direction) =>
               void task.run(
                 `order-${row.id}`,
-                () => actions.moderateTestimonial({ id: row.id, sortOrder }),
-                () => patch(row.id, { sortOrder }),
+                () => actions.moveTestimonial({ id: row.id, direction }),
+                ({ order }) =>
+                  setRows((current) =>
+                    current.map((r) => ({
+                      ...r,
+                      sortOrder: order.find((o) => o.id === r.id)?.sortOrder ?? r.sortOrder,
+                    })),
+                  ),
               )
             }
             onPublish={() => {
@@ -169,7 +177,9 @@ function TestimonialCard({
   onEdit,
   onCancel,
   onSave,
-  onOrder,
+  first,
+  last,
+  onMove,
   onPublish,
   onRemove,
 }: {
@@ -180,15 +190,15 @@ function TestimonialCard({
   onEdit: () => void;
   onCancel: () => void;
   onSave: (value: TestimonialEdit) => Promise<void>;
-  onOrder: (value: number) => void;
+  first: boolean;
+  last: boolean;
+  onMove: (direction: 'up' | 'down') => void;
   onPublish: () => void;
   onRemove: () => void;
 }) {
-  const [order, setOrder] = useState(String(row.sortOrder));
   const [dirty, setDirty] = useState(false);
 
   useUnsavedChanges(editing && dirty);
-  useEffect(() => setOrder(String(row.sortOrder)), [row.sortOrder]);
   useEffect(() => {
     if (!editing) setDirty(false);
   }, [editing]);
@@ -229,31 +239,7 @@ function TestimonialCard({
             )}
           </p>
           <div class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-            <form
-              class="flex items-center gap-2"
-              onSubmit={(event) => {
-                event.preventDefault();
-                onOrder(Number(order) || 0);
-              }}
-            >
-              <label for={`order-${row.id}`} class="text-sm text-fg-muted">
-                Reihenfolge
-              </label>
-              <input
-                id={`order-${row.id}`}
-                name="sortOrder"
-                type="number"
-                value={order}
-                onInput={(event) => setOrder(event.currentTarget.value)}
-                disabled={disabled}
-                class={`${control('xs')} max-w-24`}
-              />
-              {Number(order) !== row.sortOrder && (
-                <button type="submit" disabled={disabled} class={button({ variant: 'secondary', size: 'xs' })}>
-                  Übernehmen
-                </button>
-              )}
-            </form>
+            <OrderButtons disabled={disabled} first={first} last={last} onMove={onMove} />
             <div class="flex flex-wrap items-center gap-2">
               <button
                 type="button"
@@ -414,5 +400,43 @@ function ModerationDialog({
           : 'Zitat, Name und Rolle werden öffentlich sichtbar. Die E-Mail-Adresse bleibt intern.'}
       </p>
     </ConfirmDialog>
+  );
+}
+
+/** Up and down in the order the site shows the voices in. */
+function OrderButtons({
+  disabled,
+  first,
+  last,
+  onMove,
+}: {
+  disabled: boolean;
+  first: boolean;
+  last: boolean;
+  onMove: (direction: 'up' | 'down') => void;
+}) {
+  return (
+    <div class="flex items-center gap-1" role="group" aria-label="Reihenfolge auf der Website">
+      <button
+        type="button"
+        disabled={disabled || first}
+        onClick={() => onMove('up')}
+        class={iconButton}
+        aria-label="Nach oben"
+        title="Nach oben"
+      >
+        <span aria-hidden="true">↑</span>
+      </button>
+      <button
+        type="button"
+        disabled={disabled || last}
+        onClick={() => onMove('down')}
+        class={iconButton}
+        aria-label="Nach unten"
+        title="Nach unten"
+      >
+        <span aria-hidden="true">↓</span>
+      </button>
+    </div>
   );
 }

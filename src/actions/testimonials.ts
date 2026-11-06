@@ -3,6 +3,7 @@ import { z } from 'astro/zod';
 
 import { purgePublicCache } from '@lib/server/public-data';
 import {
+  moveTestimonial,
   setTestimonialPublished,
   setTestimonialSortOrder,
   softDeleteTestimonial,
@@ -28,6 +29,20 @@ export const testimonials = {
       await purgePublicCache(context);
 
       return { message: 'Gespeichert.' };
+    },
+  }),
+
+  moveTestimonial: defineAction({
+    input: z.object({ id: z.string(), direction: z.enum(['up', 'down']) }),
+    handler: async ({ id, direction }, context) => {
+      await requireAdmin(context);
+      const order = moveTestimonial(id, direction);
+
+      if (!order) throw new ActionError({ code: 'NOT_FOUND', message: 'Nicht gefunden.' });
+
+      await purgePublicCache(context);
+
+      return { order, message: 'Reihenfolge gespeichert.' };
     },
   }),
 
