@@ -36,7 +36,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.5",
-    "astro": "7.4.2",
+    "astro": "7.4.5",
     "astro-icon": "^1.2.0",
     "axe-core": "^4.14.0",
     "drizzle-kit": "^0.31.11",
