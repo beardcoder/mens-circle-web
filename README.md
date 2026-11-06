@@ -42,8 +42,10 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 | `BACKUP_S3_*`, `BACKUP_RETENTION_DAYS`                    | optional SQLite → S3 backup                                  |
 | `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                | optional analytics                                           |
 
-4. Scheduled task: `bun run scripts/schedule.ts` every minute (reminders every 15 min,
-   backup daily when configured).
+4. Scheduled task: `bun run scripts/schedule.ts` every minute (reminder pass every 15 min,
+   backup daily at 03:00 UTC when configured). Reminders reach participants at a fixed
+   Berlin time: from 18:00 the evening before (until 22:00), or, for later
+   registrations, from 10:00 on the day until the start. Never at night.
 
 ## Content
 

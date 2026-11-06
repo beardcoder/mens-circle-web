@@ -114,11 +114,14 @@ and Markus's avatar (`markus-avatar-192.webp`); regenerate them when the photo
 changes. Sharp is a build-time dev
 dependency. All events use `/images/og-default.png`.
 
-**Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; the two schedules
-are direct UTC checks (reminders every 15 min, the S3 backup at
-03:00 when `BACKUP_S3_*` is set). No in-process timer and no `Bun.cron` (throws at
+**Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; the
+reminder pass runs every 15 min, the S3 backup at 03:00 UTC when `BACKUP_S3_*` is set.
+Reminders go out in Berlin wall-clock time (`lib/server/reminder-window.ts`): 18:00–22:00
+the evening before ("morgen"), else from 10:00 on the day until the start ("heute"),
+once per registration (`reminder_sent_at`). Never compute local times with `getUTC*`;
+use `lib/shared/time.ts`. No in-process timer and no `Bun.cron` (throws at
 boot). Beside `dist/` and `drizzle/`, the Docker image keeps only the three scheduled
-scripts, `src/lib/server/`, the mail fonts (`src/assets/mail`) and the production
+scripts, `src/lib/server/`, `src/lib/shared/` (pure helpers), the mail fonts (`src/assets/mail`) and the production
 `dependencies` (the build bundles the rest): what those scripts and the server lib
 import at runtime must be in there (other `src/lib` files as types only).
 

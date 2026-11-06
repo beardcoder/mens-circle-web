@@ -30,9 +30,11 @@ COPY --from=production-deps /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/server.ts ./server.ts
 COPY --from=build /app/drizzle ./drizzle
-# Run by Coolify's scheduled task and by hand; they import src/lib/server directly.
+# Run by Coolify's scheduled task and by hand; they import src/lib/server (and the
+# pure helpers in src/lib/shared) directly.
 COPY --from=build /app/scripts/schedule.ts /app/scripts/backup-db.ts /app/scripts/send-reminders.ts ./scripts/
 COPY --from=build /app/src/lib/server ./src/lib/server
+COPY --from=build /app/src/lib/shared ./src/lib/shared
 COPY --from=build /app/src/assets/mail ./src/assets/mail
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

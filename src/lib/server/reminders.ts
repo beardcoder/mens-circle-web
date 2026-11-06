@@ -4,24 +4,11 @@ import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import { ACTIVE_REGISTRATION_STATUSES, events, participants, registrations } from './db/schema';
 import { sendEventReminder } from './email';
-import { toDate } from './format';
+import { candidateDays, reminderDue } from './reminder-window';
 
-type Window = ReturnType<typeof createWindow>;
 type PendingRow = Awaited<ReturnType<typeof queryPending>>[number];
 
-const createWindow = () => {
-  const now = new Date();
-  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const tomorrow = new Date(today.getTime() + 86_400_000);
-
-  return {
-    from: today.toISOString(),
-    to: new Date(tomorrow.getTime() + 86_400_000).toISOString(),
-    isToday: (d: Date) => d.getTime() < tomorrow.getTime(),
-    stamp: now.toISOString(),
-  } as const;
-};
-
+/** Unreminded seats of public events on the given days ("YYYY-MM-DD", `to` exclusive). */
 const queryPending = (from: string, to: string) =>
   db
     .select({
@@ -45,22 +32,23 @@ const queryPending = (from: string, to: string) =>
     )
     .orderBy(asc(registrations.registeredAt));
 
-const dispatch = async (row: PendingRow, { isToday, stamp }: Window) => {
-  const date = toDate(row.event.eventDate);
+const dispatch = async (row: PendingRow, now: Date) => {
+  const kind = reminderDue(row.event.eventDate, row.event.startTime, now);
 
-  if (!date) return;
+  if (!kind) return;
 
-  const accepted = await sendEventReminder(row.event, row.participant, isToday(date));
+  const accepted = await sendEventReminder(row.event, row.participant, kind === 'today');
 
   if (!accepted) return;
 
-  await db.update(registrations).set({ reminderSentAt: stamp }).where(eq(registrations.id, row.regId));
+  await db.update(registrations).set({ reminderSentAt: now.toISOString() }).where(eq(registrations.id, row.regId));
 };
 
-export async function runReminders(): Promise<void> {
-  const win = createWindow();
-  const rows = await queryPending(win.from, win.to);
-  const results = await settleWithConcurrency(rows, (row) => dispatch(row, win));
+/** One idempotent pass: every seat whose event is in a reminder window (reminder-window.ts) and has none yet. */
+export async function runReminders(now: Date = new Date()): Promise<void> {
+  const { from, to } = candidateDays(now);
+  const rows = await queryPending(from, to);
+  const results = await settleWithConcurrency(rows, (row) => dispatch(row, now));
 
   for (const [i, result] of results.entries()) {
     if (result.status === 'rejected') {

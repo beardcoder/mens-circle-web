@@ -70,16 +70,22 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
 const lm = await import('../src/lib/server/listmonk');
 const subscriber = { id: 42, email: 'person@example.invalid', name: 'Person', status: 'enabled', lists: [{ id: 9 }] };
 
+/** Seeded events take place on this day; reminders are due the evening before. */
+const EVENT_DAY = '2099-07-15';
+/** 18:00 in Berlin (summer time) the evening before EVENT_DAY. */
+const EVENING_BEFORE = new Date('2099-07-14T16:00:00Z');
+const minutesLater = (date: Date, minutes: number) => new Date(date.getTime() + minutes * 60_000);
+
 const seed = async (count = 10) => {
   const { db } = await import('../src/lib/server/db');
-  const today = new Date().toISOString().slice(0, 10);
 
   const [event] = await db
     .insert(events)
     .values({
       title: 'Test',
       slug: 'test',
-      eventDate: `${today}T12:00:00.000Z`,
+      eventDate: `${EVENT_DAY}T00:00:00.000Z`,
+      startTime: '19:00',
       isPublished: true,
       maxParticipants: 50,
       listmonkListId: 7,
@@ -295,7 +301,10 @@ const scenarios: Record<string, () => Promise<void>> = {
     handler = txHandler;
     const { runReminders } = await import('../src/lib/server/reminders');
 
-    await runReminders();
+    await runReminders(minutesLater(EVENING_BEFORE, -1));
+    assert.equal(calls.length, 0, 'nothing goes out at 17:59');
+
+    await runReminders(EVENING_BEFORE);
     const rows = await db.select().from(registrations);
 
     assert.equal(rows.filter((row) => row.reminderSentAt).length, 8);
@@ -306,8 +315,11 @@ const scenarios: Record<string, () => Promise<void>> = {
     assert.equal(calls.filter((call) => call.path === '/api/tx').length, 10);
     assert.equal(peak, 4);
     calls.length = 0;
-    await runReminders();
+    await runReminders(minutesLater(EVENING_BEFORE, 15));
     assert.equal(calls.filter((call) => call.path === '/api/tx').length, 2, 'only failed reminders remain pending');
+    const stamped = (await db.select().from(registrations)).filter((row) => row.reminderSentAt);
+
+    assert.equal(stamped.length, 8, 'a delivered reminder is never sent twice');
   },
   async 'reminder-disabled'() {
     const { db } = await seed(2);
@@ -318,10 +330,10 @@ const scenarios: Record<string, () => Promise<void>> = {
 
     config.TX_EVENT_REMINDER = 0;
     assert.equal(await sendEventReminder(event, participant, false), false);
-    await runReminders();
+    await runReminders(EVENING_BEFORE);
     config.TX_EVENT_REMINDER = 4;
     config.LISTMONK_API_TOKEN = '';
-    await runReminders();
+    await runReminders(EVENING_BEFORE);
     assert.equal(calls.length, 0);
     assert((await db.select().from(registrations)).every((row) => row.reminderSentAt === null));
   },
@@ -334,7 +346,7 @@ const scenarios: Record<string, () => Promise<void>> = {
     handler = (call) => (call.path === '/api/subscribers' ? json({ data: subscriber }) : json({}));
     const { runReminders } = await import('../src/lib/server/reminders');
 
-    await runReminders();
+    await runReminders(EVENING_BEFORE);
     assert.equal((await db.select().from(registrations)).filter((row) => row.reminderSentAt).length, 9);
     assert.equal(
       calls.filter((call) => call.path === '/api/tx').length,
