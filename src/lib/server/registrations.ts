@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
-import { and, asc, eq, isNull, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 
 import { settleWithConcurrency } from './concurrency';
 import { db } from './db';
 import type { Event, Participant, Registration, RegistrationStatus } from './db/schema';
-import { participants, registrations } from './db/schema';
+import { ACTIVE_REGISTRATION_STATUSES, events, participants, registrations } from './db/schema';
 import { sendEventMessage, sendRegistrationConfirmation, sendRegistrationEmails, sendWaitlistPromotion } from './email';
 import { countActiveRegistrations, ensureEventList, getEventById, holdsASeat, isEventPast } from './events';
 import { accepted, type FormResult, rejected } from './form-submission';
@@ -261,70 +261,169 @@ export const listRegistrationsForEvent = (eventId: string): Promise<Registration
 const participantById = async (id: string): Promise<Participant | undefined> =>
   (await db.select().from(participants).where(eq(participants.id, id)).limit(1))[0];
 
-const promoteNextWaitlisted = async (event: Event): Promise<void> => {
-  const next = (
-    await db
-      .select()
-      .from(registrations)
-      .where(
-        and(eq(registrations.eventId, event.id), eq(registrations.status, 'waitlist'), isNull(registrations.deleted)),
-      )
-      .orderBy(asc(registrations.registeredAt))
-      .limit(1)
-  )[0];
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-  if (!next) return;
+const seatsTaken = (tx: Tx, eventId: string): number =>
+  tx
+    .select({ c: sql<number>`count(*)` })
+    .from(registrations)
+    .where(and(eq(registrations.eventId, eventId), holdsASeat()))
+    .get()?.c ?? 0;
 
-  await db
-    .update(registrations)
-    .set({ status: 'registered', registeredAt: new Date().toISOString() })
-    .where(eq(registrations.id, next.id));
+const holdsSeatStatus = (status: RegistrationStatus): boolean =>
+  (ACTIVE_REGISTRATION_STATUSES as readonly RegistrationStatus[]).includes(status);
 
-  const participant = await participantById(next.participantId);
+/**
+ * Fills free seats from the waitlist, oldest first, in one write transaction with a
+ * recount (synchronous, like `claimSeat`), so parallel calls never promote twice.
+ * Past and deleted events promote nobody. `skip` keeps one registration out of the
+ * queue (someone the admin just moved to the waitlist).
+ */
+const promoteWaiting = (eventId: string, skip?: string): { event: Event; promoted: string[] } | null =>
+  db.transaction(
+    (tx) => {
+      const event = tx.select().from(events).where(eq(events.id, eventId)).get();
 
-  if (participant) {
-    fireAndForget('[registrations] promotion email failed', sendWaitlistPromotion(event, participant));
+      if (!event || event.deleted || isEventPast(event)) return null;
+
+      const free = event.maxParticipants - seatsTaken(tx, eventId);
+
+      if (free <= 0) return null;
+
+      const waiting = tx
+        .select({ id: registrations.id, participantId: registrations.participantId })
+        .from(registrations)
+        .where(
+          and(
+            eq(registrations.eventId, eventId),
+            eq(registrations.status, 'waitlist'),
+            isNull(registrations.deleted),
+            skip ? ne(registrations.id, skip) : undefined,
+          ),
+        )
+        .orderBy(asc(registrations.registeredAt))
+        .limit(free)
+        .all();
+
+      if (!waiting.length) return null;
+
+      tx.update(registrations)
+        .set({ status: 'registered', registeredAt: new Date().toISOString() })
+        .where(
+          inArray(
+            registrations.id,
+            waiting.map((row) => row.id),
+          ),
+        )
+        .run();
+
+      return { event, promoted: waiting.map((row) => row.participantId) };
+    },
+    { behavior: 'immediate' },
+  );
+
+/**
+ * Settles an event's seats after any change to its registrations or capacity:
+ * promotes as many waiters as seats are free and mails them outside the transaction.
+ * Resolves to the number of promoted registrations.
+ */
+export const reconcileSeats = async (eventId: string, opts: { skip?: string } = {}): Promise<number> => {
+  const result = promoteWaiting(eventId, opts.skip);
+
+  if (!result) return 0;
+
+  const promoted = await db.select().from(participants).where(inArray(participants.id, result.promoted));
+
+  for (const participant of promoted) {
+    fireAndForget('[registrations] promotion email failed', sendWaitlistPromotion(result.event, participant));
   }
+
+  return result.promoted.length;
 };
+
+export type StatusChange = { ok: true; registration: Registration } | { ok: false; reason: 'not-found' | 'full' };
+
+/**
+ * Sets a registration's status. A change that takes a seat is refused when the event
+ * is full, unless `overbook` says the admin means it. Moving someone to the waitlist
+ * puts them at its end. Afterwards the seats are reconciled.
+ */
+const isFull = (tx: Tx, eventId: string): boolean => {
+  const event = tx.select().from(events).where(eq(events.id, eventId)).get();
+
+  return !!event && seatsTaken(tx, eventId) >= event.maxParticipants;
+};
+
+const statusPatch = (reg: Registration, next: RegistrationStatus): Partial<Registration> => {
+  const now = new Date().toISOString();
+
+  return {
+    status: next,
+    cancelledAt: next === 'cancelled' ? (reg.status === 'cancelled' ? reg.cancelledAt : now) : null,
+    // The waitlist is a queue: whoever is moved onto it joins at the end.
+    ...(next === 'waitlist' && reg.status !== 'waitlist' && { registeredAt: now }),
+  };
+};
+
+const applyStatus = (regId: string, next: RegistrationStatus, overbook: boolean) =>
+  db.transaction(
+    (tx): StatusChange & { previous?: Registration } => {
+      const reg = tx.select().from(registrations).where(eq(registrations.id, regId)).get();
+
+      if (!reg || reg.deleted) return { ok: false, reason: 'not-found' };
+
+      const takesSeat = !holdsSeatStatus(reg.status) && holdsSeatStatus(next);
+
+      if (takesSeat && !overbook && isFull(tx, reg.eventId)) return { ok: false, reason: 'full' };
+
+      const registration = tx
+        .update(registrations)
+        .set(statusPatch(reg, next))
+        .where(eq(registrations.id, regId))
+        .returning()
+        .get();
+
+      return { ok: true, registration, previous: reg };
+    },
+    { behavior: 'immediate' },
+  );
 
 export const changeRegistrationStatus = async (
   regId: string,
   newStatus: RegistrationStatus,
-): Promise<Registration | null> => {
-  const reg = (await db.select().from(registrations).where(eq(registrations.id, regId)).limit(1))[0];
+  opts: { overbook?: boolean } = {},
+): Promise<StatusChange> => {
+  const { previous, ...change } = applyStatus(regId, newStatus, opts.overbook ?? false);
 
-  if (!reg) return null;
+  if (!change.ok || !previous) return change;
 
-  const oldStatus = reg.status;
+  if (previous.status !== 'cancelled' && newStatus === 'cancelled') {
+    const event = await getEventById(previous.eventId);
+    const participant = await participantById(previous.participantId);
 
-  const patch: Partial<Registration> = { status: newStatus };
-
-  if (newStatus === 'cancelled') patch.cancelledAt = new Date().toISOString();
-
-  const updated = (await db.update(registrations).set(patch).where(eq(registrations.id, regId)).returning())[0];
-
-  if (oldStatus !== 'cancelled' && newStatus === 'cancelled') {
-    const event = await getEventById(reg.eventId);
-
-    if (event) {
-      if (event.listmonkListId > 0) {
-        const participant = await participantById(reg.participantId);
-
-        if (participant) void removeFromList(participant.email, event.listmonkListId).catch(() => {});
-      }
-
-      // Only a seat-holding status frees a seat; a cancelled waitlist entry promotes no one.
-      if (oldStatus === 'registered' || oldStatus === 'attended') {
-        await promoteNextWaitlisted(event);
-      }
+    if (event && event.listmonkListId > 0 && participant) {
+      void removeFromList(participant.email, event.listmonkListId).catch(() => {});
     }
   }
 
-  return updated;
+  await reconcileSeats(previous.eventId, { skip: newStatus === 'waitlist' ? regId : undefined });
+
+  return change;
 };
 
-export const softDeleteRegistration = async (regId: string): Promise<void> => {
-  await db.update(registrations).set({ deleted: new Date().toISOString() }).where(eq(registrations.id, regId));
+/** Removes a registration and gives its seat to the waitlist. */
+export const softDeleteRegistration = async (regId: string): Promise<boolean> => {
+  const [removed] = await db
+    .update(registrations)
+    .set({ deleted: new Date().toISOString() })
+    .where(and(eq(registrations.id, regId), isNull(registrations.deleted)))
+    .returning({ eventId: registrations.eventId });
+
+  if (!removed) return false;
+
+  await reconcileSeats(removed.eventId);
+
+  return true;
 };
 
 export const broadcastEventMessage = async (

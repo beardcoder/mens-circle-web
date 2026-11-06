@@ -37,7 +37,11 @@ Missing/expired sessions return `UNAUTHORIZED` without private data. Unknown eve
 return `NOT_FOUND`. Responses use the existing `/_actions/*` private/no-store policy.
 Save-event responses now also include the persisted slug: `{ id, slug, message }`.
 The other existing delete, status, moderation and mail actions retain their contracts.
-Server-side transactional seat allocation and promotion remain authoritative.
+Server-side transactional seat allocation and promotion remain authoritative:
+`setRegistrationStatus` answers `CONFLICT` when a change would take a seat of a full
+event; the workspace then offers to overbook (`overbook: true`) behind a confirmation.
+Deleting a registration, cancelling or demoting a seat and raising the capacity
+promote waiters through `reconcileSeats`.
 
 After registration changes, confirmations or deletion, the workspace rereads the
 protected registration data so seat counts, promotions and confirmation timestamps

@@ -4,6 +4,7 @@ import { z } from 'astro/zod';
 import { eventInputSchema } from '@lib/event-input';
 import { createEvent, sendEventNewsletter, setEventPublished, softDeleteEvent, updateEvent } from '@lib/server/events';
 import { purgePublicCache } from '@lib/server/public-data';
+import { reconcileSeats } from '@lib/server/registrations';
 
 import { requireAdmin } from './auth';
 
@@ -19,6 +20,8 @@ export const events = {
 
         if (!event) throw new ActionError({ code: 'NOT_FOUND', message: 'Veranstaltung nicht gefunden.' });
 
+        // A larger capacity lets the waitlist move up.
+        await reconcileSeats(event.id);
         await purgePublicCache(context);
 
         return { id: event.id, slug: event.slug, message: 'Veranstaltung gespeichert.' };

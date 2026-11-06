@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { eq, sql } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 
 import { config } from '../src/lib/server/config';
 import { events, participants, registrations } from '../src/lib/server/db/schema';
@@ -429,67 +429,109 @@ const scenarios: Record<string, () => Promise<void>> = {
     assert.equal(calls.length, 6, 'registration identity must not become a global ID cache');
   },
   async 'waitlist-promotion'() {
-    const { db, event } = await seed(5);
+    const { db, event } = await seed(6);
 
-    // r0-r3 hold seats; r4 waits.
-    await db.update(registrations).set({ status: 'waitlist' }).where(eq(registrations.id, 'r4'));
+    // Four seats: r0-r3 hold them; r4 and r5 wait.
+    await db.update(events).set({ maxParticipants: 4 }).where(eq(events.id, event.id));
+    await db
+      .update(registrations)
+      .set({ status: 'waitlist' })
+      .where(inArray(registrations.id, ['r4', 'r5']));
 
     const { changeRegistrationStatus } = await import('../src/lib/server/registrations');
 
-    // Cancelling a SEAT (r0, 'registered') frees one — the sole waitlisted entry must be promoted and mailed.
-    const promoted = deferred();
+    const promotionMails = () =>
+      calls.filter((call) => call.path === '/api/tx' && call.body.template_id === config.TX_WAITLIST_PROMOTION).length;
 
-    handler = (call) => {
-      if (call.path === '/api/tx') promoted.resolve();
-
-      return txHandler(call);
-    };
-    await changeRegistrationStatus('r0', 'cancelled');
-    await promoted.promise;
+    // Cancelling a seat frees one: the first waiter moves up and is mailed once.
+    handler = txHandler;
+    assert.equal((await changeRegistrationStatus('r0', 'cancelled')).ok, true);
+    await waitForIdle();
     let rows = await db.select().from(registrations);
 
-    assert.equal(rows.find((row) => row.id === 'r4')?.status, 'registered', 'the waitlisted entry is promoted');
-    assert.equal(
-      calls.filter((call) => call.path === '/api/tx' && call.body.template_id === config.TX_WAITLIST_PROMOTION).length,
-      1,
-      'the promoted participant is mailed exactly once',
-    );
+    assert.equal(rows.find((row) => row.id === 'r4')?.status, 'registered', 'the first waiter is promoted');
+    assert.equal(rows.find((row) => row.id === 'r5')?.status, 'waitlist');
+    assert.equal(promotionMails(), 1, 'the promoted participant is mailed exactly once');
 
-    // A cancelled waitlist entry never held a seat, so nobody may be promoted.
+    // Cancelling a waiter frees no seat: nobody moves.
     calls.length = 0;
+    await changeRegistrationStatus('r5', 'cancelled');
+    await waitForIdle();
+    rows = await db.select().from(registrations);
+    assert.equal(rows.find((row) => row.id === 'r5')?.status, 'cancelled');
+    assert.equal(promotionMails(), 0);
+  },
+  async 'reconcile-seats'() {
+    const { db, event } = await seed(8);
+
+    const { changeRegistrationStatus, reconcileSeats, softDeleteRegistration } =
+      await import('../src/lib/server/registrations');
+
+    const statusOf = async (id: string) =>
+      (await db.select().from(registrations).where(eq(registrations.id, id)))[0]?.status;
+
     handler = txHandler;
-    const waiters = await db
-      .insert(participants)
-      .values([
-        { email: 'late@example.invalid', firstName: 'Late' },
-        { email: 'still-waiting@example.invalid', firstName: 'Waiting' },
-      ])
+    // Three seats, all taken (r0-r2); r3-r7 wait, oldest first.
+    await db.update(events).set({ maxParticipants: 3 }).where(eq(events.id, event.id));
+    await db
+      .update(registrations)
+      .set({ status: 'waitlist' })
+      .where(inArray(registrations.id, ['r3', 'r4', 'r5', 'r6', 'r7']));
+
+    // A removed registration gives its seat to the waitlist.
+    assert.equal(await softDeleteRegistration('r0'), true);
+    assert.equal(await statusOf('r3'), 'registered', 'deleting promotes');
+    assert.equal(await statusOf('r4'), 'waitlist');
+
+    // Two more seats promote two waiters.
+    await db.update(events).set({ maxParticipants: 5 }).where(eq(events.id, event.id));
+    assert.equal(await reconcileSeats(event.id), 2, 'capacity +2 promotes two');
+    assert.equal(await statusOf('r4'), 'registered');
+    assert.equal(await statusOf('r5'), 'registered');
+    assert.equal(await statusOf('r6'), 'waitlist');
+
+    // Parallel calls never hand out a seat twice.
+    await db.update(events).set({ maxParticipants: 6 }).where(eq(events.id, event.id));
+    const promoted = await Promise.all(Array.from({ length: 6 }, () => reconcileSeats(event.id)));
+
+    assert.equal(
+      promoted.reduce((a, b) => a + b, 0),
+      1,
+      'one free seat, one promotion',
+    );
+    assert.equal(await statusOf('r7'), 'waitlist');
+
+    // Taking a seat by hand is refused when full, unless the admin overbooks.
+    assert.deepEqual(await changeRegistrationStatus('r7', 'registered'), { ok: false, reason: 'full' });
+    assert.equal(await statusOf('r7'), 'waitlist');
+    assert.equal((await changeRegistrationStatus('r7', 'registered', { overbook: true })).ok, true);
+    assert.equal(await statusOf('r7'), 'registered');
+
+    // Moving someone to the waitlist frees a seat for the next waiter, not for them.
+    await changeRegistrationStatus('r7', 'waitlist');
+    await changeRegistrationStatus('r1', 'waitlist');
+    assert.equal(await statusOf('r1'), 'waitlist', 'the demoted person goes to the end of the queue');
+    assert.equal(await statusOf('r7'), 'registered', 'the waiter before them takes the seat');
+
+    // A past event promotes nobody.
+    const [past] = await db
+      .insert(events)
+      .values({ title: 'Vorbei', slug: 'vorbei', eventDate: '2020-01-01T00:00:00.000Z', maxParticipants: 5 })
       .returning();
 
-    await db.insert(registrations).values([
-      { id: 'r-late', eventId: event.id, participantId: waiters[0].id, status: 'waitlist', registeredAt: '998' },
-      {
-        id: 'r-still-waiting',
-        eventId: event.id,
-        participantId: waiters[1].id,
-        status: 'waitlist',
-        registeredAt: '999',
-      },
-    ]);
-    await changeRegistrationStatus('r-late', 'cancelled');
-    // Nothing async to await: with the fix, this path never calls promoteNextWaitlisted, so no fetch is even scheduled.
-    await pause();
-    rows = await db.select().from(registrations);
-    assert.equal(rows.find((row) => row.id === 'r-late')?.status, 'cancelled');
-    assert.equal(
-      rows.find((row) => row.id === 'r-still-waiting')?.status,
-      'waitlist',
-      'the other waiter is untouched, not promoted',
-    );
+    const [late] = await db.insert(participants).values({ email: 'late@example.invalid' }).returning();
+
+    await db
+      .insert(registrations)
+      .values({ id: 'r-past', eventId: past.id, participantId: late.id, status: 'waitlist', registeredAt: '1' });
+    assert.equal(await reconcileSeats(past.id), 0);
+    assert.equal(await statusOf('r-past'), 'waitlist');
+
+    await waitForIdle();
     assert.equal(
       calls.filter((call) => call.path === '/api/tx' && call.body.template_id === config.TX_WAITLIST_PROMOTION).length,
-      0,
-      'cancelling a waitlist entry must never promote anyone — it held no seat',
+      5,
+      'each promotion is mailed once',
     );
   },
   async 'registration-race'() {

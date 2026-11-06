@@ -90,13 +90,28 @@ export default function RegistrationManager({ initial }: { initial: Registration
   }
 
   function changeStatus(row: RegistrationRow, next: RegistrationStatus) {
+    const name = `${row.firstName} ${row.lastName}`;
+    const takesSeat = !holdsSeat(row.status) && holdsSeat(next);
+
+    if (takesSeat && occupied >= data.maxParticipants) {
+      prepare({
+        title: 'Termin überbuchen?',
+        actionLabel: 'Trotzdem Platz vergeben',
+        danger: true,
+        description: `Alle ${data.maxParticipants} Plätze sind belegt. ${name} bekommt trotzdem einen Platz, der Termin ist dann überbucht.`,
+        request: () => actions.setRegistrationStatus({ id: row.id, status: next, overbook: true }),
+      });
+
+      return;
+    }
+
     const request = () => actions.setRegistrationStatus({ id: row.id, status: next });
 
     if (next === 'cancelled' || next === 'registered') {
       prepare({
         title: `Status auf „${statusLabel[next]}“ setzen?`,
         actionLabel: 'Status ändern',
-        description: `${row.firstName} ${row.lastName}: ${next === 'cancelled' ? 'Bei einer Stornierung eines belegten Platzes kann jemand aus der Warteliste automatisch nachrücken.' : 'Diese manuelle Änderung belegt einen Platz. Bitte prüfe die verfügbare Kapazität.'}`,
+        description: `${name}: ${next === 'cancelled' ? 'Wird ein belegter Platz frei, rückt die nächste Person von der Warteliste nach und bekommt eine E-Mail.' : 'Diese Änderung belegt einen freien Platz.'}`,
         request,
       });
 
@@ -250,7 +265,7 @@ export default function RegistrationManager({ initial }: { initial: Registration
                     onRemove={() =>
                       prepare({
                         title: 'Anmeldung entfernen?',
-                        description: `Die Anmeldung von ${row.firstName} ${row.lastName} wird entfernt.`,
+                        description: `Die Anmeldung von ${row.firstName} ${row.lastName} wird entfernt. Ein frei werdender Platz geht an die Warteliste.`,
                         actionLabel: 'Anmeldung entfernen',
                         danger: true,
                         request: () => actions.deleteRegistration({ id: row.id }),

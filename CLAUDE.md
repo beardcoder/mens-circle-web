@@ -72,7 +72,10 @@ proxy's forwarded headers. Never fix a 403 with `checkOrigin: false`.
 
 **Data.** A read-then-write under concurrency goes in a synchronous
 `db.transaction(fn, { behavior: 'immediate' })` with no `await` inside (see
-`claimSeat()`). Capacity is computed from `holdsASeat()` only. More than one web
+`claimSeat()`). Capacity is computed from `holdsASeat()` only. Every change to
+registrations or `max_participants` ends in `reconcileSeats(eventId)`, which promotes
+waiters into free seats (never for past events) and mails them after the commit;
+taking a seat by hand over capacity needs `overbook`. More than one web
 replica on the same SQLite file is not supported.
 
 **Rendering.** Home, `/event` and the event pages are SSR with no content hydration:

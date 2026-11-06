@@ -56,12 +56,21 @@ export const registrations = {
     input: z.object({
       id: z.string(),
       status: z.enum(REGISTRATION_STATUSES),
+      /** The admin confirmed taking a seat beyond the capacity. */
+      overbook: z.boolean().optional(),
     }),
-    handler: async ({ id, status }, context) => {
+    handler: async ({ id, status, overbook }, context) => {
       await requireAdmin(context);
-      const updated = await changeRegistrationStatus(id, status);
+      const change = await changeRegistrationStatus(id, status, { overbook });
 
-      if (!updated) throw new ActionError({ code: 'NOT_FOUND', message: 'Anmeldung nicht gefunden.' });
+      if (!change.ok && change.reason === 'full') {
+        throw new ActionError({
+          code: 'CONFLICT',
+          message: 'Der Termin ist voll. Bestätige die Überbuchung, wenn du trotzdem einen Platz vergeben willst.',
+        });
+      }
+
+      if (!change.ok) throw new ActionError({ code: 'NOT_FOUND', message: 'Anmeldung nicht gefunden.' });
 
       await purgePublicCache(context);
 
@@ -73,7 +82,11 @@ export const registrations = {
     input: z.object({ id: z.string() }),
     handler: async ({ id }, context) => {
       await requireAdmin(context);
-      await softDeleteRegistration(id);
+
+      if (!(await softDeleteRegistration(id))) {
+        throw new ActionError({ code: 'NOT_FOUND', message: 'Anmeldung nicht gefunden.' });
+      }
+
       await purgePublicCache(context);
 
       return { message: 'Anmeldung entfernt.' };

@@ -19,6 +19,7 @@ const cases = [
   'broadcast',
   'registration-async',
   'waitlist-promotion',
+  'reconcile-seats',
   'registration-race',
   'template-contract',
 ];
