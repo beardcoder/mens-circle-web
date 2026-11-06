@@ -1,10 +1,11 @@
 import { type ActionAPIContext, ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
+import { config } from '@lib/server/config';
 import { accepted, type FormResult, rejected } from '@lib/server/form-submission';
 import { subscribeToNewsletter } from '@lib/server/listmonk';
 import { purgePublicCache } from '@lib/server/public-data';
-import { clientIp, rateLimit } from '@lib/server/ratelimit';
+import { clientIp, peerAddress, rateLimit } from '@lib/server/ratelimit';
 import { confirmationMessage, register } from '@lib/server/registrations';
 import { submitTestimonial, SUCCESS_MESSAGE as TESTIMONIAL_SUCCESS } from '@lib/server/testimonials';
 
@@ -24,7 +25,7 @@ const publicForm =
   async (input: T & { website?: string | null }, context: ActionAPIContext): Promise<{ message: string }> => {
     if (input.website?.trim()) return { message: fakeSuccess(input) };
 
-    if (!rateLimit(key, clientIp(context.request), maxPerHour, 3600)) {
+    if (!rateLimit(key, clientIp(context.request, peerAddress(context), config.TRUSTED_PROXY), maxPerHour, 3600)) {
       throw new ActionError({
         code: 'TOO_MANY_REQUESTS',
         message: 'Zu viele Anfragen. Bitte versuche es später erneut.',

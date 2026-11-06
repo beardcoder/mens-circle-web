@@ -53,7 +53,9 @@ The Preact registration form handles its own busy/error/success state and calls 
 same `actions.register`; errors preserve inputs. Forms
 need JS and keep feedback at the form rather than a toast. They
 go through `publicForm()` in `actions/forms.ts`: an in-process per-IP rate limit
-(`lib/server/ratelimit.ts`, one more reason for a single replica), a honeypot field
+(`lib/server/ratelimit.ts`, one more reason for a single replica; the IP comes from
+`CF-Connecting-IP` with `TRUSTED_PROXY=cloudflare`, else the peer address, never from
+`X-Forwarded-For`), a honeypot field
 (`website`) answered with a fake success, German messages, and no internal error
 ever shown. Admin pages mount Preact workspaces with local state and native navigation.
 `components/admin/useAdminTask.ts` handles busy state and inline feedback. All private

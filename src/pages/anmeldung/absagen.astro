@@ -1,9 +1,10 @@
 ---
 import site from '@data/site.json';
 import { readCancelToken } from '@lib/server/cancel-token';
+import { config } from '@lib/server/config';
 import { formatDateLongDE } from '@lib/server/format';
 import { purgePublicCache } from '@lib/server/public-data';
-import { clientIp, rateLimit } from '@lib/server/ratelimit';
+import { clientIp, peerAddress, rateLimit } from '@lib/server/ratelimit';
 import { cancelOwnRegistration, readRegistrationForCancel } from '@lib/server/registrations';
 import { link } from '@lib/ui';
 
@@ -37,7 +38,7 @@ let state: State = found ? 'confirm' : 'invalid';
 if (found && found.status !== 'registered' && found.status !== 'waitlist') state = 'already';
 
 if (isPost && state === 'confirm' && registrationId) {
-  if (!rateLimit('cancel', clientIp(Astro.request), 10, 3600)) {
+  if (!rateLimit('cancel', clientIp(Astro.request, peerAddress(Astro), config.TRUSTED_PROXY), 10, 3600)) {
     state = 'limited';
   } else {
     const result = await cancelOwnRegistration(registrationId);

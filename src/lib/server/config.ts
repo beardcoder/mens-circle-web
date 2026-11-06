@@ -1,3 +1,5 @@
+import { parseTrustedProxy } from './ratelimit';
+
 const env = (key: string, fallback = ''): string => {
   const v = process.env[key];
 
@@ -39,6 +41,8 @@ export const config = {
   MAIL_ADMIN_NAME: env('MAIL_ADMIN_NAME', 'Männerkreis Admin'),
   CONTACT_EMAIL: env('MAIL_CONTACT_ADDRESS', 'hallo@mens-circle.de'),
   DATABASE_PATH: env('DATABASE_PATH', './data/mens-circle.db'),
+  /** `cloudflare` or `none` (default): whose header names the visitor's IP (ratelimit.ts). */
+  TRUSTED_PROXY: parseTrustedProxy(env('TRUSTED_PROXY', 'none')),
   // Who may enter /admin: comma-separated emails and/or one Pocket ID group.
   ADMIN_EMAILS: env('ADMIN_EMAIL', '')
     .split(',')

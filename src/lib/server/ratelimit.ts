@@ -35,10 +35,32 @@ export const rateLimit = (key: string, ip: string, maxRequests: number, windowSe
   return true;
 };
 
-export const clientIp = (request: Request): string => {
-  const xff = request.headers.get('x-forwarded-for');
+/**
+ * Who sits in front of the app and may name the visitor's address. `cloudflare`:
+ * trust `CF-Connecting-IP`, which Cloudflare sets and overwrites (only true while the
+ * origin is reachable through Cloudflare alone). `none`: the socket's peer address.
+ * `X-Forwarded-For` is never read: its first entry is whatever the client sent.
+ */
+export type TrustedProxy = 'cloudflare' | 'none';
 
-  if (xff) return xff.split(',')[0].trim();
+export const parseTrustedProxy = (value: string): TrustedProxy => (value === 'cloudflare' ? 'cloudflare' : 'none');
 
-  return request.headers.get('x-real-ip') || 'unknown';
+/** The address a rate-limit bucket is keyed by. */
+export const clientIp = (request: Request, clientAddress: string | undefined, trust: TrustedProxy): string => {
+  if (trust === 'cloudflare') {
+    const cf = request.headers.get('cf-connecting-ip')?.trim();
+
+    if (cf) return cf;
+  }
+
+  return clientAddress || 'unknown';
+};
+
+/** Astro's `clientAddress` throws when the adapter cannot tell; that is not an error here. */
+export const peerAddress = (context: { clientAddress: string }): string | undefined => {
+  try {
+    return context.clientAddress;
+  } catch {
+    return undefined;
+  }
 };

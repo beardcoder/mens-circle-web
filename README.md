@@ -31,6 +31,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 | Variable                                                  | Purpose                                                      |
 | --------------------------------------------------------- | ------------------------------------------------------------ |
 | `APP_URL`                                                 | public URL for mail links, .ics, OIDC callback               |
+| `TRUSTED_PROXY`                                           | `cloudflare` or `none`: source of the rate-limit IP          |
 | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`     | Pocket ID client, callback `${APP_URL}/auth/callback`        |
 | `OIDC_ADMIN_GROUP`, `ADMIN_EMAIL`                         | who may enter `/admin` (group and/or comma-separated emails) |
 | `ADMIN_SESSION_SECRET`                                    | ≥ 32 random characters                                       |
