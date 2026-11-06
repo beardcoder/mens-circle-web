@@ -191,9 +191,9 @@ waits for a script.
   ring of the logo follows (`ring`). The springs are Motion's, sampled into
   `linear()` (`--ease-spring`, `--ease-spring-slow` in theme.css). The home opening
   and every sub-page opening (`PageIntro`) work this way. On an event page the date
-  line and the title rise in first, then the lead and the registration panel; the
-  dock's flight layer enters on the same beat, so the copies that fly the title
-  show the same moment of it. The opening plays when the site is opened; a page
+  line and the title rise in first, then the lead and the registration panel. Once the
+  title has scrolled under the bar, a dock with title and date fades and slides in
+  below the bar (`EventDock`, one observer, opacity and translation). The opening plays when the site is opened; a page
   reached from another page of the site arrives composed (see "Page transitions").
 - Below it, CSS scroll-driven animations (global.css, "Motion: scroll"): each piece
   arrives as it comes into view, once, driven by the scroll itself
@@ -212,8 +212,7 @@ waits for a script.
   its contact line, every date summary piece by piece, the newsletter, the event's
   story, note and map, the legal pages paragraph by paragraph. The footer is the
   frame and stands.
-- No parallax: things arrive once and then stand. The event title flying into its
-  dock is the other scroll-linked piece.
+- No parallax: things arrive once and then stand.
 - FAQ (`AccordionItem`) as a FLIP: the layout changes once, at the press; then what
   follows the item (its siblings, the sections below, the footer) slides from where
   it stood while a clip uncovers the answer on the same spring, so their edges meet,
@@ -262,8 +261,7 @@ Chrome updates a transition on it every frame:
 - Nothing restyles the whole page on its own: the bar over the opening is an
   attribute (`data-over-hero`), not `body:has()` (that reacts to every node the
   parser or an island adds); scripts write an attribute on `<html>` only when it
-  changes (`ModeToggle`); the event dock measures the page only once the
-  transition has finished (`document.activeViewTransition`).
+  changes (`ModeToggle`); the event dock reads no layout at all.
 
 Measured with Chrome at a 6× slower CPU, the work on the main thread while the page
 moves fell from about 170 ms of style to about 30 ms (home → `/event`) and from
@@ -297,8 +295,7 @@ pressed, arrows slide and nudge on a press, the FAQ disc gives a little under th
 finger, header links draw a line). The hero's ring turns once every 90 seconds; the breath circle
 follows resonance breathing (5.5 s in, 5.5 s out) only when started, and stops off
 screen, in a hidden tab or under reduced motion. The phone menu opens as a circle
-and its links rise in (`rise`); the event title flies into its dock on a scroll
-timeline. On phones the home page keeps the next date and its action in a bottom bar
+and its links rise in (`rise`); the event dock fades in once the title is gone. On phones the home page keeps the next date and its action in a bottom bar
 (`ActionBar`) once the opening's action has scrolled away; it steps back at the
 dates and the footer. Under reduced motion everything rests.
 
@@ -346,8 +343,8 @@ large and faint behind it.
   (`#newsletter`, the form and the WhatsApp note beside it, parted by a line).
 - **`/event`.** `PageIntro`, then every upcoming date as the same `EventSummary`
   beside the e-mail notification, parted by a line; the FAQ; a where-next band.
-- **Event page.** The date line and the title — "Männer**kreis**", its second half in
-  the accent — which fly into the dock as the page scrolls; the place, the calendar
+- **Event page.** The date line and the title — its last word in the accent — which
+  the dock repeats once they have scrolled away; the place, the calendar
   between lines and the registration on the forest (a band below `lg`), headed by
   the same seat bar; the evening's description (sand) with its question and a
   note under a line; the map; where next. A past date offers no registration.

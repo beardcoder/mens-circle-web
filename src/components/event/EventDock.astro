@@ -7,7 +7,7 @@ import Container from '../ui/Container.astro';
 
 interface Props {
   event: EventDTO;
-  /** The intro's date line and hours, word for word: they mark where the intro's pieces land. */
+  /** The intro's date line and hours, word for word. */
   dateLabel: string;
   hours: string;
 }
@@ -21,7 +21,7 @@ const title = accentLastWord(event.title);
   data-event-dock
   hidden
   aria-hidden="true"
-  class="pointer-events-none fixed inset-x-0 top-header z-30 overflow-clip text-fg print:hidden"
+  class="pointer-events-none fixed inset-x-0 top-header z-30 -translate-y-2 overflow-clip text-fg opacity-0 transition-[opacity,translate] duration-300 ease-out print:hidden data-visible:translate-y-0 data-visible:opacity-100 motion-reduce:transition-none"
 >
   <div data-event-dock-ground class="absolute inset-0 border-b border-line bg-ground/88 backdrop-blur-xl"></div>
   <Container class="relative flex min-h-14 items-center justify-between gap-4 py-2">
@@ -43,215 +43,21 @@ const title = accentLastWord(event.title);
     </p>
   </Container>
 </div>
-{/* The intro's pieces in flight: fixed copies, so once they land they stand still while the page scrolls.
-     The layer enters with the date line and the title (`data-enter`, the same beat), so a copy laid over its
-     piece during the opening shows the same moment of it. */}
-<div data-event-flight data-enter aria-hidden="true" class="pointer-events-none fixed inset-0 z-31 print:hidden"></div>
-
 <script>
   /**
-   * The intro's date, hours and title morph into the dock as the page scrolls, one
-   * after the other, on one scroll timeline (the browser runs it, no scroll
-   * handler). What flies is a fixed copy of each piece, laid exactly over it: it
-   * moves and shrinks onto its place in the dock and then stands still, as only a
-   * fixed element can while the page scrolls under it; the piece itself stays in
-   * the page, invisible, for screen readers and print. The dock's own copies are
-   * the fallback: without scroll timelines, with reduced motion or for a title
-   * that wraps, they simply appear once the title has left.
+   * The dock appears once the title has passed under the bar and leaves when it
+   * comes back: one observer on the title, an attribute on the dock, and CSS fades
+   * and slides it (opacity and translation only). No layout reads, no copies.
    */
   const dock = document.querySelector<HTMLElement>('[data-event-dock]');
   const title = document.querySelector<HTMLElement>('[data-event-title]');
 
-  interface Box {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-  }
-
-  /** Layout position at scroll 0, unaffected by transforms (the fixed dock is its own origin). */
-  function pageBox(element: HTMLElement): Box {
-    let top = 0;
-    let left = 0;
-
-    for (let node: HTMLElement | null = element; node; node = node.offsetParent as HTMLElement | null) {
-      top += node.offsetTop;
-      left += node.offsetLeft;
-    }
-
-    return { top, left, width: element.offsetWidth, height: element.offsetHeight };
-  }
-
-  const fontSize = (element: HTMLElement) => parseFloat(getComputedStyle(element).fontSize);
-
   if (dock && title) {
-    const ground = dock.querySelector<HTMLElement>('[data-event-dock-ground]')!;
-    const dockTitle = dock.querySelector<HTMLElement>('[data-event-dock-title]')!;
-    const flightLayer = document.querySelector<HTMLElement>('[data-event-flight]')!;
-
-    const pieces: [HTMLElement | null, HTMLElement | null, number, number][] = [
-      // [intro element, its place in the dock, start, end] as fractions of the flight.
-      // The hours go first, so the date never crosses them on its way right.
-      [document.querySelector('[data-event-hours]'), dock.querySelector('[data-event-dock-hours]'), 0, 0.45],
-      [document.querySelector('[data-event-date]'), dock.querySelector('[data-event-dock-date]'), 0.15, 0.75],
-      [title, dockTitle, 0, 1],
-    ];
-
-    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-    const supported = typeof ScrollTimeline !== 'undefined';
-    let animations: Animation[] = [];
-    let observer: IntersectionObserver | undefined;
-
-    const visible = [{ opacity: 0 }, { opacity: 1 }];
-
-    function reset() {
-      animations.forEach((animation) => animation.cancel());
-      animations = [];
-      observer?.disconnect();
-      flightLayer.replaceChildren();
-      pieces.forEach(([piece, twin]) => {
-        piece?.style.removeProperty('opacity');
-        twin?.style.removeProperty('visibility');
-      });
-    }
-
-    /** A copy of a piece in the fixed layer, exactly over the piece at scroll 0. */
-    function flyer(piece: HTMLElement, box: Box): HTMLElement {
-      const copy = piece.cloneNode(true) as HTMLElement;
-      const style = getComputedStyle(piece);
-
-      copy.removeAttribute('id');
-      copy.removeAttribute('aria-label');
-      // The layer carries the opening's entrance; the copy must not start its own again.
-      copy.removeAttribute('data-enter');
-      Object.assign(copy.style, {
-        position: 'absolute',
-        top: `${box.top}px`,
-        left: `${box.left}px`,
-        // Every piece that flies is one line; a rounded width must not wrap it.
-        width: 'max-content',
-        whiteSpace: 'nowrap',
-        margin: '0',
-        fontSize: style.fontSize,
-        lineHeight: style.lineHeight,
-        letterSpacing: style.letterSpacing,
-        willChange: 'translate, scale',
-      });
-      flightLayer.append(copy);
-
-      return copy;
-    }
-
-    /** The plain dock: shown once the title has passed under the bar. */
-    function staticDock(headerBottom: number) {
-      observer = new IntersectionObserver(
-        ([entry]) => {
-          dock!.hidden = entry.boundingClientRect.bottom > headerBottom;
-        },
-        { rootMargin: `-${headerBottom}px 0px 0px 0px` },
-      );
-      observer.observe(title!);
-    }
-
-    function setup() {
-      reset();
-      dock!.hidden = false;
-
-      const dockBox = pageBox(dock!);
-      const headerBottom = dockBox.top;
-
-      if (reducedMotion.matches || !supported) {
-        dock!.hidden = true;
-        staticDock(headerBottom);
-
-        return;
-      }
-
-      const titleBox = pageBox(title!);
-      const dockBottom = dockBox.top + dockBox.height;
-      // The flight ends as the title's own space has scrolled up to the dock.
-      const flight = Math.max(titleBox.top + titleBox.height - dockBottom, 160);
-      // The content under the title must not show through before the ground is in.
-      const next = title!.nextElementSibling as HTMLElement | null;
-      const arrival = next ? Math.max(pageBox(next).top - dockBottom, 1) : flight;
-      const timeline = new ScrollTimeline({ source: document.documentElement, axis: 'block' });
-
-      const range = (start: number, end: number): KeyframeAnimationOptions => ({
-        timeline,
-        rangeStart: `${Math.round(start)}px`,
-        rangeEnd: `${Math.round(end)}px`,
-        fill: 'both',
-      });
-
-      // A title that wraps cannot land on one truncated line; it scrolls away and the dock's copy fades in.
-      const titleFlies = titleBox.height < fontSize(title!) * 1.6;
-
-      for (const [piece, twin, from, to] of pieces) {
-        if (!piece || !twin) continue;
-
-        if (piece === title && !titleFlies) {
-          animations.push(twin.animate(visible, range(flight * 0.6, flight)));
-          continue;
-        }
-
-        const start = Math.round(from * flight);
-        const end = Math.round(to * flight);
-        const a = pageBox(piece);
-        const b = pageBox(twin);
-        const scale = fontSize(twin) / fontSize(piece);
-        // Where the copy rests in the dock, relative to the piece's place at scroll 0.
-        const x = Math.round(b.left - a.left);
-        const y = Math.round(b.top + (b.height - a.height * scale) / 2 - a.top);
-        const copy = flyer(piece, a);
-
-        piece.style.opacity = '0';
-        twin.style.visibility = 'hidden';
-        // Until its start the copy scrolls with the page, then it flies to the dock and rests there.
-        animations.push(
-          copy.animate(
-            [
-              { translate: '0 0', scale: '1' },
-              { translate: `0 ${-start}px`, scale: '1', offset: end ? start / end : 0 },
-              { translate: `${x}px ${y}px`, scale: `${scale}` },
-            ],
-            range(0, Math.max(end, 1)),
-          ),
-        );
-      }
-
-      animations.push(
-        ground.animate({ opacity: [0, 1] }, range(Math.min(arrival, flight) * 0.7, Math.min(arrival, flight))),
-      );
-    }
-
-    let frame = 0;
-
-    const schedule = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(setup);
-    };
-
-    // Setting up measures the page. While a page transition slides it in, that work
-    // would cost frames; the title stands in place until then, as the flight starts
-    // at the top. Widths change once the web fonts are in (the boot script loads
-    // them before the first frame, so mostly they are), and with the window. A
-    // phone's toolbar changes only the height while scrolling: no new flight.
-    const fontsPending = document.fonts.status !== 'loaded';
-
-    void (document.activeViewTransition?.finished ?? Promise.resolve()).then(() => {
-      setup();
-
-      if (fontsPending) void document.fonts.ready.then(schedule);
-    });
-
-    let width = innerWidth;
-
-    addEventListener('resize', () => {
-      if (innerWidth === width) return;
-
-      width = innerWidth;
-      schedule();
-    });
-    reducedMotion.addEventListener('change', schedule);
+    dock.hidden = false;
+    new IntersectionObserver(
+      ([entry]) => dock.toggleAttribute('data-visible', !entry.isIntersecting && entry.boundingClientRect.top < 0),
+      // The bar is 72px (--spacing-header): the title counts as gone once it is under it.
+      { rootMargin: '-72px 0px 0px 0px' },
+    ).observe(title);
   }
 </script>

@@ -283,8 +283,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   Every text arrives this way, never a heading beside text that already stands:
   section heads, `Prose reveal` (paragraph by paragraph), `LinkList`, `ValueItems`,
   date summaries, the newsletter, the event story and map; the footer stands. On an
-  event page the date line, the title and the dock's flight layer enter on one beat
-  (`data-enter`), then the lower part. FAQ
+  event page the date line and the title enter on one beat (`data-enter`), then the
+  lower part; once the title has passed under the bar a dock fades in with it
+  (`EventDock`, one `IntersectionObserver`). FAQ
   answers unfold and fold on a spring as a FLIP (`AccordionItem`, `item-open:`
   variant); the
   phone `ActionBar` glides in and out (its own script). CSS keeps the
@@ -308,7 +309,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   the home page has a bottom `ActionBar` with the next date once the hero's action
   is gone. Interactions ~180ms (a button rises 2px and settles when pressed, arrows
   slide and nudge on a press, header links draw a line); the breath's 11 s cycle (5.5 s in, 5.5 s out: resonance breathing) runs
-  only on request; the event title flies into its dock on a scroll timeline. No
+  only on request. No
   `content-visibility`. Under reduced motion everything rests.
 - Fonts: Fraunces 500 static (~18 kB) and Figtree variable (~20 kB); both upright
   faces preload, Figtree's italic loads when used.
