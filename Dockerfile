@@ -1,7 +1,10 @@
 # syntax=docker/dockerfile:1
 
-# Always the latest Bun (≥ 1.4).
-FROM oven/bun:latest AS build
+# Bun pinned to a minor version: a rebuild gets patches, never a new minor by surprise.
+# Raise it on purpose (and in CI's setup-bun) together.
+ARG BUN_IMAGE=oven/bun:1.4-slim
+
+FROM ${BUN_IMAGE} AS build
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
@@ -12,20 +15,19 @@ ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 ARG PUBLIC_UMAMI_ID
 ARG PUBLIC_UMAMI_ENDPOINT
 ENV PUBLIC_UMAMI_ID=$PUBLIC_UMAMI_ID PUBLIC_UMAMI_ENDPOINT=$PUBLIC_UMAMI_ENDPOINT
-# Build-time only: Astro embeds it in the server manifest. Keep it stable across builds.
-ARG ASTRO_KEY
-ENV ASTRO_KEY=$ASTRO_KEY
 RUN bun run build
 
-FROM oven/bun:latest AS production-deps
+FROM ${BUN_IMAGE} AS production-deps
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile --production
 
-FROM oven/bun:latest
+FROM ${BUN_IMAGE}
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates tzdata wget \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir -p /data \
+  && chown bun:bun /data
 ENV TZ=Europe/Berlin
 WORKDIR /app
 
@@ -40,9 +42,12 @@ COPY --from=build /app/scripts/schedule.ts /app/scripts/backup-db.ts /app/script
 COPY --from=build /app/src/lib/server ./src/lib/server
 COPY --from=build /app/src/lib/shared ./src/lib/shared
 COPY --from=build /app/src/assets/mail ./src/assets/mail
+COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# Not root: the server, and every `docker exec` (the scheduled task), run as bun, so
+# the database and its WAL files always belong to one user. A volume created by an
+# older image is root's; the entrypoint says how to hand it over.
+USER bun
 
 ENV DATABASE_PATH=/data/mens-circle.db
 VOLUME ["/data"]

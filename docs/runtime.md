@@ -93,7 +93,16 @@ canonical URL behind the proxy are identical (checked side by side).
 
 ## Deployment
 
-The Docker entrypoint and the persistent `/data` volume are unchanged; migrations run
+The image is built on `oven/bun:1.4-slim` (a minor version, so a rebuild picks up
+patches but never a new minor; raise it on purpose) and runs as the unprivileged
+`bun` user (uid 1000), the server as well as every `docker exec`, so the scheduled
+task never leaves root-owned WAL files behind. A `/data` volume created by an older
+image belongs to root: the entrypoint refuses to start and prints the one-time fix
+(`chown -R 1000:1000 /data` from a helper container). No `ASTRO_KEY`: the site has no
+server islands. `/health` runs `select 1` against SQLite and answers 503 when the
+database cannot be opened or read, so the Docker HEALTHCHECK sees a broken volume.
+
+The persistent `/data` volume keeps the database; migrations run
 on boot. `server.ts` drains in-flight requests on SIGTERM (Coolify) and exits within
 the adapter's shutdown timeout (60 s). Take the usual SQLite backup before a rollout; the previous image
 remains a rollback option while the schema is unchanged.

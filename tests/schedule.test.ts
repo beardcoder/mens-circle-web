@@ -1,7 +1,12 @@
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from 'bun:test';
 
 const fixture = fileURLToPath(new URL('./schedule.fixture.ts', import.meta.url));
+/** Only fixes the clock; the real task modules stay. */
+const clock = fileURLToPath(new URL('./schedule-clock.fixture.ts', import.meta.url));
 
 function schedule(at: string, backup = true, reminderFails = false) {
   const result = Bun.spawnSync([process.execPath, '--no-env-file', '--preload', fixture, './scripts/schedule.ts'], {
@@ -52,4 +57,21 @@ test('retention runs daily at 02:30 UTC, before the backup', () => {
   expect(result.output).not.toContain('TASK backup');
   expect(schedule('2026-10-19T03:30:00Z').output).not.toContain('TASK retention');
   expect(schedule('2026-10-19T02:31:00Z').output).toBe('');
+});
+
+test('an idle minute never opens the database', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'mens-circle-schedule-'));
+
+  try {
+    const result = Bun.spawnSync([process.execPath, '--no-env-file', '--preload', clock, './scripts/schedule.ts'], {
+      cwd: fileURLToPath(new URL('..', import.meta.url)),
+      env: { PATH: process.env.PATH, SCHEDULE_AT: '2026-10-19T12:07:00Z', DATABASE_PATH: join(dir, 'never.sqlite') },
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout.toString()).toBe('');
+    expect(existsSync(join(dir, 'never.sqlite'))).toBe(false);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

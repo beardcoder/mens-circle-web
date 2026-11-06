@@ -38,7 +38,8 @@ do it. `404.astro` is prerendered; unmatched paths get it from disk and never re
 middleware. `src/middleware.ts` guards `/admin` (a signed session, else the login; sets
 `locals.admin`) and applies `lib/cache-policy.ts`. Migrations run on boot.
 `src/lib/server/*` is server-only; never import it into client scripts. Deployed as one
-Docker image on Coolify (port 8090, SQLite on the `/data` volume); env vars are in
+Docker image on Coolify (Bun pinned to a minor, `oven/bun:1.4-slim`; runs as `bun`;
+port 8090, SQLite on the `/data` volume; `/health` answers 503 when SQLite does not); env vars are in
 `.env.example` and the README. Retired URLs redirect in `astro.config.mjs`
 (`redirects`); `trailingSlash: 'never'`.
 
@@ -130,7 +131,9 @@ and Markus's avatar (`markus-avatar-192.webp`); regenerate them when the photo
 changes. Sharp is a build-time dev
 dependency. All events use `/images/og-default.png`.
 
-**Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute; the
+**Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute. It
+decides what is due first and imports a task's module only then (`dueTasks()`):
+importing the server lib opens the database and migrates. The
 reminder pass runs every 15 min, the S3 backup at 03:00 UTC when `BACKUP_S3_*` is set.
 Reminders go out in Berlin wall-clock time (`lib/server/reminder-window.ts`): 18:00–22:00
 the evening before ("morgen"), else from 10:00 on the day until the start ("heute"),

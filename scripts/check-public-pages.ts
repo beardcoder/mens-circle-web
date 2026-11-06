@@ -380,7 +380,23 @@ try {
     }
   });
 
-  console.info('Public page checks passed: empty, scheduled, full, private, unavailable, images and sitemap.');
+  // A database the server cannot open fails the health probe instead of reporting ok.
+  const workingDb = process.env.DATABASE_PATH;
+
+  process.env.DATABASE_PATH = sandbox;
+  await withServer(async (origin) => {
+    for (const method of ['GET', 'HEAD']) {
+      const health = await fetch(`${origin}/health`, { method });
+
+      assert.equal(health.status, 503, `${method} /health without a database`);
+      assert.equal(health.headers.get('cache-control'), 'no-store');
+    }
+  });
+  process.env.DATABASE_PATH = workingDb;
+
+  console.info(
+    'Public page checks passed: empty, scheduled, full, private, unavailable, images, sitemap, security and health.',
+  );
 } finally {
   db.$client.close();
   await rm(sandbox, { recursive: true, force: true });

@@ -25,7 +25,9 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 ## Deployment (Coolify)
 
 1. Dockerfile resource, persistent volume on `/data`, port `8090`.
-2. Build variables: `PUBLIC_SITE_URL`, `ASTRO_KEY` (`bunx astro create-key`, keep it stable).
+2. Build variables: `PUBLIC_SITE_URL`; for analytics `PUBLIC_UMAMI_ID` and `PUBLIC_UMAMI_ENDPOINT`.
+   The image runs as `bun` (uid 1000): a volume created by an older image must be handed
+   over once (`docker run --rm -v <volume>:/data alpine chown -R 1000:1000 /data`).
 3. Runtime variables:
 
 | Variable                                                  | Purpose                                                      |
