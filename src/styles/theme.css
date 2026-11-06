@@ -19,9 +19,8 @@
    added to it (the parser, an island, the event dock). */
 @custom-variant over-hero (&:where([data-over-hero], [data-over-hero] *));
 
-/* Inside an open FAQ item (`AccordionItem`), but not while it folds shut: the item
-   stays open until its answer has closed, and its marker turns back right away. */
-@custom-variant item-open (&:where(details[open]:not([data-closing]) *));
+/* Inside an open FAQ item (`AccordionItem`). */
+@custom-variant item-open (&:where(details[open] *));
 
 /* A device with a real pointer that hovers (a desktop): the only place a fixed bar
    may blur what lies behind it, which is redrawn on every scroll frame. */

@@ -287,8 +287,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   event page the date line and the title enter on one beat (`data-enter`), then the
   lower part; once the title has passed under the bar a dock fades in with it
   (`EventDock`, one `IntersectionObserver`). FAQ
-  answers unfold and fold on a spring as a FLIP (`AccordionItem`, `item-open:`
-  variant); the
+  answers are native `<details>` whose `::details-content` transitions its height
+  where `interpolate-size` exists (`AccordionItem`, global.css "FAQ"; the marker
+  uses the `item-open:` variant); the
   phone `ActionBar` glides in and out (its own script). CSS keeps the
   loops (paused out of view by Hero.astro's `data-offscreen`): the glow breathes (`data-glow`), the ring turns every 90 s.
 - Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
@@ -297,9 +298,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   (CSS, 0.6 s, at load); a blur costs ~16× the main-thread work of a transform, so
   nothing that runs while scrolling blurs. Fades use `--ease-fade` (a gentle start,
   so the fade is seen); the springs fall back to `--ease-out` where `linear()` is
-  missing (Safari < 17.2). The FAQ unfolds as
-  a FLIP: one layout at the press, then what follows slides and a clip uncovers the
-  answer, no animated height. The hero's loops pause out of view
+  missing (Safari < 17.2). The FAQ's height
+  transition is the one accepted layout animation (short, on a press, never while
+  scrolling). The hero's loops pause out of view
   (`data-offscreen`). Never set a state attribute on `<html>` while the page moves
   (it restyles the whole page): flag the element itself (`data-lifted` on the
   back-to-top link); the boot script's mode flags are set

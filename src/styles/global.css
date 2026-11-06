@@ -231,6 +231,30 @@
   }
 }
 
+/* ── FAQ ─────────────────────────────────────────────────────────────────── */
+
+/* An answer unfolds natively: `::details-content` animates its height to `auto`
+   (`interpolate-size`). Browsers without it, and reduced motion, toggle at once. */
+@supports (interpolate-size: allow-keywords) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-accordion] {
+      interpolate-size: allow-keywords;
+    }
+
+    [data-accordion]::details-content {
+      height: 0;
+      overflow: clip;
+      transition:
+        height 0.32s var(--ease-out),
+        content-visibility 0.32s allow-discrete;
+    }
+
+    [data-accordion][open]::details-content {
+      height: auto;
+    }
+  }
+}
+
 /* ── Motion: scroll ───────────────────────────────────────────────────────── */
 
 /* Each piece with a scroll hook arrives once as it comes into view, driven by the

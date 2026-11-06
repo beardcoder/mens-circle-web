@@ -174,7 +174,7 @@ trace on every motion change (see "Lighthouse" below). Only opacity and transfor
 move, so the compositor carries every frame. The one exception is the soft blur the
 opening's title words come into focus from (CSS, light and 0.6 s, at load); a blur
 is redrawn on the main thread every frame (about 16× a transform), so nothing that
-moves while scrolling blurs. No parallax, no animated height. Fades start gently
+moves while scrolling blurs. No parallax, and no animated height except the FAQ's native unfolding. Fades start gently
 (`--ease-fade`, `[0.33, 0, 0.2, 1]`), so they are seen; no script reads layout
 before the page has settled (state at a scroll position comes from an
 `IntersectionObserver`, never from `scrollY`); state flags go on the element that
@@ -212,13 +212,11 @@ waits for a script.
   story, note and map, the legal pages paragraph by paragraph. The footer is the
   frame and stands.
 - No parallax: things arrive once and then stand.
-- FAQ (`AccordionItem`) as a FLIP: the layout changes once, at the press; then what
-  follows the item (its siblings, the sections below, the footer) slides from where
-  it stood while a clip uncovers the answer on the same spring, so their edges meet,
-  and the text rises in behind. Closing runs it backwards, the marker turns back at
-  once (`data-closing`, the `item-open:` variant). Each item carries its top line
-  and the closing line is its own element, so lines move instead of jumping. Under
-  reduced motion the native toggle stays.
+- FAQ (`AccordionItem`): a native `<details>`; where `interpolate-size` exists its
+  `::details-content` transitions from height 0 to `auto` in 0.32 s (global.css,
+  "FAQ"), and the marker turns (`item-open:` variant). Keyboard, find-in-page and
+  screen readers work as with any `<details>`. Elsewhere, and under reduced motion,
+  it toggles at once. No script.
 - The bottom bar on phones (`ActionBar`) glides up on a spring once the opening's
   action has gone, its date and action a beat behind; it slips away faster than it
   came. The registration form is in the page from the first frame; its answer
