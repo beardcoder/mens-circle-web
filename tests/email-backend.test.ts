@@ -25,6 +25,7 @@ const cases = [
   'registration-identity',
   'cancel-link',
   'retention',
+  'lookup-escaping',
 ];
 
 for (const scenario of cases) {

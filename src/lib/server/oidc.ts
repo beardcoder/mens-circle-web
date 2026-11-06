@@ -1,7 +1,7 @@
 /** Admin sign-in through Pocket ID — OpenID Connect via `openid-client`: authorization code flow with PKCE and `state`. */
 import * as client from 'openid-client';
 
-import { sessionSecretConfigured, signToken, verifyToken } from './auth';
+import { type Admission, sessionSecretConfigured, signToken, verifyToken } from './auth';
 import { config } from './config';
 
 export const FLOW_COOKIE = 'mc_oidc';
@@ -61,19 +61,19 @@ export const beginLogin = async (redirect: string): Promise<{ url: string; cooki
 
 /** Group membership is managed by the Pocket ID admin, so it wins when set;
  *  an email only counts once the provider has verified it. */
-const isAdmin = (user: client.UserInfoResponse, email: string): boolean => {
+const admission = (user: client.UserInfoResponse, email: string): Admission | null => {
   const groups = Array.isArray(user.groups) ? user.groups : [];
 
-  if (config.ADMIN_GROUP && groups.includes(config.ADMIN_GROUP)) return true;
+  if (config.ADMIN_GROUP && groups.includes(config.ADMIN_GROUP)) return { via: 'group', group: config.ADMIN_GROUP };
 
-  return user.email_verified !== false && config.ADMIN_EMAILS.includes(email);
+  return user.email_verified !== false && config.ADMIN_EMAILS.includes(email) ? { via: 'email' } : null;
 };
 
 /** Completes the flow from the callback's query string. */
 export const completeLogin = async (
   search: string,
   flowCookie: string | undefined,
-): Promise<{ email: string; redirect: string }> => {
+): Promise<{ email: string; admission: Admission; redirect: string }> => {
   const flow = await verifyToken<Flow>(flowCookie);
 
   if (!flow) throw new Error('sign-in flow cookie missing, expired or forged');
@@ -98,7 +98,9 @@ export const completeLogin = async (
 
   const email = typeof user.email === 'string' ? user.email.trim().toLowerCase() : '';
 
-  if (!email || !isAdmin(user, email)) throw new AccessDenied(email || 'no email');
+  const admitted = email ? admission(user, email) : null;
 
-  return { email, redirect: flow.redirect };
+  if (!admitted) throw new AccessDenied(email || 'no email');
+
+  return { email, admission: admitted, redirect: flow.redirect };
 };

@@ -15,9 +15,9 @@ export const GET: APIRoute = async ({ cookies, redirect, url }) => {
   if (url.searchParams.has('error')) return redirect('/admin/login?error=cancelled', 302);
 
   try {
-    const { email, redirect: target } = await completeLogin(url.search, flowCookie);
+    const { email, admission, redirect: target } = await completeLogin(url.search, flowCookie);
 
-    cookies.set(SESSION_COOKIE, await createSession(email), {
+    cookies.set(SESSION_COOKIE, await createSession(email, admission), {
       httpOnly: true,
       secure: import.meta.env.PROD,
       sameSite: 'lax',

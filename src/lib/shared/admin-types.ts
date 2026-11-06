@@ -37,6 +37,10 @@ export interface AdminEvent {
   isPublished: boolean;
 }
 
+export interface EventsData {
+  events: AdminEvent[];
+}
+
 export interface OverviewData {
   events: AdminEvent[];
   nextEventId: string | null;

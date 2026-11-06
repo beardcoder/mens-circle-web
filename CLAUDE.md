@@ -78,7 +78,8 @@ mails, `lib/server/cancel-token.ts`; GET shows, POST cancels; private, noindex),
 **Auth.** Pocket ID via `openid-client` (`lib/server/oidc.ts`): code flow with PKCE +
 state, `client_secret_post` (Basic would form-encode the UUID client id). The callback
 URL comes from `APP_URL`, not the request (proxy reads `http://`). Admission:
-`OIDC_ADMIN_GROUP` or a verified `ADMIN_EMAIL`. `ADMIN_SESSION_SECRET` has no fallback
+`OIDC_ADMIN_GROUP` or a verified `ADMIN_EMAIL`; the session records which, and every
+read re-checks it against the current configuration. `ADMIN_SESSION_SECRET` has no fallback
 and needs ≥ 32 chars, otherwise no session is signed or trusted. Never add a default.
 
 **CSRF.** `security.allowedDomains` (from `PUBLIC_SITE_URL`) lets Astro trust the

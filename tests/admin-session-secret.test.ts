@@ -13,7 +13,10 @@ const scenarios: Array<[string, Record<string, string>]> = [
   ['unset', {}],
   ['password-only', { ADMIN_EMAIL: 'admin@example.invalid', ADMIN_PASSWORD: 'correct-horse-battery-staple' }],
   ['short', { ADMIN_SESSION_SECRET: 'short-secret' }],
-  ['configured', { ADMIN_SESSION_SECRET: 'a-long-random-session-secret-for-the-test-suite' }],
+  [
+    'configured',
+    { ADMIN_SESSION_SECRET: 'a-long-random-session-secret-for-the-test-suite', ADMIN_EMAIL: 'admin@example.invalid' },
+  ],
 ];
 
 for (const [scenario, env] of scenarios) {

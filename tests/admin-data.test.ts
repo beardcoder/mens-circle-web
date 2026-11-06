@@ -21,6 +21,7 @@ test('admin actions protect reads and publication changes with real signed sessi
           DATABASE_PATH: join(sandbox, 'disposable.sqlite'),
           MIGRATIONS_DIR: fileURLToPath(new URL('../drizzle', import.meta.url)),
           ADMIN_SESSION_SECRET: 'test-only-session-secret-for-an-isolated-fixture',
+          ADMIN_EMAIL: 'admin@example.invalid',
         },
         encoding: 'utf8',
         timeout: 15_000,

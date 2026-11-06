@@ -56,10 +56,27 @@ export const verifyToken = async <T extends Record<string, unknown>>(token: stri
   }
 };
 
-export const createSession = (email: string): Promise<string> => signToken({ email }, SESSION_TTL_S);
+/** How a sign-in was admitted: by the Pocket ID group, or by a listed, verified address. */
+export type Admission = { via: 'group'; group: string } | { via: 'email' };
 
+export const createSession = (email: string, admission: Admission = { via: 'email' }): Promise<string> =>
+  signToken({ email, ...admission }, SESSION_TTL_S);
+
+/** Whether a session's admission still holds under today's configuration. */
+const stillAdmitted = (email: string, data: { via?: unknown; group?: unknown }): boolean =>
+  data.via === 'group'
+    ? !!config.ADMIN_GROUP && data.group === config.ADMIN_GROUP
+    : config.ADMIN_EMAILS.includes(email);
+
+/**
+ * The signed-in admin's address, or null. Besides the signature, the admission is
+ * checked against the current `ADMIN_EMAIL` / `OIDC_ADMIN_GROUP`: removing an address
+ * or changing the group ends its sessions at once, not after the 7-day lifetime.
+ */
 export const readSession = async (token: string | undefined): Promise<string | null> => {
-  const data = await verifyToken<{ email?: unknown }>(token);
+  const data = await verifyToken<{ email?: unknown; via?: unknown; group?: unknown }>(token);
 
-  return typeof data?.email === 'string' ? data.email : null;
+  if (typeof data?.email !== 'string') return null;
+
+  return stillAdmitted(data.email, data) ? data.email : null;
 };

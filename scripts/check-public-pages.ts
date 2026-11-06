@@ -9,6 +9,7 @@ const sandbox = await mkdtemp(join(tmpdir(), 'mens-circle-pages-'));
 
 process.env.DATABASE_PATH = join(sandbox, 'pages.sqlite');
 process.env.ADMIN_SESSION_SECRET = 'pages-check-secret-of-at-least-32-characters';
+process.env.ADMIN_EMAIL = 'admin@example.invalid';
 
 const { db } = await import('../src/lib/server/db');
 const { events, participants, registrations, testimonials } = await import('../src/lib/server/db/schema');
@@ -57,6 +58,7 @@ async function withServer(check: (origin: string) => Promise<void>): Promise<voi
       PORT: String(port),
       DATABASE_PATH: process.env.DATABASE_PATH,
       ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
+      ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     },
     stdout: 'ignore',
     stderr: 'pipe',

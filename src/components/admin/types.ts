@@ -2,6 +2,7 @@
 export type {
   AdminEvent,
   EventFormData,
+  EventsData,
   OverviewData,
   RegistrationRow,
   RegistrationsData,

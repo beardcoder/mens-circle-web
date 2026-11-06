@@ -1,7 +1,12 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
-import { readAdminOverview, readAdminRegistrations, readAdminTestimonials } from '@lib/server/admin-data';
+import {
+  readAdminEvents,
+  readAdminOverview,
+  readAdminRegistrations,
+  readAdminTestimonials,
+} from '@lib/server/admin-data';
 
 import { requireAdmin } from './auth';
 
@@ -11,6 +16,13 @@ export const admin = {
       await requireAdmin(context);
 
       return readAdminOverview();
+    },
+  }),
+  loadAdminEvents: defineAction({
+    handler: async (_input, context) => {
+      await requireAdmin(context);
+
+      return readAdminEvents();
     },
   }),
   loadAdminRegistrations: defineAction({

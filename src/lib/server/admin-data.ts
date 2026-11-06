@@ -1,12 +1,43 @@
-import type { OverviewData, RegistrationsData, Testimonial } from '../shared/admin-types';
+import type { AdminEvent, EventsData, OverviewData, RegistrationsData, Testimonial } from '../shared/admin-types';
 import { todayBerlin } from '../shared/time';
 import { getEventById, listEventsForAdmin } from './events';
 import { listRegistrationsForEvent } from './registrations';
-import { listTestimonialsForAdmin } from './testimonials';
+import { countPendingTestimonials, listTestimonialsForAdmin } from './testimonials';
 
-/** Called only behind the page middleware or requireAdmin; never cached. */
+const toAdminEvent = ({
+  id,
+  title,
+  slug,
+  eventDate,
+  startTime,
+  endTime,
+  location,
+  city,
+  maxParticipants,
+  activeCount,
+  isPublished,
+}: Awaited<ReturnType<typeof listEventsForAdmin>>[number]): AdminEvent => ({
+  id,
+  title,
+  slug,
+  eventDate,
+  startTime,
+  endTime,
+  location,
+  city,
+  maxParticipants,
+  activeCount,
+  isPublished,
+});
+
+/** The events list (/admin/events): events with their seat counts, nothing else. */
+export async function readAdminEvents(): Promise<EventsData> {
+  return { events: (await listEventsForAdmin()).map(toAdminEvent) };
+}
+
+/** The overview: events, the next event's people and the voices waiting. Called only behind the page middleware or requireAdmin; never cached. */
 export async function readAdminOverview(): Promise<OverviewData> {
-  const [rows, voices] = await Promise.all([listEventsForAdmin(), listTestimonialsForAdmin()]);
+  const [rows, pendingTestimonials] = await Promise.all([listEventsForAdmin(), countPendingTestimonials()]);
   const today = todayBerlin();
 
   const next = rows
@@ -14,36 +45,10 @@ export async function readAdminOverview(): Promise<OverviewData> {
     .sort((a, b) => a.eventDate.localeCompare(b.eventDate))[0];
 
   return {
-    events: rows.map(
-      ({
-        id,
-        title,
-        slug,
-        eventDate,
-        startTime,
-        endTime,
-        location,
-        city,
-        maxParticipants,
-        activeCount,
-        isPublished,
-      }) => ({
-        id,
-        title,
-        slug,
-        eventDate,
-        startTime,
-        endTime,
-        location,
-        city,
-        maxParticipants,
-        activeCount,
-        isPublished,
-      }),
-    ),
+    events: rows.map(toAdminEvent),
     nextEventId: next?.id ?? null,
     people: next ? await listRegistrationsForEvent(next.id) : [],
-    pendingTestimonials: voices.filter((voice) => !voice.isPublished).length,
+    pendingTestimonials,
   };
 }
 

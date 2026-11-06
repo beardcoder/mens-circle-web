@@ -92,6 +92,7 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
 
 const oidc = await import('../src/lib/server/oidc');
 const { readSession, createSession } = await import('../src/lib/server/auth');
+const { config } = await import('../src/lib/server/config');
 
 /** Runs beginLogin and returns what the provider would send back. */
 const start = async (redirect = '/admin/events/new') => {
@@ -137,15 +138,33 @@ const scenarios: Record<string, () => Promise<void>> = {
     assert.equal(scope, 'openid email');
     const result = await oidc.completeLogin(search, cookie);
 
-    assert.deepEqual(result, { email: 'admin@example.invalid', redirect: '/admin/events/new' });
-    assert.equal(await readSession(await createSession(result.email)), 'admin@example.invalid');
+    assert.deepEqual(result, {
+      email: 'admin@example.invalid',
+      admission: { via: 'email' },
+      redirect: '/admin/events/new',
+    });
+    const token = await createSession(result.email, result.admission);
+
+    assert.equal(await readSession(token), 'admin@example.invalid');
+    // Removing the address from ADMIN_EMAIL ends the session at once.
+    config.ADMIN_EMAILS = ['second@example.invalid'];
+    assert.equal(await readSession(token), null);
   },
   'group-admission': async () => {
     userinfo = { email: 'someone@example.invalid', email_verified: true, groups: ['mens-circle-admins'] };
     const { cookie, search, scope } = await start();
 
     assert.equal(scope, 'openid email groups');
-    assert.equal((await oidc.completeLogin(search, cookie)).email, 'someone@example.invalid');
+    const admitted = await oidc.completeLogin(search, cookie);
+
+    assert.equal(admitted.email, 'someone@example.invalid');
+    assert.deepEqual(admitted.admission, { via: 'group', group: 'mens-circle-admins' });
+    const token = await createSession(admitted.email, admitted.admission);
+
+    assert.equal(await readSession(token), 'someone@example.invalid', 'a group session needs no listed address');
+    config.ADMIN_GROUP = 'renamed-admins';
+    assert.equal(await readSession(token), null, 'a changed group ends the session');
+    config.ADMIN_GROUP = 'mens-circle-admins';
 
     userinfo = { email: 'someone@example.invalid', email_verified: true, groups: ['other'] };
     const second = await start();

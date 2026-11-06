@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNull } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, sql } from 'drizzle-orm';
 
 import type { TestimonialDTO } from '../shared/dto';
 import { db } from './db';
@@ -55,6 +55,16 @@ export async function fetchTestimonialsState(
 }
 
 /** All non-deleted testimonials (admin), newest first. */
+/** Submitted voices waiting for moderation, counted in SQL. */
+export async function countPendingTestimonials(): Promise<number> {
+  const [row] = await db
+    .select({ c: sql<number>`count(*)` })
+    .from(testimonials)
+    .where(and(eq(testimonials.isPublished, false), isNull(testimonials.deleted)));
+
+  return row?.c ?? 0;
+}
+
 export async function listTestimonialsForAdmin(): Promise<Testimonial[]> {
   return db.select().from(testimonials).where(isNull(testimonials.deleted)).orderBy(desc(testimonials.createdAt));
 }

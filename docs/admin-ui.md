@@ -28,11 +28,15 @@ which deletes the session cookie and redirects to `/admin/login`.
 | Authenticated action     | Input               | Response                                            |
 | ------------------------ | ------------------- | --------------------------------------------------- |
 | `loadAdminOverview`      | none                | events, nextEventId, people, pendingTestimonials    |
+| `loadAdminEvents`        | none                | events with seat counts (`/admin/events`)           |
 | `loadAdminRegistrations` | `{ eventId }`       | eventId, eventTitle, maxParticipants, registrations |
 | `loadAdminTestimonials`  | none                | testimonials with moderation fields                 |
 | `setEventPublished`      | `{ id, published }` | success message                                     |
 
-All four require the existing signed admin session through `requireAdmin`.
+All of them require the signed admin session through `requireAdmin`, which also
+checks the session's admission against the current `ADMIN_EMAIL` /
+`OIDC_ADMIN_GROUP`: removing an address or changing the group ends its sessions at
+once.
 Missing/expired sessions return `UNAUTHORIZED` without private data. Unknown events
 return `NOT_FOUND`. Responses use the existing `/_actions/*` private/no-store policy.
 Save-event responses now also include the persisted slug: `{ id, slug, message }`.

@@ -5,7 +5,7 @@ import { todayBerlin } from '@lib/shared/time';
 import { button, card } from '@lib/ui';
 
 import { Icon } from './icons';
-import type { AdminEvent, OverviewData } from './types';
+import type { AdminEvent, EventsData } from './types';
 import {
   ConfirmDialog,
   dateParts,
@@ -25,7 +25,7 @@ import { useAdminTask } from './useAdminTask';
 
 type Filter = 'upcoming' | 'draft' | 'past' | 'all';
 
-export default function EventList({ initial }: { initial: OverviewData }) {
+export default function EventList({ initial }: { initial: EventsData }) {
   const [data, setData] = useState(initial);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('upcoming');
@@ -44,7 +44,7 @@ export default function EventList({ initial }: { initial: OverviewData }) {
     .sort((a, b) => b.eventDate.localeCompare(a.eventDate));
 
   async function refresh() {
-    const result = await actions.loadAdminOverview();
+    const result = await actions.loadAdminEvents();
 
     if (result.error) throw new Error(result.error.message);
 
@@ -58,7 +58,7 @@ export default function EventList({ initial }: { initial: OverviewData }) {
           type="button"
           disabled={!!task.busy}
           class={button({ variant: 'secondary', size: 'sm' })}
-          onClick={() => void task.run('refresh', () => actions.loadAdminOverview(), setData)}
+          onClick={() => void task.run('refresh', () => actions.loadAdminEvents(), setData)}
         >
           <Icon name="refresh" class="size-4.5" />
           Aktualisieren

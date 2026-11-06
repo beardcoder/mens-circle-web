@@ -808,6 +808,20 @@ const scenarios: Record<string, () => Promise<void>> = {
       testimonials: 0,
     });
   },
+  /** The address lookup is a SQL expression in listmonk; quotes are doubled, nothing else gets through. */
+  async 'lookup-escaping'() {
+    handler = () => json({ data: { results: [] } });
+
+    for (const email of ["o'brien@example.invalid", "x' or '1'='1@example.invalid"]) {
+      calls.length = 0;
+      await lm.removeFromList(email, 7);
+      const query = new URL(`https://x${calls[0].path}`).searchParams.get('query');
+
+      assert.equal(query, `subscribers.email = '${email.replaceAll("'", "''")}'`);
+      // Outside the doubled quotes, the expression is unchanged: one literal.
+      assert.equal(query?.replace(/''/g, '').match(/'/g)?.length, 2);
+    }
+  },
   /** Every `{{ .Tx.Data.x }}` a versioned listmonk template reads is a field its payload sends. */
   async 'template-contract'() {
     const { db, event } = await seed(1);
