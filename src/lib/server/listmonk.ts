@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { createHash } from 'node:crypto';
 
 import { config, listmonkApiConfigured, listmonkConfigured } from './config';
 
@@ -17,6 +18,13 @@ interface ListmonkResponse {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body: any;
 }
+
+/** An address as logs may show it: a short hash that matches across lines, never the address. */
+export const logId = (email: string): string =>
+  `subscriber#${createHash('sha256').update(email.trim().toLowerCase()).digest('hex').slice(0, 10)}`;
+
+/** A request path without its query (the subscriber lookup carries the address there). */
+const logPath = (path: string): string => path.split('?')[0];
 
 const authHeader = (): string => `token ${config.LISTMONK_API_USER}:${config.LISTMONK_API_TOKEN}`;
 
@@ -39,7 +47,7 @@ const request = async (method: string, path: string, body?: unknown): Promise<Li
 
     return { ok: res.ok, status: res.status, body: parsed };
   } catch (err) {
-    console.error('[listmonk] request failed', path, String(err));
+    console.error('[listmonk] request failed', logPath(path), String(err));
 
     return null;
   }
@@ -83,23 +91,25 @@ export const subscribeToNewsletter = async (email: string, name: string): Promis
 
   if (res.status === 409) return { ok: true, status: 'exists' };
 
-  console.error('[listmonk] subscribe rejected', email, res.status, JSON.stringify(res.body));
+  console.error('[listmonk] subscribe rejected', logId(email), res.status);
 
   return failed();
 };
 
-const findSubscriber = async (email: string): Promise<ListmonkSubscriber | null> => {
+/** Looks a subscriber up by address; `ok` is false when listmonk could not answer. */
+const lookupSubscriber = async (email: string): Promise<{ ok: boolean; subscriber: ListmonkSubscriber | null }> => {
   const q = `subscribers.email = '${String(email).replace(/'/g, "''")}'`;
   const res = await request('GET', `/api/subscribers?per_page=1&query=${encodeURIComponent(q)}`);
 
-  if (!res || !res.ok) return null;
+  if (!res || !res.ok) return { ok: false, subscriber: null };
 
   const results = res.body?.data?.results;
 
-  if (Array.isArray(results) && results.length > 0) return results[0] as ListmonkSubscriber;
-
-  return null;
+  return { ok: true, subscriber: Array.isArray(results) && results.length > 0 ? results[0] : null };
 };
+
+const findSubscriber = async (email: string): Promise<ListmonkSubscriber | null> =>
+  (await lookupSubscriber(email)).subscriber;
 
 interface SubscriberIdentity {
   subscriber: ListmonkSubscriber;
@@ -225,7 +235,7 @@ const applyMembership = async (
   });
 
   if (!membership?.ok) {
-    console.error('[listmonk] list membership rejected', email, membership?.status);
+    console.error('[listmonk] list membership rejected', logId(email), membership?.status);
 
     return failed();
   }
@@ -255,7 +265,7 @@ export const addToLists = async (
   if (created.ok) return { ok: true, status: 'subscribed' };
 
   if (created.status !== 409) {
-    console.error('[listmonk] event subscribe rejected', email, created.status, JSON.stringify(created.body));
+    console.error('[listmonk] event subscribe rejected', logId(email), created.status);
 
     return failed();
   }
@@ -280,6 +290,39 @@ export const removeFromList = async (email: string, listId: number): Promise<boo
   });
 
   return !!res?.ok;
+};
+
+/** Deletes a list (an event's, once its data has expired). A missing list counts as deleted. */
+export const deleteList = async (listId: number): Promise<boolean> => {
+  if (!listmonkApiConfigured() || listId <= 0) return false;
+
+  const res = await request('DELETE', `/api/lists/${listId}`);
+
+  return !!res && (res.ok || res.status === 404);
+};
+
+/**
+ * Removes a participant from listmonk once their registrations have expired, unless
+ * they also subscribed to the newsletter (that consent stands on its own). Resolves
+ * to whether nothing of theirs is left that should not be: true when deleted, kept
+ * for the newsletter, never there, or listmonk is not in use.
+ */
+export const forgetSubscriber = async (email: string): Promise<boolean> => {
+  if (!listmonkApiConfigured()) return true;
+
+  const { ok, subscriber: sub } = await lookupSubscriber(email);
+
+  if (!ok) return false;
+
+  if (!sub?.id) return true;
+
+  const lists = (sub.lists ?? []).map((list) => list.id);
+
+  if (lists.some((id) => config.LISTMONK_LIST_IDS.includes(id))) return true;
+
+  const res = await request('DELETE', `/api/subscribers/${sub.id}`);
+
+  return !!res && (res.ok || res.status === 404);
 };
 
 interface CampaignOptions {
@@ -364,13 +407,13 @@ export const sendTransactional = async (
   data: Record<string, unknown>,
 ): Promise<boolean> => {
   if (!listmonkApiConfigured()) {
-    console.error('[listmonk] cannot send tx mail — listmonk API not configured', { to });
+    console.error('[listmonk] cannot send tx mail — listmonk API not configured', logId(to));
 
     return false;
   }
 
   if (!templateId) {
-    console.error('[listmonk] missing transactional template id — email skipped', { to });
+    console.error('[listmonk] missing transactional template id — email skipped', logId(to));
 
     return false;
   }
@@ -378,7 +421,7 @@ export const sendTransactional = async (
   const subId = await ensureSubscriber(to, recipientName);
 
   if (!subId) {
-    console.error('[listmonk] could not ensure subscriber for tx mail', { to });
+    console.error('[listmonk] could not ensure subscriber for tx mail', logId(to));
 
     return false;
   }
@@ -392,7 +435,7 @@ export const sendTransactional = async (
   });
 
   if (!res?.ok) {
-    console.error('[listmonk] tx send failed', { to, templateId, status: res?.status, body: res?.body });
+    console.error('[listmonk] tx send failed', logId(to), { templateId, status: res?.status });
 
     return false;
   }

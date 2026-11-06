@@ -32,6 +32,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 | --------------------------------------------------------- | ------------------------------------------------------------ |
 | `APP_URL`                                                 | public URL for mail links, .ics, OIDC callback               |
 | `TRUSTED_PROXY`                                           | `cloudflare` or `none`: source of the rate-limit IP          |
+| `RETENTION_DAYS`                                          | anonymise participants N days after the event (≤ 30)         |
 | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`     | Pocket ID client, callback `${APP_URL}/auth/callback`        |
 | `OIDC_ADMIN_GROUP`, `ADMIN_EMAIL`                         | who may enter `/admin` (group and/or comma-separated emails) |
 | `ADMIN_SESSION_SECRET`                                    | ≥ 32 random characters                                       |
@@ -46,7 +47,9 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 4. Scheduled task: `bun run scripts/schedule.ts` every minute (reminder pass every 15 min,
    backup daily at 03:00 UTC when configured). Reminders reach participants at a fixed
    Berlin time: from 18:00 the evening before (until 22:00), or, for later
-   registrations, from 10:00 on the day until the start. Never at night.
+   registrations, from 10:00 on the day until the start. Never at night. At 02:30 UTC
+   the retention pass anonymises participants `RETENTION_DAYS` after their last event,
+   deletes the event's listmonk list and clears published testimonials' addresses.
 
 ## Content
 

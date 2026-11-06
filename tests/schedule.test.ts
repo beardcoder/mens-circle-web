@@ -44,3 +44,12 @@ test('a failed reminder reports failure while still running the due backup', () 
   expect(result.error).toContain('[schedule] reminders failed');
   expect(result.output).toContain('TASK backup');
 });
+
+test('retention runs daily at 02:30 UTC, before the backup', () => {
+  const result = schedule('2026-10-19T02:30:00Z');
+
+  expect(result.output).toContain('TASK retention');
+  expect(result.output).not.toContain('TASK backup');
+  expect(schedule('2026-10-19T03:30:00Z').output).not.toContain('TASK retention');
+  expect(schedule('2026-10-19T02:31:00Z').output).toBe('');
+});

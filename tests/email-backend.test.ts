@@ -24,6 +24,7 @@ const cases = [
   'template-contract',
   'registration-identity',
   'cancel-link',
+  'retention',
 ];
 
 for (const scenario of cases) {

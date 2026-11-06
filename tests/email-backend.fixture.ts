@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { eq, inArray, sql } from 'drizzle-orm';
 
 import { config } from '../src/lib/server/config';
-import { events, participants, registrations } from '../src/lib/server/db/schema';
+import { events, participants, registrations, testimonials } from '../src/lib/server/db/schema';
 
 assert(process.env.EMAIL_TEST_DIR, 'requires the isolated test harness');
 assert.equal(config.DATABASE_PATH, join(process.env.EMAIL_TEST_DIR, 'test.sqlite'));
@@ -696,6 +696,117 @@ const scenarios: Record<string, () => Promise<void>> = {
 
     assert.match(sent.cancelUrl, /\/anmeldung\/absagen\?token=/);
     await waitForIdle();
+  },
+  /** RETENTION_DAYS after an event its people are anonymised, its list deleted, old voices minimised. */
+  async retention() {
+    const { db } = await import('../src/lib/server/db');
+    const { runRetention, isAnonymised } = await import('../src/lib/server/retention');
+    const { listRegistrationsForEvent } = await import('../src/lib/server/registrations');
+
+    const [old, future] = await db
+      .insert(events)
+      .values([
+        { title: 'Alt', slug: 'alt', eventDate: '2026-01-10T00:00:00.000Z', listmonkListId: 7 },
+        { title: 'Neu', slug: 'neu', eventDate: '2026-03-20T00:00:00.000Z', listmonkListId: 8 },
+      ])
+      .returning();
+
+    const people = await db
+      .insert(participants)
+      .values(
+        ['gone', 'stays', 'news', 'unreachable'].map((name) => ({
+          email: `${name}@example.invalid`,
+          firstName: name,
+          lastName: 'Person',
+          phone: '0151',
+        })),
+      )
+      .returning();
+
+    const byName = (name: string) => people.find((p) => p.firstName === name)!;
+
+    await db.insert(registrations).values([
+      ...people.map((p, i) => ({
+        id: `old-${i}`,
+        eventId: old.id,
+        participantId: p.id,
+        status: 'registered' as const,
+        registeredAt: '1',
+        submittedPhone: '0999',
+      })),
+      { id: 'future', eventId: future.id, participantId: byName('stays').id, status: 'registered', registeredAt: '2' },
+    ]);
+    await db.insert(testimonials).values([
+      {
+        id: 'published',
+        quote: 'Lange her.',
+        email: 'voice@example.invalid',
+        isPublished: true,
+        publishedAt: '2026-01-05T00:00:00.000Z',
+      },
+      {
+        id: 'recent',
+        quote: 'Frisch.',
+        email: 'recent@example.invalid',
+        isPublished: true,
+        publishedAt: '2026-02-25T00:00:00.000Z',
+      },
+      { id: 'pending', quote: 'Wartet.', email: 'pending@example.invalid' },
+      { id: 'binned', quote: 'Weg.', email: 'binned@example.invalid', deleted: '2026-01-02T00:00:00.000Z' },
+    ]);
+
+    const deleted: string[] = [];
+
+    handler = (call) => {
+      if (call.method === 'DELETE') {
+        deleted.push(call.path);
+
+        return json({ data: true });
+      }
+
+      const email = decodeURIComponent(call.path).match(/'([^']+)'/)?.[1] ?? '';
+
+      if (email.startsWith('unreachable')) return json({}, 500);
+
+      const lists = email.startsWith('news') ? [{ id: 9 }, { id: 7 }] : [{ id: 7 }];
+
+      return json({ data: { results: [{ ...subscriber, id: email.length, email, lists }] } });
+    };
+
+    const result = await runRetention(new Date('2026-03-01T12:00:00Z'), 30);
+
+    assert.deepEqual(result, { lists: 1, participants: 2, testimonials: 2 });
+    const after = await db.select().from(participants);
+    const person = (name: string) => after.find((p) => p.id === byName(name).id)!;
+
+    assert(isAnonymised(person('gone').email), 'only past events: anonymised');
+    assert.deepEqual([person('gone').firstName, person('gone').phone], ['', '']);
+    assert(isAnonymised(person('news').email), 'newsletter subscribers are anonymised here too');
+    assert.equal(person('stays').email, 'stays@example.invalid', 'a later registration keeps the data');
+    assert.equal(person('unreachable').email, 'unreachable@example.invalid', 'kept until listmonk forgets it');
+    assert.deepEqual(deleted.sort(), ['/api/lists/7', `/api/subscribers/${'gone@example.invalid'.length}`]);
+    assert.equal((await listRegistrationsForEvent(old.id)).length, 4, 'past events keep their counts');
+    assert((await listRegistrationsForEvent(old.id)).every((row) => row.submittedPhone === null));
+    assert.equal((await db.select().from(events).where(eq(events.id, old.id)))[0].listmonkListId, 0);
+    assert.equal((await db.select().from(events).where(eq(events.id, future.id)))[0].listmonkListId, 8);
+
+    const voices = await db.select().from(testimonials);
+
+    assert.equal(voices.find((v) => v.id === 'published')?.email, '');
+    assert.equal(voices.find((v) => v.id === 'recent')?.email, 'recent@example.invalid');
+    assert.equal(voices.find((v) => v.id === 'pending')?.email, 'pending@example.invalid');
+    assert.equal(
+      voices.some((v) => v.id === 'binned'),
+      false,
+    );
+
+    // A second run changes nothing.
+    deleted.length = 0;
+    assert.deepEqual(await runRetention(new Date('2026-03-01T12:00:00Z'), 30), {
+      lists: 0,
+      participants: 0,
+      testimonials: 0,
+    });
   },
   /** Every `{{ .Tx.Data.x }}` a versioned listmonk template reads is a field its payload sends. */
   async 'template-contract'() {

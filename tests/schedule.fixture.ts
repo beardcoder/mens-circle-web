@@ -11,6 +11,12 @@ mock.module('../src/lib/server/reminders', () => ({
   },
 }));
 
+mock.module('../src/lib/server/retention', () => ({
+  runRetention: async () => {
+    console.log('TASK retention');
+  },
+}));
+
 mock.module('../scripts/backup-db', () => ({
   backupConfigured: () => process.env.BACKUP_ENABLED === '1',
   runBackup: async () => {

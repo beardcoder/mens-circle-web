@@ -1,3 +1,4 @@
+import { DEFAULT_RETENTION_DAYS } from '../shared/retention';
 import { parseTrustedProxy } from './ratelimit';
 
 const env = (key: string, fallback = ''): string => {
@@ -41,6 +42,8 @@ export const config = {
   MAIL_ADMIN_NAME: env('MAIL_ADMIN_NAME', 'Männerkreis Admin'),
   CONTACT_EMAIL: env('MAIL_CONTACT_ADDRESS', 'hallo@mens-circle.de'),
   DATABASE_PATH: env('DATABASE_PATH', './data/mens-circle.db'),
+  /** Days after an event until its participants' data is anonymised (retention.ts); at most what /datenschutz names. */
+  RETENTION_DAYS: Math.min(DEFAULT_RETENTION_DAYS, Math.max(1, envInt('RETENTION_DAYS', DEFAULT_RETENTION_DAYS))),
   /** `cloudflare` or `none` (default): whose header names the visitor's IP (ratelimit.ts). */
   TRUSTED_PROXY: parseTrustedProxy(env('TRUSTED_PROXY', 'none')),
   // Who may enter /admin: comma-separated emails and/or one Pocket ID group.

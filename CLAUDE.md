@@ -135,7 +135,12 @@ reminder pass runs every 15 min, the S3 backup at 03:00 UTC when `BACKUP_S3_*` i
 Reminders go out in Berlin wall-clock time (`lib/server/reminder-window.ts`): 18:00–22:00
 the evening before ("morgen"), else from 10:00 on the day until the start ("heute"),
 once per registration (`reminder_sent_at`). Never compute local times with `getUTC*`;
-use `lib/shared/time.ts`. No in-process timer and no `Bun.cron` (throws at
+use `lib/shared/time.ts`. At 02:30 UTC `lib/server/retention.ts` anonymises
+participants `RETENTION_DAYS` after their last event (≤ `DEFAULT_RETENTION_DAYS`, the
+number `/datenschutz` prints), deletes expired event lists in listmonk and clears
+published testimonials' addresses; change the period in `lib/shared/retention.ts`
+and the policy together. Logs never carry an address (`logId()` in `listmonk.ts`).
+No in-process timer and no `Bun.cron` (throws at
 boot). Beside `dist/` and `drizzle/`, the Docker image keeps only the three scheduled
 scripts, `src/lib/server/`, `src/lib/shared/` (pure helpers), the mail fonts (`src/assets/mail`) and the production
 `dependencies` (the build bundles the rest): what those scripts and the server lib
