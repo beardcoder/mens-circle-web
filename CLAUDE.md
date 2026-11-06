@@ -206,7 +206,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   the forest — calm, warm, grounded, an invitation to a real evening. Deep forest
   green for what draws you in, the ember of the logo for the one thing to do, linen
   for reading; the circle (the photo in a ring, three warm points, the date's seal,
-  numbered steps, the breath above the hills) is the one motif. Same
+  numbered steps) is the one motif. Same
   function, same component.
 - Stance (design-system.md, "Stance" and "Voice"): the page acts like a circle
   leader who holds the space instead of performing. Quiet, the frame visible
@@ -228,7 +228,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   outlines a control alone. Check new pairs in both modes.
 - Grounds: `Section ground` is `default` (linen), `alt` (sand: facts that belong
   together, the course, the dates), `tint` (sage: agreements, quiet notes) or `dark`
-  (`surface-dark`, forest: the opening, the breath, the registration, the menu, the
+  (`surface-dark`, forest: the opening, the registration, the menu, the
   footer). Grounds run from edge to edge: square, no inset, no sheet.
 - Type: Fraunces 500 (`font-display`, one static face) for titles, quotes, dates,
   numbers in circles; Figtree (`font-sans`, variable) for text, navigation, forms,
@@ -261,10 +261,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 - Home: the forest opening holds statement, explanation, the action (in the first
   screen at 1440 × 900), the photo in its ring and the next date overlapping it; then
   the facts between lines, the intro with the first round's questions as a quiet
-  list, the four steps on a path, the breath above the hills (`#haltung`), Markus
-  (quote behind an ember rule, signed with his avatar), the five agreements as a
-  numbered list, voices, FAQ, taking part (`#termine`), staying in touch
-  (`#newsletter`).
+  list, the four steps on a path (closing with a line on breath and body), the five
+  agreements as a numbered list (`#rahmen`), taking part (`#termine`), Markus (quote
+  behind an ember rule, signed with his avatar), voices, FAQ, staying in touch
+  (`#newsletter`). The decision follows the frame, not the FAQ.
 - Header 72px: links visible from `nav`, one filled action; over the home opening the
   bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then 95% linen; fixed bars
   (header, event dock, action bar) blur what lies behind them only from `lg` on a
@@ -310,8 +310,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   Third-party scripts are `async`, so nothing queues before the opening. On phones
   the home page has a bottom `ActionBar` with the next date once the hero's action
   is gone. Interactions ~180ms (a button rises 2px and settles when pressed, arrows
-  slide and nudge on a press, header links draw a line); the breath's 11 s cycle (5.5 s in, 5.5 s out: resonance breathing) runs
-  only on request. No
+  slide and nudge on a press, header links draw a line). No
   `content-visibility`. Under reduced motion everything rests.
 - Fonts: Fraunces 500 static (~18 kB) and Figtree variable (~20 kB); both upright
   faces preload, Figtree's italic loads when used.
@@ -336,7 +335,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   or JSON page content. Section components live in `src/components/blocks/`; pages
   pass their content explicitly as props and rich-text slots. Load dynamic data in
   server code or through the public JSON endpoints; blocks only render their inputs. Component-specific
-  browser behavior belongs in its own `<script>` (Header, ModeToggle, Statement,
+  browser behavior belongs in its own `<script>` (Header, ModeToggle,
   BackToTop, ActionBar, EventDock, Hero), with no global client entry. Public form helpers stay
   in `lib/form.ts`; admin helpers live beside their Preact components. `Prose` accepts inline markup in its slot or
   an `html` prop for dynamic content. Static FAQ answers, journey steps and facts

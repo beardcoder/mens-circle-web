@@ -1,7 +1,7 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
  * utilities cannot express. "A fire circle at the edge of the forest": a linen
- * ground, deep forest green for what draws you in (the opening, the breath, the
+ * ground, deep forest green for what draws you in (the opening, the
  * footer), ember from the logo for the one thing to do, soft round shapes.
  * Fraunces for titles, quotes and dates; Figtree for everything that explains.
  * Shared by the two entry files: global.css (public site) and admin.css (back
@@ -65,7 +65,7 @@
   --color-fill: var(--p-ember);
   --color-fill-strong: var(--p-ember-deep);
   --color-on-fill: var(--p-on-ember);
-  /* The warm light of the circle motif and the breath; decoration, never text. */
+  /* The warm light of the circle motif (the hero glow); decoration, never text. */
   --color-glow: var(--p-gold);
   /* Lines: `line` parts things quietly and never alone outlines a control;
      `line-bold` outlines inputs and controls (3:1). */
@@ -264,7 +264,7 @@
   background-color: var(--color-surface);
 }
 
-/* The forest ground: the opening, the breath, the registration and the footer,
+/* The forest ground: the opening, the registration, the menu and the footer,
    in both modes. */
 @utility surface-dark {
   --color-surface: var(--p-forest);

@@ -19,7 +19,6 @@ import JourneyStep from '../components/blocks/JourneyStep.astro';
 import JourneySteps from '../components/blocks/JourneySteps.astro';
 import Moderator from '../components/blocks/Moderator.astro';
 import Newsletter from '../components/blocks/Newsletter.astro';
-import Statement from '../components/blocks/Statement.astro';
 import Testimonials from '../components/blocks/Testimonials.astro';
 import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
@@ -125,48 +124,10 @@ if (events && testimonials) {
       </JourneyStep>
     </Fragment>
     <p slot="close">
+      Zu Beginn nehmen wir uns Zeit, aus dem Kopf in den Körper zu kommen: ruhig atmen, die Füße auf dem Boden spüren.
       Vorerfahrung mit Männerkreisen, Meditation oder Atemarbeit brauchst du nicht, und vorbereiten musst du nichts.
     </p>
   </JourneySteps>
-
-  <Statement
-    anchor="haltung"
-    eyebrow="Atem und Körper"
-    lines={['Aus dem Kopf.', 'In den Körper.']}
-    text="Nach einem vollen Tag hilft es, kurz auf den Körper zu achten. Dafür nehmen wir uns zu Beginn Zeit: ruhig atmen, die Füße auf dem Boden spüren. Die Übungen sind einfach, und du entscheidest bei jeder, ob du mitmachst."
-    linkLabel="Was wir miteinander vereinbaren"
-    linkUrl="#rahmen"
-    breathGuide="Atme ein paar Züge mit: langsam ein und langsam aus, je gut fünf Sekunden."
-  />
-
-  <Moderator
-    anchor="moderator"
-    eyebrow="Wer den Kreis leitet"
-    name="Ich bin Markus."
-    quote="Ich sorge dafür, dass jeder in Ruhe sprechen kann und die anderen zuhören. Mit Ratschlägen halte ich mich zurück."
-    avatar={avatar}
-    imageAlt="Markus Sommer"
-    signature="Markus Sommer"
-    signatureNote="hat den Kreis gegründet und leitet ihn"
-    linkLabel="Warum ich den Männerkreis leite"
-    linkUrl="/warum-ich-den-maennerkreis-leite"
-  >
-    <p>
-      Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt
-      hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.
-    </p>
-    <p>
-      Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit.
-    </p>
-    <p>
-      Ich sitze mit im Kreis. Zu Beginn erkläre ich die Absprachen, frage, ob alle sie mittragen, und achte darauf, dass
-      sie gelten. Jeder kann zu Wort kommen, keiner muss.
-    </p>
-    <p>
-      Übungen mit Atem oder Körperwahrnehmung leite ich als Angebot an. Bevor wir etwas gemeinsam machen, frage ich, ob
-      es für dich passt. Nein ist dabei immer eine gute Antwort.
-    </p>
-  </Moderator>
 
   <Frame
     anchor="rahmen"
@@ -202,6 +163,43 @@ if (events && testimonials) {
       'Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Es gibt im Kreis keine Lehre und kein festes Bild davon, wie ein Mann zu sein hat.'
     }
   />
+
+  <Dates
+    events={events}
+    anchor="termine"
+    eyebrow=""
+    lede={'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin.'}
+    title="Dabei sein."
+  />
+
+  <Moderator
+    anchor="moderator"
+    eyebrow="Wer den Kreis leitet"
+    name="Ich bin Markus."
+    quote="Ich sorge dafür, dass jeder in Ruhe sprechen kann und die anderen zuhören. Mit Ratschlägen halte ich mich zurück."
+    avatar={avatar}
+    imageAlt="Markus Sommer"
+    signature="Markus Sommer"
+    signatureNote="hat den Kreis gegründet und leitet ihn"
+    linkLabel="Warum ich den Männerkreis leite"
+    linkUrl="/warum-ich-den-maennerkreis-leite"
+  >
+    <p>
+      Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt
+      hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.
+    </p>
+    <p>
+      Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit.
+    </p>
+    <p>
+      Ich sitze mit im Kreis. Zu Beginn erkläre ich die Absprachen, frage, ob alle sie mittragen, und achte darauf, dass
+      sie gelten. Jeder kann zu Wort kommen, keiner muss.
+    </p>
+    <p>
+      Übungen mit Atem oder Körperwahrnehmung leite ich als Angebot an. Bevor wir etwas gemeinsam machen, frage ich, ob
+      es für dich passt. Nein ist dabei immer eine gute Antwort.
+    </p>
+  </Moderator>
 
   <Testimonials
     items={testimonials}
@@ -252,14 +250,6 @@ if (events && testimonials) {
       unter den Anwesenden, keine Garantie. Wie viel du erzählst, entscheidest deshalb immer du.
     </AccordionItem>
   </Faq>
-
-  <Dates
-    events={events}
-    anchor="termine"
-    eyebrow=""
-    lede={'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin.'}
-    title="Dabei sein."
-  />
 
   <Newsletter
     title="Termine per E‑Mail erhalten"

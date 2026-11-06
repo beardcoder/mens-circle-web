@@ -57,58 +57,6 @@
   }
 }
 
-/* The shape rests until the visitor explicitly starts the rhythm. Text and
-   rings share one clock: resonance breathing, 5.5 s in and 5.5 s out (about
-   five and a half breaths a minute), without live announcements. */
-.breath-orbit {
-  border-radius: 50%;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-glow) 16%, transparent), transparent);
-}
-
-[data-breath][data-running] .breath-ring {
-  animation: breath-cycle 11s ease-in-out infinite;
-}
-
-[data-breath][data-running] .breath-in {
-  animation: breath-in 11s steps(1, end) infinite;
-}
-
-[data-breath][data-running] .breath-out {
-  animation: breath-out 11s steps(1, end) infinite;
-}
-
-@keyframes breath-in {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-@keyframes breath-cycle {
-  0%,
-  100% {
-    opacity: 0.45;
-    scale: var(--rest, 0.62);
-  }
-  50% {
-    opacity: 1;
-    scale: 1;
-  }
-}
-
-@keyframes breath-out {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 /* The hero's ring turns once a minute and a half; under reduced motion it rests. */
 @media (prefers-reduced-motion: no-preference) {
   .hero-orbit {

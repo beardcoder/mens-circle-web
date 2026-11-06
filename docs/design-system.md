@@ -6,7 +6,7 @@ A men's circle meets in the evening, sits in a ring and listens. The site looks 
 that evening: deep forest green for what draws you in, the warm ember of the logo
 for the one thing to do, linen daylight for reading. The circle is the one motif —
 the photograph in a ring, three warm points on it (the three figures of the logo),
-the date in its seal, numbered steps on a path, the breath above the hills of
+the date in its seal, numbered steps on a path, the hills of
 the Bavarian Forest. Shapes are soft and round.
 
 Four principles: make the next step visible, group what belongs together, keep
@@ -57,7 +57,7 @@ facts and the FAQ, not in every section.
 | File                             | Role                                                                                                                                         |
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/styles/theme.css`           | Tokens (`@theme`), primitives, variants, the three surfaces, keyframes, base rules. Shared.                                                  |
-| `src/styles/global.css`          | Public entry: Tailwind (classes from `src/` only), theme, page transitions, the breath, the hero's ring, the opening and the scroll hooks.   |
+| `src/styles/global.css`          | Public entry: Tailwind (classes from `src/` only), theme, page transitions, the FAQ, the hero's ring, the opening and the scroll hooks.      |
 | `src/styles/admin.css`           | Admin entry: Tailwind and theme; AdminLayout pins the dark mode (the forest at night).                                                       |
 | `src/lib/ui.ts`                  | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
 | `src/lib/shared/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
@@ -77,7 +77,7 @@ set before first paint. Never a hex value in markup.
 | Warm band       | `#ECE4D4` sand               | `#17201A`             | `ground-alt` (`surface-alt`)     | information that belongs together              |
 | Quiet note      | `#E2E7D8` sage               | `#1C2720`             | `tint` (`surface-tint`)          | agreements, a hint beside the work             |
 | Raised          | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | the step circles, the hills, the admin's cards |
-| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, breath, registration, menu, footer    |
+| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, registration, menu, footer            |
 | Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                          |
 | Secondary text  | `#5A6255` moss               | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                        |
 | Lines           | `#DDD5C5` / `#C8BFAC`        | `#2A362E` / `#3B4940` | `line`, `line-strong`            | quiet structure; never alone a control         |
@@ -107,7 +107,7 @@ accent colour and stays upright.
 | Token          | Size      | Use                                       |
 | -------------- | --------- | ----------------------------------------- |
 | `text-hero`    | 44–88px   | the home statement                        |
-| `text-page`    | 38–68px   | a sub-page's title, the breath line       |
+| `text-page`    | 38–68px   | a sub-page's title, an event title        |
 | `text-section` | 34–60px   | a section's title                         |
 | `text-sub`     | 22–30px   | subheadings, list titles, a fact's value  |
 | `text-quote`   | 24–34px   | one short highlighted quote               |
@@ -250,9 +250,8 @@ mobile score than it does live.
 
 Short transitions answer interactions (a button rises 2px and settles as it is
 pressed, arrows slide and nudge on a press, the FAQ disc gives a little under the
-finger, header links draw a line). The hero's ring turns once every 90 seconds; the breath circle
-follows resonance breathing (5.5 s in, 5.5 s out) only when started, and stops off
-screen, in a hidden tab or under reduced motion. The phone menu opens as a circle
+finger, header links draw a line). The hero's ring turns once every 90 seconds and rests off screen and under reduced
+motion. The phone menu opens as a circle
 and its links rise in (`rise`); the event dock fades in once the title is gone. On phones the home page keeps the next date and its action in a bottom bar
 (`ActionBar`) once the opening's action has scrolled away; it steps back at the
 dates and the footer. Under reduced motion everything rests.
@@ -294,11 +293,12 @@ large and faint behind it.
   it the photograph in a circle with the turning ring, the next date overlapping its
   edge (on phones under the text). Then the four facts between lines (columns with
   rules on the desktop, rows below), the circle's topic beside the questions of the
-  first round as a quiet list, the evening's four steps on a path (sand), the breath
-  above the hills (forest), Markus (his quote behind an ember rule, signed with his
-  avatar, beside his text), the five agreements as a numbered list beside their
-  head, with the boundary note (sage), the voices, the FAQ, taking part
-  (`#termine`, sand, invitation beside the next date) and staying in touch
+  first round as a quiet list, the evening's four steps on a path (sand) closing
+  with a line on breath and body, the five agreements as a numbered list beside
+  their head, with the boundary note (sage), taking part (`#termine`, sand,
+  invitation beside the next date: the decision follows the frame), Markus (his
+  quote behind an ember rule, signed with his avatar, beside his text), the voices,
+  the FAQ and staying in touch
   (`#newsletter`, the form and the WhatsApp note beside it, parted by a line).
 - **`/event`.** `PageIntro`, then every upcoming date as the same `EventSummary`
   beside the e-mail notification, parted by a line; the FAQ; a where-next band.
