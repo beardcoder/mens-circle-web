@@ -9,7 +9,6 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import Motion from '../components/Motion.astro';
 import SeoHead from '../components/SeoHead.astro';
-import WebMcp from '../components/WebMcp.astro';
 
 type Props = ComponentProps<typeof SeoHead> & {
   headerAction?: ComponentProps<typeof Header>['action'];
@@ -213,7 +212,6 @@ const speculationRules = JSON.stringify({
     </script>
     <script is:inline type="speculationrules" set:html={speculationRules} />
     <SeoHead {...props} />
-    <WebMcp />
   </head>
   <body>
     {/* Top sentinel: a static, in-flow target at position 0 for scroll-to-top; it

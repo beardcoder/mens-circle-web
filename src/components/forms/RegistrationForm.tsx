@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { seatFill } from '@lib/seats';
 import { button, checkbox, control, fieldError, fieldHint, fieldLabel, formStatus, link } from '@lib/ui';
-import { formTool, provideTool } from '@lib/webmcp';
 
 import type { PublicEvent } from '../event/types';
 import { usePublicData } from '../event/usePublicData';
@@ -29,17 +28,6 @@ export default function RegistrationForm({
   const [success, setSuccess] = useState('');
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // While the form is open, an agent can fill it in (lib/webmcp.ts); the person agrees
-  // to the privacy policy and registers themselves.
-  const open = !data.isPast && !success;
-  const full = data.view.state === 'full';
-
-  useEffect(() => {
-    if (!open || !form.current) return;
-
-    return provideTool(registrationTool(form.current, data.view.title.join(' '), full));
-  }, [open, full]);
 
   useEffect(() => {
     const first = form.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
@@ -239,36 +227,6 @@ export default function RegistrationForm({
       </form>
     </div>
   );
-}
-
-/** The registration form as a WebMCP tool: it fills the person's details in, never the consent. */
-function registrationTool(target: HTMLFormElement, date: string, full: boolean) {
-  const list = full ? 'the waiting list for' : 'a seat at';
-
-  return formTool({
-    form: target,
-    name: 'fill-registration-form',
-    title: full ? 'Für die Warteliste vormerken' : 'Anmeldung vorbereiten',
-    description: `Fills in the registration form on this page for ${list} the men's circle evening on ${date} with the person's name, email address and optional mobile number, and moves the focus to the privacy consent. The person then agrees to the privacy policy and submits the form themselves.`,
-    fields: [
-      { name: 'first_name', description: "The person's first name.", required: true, maxLength: 100 },
-      { name: 'last_name', description: "The person's last name.", required: true, maxLength: 100 },
-      {
-        name: 'email',
-        description: 'Where the confirmation is sent.',
-        required: true,
-        maxLength: 254,
-        email: true,
-      },
-      {
-        name: 'phone_number',
-        description: 'Optional: a mobile number for short-notice news on the day.',
-        maxLength: 40,
-      },
-    ],
-    next: target.querySelector<HTMLElement>('input[name="privacy"]'),
-    done: `Das Formular ist ausgefüllt. Die Person stimmt der Datenschutzerklärung zu und tippt auf „${full ? 'Auf die Warteliste eintragen' : 'Verbindlich anmelden'}“.`,
-  });
 }
 
 function RegistrationIntro({

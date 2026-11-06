@@ -185,17 +185,7 @@ try {
 
     assert.equal(missing.status, 404);
     assert.equal(missing.headers.get('cache-control'), 'no-store');
-    // The upcoming dates for the WebMCP tool: the public view only, route-cached.
-    const list = await fetch(`${origin}/api/public/events`);
-    const listed = await list.text();
-
-    assert.equal(list.status, 200);
-    assert.match(list.headers.get('cache-control') ?? '', /must-revalidate/);
-    assert.deepEqual(
-      (JSON.parse(listed) as { events: { slug: string }[] }).events.map((event) => event.slug),
-      ['testabend', 'voll'],
-    );
-    assert(!listed.includes('PRIVATE'), 'The list must not carry unpublished data');
+    assert.equal((await fetch(`${origin}/api/public/events`)).status, 404);
 
     for (const font of ['fraunces-500.woff2', 'figtree.woff2', 'dm-sans.woff2', 'playfair-display-400.woff2']) {
       const response = await fetch(`${origin}/fonts/mail/${font}`, { headers: { Origin: 'https://listmonk.example' } });
@@ -288,11 +278,6 @@ try {
       assert.match(html, /Seite erneut laden/);
       assert(!html.includes('Der nächste Abend ist in Planung'));
     }
-
-    const list = await fetch(`${origin}/api/public/events`);
-
-    assert.equal(list.status, 503);
-    assert.equal(list.headers.get('cache-control'), 'no-store');
   });
 
   console.info('Public page checks passed: empty, scheduled, full, private, unavailable, images and sitemap.');

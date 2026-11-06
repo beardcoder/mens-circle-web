@@ -25,8 +25,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 ## Deployment (Coolify)
 
 1. Dockerfile resource, persistent volume on `/data`, port `8090`.
-2. Build variables: `PUBLIC_SITE_URL`, `ASTRO_KEY` (`bunx astro create-key`, keep it stable);
-   optionally `PUBLIC_WEBMCP_ORIGIN_TRIAL`, Chrome's origin-trial token for WebMCP ([docs/webmcp.md](docs/webmcp.md)).
+2. Build variables: `PUBLIC_SITE_URL`, `ASTRO_KEY` (`bunx astro create-key`, keep it stable).
 3. Runtime variables:
 
 | Variable                                                  | Purpose                                                      |
@@ -61,8 +60,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 - Prefetch through Speculation Rules (no script)
 - Server adapter: `@igloczek/astro-bun-adapter` (standalone, bundled), served by `server.ts` on `Bun.serve()`; see [runtime](docs/runtime.md)
 - Mail fonts: endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view
-- Live-seat and date-list JSON, cache lifetimes and privacy boundary: `docs/public-api.md`
-- WebMCP: tools for AI agents in the visitor's browser (list the dates, fill in the registration; the person submits), see [WebMCP](docs/webmcp.md)
+- Live-seat JSON, cache lifetimes and privacy boundary: `docs/public-api.md`
 - Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)
 - Public component behavior: `<script>` in the owning Astro component; shared public form helpers stay in `src/lib/`
 - Admin: Preact TSX workspaces with local state, protected Astro Actions and native page navigation; see [admin UI](docs/admin-ui.md)
