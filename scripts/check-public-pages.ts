@@ -7,9 +7,39 @@ import { join } from 'node:path';
 const sandbox = await mkdtemp(join(tmpdir(), 'mens-circle-pages-'));
 
 process.env.DATABASE_PATH = join(sandbox, 'pages.sqlite');
+process.env.ADMIN_SESSION_SECRET = 'pages-check-secret-of-at-least-32-characters';
 
 const { db } = await import('../src/lib/server/db');
-const { events, testimonials } = await import('../src/lib/server/db/schema');
+const { events, participants, registrations, testimonials } = await import('../src/lib/server/db/schema');
+const { cancelUrlFor } = await import('../src/lib/server/cancel-token');
+
+/** The signed cancel link: GET shows, POST cancels once, anything else is refused privately. */
+async function checkCancelLink(origin: string): Promise<void> {
+  const bogus = await fetch(`${origin}/anmeldung/absagen?token=forged.token`);
+  const bogusHtml = await bogus.text();
+
+  assert.equal(bogus.status, 404);
+  assert.equal(bogus.headers.get('cache-control'), 'private, no-store');
+  assert.match(bogusHtml, /noindex/);
+  assert.match(bogusHtml, /Dieser Link gilt nicht mehr/);
+
+  const link = new URL(await cancelUrlFor('cancel-me', '2099-01-01T12:00:00.000Z'));
+  const page = await fetch(`${origin}${link.pathname}${link.search}`);
+
+  assert.equal(page.status, 200);
+  assert.equal(page.headers.get('referrer-policy'), 'no-referrer');
+  assert.match(await page.text(), /Anmeldung absagen\?/);
+
+  const post = () =>
+    fetch(`${origin}/anmeldung/absagen`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: origin, 'Sec-Fetch-Site': 'same-origin' },
+      body: new URLSearchParams({ token: link.searchParams.get('token')! }),
+    }).then((r) => r.text());
+
+  assert.match(await post(), /Du hast abgesagt/);
+  assert.match(await post(), /Schon abgesagt/);
+}
 
 async function withServer(check: (origin: string) => Promise<void>): Promise<void> {
   const reservation = Bun.serve({ hostname: '127.0.0.1', port: 0, fetch: () => new Response() });
@@ -24,6 +54,7 @@ async function withServer(check: (origin: string) => Promise<void>): Promise<voi
       HOST: '127.0.0.1',
       PORT: String(port),
       DATABASE_PATH: process.env.DATABASE_PATH,
+      ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
     },
     stdout: 'ignore',
     stderr: 'pipe',
@@ -145,6 +176,10 @@ try {
     { id: 'long', quote: 'Eine längere Erfahrung. '.repeat(25), isPublished: true },
     { id: 'hidden', quote: 'PRIVATE QUOTE' },
   ]);
+  await db.insert(participants).values({ id: 'guest', email: 'guest@example.invalid', firstName: 'Gast' });
+  await db
+    .insert(registrations)
+    .values({ id: 'cancel-me', eventId: 'open', participantId: 'guest', status: 'registered', registeredAt: '1' });
 
   await withServer(async (origin) => {
     const first = await fetch(origin);
@@ -174,6 +209,7 @@ try {
     assert.match(overview, /href="\/event\/testabend"/);
 
     await checkAssets(origin, home);
+    await checkCancelLink(origin);
 
     const json = await fetch(`${origin}/api/public/events/testabend`);
 

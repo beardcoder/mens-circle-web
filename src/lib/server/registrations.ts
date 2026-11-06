@@ -17,33 +17,60 @@ const fireAndForget = (label: string, promise: Promise<unknown>): void => {
   void promise.catch((err) => console.error(label, String(err)));
 };
 
+type ParticipantFields = { firstName?: string; lastName?: string; phone?: string };
+
+/** What a sign-up typed that differs from the stored participant (kept on the registration). */
+export interface SubmittedDetails {
+  submittedFirstName: string | null;
+  submittedLastName: string | null;
+  submittedPhone: string | null;
+}
+
+const differs = (typed: string | undefined, stored: string): string | null =>
+  typed && typed !== stored ? typed : null;
+
+/**
+ * Finds or creates the participant for a public sign-up. The address is not
+ * verified, so an existing participant only gets empty fields filled: nobody can
+ * overwrite someone else's name or phone by typing their address. What differs is
+ * returned and stored on the registration for the admin.
+ */
 const upsertParticipant = async (
   email: string,
-  fields: { firstName?: string; lastName?: string; phone?: string },
-): Promise<Participant> => {
+  fields: ParticipantFields,
+): Promise<{ participant: Participant; submitted: SubmittedDetails }> => {
   const existing = (await db.select().from(participants).where(eq(participants.email, email)).limit(1))[0];
-  const patch: Partial<Participant> = {};
 
-  if (fields.firstName) patch.firstName = fields.firstName;
-
-  if (fields.lastName) patch.lastName = fields.lastName;
-
-  if (fields.phone) patch.phone = fields.phone;
-
-  if (existing) {
-    if (Object.keys(patch).length > 0) {
-      return (await db.update(participants).set(patch).where(eq(participants.id, existing.id)).returning())[0];
-    }
-
-    return existing;
-  }
-
-  return (
-    await db
+  if (!existing) {
+    const [participant] = await db
       .insert(participants)
       .values({ email, firstName: fields.firstName ?? '', lastName: fields.lastName ?? '', phone: fields.phone ?? '' })
-      .returning()
-  )[0];
+      .returning();
+
+    return { participant, submitted: { submittedFirstName: null, submittedLastName: null, submittedPhone: null } };
+  }
+
+  const patch: Partial<Participant> = {};
+
+  if (!existing.firstName && fields.firstName) patch.firstName = fields.firstName;
+
+  if (!existing.lastName && fields.lastName) patch.lastName = fields.lastName;
+
+  if (!existing.phone && fields.phone) patch.phone = fields.phone;
+
+  const participant =
+    Object.keys(patch).length > 0
+      ? (await db.update(participants).set(patch).where(eq(participants.id, existing.id)).returning())[0]
+      : existing;
+
+  return {
+    participant,
+    submitted: {
+      submittedFirstName: differs(fields.firstName, participant.firstName),
+      submittedLastName: differs(fields.lastName, participant.lastName),
+      submittedPhone: differs(fields.phone, participant.phone),
+    },
+  };
 };
 
 /** The registration form, already validated by the `register` action's schema. */
@@ -99,6 +126,7 @@ const openEvent = async (eventId: string): Promise<{ event: Event } | { error: F
 const claimSeat = (
   participantId: string,
   event: Event,
+  submitted: SubmittedDetails,
 ): { registrationId: string; status: IntakeStatus } | { error: FormResult } =>
   db.transaction(
     (tx) => {
@@ -132,7 +160,7 @@ const claimSeat = (
       if (existing) {
         // A revived seat starts over: the old confirmation no longer describes it.
         tx.update(registrations)
-          .set({ status, registeredAt, cancelledAt: null, deleted: null, confirmationSentAt: null })
+          .set({ status, registeredAt, cancelledAt: null, deleted: null, confirmationSentAt: null, ...submitted })
           .where(eq(registrations.id, existing.id))
           .run();
 
@@ -141,7 +169,7 @@ const claimSeat = (
 
       const inserted = tx
         .insert(registrations)
-        .values({ participantId, eventId: event.id, status, registeredAt })
+        .values({ participantId, eventId: event.id, status, registeredAt, ...submitted })
         .returning()
         .get();
 
@@ -180,11 +208,13 @@ const dispatchSideEffects = (
   fireAndForget(
     '[registrations] side effects failed',
     withSubscriberScope(async () => {
-      const mails = sendRegistrationEmails(event, participant, status, activeCount).then(async (userSent) => {
-        if (userSent) await markConfirmationSent(registrationId);
+      const mails = sendRegistrationEmails(event, participant, status, activeCount, registrationId).then(
+        async (userSent) => {
+          if (userSent) await markConfirmationSent(registrationId);
 
-        return userSent;
-      });
+          return userSent;
+        },
+      );
 
       const tasks: Array<[string, Promise<unknown>]> = [
         ['emails', mails],
@@ -210,8 +240,8 @@ export const register = async (payload: RegistrationInput): Promise<FormResult> 
 
   const { event } = found;
 
-  const participant = await upsertParticipant(fields.email, fields);
-  const seat = claimSeat(participant.id, event);
+  const { participant, submitted } = await upsertParticipant(fields.email, fields);
+  const seat = claimSeat(participant.id, event, submitted);
 
   if ('error' in seat) return seat.error;
 
@@ -237,6 +267,10 @@ export interface RegistrationRow {
   lastName: string;
   email: string;
   phone: string;
+  /** Typed at sign-up but not stored on the participant (see `upsertParticipant`). */
+  submittedFirstName: string | null;
+  submittedLastName: string | null;
+  submittedPhone: string | null;
 }
 
 export const listRegistrationsForEvent = (eventId: string): Promise<RegistrationRow[]> =>
@@ -252,6 +286,9 @@ export const listRegistrationsForEvent = (eventId: string): Promise<Registration
       lastName: participants.lastName,
       email: participants.email,
       phone: participants.phone,
+      submittedFirstName: registrations.submittedFirstName,
+      submittedLastName: registrations.submittedLastName,
+      submittedPhone: registrations.submittedPhone,
     })
     .from(registrations)
     .innerJoin(participants, eq(registrations.participantId, participants.id))
@@ -279,7 +316,10 @@ const holdsSeatStatus = (status: RegistrationStatus): boolean =>
  * Past and deleted events promote nobody. `skip` keeps one registration out of the
  * queue (someone the admin just moved to the waitlist).
  */
-const promoteWaiting = (eventId: string, skip?: string): { event: Event; promoted: string[] } | null =>
+const promoteWaiting = (
+  eventId: string,
+  skip?: string,
+): { event: Event; promoted: Array<{ id: string; participantId: string }> } | null =>
   db.transaction(
     (tx) => {
       const event = tx.select().from(events).where(eq(events.id, eventId)).get();
@@ -317,7 +357,7 @@ const promoteWaiting = (eventId: string, skip?: string): { event: Event; promote
         )
         .run();
 
-      return { event, promoted: waiting.map((row) => row.participantId) };
+      return { event, promoted: waiting };
     },
     { behavior: 'immediate' },
   );
@@ -332,16 +372,30 @@ export const reconcileSeats = async (eventId: string, opts: { skip?: string } = 
 
   if (!result) return 0;
 
-  const promoted = await db.select().from(participants).where(inArray(participants.id, result.promoted));
+  const people = await db
+    .select()
+    .from(participants)
+    .where(
+      inArray(
+        participants.id,
+        result.promoted.map((row) => row.participantId),
+      ),
+    );
 
-  for (const participant of promoted) {
-    fireAndForget('[registrations] promotion email failed', sendWaitlistPromotion(result.event, participant));
+  for (const { id, participantId } of result.promoted) {
+    const participant = people.find((p) => p.id === participantId);
+
+    if (participant) {
+      fireAndForget('[registrations] promotion email failed', sendWaitlistPromotion(result.event, participant, id));
+    }
   }
 
   return result.promoted.length;
 };
 
-export type StatusChange = { ok: true; registration: Registration } | { ok: false; reason: 'not-found' | 'full' };
+export type StatusChange =
+  | { ok: true; registration: Registration; previousStatus: RegistrationStatus }
+  | { ok: false; reason: 'not-found' | 'full' };
 
 /**
  * Sets a registration's status. A change that takes a seat is refused when the event
@@ -383,7 +437,7 @@ const applyStatus = (regId: string, next: RegistrationStatus, overbook: boolean)
         .returning()
         .get();
 
-      return { ok: true, registration, previous: reg };
+      return { ok: true, registration, previousStatus: reg.status, previous: reg };
     },
     { behavior: 'immediate' },
   );
@@ -491,7 +545,7 @@ export const resendRegistrationConfirmations = async (
 
   const results = await withSubscriberScope(() =>
     settleWithConcurrency(eligible, async ({ id, status, participant }) => {
-      const ok = await sendRegistrationConfirmation(event, participant, status);
+      const ok = await sendRegistrationConfirmation(event, participant, status, id);
 
       if (ok) await markConfirmationSent(id);
 
@@ -502,4 +556,38 @@ export const resendRegistrationConfirmations = async (
   const sent = results.filter((r) => r.status === 'fulfilled' && r.value).length;
 
   return { sent, failed: results.length - sent, skipped: selected.length - eligible.length };
+};
+
+export type SelfCancelResult = 'cancelled' | 'already' | 'not-found';
+
+/** Cancels a registration from its signed link; only the first call cancels. */
+export const cancelOwnRegistration = async (regId: string): Promise<SelfCancelResult> => {
+  const reg = (await db.select().from(registrations).where(eq(registrations.id, regId)).limit(1))[0];
+
+  if (!reg || reg.deleted) return 'not-found';
+
+  if (reg.status === 'cancelled' || reg.status === 'attended') return 'already';
+
+  const change = await changeRegistrationStatus(regId, 'cancelled');
+
+  if (!change.ok) return 'not-found';
+
+  return change.previousStatus === 'cancelled' ? 'already' : 'cancelled';
+};
+
+/** What the cancel page shows about the registration its link names. */
+export const readRegistrationForCancel = async (
+  regId: string,
+): Promise<{ status: RegistrationStatus; firstName: string; event: Event } | null> => {
+  const row = (
+    await db
+      .select({ registration: registrations, participant: participants, event: events })
+      .from(registrations)
+      .innerJoin(participants, eq(registrations.participantId, participants.id))
+      .innerJoin(events, eq(registrations.eventId, events.id))
+      .where(and(eq(registrations.id, regId), isNull(registrations.deleted), isNull(events.deleted)))
+      .limit(1)
+  )[0];
+
+  return row ? { status: row.registration.status, firstName: row.participant.firstName, event: row.event } : null;
 };

@@ -1,3 +1,4 @@
+import { cancelUrlFor } from './cancel-token';
 import { config } from './config';
 import type { Event, Participant } from './db/schema';
 import { formatDateLongDE, formatDateShortDE, fullAddress, timeRangeText } from './format';
@@ -38,10 +39,11 @@ export const sendRegistrationConfirmation = async (
   ev: Event,
   participant: Participant,
   status: 'registered' | 'waitlist',
+  registrationId: string,
 ): Promise<boolean> => {
   const recipient = participant.email;
   const recipientName = fullName(participant);
-  const ctx = participantCtx(participant);
+  const ctx = { ...participantCtx(participant), cancelUrl: await cancelUrlFor(registrationId, ev.eventDate) };
 
   return status === 'waitlist'
     ? sendTransactional(config.TX_WAITLIST_CONFIRMATION, recipient, recipientName, {
@@ -64,8 +66,9 @@ export const sendRegistrationEmails = async (
   participant: Participant,
   status: 'registered' | 'waitlist',
   activeCount: number,
+  registrationId: string,
 ): Promise<boolean> => {
-  const userSend = sendRegistrationConfirmation(ev, participant, status);
+  const userSend = sendRegistrationConfirmation(ev, participant, status, registrationId);
 
   const adminSend = sendTransactional(config.TX_ADMIN_NOTIFICATION, config.MAIL_ADMIN_ADDRESS, config.MAIL_ADMIN_NAME, {
     subject: `Neue Anmeldung: ${ev.title}`,
@@ -86,19 +89,30 @@ export const sendRegistrationEmails = async (
   return userSent;
 };
 
-export const sendWaitlistPromotion = async (ev: Event, participant: Participant): Promise<void> => {
+export const sendWaitlistPromotion = async (
+  ev: Event,
+  participant: Participant,
+  registrationId: string,
+): Promise<void> => {
   await sendTransactional(config.TX_WAITLIST_PROMOTION, participant.email, fullName(participant), {
     subject: `Ein Platz ist frei – ${ev.title}`,
     ...participantCtx(participant),
+    cancelUrl: await cancelUrlFor(registrationId, ev.eventDate),
     ...fullDetail(ev),
     icsUrl: icsUrlFor(ev.slug),
   });
 };
 
-export const sendEventReminder = async (ev: Event, participant: Participant, isToday: boolean): Promise<boolean> => {
+export const sendEventReminder = async (
+  ev: Event,
+  participant: Participant,
+  isToday: boolean,
+  registrationId: string,
+): Promise<boolean> => {
   return sendTransactional(config.TX_EVENT_REMINDER, participant.email, fullName(participant), {
     subject: `Erinnerung: ${ev.title} ist ${isToday ? 'heute' : 'morgen'}!`,
     ...participantCtx(participant),
+    cancelUrl: await cancelUrlFor(registrationId, ev.eventDate),
     ...fullDetail(ev),
     whenWord: isToday ? 'heute' : 'morgen',
     whenWordCap: isToday ? 'Heute' : 'Morgen',

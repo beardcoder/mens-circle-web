@@ -37,7 +37,7 @@ const dispatch = async (row: PendingRow, now: Date) => {
 
   if (!kind) return;
 
-  const accepted = await sendEventReminder(row.event, row.participant, kind === 'today');
+  const accepted = await sendEventReminder(row.event, row.participant, kind === 'today', row.regId);
 
   if (!accepted) return;
 

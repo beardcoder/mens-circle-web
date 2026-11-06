@@ -15,6 +15,7 @@ test('nothing that carries live or signed-in state may be stored', () => {
     '/_server-islands/Testimonials',
     '/_actions/register',
     '/_actions/setRegistrationStatus',
+    '/anmeldung/absagen',
   ]) {
     expect(cacheControlForRoute(pathname)).toBe('private, no-store');
   }

@@ -355,6 +355,7 @@ function RegistrationCard({
             </a>
           )}
         </p>
+        <SubmittedNote row={row} />
       </div>
       <select
         value={row.status}
@@ -405,6 +406,21 @@ function RegistrationCard({
         </button>
       </div>
     </li>
+  );
+}
+
+/** What this sign-up typed that differs from the stored participant; never applied automatically. */
+function SubmittedNote({ row }: { row: RegistrationRow }) {
+  const name = [row.submittedFirstName, row.submittedLastName].filter(Boolean).join(' ');
+  const parts = [name && `Name „${name}“`, row.submittedPhone && `Telefon ${row.submittedPhone}`].filter(Boolean);
+
+  if (!parts.length) return null;
+
+  return (
+    <p class="mt-1 text-xs text-fg-muted">
+      Bei dieser Anmeldung abweichend angegeben: {parts.join(', ')}. Die gespeicherten Angaben bleiben, weil die
+      E-Mail-Adresse nicht bestätigt ist.
+    </p>
   );
 }
 

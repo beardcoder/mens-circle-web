@@ -1,0 +1,116 @@
+---
+import site from '@data/site.json';
+import { readCancelToken } from '@lib/server/cancel-token';
+import { formatDateLongDE } from '@lib/server/format';
+import { purgePublicCache } from '@lib/server/public-data';
+import { clientIp, rateLimit } from '@lib/server/ratelimit';
+import { cancelOwnRegistration, readRegistrationForCancel } from '@lib/server/registrations';
+import { link } from '@lib/ui';
+
+import PageIntro from '../../components/PageIntro.astro';
+import Button from '../../components/ui/Button.astro';
+import Layout from '../../layouts/Layout.astro';
+
+/**
+ * The signed cancel link from the participant mails. GET only shows what would be
+ * cancelled (mail scanners open links); the button POSTs the token back. Private:
+ * never cached, never indexed, and the token is not sent on as a referrer.
+ */
+type State = 'confirm' | 'done' | 'already' | 'invalid' | 'limited';
+
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+
+const isPost = Astro.request.method === 'POST';
+let token = Astro.url.searchParams.get('token') ?? '';
+
+if (isPost) {
+  const form = await Astro.request.formData().catch(() => null);
+
+  token = String(form?.get('token') ?? '');
+}
+
+const registrationId = await readCancelToken(token);
+const found = registrationId ? await readRegistrationForCancel(registrationId) : null;
+let state: State = found ? 'confirm' : 'invalid';
+
+if (found && found.status !== 'registered' && found.status !== 'waitlist') state = 'already';
+
+if (isPost && state === 'confirm' && registrationId) {
+  if (!rateLimit('cancel', clientIp(Astro.request), 10, 3600)) {
+    state = 'limited';
+  } else {
+    const result = await cancelOwnRegistration(registrationId);
+
+    state = result === 'cancelled' ? 'done' : result === 'already' ? 'already' : 'invalid';
+
+    if (result === 'cancelled') await purgePublicCache(Astro);
+  }
+}
+
+if (state === 'invalid') Astro.response.status = 404;
+
+if (state === 'limited') Astro.response.status = 429;
+
+const event = found?.event;
+const when = event ? formatDateLongDE(event.eventDate) : '';
+const onWaitlist = found?.status === 'waitlist';
+
+const titles: Record<State, string> = {
+  confirm: onWaitlist ? 'Von der Warteliste austragen?' : 'Anmeldung absagen?',
+  done: onWaitlist ? 'Du bist ausgetragen' : 'Du hast abgesagt',
+  already: 'Schon abgesagt',
+  invalid: 'Dieser Link gilt nicht mehr',
+  limited: 'Gerade zu viele Anfragen',
+};
+---
+
+<Layout title={`${titles[state]} – ${site.siteName}`} robots="noindex, nofollow">
+  <PageIntro eyebrow="Deine Anmeldung" title={titles[state]} titleId="cancel-title">
+    <Fragment slot="lead">
+      {state === 'confirm' && event && (
+        <>
+          Hallo {found?.firstName || 'du'}, du bist für den Abend „{event.title}“ am {when}
+          {onWaitlist ? ' auf der Warteliste' : ' angemeldet'}. Wenn du nicht kommen kannst, sag hier ab.
+          {!onWaitlist && ' Dein Platz geht dann an die nächste Person auf der Warteliste.'}
+        </>
+      )}
+      {state === 'done' && (
+        <>
+          Danke, dass du Bescheid gibst.{' '}
+          {onWaitlist ? 'Du stehst nicht mehr auf der Warteliste.' : 'Dein Platz ist wieder frei.'} Wenn es ein anderes
+          Mal passt, freue ich mich auf dich.
+        </>
+      )}
+      {state === 'already' && <>Diese Anmeldung ist bereits abgesagt. Du musst nichts weiter tun.</>}
+      {state === 'invalid' && (
+        <>
+          Der Link ist abgelaufen oder unvollständig. Wenn du absagen möchtest, schreib mir kurz an{' '}
+          <a class={link} href={`mailto:${site.contactEmail}`}>
+            {site.contactEmail}
+          </a>
+          .
+        </>
+      )}
+      {state === 'limited' && <>Bitte versuche es in einer Stunde noch einmal.</>}
+    </Fragment>
+    {state === 'confirm' ? (
+      <form method="post" action="/anmeldung/absagen" class="contents">
+        <input type="hidden" name="token" value={token} />
+        <Button type="submit" size="lg" class="max-sm:w-full">
+          {onWaitlist ? 'Ja, austragen' : 'Ja, ich sage ab'}
+        </Button>
+        {event && (
+          <Button href={`/event/${event.slug}`} variant="secondary" size="lg" class="max-sm:w-full">
+            Zum Termin
+          </Button>
+        )}
+      </form>
+    ) : (
+      <Button href="/event" variant="secondary" size="lg" class="max-sm:w-full">
+        Termine ansehen
+      </Button>
+    )}
+  </PageIntro>
+  <div class="pb-section"></div>
+</Layout>

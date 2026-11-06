@@ -71,6 +71,14 @@ export const registrations = sqliteTable(
     /** Last successful delivery of the confirmation mail; null means it never arrived. */
     confirmationSentAt: text('confirmation_sent_at'),
     reminderSentAt: text('reminder_sent_at'),
+    /**
+     * What a public sign-up typed when it differs from the stored participant: an
+     * unverified address may not overwrite someone's name or phone, so the admin
+     * sees it as a note instead.
+     */
+    submittedFirstName: text('submitted_first_name'),
+    submittedLastName: text('submitted_last_name'),
+    submittedPhone: text('submitted_phone'),
     deleted: text('deleted'),
     createdAt: text('created_at').notNull().$defaultFn(nowIso),
     updatedAt: text('updated_at').notNull().$defaultFn(nowIso).$onUpdateFn(nowIso),

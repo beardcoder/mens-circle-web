@@ -58,7 +58,8 @@ go through `publicForm()` in `actions/forms.ts`: an in-process per-IP rate limit
 ever shown. Admin pages mount Preact workspaces with local state and native navigation.
 `components/admin/useAdminTask.ts` handles busy state and inline feedback. All private
 admin reads and mutations call `requireAdmin`; see `docs/admin-ui.md`.
-Other endpoints: `/health`, `/sitemap-events.xml`, `/auth/*`, `/api/public/events/<slug>`
+Other endpoints: `/anmeldung/absagen` (the signed cancel link from the participant
+mails, `lib/server/cancel-token.ts`; GET shows, POST cancels; private, noindex), `/health`, `/sitemap-events.xml`, `/auth/*`, `/api/public/events/<slug>`
 (live seats), `/api/public/events/<slug>/ics`, `/fonts/mail/*` (CORS for listmonk).
 
 **Auth.** Pocket ID via `openid-client` (`lib/server/oidc.ts`): code flow with PKCE +
@@ -130,7 +131,11 @@ import at runtime must be in there (other `src/lib` files as types only).
 
 **Email.** listmonk is external; this repo only integrates it. `lib/server/email.ts` is
 the payload contract. Keep list/template IDs (incl. `events.listmonk_list_id`) stable.
-`confirmation_sent_at` is set only when listmonk accepted the mail.
+`confirmation_sent_at` is set only when listmonk accepted the mail. Participant
+mails carry `cancelUrl` (empty without `ADMIN_SESSION_SECRET`; the templates then
+fall back to "write to us"). A public sign-up never overwrites a stored participant's
+name or phone (the address is unverified): it fills empty fields and keeps what
+differs on the registration (`submitted_*`) for the admin.
 `listmonk-templates/` holds the versioned copies of the listmonk templates: edit
 there, then paste into listmonk. The `template-contract` email test fails when a
 template reads a `.Tx.Data` field its payload does not send. The templates load the

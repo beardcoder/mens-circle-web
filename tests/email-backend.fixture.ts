@@ -25,6 +25,12 @@ const waitForIdle = async (): Promise<void> => {
   while (active > 0) await pause();
 };
 
+/** Fire-and-forget mail first signs its cancel link, so give it a moment to reach fetch. */
+const settle = async (): Promise<void> => {
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  await waitForIdle();
+};
+
 const json = (data: unknown, status = 200) => Response.json(data, { status });
 
 const deferred = () => {
@@ -329,7 +335,7 @@ const scenarios: Record<string, () => Promise<void>> = {
     const [participant] = await db.select().from(participants);
 
     config.TX_EVENT_REMINDER = 0;
-    assert.equal(await sendEventReminder(event, participant, false), false);
+    assert.equal(await sendEventReminder(event, participant, false, 'r0'), false);
     await runReminders(EVENING_BEFORE);
     config.TX_EVENT_REMINDER = 4;
     config.LISTMONK_API_TOKEN = '';
@@ -446,7 +452,7 @@ const scenarios: Record<string, () => Promise<void>> = {
     // Cancelling a seat frees one: the first waiter moves up and is mailed once.
     handler = txHandler;
     assert.equal((await changeRegistrationStatus('r0', 'cancelled')).ok, true);
-    await waitForIdle();
+    await settle();
     let rows = await db.select().from(registrations);
 
     assert.equal(rows.find((row) => row.id === 'r4')?.status, 'registered', 'the first waiter is promoted');
@@ -456,7 +462,7 @@ const scenarios: Record<string, () => Promise<void>> = {
     // Cancelling a waiter frees no seat: nobody moves.
     calls.length = 0;
     await changeRegistrationStatus('r5', 'cancelled');
-    await waitForIdle();
+    await settle();
     rows = await db.select().from(registrations);
     assert.equal(rows.find((row) => row.id === 'r5')?.status, 'cancelled');
     assert.equal(promotionMails(), 0);
@@ -527,7 +533,7 @@ const scenarios: Record<string, () => Promise<void>> = {
     assert.equal(await reconcileSeats(past.id), 0);
     assert.equal(await statusOf('r-past'), 'waitlist');
 
-    await waitForIdle();
+    await settle();
     assert.equal(
       calls.filter((call) => call.path === '/api/tx' && call.body.template_id === config.TX_WAITLIST_PROMOTION).length,
       5,
@@ -586,6 +592,111 @@ const scenarios: Record<string, () => Promise<void>> = {
     // register() never awaits it, so it can still be in flight here.
     await waitForIdle();
   },
+  /** A sign-up with someone else's address never rewrites that person's data. */
+  async 'registration-identity'() {
+    const { db, event } = await seed(0);
+
+    const [victim] = await db
+      .insert(participants)
+      .values({ email: 'victim@example.invalid', firstName: 'Echt', lastName: 'Person', phone: '0151 111' })
+      .returning();
+
+    handler = (call) => (call.path === '/api/subscribers' ? json({ data: subscriber }) : json({}));
+    const { register, listRegistrationsForEvent } = await import('../src/lib/server/registrations');
+
+    const result = await register({
+      event_id: event.id,
+      email: 'Victim@Example.invalid',
+      first_name: 'Fremd',
+      last_name: 'Name',
+      phone_number: '0999 999',
+    });
+
+    assert.equal(result.status, 200);
+    const [stored] = await db.select().from(participants).where(eq(participants.id, victim.id));
+
+    assert.deepEqual(
+      [stored.firstName, stored.lastName, stored.phone],
+      ['Echt', 'Person', '0151 111'],
+      'the stored participant is unchanged',
+    );
+    const [row] = await listRegistrationsForEvent(event.id);
+
+    assert.deepEqual(
+      [row.submittedFirstName, row.submittedLastName, row.submittedPhone],
+      ['Fremd', 'Name', '0999 999'],
+      'what was typed is kept for the admin',
+    );
+
+    // Empty fields of an existing participant are filled; matching ones leave no note.
+    const [sparse] = await db.insert(participants).values({ email: 'sparse@example.invalid' }).returning();
+
+    await register({
+      event_id: event.id,
+      email: 'sparse@example.invalid',
+      first_name: 'Neu',
+      last_name: 'Gast',
+      phone_number: '',
+    });
+    const [filled] = await db.select().from(participants).where(eq(participants.id, sparse.id));
+
+    assert.deepEqual([filled.firstName, filled.lastName], ['Neu', 'Gast']);
+    const rows = await listRegistrationsForEvent(event.id);
+
+    assert.equal(rows.find((r) => r.email === 'sparse@example.invalid')?.submittedFirstName, null);
+    await waitForIdle();
+  },
+  /** The signed link in the mails cancels exactly once; forged and expired tokens fail. */
+  async 'cancel-link'() {
+    const { db, event } = await seed(3);
+    const { cancelUrlFor, createCancelToken, readCancelToken } = await import('../src/lib/server/cancel-token');
+    const { signToken, createSession } = await import('../src/lib/server/auth');
+    const { cancelOwnRegistration } = await import('../src/lib/server/registrations');
+
+    await db.update(events).set({ maxParticipants: 2 }).where(eq(events.id, event.id));
+    await db.update(registrations).set({ status: 'waitlist' }).where(eq(registrations.id, 'r2'));
+    handler = txHandler;
+
+    const url = await cancelUrlFor('r0', event.eventDate);
+
+    assert.match(url, /^http:\/\/app\.invalid\/anmeldung\/absagen\?token=/);
+    const token = decodeURIComponent(new URL(url).searchParams.get('token')!);
+
+    assert.equal(await readCancelToken(token), 'r0');
+    assert.equal(await cancelOwnRegistration('r0'), 'cancelled');
+    assert.equal(await cancelOwnRegistration('r0'), 'already', 'a second use cancels nothing');
+    const rows = await db.select().from(registrations);
+
+    assert.equal(rows.find((r) => r.id === 'r0')?.status, 'cancelled');
+    assert.equal(rows.find((r) => r.id === 'r2')?.status, 'registered', 'the freed seat goes to the waitlist');
+
+    // Forged: a changed payload or signature fails.
+    const [payload, sig] = token.split('.');
+
+    const forgedPayload = Buffer.from(JSON.stringify({ p: 'cancel', r: 'r1', exp: Date.now() + 1e9 })).toString(
+      'base64url',
+    );
+
+    assert.equal(await readCancelToken(`${forgedPayload}.${sig}`), null);
+    assert.equal(await readCancelToken(`${payload}.${sig.slice(0, -2)}AA`), null);
+    assert.equal(await readCancelToken(''), null);
+    assert.equal(await readCancelToken(null), null);
+    // Expired: past the event day, or signed with an expiry in the past.
+    assert.equal(await createCancelToken('r1', '2020-01-01T00:00:00.000Z'), null);
+    assert.equal(await readCancelToken(await signToken({ p: 'cancel', r: 'r1' }, -1)), null);
+    // An admin session is not a cancel token.
+    assert.equal(await readCancelToken(await createSession('admin@example.invalid')), null);
+    // The mails carry the link.
+    calls.length = 0;
+    const mail = await import('../src/lib/server/email');
+    const [participant] = await db.select().from(participants).limit(1);
+
+    await mail.sendEventReminder(event, participant, true, 'r1');
+    const sent = calls.find((call) => call.path === '/api/tx')?.body.data as Record<string, string>;
+
+    assert.match(sent.cancelUrl, /\/anmeldung\/absagen\?token=/);
+    await waitForIdle();
+  },
   /** Every `{{ .Tx.Data.x }}` a versioned listmonk template reads is a field its payload sends. */
   async 'template-contract'() {
     const { db, event } = await seed(1);
@@ -594,10 +705,10 @@ const scenarios: Record<string, () => Promise<void>> = {
     handler = (call) => (call.path === '/api/subscribers' ? json({ data: subscriber }) : json({}));
     const mail = await import('../src/lib/server/email');
 
-    await mail.sendRegistrationEmails(event, participant, 'registered', 1);
-    await mail.sendRegistrationConfirmation(event, participant, 'waitlist');
-    await mail.sendWaitlistPromotion(event, participant);
-    await mail.sendEventReminder(event, participant, true);
+    await mail.sendRegistrationEmails(event, participant, 'registered', 1, 'r0');
+    await mail.sendRegistrationConfirmation(event, participant, 'waitlist', 'r0');
+    await mail.sendWaitlistPromotion(event, participant, 'r0');
+    await mail.sendEventReminder(event, participant, true, 'r0');
     await mail.sendEventMessage(event, participant, 'Betreff', 'Hallo {first_name}');
 
     const sent = new Map<number, Record<string, unknown>>();

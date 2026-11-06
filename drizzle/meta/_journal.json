@@ -29,6 +29,13 @@
       "when": 1790010899026,
       "tag": "0003_faithful_yellow_claw",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1793998982611,
+      "tag": "0004_elite_zombie",
+      "breakpoints": true
     }
   ]
 }

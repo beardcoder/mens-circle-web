@@ -22,6 +22,8 @@ const cases = [
   'reconcile-seats',
   'registration-race',
   'template-contract',
+  'registration-identity',
+  'cancel-link',
 ];
 
 for (const scenario of cases) {
@@ -57,6 +59,7 @@ for (const scenario of cases) {
             LISTMONK_TX_EVENT_MESSAGE: '5',
             MAIL_ADMIN_ADDRESS: 'admin@example.invalid',
             APP_URL: 'http://app.invalid',
+            ADMIN_SESSION_SECRET: 'test-secret-that-is-at-least-32-characters-long',
           },
           stdout: 'pipe',
           stderr: 'pipe',
