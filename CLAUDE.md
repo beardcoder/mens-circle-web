@@ -47,8 +47,13 @@ port 8090, SQLite on the `/data` volume; `/health` answers 503 when SQLite does 
 `.env.example` and the README. Retired URLs redirect in `astro.config.mjs`
 (`redirects`); `trailingSlash: 'never'`.
 
-**Tests.** A test that reads config must spawn a fixture with `--no-env-file` and an
-explicit env; config is read at module load, so an in-process import measures `.env`.
+**Tests.** Nothing opens or reads on import: `loadConfig(env)` is pure, and the
+database opens on first use (`getDb()`; `db` forwards to it). In-process tests pass
+their own env to `loadConfig` or assign `config` fields, and install a database with
+`useDatabase(openDatabase(':memory:', { migrationsFolder }))` (see
+`tests/public-data.test.ts`). The older `*.fixture.ts` suites still spawn a process
+with `--no-env-file` (module state such as listmonk's in-flight map, query counting)
+and move in-process one at a time.
 
 **Actions.** Everything is an Astro Action (`src/actions/*`), merged flat in `index.ts`.
 Public forms validate only in their action Zod schemas. `lib/form.ts` owns submit,

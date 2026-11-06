@@ -1,49 +1,72 @@
-/** Opens the SQLite file from `DATABASE_PATH` and applies the migrations under `./drizzle` on first import. */
+/**
+ * The SQLite database. `openDatabase(path)` opens a file (or `:memory:`) and applies the
+ * migrations under `./drizzle`; nothing happens on import. The app uses one shared
+ * handle, opened on first use from `DATABASE_PATH` (`getDb()`, or `db`, which forwards
+ * to it). Tests open their own and install it with `useDatabase()`.
+ */
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { Database } from 'bun:sqlite';
 
-import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { type BunSQLiteDatabase, drizzle } from 'drizzle-orm/bun-sqlite';
 import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
 
 import { config } from '../config';
 import * as schema from './schema';
 
-function resolveDbPath(): string {
-  const p = config.DATABASE_PATH;
+export type Db = BunSQLiteDatabase<typeof schema> & { $client: Database };
 
-  return isAbsolute(p) ? p : resolve(process.cwd(), p);
+const migrationsFolder = (): string => resolve(process.cwd(), process.env.MIGRATIONS_DIR || './drizzle');
+
+export function openDatabase(path: string, opts: { migrationsFolder?: string } = {}): Db {
+  const file = path === ':memory:' || isAbsolute(path) ? path : resolve(process.cwd(), path);
+
+  // The data volume may be empty on a fresh deploy.
+  if (file !== ':memory:') {
+    const dir = dirname(file);
+
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  }
+
+  const sqlite = new Database(file, { create: true });
+
+  // WAL, NORMAL sync (durable across app crashes), FKs on, wait out brief write locks.
+  sqlite.run('PRAGMA journal_mode = WAL;');
+  sqlite.run('PRAGMA synchronous = NORMAL;');
+  sqlite.run('PRAGMA foreign_keys = ON;');
+  sqlite.run('PRAGMA busy_timeout = 5000;');
+
+  const db = drizzle(sqlite, { schema }) as Db;
+
+  try {
+    migrate(db, { migrationsFolder: opts.migrationsFolder ?? migrationsFolder() });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('[db] migration failed', err);
+    sqlite.close();
+    throw err;
+  }
+
+  // Refresh planner statistics on open; a no-op when current.
+  sqlite.run('PRAGMA optimize = 0x10002;');
+
+  return db;
 }
 
-const dbPath = resolveDbPath();
+let current: Db | null = null;
 
-// The data volume may be empty on a fresh deploy.
-if (dbPath !== ':memory:') {
-  const dir = dirname(dbPath);
+/** The app's database, opened from `DATABASE_PATH` on first use. */
+export const getDb = (): Db => (current ??= openDatabase(config.DATABASE_PATH));
 
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-}
+/** Replaces the shared handle (tests); returns it. */
+export const useDatabase = (db: Db): Db => (current = db);
 
-const sqlite = new Database(dbPath, { create: true });
+/** The shared handle under its old name; every access goes to `getDb()`. */
+export const db: Db = new Proxy({} as Db, {
+  get: (_, key) => {
+    const target = getDb();
+    const value = Reflect.get(target, key, target);
 
-// WAL, NORMAL sync (durable across app crashes), FKs on, wait out brief write locks.
-sqlite.run('PRAGMA journal_mode = WAL;');
-sqlite.run('PRAGMA synchronous = NORMAL;');
-sqlite.run('PRAGMA foreign_keys = ON;');
-sqlite.run('PRAGMA busy_timeout = 5000;');
-
-export const db = drizzle(sqlite, { schema });
-
-// Resolved against cwd so it works in local dev and in the container.
-const migrationsFolder = resolve(process.cwd(), process.env.MIGRATIONS_DIR || './drizzle');
-
-try {
-  migrate(db, { migrationsFolder });
-} catch (err) {
-  // eslint-disable-next-line no-console
-  console.error('[db] migration failed', err);
-  throw err;
-}
-
-// Refresh planner statistics on open; a no-op when current.
-sqlite.run('PRAGMA optimize = 0x10002;');
+    return typeof value === 'function' ? value.bind(target) : value;
+  },
+});

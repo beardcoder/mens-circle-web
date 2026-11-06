@@ -26,7 +26,10 @@ Object.defineProperty(globalThis, 'fetch', {
   },
 });
 
-const { db } = await import('../src/lib/server/db');
+const { db, getDb } = await import('../src/lib/server/db');
+
+// Open (and migrate) now, so the query counts below see only the app's own queries.
+getDb();
 const { events, participants, registrations, testimonials } = await import('../src/lib/server/db/schema');
 
 const {

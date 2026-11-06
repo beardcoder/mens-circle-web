@@ -1,13 +1,7 @@
 import { DEFAULT_RETENTION_DAYS } from '../shared/retention';
 import { parseTrustedProxy } from './ratelimit';
 
-const env = (key: string, fallback = ''): string => {
-  const v = process.env[key];
-
-  return v && v.length > 0 ? v : fallback;
-};
-
-const envInt = (key: string, fallback = 0) => Number.parseInt(env(key, String(fallback)), 10) || fallback;
+type Env = Record<string, string | undefined>;
 
 const parseIntList = (raw: string): number[] =>
   raw
@@ -33,43 +27,62 @@ const parseIntList = (raw: string): number[] =>
         })
     : [];
 
-export const config = {
-  APP_URL: env('APP_URL', env('PUBLIC_SITE_URL', 'https://mens-circle.de')).replace(/\/+$/, ''),
-  SITE_NAME: env('SITE_NAME', 'Männerkreis Niederbayern'),
-  MAIL_FROM_ADDRESS: env('MAIL_FROM_ADDRESS', 'hallo@mens-circle.de'),
-  MAIL_FROM_NAME: env('MAIL_FROM_NAME', 'Männerkreis Niederbayern'),
-  MAIL_ADMIN_ADDRESS: env('MAIL_ADMIN_ADDRESS', 'hallo@mens-circle.de'),
-  MAIL_ADMIN_NAME: env('MAIL_ADMIN_NAME', 'Männerkreis Admin'),
-  CONTACT_EMAIL: env('MAIL_CONTACT_ADDRESS', 'hallo@mens-circle.de'),
-  DATABASE_PATH: env('DATABASE_PATH', './data/mens-circle.db'),
-  /** Days after an event until its participants' data is anonymised (retention.ts); at most what /datenschutz names. */
-  RETENTION_DAYS: Math.min(DEFAULT_RETENTION_DAYS, Math.max(1, envInt('RETENTION_DAYS', DEFAULT_RETENTION_DAYS))),
-  /** `cloudflare` or `none` (default): whose header names the visitor's IP (ratelimit.ts). */
-  TRUSTED_PROXY: parseTrustedProxy(env('TRUSTED_PROXY', 'none')),
-  // Who may enter /admin: comma-separated emails and/or one Pocket ID group.
-  ADMIN_EMAILS: env('ADMIN_EMAIL', '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean),
-  ADMIN_GROUP: env('OIDC_ADMIN_GROUP', ''),
-  // No fallback — never to a literal default (this repo is public, so a literal here is a published secret).
-  ADMIN_SESSION_SECRET: env('ADMIN_SESSION_SECRET', ''),
-  // Pocket ID (any OIDC provider): the issuer URL, e.g. https://id.example.org.
-  OIDC_ISSUER: env('OIDC_ISSUER', '').replace(/\/+$/, ''),
-  OIDC_CLIENT_ID: env('OIDC_CLIENT_ID', ''),
-  OIDC_CLIENT_SECRET: env('OIDC_CLIENT_SECRET', ''),
-  LISTMONK_URL: env('LISTMONK_URL', '').replace(/\/+$/, ''),
-  LISTMONK_API_USER: env('LISTMONK_API_USER', ''),
-  LISTMONK_API_TOKEN: env('LISTMONK_API_TOKEN', ''),
-  LISTMONK_LIST_IDS: parseIntList(env('LISTMONK_LIST_IDS', '')),
-  CAMPAIGN_TEMPLATE_ID: envInt('LISTMONK_CAMPAIGN_TEMPLATE_ID'),
-  TX_REGISTRATION_CONFIRMATION: envInt('LISTMONK_TX_REGISTRATION_CONFIRMATION'),
-  TX_WAITLIST_CONFIRMATION: envInt('LISTMONK_TX_WAITLIST_CONFIRMATION'),
-  TX_ADMIN_NOTIFICATION: envInt('LISTMONK_TX_ADMIN_NOTIFICATION'),
-  TX_WAITLIST_PROMOTION: envInt('LISTMONK_TX_WAITLIST_PROMOTION'),
-  TX_EVENT_REMINDER: envInt('LISTMONK_TX_EVENT_REMINDER'),
-  TX_EVENT_MESSAGE: envInt('LISTMONK_TX_EVENT_MESSAGE'),
-};
+/**
+ * The configuration an environment describes. Pure: tests pass their own `env`;
+ * the app reads `process.env` once (`config` below).
+ */
+export function loadConfig(source: Env = process.env) {
+  const env = (key: string, fallback = ''): string => {
+    const v = source[key];
+
+    return v && v.length > 0 ? v : fallback;
+  };
+
+  const envInt = (key: string, fallback = 0) => Number.parseInt(env(key, String(fallback)), 10) || fallback;
+
+  return {
+    APP_URL: env('APP_URL', env('PUBLIC_SITE_URL', 'https://mens-circle.de')).replace(/\/+$/, ''),
+    SITE_NAME: env('SITE_NAME', 'Männerkreis Niederbayern'),
+    MAIL_FROM_ADDRESS: env('MAIL_FROM_ADDRESS', 'hallo@mens-circle.de'),
+    MAIL_FROM_NAME: env('MAIL_FROM_NAME', 'Männerkreis Niederbayern'),
+    MAIL_ADMIN_ADDRESS: env('MAIL_ADMIN_ADDRESS', 'hallo@mens-circle.de'),
+    MAIL_ADMIN_NAME: env('MAIL_ADMIN_NAME', 'Männerkreis Admin'),
+    CONTACT_EMAIL: env('MAIL_CONTACT_ADDRESS', 'hallo@mens-circle.de'),
+    DATABASE_PATH: env('DATABASE_PATH', './data/mens-circle.db'),
+    /** Days after an event until its participants' data is anonymised (retention.ts); at most what /datenschutz names. */
+    RETENTION_DAYS: Math.min(DEFAULT_RETENTION_DAYS, Math.max(1, envInt('RETENTION_DAYS', DEFAULT_RETENTION_DAYS))),
+    /** `cloudflare` or `none` (default): whose header names the visitor's IP (ratelimit.ts). */
+    TRUSTED_PROXY: parseTrustedProxy(env('TRUSTED_PROXY', 'none')),
+    // Who may enter /admin: comma-separated emails and/or one Pocket ID group.
+    ADMIN_EMAILS: env('ADMIN_EMAIL', '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean),
+    ADMIN_GROUP: env('OIDC_ADMIN_GROUP', ''),
+    // No fallback — never to a literal default (this repo is public, so a literal here is a published secret).
+    ADMIN_SESSION_SECRET: env('ADMIN_SESSION_SECRET', ''),
+    // Pocket ID (any OIDC provider): the issuer URL, e.g. https://id.example.org.
+    OIDC_ISSUER: env('OIDC_ISSUER', '').replace(/\/+$/, ''),
+    OIDC_CLIENT_ID: env('OIDC_CLIENT_ID', ''),
+    OIDC_CLIENT_SECRET: env('OIDC_CLIENT_SECRET', ''),
+    LISTMONK_URL: env('LISTMONK_URL', '').replace(/\/+$/, ''),
+    LISTMONK_API_USER: env('LISTMONK_API_USER', ''),
+    LISTMONK_API_TOKEN: env('LISTMONK_API_TOKEN', ''),
+    LISTMONK_LIST_IDS: parseIntList(env('LISTMONK_LIST_IDS', '')),
+    CAMPAIGN_TEMPLATE_ID: envInt('LISTMONK_CAMPAIGN_TEMPLATE_ID'),
+    TX_REGISTRATION_CONFIRMATION: envInt('LISTMONK_TX_REGISTRATION_CONFIRMATION'),
+    TX_WAITLIST_CONFIRMATION: envInt('LISTMONK_TX_WAITLIST_CONFIRMATION'),
+    TX_ADMIN_NOTIFICATION: envInt('LISTMONK_TX_ADMIN_NOTIFICATION'),
+    TX_WAITLIST_PROMOTION: envInt('LISTMONK_TX_WAITLIST_PROMOTION'),
+    TX_EVENT_REMINDER: envInt('LISTMONK_TX_EVENT_REMINDER'),
+    TX_EVENT_MESSAGE: envInt('LISTMONK_TX_EVENT_MESSAGE'),
+  };
+}
+
+export type Config = ReturnType<typeof loadConfig>;
+
+/** The app's configuration, from `process.env`; fields may be reassigned in tests. */
+export const config: Config = loadConfig();
 
 export const listmonkApiConfigured = (): boolean =>
   config.LISTMONK_URL.length > 0 && config.LISTMONK_API_USER.length > 0 && config.LISTMONK_API_TOKEN.length > 0;
