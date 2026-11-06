@@ -1,6 +1,15 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
+  "include": [
+    ".astro/types.d.ts",
+    "src",
+    "scripts",
+    "tests",
+    "server.ts",
+    "astro.config.mjs",
+    "eslint.config.ts",
+    "drizzle.config.ts"
+  ],
   "exclude": ["dist", "drizzle"],
   "compilerOptions": {
     "strictNullChecks": true,

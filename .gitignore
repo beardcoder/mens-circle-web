@@ -26,3 +26,6 @@ data/
 # Local browser verification artifacts
 .playwright-cli/
 output/playwright/
+
+# Third-party Claude skills are installed per machine (plugins), never vendored
+.claude/skills/

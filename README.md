@@ -53,6 +53,34 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
    the retention pass anonymises participants `RETENTION_DAYS` after their last event,
    deletes the event's listmonk list and clears published testimonials' addresses.
 
+## Operations
+
+| When (UTC)   | What                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| every 15 min | reminder pass; mails leave only 18:00–22:00 Berlin the evening before or from 10:00 on the day |
+| 02:30 daily  | retention: participants anonymised `RETENTION_DAYS` (≤ 30) after their last event              |
+| 03:00 daily  | SQLite → S3 backup when `BACKUP_S3_*` is set; copies older than `BACKUP_RETENTION_DAYS` go     |
+
+The Coolify scheduled task runs `bun run scripts/schedule.ts` every minute in the
+container; `bun run scripts/send-reminders.ts` runs one reminder pass by hand.
+
+**Restoring a backup.** Backups are gzipped SQLite snapshots
+(`<BACKUP_S3_PREFIX>/mens-circle-<timestamp>.db.gz`, taken with `VACUUM INTO`, so
+they are consistent without the WAL files).
+
+1. Download the snapshot you want (S3 console, `aws s3 cp`, `rclone`) and unpack it:
+   `gunzip mens-circle-<timestamp>.db.gz`.
+2. Check it: `sqlite3 mens-circle-<timestamp>.db 'pragma integrity_check; select count(*) from events;'`.
+3. Stop the application in Coolify (the volume stays).
+4. Replace the database on the `/data` volume and remove the old WAL files, e.g. with a
+   helper container: `docker run --rm -v <volume>:/data -v "$PWD":/in alpine sh -c
+'rm -f /data/mens-circle.db-wal /data/mens-circle.db-shm && cp /in/mens-circle-<timestamp>.db /data/mens-circle.db && chown 1000:1000 /data/mens-circle.db'`.
+5. Start the application. Migrations newer than the snapshot run on boot; `/health`
+   answers 200 once SQLite is readable.
+
+A restore brings back data the retention pass had already anonymised; it is
+anonymised again on the next run at 02:30.
+
 ## Content
 
 - Page content and section order: directly in `src/pages/*.astro`
