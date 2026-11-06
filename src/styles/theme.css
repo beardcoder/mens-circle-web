@@ -26,16 +26,6 @@
    may blur what lies behind it, which is redrawn on every scroll frame. */
 @custom-variant hover-device (@media (hover: hover) and (pointer: fine));
 
-/* Scroll-driven, where scroll timelines exist and motion is allowed; without
-   support the element simply stands. */
-@custom-variant scroll-motion {
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: scroll()) {
-      @slot;
-    }
-  }
-}
-
 /* ── Tokens ───────────────────────────────────────────────────────────────── */
 
 @theme {

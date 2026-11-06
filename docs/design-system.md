@@ -163,8 +163,8 @@ no shadow. A primary button glows a little in its own colour on hover.
 The page moves the way an evening starts, at the pace of an app: things arrive one
 after the other, quickly, and settle. Opacity fades in on a gentle curve
 (`--ease-fade`, 0.7 s below the opening, 0.9 s in it), focus comes from a light blur
-on titles, movement follows Motion's springs without overshoot (visualDuration
-0.65 s on scroll, the opening's sampled spring over 1.3 s, 1.9 s for the photo),
+on titles, movement follows springs without overshoot (sampled into `linear()`:
+the opening's over 1.3 s, 1.9 s for the photo; scroll reveals follow the scroll),
 distances stay short (a word 0.3em, a piece 1.125rem) and things follow one another
 at 0.055 s (words) or 0.07 s (what arrives together). Calm, never playful: no
 bounce, no scale on text.
@@ -217,9 +217,10 @@ waits for a script.
   "FAQ"), and the marker turns (`item-open:` variant). Keyboard, find-in-page and
   screen readers work as with any `<details>`. Elsewhere, and under reduced motion,
   it toggles at once. No script.
-- The bottom bar on phones (`ActionBar`) glides up on a spring once the opening's
-  action has gone, its date and action a beat behind; it slips away faster than it
-  came. The registration form is in the page from the first frame; its answer
+- The bottom bar on phones (`ActionBar`) glides up on the spring curve once the
+  opening's action has gone and slips away again (a CSS transition on
+  `data-visible`, at once under reduced motion). There is no reading-progress bar,
+  and the back-to-top link shows on the desktop only. The registration form is in the page from the first frame; its answer
   replaces the fields in place.
 - Loops that never change state stay in CSS: the glow breathes on the 11-second
   cycle (`data-glow`), the ring turns; both pause once the opening is out of view

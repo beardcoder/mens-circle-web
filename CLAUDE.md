@@ -189,8 +189,8 @@ tokens, variants, surfaces and keyframes; `global.css` (public, one shared hashe
 and `admin.css` are the two entries. Both read classes from `src/` only
 (`source('..')`, so words in docs, mail templates and tests never become utilities) and
 skip server-only code; `global.css` keeps the admin sources out with `@source not`.
-Scroll reveals are CSS scroll-driven animations (`animation-timeline: view()`); the FAQ
-and the phone action bar use Motion (a dev dependency bundled into the client); the opening, page transitions, loops and
+Scroll reveals are CSS scroll-driven animations (`animation-timeline: view()`); the FAQ is
+native `<details>`; no animation library ships to the browser. The opening, page transitions, loops and
 state transitions are the theme's own keyframes and `--animate-*` tokens (`rise`,
 `skeleton`); there is no animation plugin.
 No `<style>` blocks and no component stylesheets: utilities in the
@@ -290,7 +290,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   answers are native `<details>` whose `::details-content` transitions its height
   where `interpolate-size` exists (`AccordionItem`, global.css "FAQ"; the marker
   uses the `item-open:` variant); the
-  phone `ActionBar` glides in and out (its own script). CSS keeps the
+  phone `ActionBar` glides in and out on a CSS transition (its script only toggles
+  `data-visible`). No reading-progress bar; the back-to-top link is desktop only. CSS keeps the
   loops (paused out of view by Hero.astro's `data-offscreen`): the glow breathes (`data-glow`), the ring turns every 90 s.
 - Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
   forced reflow. 120fps means the compositor: only opacity and transforms move. The
@@ -302,8 +303,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   transition is the one accepted layout animation (short, on a press, never while
   scrolling). The hero's loops pause out of view
   (`data-offscreen`). Never set a state attribute on `<html>` while the page moves
-  (it restyles the whole page): flag the element itself (`data-lifted` on the
-  back-to-top link); the boot script's mode flags are set
+  (it restyles the whole page): flag the element itself; the boot script's mode flags are set
   before the first frame. Never read layout or `scrollY` at load: header tone,
   back-to-top and the like watch a sentinel with an `IntersectionObserver`.
   Nothing that holds the LCP waits for a script.
@@ -337,7 +337,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   pass their content explicitly as props and rich-text slots. Load dynamic data in
   server code or through the public JSON endpoints; blocks only render their inputs. Component-specific
   browser behavior belongs in its own `<script>` (Header, ModeToggle, Statement,
-  BackToTop, Motion), with no global client entry. Public form helpers stay
+  BackToTop, ActionBar, EventDock, Hero), with no global client entry. Public form helpers stay
   in `lib/form.ts`; admin helpers live beside their Preact components. `Prose` accepts inline markup in its slot or
   an `html` prop for dynamic content. Static FAQ answers, journey steps and facts
   use slotted item components at their page location, rather than frontmatter arrays.
