@@ -271,6 +271,13 @@ export function Feedback({ notice }: { notice: Notice | null }) {
       <Icon name={notice.tone === 'success' ? 'check' : 'alert'} class="mt-0.5 size-4.5" />
       <div>
         <p>{notice.text}</p>
+        {notice.link && (
+          <p class="mt-2">
+            <a href={notice.link.href} target="_blank" rel="noopener" class="text-accent underline">
+              {notice.link.label}
+            </a>
+          </p>
+        )}
         {notice.login && (
           <p class="mt-2">
             <a href="/admin/login" target="_blank" rel="noopener" class="text-accent underline">

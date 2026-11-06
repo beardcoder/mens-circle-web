@@ -5,6 +5,8 @@ export interface Notice {
   tone: 'success' | 'error' | 'warning';
   text: string;
   login?: boolean;
+  /** A follow-up link, e.g. the public page of an event just published. */
+  link?: { href: string; label: string };
 }
 
 type ActionResult<T> = { data?: T; error?: { message: string; code?: string } };
@@ -89,5 +91,8 @@ function actionNotice(data: object): Notice | null {
   const failed = 'failed' in data && Number(data.failed) > 0;
   const partial = 'sent' in data && 'total' in data && Number(data.sent) < Number(data.total);
 
-  return { text: data.message, tone: failed || partial ? 'warning' : 'success' };
+  const link =
+    'link' in data && data.link && typeof data.link === 'object' ? (data.link as { href: string; label: string }) : undefined;
+
+  return { text: data.message, tone: failed || partial ? 'warning' : 'success', link };
 }

@@ -2,11 +2,22 @@ import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 
 import { saveEventSchema } from '@lib/event-input';
-import { createEvent, sendEventNewsletter, setEventPublished, softDeleteEvent, updateEvent } from '@lib/server/events';
+import {
+  createEvent,
+  getEventById,
+  sendEventNewsletter,
+  setEventPublished,
+  softDeleteEvent,
+  updateEvent,
+} from '@lib/server/events';
 import { purgePublicCache } from '@lib/server/public-data';
 import { reconcileSeats } from '@lib/server/registrations';
 
 import { requireAdmin } from './auth';
+
+/** After saving a published event: the way to its public page. */
+const publicLink = (event: { slug: string; isPublished: boolean }) =>
+  event.isPublished ? { href: `/event/${event.slug}`, label: 'Öffentliche Seite ansehen' } : undefined;
 
 export const events = {
   saveEvent: defineAction({
@@ -24,14 +35,14 @@ export const events = {
         await reconcileSeats(event.id);
         await purgePublicCache(context);
 
-        return { id: event.id, slug: event.slug, message: 'Veranstaltung gespeichert.' };
+        return { id: event.id, slug: event.slug, message: 'Veranstaltung gespeichert.', link: publicLink(event) };
       }
 
       const event = await createEvent(input);
 
       await purgePublicCache(context);
 
-      return { id: event.id, slug: event.slug, message: 'Veranstaltung erstellt.' };
+      return { id: event.id, slug: event.slug, message: 'Veranstaltung erstellt.', link: publicLink(event) };
     },
   }),
 
@@ -45,7 +56,12 @@ export const events = {
 
       await purgePublicCache(context);
 
-      return { message: published ? 'Veranstaltung veröffentlicht.' : 'Veranstaltung als Entwurf gespeichert.' };
+      const event = published ? await getEventById(id) : null;
+
+      return {
+        message: published ? 'Veranstaltung veröffentlicht.' : 'Veranstaltung als Entwurf gespeichert.',
+        link: event ? publicLink(event) : undefined,
+      };
     },
   }),
 

@@ -78,7 +78,19 @@ export default function EventForm({ event, newsletterIntro }: { event: EventForm
         }}
       >
         <EventFields event={event} errors={task.fields} busy={!!task.busy} editing={!!id} draftSlug={draftSlug} />
-        <PublishPanel published={event?.isPublished ?? false} dirty={dirty} saved={saved} busy={!!task.busy} />
+        <PublishPanel
+          published={event?.isPublished ?? false}
+          dirty={dirty}
+          saved={saved}
+          busy={!!task.busy}
+          onDiscard={() => {
+            // Back to what was loaded or last saved, without a reload.
+            form.current?.reset();
+            setDraftSlug(slug);
+            setDirty(false);
+            task.setNotice(null);
+          }}
+        />
       </form>
       {id && <EventNewsletter eventId={id} intro={newsletterIntro} disabled={dirty || !!task.busy} />}
     </>
@@ -236,11 +248,13 @@ function PublishPanel({
   dirty,
   saved,
   busy,
+  onDiscard,
 }: {
   published: boolean;
   dirty: boolean;
   saved: boolean;
   busy: boolean;
+  onDiscard: () => void;
 }) {
   return (
     <>
@@ -268,14 +282,14 @@ function PublishPanel({
             </span>
           </label>
           <div class="grid gap-2 border-t border-line pt-4 max-lg:hidden">
-            <SaveButtons dirty={dirty} busy={busy} block />
+            <SaveButtons dirty={dirty} busy={busy} onDiscard={onDiscard} block />
           </div>
         </section>
       </aside>
       <div class="sticky bottom-20 z-20 flex flex-wrap items-center justify-between gap-3 border border-line-strong bg-raised p-3 shadow-overlay lg:hidden">
         <SaveState dirty={dirty} saved={saved} />
         <div class="flex gap-2">
-          <SaveButtons dirty={dirty} busy={busy} />
+          <SaveButtons dirty={dirty} busy={busy} onDiscard={onDiscard} />
         </div>
       </div>
     </>
@@ -296,7 +310,17 @@ function SaveState({ dirty, saved }: { dirty: boolean; saved: boolean }) {
   );
 }
 
-function SaveButtons({ dirty, busy, block = false }: { dirty: boolean; busy: boolean; block?: boolean }) {
+function SaveButtons({
+  dirty,
+  busy,
+  onDiscard,
+  block = false,
+}: {
+  dirty: boolean;
+  busy: boolean;
+  onDiscard: () => void;
+  block?: boolean;
+}) {
   return (
     <>
       <button type="submit" disabled={busy} class={button({ size: 'sm', block })}>
@@ -306,7 +330,7 @@ function SaveButtons({ dirty, busy, block = false }: { dirty: boolean; busy: boo
         type="button"
         disabled={!dirty || busy}
         class={button({ variant: 'secondary', size: 'sm', block })}
-        onClick={() => window.location.reload()}
+        onClick={onDiscard}
       >
         Verwerfen
       </button>
