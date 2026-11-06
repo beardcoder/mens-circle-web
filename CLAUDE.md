@@ -46,7 +46,8 @@ Layers: `src/lib/server/*` is server-only (pages, actions, endpoints, scripts);
 imports; dates, HTML escaping, event views, DTOs, admin types); components, layouts
 and shared code never import the server lib (ESLint `no-restricted-imports`). Pages
 load data and pass it as props. Deployed as one
-Docker image on Coolify (Bun pinned to a minor, `oven/bun:1.4-slim`; runs as `bun`;
+Docker image on Coolify (Bun pinned to a minor, `oven/bun:1.4-slim`; the entrypoint hands `/data` to `bun` and runs the server as
+`bun`, scripts switch via `RUN_AS`;
 port 8090, SQLite on the `/data` volume; `/health` answers 503 when SQLite does not); env vars are in
 `.env.example` and the README. Retired URLs redirect in `astro.config.mjs`
 (`redirects`); `trailingSlash: 'never'`.

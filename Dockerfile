@@ -45,12 +45,12 @@ COPY --from=build /app/src/data ./src/data
 COPY --from=build /app/src/assets/mail ./src/assets/mail
 COPY --chmod=755 docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-# Not root: the server, and every `docker exec` (the scheduled task), run as bun, so
-# the database and its WAL files always belong to one user. A volume created by an
-# older image is root's; the entrypoint says how to hand it over.
-USER bun
-
-ENV DATABASE_PATH=/data/mens-circle.db
+# The entrypoint starts as root only to hand /data to bun (a volume created by an
+# older image is root's), then runs the server as bun. Scripts started with
+# `docker exec` (the scheduled task runs as root) switch to bun themselves
+# (RUN_AS, src/lib/server/run-as.ts), so the database and its WAL files always
+# belong to one user.
+ENV DATABASE_PATH=/data/mens-circle.db RUN_AS=bun
 VOLUME ["/data"]
 EXPOSE 8090
 

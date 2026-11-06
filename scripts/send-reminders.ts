@@ -1,5 +1,8 @@
 /** One idempotent reminder pass, then exit — the manual escape hatch beside the scheduled pass in scripts/schedule.ts. */
 import { runReminders } from '../src/lib/server/reminders';
+import { runAsAppUser } from '../src/lib/server/run-as';
+
+await runAsAppUser();
 
 try {
   await runReminders();

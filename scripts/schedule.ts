@@ -43,6 +43,8 @@ async function run({ name, run: task }: Task): Promise<void> {
 }
 
 if (import.meta.main) {
+  await (await import('../src/lib/server/run-as')).runAsAppUser();
+
   const { backupConfigured } = await import('./backup-db');
 
   for (const task of dueTasks(new Date(), backupConfigured)) await run(task);

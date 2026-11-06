@@ -99,11 +99,12 @@ canonical URL behind the proxy are identical (checked side by side).
 ## Deployment
 
 The image is built on `oven/bun:1.4-slim` (a minor version, so a rebuild picks up
-patches but never a new minor; raise it on purpose) and runs as the unprivileged
-`bun` user (uid 1000), the server as well as every `docker exec`, so the scheduled
-task never leaves root-owned WAL files behind. A `/data` volume created by an older
-image belongs to root: the entrypoint refuses to start and prints the one-time fix
-(`chown -R 1000:1000 /data` from a helper container). No `ASTRO_KEY`: the site has no
+patches but never a new minor; raise it on purpose). The entrypoint starts as root only
+to hand the `/data` volume to the unprivileged `bun` user (uid 1000; a volume created
+by an older image belongs to root), then runs the server as `bun` (`setpriv`). Scripts
+started with `docker exec` (the scheduled task runs as root) switch to `bun` themselves
+(`RUN_AS`, `src/lib/server/run-as.ts`), so the database and its WAL files always
+belong to one user. No `ASTRO_KEY`: the site has no
 server islands. `/health` runs `select 1` against SQLite and answers 503 when the
 database cannot be opened or read, so the Docker HEALTHCHECK sees a broken volume.
 
