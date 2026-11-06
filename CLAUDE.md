@@ -73,6 +73,16 @@ and needs ≥ 32 chars, otherwise no session is signed or trusted. Never add a d
 **CSRF.** `security.allowedDomains` (from `PUBLIC_SITE_URL`) lets Astro trust the
 proxy's forwarded headers. Never fix a 403 with `checkOrigin: false`.
 
+**CSP.** Astro's `security.csp` hashes every script it renders (a header on SSR
+pages, a `<meta>` on prerendered ones); `server.ts` adds a second policy
+(`frame-ancestors 'none'`, `object-src`, `base-uri`; a complete host-free one on
+`/admin` and `/auth`) plus `nosniff`, `Referrer-Policy` and `Permissions-Policy`. An
+`is:inline` script must come from `src/scripts/inline.ts`, whose strings
+`astro.config.mjs` hashes: a hash added from a component arrives after the SSR headers.
+A new third-party host goes into the config's directives. Styles keep
+`'unsafe-inline'` (the BayernAtlas component renders `<style>` into its shadow root).
+JSON-LD escapes `<`. `test:pages` checks the hashes; HSTS is set at the proxy.
+
 **Data.** A read-then-write under concurrency goes in a synchronous
 `db.transaction(fn, { behavior: 'immediate' })` with no `await` inside (see
 `claimSeat()`). Capacity is computed from `holdsASeat()` only. Every change to

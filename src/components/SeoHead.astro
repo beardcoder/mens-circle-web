@@ -233,7 +233,7 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png" />
 <link rel="manifest" href="/manifest.webmanifest" />
 
-<!-- Structured data -->
+<!-- Structured data; `<` escaped so no text can close the script element. -->
 {allSchemas.map((schema) => (
-  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />
 ))}

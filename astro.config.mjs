@@ -1,5 +1,8 @@
 // @ts-check
 
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+
 import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
 import bun from '@igloczek/astro-bun-adapter';
@@ -10,12 +13,54 @@ import icon from 'astro-icon';
 const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
 const { hostname: siteHostname, protocol: siteProtocol } = new URL(siteUrl);
 
+// Analytics only when configured (SeoHead.astro); its origin joins the CSP then.
+const umamiOrigin = process.env.PUBLIC_UMAMI_ID
+  ? new URL(process.env.PUBLIC_UMAMI_ENDPOINT || 'https://cloud.umami.is').origin
+  : '';
+
+const ATLAS = 'https://atlas.bayern.de';
+
+/** Hashes of the head's inline scripts (src/scripts/inline.ts), exactly as rendered. */
+/** @param {string} file */
+const read = (file) => readFileSync(new URL(file, import.meta.url), 'utf8');
+/** @param {string} code @returns {`sha256-${string}`} */
+const sha256 = (code) => `sha256-${createHash('sha256').update(code).digest('base64')}`;
+
+const inlineScriptHashes = [
+  read('./src/scripts/boot.js'),
+  read('./src/scripts/load-fonts.js'),
+  JSON.stringify(JSON.parse(read('./src/scripts/speculation-rules.json'))),
+].map(sha256);
+
 export default defineConfig({
   site: siteUrl,
   // TLS ends at the proxy; this lets the CSRF check trust X-Forwarded-* for our host only.
   // Never disable checkOrigin instead.
   security: {
     allowedDomains: [{ hostname: siteHostname, protocol: siteProtocol.replace(':', '') }],
+    // Astro's CSP: hashes of every script it bundles plus the head's inline scripts,
+    // as a header on rendered pages and a <meta> on prerendered ones. Hashes, not
+    // nonces: cached and prerendered HTML is reused.
+    // server.ts adds what a <meta> cannot say (frame-ancestors) and the stricter
+    // admin policy. Styles allow 'unsafe-inline': the BayernAtlas component renders
+    // <style> elements into its shadow root, and markup sets custom properties inline.
+    csp: {
+      directives: [
+        "default-src 'self'",
+        "img-src 'self' data:",
+        "font-src 'self'",
+        `connect-src 'self'${umamiOrigin ? ` ${umamiOrigin}` : ''}`,
+        `frame-src ${ATLAS}`,
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ],
+      scriptDirective: {
+        resources: ["'self'", ATLAS, ...(umamiOrigin ? [umamiOrigin] : [])],
+        hashes: inlineScriptHashes,
+      },
+      styleDirective: { resources: ["'self'", "'unsafe-inline'"] },
+    },
   },
   // Rendered public pages and the event JSON, held in this one process. Keyed by path
   // alone (none of them reads the query), so `?x=1` can neither bypass nor bloat it;

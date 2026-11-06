@@ -2,10 +2,11 @@
  * The production server: Bun.serve() around the handler that
  * @igloczek/astro-bun-adapter builds (`dist/server/entry.mjs`, standalone mode with
  * its autostart off). It serves like the adapter's own server (hashed `/assets/`
- * immutable, ETag/304, ranges, dotfiles and traversal refused) and adds one header:
+ * immutable, ETag/304, ranges, dotfiles and traversal refused) and adds a cache header:
  * a file without a Cache-Control of its own (prerendered pages, robots.txt, sw.js,
  * sitemaps) gets `public, max-age=0`, so browsers and Cloudflare revalidate it, as
  * they did under the Node adapter. Rendered pages bring theirs (lib/cache-policy.ts).
+ * Every response also gets the security headers below.
  */
 interface Context {
   clientAddress?: string;
@@ -24,12 +25,50 @@ const { handler, options } = (await import(entry)) as Entry;
 
 const REVALIDATE = 'public, max-age=0';
 
-const withCacheControl = (response: Response): Response => {
-  if (response.headers.has('cache-control') || ![200, 206, 304].includes(response.status)) return response;
+/**
+ * Headers every response gets unless it set its own. The page CSP (script and style
+ * hashes, allowed hosts) comes from Astro (astro.config.mjs): a header on rendered
+ * pages, a <meta> on prerendered ones. A <meta> cannot forbid framing, so that part
+ * travels here as a second policy. Back office and sign-in get a
+ * complete, stricter policy without third-party hosts; a browser enforces both.
+ */
+const BASE_CSP = "frame-ancestors 'none'; object-src 'none'; base-uri 'self'";
 
+const ADMIN_CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  "frame-src 'none'",
+  "form-action 'self'",
+  BASE_CSP,
+].join('; ');
+
+const PRIVATE_PATH = /^\/(?:admin|auth)(?:\/|$)/;
+
+const securityHeaders = (pathname: string): Record<string, string> => ({
+  'content-security-policy': PRIVATE_PATH.test(pathname) ? ADMIN_CSP : BASE_CSP,
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+});
+
+const finish = (response: Response, pathname: string): Response => {
   const headers = new Headers(response.headers);
 
-  headers.set('cache-control', REVALIDATE);
+  for (const [name, value] of Object.entries(securityHeaders(pathname))) {
+    // A second CSP header is a second policy: the browser enforces both, so Astro's
+    // own (rendered pages) keeps its hashes and gains these restrictions.
+    if (name === 'content-security-policy') headers.append(name, value);
+    else if (!headers.has(name)) headers.set(name, value);
+  }
+
+  // A file without a Cache-Control of its own is revalidated (see the top).
+  if (!headers.has('cache-control') && [200, 206, 304].includes(response.status)) {
+    headers.set('cache-control', REVALIDATE);
+  }
 
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 };
@@ -44,7 +83,9 @@ const server = Bun.serve({
   async fetch(request, bun) {
     const clientAddress = bun.requestIP(request)?.address;
 
-    return withCacheControl(await handler(request, { clientAddress, serverPort: bun.port }));
+    const response = await handler(request, { clientAddress, serverPort: bun.port });
+
+    return finish(response, new URL(request.url).pathname);
   },
   error(error) {
     console.error(error);

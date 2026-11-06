@@ -32,6 +32,25 @@ toolchain into the image (256 MB instead of 30 MB).
   at build time; the SSR home page uses pre-sized AVIF and WebP files. Sharp never loads in the
   server process, and nobody can make it transform arbitrary sizes.
 
+## Security headers
+
+`server.ts` adds to every response (static files included) `X-Content-Type-Options:
+nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`,
+a `Permissions-Policy` that denies camera, microphone, geolocation, payment and USB,
+and a Content Security Policy with `frame-ancestors 'none'; object-src 'none';
+base-uri 'self'`. A route may set its own `Referrer-Policy` (the cancel link sends
+`no-referrer`). The page policy itself comes from Astro (`security.csp` in
+`astro.config.mjs`): `default-src 'self'`, scripts by hash plus BayernAtlas and the
+analytics host when configured, the map's iframe, fonts and images from the site.
+On rendered pages Astro sends it as a header, on prerendered ones as a `<meta>`; the
+browser enforces both policies. `/admin` and `/auth` get a complete policy without
+any third-party host on top.
+
+HSTS belongs at the edge, not in the app: set
+`Strict-Transport-Security: max-age=31536000; includeSubDomains` in Cloudflare
+(SSL/TLS → Edge Certificates → HSTS) or in the Coolify proxy, once every subdomain
+serves HTTPS.
+
 Mail templates load three self-hosted fonts from another origin. Their URLs remain
 `/fonts/mail/*.woff2`: an allow-listed endpoint reads `src/assets/mail` per request
 (rare) and sets `Access-Control-Allow-Origin: *`, without cookies or authentication.

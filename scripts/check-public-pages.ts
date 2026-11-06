@@ -1,5 +1,6 @@
 /** Production HTML regression checks. Run after build; all data lives in a disposable database. */
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -12,6 +13,7 @@ process.env.ADMIN_SESSION_SECRET = 'pages-check-secret-of-at-least-32-characters
 const { db } = await import('../src/lib/server/db');
 const { events, participants, registrations, testimonials } = await import('../src/lib/server/db/schema');
 const { cancelUrlFor } = await import('../src/lib/server/cancel-token');
+const { createSession, SESSION_COOKIE } = await import('../src/lib/server/auth');
 
 /** The signed cancel link: GET shows, POST cancels once, anything else is refused privately. */
 async function checkCancelLink(origin: string): Promise<void> {
@@ -107,6 +109,56 @@ async function readPage(origin: string, path: string, status = 200): Promise<str
   assert(!/<script[^>]+src="[^"]*\/page\.[^"]+\.js"/.test(html), `${path}: no prefetch script`);
 
   return html;
+}
+
+/** Headers every response carries; admin and sign-in add a complete, host-free policy. */
+function checkHeaders(path: string, headers: Headers): string {
+  const csp = headers.get('content-security-policy') ?? '';
+
+  assert.equal(headers.get('x-content-type-options'), 'nosniff', path);
+  assert.match(headers.get('referrer-policy') ?? '', /strict-origin-when-cross-origin|no-referrer/, path);
+  assert.match(headers.get('permissions-policy') ?? '', /camera=\(\)/, path);
+  assert.match(csp, /frame-ancestors 'none'/, path);
+
+  if (/^\/(admin|auth)/.test(path)) {
+    // The browser enforces every policy; ours is the last one and names no other host.
+    const own = csp.split(/,\s*/).at(-1) ?? '';
+
+    assert.match(own, /default-src 'self'/, `${path}: a complete admin policy`);
+    assert(!/https?:\/\//.test(own), `${path}: no third-party host in the admin policy`);
+  }
+
+  return csp;
+}
+
+/**
+ * The page CSP: a <meta> on prerendered pages, a header on rendered ones, whose
+ * script-src holds the hash of every inline script and never 'unsafe-inline'.
+ */
+async function checkSecurity(origin: string, path: string, cookie = ''): Promise<void> {
+  const response = await fetch(`${origin}${path}`, { redirect: 'manual', headers: cookie ? { Cookie: cookie } : {} });
+  const html = await response.text();
+
+  if (cookie) assert.equal(response.status, 200, `${path}: signed in`);
+
+  const csp = checkHeaders(path, response.headers);
+
+  if (!html.includes('<html')) return;
+
+  const meta = /<meta http-equiv="content-security-policy" content="([^"]*)"/.exec(html)?.[1];
+  const policy = meta ?? csp.split(/,\s*(?=default-src)/).find((p) => /script-src/.test(p) && /sha256/.test(p));
+
+  assert(policy, `${path}: page CSP`);
+  assert.match(policy, /default-src 'self'/);
+  assert(!/script-src[^;]*'unsafe-inline'/.test(policy), `${path}: no inline scripts allowed wholesale`);
+
+  for (const script of html.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/g)) {
+    if (/ld\+json/.test(script[1])) continue;
+
+    const hash = `'sha256-${createHash('sha256').update(script[2]).digest('base64')}'`;
+
+    assert(policy.includes(hash), `${path}: inline script ${script[2].slice(0, 40)} lacks its hash`);
+  }
 }
 
 /** The portrait and the stylesheet are hashed build files; nothing is transformed on request. */
@@ -209,6 +261,18 @@ try {
     assert.match(overview, /href="\/event\/testabend"/);
 
     await checkAssets(origin, home);
+
+    for (const path of ['/', '/event', '/event/testabend', '/impressum', '/admin/login', '/admin', '/favicon.svg']) {
+      await checkSecurity(origin, path);
+    }
+
+    // The signed-in workspace hydrates Preact islands under the same policies.
+    const session = `${SESSION_COOKIE}=${await createSession('admin@example.invalid')}`;
+
+    for (const path of ['/admin', '/admin/events/open/registrations', '/admin/testimonials']) {
+      await checkSecurity(origin, path, session);
+    }
+
     await checkCancelLink(origin);
 
     const json = await fetch(`${origin}/api/public/events/testabend`);
