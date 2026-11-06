@@ -13,10 +13,11 @@ import icon from 'astro-icon';
 const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
 const { hostname: siteHostname, protocol: siteProtocol } = new URL(siteUrl);
 
-// Analytics only when configured (SeoHead.astro); its origin joins the CSP then.
-const umamiOrigin = process.env.PUBLIC_UMAMI_ID
-  ? new URL(process.env.PUBLIC_UMAMI_ENDPOINT || 'https://cloud.umami.is').origin
-  : '';
+// Analytics only when both values are set (SeoHead.astro); its origin joins the CSP then.
+const umamiOrigin =
+  process.env.PUBLIC_UMAMI_ID && process.env.PUBLIC_UMAMI_ENDPOINT
+    ? new URL(process.env.PUBLIC_UMAMI_ENDPOINT).origin
+    : '';
 
 const ATLAS = 'https://atlas.bayern.de';
 

@@ -51,10 +51,14 @@ const siteUrl = Astro.site!;
 // One spelling per page, shared with the pages' own structured data.
 const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 
-// Umami, self-hosted — the only third-party origin the site loads. Production
-// builds only, so local sessions never count as visits.
-const umamiOrigin = new URL(import.meta.env.PUBLIC_UMAMI_ENDPOINT || 'https://va.letsbenow.de').origin;
-const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_ID || 'f2964cb9-28e6-4658-810f-2acfb9cb9c46';
+// Umami, self-hosted: loaded only when both values are set at build time (a fork or
+// staging build without them sends nothing anywhere), and only in production builds.
+// astro.config.mjs adds the same origin to the CSP.
+const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_ID ?? '';
+
+const umamiOrigin =
+  umamiWebsiteId && import.meta.env.PUBLIC_UMAMI_ENDPOINT ? new URL(import.meta.env.PUBLIC_UMAMI_ENDPOINT).origin : '';
+
 const fullTitle = title ?? `${site.siteName}${site.tagline ? ` – ${site.tagline}` : ''}`;
 const socialTitle = ogTitle ?? title ?? site.siteName;
 const socialDescription = ogDescription ?? description;
@@ -182,7 +186,7 @@ const allSchemas = [localBusiness, person, website, ...schemas];
 <meta name="color-scheme" content="light dark" />
 <meta name="msapplication-TileColor" content={site.themeColor} />
 
-{import.meta.env.PROD && (
+{import.meta.env.PROD && umamiOrigin && (
   <>
     <link rel="preconnect" href={umamiOrigin} crossorigin />
     <script is:inline async src={`${umamiOrigin}/script.js`} data-website-id={umamiWebsiteId} data-performance="true" />

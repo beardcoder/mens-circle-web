@@ -8,6 +8,10 @@ RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lock
 COPY . .
 ARG PUBLIC_SITE_URL
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
+# Analytics loads only when both are given as build arguments (Coolify: build variables).
+ARG PUBLIC_UMAMI_ID
+ARG PUBLIC_UMAMI_ENDPOINT
+ENV PUBLIC_UMAMI_ID=$PUBLIC_UMAMI_ID PUBLIC_UMAMI_ENDPOINT=$PUBLIC_UMAMI_ENDPOINT
 # Build-time only: Astro embeds it in the server manifest. Keep it stable across builds.
 ARG ASTRO_KEY
 ENV ASTRO_KEY=$ASTRO_KEY

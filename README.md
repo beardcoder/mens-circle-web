@@ -42,7 +42,7 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
 | `LISTMONK_TX_*`                                           | six transactional template IDs (below)                       |
 | `MAIL_FROM_*`, `MAIL_ADMIN_*`, `MAIL_CONTACT_ADDRESS`     | sender, admin notifications, contact                         |
 | `BACKUP_S3_*`, `BACKUP_RETENTION_DAYS`                    | optional SQLite → S3 backup                                  |
-| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                | optional analytics                                           |
+| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                | analytics at build time; none unless both are set            |
 
 4. Scheduled task: `bun run scripts/schedule.ts` every minute (reminder pass every 15 min,
    backup daily at 03:00 UTC when configured). Reminders reach participants at a fixed
