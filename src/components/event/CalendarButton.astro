@@ -2,7 +2,7 @@
 import { Icon } from 'astro-icon/components';
 
 import type { EventDTO } from '@lib/shared/dto';
-import { buildIcs, type CalendarEvent, googleCalendarUrl } from '@lib/shared/ics';
+import { calendarEventFrom, googleCalendarUrl } from '@lib/shared/ics';
 
 import Button from '../ui/Button.astro';
 
@@ -14,22 +14,14 @@ interface Props {
 
 const { event } = Astro.props;
 
-const calendarEvent: CalendarEvent = {
-  id: event.id,
-  title: event.title,
-  description: event.description,
-  eventDate: event.event_date,
-  startTime: event.start_time,
-  endTime: event.end_time,
-  location: event.location,
-};
-
-const ics = buildIcs(calendarEvent);
-const icsHref = `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`;
+const calendarEvent = calendarEventFrom(event, Astro.site!);
 const googleHref = googleCalendarUrl(calendarEvent);
+// A real URL, not a data: link: iOS Safari opens text/calendar from a URL in the
+// Calendar app, but does nothing with a data: link or the download attribute.
+const icsHref = `/api/public/events/${encodeURIComponent(event.slug)}/ics`;
 ---
 
-{ics && (
+{googleHref && (
   <>
     <Button
       variant="secondary"
@@ -73,13 +65,8 @@ const googleHref = googleCalendarUrl(calendarEvent);
           >
             Google Calendar
           </Button>
-          <Button
-            href={icsHref}
-            variant="secondary"
-            download="maennerkreis-straubing.ics"
-            data-umami-event="calendar-download-ics"
-          >
-            Apple/Outlook (.ics)
+          <Button href={icsHref} variant="secondary" data-umami-event="calendar-download-ics">
+            Apple Kalender, Outlook (.ics)
           </Button>
         </div>
       </div>

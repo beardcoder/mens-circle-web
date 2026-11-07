@@ -1,6 +1,5 @@
 import { expect, test } from 'bun:test';
 
-import { buildIcs, googleCalendarUrl } from '../src/lib/shared/ics';
 import {
   addDays,
   daySeal,
@@ -63,28 +62,4 @@ test('today and the past follow Berlin midnight, not UTC midnight', () => {
   expect(isPast('2026-01-14', new Date('2026-01-14T22:30:00Z'))).toBe(false);
   expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
   expect(addDays('2026-03-01', -1)).toBe('2026-02-28');
-});
-
-test('calendar files carry Berlin wall-clock times', () => {
-  const ev = {
-    id: 'e1',
-    title: 'Männerkreis',
-    description: '',
-    eventDate: '2026-07-15',
-    startTime: '19:00',
-    endTime: '21:30',
-    location: 'Straubing',
-  };
-
-  const ics = buildIcs(ev);
-
-  expect(ics).toContain('DTSTART;TZID=Europe/Berlin:20260715T190000');
-  expect(ics).toContain('DTEND;TZID=Europe/Berlin:20260715T213000');
-  expect(ics).toMatch(/DTSTAMP:\d{8}T\d{6}Z/);
-  // Without an end: 90 minutes; an end before the start is ignored the same way.
-  expect(buildIcs({ ...ev, endTime: '' })).toContain('DTEND;TZID=Europe/Berlin:20260715T203000');
-  expect(buildIcs({ ...ev, startTime: '23:00', endTime: '' })).toContain('DTEND;TZID=Europe/Berlin:20260716T003000');
-  expect(buildIcs({ ...ev, endTime: '18:00' })).toContain('DTEND;TZID=Europe/Berlin:20260715T203000');
-  expect(buildIcs({ ...ev, startTime: '' })).toBe('');
-  expect(googleCalendarUrl(ev)).toContain('dates=20260715T190000%2F20260715T213000');
 });

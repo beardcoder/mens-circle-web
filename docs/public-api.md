@@ -21,8 +21,15 @@ action checks availability in its own database transaction; a displayed count ne
 reserves a seat. Posted without JavaScript, the form gets its answer from the event
 page itself, marked `private, no-store` and kept out of the route cache.
 
-`/api/public/events/{slug}/ics` is the calendar file linked from confirmation mails; it
-carries the full address.
+`/api/public/events/{slug}/ics` is the calendar file, linked from the event page's
+"Apple Kalender, Outlook" button and from the confirmation mails. It is served
+`inline` as `text/calendar` from this real URL, because iOS Safari hands such a
+response to the Calendar app but cannot open a `data:` link or honour `download`.
+`lib/shared/ics.ts` fills what Apple Calendar shows: title, notes (description, how to
+find the room, fee, page, contact), the full address, `GEO` and Apple's map pin
+(`X-APPLE-STRUCTURED-LOCATION`, travel-time alerts), the page as `URL`, status,
+colour, two alarms (the evening before and an hour before) and `LAST-MODIFIED`, so a
+newer download replaces the older entry. Lines fold at 75 octets.
 
 ## Route cache
 

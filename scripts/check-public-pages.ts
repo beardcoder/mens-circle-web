@@ -240,6 +240,8 @@ try {
       title: 'Männerkreis',
       slug: 'testabend',
       eventDate: '2099-01-01T12:00:00.000Z',
+      startTime: '19:00',
+      endTime: '21:30',
       city: 'Straubing',
       isPublished: true,
     },
@@ -325,6 +327,18 @@ try {
 
     await checkCancelLink(origin);
     await checkRegistration(origin);
+
+    // The calendar file iOS opens: a real URL, text/calendar, inline, linked from the page.
+    const eventHtml = await fetch(`${origin}/event/testabend`).then((r) => r.text());
+
+    assert.match(eventHtml, /href="\/api\/public\/events\/testabend\/ics"/);
+    assert(!eventHtml.includes('data:text/calendar'), 'no data: link, iOS Safari cannot open it');
+    const ics = await fetch(`${origin}/api/public/events/testabend/ics`);
+
+    assert.equal(ics.status, 200);
+    assert.equal(ics.headers.get('content-type'), 'text/calendar; charset=utf-8');
+    assert.match(ics.headers.get('content-disposition') ?? '', /^inline; filename="maennerkreis-testabend\.ics"$/);
+    assert.match(await ics.text(), /BEGIN:VEVENT[\s\S]*URL;VALUE=URI:https?:\/\/[^\r]+\/event\/testabend/);
 
     const json = await fetch(`${origin}/api/public/events/testabend`);
 

@@ -78,7 +78,7 @@ ever shown. Admin pages mount Preact workspaces with local state and native navi
 admin reads and mutations call `requireAdmin`; see `docs/admin-ui.md`.
 Other endpoints: `/anmeldung/absagen` (the signed cancel link from the participant
 mails, `lib/server/cancel-token.ts`; GET shows, POST cancels; private, noindex), `/health`, `/sitemap-events.xml`, `/auth/*`, `/api/public/events/<slug>`
-(live seats), `/api/public/events/<slug>/ics`, `/fonts/mail/*` (CORS for listmonk).
+(live seats), `/api/public/events/<slug>/ics` (served inline from a URL: iOS cannot open a `data:` calendar link; fields in `lib/shared/ics.ts`), `/fonts/mail/*` (CORS for listmonk).
 
 **Auth.** Pocket ID via `openid-client` (`lib/server/oidc.ts`): code flow with PKCE +
 state, `client_secret_post` (Basic would form-encode the UUID client id). The callback

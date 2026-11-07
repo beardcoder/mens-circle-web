@@ -1,30 +1,29 @@
+/**
+ * `GET /api/public/events/<slug>/ics`: the evening as a calendar file. The event
+ * page's "Apple/Outlook" button and the confirmation mails (`icsUrl`) link here.
+ * Served `inline` from a real URL: iOS Safari hands a `text/calendar` response to
+ * the Calendar app ("Hinzufügen"), but cannot open a `data:` link or honour
+ * `download`. It carries the venue's full address, which the event page shows too.
+ */
 import type { APIRoute } from 'astro';
 
 import { getPublishedEventBySlug } from '@lib/server/events';
-import { fullAddress } from '@lib/shared/format';
-import { buildIcs } from '@lib/shared/ics';
+import { buildIcs, calendarEventFrom } from '@lib/shared/ics';
 
 export const prerender = false;
 
-// GET /api/public/events/{slug}/ics — hosted iCalendar download, linked from the confirmation mails (`icsUrl`), so it carries the full address.
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, site }) => {
   const slug = params.slug;
+  const event = slug ? await getPublishedEventBySlug(slug) : null;
+  const ics = event ? buildIcs(calendarEventFrom(event, site ?? 'https://mens-circle.de')) : '';
 
-  if (!slug) return new Response('Not found', { status: 404 });
-
-  const event = await getPublishedEventBySlug(slug);
-
-  if (!event) return new Response('Not found', { status: 404 });
-
-  const ics = buildIcs({ ...event, location: [event.location, fullAddress(event)].filter(Boolean).join(', ') });
-
-  if (!ics) return new Response('Not found', { status: 404 });
+  if (!ics) return new Response('Not found', { status: 404, headers: { 'cache-control': 'no-store' } });
 
   return new Response(ics, {
     status: 200,
     headers: {
       'content-type': 'text/calendar; charset=utf-8',
-      'content-disposition': `attachment; filename="termin-${slug}.ics"`,
+      'content-disposition': `inline; filename="maennerkreis-${slug}.ics"`,
     },
   });
 };
