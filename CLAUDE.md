@@ -20,6 +20,9 @@ bun run test:pages     # builds, then checks production HTML and headers (dispos
 bun run test:browser   # builds, then Chromium: console/CSP errors, axe, forms (fake listmonk)
 bun run db:generate    # after editing src/lib/server/db/schema.ts
 bun run knip           # unused files, exports and dependencies
+bun run brand:export   # after editing theme.css: brand/tokens.json, tokens.css, palette.ase/.gpl
+bun run brand:logo     # after editing brand/logo/logo.svg: logo variants, favicons, mail marks
+bun run brand:render   # flyers, poster, card, posts, preview images → brand/out (docs/brand)
 ```
 
 Verify with `check` + `lint` + `format:check` + `test`; CI (`.github/workflows/ci.yml`)
@@ -133,7 +136,15 @@ worker, is revalidated on every load and goes after 2027-04-26 (docs/runtime.md)
 
 **Generated files.** `sitemap()` lists `/sitemap-events.xml` in the index (`customSitemaps`).
 `src/pages/llms.txt.ts` prerenders a short index of the three public content pages.
-No live-site fetching, Markdown export or post-build patching is needed.
+No live-site fetching, Markdown export or post-build patching is needed. The brand
+files are generated and committed (docs/brand/README.md): `brand/tokens.*` and
+`brand/palette.*` from `theme.css` (`brand:export`), every logo, favicon and mail
+mark from `brand/logo/logo.svg` (`brand:logo`), the preview images
+`public/images/og-*.png` from their templates (`brand:render --install`, then bump
+their `?v=`). Never hand-edit them; `tests/brand-export.test.ts` and
+`tests/brand-logo.test.ts` fail on drift. `brand/out/` and `brand/.dist/` are not
+committed. The template pages (`src/pages/brand/[template].astro`) exist only in a
+brand build (`BRAND_TEMPLATES=1`); a normal build has no `/brand/*`.
 
 **Images.** On prerendered pages, Astro's `<Image />` straight from `astro:assets`, no
 wrapper component: `layout="constrained"` with `width`/`height` (Astro writes `srcset`
@@ -144,7 +155,7 @@ production. The home page uses pre-sized files beside the original with a writte
 `srcset`: the photo in its ring (`markus-kreis-{480,720,960}.avif`, square, AVIF q52)
 and Markus's avatar (`markus-avatar-192.webp`); regenerate them when the photo
 changes. Sharp is a build-time dev
-dependency. All events use `/images/og-default.png`.
+dependency. All events use `/images/og-default.png`, rendered from its template.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute. It
 decides what is due first and imports a task's module only then (`dueTasks()`):
@@ -190,10 +201,13 @@ once, on connect, and takes commands (`addMarker`) only after `baLoad`. `c` is l
 Keep the attribution line under the map.
 
 **Styling.** Tailwind v4 (`@tailwindcss/vite`), CSS-first. `styles/theme.css` holds the
-tokens, variants, surfaces and keyframes; `global.css` (public, one shared hashed file)
-and `admin.css` are the two entries. Both read classes from `src/` only
-(`source('..')`, so words in docs, mail templates and tests never become utilities) and
-skip server-only code; `global.css` keeps the admin sources out with `@source not`.
+tokens, variants, surfaces, the bleed utilities and keyframes; `global.css` (public,
+one shared hashed file), `admin.css` and `print.css` (brand templates) are the three
+entries. The first two read classes from `src/` only (`source('..')`, so words in
+docs, mail templates and tests never become utilities) and skip server-only code;
+`global.css` keeps the admin and print sources out with `@source not`, `admin.css`
+the print and styleguide sources; `print.css` reads only the print, brand and ui
+components. Printing a page of the site (`@media print`) lives in `global.css`.
 Scroll reveals are CSS scroll-driven animations (`animation-timeline: view()`); the FAQ is
 native `<details>`; no animation library ships to the browser. The opening, page transitions, loops and
 state transitions are the theme's own keyframes and `--animate-*` tokens (`rise`,
@@ -207,131 +221,94 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Design
 
-- `docs/design-system.md` is the reference. The idea: a fire circle at the edge of
-  the forest — calm, warm, grounded, an invitation to a real evening. Deep forest
-  green for what draws you in, the ember of the logo for the one thing to do, linen
-  for reading; the circle (the photo in a ring, three warm points, the date's seal,
-  numbered steps) is the one motif. Same
-  function, same component.
-- Stance (design-system.md, "Stance" and "Voice"): the page acts like a circle
-  leader who holds the space instead of performing. Quiet, the frame visible
-  (course, five agreements, consent: every exercise is an offer, "no" is a good
-  answer, no therapy), grounded rather than lofty, open to every man. Copy: "du",
-  plain German, no jargon, no "brother" tone, no promises of healing; no dashes for
-  effect, slogan contrasts, triads or therapy phrases, and each point once per page
-  (design-system.md, "Voice").
-- Colours are roles (`ground`, `ground-alt`, `tint`, `raised`, `fg`, `fg-soft`,
-  `fg-muted`, `line`, `line-strong`, `line-bold`, `accent`, `accent-soft`,
-  `fill`/`fill-strong`/`on-fill`, `glow` for decoration, `success`/`danger` for
-  states only); hex primitives (`--p-*`) live on `:root` only, never in markup. Day
-  and night follow the system by default (`light-dark()` tokens, no `data-mode`);
-  `ModeToggle` (footer and phone menu) offers Auto · Hell · Dunkel and pins a choice
-  as `data-mode` (stored as `mc-appearance`; keys of older versions are simply
-  ignored). `theme-color` comes
-  as a light and a dark tag by `media`. Every text
-  pair ≥ 4.5:1 on every ground in both modes, control lines ≥ 3:1; `line` never
-  outlines a control alone. Check new pairs in both modes.
-- Grounds: `Section ground` is `default` (linen), `alt` (sand: facts that belong
-  together, the course, the dates), `tint` (sage: agreements, quiet notes) or `dark`
-  (`surface-dark`, forest: the opening, the registration, the menu, the
-  footer). Grounds run from edge to edge: square, no inset, no sheet.
-- Type: Fraunces 500 (`font-display`, one static face) for titles, quotes, dates,
-  numbers in circles; Figtree (`font-sans`, variable) for text, navigation, forms,
-  data. Role tokens `text-hero`, `text-page`, `text-section`, `text-sub`, `text-quote`,
-  `text-md` (body), `text-base` (controls). No italic display face: `<em>` in a title
-  turns the accent, upright; an event title sets its last word in the accent
-  (`accentLastWord`), and no title gets a layout of its own. Labels in sentence case: `Eyebrow` (ember dot, accent),
-  `label` (muted). Running text on `max-w-measure`. A dash in running copy is bound
-  to the word before it (`\u00a0–`).
-- Shapes: soft and round. `rounded-full` for what you press and for circles; fields
-  `rounded-md` with the buttons' heights (`button()` and `control()` share sizes);
-  the map `rounded-xl`; the registration panel `rounded-2xl` (runs out to the right
-  window edge beside the intro). No cards on public pages, not even for a date: the
-  date is open too (seal, facts as small columns, seat bar). Everything stands open
-  on its ground: facts, questions,
-  agreements, FAQ and voices are rows or columns between lines, a quote stands
-  behind an ember rule, a note is a heading and its text. Never wrap content in a
-  box to group it; part it by a line or space. `shadow-overlay` only for what floats.
-- Grid: 1200px of content and one edge, 28 / 40 / 56px from the window in every
-  section (`Container`, `px-gutter`), and wide, open space: `py-section` 88 → 144px.
-  `p-card` for the calendar dialog, `p-panel` (28 → 48px) for the registration,
-  which below `lg` becomes a full-width forest band. `py-band` for compact bands;
-  breakpoints `md` tablet, `lg` desktop, `nav` (1100px) header links. No section is
-  forced to a screen's height.
-- Shared components: `EventSummary` (every date, open: seal, facts, `SeatBar`; fed
-  by `lib/shared/event-status.ts`, the bar by `lib/shared/seats.ts`, which the registration panel
-  shares), `PageIntro` (every sub-page opening), `SectionHead`, `Eyebrow`,
-  `Fact`, `Button`, `Field` + `FormStatus`, `TestimonialList`, `Accordion` (every
-  FAQ). Use them; do not restyle a copy.
-- Home: the forest opening holds statement, explanation, the action (in the first
-  screen at 1440 × 900), the photo in its ring and the next date overlapping it; then
-  the facts between lines, the intro with the first round's questions as a quiet
-  list, the four steps on a path (closing with a line on breath and body), the five
-  agreements as a numbered list (`#rahmen`), taking part (`#termine`), Markus (quote
-  behind an ember rule, signed with his avatar), voices, FAQ, staying in touch
-  (`#newsletter`). The decision follows the frame, not the FAQ.
-- Header 72px: links visible from `nav`, one filled action; over the home opening the
-  bar is clear (`over-hero:`) until the page moves (`data-scrolled`), then 95% linen; fixed bars
-  (header, event dock, action bar) blur what lies behind them only from `lg` on a
-  hovering pointer (`lg:hover-device:`), never on phones. The phone menu is a native modal `<dialog>` on the forest, opening as a circle.
+- `docs/design-system.md` is the reference, `/styleguide` the living one (read from
+  `theme.css` by `lib/brand/theme-tokens.ts`, real components; noindex, in the
+  browser check). The idea: the circle of chairs. A centre, things turned towards
+  each other, much air; poster-sized type where the site invites, calm reading where
+  it explains. Forest and moss for what draws you in and what is spoken in the
+  circle, warm paper for reading, ember for the one thing to do, the spark (gold)
+  for what stands large on the dark grounds. The circle is the one motif, in four
+  forms: the mark, the seat ring, the stamp, the index number. Same function, same
+  component.
+- Stance and voice (design-system.md): the page acts like a circle leader who holds
+  the space instead of performing. Quiet, the frame visible (course, five
+  agreements, consent, no therapy), grounded, open to every man. Copy: "du", plain
+  German, no jargon, no "brother" tone, no promises of healing; no dashes for effect,
+  slogan contrasts, triads or therapy phrases; each point once per page.
+- Colours are roles (`ground`, `ground-alt`, `raised`, `fg`, `fg-soft`, `fg-muted`,
+  `line`, `line-strong`, `line-bold`, `accent`, `accent-soft`,
+  `fill`/`fill-strong`/`on-fill`, `spark`, `success`/`danger` for states only); hex
+  primitives (`--p-*`) live on `:root` only, mirrored in `lib/shared/brand.ts`
+  (`tests/brand.test.ts`), never in markup. Day and night follow the system
+  (`light-dark()`); `ModeToggle` pins Auto · Hell · Dunkel as `data-mode`
+  (`mc-appearance`). Every text pair ≥ 4.5:1 on every ground in both modes, control
+  lines ≥ 3:1 (`tests/contrast.test.ts`); `line` never outlines a control alone; the
+  spark is never text on paper or sand. Check new pairs in both modes.
+- Grounds: `Section ground` is `default` (paper), `alt` (sand: facts, course,
+  dates), `moss` (`surface-moss`, dark in both modes: agreements, voices) or `dark`
+  (`surface-dark`, forest: opening, registration, menu, last band, footer). Grounds
+  run from edge to edge; `Section` clips horizontally what bleeds.
+- Type: Fraunces variable (`font-display`, weight 500–700, optical size 9–144, one
+  ~60 kB file in `src/assets/fonts/`, local provider) for titles, dates, numbers,
+  poster words; Figtree (`font-sans`) for text, navigation, forms, data. Role tokens
+  `text-poster`, `text-hero`, `text-index`, `text-page`, `text-section`, `text-sub`,
+  `text-quote`, `text-md` (body), `text-base` (controls), `text-marginal`. `<em>` in
+  a title turns the accent (the spark on the forest), upright. Labels in sentence
+  case. Running text on `max-w-measure`. A dash in running copy is bound to the word
+  before it (`\u00a0–`).
+- The four moves, the only ways to break the 12-column grid, each at most once per
+  section: the margin column (`margin` recipes in `lib/ui.ts`: side 1–3, content
+  4–12, reading 4–10, a crossing title 1–10), the overlap (`overlap` token, always on
+  a ground of its own, towards the centre), the bleed (`bleed-l`/`-r`/`-x`, the side
+  changes down the page) and the poster word (`Poster`, one per screen). Never:
+  staircases, rotation (only the stamp turns), shadows, boxes around content, text
+  over a photograph.
+- Shapes: soft and round. `rounded-full` for what you press and for circles
+  (people's photographs, seat ring, stamp, avatar); fields `rounded-md` with the
+  buttons' heights; the map `rounded-xl`, the registration panel `rounded-2xl`. No
+  cards on public pages: facts, steps, agreements, FAQ and voices are rows between
+  lines. `shadow-overlay` only for what floats. Images: a person in a circle, a place
+  in a rectangle cut by the edge; one form per section.
+- Shared components: `EventSummary` (every date: date, facts, `SeatRing`, action;
+  fed by `lib/shared/event-status.ts`), `SeatRing` (`lib/shared/seats.ts`:
+  `seatFill`, `seatDots`), `Stamp`, `Lockup`, `Qr` (`src/components/brand/`, shared
+  with the print templates), `PageIntro`, `SectionHead`, `Poster`, `Index`,
+  `Marginal`, `Eyebrow`, `Fact`, `Button`, `Field` + `FormStatus`,
+  `TestimonialList`, `Accordion`. Use them; do not restyle a copy.
+- Home: the forest opening (statement at poster size, the one action, the next
+  date; the photograph cut by the right edge, the seat ring overlapping it; the bar's
+  action outlined over it), facts, intro (questions in the margin), course (sand,
+  index numbers), agreements (moss), taking part (`#termine`, "Dabei sein." as a
+  poster word), Markus (quote crossing a ring cut by the window), voices (moss, every
+  voice in full), FAQ, staying in touch (forest, the stamp), the footer.
+- Header 72px: links from `nav`, one action; over the home opening clear with light
+  text until the page moves (`data-scrolled`), then 95 % paper; fixed bars blur only
+  from `lg` on a hovering pointer. The phone menu is a native modal `<dialog>` on
+  the forest, opening as a circle.
 - Motion: the opening moves in pure CSS from the first paint (`data-enter`,
-  global.css; the title is the LCP): the title rises word by word
-  (`data-enter="words"`, words and their index `--i` wrapped on the server by
-  `lib/shared/words.ts`, out of a soft blur), the rest follows at `--enter-delay` (`afterWords()`), the photo
-  settles (`settle`), its ring follows (`ring`), on Motion's springs sampled into
-  `--ease-spring`/`--ease-spring-slow`; the opening's seat bars fill in CSS. Below it
-  each piece arrives once as it comes into view, driven by the scroll in CSS
-  (`animation-timeline: view()`, global.css "Motion: scroll"; no script, nothing
-  hidden up front, a browser without scroll timelines shows everything):
-  `data-reveal`, or every child of a `data-reveal-group` (later children start
-  further into their entry); the steps' path draws in (`data-line`), the seat bar
-  fills (`data-seat-fill`). No parallax.
-  Every text arrives this way, never a heading beside text that already stands:
-  section heads, `Prose reveal` (paragraph by paragraph), `LinkList`, `ValueItems`,
-  date summaries, the newsletter, the event story and map; the footer stands. On an
-  event page the date line and the title enter on one beat (`data-enter`), then the
-  lower part; once the title has passed under the bar a dock fades in with it
-  (`EventDock`, one `IntersectionObserver`). FAQ
-  answers are native `<details>` whose `::details-content` transitions its height
-  where `interpolate-size` exists (`AccordionItem`, global.css "FAQ"; the marker
-  uses the `item-open:` variant); the
-  phone `ActionBar` glides in and out on a CSS transition (its script only toggles
-  `data-visible`). No reading-progress bar; the back-to-top link is desktop only. CSS keeps the
-  loops (paused out of view by Hero.astro's `data-offscreen`): the glow breathes (`data-glow`), the ring turns every 90 s.
-- Lighthouse on every motion change (design-system.md, "Lighthouse"): CLS 0, no
-  forced reflow. 120fps means the compositor: only opacity and transforms move. The
-  one exception is the soft blur the opening's title words come into focus from
-  (CSS, 0.6 s, at load); a blur costs ~16× the main-thread work of a transform, so
-  nothing that runs while scrolling blurs. Fades use `--ease-fade` (a gentle start,
-  so the fade is seen); the springs fall back to `--ease-out` where `linear()` is
-  missing (Safari < 17.2). The FAQ's height
-  transition is the one accepted layout animation (short, on a press, never while
-  scrolling). The hero's loops pause out of view
-  (`data-offscreen`). Never set a state attribute on `<html>` while the page moves
-  (it restyles the whole page): flag the element itself; the boot script's mode flags are set
-  before the first frame. Never read layout or `scrollY` at load: header tone,
-  back-to-top and the like watch a sentinel with an `IntersectionObserver`.
-  Nothing that holds the LCP waits for a script.
-  Third-party scripts are `async`, so nothing queues before the opening. On phones
-  the home page has a bottom `ActionBar` with the next date once the hero's action
-  is gone. Interactions ~180ms (a button rises 2px and settles when pressed, arrows
-  slide and nudge on a press, header links draw a line). No
-  `content-visibility`. Under reduced motion everything rests.
-- Fonts: Fraunces 500 static (~18 kB) and Figtree variable (~20 kB); both upright
-  faces preload, Figtree's italic loads when used.
-- No layout shift: every summary line is one line (`truncate`); a summary under
-  24rem (container query) puts the seal beside its label and the date below it. A
-  title's measure is in `em`, never `ch` (`ch` follows the font in use and
-  re-resolves when it swaps).
-- Page transitions are a native cross-document cross-fade (global.css, "Page
-  transitions": `@view-transition`, `plus-lighter`, one duration, linear). No
-  script names directions or arrivals; the boot script in the head only sets the
-  colour mode (`data-mode`, `data-mode-resolved`). No `:has()` on `body` or `html`
-  (the bar over the opening is `data-over-hero`, the open menu `data-menu-open`); write `<html>` attributes only
-  when they change.
+  global.css; the title is the LCP): words rise one by one out of a soft blur
+  (`lib/shared/words.ts`), the rest follows at `--enter-delay`, the photo settles,
+  its ring follows, the seat ring's taken chairs fill in (`data-seat-dot`). Below it
+  each piece arrives once as it comes into view (`animation-timeline: view()`:
+  `data-reveal`, `data-reveal-group`); the stamp turns with the scroll
+  (`data-stamp-turn`, the one scroll-linked rotation). Nothing hidden up front; a
+  browser without scroll timelines shows everything; under reduced motion
+  everything rests. FAQ answers are native `<details>` (height transition where
+  `interpolate-size` exists). The phone `ActionBar` glides in on a CSS transition.
+- Lighthouse on every motion change (design-system.md): CLS 0, no forced reflow,
+  only opacity and transforms move (the one exception: the opening's soft blur).
+  Never set a state attribute on `<html>` while the page moves; never read layout
+  or `scrollY` at load (use an `IntersectionObserver`); nothing that holds the LCP
+  waits for a script. No `content-visibility`.
+- No layout shift: summary lines are one line (`truncate`); a title's measure is in
+  `em`, never `ch`.
+- Page transitions are a native cross-document cross-fade (`@view-transition`,
+  `plus-lighter`, one duration, linear). No `:has()` on `body` or `html`.
 - Styles live in the component's markup as utilities. `global.css` is one stylesheet
-  for every public page (`inlineStylesheets: 'auto'`), so keep one-off arbitrary
-  values few.
+  for every public page, so keep one-off arbitrary values few; the print templates
+  size everything in `cqw` of their sheet and may use arbitrary values freely.
+- A token the styleguide describes carries a trailing comment in `theme.css`; German
+  notes live in `lib/brand/notes.ts`.
 
 ## Conventions
 
@@ -353,8 +330,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   or press (Chromium), never `/admin`, `/auth` or `/api`. No Astro prefetch script and
   no per-link attributes.
 - Search: every public page is indexed and in the sitemap, the legal pages and
-  `/teile-deine-erfahrung` included; only `/admin`, `/auth/*` (redirect endpoints)
-  and the 404 stay out (`noindex` on the admin and the 404). llms.txt lists the
+  `/teile-deine-erfahrung` included; only `/admin`, `/auth/*` (redirect endpoints),
+  `/styleguide` (`noindex, follow`) and the 404 stay out (`noindex` on the admin and
+  the 404). llms.txt lists the
   three content pages. An event held outside Straubing names its
   place in the `<title>` (≤ 60 chars, brand dropped first). Structured data states only
   what the pages say (Person, `areaServed`); no FAQPage for rich results.

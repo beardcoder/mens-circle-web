@@ -1,17 +1,23 @@
 # Design system
 
-## Idea — a fire circle at the edge of the forest
+## Idea: the circle of chairs
 
 A men's circle meets in the evening, sits in a ring and listens. The site looks like
-that evening: deep forest green for what draws you in, the warm ember of the logo
-for the one thing to do, linen daylight for reading. The circle is the one motif —
-the photograph in a ring, three warm points on it (the three figures of the logo),
-the date in its seal, numbered steps on a path, the hills of
-the Bavarian Forest. Shapes are soft and round.
+that evening: a centre, things turned towards each other, much air between them.
+Poster-sized type where the site invites, calm reading where it explains. The
+forest and the moss for what draws you in and what is spoken in the circle, warm
+paper for reading, the ember of the logo for the one thing to do and a spark of
+gold for what stands large on the dark grounds.
 
-Four principles: make the next step visible, group what belongs together, keep
-reading lines short, use the same component for the same function. Everything is
-fast: two font files (~37 kB), one stylesheet, images sized at build time.
+The grid is twelve columns and one edge. Four moves break it, and only these
+(see "The four moves"): the margin column, the overlap, the bleed and the poster
+word. The circle is the one motif, in four forms: the mark, the seat ring (every
+chair of an evening on a ring), the stamp and the index number.
+
+The living reference is `/styleguide` (noindex): it reads `theme.css` through
+`lib/brand/theme-tokens.ts` and shows the real components, so it cannot drift.
+Everything that leaves the site (flyers, posts, preview images, logo files, token
+exports) is in [docs/brand/README.md](brand/README.md).
 
 ## Stance — hold the space, don't perform
 
@@ -54,15 +60,19 @@ facts and the FAQ, not in every section.
 
 ## Files
 
-| File                             | Role                                                                                                                                         |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/styles/theme.css`           | Tokens (`@theme`), primitives, variants, the three surfaces, keyframes, base rules. Shared.                                                  |
-| `src/styles/global.css`          | Public entry: Tailwind (classes from `src/` only), theme, page transitions, the FAQ, the hero's ring, the opening and the scroll hooks.      |
-| `src/styles/admin.css`           | Admin entry: Tailwind and theme; AdminLayout pins the dark mode (the forest at night).                                                       |
-| `src/lib/ui.ts`                  | Class recipes: `button()`, `control()`, `link`, `label`, `fieldLabel`, `fieldHint`, `fieldError`, `formStatus`, `checkbox`, `card`, `panel`. |
-| `src/lib/shared/event-status.ts` | The view model every date summary renders (`eventView`, `splitFee`).                                                                         |
-| `src/lib/shared/seats.ts`        | How full a circle is (`seatFill`), shared by the date's bar and the registration panel; imports nothing.                                     |
-| `src/components/ui/`             | The components built on them; `src/icons/` the line icons (24px grid, 1.7 stroke).                                                           |
+| File                            | Role                                                                                                       |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `src/styles/theme.css`          | Tokens (`@theme`), primitives, variants, the surfaces, the bleed utilities, keyframes, base rules. Shared. |
+| `src/styles/global.css`         | Public entry: Tailwind, theme, print of a page, page transitions, the FAQ, opening and scroll motion.      |
+| `src/styles/admin.css`          | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                           |
+| `src/styles/print.css`          | Brand templates entry (`src/components/print`, `src/pages/brand`), container units, no page margin.        |
+| `src/lib/ui.ts`                 | Class recipes: `button()`, `control()`, `link`, `label`, field and form states, `card`, `panel`, `margin`. |
+| `src/lib/brand/theme-tokens.ts` | Parses `theme.css` into tokens for the styleguide and the export.                                          |
+| `src/lib/brand/notes.ts`        | German notes per token for the styleguide.                                                                 |
+| `src/lib/shared/seats.ts`       | How full a circle is (`seatFill`) and where its chairs sit on the ring (`seatDots`).                       |
+| `src/components/ui/`            | Components on the recipes (`Section`, `SectionHead`, `Poster`, `Index`, `Marginal`, `Button`, `Field` …).  |
+| `src/components/brand/`         | The motifs, shared by site and print: `SeatRing`, `Stamp`, `Lockup`, `Qr`.                                 |
+| `src/components/styleguide/`    | What only the styleguide needs: `Swatch`, `TypeSpecimen`, `Example`, `DoDont`.                             |
 
 ## Colour
 
@@ -71,92 +81,109 @@ Primitives (`--p-*`) are plain hex values on `:root`; the roles pick them with
 (Auto); `ModeToggle` offers Auto · Hell · Dunkel and pins a choice as `data-mode`,
 set before first paint. Never a hex value in markup.
 
-| Role            | Light                        | Night                 | Token                            | Use                                            |
-| --------------- | ---------------------------- | --------------------- | -------------------------------- | ---------------------------------------------- |
-| Page            | `#F6F2EA` linen              | `#111915`             | `ground`                         | the page                                       |
-| Warm band       | `#ECE4D4` sand               | `#17201A`             | `ground-alt` (`surface-alt`)     | information that belongs together              |
-| Quiet note      | `#E2E7D8` sage               | `#1C2720`             | `tint` (`surface-tint`)          | agreements, a hint beside the work             |
-| Raised          | `#FFFCF6` cream              | `#1E2922`             | `raised`                         | the step circles, the hills, the admin's cards |
-| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, registration, menu, footer            |
-| Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                          |
-| Secondary text  | `#5A6255` moss               | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                        |
-| Lines           | `#DDD5C5` / `#C8BFAC`        | `#2A362E` / `#3B4940` | `line`, `line-strong`            | quiet structure; never alone a control         |
-| Control outline | `#7A8072`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)              |
-| Accent          | `#9A421D` (hover `#953F1C`)  | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word, free seats  |
-| Accent tint     | `#F5DFCD`                    | `#3A2619`             | `accent-soft`                    | icon discs, the date seal, the FAQ disc        |
-| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module                     |
-| Glow            | `#E8B65A`                    | same                  | `glow`                           | the warm point of the circle; never text       |
+| Role            | Light                        | Night                 | Token                            | Use                                              |
+| --------------- | ---------------------------- | --------------------- | -------------------------------- | ------------------------------------------------ |
+| Page            | `#F4EEE2` paper              | `#0F1410`             | `ground`                         | the page                                         |
+| Warm band       | `#E6DAC4` sand               | `#1D2019`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates      |
+| Raised          | `#FFFCF6` cream              | `#262B23`             | `raised`                         | fields, the QR square, the admin's cards         |
+| Moss            | `#2C3A30`                    | `#1A2A20`             | `surface-moss`                   | what is spoken in the circle: agreements, voices |
+| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, registration, menu, last band, footer   |
+| Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                            |
+| Secondary text  | `#565E51` moss grey          | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                          |
+| Lines           | `#D8CDB8` / `#C2B59C`        | `#2B3029` / `#3D4339` | `line`, `line-strong`            | quiet structure; never alone a control           |
+| Control outline | `#767C6E`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                |
+| Accent          | `#9A421D`                    | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers |
+| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module, a taken chair        |
+| Spark           | `#E8B65A`                    | same                  | `spark`                          | poster words and numbers on forest and moss      |
 
-On the forest, `surface-dark` re-declares text (`#F2EDE3` bone, `#B4BBAD` muted),
-accent (`#F2A56C`), lines (bone at 14 / 24 %) and the control outline (`#768379`).
-`success` and `danger` are for real states only and always come with words.
-Every text pair holds at least 4.5:1 on every ground in both modes, every control
-line at least 3:1 (checked pair by pair; the tightest are the control outline on sand,
-3.2:1, and white on ember, 4.7:1). Check any new pair in both modes.
+On the forest and the moss the surfaces re-declare text (bone `#F2EDE3`, muted
+`#B4BBAD`), accent (`#F2A56C`), lines (bone at 14–28 %) and the control outline
+(forest `#768379`, moss `#8A968A`). The spark is never text on paper or sand.
+`success` and `danger` are for real states only and always come with words. Every
+text pair holds at least 4.5:1 on every ground in both modes, every control line at
+least 3:1 (`tests/contrast.test.ts`, pair by pair). Check any new pair in both modes.
 
 ## Type
 
-`font-display` is Fraunces at its one weight, 500 — warm, a little old-fashioned,
-steady: titles, the quote, the date, numbers in circles, the menu. `font-sans` is
-Figtree (variable, 400–700) — clear and friendly: running text, navigation, forms,
-data, FAQ questions. Fraunces ships as one static face (~18 kB), Figtree as one
-variable file (~20 kB); both upright faces preload, Figtree's italic loads when used.
-There is no italic display face: a highlighted phrase in a title (`<em>`) turns the
-accent colour and stays upright.
+`font-display` is Fraunces, variable in weight (500–700) and optical size (9–144),
+one file of ~60 kB in the repo (`src/assets/fonts/`). The optical size follows the
+size by itself, so a poster word gets the high-contrast cut and a date the sturdy
+one. Titles are 500, the hero, page titles, index numbers and poster words 600.
+`font-sans` is Figtree (variable, 400–700): running text, navigation, forms, data.
+A highlighted phrase in a title (`<em>`) turns the accent (the spark on the forest)
+and stays upright.
 
-| Token          | Size      | Use                                       |
-| -------------- | --------- | ----------------------------------------- |
-| `text-hero`    | 44–88px   | the home statement                        |
-| `text-page`    | 38–68px   | a sub-page's title, an event title        |
-| `text-section` | 34–60px   | a section's title                         |
-| `text-sub`     | 22–30px   | subheadings, list titles, a fact's value  |
-| `text-quote`   | 24–34px   | one short highlighted quote               |
-| `text-xl`      | 18–22px   | FAQ questions, data values                |
-| `text-lg`      | 18–21px   | a lead                                    |
-| `text-md`      | 17–19px   | running text (the body)                   |
-| `text-base`    | 16px      | controls, buttons, data                   |
-| `text-sm`/`xs` | 14 / 13px | labels, hints, captions / the small print |
+| Token           | Size     | Use                                              |
+| --------------- | -------- | ------------------------------------------------ |
+| `text-poster`   | 72–216px | one poster word or number (`Poster`)             |
+| `text-hero`     | 48–104px | the home statement                               |
+| `text-index`    | 48–104px | an index number in the margin (`Index`)          |
+| `text-page`     | 44–96px  | a sub-page's title, an event title               |
+| `text-section`  | 36–72px  | a section's title, the one featured voice        |
+| `text-sub`      | 22–30px  | subheadings, list titles, a fact's value, a date |
+| `text-quote`    | 24–34px  | one short quote                                  |
+| `text-xl`       | 18–22px  | FAQ questions, the questions of the first round  |
+| `text-lg`       | 18–21px  | a lead                                           |
+| `text-md`       | 17–19px  | running text (the body)                          |
+| `text-base`     | 16px     | controls, buttons, data                          |
+| `text-sm`/`xs`  | 14/13px  | labels, hints, captions / the small print        |
+| `text-marginal` | 14px     | a note in the margin column (`Marginal`)         |
 
-Titles tighten their tracking as they grow (−1 % to −3 %). Labels are sentence case:
-the section label (`Eyebrow`) in the accent after a small ember dot, data labels
-(`label`) in the secondary colour. Running text stays on `max-w-measure` (~62
-characters), aligned left. Long words hyphenate; a hyphenated word that must not
-break at its hyphen uses U+2011 ("E‑Mail" in a big title).
+Titles tighten their tracking as they grow (−1 % to −5 %). Labels are sentence
+case: `Eyebrow` in the accent after a small ember dot, data labels (`label`) in the
+secondary colour. Running text stays on `max-w-measure` (~62 characters).
 
 ## Space and grid
 
-One content width, 1200px, and **one edge**: the content sits 28 / 40 / 56px from
-the window (`gutter`, `Container`) in every section, and the header shares it. The
-grounds — the opening, the bands and the footer — run from edge to edge.
+One content width, 1200px, and one edge: the content sits 28 / 40 / 56px from the
+window (`gutter`, `Container`) in every section, and the header shares it. The
+grounds run from edge to edge. Space per width on `:root`: `py-section` 88 → 144px,
+`py-band` 56 → 80px, `group` 40 → 64px, `grid` 32 → 48px (column gap), `overlap`
+40 / 64 / 96px. Breakpoints: `sm` 36rem, `md` 48rem, `lg` 64rem, `nav` 68.75rem,
+`xl` 80rem. No section is forced to a screen's height.
 
-Content stands on its ground, with plenty of air; a second part is parted by space,
-rarely by a line, never by a box. The dates are open too: no card, the facts as small
-columns and a seat bar. Two paddings remain: `card` 24 / 28 / 32px (the calendar
-dialog), `panel` 28 / 40 / 48px (the registration: beside the intro it runs out to
-the window's right edge with a rounded inner corner; below `lg` it is a forest band
-from edge to edge).
+### The four moves
 
-Space per width on `:root`: `py-section` 88 → 144px, `py-band` 56 → 80px, `group`
-40 → 64px (an explanation to the module after it), `grid` 32 → 48px (column gap).
-An eyebrow stands 16px above its title. Breakpoints: `sm` 36rem, `md` 48rem, `lg`
-64rem, `nav` 68.75rem (the header shows its links), `xl` 80rem. No section is forced
-to a screen's height.
+The grid breaks in these four ways only, each at most once per section, so the
+page stays alive and calm. The styleguide shows each with its rules.
+
+1. **Margin column** (`margin` in `lib/ui.ts`): from `lg` a margin on columns 1–3
+   for index numbers, labels and notes, the content on 4–12 (`margin.reading` 4–10
+   for running text). A title may start in the margin and cross into the content
+   (`margin.cross`, 1–10). Always on the left; below `lg` it stacks, margin first.
+   Facts, intro, course, voices, FAQ, the personal page's sections.
+2. **Overlap** (`overlap` token: `-bottom-overlap`, `-left-overlap` …): an element
+   crosses an edge towards the centre, always on a ground of its own (a disc, a
+   panel). The seat ring over the hero's photograph, the quote crossing Markus's
+   ring.
+3. **Bleed** (`bleed-l`, `bleed-r`, `bleed-x`; `--spacing-bleed` is the way from the
+   content's edge to the window's): a photograph, a ring or the stamp runs out of
+   the window. The side changes down the page (the hero's photo right, Markus's
+   ring right after a left-hand intro, the stamp right at the end). Sections clip
+   horizontally (`Section`), so a bleed never scrolls.
+4. **Poster word** (`Poster`, `text-poster`): one word or number as large as a
+   poster, as the title ("Dabei sein.") or quietly behind content (`tone="ghost"`,
+   8 % of the text colour, hidden from assistive technology). At most one per screen.
+
+Never: staircases of offset blocks, rotation (only the stamp turns), shadows, boxes
+around content, text over a photograph.
 
 ## Shape and depth
 
 Soft and round. `rounded-full` is what you press (buttons, chips, icon buttons, the
-FAQ disc) and the circle (the photograph, the seal, the numbered steps, the avatar,
-the rings). Fields take `rounded-md` (14px) — inputs and textareas alike — with the
-buttons' heights (48 / 44 / 36px). The map, the calendar dialog and the admin's
-cards take `rounded-xl` (28px), the registration panel and the photograph on the
-personal page `rounded-2xl` (40px). The grounds are square and run from edge to edge.
+FAQ disc) and the circle (photographs of people, the seat ring, the stamp, the
+avatar). Fields take `rounded-md` with the buttons' heights (48 / 44 / 36px). The
+map and dialogs take `rounded-xl`, the registration panel `rounded-2xl`. The grounds
+are square and run from edge to edge. On public pages nothing is boxed: facts,
+questions, agreements, steps, FAQ and voices are rows between thin lines.
+`shadow-overlay` is for what floats; nothing else casts a shadow.
 
-A card (`card`) is cream with a thin `line` and `shadow-card`: soft, wide, low, and
-only in the admin. On public pages everything is open: facts, questions,
-agreements, FAQ and voices are rows or columns between thin lines; a quote stands
-behind an ember rule; a note is a heading with its text. `shadow-overlay` is for
-what floats (dialogs, menus, the admin's save bar). The forest and the sage carry
-no shadow. A primary button glows a little in its own colour on hover.
+## Images
+
+Two forms only: a person in a circle, a place (forest, evening, the room) in a
+rectangle cut by the window or the sheet. One form per section; warm, natural
+light; captions as margin notes. No staged group shots, no stock, no recognisable
+participants without their explicit consent, no text on a photograph.
 
 ## Motion
 
@@ -174,7 +201,7 @@ trace on every motion change (see "Lighthouse" below). Only opacity and transfor
 move, so the compositor carries every frame. The one exception is the soft blur the
 opening's title words come into focus from (CSS, light and 0.6 s, at load); a blur
 is redrawn on the main thread every frame (about 16× a transform), so nothing that
-moves while scrolling blurs. No parallax, and no animated height except the FAQ's native unfolding. Fades start gently
+moves while scrolling blurs. No parallax beyond the stamp's turn, and no animated height except the FAQ's native unfolding. Fades start gently
 (`--ease-fade`, `[0.33, 0, 0.2, 1]`), so they are seen; no script reads layout
 before the page has settled (state at a scroll position comes from an
 `IntersectionObserver`, never from `scrollY`); state flags go on the element that
@@ -186,8 +213,8 @@ waits for a script.
   title is the largest paint): the label, then the title word by word
   (`data-enter="words"`; `lib/shared/words.ts` wraps the words on the server with their
   index, so the lines break the same with and without motion), then the lead, the
-  action and the next date at their `--enter-delay` (`afterWords()`), the seat bar
-  filling after its line. The photo settles from a little larger (`settle`), the
+  action and the next date at their `--enter-delay` (`afterWords()`), the taken
+  chairs of the seat ring filling in one after the other. The photo settles from a little larger (`settle`), the
   ring of the logo follows (`ring`). The springs are Motion's, sampled into
   `linear()` (`--ease-spring`, `--ease-spring-slow` in theme.css). The home opening
   and every sub-page opening (`PageIntro`) work this way. On an event page the date
@@ -202,8 +229,9 @@ waits for a script.
   children of a group start a little further into their entry, so what enters
   together follows top to bottom. Nothing is hidden up front: what is in view at
   load, or scrolled past, stands; a browser without scroll timelines, reduced motion
-  and print show everything at once. The path between the steps draws itself in
-  (`data-line`); a seat bar below the opening fills once in view (`data-seat-fill`).
+  and print show everything at once. The taken chairs of a seat ring below the opening fill in once in view
+  (`data-seat-dot`); the stamp turns a little as it passes (`data-stamp-turn`, the one
+  element that turns, driven by the scroll, so it costs nothing out of view).
   No script and no `motion` on this path.
 - Every text on a page arrives this way, never a heading beside text that already
   stands: section heads, the intro's text and its questions, Markus's text and link,
@@ -211,7 +239,7 @@ waits for a script.
   its contact line, every date summary piece by piece, the newsletter, the event's
   story, note and map, the legal pages paragraph by paragraph. The footer is the
   frame and stands.
-- No parallax: things arrive once and then stand.
+- Things arrive once and then stand; only the stamp turns with the scroll.
 - FAQ (`AccordionItem`): a native `<details>`; where `interpolate-size` exists its
   `::details-content` transitions from height 0 to `auto` in 0.32 s (global.css,
   "FAQ"), and the marker turns (`item-open:` variant). Keyboard, find-in-page and
@@ -258,62 +286,58 @@ dates and the footer. Under reduced motion everything rests.
 
 ## Components
 
-| Component                                         | Purpose                                                                                                |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                                 |
-| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `tint` / `dark`; every ground runs from edge to edge                      |
-| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead                                                               |
-| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; without a photo the circle motif stands at its right                             |
-| `Eyebrow`                                         | The section label: ember dot, accent text                                                              |
-| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`; 48 / 52px high                               |
-| `TextLink`                                        | A quiet, underlined link with a small arrow                                                            |
-| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                          |
-| `EventSummary`                                    | One date, open on its ground: the seal, the date, the facts as small columns, the seat bar, the action |
-| `Fact` (`icon`)                                   | An icon in an accent disc, label, value in Fraunces, a note; a row, on the desktop a column            |
-| `TestimonialList`                                 | One short featured quote behind an ember rule; the rest under a line each; long ones fold              |
-| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                          |
-| `Split`, `LinkList`, `Prose` (`width`)            | Head beside content; where-next rows; rich text (`measure` / `column`)                                 |
-| `ModeToggle`                                      | Auto · Hell · Dunkel (Auto follows the system), in the footer and the phone menu                       |
+| Component                                         | Purpose                                                                                              |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                               |
+| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `moss` / `dark`, edge to edge, clipping what bleeds                     |
+| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead; with `margin.cross` it crosses into the content            |
+| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; a photograph bleeds right, without one the stamp stands there                  |
+| `Poster`, `Index`, `Marginal`                     | The poster word, the index number, the margin note                                                   |
+| `Eyebrow`                                         | The section label: ember dot, accent text                                                            |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`                                             |
+| `TextLink`                                        | A quiet, underlined link with a small arrow                                                          |
+| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                        |
+| `EventSummary`                                    | One date, open on its ground: the date, the facts as small columns, the seat ring, the action        |
+| `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in ember from the top; the number free in the middle; words beside |
+| `Stamp` (`turn`)                                  | The mark between two rings, the circle's name round it; turns with the scroll where `turn` is set    |
+| `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                  |
+| `Fact`                                            | Label, value in Fraunces, a note, under a rule; four in a row in the content column                  |
+| `TestimonialList`                                 | One short voice large, the others as rows (author in the margin); every voice in full                |
+| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                        |
+| `LinkList`, `Prose` (`width`)                     | Where-next rows; rich text (`measure` / `column`)                                                    |
+| `ModeToggle`                                      | Auto · Hell · Dunkel, in the footer and the phone menu                                               |
 
-**Header.** 72px: the mark in ember and the word mark in Fraunces; from `nav` five
-links and one filled action; below `nav` the action and a menu button. Over the home
-opening the bar is clear with light text; once the page moves it is linen at 95% (`data-scrolled`);
-only on a desktop with a hovering pointer does it blur what lies behind
-(`lg:hover-device:`), since a blur behind a fixed bar is redrawn on every scroll frame. The phone menu is a native modal `<dialog>` on the forest,
-opening as a circle from its button, its links in Fraunces.
+**Header.** 72px: the mark in ember and the word mark; from `nav` five links and one
+action. Over the home opening the bar is clear with light text and its action is
+outlined (the opening's own action is the one filled button on that screen); once
+the page moves it is paper at 95 % and the action fills. The phone menu is a native
+modal `<dialog>` on the forest, opening as a circle from its button.
 
-**Footer.** A forest band on every page: the mark and word mark, one line about the
-circle, navigation, contact, legal links and `ModeToggle`; the logo's ring stands
-large and faint behind it.
+**Footer.** The forest on every page, a line at its top: the lockup and one line
+about the circle, navigation, contact, legal links and `ModeToggle`.
 
 ## Compositions
 
-- **Home.** The opening on the forest: eyebrow, statement (its key phrase in the
-  accent), explanation, the main action and the link to the evening's course; beside
-  it the photograph in a circle with the turning ring, the next date overlapping its
-  edge (on phones under the text). Then the four facts between lines (columns with
-  rules on the desktop, rows below), the circle's topic beside the questions of the
-  first round as a quiet list, the evening's four steps on a path (sand) closing
-  with a line on breath and body, the five agreements as a numbered list beside
-  their head, with the boundary note (sage), taking part (`#termine`, sand,
-  invitation beside the next date: the decision follows the frame), Markus (his
-  quote behind an ember rule, signed with his avatar, beside his text), the voices,
-  the FAQ and staying in touch
-  (`#newsletter`, the form and the WhatsApp note beside it, parted by a line).
-- **`/event`.** `PageIntro`, then every upcoming date as the same `EventSummary`
-  beside the e-mail notification, parted by a line; the FAQ; a where-next band.
-- **Event page.** The date line and the title — its last word in the accent — which
-  the dock repeats once they have scrolled away; the place, the calendar
-  between lines and the registration on the forest (a band below `lg`), headed by
-  the same seat bar (on phones it comes straight under the title, before the
-  invitation); its button reads "Anmelden" or "Auf die Warteliste", with a line
-  about the cancel link under it; the evening's description (sand) with its question and a
-  note under a line; the map; where next. A past date offers no registration.
-- **Personal page.** `PageIntro` with the rounded photograph, split heading/text
-  sections, the FAQ, one closing invitation.
-- **Testimonial form.** `PageIntro`, then the notes and the form in one column of
-  ~672px (`max-w-form`), on the page.
-- **Legal pages, 404.** `PageIntro` and the text in one ~720px column.
+- **Home.** The opening on the forest: the statement at poster size (its phrase in
+  the spark), the explanation, the one action and the next date; the photograph in
+  its ring cut by the window's right edge, the next evening's seat ring on a disc
+  overlapping it. Then: the facts in the content column beside their label (paper);
+  the intro, its title crossing into the content, the first round's questions in
+  the margin; the course on sand, each step with its index number in the margin;
+  the five agreements on the moss as rows across the page, numbers in the spark;
+  taking part (`#termine`, sand, "Dabei sein." as a poster word beside the next
+  date); Markus, his quote crossing a large ring cut by the window; the voices on
+  the moss; the FAQ with the contact line in the margin; staying in touch on the
+  forest with the stamp cut by the right edge, running into the footer.
+- **`/event`.** `PageIntro` with the stamp, every coming date as `EventSummary`
+  beside the e-mail notification; the FAQ; a where-next band.
+- **Event page.** The date line and the title, the place, the calendar and the
+  registration on the forest headed by the seat ring; the evening's description
+  (sand); the map; where next.
+- **Personal page.** `PageIntro` with the photograph in a circle cut by the right
+  edge, sections with their headings in the margin, values with index numbers, the
+  FAQ, one closing invitation.
+- **Legal pages, testimonial form, 404.** `PageIntro` and one column.
 - **Admin.** The same tokens at night: forest grounds, rounded cards, ember for the
   one action.
 
@@ -335,12 +359,17 @@ large and faint behind it.
 - Images on SSR pages are pre-sized files (`<img srcset>`); `<Image />` only on
   prerendered pages. The hero photograph is AVIF, eager and `fetchpriority="high"`.
 - No layout shift: a date summary's lines are one line (`truncate`); titles measure
-  in `em`, never `ch`. A narrow summary (container under 24rem) sets the seal beside
-  its label and the date below, so "17. September 2026" never truncates.
-- The seat bar (`SeatBar`) is decorative (`aria-hidden`): the line under it says the
+  in `em`, never `ch`.
+- The seat ring (`SeatRing`) is decorative (`aria-hidden`): the line beside it says the
   seats in words.
 - Forms: labels always visible, placeholders never instead; a field's message under
   the field, the form's result under its button (`FormStatus`), never a toast;
   entries survive an error; success says what actually happened.
 - Focus is always visible (2px accent outline, offset 3px). Buttons and fields are
   44–52px high; touch targets at least 44px.
+- The four moves are the only ways to break the grid, each at most once per
+  section: margin column, overlap, bleed, poster word. No staircases of offset
+  blocks, no rotation (the stamp turns, nothing else), no boxes around content.
+- A token that the styleguide should describe carries a trailing comment in
+  `theme.css`; German notes for people live in `lib/brand/notes.ts`
+  (`tests/brand-notes.test.ts` keeps their keys real).
