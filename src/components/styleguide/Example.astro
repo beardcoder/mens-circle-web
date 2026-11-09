@@ -1,0 +1,26 @@
+---
+/** A live example inside a thin frame, on one of the grounds, with a caption under it. */
+interface Props {
+  ground?: 'default' | 'alt' | 'moss' | 'dark';
+  caption?: string;
+  /** Clip what bleeds out of the frame (the bleed and the overlap examples). */
+  clip?: boolean;
+  class?: string;
+}
+
+const GROUNDS = {
+  default: 'bg-ground',
+  alt: 'surface-alt',
+  moss: 'surface-moss',
+  dark: 'surface-dark',
+} as const;
+
+const { ground = 'default', caption, clip = false, class: className } = Astro.props;
+---
+
+<figure class:list={['grid min-w-0 content-start gap-3', className]}>
+  <div class:list={['relative border border-line p-6 sm:p-8', GROUNDS[ground], clip && 'overflow-clip']}>
+    <slot />
+  </div>
+  {caption && <figcaption class="text-sm text-fg-muted">{caption}</figcaption>}
+</figure>

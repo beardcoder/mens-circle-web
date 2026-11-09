@@ -1,0 +1,478 @@
+---
+/**
+ * The living styleguide: the design system read from its sources (theme.css through
+ * lib/brand/theme-tokens.ts, the real components), so it cannot drift from the site.
+ * For the people who design with the brand (flyers, posts, prints); noindex and out
+ * of the sitemap.
+ */
+import { Icon } from 'astro-icon/components';
+
+import { COLOUR_USE, GROUNDS, TYPE_USE } from '@lib/brand/notes';
+import { pageSize, TEMPLATES } from '@lib/brand/registry';
+import { SAMPLE_EVENT } from '@lib/brand/sample';
+import { parseTheme } from '@lib/brand/theme-tokens';
+import { eventView } from '@lib/shared/event-status';
+import { control, formStatus, label, margin } from '@lib/ui';
+
+import Lockup from '../components/brand/Lockup.astro';
+import Qr from '../components/brand/Qr.astro';
+import SeatRing from '../components/brand/SeatRing.astro';
+import Stamp from '../components/brand/Stamp.astro';
+import EventSummary from '../components/event/EventSummary.astro';
+import PageIntro from '../components/PageIntro.astro';
+import DoDont from '../components/styleguide/DoDont.astro';
+import Example from '../components/styleguide/Example.astro';
+import Swatch from '../components/styleguide/Swatch.astro';
+import TypeSpecimen from '../components/styleguide/TypeSpecimen.astro';
+import Accordion from '../components/ui/Accordion.astro';
+import AccordionItem from '../components/ui/AccordionItem.astro';
+import Button from '../components/ui/Button.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import Field from '../components/ui/Field.astro';
+import Index from '../components/ui/Index.astro';
+import LinkList from '../components/ui/LinkList.astro';
+import Marginal from '../components/ui/Marginal.astro';
+import Poster from '../components/ui/Poster.astro';
+import Section from '../components/ui/Section.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
+import TextLink from '../components/ui/TextLink.astro';
+import Layout from '../layouts/Layout.astro';
+import theme from '../styles/theme.css?raw';
+
+export const prerender = true;
+
+const tokens = parseTheme(theme);
+const roles = tokens.colours.filter((c) => COLOUR_USE[c.name]);
+const sample = eventView(SAMPLE_EVENT, 'Nächster Termin');
+const spaceNames = ['gutter', 'section', 'band', 'group', 'grid', 'overlap'];
+const space = tokens.space.filter((s) => spaceNames.includes(s.name));
+
+const nav = [
+  ['idee', 'Idee'],
+  ['farbe', 'Farbe'],
+  ['schrift', 'Schrift'],
+  ['raster', 'Raster'],
+  ['zuege', 'Die vier Züge'],
+  ['motive', 'Motive'],
+  ['bausteine', 'Bausteine'],
+  ['bilder', 'Bilder'],
+  ['sprache', 'Sprache'],
+  ['druck', 'Druck'],
+];
+---
+
+<Layout
+  title="Styleguide – Männerkreis Niederbayern"
+  description="Farben, Schrift, Raster, Motive und Bausteine des Männerkreises, für Website, Flyer und Druck."
+  robots="noindex, follow"
+>
+  <PageIntro eyebrow="Gestaltung" title="Styleguide">
+    <Fragment slot="lead">
+      Wie der Männerkreis aussieht, auf der Website, auf Flyern und in Beiträgen. Alles hier ist aus denselben Quellen
+      gebaut wie die Seite selbst.
+    </Fragment>
+    <nav aria-label="Abschnitte" class="flex flex-wrap gap-x-5 gap-y-1">
+      {nav.map(([id, text]) => (
+        <a
+          href={`#${id}`}
+          class="inline-flex min-h-11 items-center text-base font-semibold text-accent underline underline-offset-4"
+        >
+          {text}
+        </a>
+      ))}
+    </nav>
+  </PageIntro>
+
+  <Section id="idee" labelledby="idee-title">
+    <div class:list={[margin.grid, 'gap-y-8']}>
+      <SectionHead eyebrow="Idee" title="Der Sitzkreis" titleId="idee-title" class={margin.cross} />
+      <div class:list={[margin.reading, 'grid gap-6 text-md text-fg-soft']}>
+        <p>
+          Ein Männerkreis trifft sich am Abend, sitzt im Kreis und hört zu. Die Gestaltung macht das sichtbar: eine
+          Mitte, Dinge wenden sich einander zu, viel Luft dazwischen. Plakativ, wo es um die Einladung geht, ruhig, wo
+          gelesen wird.
+        </p>
+        <p>
+          Grundlage ist ein Raster aus zwölf Spalten mit einer Kante. Genau vier Züge brechen es: die Marginalspalte,
+          die Überlappung, der Anschnitt und das Plakatwort. Jeder höchstens einmal je Fläche.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="farbe" ground="alt" labelledby="farbe-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead
+        eyebrow="Farbe"
+        title="Vier Gründe, eine Glut"
+        titleId="farbe-title"
+        lead="Farben sind Rollen. Jede Rolle hat einen Wert bei Tag und einen bei Nacht; Text erreicht auf jedem Grund mindestens 4,5 : 1, Konturen 3 : 1."
+        class={margin.cross}
+      />
+      <div class="grid gap-grid sm:grid-cols-2 lg:col-span-12 lg:grid-cols-4">
+        {GROUNDS.map((ground) => (
+          <Example ground={ground.surface} caption={ground.text}>
+            <p class="font-display text-sub text-fg">{ground.name}</p>
+            <p class="mt-2 text-sm text-fg-muted">Text auf {ground.name}</p>
+            <p class="mt-1 text-sm font-semibold text-accent">Akzent</p>
+            <span class="mt-4 inline-flex rounded-full bg-fill px-4 py-1.5 text-sm font-semibold text-on-fill">
+              Handlung
+            </span>
+          </Example>
+        ))}
+      </div>
+      <div class="grid gap-x-grid gap-y-10 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-4">
+        {roles.map((colour) => (
+          <Swatch colour={colour} use={COLOUR_USE[colour.name]} />
+        ))}
+      </div>
+      <Marginal class={margin.reading}>
+        CMYK-Werte sind rechnerische Richtwerte aus sRGB. Verbindlich ist ein Proof auf dem Papier, das gedruckt wird.
+        Die Glut (Handlung) und der Funke wirken auf ungestrichenem Papier dunkler; dort lieber gestrichenes Papier
+        wählen oder die Werte mit der Druckerei abstimmen.
+      </Marginal>
+    </div>
+  </Section>
+
+  <Section id="schrift" labelledby="schrift-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead
+        eyebrow="Schrift"
+        title="Plakat und Brief"
+        titleId="schrift-title"
+        lead="Fraunces für Titel, Daten und Plakatworte (variabel: Stärke 500 bis 700, die optische Größe folgt der Größe). Figtree für alles, was erklärt."
+        class={margin.cross}
+      />
+      <div class="lg:col-span-12">
+        {tokens.type.map((role) => (
+          <TypeSpecimen role={role} {...TYPE_USE[role.name]} />
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  <Section id="raster" ground="alt" labelledby="raster-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead
+        eyebrow="Raster"
+        title="Zwölf Spalten, eine Kante"
+        titleId="raster-title"
+        lead="1200 px Inhalt, 28 / 40 / 56 px vom Fensterrand. Im Druck: dieselben Verhältnisse auf dem Satzspiegel, Ränder mindestens 8 mm."
+        class={margin.cross}
+      />
+      <div aria-hidden="true" class="grid grid-cols-12 gap-x-grid lg:col-span-12">
+        {Array.from({ length: 12 }, (_, i) => (
+          <span class="grid h-24 place-items-end justify-center bg-accent-soft pb-2 text-xs font-semibold text-accent">
+            {i + 1}
+          </span>
+        ))}
+      </div>
+      <dl class="grid gap-x-grid gap-y-4 text-sm sm:grid-cols-2 lg:col-span-12 lg:grid-cols-3">
+        {space.map((s) => (
+          <div class="border-t border-line-strong pt-3">
+            <dt class="font-semibold text-fg">{s.name}</dt>
+            <dd class="text-fg-muted tabular-nums">
+              {Object.entries(s.steps)
+                .map(([step, value]) => (step === 'base' ? value : `ab ${step}: ${value}`))
+                .join(' · ')}
+            </dd>
+            {s.note && <dd class="text-xs text-fg-muted">{s.note}</dd>}
+          </div>
+        ))}
+      </dl>
+    </div>
+  </Section>
+
+  <Section id="zuege" labelledby="zuege-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead
+        eyebrow="Rasterbruch"
+        title="Die vier Züge"
+        titleId="zuege-title"
+        lead="Das Raster bricht nur auf diese vier Arten, jede höchstens einmal je Sektion oder Seite. So bleibt es lebendig und trotzdem ruhig."
+        class={margin.cross}
+      />
+
+      <div class="grid gap-x-grid gap-y-12 lg:col-span-12 lg:grid-cols-2">
+        <div class="grid content-start gap-5">
+          <h3 class="text-sub text-fg">1 · Marginalspalte</h3>
+          <Example caption="Ziffer, Label oder Notiz links im Rand (Spalten 1–3), Inhalt rechts (4–12). Titel dürfen im Rand beginnen.">
+            <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-x-6">
+              <Index value={2} />
+              <div>
+                <p class="font-display text-sub text-fg">Die erste Runde</p>
+                <p class="mt-2 text-base text-fg-soft">Reihum sagt jeder kurz, wie es ihm gerade geht.</p>
+              </div>
+            </div>
+          </Example>
+        </div>
+
+        <div class="grid content-start gap-5">
+          <h3 class="text-sub text-fg">2 · Überlappung</h3>
+          <Example
+            ground="alt"
+            caption="Ein Element kreuzt eine Kante um 40 / 64 / 96 px (overlap), immer zur Mitte hin."
+          >
+            <div class="relative pt-10">
+              <div class="surface-dark h-28"></div>
+              <div class="absolute top-0 left-6 surface-dark rounded-full p-2">
+                <SeatRing seats={{ total: 7, free: 3 }} text="" size="md" layout="none" />
+              </div>
+            </div>
+          </Example>
+        </div>
+
+        <div class="grid content-start gap-5">
+          <h3 class="text-sub text-fg">3 · Anschnitt</h3>
+          <Example
+            ground="dark"
+            clip
+            caption="Bild, Ring oder Stempel läuft aus dem Fenster oder dem Blatt (bleed). Die Seite wechselt im Verlauf."
+          >
+            <div class="relative h-40">
+              <div class="absolute top-1/2 -right-20 w-56 -translate-y-1/2 text-line-strong">
+                <Stamp />
+              </div>
+              <p class="relative max-w-[10em] font-display text-sub text-fg">Termine per E-Mail erhalten</p>
+            </div>
+          </Example>
+        </div>
+
+        <div class="grid content-start gap-5">
+          <h3 class="text-sub text-fg">4 · Plakatwort</h3>
+          <Example
+            ground="moss"
+            clip
+            caption="Ein Wort oder eine Zahl in Plakatgröße: als Titel oder leise im Hintergrund. Höchstens eins je Bildschirm."
+          >
+            <Poster tone="ghost" class="absolute -right-4 -bottom-10">
+              05
+            </Poster>
+            <p class="relative font-display text-sub text-fg">Fünf Absprachen</p>
+            <p class="relative mt-2 max-w-[18em] text-base text-fg-soft">
+              Vertraulichkeit, Ehrlichkeit, Annehmen statt bewerten, von sich sprechen, Respekt.
+            </p>
+          </Example>
+        </div>
+      </div>
+
+      <div class="lg:col-span-12">
+        <DoDont
+          dos={[
+            'Einen Zug pro Sektion wählen und ihn deutlich setzen.',
+            'Den Anschnitt im Seitenverlauf links und rechts wechseln.',
+            'Überlappungen nur auf eigenem Grund (Scheibe, Fläche).',
+          ]}
+          donts={[
+            'Treppen aus versetzten Blöcken.',
+            'Gedrehte Elemente; nur der Stempel dreht sich.',
+            'Schatten, Rahmen oder Boxen um Inhalt.',
+            'Text über einem Foto.',
+          ]}
+        />
+      </div>
+    </div>
+  </Section>
+
+  <Section id="motive" ground="alt" labelledby="motive-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead
+        eyebrow="Motive"
+        title="Der Kreis, in vier Formen"
+        titleId="motive-title"
+        lead="Die Marke (vier Figuren im Kreis), der Sitzring, der Stempel und die Ziffer. Mehr Dekoration gibt es nicht."
+        class={margin.cross}
+      />
+      <div class="grid gap-grid sm:grid-cols-2 lg:col-span-12 lg:grid-cols-4">
+        <Example caption="Marke und Wortmarke auf Papier. Schutzraum rundum: ein Viertel der Markenhöhe. Mindestens 6 mm (24 px) hoch.">
+          <span class="text-sub">
+            <Lockup variant="full" />
+          </span>
+        </Example>
+        <Example ground="dark" caption="Auf Wald und Moos: Marke in Glut, Schrift in Knochenweiß.">
+          <span class="text-sub">
+            <Lockup variant="full" />
+          </span>
+        </Example>
+        <Example caption="Der Sitzring: jeder Stuhl ein Punkt, belegt in Glut, frei offen. Mitte: freie Plätze.">
+          <div class="flex flex-wrap items-end gap-4">
+            <SeatRing seats={{ total: 8, free: 8 }} text="" size="sm" layout="none" />
+            <SeatRing seats={{ total: 8, free: 3 }} text="" size="sm" layout="none" />
+            <SeatRing seats={{ total: 8, free: 0 }} text="" size="sm" layout="none" />
+          </div>
+        </Example>
+        <Example
+          ground="dark"
+          caption="Der Stempel: Marke zwischen zwei Ringen, der Name im Umlauf. Fuß, Rückseiten, Sticker."
+        >
+          <div class="mx-auto w-40 text-line-strong">
+            <Stamp />
+          </div>
+        </Example>
+      </div>
+      <div class="flex flex-wrap items-center gap-6 lg:col-span-12">
+        {['text-fill', 'text-fg', 'text-fg-muted'].map((tone) => (
+          <span class="grid justify-items-center gap-2 text-xs text-fg-muted">
+            <Icon name="logo" aria-hidden="true" class:list={['size-12', tone]} />
+            {tone.replace('text-', '')}
+          </span>
+        ))}
+        <p class="max-w-measure text-sm text-fg-muted">
+          Logodateien (SVG, PNG, einfarbig schwarz und weiß) liegen im Repository unter <code>brand/logo/</code>.
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="bausteine" labelledby="bausteine-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead
+        eyebrow="Bausteine"
+        title="Gleiche Aufgabe, gleiche Form"
+        titleId="bausteine-title"
+        lead="Was man drückt, ist rund. Was etwas hält, ist eckig. Eine Fläche hat genau eine gefüllte Handlung."
+        class={margin.cross}
+      />
+      <div class="grid gap-x-grid gap-y-12 lg:col-span-12 lg:grid-cols-2">
+        <Example caption="Buttons: primär (die eine Handlung), sekundär, in den Größen md und lg.">
+          <div class="flex flex-wrap items-center gap-4">
+            <Button size="lg">Zur Anmeldung</Button>
+            <Button variant="secondary">In Kalender speichern</Button>
+            <Button size="sm" decorate>
+              Termine
+            </Button>
+          </div>
+          <div class="mt-6">
+            <TextLink href="#bausteine">Ein ruhiger Link mit Pfeil</TextLink>
+          </div>
+        </Example>
+        <Example caption="Felder: Label immer sichtbar, Meldung unter dem Feld, Ergebnis unter dem Button.">
+          <div class="grid gap-5">
+            <Field for="sg-mail" label="E-Mail-Adresse" hint="Mehr wird über diesen Verteiler nicht verschickt.">
+              <input id="sg-mail" type="email" placeholder="name@beispiel.de" class={control()} />
+            </Field>
+            <p data-tone="success" class={formStatus}>
+              Danke, du bekommst eine Bestätigung per E-Mail.
+            </p>
+            <p data-tone="error" class={formStatus}>
+              Bitte prüfe die markierten Angaben.
+            </p>
+          </div>
+        </Example>
+        <Example
+          ground="alt"
+          caption="Ein Termin: Datum, Fakten, Sitzring, Handlung. Überall gleich (Startseite, Terminliste)."
+        >
+          <EventSummary view={sample} showAction location="styleguide" />
+        </Example>
+        <Example caption="Fragen: eine Zeile je Frage, die Antwort klappt auf.">
+          <Accordion>
+            <AccordionItem question="Muss ich etwas erzählen?">
+              Nein. Du entscheidest, was und wie viel du teilst.
+            </AccordionItem>
+            <AccordionItem question="Ist das spirituell?">Nein, eher bodenständig.</AccordionItem>
+          </Accordion>
+          <div class="mt-8">
+            <LinkList items={[{ href: '#bausteine', title: 'Weiterlesen', text: 'Wohin es von hier aus geht.' }]} />
+          </div>
+        </Example>
+        <Example ground="moss" caption="Labels: der Abschnittsname mit Glutpunkt; Datenlabels in Moosgrau.">
+          <Eyebrow>Der Rahmen</Eyebrow>
+          <p class:list={[label, 'mt-4']}>Nächster Termin</p>
+        </Example>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="bilder" ground="moss" labelledby="bilder-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead eyebrow="Bilder" title="Kreis oder Anschnitt" titleId="bilder-title" class={margin.cross} />
+      <div class:list={[margin.reading]}>
+        <DoDont
+          dos={[
+            'Menschen im Kreis zeigen (rund freigestellt), Orte, Wald und Abendlicht im angeschnittenen Rechteck.',
+            'Warmes, natürliches Licht; echte Abende und Orte in Niederbayern.',
+            'Eine Bildform je Sektion; Bildunterschrift als Randnotiz.',
+          ]}
+          donts={[
+            'Gestellte Gruppenbilder, Stockfotos, Pathos (Fäuste, Lagerfeuer-Inszenierung).',
+            'Erkennbare Teilnehmer ohne ihre ausdrückliche Zustimmung.',
+            'Text oder Logo auf ein Foto legen.',
+          ]}
+        />
+      </div>
+    </div>
+  </Section>
+
+  <Section id="sprache" labelledby="sprache-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead eyebrow="Sprache" title="Wie ein Kreisleiter spricht" titleId="sprache-title" class={margin.cross} />
+      <div class:list={[margin.reading]}>
+        <DoDont
+          dos={[
+            'Du, kurze Sätze, einfaches Deutsch. Beschreiben, was passiert.',
+            'Den Rahmen klar benennen: fünf Absprachen, jede Übung ist ein Angebot, Nein ist eine gute Antwort.',
+            'Jede Einladung mit der Erlaubnis, nicht mitzumachen.',
+            'Eine Sache einmal je Seite sagen.',
+          ]}
+          donts={[
+            'Heilsversprechen, Therapie-Floskeln („das darf sein“, „was sich zeigt“).',
+            'Bruder-Ton, Esoterik, Pathos.',
+            'Parolen nach dem Muster „nicht X, sondern Y“, Dreierreihen für den Klang.',
+            'Gedankenstriche als Effekt.',
+          ]}
+        />
+      </div>
+    </div>
+  </Section>
+
+  <Section id="druck" ground="alt" labelledby="druck-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead
+        eyebrow="Druck und Beiträge"
+        title="Vorlagen"
+        titleId="druck-title"
+        lead="Flyer, Plakat, Visitenkarte und Beiträge entstehen aus denselben Bausteinen, mit den nächsten Terminen und einem QR-Code zur Anmeldung."
+        class={margin.cross}
+      />
+      <ul role="list" class="grid lg:col-span-12">
+        {TEMPLATES.map((spec) => {
+          const size = pageSize(spec);
+
+          return (
+            <li class="grid gap-x-grid gap-y-1 border-t border-line py-4 sm:grid-cols-12">
+              <span class="font-semibold text-fg sm:col-span-5">{spec.label}</span>
+              <span class="text-sm text-fg-muted tabular-nums sm:col-span-4">
+                {spec.width} × {spec.height} {spec.unit}
+                {spec.bleed > 0 && ` · mit Beschnitt ${size.width} × ${size.height}`}
+              </span>
+              <span class="text-sm text-fg-muted sm:col-span-3">{spec.outputs.join(', ').toUpperCase()}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <div class="grid gap-x-grid gap-y-6 lg:col-span-12 lg:grid-cols-12">
+        <div class="text-md text-fg-soft lg:col-span-7">
+          <p>
+            Erzeugt werden sie im Repository mit <code>bun run brand:render</code>: PDF mit 3 mm Beschnitt (Visitenkarte
+            2 mm) und eingebetteten Schriften, PNG für Beiträge und Vorschaubilder. Die Termine kommen aus der Website
+            oder aus einer JSON-Datei.
+          </p>
+          <p class="mt-4 text-sm text-fg-muted">
+            PDFs sind RGB. Für den Offsetdruck wandelt die Druckerei nach CMYK (Proof anfordern). Farbwerte, Schriften
+            und Logodateien für andere Programme: <code>brand/tokens.json</code>, <code>brand/palette.ase</code>,
+            <code>brand/logo/</code>.
+          </p>
+        </div>
+        <div class="flex items-center gap-5 lg:col-span-4 lg:col-start-9">
+          <div class="w-28 shrink-0 bg-raised p-2 text-fg">
+            <Qr value="https://mens-circle.de/event" label="QR-Code zur Terminseite" />
+          </div>
+          <p class="text-sm text-fg-muted">
+            Der QR-Code steht immer auf hellem Grund, mit Ruhezone, mindestens 20 mm breit.
+          </p>
+        </div>
+      </div>
+    </div>
+  </Section>
+</Layout>

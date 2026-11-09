@@ -1,0 +1,29 @@
+{
+  "datesUrl": "https://mens-circle.de/event",
+  "events": [
+    {
+      "date": "Freitag, 20. November 2026",
+      "day": "2026-11-20",
+      "time": "19:30–21:30 Uhr",
+      "place": "Geiselhöring",
+      "url": "https://mens-circle.de/event/maennerkreis-2026-11-20",
+      "seats": { "total": 7, "free": 3 }
+    },
+    {
+      "date": "Freitag, 11. Dezember 2026",
+      "day": "2026-12-11",
+      "time": "18:30–21:30 Uhr",
+      "place": "Bogen",
+      "url": "https://mens-circle.de/event/feuer-2026-12-11",
+      "seats": { "total": 10, "free": 9 }
+    },
+    {
+      "date": "Freitag, 15. Januar 2027",
+      "day": "2027-01-15",
+      "time": "19:30–21:30 Uhr",
+      "place": "Straubing",
+      "url": "https://mens-circle.de/event/maennerkreis-2027-01-15",
+      "seats": { "total": 8, "free": 8 }
+    }
+  ]
+}

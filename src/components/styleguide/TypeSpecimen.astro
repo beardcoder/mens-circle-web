@@ -1,0 +1,48 @@
+---
+/** One type role set in its own size, with its values and use. */
+import type { TypeRole } from '@lib/brand/theme-tokens';
+
+interface Props {
+  role: TypeRole;
+  face: 'display' | 'sans';
+  use: string;
+  sample: string;
+}
+
+/** Complete class strings per role, so Tailwind finds each one. */
+const SIZES: Record<string, string> = {
+  poster: 'text-poster font-semibold',
+  hero: 'text-hero font-semibold',
+  index: 'text-index font-semibold text-accent',
+  page: 'text-page font-semibold',
+  section: 'text-section',
+  sub: 'text-sub',
+  quote: 'text-quote',
+  xl: 'text-xl',
+  lg: 'text-lg',
+  md: 'text-md',
+  base: 'text-base',
+  sm: 'text-sm',
+  marginal: 'text-marginal font-medium',
+  xs: 'text-xs',
+};
+
+const FACES = { display: 'font-display', sans: 'font-sans' } as const;
+
+const { role, face, use, sample } = Astro.props;
+---
+
+<div class="grid gap-x-grid gap-y-3 border-t border-line py-6 lg:grid-cols-12">
+  <dl class="grid content-start gap-1 text-sm lg:col-span-3">
+    <dt class="font-semibold text-fg">text-{role.name}</dt>
+    <dd class="text-fg-muted">
+      {face === 'display' ? 'Fraunces' : 'Figtree'} · {use}
+    </dd>
+    <dd class="text-xs text-fg-muted tabular-nums">
+      {role.size}
+      {role.lineHeight && ` · Zeilenhöhe ${role.lineHeight}`}
+      {role.letterSpacing && ` · Laufweite ${role.letterSpacing}`}
+    </dd>
+  </dl>
+  <p class:list={['min-w-0 text-fg wrap-anywhere lg:col-span-9', FACES[face], SIZES[role.name]]}>{sample}</p>
+</div>

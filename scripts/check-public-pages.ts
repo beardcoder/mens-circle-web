@@ -415,6 +415,14 @@ try {
     }
 
     assert(!paths.some((path) => path.startsWith('/admin') || path.startsWith('/auth')));
+
+    // The styleguide is for people who design with the brand: reachable, noindex, not listed.
+    const styleguide = await fetch(`${origin}/styleguide`);
+
+    assert.equal(styleguide.status, 200);
+    assert.match(await styleguide.text(), /<meta name="robots" content="noindex, follow"/);
+    assert(!paths.some((path) => path.startsWith('/styleguide') || path.startsWith('/brand')));
+    assert.equal((await fetch(`${origin}/brand/flyer-a6`)).status, 404, 'brand templates are never part of the site');
     console.info(
       `Public HTML: home ${Buffer.byteLength(home)} bytes, overview ${Buffer.byteLength(overview)} bytes; zero hydrated islands.`,
     );

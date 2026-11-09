@@ -138,7 +138,8 @@ export default defineConfig({
       // The event pages are SSR; their sitemap is a route, listed in the index here.
       customSitemaps: [new URL('/sitemap-events.xml', siteUrl).href],
       // Every public page is indexed; only the back office and sign-in stay out.
-      filter: (page) => !['/admin', '/auth'].some((p) => page.includes(p)),
+      // The back office, the sign-in, the styleguide and the brand templates stay out.
+      filter: (page) => !['/admin', '/auth', '/styleguide', '/brand'].some((p) => page.includes(p)),
       // Slash-less, matching the canonicals.
       serialize(item) {
         const url = new URL(item.url);

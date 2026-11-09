@@ -1,0 +1,28 @@
+---
+/** A rule as two short lists: what to do, what to leave. */
+interface Props {
+  dos: string[];
+  donts: string[];
+}
+
+const { dos, donts } = Astro.props;
+---
+
+<div class="grid gap-x-grid gap-y-6 sm:grid-cols-2">
+  <div>
+    <p class="text-sm font-semibold text-success">So</p>
+    <ul role="list" class="mt-3 grid gap-2 text-base text-fg-soft">
+      {dos.map((item) => (
+        <li class="border-t border-line pt-2">{item}</li>
+      ))}
+    </ul>
+  </div>
+  <div>
+    <p class="text-sm font-semibold text-danger">Nicht so</p>
+    <ul role="list" class="mt-3 grid gap-2 text-base text-fg-soft">
+      {donts.map((item) => (
+        <li class="border-t border-line pt-2">{item}</li>
+      ))}
+    </ul>
+  </div>
+</div>

@@ -118,6 +118,7 @@ const PAGES = [
   '/warum-ich-den-maennerkreis-leite',
   '/impressum',
   '/datenschutz',
+  '/styleguide',
   '/gibt-es-nicht',
   '/admin/login',
 ];

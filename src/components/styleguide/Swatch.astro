@@ -1,0 +1,39 @@
+---
+/**
+ * One colour role: its day value in the left half, its night value in the right, the
+ * values and what it is for.
+ */
+import { hexToRgb, rgbToCmyk } from '@lib/brand/color';
+import type { Colour } from '@lib/brand/theme-tokens';
+
+interface Props {
+  colour: Colour;
+  use?: string;
+}
+
+const { colour, use } = Astro.props;
+/** The parsed values themselves: a role's `light-dark()` resolves once, on the root, so a scheme on the half would not switch it. */
+const fill = (hex: string | null) => `background-color: ${hex ?? `var(--color-${colour.name})`}`;
+const cmyk = (hex: string | null) => (hex ? rgbToCmyk(hexToRgb(hex)).join(' / ') : '');
+const same = colour.light.hex === colour.dark.hex;
+---
+
+<figure class="grid content-start gap-3">
+  <div aria-hidden="true" class="grid h-24 grid-cols-2 border border-line">
+    <span style={fill(colour.light.hex)}></span>
+    <span style={fill(colour.dark.hex)}></span>
+  </div>
+  <figcaption class="grid gap-1 text-sm">
+    <span class="font-semibold text-fg">{colour.name}</span>
+    {colour.derived ? (
+      <span class="text-fg-muted">gemischt aus anderen Farben</span>
+    ) : (
+      <span class="text-fg-muted tabular-nums">
+        {same ? colour.light.hex : `${colour.light.hex} · nachts ${colour.dark.hex}`}
+        {colour.light.primitive && <span> ({colour.light.primitive})</span>}
+      </span>
+    )}
+    {!colour.derived && <span class="text-xs text-fg-muted tabular-nums">CMYK ≈ {cmyk(colour.light.hex)}</span>}
+    {use && <span class="mt-1 text-fg-soft">{use}</span>}
+  </figcaption>
+</figure>
