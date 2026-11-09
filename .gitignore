@@ -29,3 +29,7 @@ output/playwright/
 
 # Third-party Claude skills are installed per machine (plugins), never vendored
 .claude/skills/
+
+# brand templates, rendered (bun run brand:render)
+/brand/out/
+/brand/.dist/

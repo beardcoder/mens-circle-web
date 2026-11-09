@@ -20,7 +20,11 @@
     "db:studio": "drizzle-kit studio",
     "db:backup": "bun run scripts/backup-db.ts",
     "knip": "knip",
-    "test:browser": "bun run build && bun --no-env-file scripts/check-browser.ts"
+    "test:browser": "bun run build && bun --no-env-file scripts/check-browser.ts",
+    "brand:export": "bun scripts/brand-export.ts",
+    "brand:logo": "bun scripts/brand-logo.ts",
+    "brand:render": "bun scripts/brand-render.ts",
+    "brand": "bun run brand:export && bun run brand:logo && bun run brand:render"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
