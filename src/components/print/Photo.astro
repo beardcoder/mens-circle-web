@@ -1,0 +1,17 @@
+---
+/** The photograph in its circle with the thin ring of the logo around it, for the templates. Size and position come from the parent. */
+import photo from '../../assets/images/markus-kreis-960.avif';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['aspect-square', className]}>
+  <div class="relative size-full">
+    <img src={photo.src} alt="" class="size-full rounded-full object-cover" />
+    <span class="absolute -inset-[7%] rounded-full border border-line-strong"></span>
+  </div>
+</div>

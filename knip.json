@@ -3,7 +3,8 @@
   "tags": ["-lintignore"],
   "workspaces": {
     ".": {
-      "entry": ["scripts/schedule.ts", "scripts/send-reminders.ts", "public/sw.js"]
+      "entry": ["scripts/schedule.ts", "scripts/send-reminders.ts", "public/sw.js"],
+      "ignore": ["brand/**"]
     }
   }
 }

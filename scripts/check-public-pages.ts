@@ -293,7 +293,9 @@ try {
 
     assert.match(home, /1\. Januar 2099/);
     assert.match(home, /Eine freigegebene Erfahrung/);
-    assert.match(home, /<details class="group\/quote"/);
+    // Every voice is read in full; nothing folds behind a click.
+    assert.match(home, /(Eine längere Erfahrung\. ){25}/);
+    assert.doesNotMatch(home, /<details class="group\/quote"/);
     assert.match(overview, /data-state="full"/);
     assert.match(overview, /Auf die Warteliste/);
     assert.match(overview, /href="\/event\/testabend"/);

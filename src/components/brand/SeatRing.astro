@@ -8,7 +8,8 @@
  */
 import { seatDots } from '@lib/shared/seats';
 
-type Size = 'sm' | 'md' | 'lg';
+/** `fill` takes the size of its parent (print templates set it); the number scales with it. */
+type Size = 'sm' | 'md' | 'lg' | 'fill';
 
 interface Props {
   seats: { total: number; free: number } | null;
@@ -24,6 +25,7 @@ const SIZES: Record<Size, { ring: string; number: string; label: string }> = {
   sm: { ring: 'size-16', number: 'text-xl', label: 'hidden' },
   md: { ring: 'size-28', number: 'text-sub', label: 'text-xs' },
   lg: { ring: 'size-40 sm:size-44', number: 'text-section', label: 'text-sm' },
+  fill: { ring: '@container size-full', number: 'text-[34cqw]', label: 'text-[9cqw]' },
 };
 
 const { seats, text, size = 'md', layout = 'row', class: className } = Astro.props;

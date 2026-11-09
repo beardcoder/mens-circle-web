@@ -13,7 +13,7 @@ export interface Swatch {
 }
 
 /** Every primitive once, its night value as `<name>-night` where it differs. */
-export const swatches = (tokens: ThemeTokens): Swatch[] =>
+const swatches = (tokens: ThemeTokens): Swatch[] =>
   Object.entries(tokens.primitives).flatMap(([name, { light, dark }]) =>
     light === dark
       ? [{ name, hex: light }]

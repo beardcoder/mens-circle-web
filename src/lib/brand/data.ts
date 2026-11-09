@@ -15,15 +15,28 @@ const brandEvent = z.object({
   /** "Geiselhöring". */
   place: z.string(),
   /** The event page; the QR code opens it. */
-  url: z.string().url(),
+  url: z.url(),
   seats: z.object({ total: z.number().int().min(0), free: z.number().int().min(0) }).nullable(),
 });
 
 export const brandData = z.object({
   events: z.array(brandEvent),
   /** Where the dates are listed when no single one is printed. */
-  datesUrl: z.string().url(),
+  datesUrl: z.url(),
 });
 
 export type BrandEvent = z.infer<typeof brandEvent>;
 export type BrandData = z.infer<typeof brandData>;
+
+const parts = (day: string, options: Intl.DateTimeFormatOptions): string =>
+  new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', ...options }).format(new Date(`${day}T12:00:00Z`));
+
+/** A calendar day in its printed pieces: "20", "November", "Freitag". */
+export const dateParts = (day: string): { day: string; month: string; weekday: string } => ({
+  day: parts(day, { day: 'numeric' }),
+  month: parts(day, { month: 'long' }),
+  weekday: parts(day, { weekday: 'long' }),
+});
+
+/** A URL without its scheme, for print ("mens-circle.de/event"). */
+export const shortUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '');

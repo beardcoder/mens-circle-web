@@ -96,8 +96,6 @@ export const TEMPLATES: TemplateSpec[] = [
   }),
 ];
 
-export const templateById = (id: string): TemplateSpec | undefined => TEMPLATES.find((t) => t.id === id);
-
 /** The size a template prints or renders at, bleed included, as CSS lengths. */
 export const pageSize = (spec: TemplateSpec): { width: string; height: string } => ({
   width: `${spec.width + 2 * spec.bleed}${spec.unit}`,

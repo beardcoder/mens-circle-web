@@ -22,7 +22,7 @@ export const rgbToCmyk = ([r, g, b]: [number, number, number]): [number, number,
 };
 
 /** Relative luminance (WCAG 2). */
-export const luminance = (hex: string): number => {
+const luminance = (hex: string): number => {
   const [r, g, b] = hexToRgb(hex).map((value) => {
     const c = value / 255;
 

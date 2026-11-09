@@ -1,0 +1,29 @@
+---
+/** The preview image of every page (1200 × 630): the statement on the forest, the photograph cut by the right edge. */
+import type { BrandData } from '@lib/brand/data';
+import type { TemplateSpec } from '@lib/brand/registry';
+
+import Lockup from '../brand/Lockup.astro';
+import Photo from './Photo.astro';
+import Sheet from './Sheet.astro';
+import Statement from './Statement.astro';
+
+interface Props {
+  spec: TemplateSpec;
+  /** Not used: the image says the same on every date. */
+  data?: BrandData;
+}
+
+const { spec } = Astro.props;
+---
+
+<Sheet spec={spec} ground="dark">
+  <div class="absolute top-[5cqw] left-[6cqw] text-[2.6cqw]">
+    <Lockup variant="full" />
+  </div>
+  <Statement class="absolute top-[15cqw] left-[6cqw] max-w-[58cqw] text-[7.4cqw]" />
+  <Photo class="absolute top-[6cqw] -right-[8cqw] w-[38cqw]" />
+  <p class="absolute bottom-[5cqw] left-[6cqw] text-[1.9cqw] text-fg-muted">
+    Raum Straubing, Niederbayern · alle zwei bis vier Wochen · auf Spendenbasis
+  </p>
+</Sheet>

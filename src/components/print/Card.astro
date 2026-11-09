@@ -1,0 +1,44 @@
+---
+/** Visitenkarte. Front on the forest: the lockup and the stamp cut by the right edge. Back on paper: who, how to reach, the QR code. */
+import site from '@data/site.json';
+import type { BrandData } from '@lib/brand/data';
+import { shortUrl } from '@lib/brand/data';
+import type { TemplateSpec } from '@lib/brand/registry';
+
+import Lockup from '../brand/Lockup.astro';
+import Qr from '../brand/Qr.astro';
+import Stamp from '../brand/Stamp.astro';
+import Sheet from './Sheet.astro';
+
+interface Props {
+  spec: TemplateSpec;
+  data: BrandData;
+}
+
+const { spec, data } = Astro.props;
+const home = new URL('/', data.datesUrl).href;
+---
+
+<Sheet spec={spec} ground="dark">
+  <div aria-hidden="true" class="absolute top-1/2 -right-[22cqw] w-[70cqw] -translate-y-1/2 text-line-strong">
+    <Stamp />
+  </div>
+  <div class="absolute bottom-[9cqw] left-[8cqw] text-[6.6cqw]">
+    <Lockup variant="full" />
+  </div>
+</Sheet>
+
+<Sheet spec={spec}>
+  <div class="absolute top-[9cqw] left-[8cqw] grid gap-[1.6cqw]">
+    <span class="font-display text-[7cqw] leading-none font-semibold text-fg">Markus Sommer</span>
+    <span class="text-[3.6cqw] text-fg-muted">leitet den {site.siteName}</span>
+  </div>
+  <div class="absolute bottom-[9cqw] left-[8cqw] grid gap-[1cqw] text-[3.8cqw] leading-snug text-fg">
+    <span>{site.contactEmail}</span>
+    <span>{site.contactPhone}</span>
+    <span class="font-semibold text-accent">{shortUrl(home)}</span>
+  </div>
+  <div class="absolute right-[8cqw] bottom-[9cqw] w-[22cqw] bg-raised p-[1cqw] text-fg">
+    <Qr value={home} label={`QR-Code: ${shortUrl(home)}`} />
+  </div>
+</Sheet>

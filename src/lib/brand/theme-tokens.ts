@@ -13,7 +13,7 @@ export interface Declaration {
   note: string;
 }
 
-export interface ColourValue {
+interface ColourValue {
   /** Resolved hex, or `null` when the value is mixed (`color-mix`) or not a colour. */
   hex: string | null;
   /** The primitive it comes from (`linen`), if any. */
@@ -37,7 +37,7 @@ export interface TypeRole {
   note: string;
 }
 
-export interface Space {
+interface Space {
   name: string;
   /** Value per breakpoint, from the smallest: `{ base: '1.75rem', '48rem': '2.5rem' }`. */
   steps: Record<string, string>;

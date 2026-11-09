@@ -1,0 +1,32 @@
+---
+/**
+ * A band of another ground across a sheet, from its top edge down (or its bottom
+ * edge up), running into the bleed on three sides. What sits on it goes inside, so
+ * the ground's colour roles apply; sizes still refer to the sheet (`cqw`).
+ */
+interface Props {
+  ground: 'alt' | 'moss' | 'dark';
+  edge?: 'top' | 'bottom';
+  /** The band's height, as a class (`h-[118cqw]`). */
+  class: string;
+}
+
+const GROUNDS = { alt: 'surface-alt', moss: 'surface-moss', dark: 'surface-dark' } as const;
+
+const { ground, edge = 'top', class: className } = Astro.props;
+---
+
+<div
+  class:list={[
+    'absolute -inset-x-(--bleed) overflow-clip',
+    edge === 'top' ? '-top-(--bleed)' : '-bottom-(--bleed)',
+    GROUNDS[ground],
+    className,
+  ]}
+>
+  <div
+    class:list={['absolute inset-x-(--bleed)', edge === 'top' ? 'top-(--bleed) bottom-0' : 'top-0 bottom-(--bleed)']}
+  >
+    <slot />
+  </div>
+</div>

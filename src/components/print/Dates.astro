@@ -1,0 +1,40 @@
+---
+/**
+ * The coming evenings as a list: the day large in the margin, the date, the time
+ * and the place beside it. Sizes in container units of the sheet.
+ */
+import { type BrandEvent, dateParts } from '@lib/brand/data';
+
+interface Props {
+  events: BrandEvent[];
+  max?: number;
+  class?: string;
+}
+
+const { events, max = 3, class: className } = Astro.props;
+const shown = events.slice(0, max);
+---
+
+{shown.length > 0 ? (
+  <ol class:list={['grid', className]}>
+    {shown.map((event) => {
+      const parts = dateParts(event.day);
+
+      return (
+        <li class="grid grid-cols-[22cqw_minmax(0,1fr)] items-baseline gap-x-[3cqw] border-t border-line-strong py-[2.4cqw]">
+          <span class="font-display text-[14cqw] leading-[0.9] font-semibold tracking-[-0.04em] text-accent tabular-nums">
+            {parts.day}.
+          </span>
+          <span class="grid gap-[0.6cqw]">
+            <span class="font-display text-[4.6cqw] leading-tight text-fg">
+              {parts.weekday} im {parts.month}
+            </span>
+            <span class="text-[3.2cqw] text-fg-muted">{[event.time, event.place].filter(Boolean).join(' · ')}</span>
+          </span>
+        </li>
+      );
+    })}
+  </ol>
+) : (
+  <p class:list={['font-display text-[5cqw] text-fg', className]}>Der nächste Abend ist in Planung.</p>
+)}

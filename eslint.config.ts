@@ -11,7 +11,7 @@ export default defineConfig([
   // Build output and vendored assets are never linted.
   // (node_modules and .git are ignored by ESLint out of the box.)
   {
-    ignores: ['dist/**', '.astro/**', '.claude/**', 'public/**', '**/*.min.js'],
+    ignores: ['dist/**', '.astro/**', '.claude/**', 'public/**', 'brand/.dist/**', 'brand/out/**', '**/*.min.js'],
   },
 
   // Base rule sets.

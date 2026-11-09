@@ -1,0 +1,31 @@
+---
+/** The way in, for print: the QR code to the dates on a light square, the address beside it, the mail and phone. */
+import site from '@data/site.json';
+import { shortUrl } from '@lib/brand/data';
+
+import Qr from '../brand/Qr.astro';
+
+interface Props {
+  /** What the QR code opens (the next evening's page). */
+  url: string;
+  /** The address printed beside it, short enough to type ("mens-circle.de/event"). */
+  display: string;
+  label?: string;
+  class?: string;
+}
+
+const { url, display, label = 'Termine und Anmeldung', class: className } = Astro.props;
+---
+
+<div class:list={['grid grid-cols-[26cqw_minmax(0,1fr)] items-center gap-x-[4cqw]', className]}>
+  <div class="bg-raised p-[1.2cqw] text-fg">
+    <Qr value={url} label={`QR-Code: ${label}`} />
+  </div>
+  <div class="grid gap-[1cqw] text-[3.2cqw] leading-snug">
+    <span class="font-semibold text-fg">{label}</span>
+    <span class="font-display text-[4.6cqw] text-accent">{shortUrl(display)}</span>
+    <span class="text-fg-muted">
+      {site.contactEmail} · {site.contactPhone}
+    </span>
+  </div>
+</div>

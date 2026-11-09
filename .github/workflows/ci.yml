@@ -66,6 +66,17 @@ jobs:
           path: dist/browser-shots/
           if-no-files-found: ignore
 
+      # The brand templates (flyers, poster, card, posts, preview images) build and
+      # print: a separate build with the template pages, PDFs and PNGs as an artifact.
+      - name: Brand templates
+        run: bun --no-env-file scripts/brand-render.ts --data brand/data.example.json
+
+      - name: Brand files
+        uses: actions/upload-artifact@v4
+        with:
+          name: brand-templates
+          path: brand/out/
+
   lighthouse:
     name: Lighthouse (advisory)
     runs-on: ubuntu-latest

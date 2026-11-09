@@ -1,0 +1,22 @@
+---
+/** The mark and the word mark on a transparent ground, large, for anyone who needs the logo with its name. */
+import type { BrandData } from '@lib/brand/data';
+import type { TemplateSpec } from '@lib/brand/registry';
+
+import Lockup from '../brand/Lockup.astro';
+import Sheet from './Sheet.astro';
+
+interface Props {
+  spec: TemplateSpec;
+  /** Not used: the image says the same on every date. */
+  data?: BrandData;
+}
+
+const { spec } = Astro.props;
+---
+
+<Sheet spec={spec} ground="none">
+  <div class="absolute inset-0 grid place-items-center text-[12cqw]">
+    <Lockup variant="full" />
+  </div>
+</Sheet>

@@ -5,14 +5,17 @@
 @import './theme.css';
 
 /* Classes come from src/ only (`source('..')`): words in docs, mail templates or
-   tests never become utilities. The back office has its own entry (admin.css), and
-   server-only code holds no markup. */
+   tests never become utilities. The back office has its own entry (admin.css), the
+   brand templates theirs (print.css), and server-only code holds no markup. */
 @source not '../layouts/AdminLayout.astro';
 @source not '../components/admin';
 @source not '../pages/admin';
 @source not '../pages/api';
 @source not '../actions';
 @source not '../lib/server';
+@source not '../components/print';
+@source not '../layouts/PrintLayout.astro';
+@source not '../pages/brand';
 
 /* Printing a page of the site: black on white, A4 margins. Here, not in the shared
    theme: the brand templates (print.css) print edge to edge in their own colours. */

@@ -1,0 +1,32 @@
+/**
+ * Brand templates entry (flyers, poster, card, posts, preview images): Tailwind
+ * plus the shared design system, for the pages under src/pages/brand/ that only
+ * exist in a brand build (`bun run brand:render`). Sizes in the templates are
+ * container units of their sheet, so one design scales from a card to a poster.
+ */
+@import 'tailwindcss' source(none);
+@import './theme.css';
+
+@source '../components/print';
+@source '../components/brand';
+@source '../components/ui';
+@source '../layouts/PrintLayout.astro';
+@source '../pages/brand';
+
+@layer base {
+  /* Print what the screen shows: grounds and photos included, no page margin
+     (each sheet carries its own bleed). */
+  html {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  @page {
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+    min-block-size: 0;
+  }
+}

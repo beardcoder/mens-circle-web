@@ -1,0 +1,38 @@
+---
+/**
+ * One brand template per page, for the render script (`bun run brand:render`). The
+ * pages exist only in a brand build (`BRAND_TEMPLATES=1`): every other build gets
+ * no path, so the site never carries them. The data comes from `BRAND_DATA`, a
+ * JSON file the script writes (brand/data.example.json without it).
+ */
+import { readFile } from 'node:fs/promises';
+
+import { type BrandData, brandData } from '@lib/brand/data';
+import { TEMPLATES, type TemplateSpec } from '@lib/brand/registry';
+
+import { TEMPLATE_COMPONENTS } from '../../components/print';
+import PrintLayout from '../../layouts/PrintLayout.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  if (process.env.BRAND_TEMPLATES !== '1') return [];
+
+  const file = process.env.BRAND_DATA ?? 'brand/data.example.json';
+  const data = brandData.parse(JSON.parse(await readFile(file, 'utf8')));
+
+  return TEMPLATES.map((spec) => ({ params: { template: spec.id }, props: { spec, data } }));
+}
+
+interface Props {
+  spec: TemplateSpec;
+  data: BrandData;
+}
+
+const { spec, data } = Astro.props;
+const Template = TEMPLATE_COMPONENTS[spec.id];
+---
+
+<PrintLayout title={spec.label} mode={spec.mode} transparent={spec.transparent}>
+  <Template spec={spec} data={data} />
+</PrintLayout>

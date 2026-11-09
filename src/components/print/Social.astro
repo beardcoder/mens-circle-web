@@ -1,0 +1,75 @@
+---
+/**
+ * A post for Instagram and WhatsApp (square, portrait or story), on the forest: the
+ * next evening as a poster (the day in the spark), its seat ring on a disc
+ * overlapping the photograph, the lockup and the address. Without a date: the
+ * statement and the address for the dates.
+ */
+import type { BrandData } from '@lib/brand/data';
+import { dateParts, shortUrl } from '@lib/brand/data';
+import type { TemplateSpec } from '@lib/brand/registry';
+
+import Lockup from '../brand/Lockup.astro';
+import SeatRing from '../brand/SeatRing.astro';
+import Photo from './Photo.astro';
+import Sheet from './Sheet.astro';
+import Statement from './Statement.astro';
+
+interface Props {
+  spec: TemplateSpec;
+  data: BrandData;
+}
+
+const { spec, data } = Astro.props;
+const next = data.events[0];
+const parts = next ? dateParts(next.day) : null;
+const ratio = spec.height / spec.width;
+const format = ratio > 1.5 ? 'story' : ratio > 1.1 ? 'portrait' : 'square';
+
+/** Where things stand per format: the taller, the lower the date and the larger the photograph. */
+const LAYOUT = {
+  square: {
+    text: 'top-[22cqw]',
+    photo: '-right-[18cqw] -bottom-[16cqw] w-[66cqw]',
+    ring: 'bottom-[34cqw] left-[56cqw]',
+  },
+  portrait: {
+    text: 'top-[24cqw]',
+    photo: '-right-[20cqw] -bottom-[24cqw] w-[66cqw]',
+    ring: 'bottom-[38cqw] left-[58cqw]',
+  },
+  story: {
+    text: 'top-[30cqw]',
+    photo: '-right-[30cqw] -bottom-[36cqw] w-[100cqw]',
+    ring: 'bottom-[52cqw] left-[54cqw]',
+  },
+} as const;
+
+const layout = LAYOUT[format];
+---
+
+<Sheet spec={spec} ground="dark">
+  <div class="absolute top-[7cqw] left-[7cqw] text-[4.4cqw]">
+    <Lockup variant="full" />
+  </div>
+  <Photo class:list={['absolute', layout.photo]} />
+  {next && parts ? (
+    <div class:list={['absolute left-[7cqw] grid gap-[2cqw]', layout.text]}>
+      <span class="text-[3.6cqw] font-semibold text-fg-muted">Nächster Männerkreis</span>
+      <span class="font-display text-[30cqw] leading-[0.82] font-semibold tracking-[-0.05em] text-spark tabular-nums">
+        {parts.day}.
+      </span>
+      <span class="font-display text-[10cqw] leading-none font-semibold tracking-[-0.03em] text-fg">{parts.month}</span>
+      <span class="mt-[1cqw] text-[4cqw] text-fg-soft">{[parts.weekday, next.time].filter(Boolean).join(' · ')}</span>
+      <span class="text-[4cqw] text-fg-soft">{next.place}</span>
+      <span class="mt-[2cqw] font-display text-[4.6cqw] text-accent">{shortUrl(data.datesUrl)}</span>
+    </div>
+  ) : (
+    <Statement class:list={['absolute left-[7cqw] max-w-[80cqw] text-[11cqw]', layout.text]} />
+  )}
+  {next?.seats && (
+    <div class:list={['absolute size-[24cqw] rounded-full bg-surface p-[1.6cqw]', layout.ring]}>
+      <SeatRing seats={next.seats} text="" size="fill" layout="none" class="size-full" />
+    </div>
+  )}
+</Sheet>

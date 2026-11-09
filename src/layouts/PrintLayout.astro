@@ -1,0 +1,34 @@
+---
+/**
+ * The page around a brand template: the fonts, the theme and the print entry,
+ * nothing else (no header, footer, scripts or SEO). The mode pins the colour
+ * scheme, so the roles resolve as on the site.
+ */
+import '../styles/print.css';
+
+import { Font } from 'astro:assets';
+
+interface Props {
+  title: string;
+  mode: 'light' | 'dark';
+  /** A transparent page (the logo lockup). */
+  transparent?: boolean;
+}
+
+const { title, mode, transparent = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="de" data-mode={mode} data-mode-resolved={mode}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title}</title>
+    <Font cssVariable="--font-fraunces" preload />
+    <Font cssVariable="--font-figtree" preload={[{ weight: '300 900', style: 'normal' }]} />
+  </head>
+  <body class:list={[transparent && 'bg-transparent']}>
+    <slot />
+  </body>
+</html>

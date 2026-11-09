@@ -1,0 +1,59 @@
+---
+/**
+ * Plakat A3, on the forest: the invitation as a poster word, the next evening large
+ * with its seat ring, the photograph cut by the right edge, the way in on paper at
+ * the foot.
+ */
+import type { BrandData } from '@lib/brand/data';
+import { dateParts } from '@lib/brand/data';
+import type { TemplateSpec } from '@lib/brand/registry';
+
+import Lockup from '../brand/Lockup.astro';
+import SeatRing from '../brand/SeatRing.astro';
+import Band from './Band.astro';
+import Contact from './Contact.astro';
+import Photo from './Photo.astro';
+import Sheet from './Sheet.astro';
+import Statement from './Statement.astro';
+
+interface Props {
+  spec: TemplateSpec;
+  data: BrandData;
+}
+
+const { spec, data } = Astro.props;
+const next = data.events[0];
+const parts = next ? dateParts(next.day) : null;
+---
+
+<Sheet spec={spec}>
+  <Band ground="dark" class="h-[calc(106cqw+var(--bleed))]">
+    <div class="absolute top-[6cqw] left-[6cqw] text-[3.6cqw]">
+      <Lockup variant="full" />
+    </div>
+    <Photo class="absolute top-[10cqw] -right-[24cqw] w-[62cqw]" />
+    <p class="absolute top-[18cqw] left-[5cqw] font-display text-[19cqw] leading-[0.86] font-semibold tracking-[-0.05em] text-fg">
+      Dabei
+      <br />
+      sein.
+    </p>
+    <Statement class="absolute top-[56cqw] left-[6cqw] max-w-[58cqw] text-[6cqw]" />
+    {next && parts && (
+      <div class="absolute top-[80cqw] left-[6cqw] grid gap-[1cqw]">
+        <span class="text-[2.4cqw] font-semibold text-fg-muted">Nächster Abend</span>
+        <span class="font-display text-[11cqw] leading-[0.86] font-semibold tracking-[-0.05em] text-spark tabular-nums">
+          {parts.day}. {parts.month}
+        </span>
+        <span class="text-[3cqw] text-fg-soft">
+          {[parts.weekday, next.time, next.place].filter(Boolean).join(' · ')}
+        </span>
+      </div>
+    )}
+    {next?.seats && (
+      <div class="absolute top-[78cqw] right-[6cqw] size-[20cqw]">
+        <SeatRing seats={next.seats} text="" size="fill" layout="none" class="size-full" />
+      </div>
+    )}
+  </Band>
+  <Contact url={next?.url ?? data.datesUrl} display={data.datesUrl} class="absolute inset-x-[6cqw] bottom-[5cqw]" />
+</Sheet>

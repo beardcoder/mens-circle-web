@@ -9,6 +9,11 @@
 @source not '../pages/api';
 @source not '../actions';
 @source not '../lib/server';
+@source not '../components/print';
+@source not '../components/styleguide';
+@source not '../layouts/PrintLayout.astro';
+@source not '../pages/brand';
+@source not '../pages/styleguide.astro';
 
 /* Native page navigation; editing itself stays in Preact without page reloads. */
 @view-transition {

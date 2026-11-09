@@ -1,0 +1,56 @@
+---
+/**
+ * Flyer A6. Front on the forest: the mark, the statement, the photograph cut by the
+ * corner, the next evening. Back on paper: the coming dates, a few words about the
+ * circle, the way in (QR code), the stamp cut by the top right corner.
+ */
+import { type BrandData, dateParts } from '@lib/brand/data';
+import type { TemplateSpec } from '@lib/brand/registry';
+
+import Lockup from '../brand/Lockup.astro';
+import Stamp from '../brand/Stamp.astro';
+import Contact from './Contact.astro';
+import Dates from './Dates.astro';
+import Photo from './Photo.astro';
+import Sheet from './Sheet.astro';
+import Statement from './Statement.astro';
+
+interface Props {
+  spec: TemplateSpec;
+  data: BrandData;
+}
+
+const { spec, data } = Astro.props;
+const next = data.events[0];
+const parts = next ? dateParts(next.day) : null;
+---
+
+<Sheet spec={spec} ground="dark">
+  <div class="absolute top-[7cqw] left-[7cqw] text-[5cqw]">
+    <Lockup variant="full" />
+  </div>
+  <Statement class="absolute top-[30cqw] left-[7cqw] max-w-[84cqw] text-[11.5cqw]" />
+  <Photo class="absolute -right-[24cqw] -bottom-[18cqw] w-[82cqw]" />
+  {next && parts && (
+    <p class="absolute bottom-[9cqw] left-[7cqw] grid max-w-[40cqw] gap-[1cqw] text-[3.4cqw] leading-snug">
+      <span class="font-semibold text-fg-muted">Nächster Abend</span>
+      <span class="font-display text-[6cqw] leading-tight text-fg">
+        {parts.day}. {parts.month}
+      </span>
+      <span class="text-fg-muted">{next.place}</span>
+    </p>
+  )}
+</Sheet>
+
+<Sheet spec={spec}>
+  <div aria-hidden="true" class="absolute -top-[14cqw] -right-[14cqw] w-[46cqw] text-line-strong">
+    <Stamp />
+  </div>
+  <div class="absolute inset-x-[7cqw] top-[9cqw] bottom-[8cqw] flex flex-col gap-[5cqw]">
+    <p class="max-w-[58cqw] font-display text-[7.4cqw] leading-none font-semibold tracking-[-0.03em] text-fg">
+      Die nächsten Abende
+    </p>
+    <Dates events={data.events} />
+    <Contact url={next?.url ?? data.datesUrl} display={data.datesUrl} class="mt-auto" />
+  </div>
+</Sheet>

@@ -1,0 +1,28 @@
+---
+/** The preview image of the personal page (1200 × 630): its title on paper, the photograph cut by the right edge. */
+import type { BrandData } from '@lib/brand/data';
+import type { TemplateSpec } from '@lib/brand/registry';
+
+import Lockup from '../brand/Lockup.astro';
+import Photo from './Photo.astro';
+import Sheet from './Sheet.astro';
+
+interface Props {
+  spec: TemplateSpec;
+  /** Not used: the image says the same on every date. */
+  data?: BrandData;
+}
+
+const { spec } = Astro.props;
+---
+
+<Sheet spec={spec}>
+  <div class="absolute top-[5cqw] left-[6cqw] text-[2.6cqw]">
+    <Lockup variant="full" />
+  </div>
+  <p class="absolute top-[16cqw] left-[6cqw] max-w-[54cqw] font-display text-[7.4cqw] leading-[0.95] font-semibold tracking-[-0.035em] text-fg">
+    Warum ich den <span class="text-accent">Männerkreis</span> leite.
+  </p>
+  <p class="absolute bottom-[5cqw] left-[6cqw] text-[2cqw] text-fg-muted">Markus Sommer</p>
+  <Photo class="absolute top-[4cqw] -right-[8cqw] w-[40cqw]" />
+</Sheet>

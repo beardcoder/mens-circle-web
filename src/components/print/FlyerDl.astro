@@ -1,0 +1,35 @@
+---
+/** Flyer DIN lang: the forest above (statement, photograph cut by the right edge), the paper below (dates, the way in). */
+import type { BrandData } from '@lib/brand/data';
+import type { TemplateSpec } from '@lib/brand/registry';
+
+import Lockup from '../brand/Lockup.astro';
+import Band from './Band.astro';
+import Contact from './Contact.astro';
+import Dates from './Dates.astro';
+import Photo from './Photo.astro';
+import Sheet from './Sheet.astro';
+import Statement from './Statement.astro';
+
+interface Props {
+  spec: TemplateSpec;
+  data: BrandData;
+}
+
+const { spec, data } = Astro.props;
+---
+
+<Sheet spec={spec}>
+  <Band ground="dark" class="h-[calc(98cqw+var(--bleed))]">
+    <div class="absolute top-[8cqw] left-[8cqw] text-[5cqw]">
+      <Lockup variant="full" />
+    </div>
+    <Photo class="absolute top-[22cqw] -right-[30cqw] w-[64cqw]" />
+    <Statement class="absolute top-[30cqw] left-[8cqw] max-w-[60cqw] text-[9.6cqw]" />
+  </Band>
+  <div class="absolute inset-x-[8cqw] top-[106cqw] bottom-[8cqw] flex flex-col gap-[4cqw]">
+    <p class="font-display text-[7cqw] leading-none font-semibold tracking-[-0.03em] text-fg">Die nächsten Abende</p>
+    <Dates events={data.events} max={3} />
+    <Contact url={data.events[0]?.url ?? data.datesUrl} display={data.datesUrl} class="mt-auto" />
+  </div>
+</Sheet>

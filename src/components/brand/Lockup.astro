@@ -22,6 +22,8 @@ const [name, ...region] = site.siteName.split(' ');
   <Icon name="logo" aria-hidden="true" class="size-[1.6em] shrink-0 text-fill" />
   <span class="grid gap-[0.3em]">
     <span>{name}</span>
+    {/* A space between name and region, so they read as two words. */}
+    {variant === 'full' && region.length > 0 && ' '}
     {variant === 'full' && region.length > 0 && (
       <span class="font-sans text-[0.42em] font-semibold tracking-[0.18em] text-fg-muted uppercase">
         {region.join(' ')}

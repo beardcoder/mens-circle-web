@@ -1,0 +1,37 @@
+---
+/**
+ * One sheet of a template: the full size with its bleed, the ground running to the
+ * edge, and the trimmed area inside (the default slot), which is the container
+ * every size in the template refers to (`cqw`). What should bleed (a photo, the
+ * stamp) is positioned against the trimmed area and may leave it; the sheet clips
+ * at the bleed's outer edge.
+ */
+import { pageSize, type TemplateSpec } from '@lib/brand/registry';
+
+interface Props {
+  spec: TemplateSpec;
+  ground?: 'default' | 'alt' | 'moss' | 'dark' | 'none';
+}
+
+const GROUNDS = {
+  default: 'bg-ground text-fg',
+  alt: 'surface-alt',
+  moss: 'surface-moss',
+  dark: 'surface-dark',
+  none: 'text-fg',
+} as const;
+
+const { spec, ground = 'default' } = Astro.props;
+const { width, height } = pageSize(spec);
+const size = `--sheet-w: ${width}; --sheet-h: ${height}; --bleed: ${spec.bleed}${spec.unit === 'mm' ? 'mm' : 'px'}`;
+---
+
+<section
+  data-sheet
+  class:list={['relative h-(--sheet-h) w-(--sheet-w) overflow-clip break-after-page not-print:mb-8', GROUNDS[ground]]}
+  style={size}
+>
+  <div class="@container absolute inset-(--bleed)">
+    <slot />
+  </div>
+</section>

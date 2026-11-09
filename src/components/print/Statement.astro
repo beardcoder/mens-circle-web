@@ -1,0 +1,12 @@
+---
+/** The circle's statement, its phrase in the spark: the title of the flyer, the poster and the preview image. */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<p class:list={['font-display leading-[0.95] font-semibold tracking-[-0.035em] text-fg', className]}>
+  Ein Abend, an dem du <span class="text-spark">nichts darstellen</span> musst.
+</p>
