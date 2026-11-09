@@ -5,6 +5,8 @@
  * For the people who design with the brand (flyers, posts, prints); noindex and out
  * of the sitemap.
  */
+import { readFile } from 'node:fs/promises';
+
 import { Icon } from 'astro-icon/components';
 
 import { COLOUR_USE, GROUNDS, TYPE_USE } from '@lib/brand/notes';
@@ -37,11 +39,12 @@ import Section from '../components/ui/Section.astro';
 import SectionHead from '../components/ui/SectionHead.astro';
 import TextLink from '../components/ui/TextLink.astro';
 import Layout from '../layouts/Layout.astro';
-import theme from '../styles/theme.css?raw';
 
 export const prerender = true;
 
-const tokens = parseTheme(theme);
+// Read from disk at build time (the page is prerendered): a `?raw` import of a .css file
+// still passes through Vite's CSS transform, which does not know Tailwind's at-rules.
+const tokens = parseTheme(await readFile('src/styles/theme.css', 'utf8'));
 const roles = tokens.colours.filter((c) => COLOUR_USE[c.name]);
 const sample = eventView(SAMPLE_EVENT, 'Nächster Termin');
 const spaceNames = ['gutter', 'section', 'band', 'group', 'grid', 'overlap'];
