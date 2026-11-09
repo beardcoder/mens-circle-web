@@ -1,0 +1,72 @@
+---
+/**
+ * The seat ring, the circle's signature: every chair of an evening as a dot on a
+ * ring, the taken ones in ember from the top, clockwise, the free ones open, and
+ * in the middle how many are free. It repeats the seats line beside it in a shape
+ * (decorative, `aria-hidden`); the line says it in words. In an opening the taken
+ * chairs fill in one after the other (global.css, "Motion: the opening").
+ */
+import { seatDots } from '@lib/shared/seats';
+
+type Size = 'sm' | 'md' | 'lg';
+
+interface Props {
+  seats: { total: number; free: number } | null;
+  /** "3 von 7 Plätzen frei", "Ausgebucht · Warteliste". */
+  text: string;
+  size?: Size;
+  /** `row`: the words beside the ring; `stack`: under it; `none`: only the ring (the words stand elsewhere). */
+  layout?: 'row' | 'stack' | 'none';
+  class?: string;
+}
+
+const SIZES: Record<Size, { ring: string; number: string; label: string }> = {
+  sm: { ring: 'size-16', number: 'text-xl', label: 'hidden' },
+  md: { ring: 'size-28', number: 'text-sub', label: 'text-xs' },
+  lg: { ring: 'size-40 sm:size-44', number: 'text-section', label: 'text-sm' },
+};
+
+const { seats, text, size = 'md', layout = 'row', class: className } = Astro.props;
+const ring = seatDots(seats);
+const { ring: ringSize, number, label } = SIZES[size];
+---
+
+<div
+  data-seat-ring
+  class:list={['flex gap-x-5 gap-y-3', layout === 'stack' ? 'flex-col items-start' : 'items-center', className]}
+>
+  {ring && (
+    <span aria-hidden="true" class:list={['relative grid shrink-0 place-items-center', ringSize]}>
+      <svg viewBox="0 0 100 100" class="absolute inset-0 size-full overflow-visible">
+        <circle
+          cx="50"
+          cy="50"
+          r="40"
+          fill="none"
+          class="stroke-line-strong"
+          stroke-width="1"
+          vector-effect="non-scaling-stroke"
+        />
+        {ring.dots.map((dot, i) =>
+          dot.taken ? (
+            <circle data-seat-dot cx={dot.x} cy={dot.y} r={ring.r} class="fill-fill" style={`--i: ${i}`} />
+          ) : (
+            <circle
+              cx={dot.x}
+              cy={dot.y}
+              r={ring.r - 0.75}
+              class="fill-surface stroke-line-bold"
+              stroke-width="1.5"
+              vector-effect="non-scaling-stroke"
+            />
+          ),
+        )}
+      </svg>
+      <span class="relative grid justify-items-center leading-none">
+        <span class:list={['font-display font-semibold text-fg tabular-nums', number]}>{ring.free}</span>
+        <span class:list={['mt-1 font-semibold text-fg-muted', label]}>frei</span>
+      </span>
+    </span>
+  )}
+  {layout !== 'none' && <p class="text-sm text-fg-muted">{text}</p>}
+</div>

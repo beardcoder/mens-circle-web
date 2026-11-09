@@ -1,12 +1,13 @@
 ---
 import type { ComponentProps } from 'astro/types';
 
+import { margin } from '@lib/ui';
+
 import LinkList from '../ui/LinkList.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
-import Split from '../ui/Split.astro';
 
-/** A page's exit, as a compact band: where someone who has read it goes next. */
+/** A page's exit, as a compact band: where someone who has read it goes next. Head in the margin, the links beside it. */
 interface Props {
   eyebrow: string;
   title: string;
@@ -18,8 +19,10 @@ const { eyebrow, title, titleId, items } = Astro.props;
 ---
 
 <Section ground="alt" space="band" labelledby={titleId}>
-  <Split>
-    <SectionHead slot="head" eyebrow={eyebrow} title={title} titleId={titleId} size="sub" />
-    <LinkList items={items} />
-  </Split>
+  <div class:list={[margin.grid, 'gap-y-8']}>
+    <SectionHead eyebrow={eyebrow} title={title} titleId={titleId} size="sub" class={margin.side} />
+    <div class={margin.content}>
+      <LinkList items={items} />
+    </div>
+  </div>
 </Section>

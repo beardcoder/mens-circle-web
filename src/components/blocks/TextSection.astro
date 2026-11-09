@@ -1,8 +1,9 @@
 ---
+import { margin } from '@lib/ui';
+
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
-import Split from '../ui/Split.astro';
 
 interface Props {
   anchor: string;
@@ -13,11 +14,12 @@ interface Props {
 const { anchor, eyebrow, title } = Astro.props;
 ---
 
+{/* A heading in the margin, the text beside it on the reading line. */}
 <Section id={anchor} space="band">
-  <Split>
-    <SectionHead slot="head" eyebrow={eyebrow} title={title} size="sub" />
-    <Prose reveal>
+  <div class:list={[margin.grid, 'gap-y-6']}>
+    <SectionHead eyebrow={eyebrow} title={title} size="sub" class={margin.side} />
+    <Prose reveal class={margin.reading}>
       <slot />
     </Prose>
-  </Split>
+  </div>
 </Section>

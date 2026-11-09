@@ -3,19 +3,20 @@ import Container from './Container.astro';
 
 /**
  * A block of the page. Blocks are parted by space, and by their ground only
- * where it means something: the linen page, or a band from edge to edge in warm
- * sand (`alt`: information that belongs together), pale sage (`tint`: a quiet
- * note) or forest (`dark`: what draws you in). Each ground re-declares the colour
- * roles (`surface-*` in theme.css), so everything inside follows it.
+ * where it means something: the paper, or a band from edge to edge in warm sand
+ * (`alt`: information that belongs together), moss (`moss`: what is spoken in the
+ * circle, the agreements and the voices) or forest (`dark`: what draws you in).
+ * Each ground re-declares the colour roles (`surface-*` in theme.css), so
+ * everything inside follows it. A section clips what bleeds out of it.
  */
 
-type Ground = 'default' | 'alt' | 'tint' | 'dark';
+type Ground = 'default' | 'alt' | 'moss' | 'dark';
 type Space = 'default' | 'band' | 'none';
 
 interface Props {
   id?: string;
   ground?: Ground;
-  /** `default` is a section's space (72 → 112px); `band` the compact space of a band (48 → 64px). */
+  /** `default` is a section's space (88 → 144px); `band` the compact space of a band (56 → 80px). */
   space?: Space;
   labelledby?: string;
   class?: string;
@@ -26,7 +27,7 @@ interface Props {
 const GROUNDS: Record<Ground, string> = {
   default: '',
   alt: 'surface-alt',
-  tint: 'surface-tint',
+  moss: 'surface-moss',
   dark: 'surface-dark',
 };
 
@@ -39,7 +40,11 @@ const SPACES: Record<Space, string> = {
 const { id, ground = 'default', space = 'default', labelledby, class: className, innerClass } = Astro.props;
 ---
 
-<section id={id} aria-labelledby={labelledby} class:list={['relative', GROUNDS[ground], SPACES[space], className]}>
+<section
+  id={id}
+  aria-labelledby={labelledby}
+  class:list={['relative overflow-x-clip', GROUNDS[ground], SPACES[space], className]}
+>
   <Container class={innerClass}>
     <slot />
   </Container>

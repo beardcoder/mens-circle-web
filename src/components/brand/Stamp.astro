@@ -1,0 +1,55 @@
+---
+/**
+ * The stamp: the mark in the middle of two thin rings with the circle's name
+ * running round between them, like a seal pressed on paper. Footer, the last band
+ * of the home page, the back of a flyer, a sticker. The one element that may turn:
+ * on screen it turns a little as it scrolls past (global.css, `data-stamp-turn`),
+ * never on its own.
+ */
+import { Icon } from 'astro-icon/components';
+
+import site from '@data/site.json';
+
+interface Props {
+  /** The words round the ring; repeated to fill it. */
+  text?: string;
+  /** Turn with the scroll (screens only). */
+  turn?: boolean;
+  class?: string;
+}
+
+const { text = `${site.siteName} · Raum ${site.geo.locality} · `, turn = false, class: className } = Astro.props;
+
+const id = `stamp-${crypto.randomUUID().slice(0, 8)}`;
+const radius = 78;
+const circumference = 2 * Math.PI * radius;
+/** As often as the words fit round the ring at a readable spacing (about 7.4 units a letter). */
+const once = text.toUpperCase();
+const words = once.repeat(Math.max(1, Math.floor(circumference / (once.length * 7.4)))).trim();
+---
+
+<span aria-hidden="true" class:list={['relative block aspect-square', className]}>
+  <svg viewBox="0 0 200 200" data-stamp-turn={turn || undefined} class="absolute inset-0 size-full">
+    <defs>
+      <path
+        id={id}
+        d={`M ${100 - radius},100 a ${radius},${radius} 0 1,1 ${2 * radius},0 a ${radius},${radius} 0 1,1 ${-2 * radius},0`}
+      />
+    </defs>
+    <circle cx="100" cy="100" r="97" fill="none" stroke="currentColor" stroke-width="1.25" />
+    <circle cx="100" cy="100" r="62" fill="none" stroke="currentColor" stroke-width="1.25" />
+    <text
+      fill="currentColor"
+      font-size="11.5"
+      font-weight="600"
+      letter-spacing="0"
+      dominant-baseline="central"
+      class="font-sans"
+    >
+      <textPath href={`#${id}`} textLength={circumference.toFixed(2)} lengthAdjust="spacing">
+        {words}
+      </textPath>
+    </text>
+  </svg>
+  <Icon name="logo" class="absolute inset-[34%] size-[32%] text-fill" />
+</span>

@@ -1,0 +1,35 @@
+---
+/**
+ * The poster word, the fourth of the four moves: one word or number as large as a
+ * poster sets it (`text-poster`, Fraunces 600). `title` is read (the section's
+ * title, full contrast); `ghost` stands quietly behind the content (8 % of the text
+ * colour, hidden from assistive technology). At most one per screen.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+type Element = 'h1' | 'h2' | 'p' | 'span';
+
+type Props = HTMLAttributes<'p'> & {
+  tone?: 'title' | 'ghost';
+  as?: Element;
+};
+
+const TONES = {
+  title: 'text-fg',
+  ghost: 'pointer-events-none text-fg/8 select-none',
+} as const;
+
+const { tone = 'title', as: Tag = tone === 'ghost' ? 'span' : 'p', class: className, ...rest } = Astro.props;
+---
+
+<Tag
+  {...rest}
+  aria-hidden={tone === 'ghost' ? 'true' : rest['aria-hidden']}
+  class:list={[
+    'block font-display text-poster font-semibold wrap-normal hyphens-manual [text-wrap:balance]',
+    TONES[tone],
+    className,
+  ]}
+>
+  <slot />
+</Tag>

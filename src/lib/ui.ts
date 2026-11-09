@@ -86,3 +86,23 @@ export const card = 'rounded-xl border border-line bg-raised shadow-card';
 
 /** A card with its padding, for the cards that hold a form (the admin's panels). */
 export const panel = `${card} p-card`;
+
+/**
+ * The margin column, the first of the four moves (docs/design-system.md): from `lg`
+ * a margin on columns 1–3 for what labels the content (an index number, a note, the
+ * labels of data) beside the content on 4–12. A title may start in the margin and
+ * run into the content (`cross`, columns 1–10), crossing the line between them.
+ * Below `lg` everything stacks, the margin first. Always on the left.
+ */
+export const margin = {
+  /** The grid itself: one column, twelve from `lg`. */
+  grid: 'grid grid-cols-1 gap-x-grid lg:grid-cols-12',
+  /** The margin: columns 1–3. */
+  side: 'min-w-0 lg:col-span-3',
+  /** The content: columns 4–12. */
+  content: 'min-w-0 lg:col-span-9 lg:col-start-4',
+  /** A reading column in the content: columns 4–10, about a line of running text. */
+  reading: 'min-w-0 lg:col-span-7 lg:col-start-4',
+  /** A title that starts in the margin and crosses into the content: columns 1–10. */
+  cross: 'min-w-0 lg:col-span-10',
+} as const;

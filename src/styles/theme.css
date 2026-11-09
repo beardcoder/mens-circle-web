@@ -1,11 +1,14 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
- * utilities cannot express. "A fire circle at the edge of the forest": a linen
- * ground, deep forest green for what draws you in (the opening, the
- * footer), ember from the logo for the one thing to do, soft round shapes.
- * Fraunces for titles, quotes and dates; Figtree for everything that explains.
- * Shared by the two entry files: global.css (public site) and admin.css (back
- * office). docs/design-system.md describes the system.
+ * utilities cannot express. "The circle of chairs": a warm paper ground, deep
+ * forest and moss for what draws you in, ember from the logo for the one thing
+ * to do, a spark of gold for what stands large on the dark grounds. Poster type
+ * (Fraunces, variable in weight and optical size) beside calm running text
+ * (Figtree); a margin column and four fixed ways to break the grid.
+ * Shared by the three entry files: global.css (public site), admin.css (back
+ * office) and print.css (brand templates). docs/design-system.md describes the
+ * system; /styleguide shows it, read from this file: a token's trailing comment
+ * is its description there.
  */
 
 /* ── Variants ─────────────────────────────────────────────────────────────── */
@@ -50,7 +53,6 @@
      changes on their ground. */
   --color-ground: light-dark(var(--p-linen), var(--p-night)); /* the page */
   --color-ground-alt: light-dark(var(--p-sand), var(--p-night-alt)); /* a warm band */
-  --color-tint: light-dark(var(--p-sage), var(--p-sage-night)); /* a quiet green note */
   --color-raised: light-dark(var(--p-cream), var(--p-night-raised)); /* cards */
   --color-surface: light-dark(var(--p-linen), var(--p-night)); /* the ground of the current block */
   --color-fg: light-dark(var(--p-ink), var(--p-night-text));
@@ -65,8 +67,9 @@
   --color-fill: var(--p-ember);
   --color-fill-strong: var(--p-ember-deep);
   --color-on-fill: var(--p-on-ember);
-  /* The warm light of the circle motif (the hero glow); decoration, never text. */
-  --color-glow: var(--p-gold);
+  /* The spark: what stands large on the forest and the moss (a poster word, an index
+     number, the stamp) and the warm point of the circle. Never text on paper. */
+  --color-spark: var(--p-spark);
   /* Lines: `line` parts things quietly and never alone outlines a control;
      `line-bold` outlines inputs and controls (3:1). */
   --color-line: light-dark(var(--p-line), var(--p-night-line));
@@ -87,11 +90,16 @@
 
   /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). */
   --font-sans: var(--font-figtree);
-  --font-display: var(--font-fraunces);
+  --font-display: var(--font-fraunces); /* Fraunces, variable: weight 500–700, optical size 9–144 */
 
   /* Type scale. Small sizes for labels and data, the reading size, then the
      titles by role: `sub` (subheadings), `section` (section titles), `page` (a
-     sub-page's title) and `hero` (the home statement). Titles are Fraunces 500. */
+     sub-page's title), `hero` (the home statement) and `poster` (one word or
+     number, as on a poster). Titles are Fraunces 500, the poster word 600; the
+     optical size follows the size by itself (`font-optical-sizing: auto`). */
+  --text-marginal: 0.875rem; /* 14px: a note in the margin column */
+  --text-marginal--line-height: 1.5;
+  --text-marginal--letter-spacing: 0.01em;
   --text-xs: 0.8125rem; /* 13px: the small print */
   --text-xs--line-height: 1.45;
   --text-sm: 0.875rem; /* 14px: labels, hints, captions */
@@ -110,15 +118,21 @@
   --text-sub: clamp(1.375rem, 1.2rem + 0.7vw, 1.875rem); /* 22–30px */
   --text-sub--line-height: 1.2;
   --text-sub--letter-spacing: -0.01em;
-  --text-section: clamp(2.125rem, 1.45rem + 2.6vw, 3.75rem); /* 34–60px */
-  --text-section--line-height: 1.08;
-  --text-section--letter-spacing: -0.02em;
-  --text-page: clamp(2.375rem, 1.55rem + 3.1vw, 4.25rem); /* 38–68px */
-  --text-page--line-height: 1.04;
-  --text-page--letter-spacing: -0.025em;
-  --text-hero: clamp(2.75rem, 1.55rem + 4.8vw, 5.5rem); /* 44–88px */
-  --text-hero--line-height: 1.02;
-  --text-hero--letter-spacing: -0.03em;
+  --text-section: clamp(2.25rem, 1.4rem + 3.4vw, 4.5rem); /* 36–72px: a section's title */
+  --text-section--line-height: 1.02;
+  --text-section--letter-spacing: -0.025em;
+  --text-page: clamp(2.75rem, 1.6rem + 4.6vw, 6rem); /* 44–96px: a sub-page's title */
+  --text-page--line-height: 0.98;
+  --text-page--letter-spacing: -0.03em;
+  --text-hero: clamp(3rem, 1.4rem + 6vw, 6.5rem); /* 48–104px: the home statement */
+  --text-hero--line-height: 0.96;
+  --text-hero--letter-spacing: -0.035em;
+  --text-index: clamp(3rem, 1.9rem + 4.4vw, 6.5rem); /* 48–104px: an index number in the margin */
+  --text-index--line-height: 0.9;
+  --text-index--letter-spacing: -0.04em;
+  --text-poster: clamp(4.5rem, 1.4rem + 12.4vw, 13.5rem); /* 72–216px: one poster word or number */
+  --text-poster--line-height: 0.86;
+  --text-poster--letter-spacing: -0.05em;
 
   /* Space. `section` the vertical space of a section, `band` that of a compact
      band, `group` from an explanation to the module after it, `grid` the column
@@ -132,6 +146,8 @@
   --spacing-gutter: var(--space-gutter);
   --spacing-card: var(--space-card);
   --spacing-panel: var(--space-panel);
+  --spacing-overlap: var(--space-overlap); /* how far an element crosses an edge: 40 / 64 / 96px */
+  --spacing-bleed: var(--space-bleed); /* from the content's edge to the window's */
   --spacing-header: 4.5rem; /* the fixed bar, 72px */
   --spacing-clearance: 6rem; /* the bar plus air, for anchors and sticky columns */
 
@@ -256,10 +272,24 @@
   background-color: var(--color-surface);
 }
 
-/* The quiet green note: agreements, a boundary, a hint beside the work. */
-@utility surface-tint {
-  --color-surface: var(--color-tint);
-  --color-raised: light-dark(var(--p-cream), var(--p-night-raised));
+/* The moss: a second dark ground for what is spoken in the circle (the agreements,
+   the voices). Dark in both modes, set apart from the forest by its green. */
+@utility surface-moss {
+  --color-surface: var(--p-moss);
+  --color-raised: color-mix(in srgb, var(--p-bone) 7%, var(--p-moss));
+  --color-fg: var(--p-bone);
+  --color-fg-soft: var(--p-bone);
+  --color-fg-muted: var(--p-bone-muted);
+  --color-accent: var(--p-ember-light);
+  --color-accent-strong: var(--p-bone);
+  --color-accent-soft: color-mix(in srgb, var(--p-bone) 10%, var(--p-moss));
+  --color-on-accent: var(--p-moss);
+  --color-line: color-mix(in srgb, var(--p-bone) 16%, transparent);
+  --color-line-strong: color-mix(in srgb, var(--p-bone) 28%, transparent);
+  --color-line-bold: var(--p-moss-control);
+  --color-field: color-mix(in srgb, var(--p-bone) 7%, var(--p-moss));
+  --color-success: #8fcb97;
+  --color-danger: #f0a197;
   color: var(--color-fg);
   background-color: var(--color-surface);
 }
@@ -286,6 +316,25 @@
   background-color: var(--color-surface);
 }
 
+/* ── The four moves ────────────────────────────────────────────────────────── */
+
+/* The grid is 12 columns and one edge; four moves break it, each at most once per
+   section (docs/design-system.md, "The four moves"): the margin column (`lib/ui.ts`,
+   `margin`), the overlap (`-mt-overlap`, `-ml-overlap` …), the bleed (below) and the
+   poster word (`Poster.astro`). A bleed runs an element from the content's edge out
+   to the window's, on one side or both; the section or the page clips it. */
+@utility bleed-r {
+  margin-inline-end: calc(-1 * var(--space-bleed));
+}
+
+@utility bleed-l {
+  margin-inline-start: calc(-1 * var(--space-bleed));
+}
+
+@utility bleed-x {
+  margin-inline: calc(-1 * var(--space-bleed));
+}
+
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 
 @layer base {
@@ -293,20 +342,21 @@
     /* `data-mode` absent follows the OS; "light"/"dark" pins it (Layout.astro). */
     color-scheme: light dark;
 
-    /* The primitives. Light: linen, a warm sand band, a pale sage note, cream
-       cards, green-black text, a moss grey for secondary text, ember that reads
-       as text and ember that carries a light label. Dark: the forest at night
-       keeps the roles. Every text pair is ≥ 4.5:1, every control line ≥ 3:1. */
-    --p-linen: #f6f2ea;
-    --p-sand: #ece4d4;
-    --p-sage: #e2e7d8;
+    /* The primitives. Light: warm paper (still called linen), a sand band that
+       reads as a band, cream cards, green-black text, a moss grey for secondary
+       text, ember that reads as text and ember that carries a light label. Dark:
+       the forest at night keeps the roles, its grounds set apart in warmth. The
+       moss and the forest are dark in both modes. Every text pair is ≥ 4.5:1,
+       every control line ≥ 3:1 (tests/contrast.test.ts). */
+    --p-linen: #f4eee2;
+    --p-sand: #e6dac4;
     --p-cream: #fffcf6;
     --p-ink: #1b241e;
     --p-ink-soft: #2e372f;
-    --p-muted: #5a6255;
-    --p-line: #ddd5c5;
-    --p-line-strong: #c8bfac;
-    --p-control: #7a8072;
+    --p-muted: #565e51;
+    --p-line: #d8cdb8;
+    --p-line-strong: #c2b59c;
+    --p-control: #767c6e;
     --p-ember: #b4532a;
     --p-ember-deep: #953f1c;
     --p-ember-text: #9a421d;
@@ -314,27 +364,31 @@
     --p-ember-light: #f2a56c;
     --p-ember-tint: #f5dfcd;
     --p-ember-tint-night: #3a2619;
-    --p-gold: #e8b65a;
-    --p-night: #111915;
-    --p-night-alt: #17201a;
-    --p-night-raised: #1e2922;
+    --p-spark: #e8b65a;
+    --p-night: #0f1410;
+    --p-night-alt: #1d2019;
+    --p-night-raised: #262b23;
     --p-night-text: #ece7dc;
     --p-night-muted: #a6ae9f;
-    --p-night-line: #2a362e;
-    --p-night-line-strong: #3b4940;
+    --p-night-line: #2b3029;
+    --p-night-line-strong: #3d4339;
     --p-night-control: #7e8878;
-    --p-sage-night: #1c2720;
     --p-forest: light-dark(#16221b, #0c130f);
     --p-forest-raised: light-dark(#213029, #18221c);
     --p-forest-control: #768379;
+    --p-moss: light-dark(#2c3a30, #1a2a20);
+    --p-moss-control: #8a968a;
     --p-bone: #f2ede3;
     --p-bone-muted: #b4bbad;
 
     /* Space per width. The content's edge sits 28 / 40 / 56px from the window in
        every section; grounds run from edge to edge. Sections 88px on phones, 144px
        on the desktop: room to breathe. Cards 24 → 32px inside, the registration
-       panel 28 → 48px. */
+       panel 28 → 48px. An overlap crosses an edge by 40 / 64 / 96px; the bleed
+       is the way from the content's edge to the window's. */
     --space-gutter: 1.75rem;
+    --space-overlap: 2.5rem;
+    --space-bleed: max(var(--space-gutter), calc((100vw - 75rem) / 2));
     --space-section: 5.5rem;
     --space-band: 3.5rem;
     --space-group: 2.5rem;
@@ -347,6 +401,7 @@
       --space-section: 7rem;
       --space-band: 4rem;
       --space-group: 3rem;
+      --space-overlap: 4rem;
       --space-card: 1.75rem;
       --space-panel: 2.5rem;
     }
@@ -355,6 +410,7 @@
       --space-section: 9rem;
       --space-band: 5rem;
       --space-group: 4rem;
+      --space-overlap: 6rem;
       --space-card: 2rem;
       --space-panel: 3rem;
     }
@@ -406,7 +462,8 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Titles in Fraunces at its one weight; sizes come from the components.
+  /* Titles in Fraunces 500; sizes come from the components, the optical size
+     follows the size (large titles get the poster cut by themselves).
      Plain selectors, not :where(): preflight's `font-weight: inherit` on headings
      has element specificity and would win over a zero-specificity rule. */
   h1,
@@ -459,18 +516,6 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
-    }
-  }
-
-  @media print {
-    body {
-      font-size: 11pt;
-      color: #000;
-      background: #fff;
-    }
-
-    @page {
-      margin: 2cm;
     }
   }
 }

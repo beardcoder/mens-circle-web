@@ -99,7 +99,11 @@ const roundButton =
       data-umami-event="cta-click"
       data-umami-event-location="header"
       data-umami-event-target={cta.umamiTarget}
-      class:list={[button({ variant: 'primary', size: 'sm' }), 'max-nav:ml-auto']}
+      class:list={[
+        button({ variant: 'primary', size: 'sm' }),
+        // Over the opening, whose own action is the one filled button, the bar's action is outlined.
+        'max-nav:ml-auto [[data-over-hero]:not([data-scrolled])_&]:border-bone/45 [[data-over-hero]:not([data-scrolled])_&]:bg-transparent [[data-over-hero]:not([data-scrolled])_&]:text-bone [[data-over-hero]:not([data-scrolled])_&]:hover:border-bone [[data-over-hero]:not([data-scrolled])_&]:hover:shadow-none',
+      ]}
     >
       {cta.label}
     </a>

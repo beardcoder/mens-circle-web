@@ -1,0 +1,33 @@
+---
+/**
+ * An index number in the margin ("01"): Fraunces at its poster cut, in the accent
+ * on paper and sand, in the spark on the moss and the forest. Decoration beside a
+ * title or a step that already says its place; hidden from assistive technology.
+ */
+interface Props {
+  value: number;
+  tone?: 'accent' | 'spark';
+  /** `index` in the margin; `sub` above a short item in a list. */
+  size?: 'index' | 'sub';
+  class?: string;
+}
+
+const SIZES = {
+  index: 'text-index',
+  sub: 'text-sub',
+} as const;
+
+const TONES = {
+  accent: 'text-accent',
+  spark: 'text-spark',
+} as const;
+
+const { value, tone = 'accent', size = 'index', class: className } = Astro.props;
+---
+
+<span
+  aria-hidden="true"
+  class:list={['block font-display font-semibold tabular-nums', SIZES[size], TONES[tone], className]}
+>
+  {String(value).padStart(2, '0')}
+</span>

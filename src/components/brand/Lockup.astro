@@ -1,0 +1,31 @@
+---
+/**
+ * The mark and the word mark together: the logo in ember, "Männerkreis" in
+ * Fraunces and, in the `full` form, the region under it in small letters. The
+ * header, the footer, the print templates. Size it with `class` (font size); the
+ * mark follows the type.
+ */
+import { Icon } from 'astro-icon/components';
+
+import site from '@data/site.json';
+
+interface Props {
+  variant?: 'short' | 'full';
+  class?: string;
+}
+
+const { variant = 'short', class: className } = Astro.props;
+const [name, ...region] = site.siteName.split(' ');
+---
+
+<span class:list={['inline-flex items-center gap-[0.45em] font-display leading-none tracking-[-0.01em]', className]}>
+  <Icon name="logo" aria-hidden="true" class="size-[1.6em] shrink-0 text-fill" />
+  <span class="grid gap-[0.3em]">
+    <span>{name}</span>
+    {variant === 'full' && region.length > 0 && (
+      <span class="font-sans text-[0.42em] font-semibold tracking-[0.18em] text-fg-muted uppercase">
+        {region.join(' ')}
+      </span>
+    )}
+  </span>
+</span>

@@ -1,4 +1,6 @@
 ---
+import { label, margin } from '@lib/ui';
+
 import Section from '../ui/Section.astro';
 
 interface Props {
@@ -9,12 +11,15 @@ interface Props {
 const { anchor, eyebrow } = Astro.props;
 ---
 
-{/* Close under the opening, and no bottom space of its own: the next section brings it. */}
-<Section id={anchor} space="none" labelledby="praktisches-title" class="pt-[calc(var(--spacing-band)+1.5rem)]">
-  <h2 id="praktisches-title" class="sr-only">
-    {eyebrow}
-  </h2>
-  <dl data-reveal-group class="grid gap-y-8 lg:grid-cols-4 lg:gap-x-grid">
-    <slot />
-  </dl>
+{/* Close under the opening, and no bottom space of its own: the next section brings it.
+    The label stands in the margin, the four facts in a row of the content between lines. */}
+<Section id={anchor} space="none" labelledby="praktisches-title" class="pt-band">
+  <div class:list={[margin.grid, 'gap-y-6']}>
+    <h2 id="praktisches-title" data-reveal class:list={[label, margin.side, 'lg:pt-5']}>
+      {eyebrow}
+    </h2>
+    <dl data-reveal-group class:list={[margin.content, 'grid grid-cols-2 gap-x-grid gap-y-8 lg:grid-cols-4']}>
+      <slot />
+    </dl>
+  </div>
 </Section>

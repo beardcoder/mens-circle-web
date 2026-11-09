@@ -58,19 +58,19 @@ if (events && testimonials) {
   </Hero>
 
   <Facts anchor="praktisches" eyebrow="Auf einen Blick">
-    <Fact label="Wo" icon="place">
+    <Fact label="Wo">
       <Fragment slot="value">{events?.next?.place || site.geo.locality}</Fragment>
       Adresse und Anfahrt stehen beim jeweiligen Termin
     </Fact>
-    <Fact label="Wie oft" icon="calendar">
-      <Fragment slot="value">Alle 2–4 Wochen</Fragment>
+    <Fact label="Wie oft">
+      <Fragment slot="value">{'Alle 2–\u20604\u00a0Wochen'}</Fragment>
       Ohne Mitgliedschaft. Du kommst, wann es dir passt.
     </Fact>
-    <Fact label="Dauer" icon="clock">
+    <Fact label="Dauer">
       <Fragment slot="value">2–3 Stunden</Fragment>
       {events?.next?.timeRange ? `z.\u00a0B. ${events.next.timeRange}` : 'Ein Abend, kein Seminar'}
     </Fact>
-    <Fact label="Beitrag" icon="heart">
+    <Fact label="Beitrag">
       <Fragment slot="value">{events?.fee.main || 'Spendenbasis'}</Fragment>
       {events?.fee.note ?? 'Du gibst, was für dich machbar ist'}
     </Fact>
@@ -167,7 +167,6 @@ if (events && testimonials) {
   <Dates
     events={events}
     anchor="termine"
-    eyebrow=""
     lede={'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin.'}
     title="Dabei sein."
   />

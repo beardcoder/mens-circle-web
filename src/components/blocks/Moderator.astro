@@ -23,35 +23,10 @@ interface Props {
 const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote, linkLabel, linkUrl } = Astro.props;
 ---
 
-<Section id={anchor} labelledby="person-title" innerClass="grid items-start gap-x-grid gap-y-10 lg:grid-cols-12">
-  {/* A quote behind an ember rule, as every quote on the site; on phones after the introduction. */}
-  {quote && (
-    <figure
-      data-reveal
-      class="grid content-start border-l-4 border-fill pl-6 max-lg:order-last sm:pl-8 lg:col-span-5 lg:mt-2"
-    >
-      <blockquote class="font-display text-quote text-fg">
-        <p>{quote}</p>
-      </blockquote>
-      <figcaption class="mt-8 flex items-center gap-4">
-        <img
-          src={avatar.src}
-          width={avatar.width}
-          height={avatar.height}
-          alt={imageAlt}
-          loading="lazy"
-          decoding="async"
-          class="size-14 shrink-0 rounded-full object-cover"
-        />
-        <span class="grid">
-          <span class="font-semibold text-fg">{signature}</span>
-          <span class="text-sm text-fg-muted">{signatureNote}</span>
-        </span>
-      </figcaption>
-    </figure>
-  )}
-
-  <div class="grid content-start justify-items-start gap-6 lg:col-span-6 lg:col-start-7">
+{/* Markus introduces himself; beside him his quote stands in a large ring that the window
+    cuts on the right (the bleed), the quote crossing the ring's edge, his face a chair on it. */}
+<Section id={anchor} labelledby="person-title" innerClass="grid items-center gap-x-grid gap-y-16 lg:grid-cols-12">
+  <div class="grid min-w-0 content-start justify-items-start gap-6 lg:col-span-6">
     <SectionHead eyebrow={eyebrow} title={name} titleId="person-title" />
     <Prose reveal>
       <slot />
@@ -62,4 +37,31 @@ const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote
       </TextLink>
     )}
   </div>
+
+  {quote && (
+    <figure data-reveal class="relative grid min-w-0 content-center py-12 lg:col-span-5 lg:col-start-8 lg:py-24">
+      <span
+        aria-hidden="true"
+        class="absolute top-1/2 left-[14%] aspect-square w-[118%] -translate-y-1/2 rounded-full border border-line-strong lg:left-[22%] lg:w-[132%]"
+      ></span>
+      <blockquote class="relative max-w-[16em] font-display text-quote text-fg">
+        <p>„{quote}“</p>
+      </blockquote>
+      <figcaption class="relative mt-8 flex items-center gap-4">
+        <img
+          src={avatar.src}
+          width={avatar.width}
+          height={avatar.height}
+          alt={imageAlt}
+          loading="lazy"
+          decoding="async"
+          class="size-16 shrink-0 rounded-full object-cover ring-4 ring-surface"
+        />
+        <span class="grid">
+          <span class="font-semibold text-fg">{signature}</span>
+          <span class="text-sm text-fg-muted">{signatureNote}</span>
+        </span>
+      </figcaption>
+    </figure>
+  )}
 </Section>

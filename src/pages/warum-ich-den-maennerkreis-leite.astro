@@ -64,13 +64,15 @@ const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
         alt="Markus Sommer sitzt auf einem Felsen und blickt im Abendlicht über eine bewaldete Hügellandschaft."
         layout="constrained"
         width={800}
-        height={1000}
+        height={800}
         position="left"
         loading="eager"
         fetchpriority="high"
-        class="block aspect-4/3 w-full rounded-2xl object-cover lg:aspect-4/5"
+        class="block aspect-square w-full rounded-full object-cover"
       />
-      <figcaption class="mt-3 text-sm text-fg-muted">Markus Sommer begleitet den Männerkreis in Straubing.</figcaption>
+      <figcaption class="mt-4 text-marginal font-medium text-fg-muted">
+        Markus Sommer begleitet den Männerkreis in Straubing.
+      </figcaption>
     </figure>
   </PageIntro>
   <TextSection

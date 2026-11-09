@@ -1,11 +1,10 @@
 ---
 import site from '@data/site.json';
-import { link } from '@lib/ui';
+import { link, margin } from '@lib/ui';
 
 import Accordion from '../ui/Accordion.astro';
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
-import Split from '../ui/Split.astro';
 
 interface Props {
   anchor: string;
@@ -15,32 +14,42 @@ interface Props {
 }
 
 /**
- * Questions people ask before they come: a short head beside them (the title, an
- * intro, the way to ask what is not there), the questions as one Accordion.
+ * Questions people ask before they come: the title across the margin, the way to
+ * ask what is not there in the margin, the questions as one Accordion beside it.
  */
 
 const { anchor, eyebrow, title, intro } = Astro.props;
 ---
 
 <Section id={anchor} labelledby={`${anchor}-title`}>
-  <div itemscope itemtype="https://schema.org/FAQPage">
-    <Split>
-      <div slot="head" class="grid justify-items-start gap-6 lg:sticky lg:top-(--spacing-clearance)">
-        <SectionHead eyebrow={eyebrow} title={title} titleId={`${anchor}-title`} lead={intro} leadHtml />
-        {site.contactEmail && (
-          <p data-reveal class="max-w-measure text-base text-fg-muted">
-            Deine Frage ist nicht dabei? Schreib mir an{' '}
-            <a class={link} href={`mailto:${site.contactEmail}`}>
-              {site.contactEmail}
-            </a>
-            .
-          </p>
-        )}
-      </div>
-
+  <div itemscope itemtype="https://schema.org/FAQPage" class:list={[margin.grid, 'gap-y-10']}>
+    <SectionHead
+      eyebrow={eyebrow}
+      title={title}
+      titleId={`${anchor}-title`}
+      lead={intro}
+      leadHtml
+      class={margin.cross}
+    />
+    {site.contactEmail && (
+      <p
+        data-reveal
+        class:list={[
+          margin.side,
+          'text-base text-fg-muted max-lg:order-last lg:sticky lg:top-(--spacing-clearance) lg:self-start',
+        ]}
+      >
+        Deine Frage ist nicht dabei? Schreib mir an{' '}
+        <a class={link} href={`mailto:${site.contactEmail}`}>
+          {site.contactEmail}
+        </a>
+        .
+      </p>
+    )}
+    <div class={margin.content}>
       <Accordion>
         <slot />
       </Accordion>
-    </Split>
+    </div>
   </div>
 </Section>

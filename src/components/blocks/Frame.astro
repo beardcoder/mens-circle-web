@@ -1,5 +1,5 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { margin } from '@lib/ui';
 
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -22,39 +22,38 @@ interface Props {
 const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props;
 ---
 
-<Section id={anchor} ground="tint" labelledby="rahmen-title" innerClass="grid gap-x-grid gap-y-10 lg:grid-cols-12">
-  <div class="min-w-0 lg:col-span-5">
-    <div class="lg:sticky lg:top-[calc(var(--spacing-header)+2rem)]">
-      <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} />
-    </div>
-  </div>
+{/* On the moss: what is said in the circle. The five agreements as lines across the
+    page, each number in the spark, its name and what it means; the boundary (no
+    therapy) under them, its title in the margin. */}
+<Section id={anchor} ground="moss" labelledby="rahmen-title">
+  <div class:list={[margin.grid, 'gap-y-group']}>
+    <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} class={margin.cross} />
 
-  {/* Spoken at the start of every evening, one after the other: a list, not a set of cards. */}
-  <div class="min-w-0 lg:col-span-7">
     {agreements.length > 0 && (
-      <ol role="list" data-reveal-group class="grid gap-y-10">
+      <ol role="list" data-reveal-group class="grid lg:col-span-12">
         {agreements.map((rule, i) => (
-          <li class="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-4 sm:grid-cols-[3rem_minmax(0,1fr)] sm:gap-x-6">
+          <li class="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-line py-6 last:border-b sm:grid-cols-[4rem_minmax(0,1fr)] lg:grid-cols-12 lg:gap-x-grid lg:py-8">
             <span
               aria-hidden="true"
-              class="row-span-2 grid size-11 place-items-center rounded-full border border-line-bold font-display text-lg text-accent sm:size-12"
+              class="row-span-2 font-display text-sub font-semibold text-spark tabular-nums lg:col-span-1"
             >
-              {i + 1}
+              {String(i + 1).padStart(2, '0')}
             </span>
-            <h3 class="self-center text-sub text-fg hyphens-auto">{rule.title}</h3>
-            {rule.text && <p class="mt-2 max-w-measure text-md text-fg-soft">{rule.text}</p>}
+            <h3 class="text-sub text-fg hyphens-auto lg:col-span-4 lg:col-start-2">{rule.title}</h3>
+            {rule.text && (
+              <p class="max-w-measure text-md text-fg-soft lg:col-span-6 lg:col-start-7 lg:row-start-1">{rule.text}</p>
+            )}
           </li>
         ))}
       </ol>
     )}
 
     {boundaryText && (
-      <aside aria-labelledby="rahmen-boundary-title" data-reveal class="mt-16">
-        <h3 id="rahmen-boundary-title" class="flex items-center gap-3 font-sans text-base font-semibold text-fg">
-          <Icon name="info" aria-hidden="true" class="size-6 shrink-0 text-accent" />
+      <aside aria-labelledby="rahmen-boundary-title" data-reveal class:list={[margin.grid, 'gap-y-3 lg:col-span-12']}>
+        <h3 id="rahmen-boundary-title" class:list={[margin.side, 'font-sans text-base font-semibold text-fg']}>
           {boundaryTitle}
         </h3>
-        <p class="mt-3 text-md text-fg-soft">{boundaryText}</p>
+        <p class:list={[margin.reading, 'max-w-measure text-md text-fg-muted']}>{boundaryText}</p>
       </aside>
     )}
   </div>

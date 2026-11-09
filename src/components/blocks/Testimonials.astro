@@ -1,5 +1,6 @@
 ---
 import type { TestimonialDTO } from '@lib/shared/dto';
+import { margin } from '@lib/ui';
 
 import Section from '../ui/Section.astro';
 import SectionHead from '../ui/SectionHead.astro';
@@ -20,17 +21,22 @@ interface Props {
 const { items, anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel } = Astro.props;
 ---
 
-<Section id={anchor} labelledby="testimonials-title">
-  <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" />
+{/* On the moss, like the agreements: what men said after an evening. */}
+<Section id={anchor} ground="moss" labelledby="testimonials-title">
+  <div class:list={[margin.grid, 'gap-y-group']}>
+    <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" size="sub" class={margin.cross} />
 
-  {items?.length ? (
-    <TestimonialList items={items} />
-  ) : (
-    <p data-reveal class="mt-6 text-md text-fg-muted">
-      {items ? emptyText : errorText}
+    <div class="lg:col-span-12">
+      {items?.length ? (
+        <TestimonialList items={items} />
+      ) : (
+        <p data-reveal class:list={[margin.reading, 'text-md text-fg-muted']}>
+          {items ? emptyText : errorText}
+        </p>
+      )}
+    </div>
+    <p data-reveal class={margin.content}>
+      <TextLink href={linkUrl}>{linkLabel}</TextLink>
     </p>
-  )}
-  <p data-reveal class="mt-6">
-    <TextLink href={linkUrl}>{linkLabel}</TextLink>
-  </p>
+  </div>
 </Section>

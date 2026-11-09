@@ -1,8 +1,10 @@
 ---
 import type { TestimonialDTO } from '@lib/shared/dto';
+import { margin } from '@lib/ui';
 
 interface Props {
   item: TestimonialDTO;
+  /** The one short voice set large. Otherwise a row: the author in the margin, the words beside. */
   featured?: boolean;
 }
 
@@ -10,26 +12,22 @@ const { item, featured = false } = Astro.props;
 const byline = [item.author, item.role].filter(Boolean).join(' · ');
 ---
 
-<figure class="grid content-start gap-5">
-  <blockquote
-    class:list={[
-      featured ? 'font-display text-quote text-fg' : 'max-w-measure text-md text-fg-soft',
-      'whitespace-pre-line wrap-anywhere',
-    ]}
-  >
-    „{item.quote}“
-  </blockquote>
-  {byline && (
-    <figcaption class="flex items-center gap-3 text-sm text-fg-muted">
-      {item.author && (
-        <span
-          aria-hidden="true"
-          class="grid size-9 shrink-0 place-items-center rounded-full bg-tint font-semibold text-fg"
-        >
-          {item.author.trim().charAt(0).toUpperCase()}
-        </span>
-      )}
-      <cite class="font-semibold text-fg not-italic">{byline}</cite>
+{featured ? (
+  <figure class="grid content-start gap-6">
+    <blockquote class="font-display text-section text-fg wrap-anywhere">„{item.quote}“</blockquote>
+    {byline && (
+      <figcaption>
+        <cite class="text-sm font-semibold text-fg-muted not-italic">{byline}</cite>
+      </figcaption>
+    )}
+  </figure>
+) : (
+  <figure class="contents">
+    <figcaption class:list={[margin.side, 'lg:pt-1']}>
+      {byline && <cite class="text-sm font-semibold text-fg not-italic">{byline}</cite>}
     </figcaption>
-  )}
-</figure>
+    <blockquote class:list={[margin.reading, 'max-w-measure text-lg whitespace-pre-line text-fg-soft wrap-anywhere']}>
+      „{item.quote}“
+    </blockquote>
+  </figure>
+)}

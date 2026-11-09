@@ -26,24 +26,35 @@ type Key = keyof typeof BRAND;
 
 const MODES: Record<string, { grounds: Key[]; texts: Key[]; controls: Key[] }> = {
   light: {
-    grounds: ['linen', 'sand', 'sage', 'cream'],
+    grounds: ['linen', 'sand', 'cream'],
     texts: ['ink', 'inkSoft', 'muted', 'emberText'],
     controls: ['control'],
   },
   dark: {
-    grounds: ['night', 'nightAlt', 'nightRaised', 'sageNight'],
-    texts: ['nightText', 'nightMuted', 'emberLight'],
+    grounds: ['night', 'nightAlt', 'nightRaised'],
+    texts: ['nightText', 'nightMuted', 'emberLight', 'spark'],
     controls: ['nightControl'],
   },
   'forest (light)': {
     grounds: ['forest', 'forestRaised'],
-    texts: ['bone', 'boneMuted', 'emberLight'],
+    texts: ['bone', 'boneMuted', 'emberLight', 'spark'],
     controls: ['forestControl'],
   },
   'forest (dark)': {
     grounds: ['forestNight', 'forestRaisedNight'],
-    texts: ['bone', 'boneMuted', 'emberLight'],
+    texts: ['bone', 'boneMuted', 'emberLight', 'spark'],
     controls: ['forestControl'],
+  },
+  // The moss is dark in both modes; its fields and controls use their own outline.
+  'moss (light)': {
+    grounds: ['moss'],
+    texts: ['bone', 'boneMuted', 'emberLight', 'spark'],
+    controls: ['mossControl'],
+  },
+  'moss (dark)': {
+    grounds: ['mossNight'],
+    texts: ['bone', 'boneMuted', 'emberLight', 'spark'],
+    controls: ['mossControl'],
   },
 };
 
@@ -60,6 +71,11 @@ for (const [mode, { grounds, texts, controls }] of Object.entries(MODES)) {
     }
   });
 }
+
+test('the accent reads on its own tint (the date seal, the FAQ disc)', () => {
+  expect(ratio(BRAND.emberText, BRAND.emberTint)).toBeGreaterThanOrEqual(4.5);
+  expect(ratio(BRAND.emberLight, BRAND.emberTintNight)).toBeGreaterThanOrEqual(4.5);
+});
 
 test('the label on a filled button reads on both fills', () => {
   for (const fill of ['ember', 'emberDeep'] as const) {

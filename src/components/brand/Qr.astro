@@ -1,0 +1,29 @@
+---
+/**
+ * A QR code in the current text colour, with its quiet zone (four modules) as
+ * padding on the ground behind it. Only for print and social templates: on a
+ * screen a link is better.
+ */
+import { qrPath } from '@lib/brand/qr';
+
+interface Props {
+  value: string;
+  /** What the code opens, for the image's accessible name. */
+  label: string;
+  class?: string;
+}
+
+const { value, label, class: className } = Astro.props;
+const { size, d } = qrPath(value);
+const quiet = 4;
+---
+
+<svg
+  role="img"
+  aria-label={label}
+  viewBox={`${-quiet} ${-quiet} ${size + 2 * quiet} ${size + 2 * quiet}`}
+  shape-rendering="crispEdges"
+  class:list={['block aspect-square', className]}
+>
+  <path d={d} fill="currentColor" />
+</svg>

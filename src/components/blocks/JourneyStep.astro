@@ -1,4 +1,8 @@
 ---
+import { margin } from '@lib/ui';
+
+import Index from '../ui/Index.astro';
+
 interface Props {
   title: string;
   number: number;
@@ -7,26 +11,16 @@ interface Props {
 const { title, number } = Astro.props;
 ---
 
+{/* One step: its number in the margin, its title and text beside it, under a thin rule. */}
 <li
   itemprop="itemListElement"
   itemscope
   itemtype="https://schema.org/ListItem"
-  class="group/step relative grid grid-cols-[3rem_minmax(0,1fr)] content-start gap-x-5 lg:grid-cols-1 lg:gap-y-5"
+  class:list={[margin.grid, 'gap-y-3 border-t border-line-strong py-8 last:border-b lg:py-10']}
 >
-  {/* The path to the next step: down on phones, across on the desktop; it draws itself in as it scrolls into view (global.css). */}
-  <span
-    aria-hidden="true"
-    data-line
-    class="absolute top-12 -bottom-8 left-6 w-px origin-top-left bg-line-strong group-last/step:hidden lg:top-6 lg:-right-(--spacing-grid) lg:bottom-auto lg:left-12 lg:h-px lg:w-auto"
-  ></span>
   <meta itemprop="position" content={String(number)} />
-  <span
-    aria-hidden="true"
-    class="relative grid size-12 place-items-center rounded-full border border-line-strong bg-raised font-display text-xl text-accent"
-  >
-    {number}
-  </span>
-  <div class="grid content-start gap-2 pt-2 lg:pt-0">
+  <Index value={number} class={margin.side} />
+  <div class:list={[margin.reading, 'grid content-start gap-3 lg:pt-2']}>
     <h3 itemprop="name" class="text-sub text-fg">
       {title}
     </h3>

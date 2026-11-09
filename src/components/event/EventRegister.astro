@@ -3,10 +3,10 @@ import { actions } from 'astro:actions';
 
 import { button, checkbox, control, fieldError, formStatus, link } from '@lib/ui';
 
+import SeatRing from '../brand/SeatRing.astro';
 import FormStatus from '../forms/FormStatus.astro';
 import Honeypot from '../forms/Honeypot.astro';
 import Field from '../ui/Field.astro';
-import SeatBar from './SeatBar.astro';
 import type { PublicEvent } from './types';
 
 /**
@@ -75,7 +75,7 @@ const field = (name: string) => ({
       <h2 id="anmeldung-title" class="text-sub text-fg">
         {full ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
       </h2>
-      <SeatBar
+      <SeatRing
         class="mt-4"
         seats={event.view.seats}
         text={full ? 'Alle Plätze sind belegt' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`}

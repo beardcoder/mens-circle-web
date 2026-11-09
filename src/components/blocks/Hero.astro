@@ -4,7 +4,7 @@ import type { ImageMetadata } from 'astro';
 import { afterWords, splitWords } from '@lib/shared/words';
 import { button, label } from '@lib/ui';
 
-import SeatBar from '../event/SeatBar.astro';
+import SeatRing from '../brand/SeatRing.astro';
 import type { PublicEvents } from '../event/types';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
@@ -37,8 +37,11 @@ const nextLine = next
   : null;
 ---
 
-{/* The opening, from edge to edge on the forest. On load the title's words rise one after
-     the other, the rest follows and the photo settles (global.css, "Motion: the opening"). */}
+{/* The opening, from edge to edge on the forest: the statement as large as a poster,
+     its phrase in the spark; beside it the photograph in a circle, cut by the window's
+     right edge (the bleed), and the next evening's seat ring overlapping it. On load the
+     title's words rise one after the other, the rest follows and the photo settles
+     (global.css, "Motion: the opening"). */}
 <section
   data-hero
   aria-labelledby="hero-title"
@@ -51,8 +54,8 @@ const nextLine = next
     class="pointer-events-none absolute top-[38%] -right-[30%] aspect-square w-[110%] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-fill)_32%,transparent),transparent)] lg:top-[-14%] lg:-right-[12%] lg:w-[66%]"
   ></div>
 
-  <Container class="relative grid items-center gap-x-grid gap-y-16 lg:grid-cols-12">
-    <div class="grid min-w-0 justify-items-start lg:col-span-7">
+  <Container class="relative grid items-start gap-x-grid gap-y-16 lg:grid-cols-12">
+    <div class="grid min-w-0 justify-items-start lg:col-span-9">
       {kicker && (
         <Eyebrow class="mb-6" data-enter>
           {kicker}
@@ -61,7 +64,7 @@ const nextLine = next
       <h1
         id="hero-title"
         data-enter="words"
-        class="max-w-[11em] text-hero text-fg wrap-anywhere hyphens-auto"
+        class="max-w-[8.5em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto [&_em]:text-spark"
         set:html={title.html}
       />
       <p data-enter style={beat(0)} class="mt-7 max-w-measure text-lg text-fg-muted">
@@ -106,7 +109,7 @@ const nextLine = next
             </time>
             <span class="text-sm text-fg-muted">{nextLine.meta}</span>
           </span>
-          <SeatBar seats={next!.view.seats} text={nextLine.seats} />
+          <span class="text-sm text-fg-muted">{nextLine.seats}</span>
         </a>
       )}
       {events && !next && (
@@ -118,31 +121,41 @@ const nextLine = next
         </p>
       )}
     </div>
+  </Container>
 
-    <div class="relative mx-auto w-full max-w-[22rem] sm:max-w-[28rem] lg:col-span-5 lg:max-w-none">
-      <div data-enter="settle" class="relative">
-        <img
-          src={largest.src}
-          srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
-          sizes="(min-width: 80rem) 30rem, (min-width: 64rem) 36vw, (min-width: 36rem) 28rem, 22rem"
-          width={largest.width}
-          height={largest.height}
-          alt={imageAlt}
-          fetchpriority="high"
-          decoding="async"
-          class="aspect-square w-full rounded-full object-cover"
-        />
-        {/* The circle of the logo: a thin ring with three warm points, turning slowly. */}
-        <div aria-hidden="true" data-enter="ring" class="pointer-events-none absolute -inset-[7%]">
-          <div class="hero-orbit absolute inset-0 rounded-full border border-line-strong">
-            <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-glow"></span>
-            <span class="absolute top-3/4 left-[93.3%] size-3 -translate-1/2 rounded-full bg-fill"></span>
-            <span class="absolute top-3/4 left-[6.7%] size-3 -translate-1/2 rounded-full bg-accent"></span>
-          </div>
+  {/* The photograph: under the text on phones; from `lg` beside the title, as large as
+      a third of the window and cut by its right edge. */}
+  <div class="relative mx-auto mt-16 w-[calc(100%-2*var(--spacing-gutter))] max-w-[22rem] sm:max-w-[28rem] lg:absolute lg:top-[calc(var(--spacing-header)+var(--spacing-group)+2rem)] lg:right-0 lg:mt-0 lg:w-[36vw] lg:max-w-[40rem] lg:translate-x-[16%]">
+    <div data-enter="settle" class="relative">
+      <img
+        src={largest.src}
+        srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
+        sizes="(min-width: 64rem) min(36vw, 40rem), (min-width: 36rem) 28rem, 22rem"
+        width={largest.width}
+        height={largest.height}
+        alt={imageAlt}
+        fetchpriority="high"
+        decoding="async"
+        class="aspect-square w-full rounded-full object-cover"
+      />
+      {/* The circle of the logo: a thin ring with one warm point, turning slowly. */}
+      <div aria-hidden="true" data-enter="ring" class="pointer-events-none absolute -inset-[7%]">
+        <div class="hero-orbit absolute inset-0 rounded-full border border-line-strong">
+          <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-spark"></span>
         </div>
       </div>
     </div>
-  </Container>
+    {next?.view.seats && (
+      /* The next evening's chairs, on a disc of the forest, overlapping the circle's edge. */
+      <div
+        data-enter
+        style={beat(2)}
+        class="absolute -bottom-6 -left-4 rounded-full bg-surface p-3 sm:-left-overlap lg:-bottom-overlap"
+      >
+        <SeatRing seats={next.view.seats} text={nextLine?.seats ?? ''} size="lg" layout="none" />
+      </div>
+    )}
+  </div>
 </section>
 
 <script>

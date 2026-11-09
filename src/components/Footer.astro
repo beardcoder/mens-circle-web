@@ -5,14 +5,16 @@ import { label } from '@lib/ui';
 
 import nav from '../data/navigation.json';
 import site from '../data/site.json';
+import Lockup from './brand/Lockup.astro';
 import ModeToggle from './ModeToggle.astro';
 import Container from './ui/Container.astro';
 
 /**
- * The compact footer on the dark focus ground, the same on every page: the mark
- * and one line about the circle, the navigation, the contact, then the legal
- * links and the display option. No invitation of its own: a page that ends on
- * one sets it itself.
+ * The compact footer on the forest, the same on every page: the mark and word
+ * mark with one line about the circle, the navigation, the contact, then the
+ * legal links and the display option. No invitation of its own: a page that ends
+ * on one sets it itself. After the home page's last band (also the forest) a
+ * line parts the two.
  */
 
 // `mailto:` and `tel:` stay in place; external profiles open in a new tab,
@@ -30,24 +32,21 @@ const footerLink =
 ---
 
 {/* Bottom space keeps the last row clear of the fixed back-to-top button. */}
-<footer id="footer" class="surface-dark relative overflow-clip pt-section pb-24 print:hidden">
-  {/* The circle of the logo, large and faint, behind the footer's columns. */}
-  <Icon
-    name="logo"
-    aria-hidden="true"
-    class="pointer-events-none absolute -right-24 -bottom-28 size-[26rem] text-bone opacity-[0.04] sm:size-[34rem]"
-  />
+<footer id="footer" class="surface-dark relative overflow-clip pt-band pb-24 print:hidden">
   <Container class="relative">
-    <div class="grid gap-x-grid gap-y-10 pb-group sm:grid-cols-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,4fr)]">
-      <div class="max-w-[38ch] sm:col-span-2 lg:col-span-1">
-        <a href="/" class="mb-4 inline-flex min-h-11 items-center gap-3 font-display text-sub">
-          <Icon name="logo" aria-hidden="true" class="size-9 shrink-0 text-accent" />
-          <span>{site.siteName}</span>
+    <div class="grid gap-x-grid gap-y-10 border-t border-line pt-group pb-group sm:grid-cols-2 lg:grid-cols-12">
+      <div class="max-w-[38ch] sm:col-span-2 lg:col-span-5">
+        <a
+          href="/"
+          aria-label={`${site.siteName} – Startseite`}
+          class="mb-6 inline-flex min-h-11 items-center text-sub"
+        >
+          <Lockup variant="full" />
         </a>
         <p class="text-base text-fg-muted">{site.footerDescription}</p>
       </div>
 
-      <nav aria-label="Fußnavigation">
+      <nav aria-label="Fußnavigation" class="lg:col-span-3 lg:col-start-7">
         <h2 class:list={[label, 'mb-3']}>Navigation</h2>
         <ul role="list" class="grid grid-cols-2 gap-x-5 sm:grid-cols-1">
           {nav.footerPrimary.map((item) => (
@@ -60,7 +59,7 @@ const footerLink =
         </ul>
       </nav>
 
-      <div>
+      <div class="lg:col-span-3 lg:col-start-10">
         <h2 class:list={[label, 'mb-3']}>Kontakt</h2>
         <ul role="list">
           {socialLinks.map((link) => (

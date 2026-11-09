@@ -105,17 +105,18 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
   fonts: [
-    // Fraunces for titles, quotes and dates; Figtree for everything that explains,
-    // mapped to font-display and font-sans in the shared theme. Titles only ever set
-    // Fraunces 500, so one static face (~18 kB) does; Figtree is one variable file
-    // (~20 kB) for 400–700.
+    // Fraunces for titles, quotes, dates and poster words; Figtree for everything that
+    // explains, mapped to font-display and font-sans in the shared theme. Fraunces is
+    // one variable file (weight 500–700, optical size 9–144, ~60 kB), kept in the repo:
+    // Fontsource would serve every axis (~120 kB). Figtree is one variable file
+    // (~20 kB) for 400–700. src/assets/fonts/README.md says how the file was made.
     {
       name: 'Fraunces',
       cssVariable: '--font-fraunces',
-      provider: fontProviders.fontsource(),
-      weights: [500],
-      styles: ['normal'],
-      subsets: ['latin'],
+      provider: fontProviders.local(),
+      options: {
+        variants: [{ src: ['./src/assets/fonts/fraunces-variable-latin.woff2'], weight: '500 700', style: 'normal' }],
+      },
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
     },
     {

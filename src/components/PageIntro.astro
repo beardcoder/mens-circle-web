@@ -1,6 +1,7 @@
 ---
 import { afterWords, splitText } from '@lib/shared/words';
 
+import Stamp from './brand/Stamp.astro';
 import Container from './ui/Container.astro';
 import Eyebrow from './ui/Eyebrow.astro';
 
@@ -22,7 +23,7 @@ const { eyebrow, title, id, titleId } = Astro.props;
 
 const words = splitText(title);
 
-const titleClass = 'max-w-[12em] text-page text-fg wrap-anywhere hyphens-auto';
+const titleClass = 'max-w-[11em] text-page font-semibold text-fg wrap-anywhere hyphens-auto';
 
 const hasLead = Astro.slots.has('lead');
 const hasAction = Astro.slots.has('default');
@@ -35,16 +36,13 @@ const hasMedia = Astro.slots.has('media');
   class="relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
 >
   {!hasMedia && (
-    /* The circle of the logo, quietly, where a photograph would stand. */
+    /* The stamp, where a photograph would stand: cut by the window's right edge. */
     <div
       aria-hidden="true"
       data-enter="ring"
-      class="pointer-events-none absolute top-[calc(var(--spacing-header)+1rem)] right-[max(var(--spacing-gutter),calc((100vw-75rem)/2))] hidden size-64 rounded-full border border-line-strong lg:block xl:size-72"
+      class="pointer-events-none absolute top-[calc(var(--spacing-header)+1rem)] right-0 hidden w-80 translate-x-1/4 text-line-strong lg:block xl:w-96"
     >
-      <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-glow" />
-      <span class="absolute top-3/4 left-[93.3%] size-3 -translate-1/2 rounded-full bg-fill" />
-      <span class="absolute top-3/4 left-[6.7%] size-3 -translate-1/2 rounded-full bg-accent" />
-      <span class="absolute inset-[22%] rounded-full bg-accent-soft" />
+      <Stamp turn />
     </div>
   )}
   <Container class:list={['relative grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
@@ -67,7 +65,7 @@ const hasMedia = Astro.slots.has('media');
       )}
     </div>
     {hasMedia && (
-      <div data-enter="settle" class="lg:col-span-4 lg:col-start-9">
+      <div data-enter="settle" class="lg:col-span-4 lg:col-start-9 lg:bleed-r lg:translate-x-[8%]">
         <slot name="media" />
       </div>
     )}
