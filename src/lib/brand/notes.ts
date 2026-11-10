@@ -7,17 +7,18 @@
 /** Colour roles by name (`--color-<name>`): what they are for. */
 export const COLOUR_USE: Record<string, string> = {
   ground: 'Papier: der Grund jeder Seite und jedes Drucks.',
-  'ground-alt': 'Sand: ein Band für Zusammengehöriges (Fakten, Ablauf, Termine).',
+  'ground-alt': 'Band: ein etwas dunklerer Papierton für Zusammengehöriges (Fakten, Ablauf, Termine).',
   raised: 'Creme: Felder und Karten, die über dem Grund liegen.',
   fg: 'Tinte: Titel und Text.',
   'fg-soft': 'Fließtext, eine Spur weicher als die Titel.',
-  'fg-muted': 'Moosgrau: Labels, Notizen, Bildunterschriften.',
+  'fg-muted': 'Warmgrau: Labels, Notizen, Bildunterschriften.',
   accent: 'Glut als Schrift: Links, Labels, ein hervorgehobenes Wort.',
   'accent-soft': 'Glut, ganz hell: Flächen hinter einem Akzent.',
   fill: 'Glut: die eine Handlung einer Fläche (Button, Sitz belegt).',
   'fill-strong': 'Glut, dunkel: die Handlung beim Darüberfahren.',
   'on-fill': 'Schrift auf Glut.',
-  spark: 'Funke: Plakatwort, Ziffern und Stempel auf Wald und Moos. Nie Schrift auf Papier.',
+  spark:
+    'Terrakotta-Gold: die kursive Stelle im Titel, Ziffern und Stempel auf dem dunklen Grund. Nie Schrift auf Papier.',
   line: 'Linie: ruhige Struktur zwischen Zeilen.',
   'line-strong': 'Linie, kräftiger: Ringe, Regeln über Fakten.',
   'line-bold': 'Kontur von Feldern und Bedienelementen (≥ 3:1).',
@@ -28,9 +29,13 @@ export const COLOUR_USE: Record<string, string> = {
 /** The grounds, in the order a page uses them. */
 export const GROUNDS = [
   { name: 'Papier', surface: 'default', text: 'Die Seite. Offen, viel Luft.' },
-  { name: 'Sand', surface: 'alt', text: 'Ein Band für Zusammengehöriges.' },
-  { name: 'Moos', surface: 'moss', text: 'Was im Kreis gesprochen wird: Absprachen, Stimmen.' },
-  { name: 'Wald', surface: 'dark', text: 'Was hineinzieht: Eröffnung, Anmeldung, Fuß.' },
+  { name: 'Band', surface: 'alt', text: 'Ein Band für Zusammengehöriges.' },
+  { name: 'Zweites Dunkel', surface: 'moss', text: 'Nur im Druck; die Website hat drei Gründe.' },
+  {
+    name: 'Dunkler Grund',
+    surface: 'dark',
+    text: 'Was hineinzieht und was im Kreis gesprochen wird: Eröffnung, Absprachen, Stimmen, Anmeldung, Fuß.',
+  },
 ] as const;
 
 /** Type roles by name (`--text-<name>`): the face and what they set. */

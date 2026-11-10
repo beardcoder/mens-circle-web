@@ -22,23 +22,24 @@ adds the greeting, signature, footer and unsubscribe link.
 
 Colours come from `src/lib/shared/brand.ts` (the `--p-*` primitives of `theme.css` by
 name, plus the mail-only footer rule); `tests/brand.test.ts` fails when a template
-uses a hex value that is not there. Design as on the site (`docs/design-system.md`): three rounded sheets on the sand
-page, 8px apart — a forest masthead with the ember mark (`/images/logo-mail.png`,
-loaded by URL; mails already sent still load `/images/logo-flame.png`) and the word
-mark in Vollkorn, a cream content sheet, a compact forest footer that links Impressum
-and Datenschutz and carries no slogan. Vollkorn 500 for titles and the date (no
-italic: an accent phrase turns ember, upright), Figtree for text, labels in sentence
-case (the first one an eyebrow in the accent). The date is a rounded sand card:
-the date over its facts as rows; weekday and day each stay on one line (`dateWeekday`,
-`dateDay`; a payload without them falls back to `dateLong`), so a phone breaks after
-the weekday. A mail's title says what it is about: the campaign its subject, a message
-to the participants its subject over the evening it belongs to. One action per mail
-(the calendar, the registrations for the admin). What you press is round and ember. No shadows, no
-bulleted or numbered lists. Webfonts load where the client allows (Apple Mail, iOS),
+uses a hex value that is not there. Design as on the site (`docs/design-system.md`), open and full-bleed: three bands
+whose grounds run from edge to edge while their content stands on a 600px column.
+A dark masthead with the ember mark (`/images/logo-mail.png`, loaded by URL; mails
+already sent still load `/images/logo-flame.png`) and the word mark in Cormorant,
+the content on paper, a dark footer that links Impressum and Datenschutz and
+carries no slogan. Cormorant 500 for titles and the date, IBM Plex Sans for text,
+labels in sentence case (the first one an eyebrow in the accent). The date stands
+open between two rules, the date over its facts as rows; weekday and day each stay
+on one line (`dateWeekday`, `dateDay`; a payload without them falls back to
+`dateLong`), so a phone breaks after the weekday. No rounded sheet and no card. A
+mail's title says what it is about: the campaign its subject, a message to the
+participants its subject over the evening it belongs to. One action per mail (the
+calendar, the registrations for the admin). What you press is round and ember. No
+shadows, no bulleted or numbered lists. Webfonts load where the client allows (Apple Mail, iOS),
 from `/fonts/mail/` on the site (`src/assets/mail`, stable names, CORS open; the
-older Fraunces, DM Sans and Playfair files stay for mails already sent), never from Google: a
+older Vollkorn, Fraunces, Figtree, DM Sans and Playfair files stay for mails already sent), never from Google: a
 third-party font would hand every reader's IP to that party. Elsewhere Georgia and
-Helvetica stand in, and Outlook on Windows shows square corners. Every style is inline except the
+Helvetica stand in, Every style is inline except the
 campaign's `.em-prose` rules for authored content.
 
 Privacy: no `TrackView` pixel and no `TrackLink`; the privacy policy promises no

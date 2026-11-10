@@ -75,7 +75,7 @@ which `global.css` and `admin.css` keep out. Add a template: an entry in
   coated paper or agree the values with the printer.
 - The QR code always stands on a light square with its quiet zone, at least 20 mm
   wide on print.
-- Fonts: Vollkorn and Figtree, both under the SIL Open Font License; see
+- Fonts: Cormorant and IBM Plex Sans, both under the SIL Open Font License; see
   `src/assets/fonts/README.md`. Other tools: install them from Google Fonts.
 
 ## Logo

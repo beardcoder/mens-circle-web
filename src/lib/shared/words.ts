@@ -1,9 +1,9 @@
 /**
- * The opening's beat (global.css, "Motion: the opening"). A title's words rise in
- * turn: each word gets its index (`--i`), and global.css starts word `i` at
- * 0.06 s + i × 0.055 s. The pieces after the title follow 0.1 s after the last word,
- * 0.1 s apart (`--enter-delay`). Wrapping happens on the server, so the lines break
- * the same with and without the motion; it splits on ordinary white space only, so a
+ * The opening's beat (global.css, "Motion: the opening"). The title rises in as
+ * one; the pieces after it follow closely, 0.08 s apart (`--enter-delay`), so the
+ * largest paint of a phone (the lead under the title) is never held back. Titles
+ * are still wrapped word by word on the server (each word a box with its index):
+ * the lines break the same everywhere; it splits on ordinary white space only, so a
  * no-break space keeps a dash bound to its word, and tags pass through untouched.
  */
 export interface Words {
@@ -35,9 +35,8 @@ export const splitWords = (html: string): Words => {
 export const splitText = (text: string): Words =>
   splitWords(text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;'));
 
-/** `--enter-delay` for the `n`th piece (from 0) after a title of `count` words. */
-export const afterWords = (count: number, n: number): string =>
-  `--enter-delay: ${(0.06 + count * 0.055 + 0.1 + n * 0.1).toFixed(2)}s`;
+/** `--enter-delay` for the `n`th piece (from 0) after a title; the title's length does not delay it. */
+export const afterWords = (_count: number, n: number): string => `--enter-delay: ${(0.08 + n * 0.08).toFixed(2)}s`;
 
 /**
  * A title as its lead and its last word, which pages set in the accent, the way an

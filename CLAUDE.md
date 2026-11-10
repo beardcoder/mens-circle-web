@@ -225,9 +225,12 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `theme.css` by `lib/brand/theme-tokens.ts`, real components; noindex, in the
   browser check). The idea: the circle of chairs. A centre, things turned towards
   each other, much air; poster-sized type where the site invites, calm reading where
-  it explains. Forest and moss for what draws you in and what is spoken in the
-  circle, warm paper for reading, ember for the one thing to do, the spark (gold)
-  for what stands large on the dark grounds. The circle is the one motif, in four
+  it explains. The look follows the dark-botanical theme (ConardLi/garden-skills):
+  at night a warm near-black with soft pools of light, bone text, a terracotta
+  gold and Cormorant with its italic; by day the same family turned round (bone
+  paper, near-black text). Ember stays the logo's and the one action's. Open and
+  full-bleed: grounds from edge to edge, content between lines, no rounded card.
+  The circle is the one motif, in four
   forms: the mark, the seat ring, the stamp, the index number. Same function, same
   component.
 - Stance and voice (design-system.md): the page acts like a circle leader who holds
@@ -246,15 +249,18 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   spark is never text on paper or sand. Check new pairs in both modes.
 - Grounds: `Section ground` is `default` (paper), `alt` (sand: facts, course,
   dates) or `dark`
-  (`surface-dark`, forest: opening, agreements, voices, registration, menu, last
-  band, footer). The site has these three grounds; `moss` stays for print. Grounds
+  (`surface-dark`, the theme's near-black with its three still pools of light, its
+  primitive still called `--p-forest`: opening, agreements, voices, registration,
+  menu, last band, footer). The site has these three grounds; `moss` stays for print. Grounds
   run from edge to edge; `Section` clips horizontally what bleeds.
-- Type: Vollkorn variable (`font-display`, one ~46 kB file in `src/assets/fonts/`,
-  local provider, declared from weight 500, figures lining via `lnum`) for titles,
-  dates, numbers, poster words; it runs wide, so the home statement is 44–82px; Figtree (`font-sans`) for text, navigation, forms, data. Role tokens
+- Type: Cormorant variable, upright and italic (`font-display`, two files in
+  `src/assets/fonts/`, local provider, from weight 500, figures lining via `lnum`)
+  for titles, dates, numbers, poster words; a light, narrow face, so its sizes run
+  a step larger; IBM Plex Sans (`font-sans`, static regular and semibold) for text,
+  navigation, forms, data. Role tokens
   `text-poster`, `text-hero`, `text-index`, `text-page`, `text-section`, `text-sub`,
   `text-quote`, `text-md` (body), `text-base` (controls), `text-marginal`. `<em>` in
-  a title turns the accent (the spark on the forest), upright. Labels in sentence
+  a title is Cormorant's italic in the accent (the terracotta gold on the dark ground). Labels in sentence
   case. Running text on `max-w-measure`. A dash in running copy is bound to the word
   before it (`\u00a0–`).
 - The four moves, the only ways to break the 12-column grid, each at most once per
@@ -264,9 +270,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   changes down the page) and the poster word (`Poster`, one per screen). Never:
   staircases, rotation, shadows, boxes around content, text
   over a photograph.
-- Shapes: soft and round. `rounded-full` for what you press and for circles
-  (people's photographs, seat ring, stamp, avatar); fields `rounded-md` with the
-  buttons' heights; the map `rounded-xl`, the registration panel `rounded-2xl`. No
+- Shapes: open and square. Grounds, bands, the registration and the map have no
+  radius. `rounded-full` for what you press and for circles (people's photographs,
+  seat ring, stamp, avatar); fields `rounded-md` (8px) with the buttons' heights;
+  only what floats (a dialog) and the admin's cards take `rounded-xl`. No rounded
   cards on public pages: facts, steps, agreements, FAQ and voices are rows between
   lines. `shadow-overlay` only for what floats. Images: a person in a circle, a place
   in a rectangle cut by the edge; one form per section.
@@ -299,8 +306,9 @@ experimental_install`, `.claude/skills/` is not committed) is a reviewer here, n
   from `lg` on a hovering pointer. The phone menu is a native modal `<dialog>` on
   the forest, opening as a circle.
 - Motion (design-system.md, "Motion"): the page stands still. Three things move, each
-  for a reason: the opening once on load (`data-enter`, pure CSS from the first paint;
-  the title is the LCP; the photo settles, the seat ring's taken chairs fill in),
+  for a reason: the opening once on load (`data-enter`, pure CSS from the first paint,
+  transforms only and never from opacity 0: the title, the lead or the photo is the
+  LCP; the photo settles, the seat ring's taken chairs fill in),
   what answers the hand (buttons, links, the native `<details>` of the FAQ, the phone
   menu), and two bars whose place depends on the scroll (the event page's dock, the
   phone `ActionBar` on the home page: view timelines lifted by `timeline-scope` on

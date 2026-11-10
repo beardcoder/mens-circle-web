@@ -4,8 +4,10 @@ import { resolve } from 'node:path';
 
 import type { APIRoute } from 'astro';
 
-// Vollkorn 500 and Figtree for the current templates; Fraunces and the older three stay for mails already sent.
+// Cormorant 500 and IBM Plex Sans for the current templates; the others stay for mails already sent.
 const fonts = new Set([
+  'cormorant-500.woff2',
+  'ibm-plex-sans.woff2',
   'vollkorn-500.woff2',
   'fraunces-500.woff2',
   'figtree.woff2',

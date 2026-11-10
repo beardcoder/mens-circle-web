@@ -1,10 +1,10 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
- * utilities cannot express. "The circle of chairs": a warm paper ground, deep
- * forest and moss for what draws you in, ember from the logo for the one thing
- * to do, a spark of gold for what stands large on the dark grounds. Poster type
- * (Vollkorn, variable in weight) beside calm running text
- * (Figtree); a margin column and four fixed ways to break the grid.
+ * utilities cannot express. After the dark-botanical theme: a warm near-black
+ * with soft pools of light for what draws you in, bone paper for reading, a
+ * terracotta gold for what is marked, ember from the logo for the one thing to
+ * do. Titles in Cormorant (the accent phrase in italic) beside calm running text
+ * (IBM Plex Sans); open, full-bleed grounds, lines instead of boxes.
  * Shared by the three entry files: global.css (public site), admin.css (back
  * office) and print.css (brand templates). docs/design-system.md describes the
  * system; /styleguide shows it, read from this file: a token's trailing comment
@@ -89,15 +89,16 @@
   --color-bone: var(--p-bone);
 
   /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). */
-  --font-sans: var(--font-figtree);
-  --font-display: var(--font-vollkorn); /* Vollkorn, variable: weight 400–900, lining figures */
+  --font-sans: var(--font-plex);
+  --font-display: var(--font-cormorant); /* Cormorant, variable: weight 500–700, upright and italic, lining figures */
   --font-display--font-feature-settings: 'lnum';
 
   /* Type scale. Small sizes for labels and data, the reading size, then the
      titles by role: `sub` (subheadings), `section` (section titles), `page` (a
      sub-page's title), `hero` (the home statement) and `poster` (one word or
-     number, as on a poster). Titles are Vollkorn 500, the poster word 600; its
-     figures are set lining (`lnum`), so dates and counts stand on the line. */
+     number, as on a poster). Titles are Cormorant 500, the hero and the poster word
+     600; it is a light, narrow face with a small x-height, so its sizes run a step
+     larger than a sturdier serif's would. Figures lining (`lnum`). */
   --text-marginal: 0.875rem; /* 14px: a note in the margin column */
   --text-marginal--line-height: 1.5;
   --text-marginal--letter-spacing: 0.01em;
@@ -113,21 +114,21 @@
   --text-lg--line-height: 1.55;
   --text-xl: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem); /* 18–22px: FAQ questions, data values */
   --text-xl--line-height: 1.4;
-  --text-quote: clamp(1.5rem, 1.3rem + 0.8vw, 2.125rem); /* 24–34px: one short quote */
-  --text-quote--line-height: 1.3;
+  --text-quote: clamp(1.75rem, 1.45rem + 1.2vw, 2.625rem); /* 28–42px: one short quote */
+  --text-quote--line-height: 1.2;
   --text-quote--letter-spacing: -0.01em;
-  --text-sub: clamp(1.375rem, 1.2rem + 0.7vw, 1.875rem); /* 22–30px */
-  --text-sub--line-height: 1.2;
+  --text-sub: clamp(1.625rem, 1.4rem + 0.9vw, 2.25rem); /* 26–36px */
+  --text-sub--line-height: 1.15;
   --text-sub--letter-spacing: -0.01em;
   --text-section: clamp(2.25rem, 1.4rem + 3.4vw, 4.5rem); /* 36–72px: a section's title */
   --text-section--line-height: 1.02;
-  --text-section--letter-spacing: -0.025em;
+  --text-section--letter-spacing: -0.015em;
   --text-page: clamp(2.75rem, 1.6rem + 4.6vw, 6rem); /* 44–96px: a sub-page's title */
   --text-page--line-height: 0.98;
-  --text-page--letter-spacing: -0.03em;
-  --text-hero: clamp(2.75rem, 1.5rem + 4.2vw, 5.125rem); /* 44–82px: the home statement */
+  --text-page--letter-spacing: -0.02em;
+  --text-hero: clamp(3rem, 1.6rem + 5.2vw, 5.625rem); /* 48–90px: the home statement */
   --text-hero--line-height: 0.96;
-  --text-hero--letter-spacing: -0.035em;
+  --text-hero--letter-spacing: -0.02em;
   --text-index: clamp(3rem, 1.9rem + 4.4vw, 6.5rem); /* 48–104px: an index number in the margin */
   --text-index--line-height: 0.9;
   --text-index--letter-spacing: -0.04em;
@@ -159,10 +160,11 @@
   --container-column: 45rem; /* a reading column (legal pages, essays) */
   --container-measure: 38rem; /* a line of running text, ~62 characters */
 
-  /* Soft and round. `full` is what you press (buttons, chips, toggles) and the
-     circle; fields take `md`; the map, dialogs and the admin's cards `xl`; the
-     registration panel and the personal photograph `2xl`. The grounds are square. */
-  --radius-md: 0.875rem;
+  /* Open and square: grounds, bands, the registration and the map have no radius.
+     `full` is what you press (buttons, chips, toggles) and the circle; fields take
+     `md`; what floats (a dialog) and the admin's cards `xl`. No rounded card on a
+     public page. */
+  --radius-md: 0.5rem;
   --radius-xl: 1.75rem;
   --radius-2xl: 2.5rem;
 
@@ -295,8 +297,10 @@
   background-color: var(--color-surface);
 }
 
-/* The forest ground: the opening, the registration, the menu and the footer,
-   in both modes. */
+/* The dark ground (the theme's night, still called forest): the opening, the
+   agreements, the voices, the registration, the menu and the footer, in both modes.
+   Its signature is the theme's own: soft pools of light in its corners, a
+   terracotta gold, a blush and a pale gold, still and never animated. */
 @utility surface-dark {
   --color-surface: var(--p-forest);
   --color-raised: var(--p-forest-raised);
@@ -315,6 +319,10 @@
   --color-danger: #f0a197;
   color: var(--color-fg);
   background-color: var(--color-surface);
+  background-image:
+    radial-gradient(ellipse 60% 50% at 12% 22%, rgb(212 165 116 / 16%) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 88% 82%, rgb(232 180 184 / 11%) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 78% 18%, rgb(201 184 150 / 8%) 0%, transparent 60%);
 }
 
 /* ── The four moves ────────────────────────────────────────────────────────── */
@@ -343,44 +351,45 @@
     /* `data-mode` absent follows the OS; "light"/"dark" pins it (Layout.astro). */
     color-scheme: light dark;
 
-    /* The primitives. Light: warm paper (still called linen), a sand band that
-       reads as a band, cream cards, green-black text, a moss grey for secondary
-       text, ember that reads as text and ember that carries a light label. Dark:
-       the forest at night keeps the roles, its grounds set apart in warmth. The
-       moss and the forest are dark in both modes. Every text pair is ≥ 4.5:1,
-       every control line ≥ 3:1 (tests/contrast.test.ts). */
-    --p-linen: #f4eee2;
-    --p-sand: #e6dac4;
-    --p-cream: #fffcf6;
-    --p-ink: #1b241e;
-    --p-ink-soft: #2e372f;
-    --p-muted: #565e51;
-    --p-line: #d8cdb8;
-    --p-line-strong: #c2b59c;
-    --p-control: #767c6e;
+    /* The primitives, after the dark-botanical theme: at night a warm near-black
+       with bone text and a terracotta gold; by day the same family turned round:
+       bone becomes the paper and its band, the near-black the text. The dark ground
+       (still called forest) is the night's own colour in both modes; ember stays
+       the logo's and the one action's. The names are the roles they had; the
+       values are what counts. Every text pair is ≥ 4.5:1, every control line ≥ 3:1
+       (tests/contrast.test.ts). */
+    --p-linen: #f5f2ed;
+    --p-sand: #e8e4df;
+    --p-cream: #fcfbf8;
+    --p-ink: #141312;
+    --p-ink-soft: #2a2622;
+    --p-muted: #625a51;
+    --p-line: #ddd7ce;
+    --p-line-strong: #c8c0b6;
+    --p-control: #7a7268;
     --p-ember: #b4532a;
     --p-ember-deep: #953f1c;
-    --p-ember-text: #9a421d;
+    --p-ember-text: #85501f;
     --p-on-ember: #fff8f0;
-    --p-ember-light: #f2a56c;
-    --p-ember-tint: #f5dfcd;
-    --p-ember-tint-night: #3a2619;
-    --p-spark: #e8b65a;
-    --p-night: #0f1410;
-    --p-night-alt: #1d2019;
-    --p-night-raised: #262b23;
-    --p-night-text: #ece7dc;
-    --p-night-muted: #a6ae9f;
-    --p-night-line: #2b3029;
-    --p-night-line-strong: #3d4339;
-    --p-night-control: #7e8878;
-    --p-forest: light-dark(#16221b, #0c130f);
-    --p-forest-raised: light-dark(#213029, #18221c);
-    --p-forest-control: #768379;
-    --p-moss: light-dark(#2c3a30, #1a2a20);
-    --p-moss-control: #8a968a;
-    --p-bone: #f2ede3;
-    --p-bone-muted: #b4bbad;
+    --p-ember-light: #d4a574;
+    --p-ember-tint: #efe3d3;
+    --p-ember-tint-night: #2e241a;
+    --p-spark: #d4a574;
+    --p-night: #141312;
+    --p-night-alt: #1c1a18;
+    --p-night-raised: #25221f;
+    --p-night-text: #e8e4df;
+    --p-night-muted: #a39a8f;
+    --p-night-line: #2a2622;
+    --p-night-line-strong: #3a352f;
+    --p-night-control: #857c71;
+    --p-forest: light-dark(#141312, #0a0a0a);
+    --p-forest-raised: light-dark(#1f1d1a, #151413);
+    --p-forest-control: #857c71;
+    --p-moss: light-dark(#25221f, #1c1a18);
+    --p-moss-control: #8f867b;
+    --p-bone: #e8e4df;
+    --p-bone-muted: #b3aaa0;
 
     /* Space per width. The content's edge sits 28 / 40 / 56px from the window in
        every section; grounds run from edge to edge. Sections 88px on phones, 144px
@@ -463,7 +472,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Titles in Vollkorn 500 with lining figures; sizes come from the components.
+  /* Titles in Cormorant 500 with lining figures; sizes come from the components.
      Plain selectors, not :where(): preflight's `font-weight: inherit` on headings
      has element specificity and would win over a zero-specificity rule. */
   h1,
@@ -478,9 +487,9 @@
     text-wrap: balance;
   }
 
-  /* A highlighted phrase in a title glows in the accent, upright. */
+  /* A highlighted phrase in a title: Cormorant's italic, in the accent. */
   :where(h1, h2, h3) em {
-    font-style: normal;
+    font-style: italic;
     color: var(--color-accent);
   }
 

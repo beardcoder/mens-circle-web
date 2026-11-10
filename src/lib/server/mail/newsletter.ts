@@ -25,7 +25,6 @@ const NL = {
   text: BRAND.ink,
   muted: BRAND.muted,
   lineStrong: BRAND.lineStrong,
-  sand: BRAND.sand,
   fill: BRAND.ember,
   onFill: BRAND.onEmber,
   ...MAIL_FONTS,
@@ -45,7 +44,7 @@ const newsletterRow = ([label, value]: [string, string]): string =>
   `<td style="padding:4px 0;vertical-align:top;font-family:${NL.sans};font-size:16px;line-height:24px;color:${NL.text};">${escapeHtml(value)}</td></tr>`;
 
 /**
- * The event as the site's date summary sets it: a rounded sand card with the
+ * The event as the site's date summary sets it: open between two rules, the
  * label, the date, the title, the facts as rows and the one round action.
  */
 export const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
@@ -63,7 +62,7 @@ export const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
   ).filter(([, value]) => value);
 
   const event = [
-    `<div class="em-event" style="margin:10px 0 30px;padding:26px 28px 24px;background-color:${NL.sand};border-radius:20px;">`,
+    `<div class="em-event" style="margin:10px 0 30px;padding:22px 0 20px;border-top:1px solid ${NL.lineStrong};border-bottom:1px solid ${NL.lineStrong};">`,
     `<p style="margin:0 0 10px;font-family:${NL.sans};font-size:14px;font-weight:600;line-height:1.3;color:${NL.muted};">Nächster Termin</p>`,
     dateLong
       ? `<p class="em-event__date" style="margin:0;font-family:${NL.serif};font-size:26px;font-weight:500;line-height:1.25;color:${NL.text};">${dateLines(dateLong)}</p>`

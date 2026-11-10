@@ -4,10 +4,14 @@
 
 A men's circle meets in the evening, sits in a ring and listens. The site looks like
 that evening: a centre, things turned towards each other, much air between them.
-Poster-sized type where the site invites, calm reading where it explains. The
-forest and the moss for what draws you in and what is spoken in the circle, warm
-paper for reading, the ember of the logo for the one thing to do and a spark of
-gold for what stands large on the dark grounds.
+Its look follows the dark-botanical theme (the `web-video-presentation` skill of
+ConardLi/garden-skills): a warm near-black with soft pools of light, bone text, a
+terracotta gold, an elegant serif whose accent phrase is set in italic. The night
+mode is that theme; the day mode is built from the same family turned round: bone
+becomes the paper, the near-black the text. The dark ground carries what draws you
+in and what is spoken in the circle, paper is for reading, the ember of the logo
+for the one thing to do. Everything is open and full-bleed: grounds run from edge
+to edge, content stands between lines, nothing sits in a rounded card.
 
 The grid is twelve columns and one edge. Four moves break it, and only these
 (see "The four moves"): the margin column, the overlap, the bleed and the poster
@@ -81,50 +85,55 @@ Primitives (`--p-*`) are plain hex values on `:root`; the roles pick them with
 (Auto); `ModeToggle` offers Auto · Hell · Dunkel and pins a choice as `data-mode`,
 set before first paint. Never a hex value in markup.
 
-| Role            | Light                        | Night                 | Token                            | Use                                              |
-| --------------- | ---------------------------- | --------------------- | -------------------------------- | ------------------------------------------------ |
-| Page            | `#F4EEE2` paper              | `#0F1410`             | `ground`                         | the page                                         |
-| Warm band       | `#E6DAC4` sand               | `#1D2019`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates      |
-| Raised          | `#FFFCF6` cream              | `#262B23`             | `raised`                         | fields, the QR square, the admin's cards         |
-| Moss            | `#2C3A30`                    | `#1A2A20`             | `surface-moss`                   | print and mail only; the site has three grounds  |
-| Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, registration, menu, last band, footer   |
-| Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                            |
-| Secondary text  | `#565E51` moss grey          | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text  |
-| Lines           | `#D8CDB8` / `#C2B59C`        | `#2B3029` / `#3D4339` | `line`, `line-strong`            | quiet structure; never alone a control           |
-| Control outline | `#767C6E`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                |
-| Accent          | `#9A421D`                    | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers |
-| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module, a taken chair        |
-| Spark           | `#E8B65A`                    | same                  | `spark`                          | poster words and numbers on forest and moss      |
+| Role            | Light                        | Night                 | Token                            | Use                                               |
+| --------------- | ---------------------------- | --------------------- | -------------------------------- | ------------------------------------------------- |
+| Page            | `#F5F2ED` bone paper         | `#141312`             | `ground`                         | the page                                          |
+| Band            | `#E8E4DF` bone               | `#1C1A18`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates       |
+| Raised          | `#FCFBF8`                    | `#25221F`             | `raised`                         | fields, the QR square, the admin's cards          |
+| Dark ground     | `#141312` / raised `#1F1D1A` | `#0A0A0A` / `#151413` | `surface-dark`                   | opening, agreements, voices, registration, footer |
+| Second dark     | `#25221F`                    | `#1C1A18`             | `surface-moss`                   | print only; the site has three grounds            |
+| Text            | `#141312` / soft `#2A2622`   | `#E8E4DF`             | `fg`, `fg-soft`                  | titles / running text                             |
+| Secondary text  | `#625A51`                    | `#A39A8F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text   |
+| Lines           | `#DDD7CE` / `#C8C0B6`        | `#2A2622` / `#3A352F` | `line`, `line-strong`            | quiet structure; never alone a control            |
+| Control outline | `#7A7268`                    | `#857C71`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                 |
+| Accent          | `#85501F`                    | `#D4A574`             | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers  |
+| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module, a taken chair         |
+| Spark           | `#D4A574` terracotta gold    | same                  | `spark`                          | the italic phrase and numbers on the dark ground  |
 
-On the forest and the moss the surfaces re-declare text (bone `#F2EDE3`, muted
-`#B4BBAD`), accent (`#F2A56C`), lines (bone at 14–28 %) and the control outline
-(forest `#768379`, moss `#8A968A`). The spark is never text on paper or sand.
+The primitives keep the names of the roles they had (`--p-forest` is the dark
+ground, `--p-linen` the paper, `--p-sand` the band); the values are the theme's.
+The dark ground carries the theme's signature, three soft pools of light in its
+corners (a terracotta gold, a blush, a pale gold; `surface-dark` in theme.css),
+still and never animated.
+
+On the dark grounds the surfaces re-declare text (bone `#E8E4DF`, muted
+`#B3AAA0`), accent (`#D4A574`), lines (bone at 14–28 %) and the control outline
+(`#857C71`, on the second dark `#8F867B`). The spark is never text on paper or sand.
 `success` and `danger` are for real states only and always come with words. Every
 text pair holds at least 4.5:1 on every ground in both modes, every control line at
 least 3:1 (`tests/contrast.test.ts`, pair by pair). Check any new pair in both modes.
 
 ## Type
 
-`font-display` is Vollkorn (Friedrich Althausen), a sturdy book face made for
-everyday reading, variable in weight, one file of ~46 kB in the repo
-(`src/assets/fonts/`), declared from weight 500. It was chosen over the faces a
-generated page reaches for: it is plain, dark and a little rustic, which is what
-the circle is. Its figures are set lining (`lnum`), so dates and counts stand on
-the line. Titles are 500, the hero, page titles, index numbers and poster words 600.
-The face runs wide, so the home statement is 44–82px and stands on two lines.
-`font-sans` is Figtree (variable, 400–700): running text, navigation, forms, data.
-A highlighted phrase in a title (`<em>`) turns the accent (the spark on the forest)
-and stays upright.
+`font-display` is Cormorant (Christian Thalmann, OFL), the theme's serif: light,
+narrow, with a small x-height, so its sizes run a step larger than a sturdier
+serif's would (`text-sub` 26–36px, `text-quote` 28–42px, the home statement
+48–90px on two lines). Two variable files, upright and italic (~35 and ~38 kB,
+`src/assets/fonts/`), declared from weight 500; figures lining (`lnum`). Titles are
+500, the hero, page titles, index numbers and poster words 600. A highlighted
+phrase in a title (`<em>`) is set in Cormorant's italic, in the accent (the
+terracotta gold on the dark ground). `font-sans` is IBM Plex Sans (the static
+regular and semibold, ~23 kB each; the regular also serves 500, the semibold 700): running text, navigation, forms, data.
 
 | Token           | Size     | Use                                              |
 | --------------- | -------- | ------------------------------------------------ |
 | `text-poster`   | 72–216px | one poster word or number (`Poster`)             |
-| `text-hero`     | 44–82px  | the home statement                               |
+| `text-hero`     | 48–90px  | the home statement                               |
 | `text-index`    | 48–104px | an index number in the margin (`Index`)          |
 | `text-page`     | 44–96px  | a sub-page's title, an event title               |
 | `text-section`  | 36–72px  | a section's title, the one featured voice        |
-| `text-sub`      | 22–30px  | subheadings, list titles, a fact's value, a date |
-| `text-quote`    | 24–34px  | one short quote                                  |
+| `text-sub`      | 26–36px  | subheadings, list titles, a fact's value, a date |
+| `text-quote`    | 28–42px  | one short quote                                  |
 | `text-xl`       | 18–22px  | FAQ questions, the questions of the first round  |
 | `text-lg`       | 18–21px  | a lead                                           |
 | `text-md`       | 17–19px  | running text (the body)                          |
@@ -175,12 +184,13 @@ around content, text over a photograph.
 
 ## Shape and depth
 
-Soft and round. `rounded-full` is what you press (buttons, chips, icon buttons, the
-FAQ disc) and the circle (photographs of people, the seat ring, the stamp, the
-avatar). Fields take `rounded-md` with the buttons' heights (48 / 44 / 36px). The
-map and dialogs take `rounded-xl`, the registration panel `rounded-2xl`. The grounds
-are square and run from edge to edge. On public pages nothing is boxed: facts,
-questions, agreements, steps, FAQ and voices are rows between thin lines.
+Open and square. Grounds, bands, the registration and the map have no radius and
+run from edge to edge or out to the window. `rounded-full` is what you press
+(buttons, chips, icon buttons, the FAQ disc) and the circle (photographs of people,
+the seat ring, the stamp, the avatar). Fields take `rounded-md` (8px) with the
+buttons' heights (48 / 44 / 36px); what floats (a dialog) and the admin's cards
+take `rounded-xl`. On public pages nothing is boxed and nothing is a rounded card:
+facts, questions, agreements, steps, FAQ and voices are rows between thin lines.
 `shadow-overlay` is for what floats; nothing else casts a shadow.
 
 ## Images
@@ -195,10 +205,12 @@ participants without their explicit consent, no text on a photograph.
 The page stands still. Motion is kept for three things, and each has a reason:
 
 - **The opening, once.** On load the label, the title and the pieces after it rise a
-  little and fade in at their `--enter-delay` (`data-enter`, global.css, pure CSS from
+  little, 0.08 s apart (`--enter-delay`; nothing starts invisible: the browser counts
+  a text or a picture as painted only once it is seen, so a fade from nothing would
+  hold back the LCP) (`data-enter`, global.css, pure CSS from
   the first paint, because the title is the largest paint); the photograph settles
   from a little larger, the taken chairs of the opening's seat ring fill in one after
-  the other. Fades use `--ease-fade`, movement a spring without overshoot sampled
+  the other. Movement is a spring without overshoot sampled
   into `linear()` (`--ease-spring`, `--ease-spring-slow` in theme.css). The home
   opening and every sub-page opening (`PageIntro`) work this way; on an event page
   the date and the title rise in first, then the lead and the registration. Then the
@@ -255,26 +267,26 @@ mobile score than it does live.
 
 ## Components
 
-| Component                                         | Purpose                                                                                              |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                               |
-| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `moss` / `dark`, edge to edge, clipping what bleeds                     |
-| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead; with `margin.cross` it crosses into the content            |
-| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; a photograph bleeds right, without one the stamp stands there                  |
-| `Poster`, `Index`, `Marginal`                     | The poster word, the index number, the margin note                                                   |
-| `Eyebrow`                                         | A label above a title where it adds information: accent text                                         |
-| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`                                             |
-| `TextLink`                                        | A quiet, underlined link with a small arrow                                                          |
-| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                        |
-| `EventSummary`                                    | One date, open on its ground: the date, the facts as small columns, the seat ring, the action        |
-| `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in ember from the top; the number free in the middle; words beside |
-| `Stamp`                                           | The mark between two rings, the circle's name round it; it stands still                              |
-| `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                  |
-| `Fact` (`layout`)                                 | Label, value in Vollkorn, a note, under a rule; four in a row, or (`row`) lines with the label first |
-| `TestimonialList`                                 | One short voice large, the others as rows (author in the margin); every voice in full                |
-| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                        |
-| `LinkList`, `Prose` (`width`)                     | Where-next rows; rich text (`measure` / `column`)                                                    |
-| `ModeToggle`                                      | Auto · Hell · Dunkel, in the footer and the phone menu                                               |
+| Component                                         | Purpose                                                                                               |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                                |
+| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `moss` / `dark`, edge to edge, clipping what bleeds                      |
+| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead; with `margin.cross` it crosses into the content             |
+| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; a photograph bleeds right, without one the stamp stands there                   |
+| `Poster`, `Index`, `Marginal`                     | The poster word, the index number, the margin note                                                    |
+| `Eyebrow`                                         | A label above a title where it adds information: accent text                                          |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`                                              |
+| `TextLink`                                        | A quiet, underlined link with a small arrow                                                           |
+| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                         |
+| `EventSummary`                                    | One date, open on its ground: the date, the facts as small columns, the seat ring, the action         |
+| `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in ember from the top; the number free in the middle; words beside  |
+| `Stamp`                                           | The mark between two rings, the circle's name round it; it stands still                               |
+| `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                   |
+| `Fact` (`layout`)                                 | Label, value in Cormorant, a note, under a rule; four in a row, or (`row`) lines with the label first |
+| `TestimonialList`                                 | One short voice large, the others as rows (author in the margin); every voice in full                 |
+| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                         |
+| `LinkList`, `Prose` (`width`)                     | Where-next rows; rich text (`measure` / `column`)                                                     |
+| `ModeToggle`                                      | Auto · Hell · Dunkel, in the footer and the phone menu                                                |
 
 **Header.** 72px: the mark in ember and the word mark; from `nav` five links and one
 action. Over the home opening the bar is clear with light text and its action is

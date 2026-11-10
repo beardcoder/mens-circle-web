@@ -87,8 +87,8 @@ test('words: each word its index, tags and no-break spaces left alone', () => {
   expect(words.html).toContain('Abend –</span>');
   expect(splitText('A & <b>').html).toContain('&amp;');
   expect(splitText('A & <b>').html).not.toContain('<b>');
-  expect(afterWords(3, 0)).toBe('--enter-delay: 0.33s');
-  expect(afterWords(3, 2)).toBe('--enter-delay: 0.53s');
+  expect(afterWords(3, 0)).toBe('--enter-delay: 0.08s');
+  expect(afterWords(3, 2)).toBe('--enter-delay: 0.24s');
 });
 
 test('canonical URLs drop trailing slashes, except the root', () => {

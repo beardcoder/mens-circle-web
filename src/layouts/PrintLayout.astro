@@ -25,8 +25,8 @@ const { title, mode, transparent = false } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>{title}</title>
-    <Font cssVariable="--font-vollkorn" preload />
-    <Font cssVariable="--font-figtree" preload={[{ weight: '300 900', style: 'normal' }]} />
+    <Font cssVariable="--font-cormorant" preload />
+    <Font cssVariable="--font-plex" preload />
   </head>
   <body class:list={[transparent && 'bg-transparent']}>
     <slot />

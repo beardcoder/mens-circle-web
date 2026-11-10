@@ -78,23 +78,21 @@
 
 /* The opening of every page moves once, in CSS, so it starts with the first paint
    and never waits for a script (the title is the largest paint): the label, the
-   title and the pieces after it rise a little and fade in, each at its
+   title and the pieces after it rise a little, each at its
    `--enter-delay`; the photograph settles from a little larger; in a seat ring of
-   the opening the taken chairs fill in one after the other. Opacity and
-   transforms only. Nothing else on a page animates on its own. */
+   the opening the taken chairs fill in one after the other. Transforms only:
+   nothing here starts invisible, because the browser counts a text or a picture as
+   painted only once it is seen, and the largest of them is the page's LCP. Nothing
+   else on a page animates on its own. */
 
 @media (prefers-reduced-motion: no-preference) {
   [data-enter]:not([data-enter='settle']) {
-    animation:
-      enter-fade 0.9s var(--ease-fade) backwards,
-      enter-rise 1.3s var(--ease-spring) backwards;
+    animation: enter-rise 1.3s var(--ease-spring) backwards;
     animation-delay: var(--enter-delay, 0s);
   }
 
   [data-enter='settle'] {
-    animation:
-      enter-fade 1.3s var(--ease-fade) backwards,
-      enter-settle 1.9s var(--ease-spring-slow) backwards;
+    animation: enter-settle 1.9s var(--ease-spring-slow) backwards;
     animation-delay: 0.1s;
   }
 
@@ -112,12 +110,6 @@
   :root {
     --ease-spring: var(--ease-out);
     --ease-spring-slow: var(--ease-out);
-  }
-}
-
-@keyframes enter-fade {
-  from {
-    opacity: 0;
   }
 }
 

@@ -105,27 +105,36 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
   fonts: [
-    // Vollkorn for titles, quotes, dates and poster words; Figtree for everything that
-    // explains, mapped to font-display and font-sans in the shared theme. Vollkorn is
-    // one variable file (~46 kB, declared from 500: nothing is set lighter), in the repo; Figtree is one
-    // variable file (~20 kB) for 400–700. src/assets/fonts/README.md says where the
-    // file comes from.
+    // Cormorant for titles, quotes, dates and poster words (upright and italic: the
+    // accent phrase of a title is set in italic); IBM Plex Sans for everything that
+    // explains, mapped to font-display and font-sans in the shared theme. Latin
+    // files in the repo (Cormorant variable ~35 and ~38 kB, Plex static ~23 kB each);
+    // src/assets/fonts/README.md says where they come from.
     {
-      name: 'Vollkorn',
-      cssVariable: '--font-vollkorn',
+      name: 'Cormorant',
+      cssVariable: '--font-cormorant',
       provider: fontProviders.local(),
       options: {
-        variants: [{ src: ['./src/assets/fonts/vollkorn-variable-latin.woff2'], weight: '500 900', style: 'normal' }],
+        variants: [
+          { src: ['./src/assets/fonts/cormorant-variable-latin.woff2'], weight: '500 700', style: 'normal' },
+          { src: ['./src/assets/fonts/cormorant-variable-latin-italic.woff2'], weight: '500 700', style: 'italic' },
+        ],
       },
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
     },
     {
-      name: 'Figtree',
-      cssVariable: '--font-figtree',
-      provider: fontProviders.fontsource(),
-      weights: ['300 900'],
-      styles: ['normal', 'italic'],
-      subsets: ['latin'],
+      name: 'IBM Plex Sans',
+      cssVariable: '--font-plex',
+      provider: fontProviders.local(),
+      options: {
+        // Two static cuts instead of the variable file (46 kB): the regular carries
+        // 400–500, the semibold 600–700. All four files of a page are preloaded: a late
+        // swap of the italic phrase or of a button label would shift the layout.
+        variants: [
+          { src: ['./src/assets/fonts/ibm-plex-sans-400-latin.woff2'], weight: '400 500', style: 'normal' },
+          { src: ['./src/assets/fonts/ibm-plex-sans-600-latin.woff2'], weight: '600 700', style: 'normal' },
+        ],
+      },
       fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
     },
   ],

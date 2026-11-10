@@ -355,6 +355,8 @@ try {
     assert.equal((await fetch(`${origin}/api/public/events`)).status, 404);
 
     for (const font of [
+      'cormorant-500.woff2',
+      'ibm-plex-sans.woff2',
       'vollkorn-500.woff2',
       'fraunces-500.woff2',
       'figtree.woff2',
