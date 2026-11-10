@@ -8,7 +8,7 @@ import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
   anchor: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   intro?: string;
 }
@@ -33,7 +33,6 @@ const { anchor, eyebrow, title, intro } = Astro.props;
     />
     {site.contactEmail && (
       <p
-        data-reveal
         class:list={[
           margin.side,
           'text-base text-fg-muted max-lg:order-last lg:sticky lg:top-(--spacing-clearance) lg:self-start',

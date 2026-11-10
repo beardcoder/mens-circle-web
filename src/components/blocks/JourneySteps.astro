@@ -7,7 +7,7 @@ import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
   anchor: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   subtitle: string;
 }
@@ -23,11 +23,11 @@ const { anchor, eyebrow, title, subtitle } = Astro.props;
     <meta itemprop="description" content={subtitle} />
     <SectionHead eyebrow={eyebrow} title={title} titleId="ablauf-title" lead={subtitle} class={margin.cross} />
 
-    <ol role="list" data-reveal-group class="grid lg:col-span-12">
+    <ol role="list" class="grid lg:col-span-12">
       <slot name="steps" />
     </ol>
 
-    <Prose reveal class:list={[margin.reading, 'border-t border-line-strong pt-8']}>
+    <Prose class:list={[margin.reading, 'border-t border-line-strong pt-8']}>
       <slot name="close" />
     </Prose>
   </div>

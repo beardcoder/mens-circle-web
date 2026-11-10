@@ -18,7 +18,7 @@ const next = data?.events[0];
 {next ? (
   <EventSummary view={next.view} location={location} showAction={showAction} />
 ) : (
-  <div data-reveal-group class="grid content-start justify-items-start gap-4">
+  <div class="grid content-start justify-items-start gap-4">
     <p class={label}>Nächster Termin</p>
     <p class="font-display text-sub text-fg">
       {data ? 'Der nächste Abend ist in Planung.' : 'Die Termine sind gerade nicht abrufbar.'}

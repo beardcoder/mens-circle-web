@@ -208,7 +208,7 @@ docs, mail templates and tests never become utilities) and skip server-only code
 `global.css` keeps the admin and print sources out with `@source not`, `admin.css`
 the print and styleguide sources; `print.css` reads only the print, brand and ui
 components. Printing a page of the site (`@media print`) lives in `global.css`.
-Scroll reveals are CSS scroll-driven animations (`animation-timeline: view()`); the FAQ is
+Nothing fades in on scroll; the two scroll-linked bars use CSS view timelines (`animation-timeline`); the FAQ is
 native `<details>`; no animation library ships to the browser. The opening, page transitions, loops and
 state transitions are the theme's own keyframes and `--animate-*` tokens (`rise`,
 `skeleton`); there is no animation plugin.
@@ -261,7 +261,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   4–12, reading 4–10, a crossing title 1–10), the overlap (`overlap` token, always on
   a ground of its own, towards the centre), the bleed (`bleed-l`/`-r`/`-x`, the side
   changes down the page) and the poster word (`Poster`, one per screen). Never:
-  staircases, rotation (only the stamp turns), shadows, boxes around content, text
+  staircases, rotation, shadows, boxes around content, text
   over a photograph.
 - Shapes: soft and round. `rounded-full` for what you press and for circles
   (people's photographs, seat ring, stamp, avatar); fields `rounded-md` with the
@@ -274,8 +274,13 @@ experimental_install`, `.claude/skills/` is not committed) is a reviewer here, n
   the system: run its `copy-lint.mjs` and `consistency.mjs` against the built server
   and fix what this system agrees with (a hero that fits its screen, running text in
   `fg-soft`, no half-empty column, focus and tap sizes). Its kit, dealt palettes,
-  one-section-per-screen rhythm and its ban on scroll reveals, bleeds and overlaps do
+  one-section-per-screen rhythm and its ban on bleeds and overlaps do
   not apply; never copy its `assets/` into the site or add stand-in photographs.
+- Against the generated look (the `web-design-engineer` skill's failure patterns,
+  `skills-lock.json`): no label above every heading (`Eyebrow` only where it adds the
+  place or the kind of page), no decorative numbers (an index number only where
+  there is a real order: the course, the agreements), no drawn shape standing in for
+  a picture (no empty rings, no glows), one label for one action, nothing invented.
 - Shared components: `EventSummary` (every date: date, facts, `SeatRing`, action;
   fed by `lib/shared/event-status.ts`), `SeatRing` (`lib/shared/seats.ts`:
   `seatFill`, `seatDots`), `Stamp`, `Lockup`, `Qr` (`src/components/brand/`, shared
@@ -286,30 +291,24 @@ experimental_install`, `.claude/skills/` is not committed) is a reviewer here, n
   date; the photograph cut by the right edge, the seat ring overlapping it; the bar's
   action outlined over it), facts, intro (questions in the margin), course (sand,
   index numbers), agreements (moss), taking part (`#termine`, "Dabei sein." as a
-  poster word), Markus (quote crossing a ring cut by the window), voices (moss, every
+  poster word), Markus (one sentence of his under a rule), voices (moss, every
   voice in full), FAQ, staying in touch (forest, the stamp), the footer.
 - Header 72px: links from `nav`, one action; over the home opening clear with light
   text until the page moves (`data-scrolled`), then 95 % paper; fixed bars blur only
   from `lg` on a hovering pointer. The phone menu is a native modal `<dialog>` on
   the forest, opening as a circle.
-- Motion: the opening moves in pure CSS from the first paint (`data-enter`,
-  global.css; the title is the LCP): words rise one by one out of a soft blur
-  (`lib/shared/words.ts`), the rest follows at `--enter-delay`, the photo settles,
-  its ring follows, the seat ring's taken chairs fill in (`data-seat-dot`). Below it
-  each piece arrives once as it comes into view (`animation-timeline: view()`:
-  `data-reveal`, `data-reveal-group`); the stamp turns with the scroll
-  (`data-stamp-turn`). Depth is scroll-linked too (design-system.md, "Depth"): the
-  opening leaves in layers (`data-hero-text`, `-photo`, `-orbit`), index numbers trail
-  (`data-index`), the poster word drifts in (`data-drift`), Markus's ring opens
-  (`data-ring-open`); a hovering pointer carries a firelight over the opening
-  (`data-ember`). Nothing hidden up front; a
-  browser without scroll timelines shows everything; under reduced motion
-  everything rests. FAQ answers are native `<details>` (height transition where
-  `interpolate-size` exists). The phone `ActionBar` and the event page's
-  dock follow the scroll on view timelines (`timeline-scope` on `body`), with an
-  observer and a CSS transition where those are missing.
+- Motion (design-system.md, "Motion"): the page stands still. Three things move, each
+  for a reason: the opening once on load (`data-enter`, pure CSS from the first paint;
+  the title is the LCP; the photo settles, the seat ring's taken chairs fill in),
+  what answers the hand (buttons, links, the native `<details>` of the FAQ, the phone
+  menu), and two bars whose place depends on the scroll (the event page's dock, the
+  phone `ActionBar` on the home page: view timelines lifted by `timeline-scope` on
+  `body`, an observer and a CSS transition where those are missing). Never add: a
+  fade or rise on entering the view, parallax or anything that drifts, trails or
+  turns with the scroll, an ambient loop, a glow, anything that follows the pointer.
+  Under reduced motion everything rests.
 - Lighthouse on every motion change (design-system.md): CLS 0, no forced reflow,
-  only opacity and transforms move (the one exception: the opening's soft blur).
+  only opacity and transforms move.
   Never set a state attribute on `<html>` while the page moves; never read layout
   or `scrollY` at load (use an `IntersectionObserver`); nothing that holds the LCP
   waits for a script. No `content-visibility`.

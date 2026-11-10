@@ -9,7 +9,7 @@ import SectionHead from '../ui/SectionHead.astro';
 
 /** A page's exit, as a compact band: where someone who has read it goes next. Head in the margin, the links beside it. */
 interface Props {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   titleId: string;
   items: ComponentProps<typeof LinkList>['items'];

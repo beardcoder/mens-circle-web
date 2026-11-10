@@ -11,7 +11,7 @@ interface Agreement {
 
 interface Props {
   anchor: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   intro: string;
   agreements: Agreement[];
@@ -30,7 +30,7 @@ const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText }
     <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} class={margin.cross} />
 
     {agreements.length > 0 && (
-      <ol role="list" data-reveal-group class="grid lg:col-span-12">
+      <ol role="list" class="grid lg:col-span-12">
         {agreements.map((rule, i) => (
           <li class="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-line py-6 last:border-b sm:grid-cols-[4rem_minmax(0,1fr)] lg:grid-cols-12 lg:gap-x-grid lg:py-8">
             <span
@@ -49,7 +49,7 @@ const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText }
     )}
 
     {boundaryText && (
-      <aside aria-labelledby="rahmen-boundary-title" data-reveal class:list={[margin.grid, 'gap-y-3 lg:col-span-12']}>
+      <aside aria-labelledby="rahmen-boundary-title" class:list={[margin.grid, 'gap-y-3 lg:col-span-12']}>
         <h3 id="rahmen-boundary-title" class:list={[margin.side, 'font-sans text-base font-semibold text-fg']}>
           {boundaryTitle}
         </h3>

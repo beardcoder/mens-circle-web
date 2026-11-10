@@ -74,45 +74,21 @@
   }
 }
 
-/* The hero's ring turns once a minute and a half; under reduced motion it rests. */
-@media (prefers-reduced-motion: no-preference) {
-  .hero-orbit {
-    animation: orbit-turn 90s linear infinite;
-  }
-}
-
-@keyframes orbit-turn {
-  to {
-    rotate: 360deg;
-  }
-}
-
 /* ── Motion: the opening ───────────────────────────────────────────────────── */
 
-/* The opening of every page moves in CSS, so it starts with the first paint and
-   never waits for a script (the title is the largest paint). The label comes
-   first, the title's words rise in turn out of a soft blur (word `i` at
-   0.06 s + i × 0.055 s, `lib/shared/words.ts`), the pieces after it follow at their
-   `--enter-delay`; the photo settles from a little larger and the ring follows;
-   in a seat ring of the opening the taken chairs fill in one after the other. Opacity and focus take a gentle
-   fade (`--ease-fade`), the movement Motion's spring (`--ease-spring`). The blur is
-   the one non-composited piece: on the title's words only, light and short
-   (0.6 s), so the main thread is soon free. */
+/* The opening of every page moves once, in CSS, so it starts with the first paint
+   and never waits for a script (the title is the largest paint): the label, the
+   title and the pieces after it rise a little and fade in, each at its
+   `--enter-delay`; the photograph settles from a little larger; in a seat ring of
+   the opening the taken chairs fill in one after the other. Opacity and
+   transforms only. Nothing else on a page animates on its own. */
 
 @media (prefers-reduced-motion: no-preference) {
-  [data-enter]:not([data-enter='words'], [data-enter='settle'], [data-enter='ring']) {
+  [data-enter]:not([data-enter='settle']) {
     animation:
       enter-fade 0.9s var(--ease-fade) backwards,
       enter-rise 1.3s var(--ease-spring) backwards;
     animation-delay: var(--enter-delay, 0s);
-  }
-
-  [data-word] {
-    animation:
-      enter-fade 0.9s var(--ease-fade) backwards,
-      enter-focus 0.6s var(--ease-fade) backwards,
-      enter-word 1.3s var(--ease-spring) backwards;
-    animation-delay: calc(0.06s + var(--i, 0) * 55ms);
   }
 
   [data-enter='settle'] {
@@ -120,13 +96,6 @@
       enter-fade 1.3s var(--ease-fade) backwards,
       enter-settle 1.9s var(--ease-spring-slow) backwards;
     animation-delay: 0.1s;
-  }
-
-  [data-enter='ring'] {
-    animation:
-      enter-fade 1.3s var(--ease-fade) backwards,
-      enter-ring 1.9s var(--ease-spring-slow) backwards;
-    animation-delay: 0.4s;
   }
 
   [data-enter] [data-seat-dot] {
@@ -146,12 +115,6 @@
   }
 }
 
-@keyframes enter-focus {
-  from {
-    filter: blur(6px);
-  }
-}
-
 @keyframes enter-fade {
   from {
     opacity: 0;
@@ -164,21 +127,9 @@
   }
 }
 
-@keyframes enter-word {
-  from {
-    translate: 0 0.3em;
-  }
-}
-
 @keyframes enter-settle {
   from {
     scale: 1.06;
-  }
-}
-
-@keyframes enter-ring {
-  from {
-    scale: 0.92;
   }
 }
 
@@ -215,77 +166,10 @@
 
 /* ── Motion: scroll ───────────────────────────────────────────────────────── */
 
-/* Each piece with a scroll hook arrives once as it comes into view, driven by the
-   scroll itself (`animation-timeline: view()`), with no script and nothing hidden
-   up front: a piece that is already in view, or scrolled past, stands at its end
-   state; a browser without scroll timelines, reduced motion and print show
-   everything at once. Only opacity and transforms move. In a group, later children
-   start a little further into their entry, so what enters together follows top to
-   bottom. The taken chairs of a seat ring fill in, and the stamp turns a little
-   as it passes (the one element that turns; driven by the scroll, so it costs
-   nothing while it is out of view). */
+/* Two bars follow the scroll, because their place depends on it; nothing else is
+   tied to it. No piece fades in as it enters the view: what is on the page stands. */
 @supports (animation-timeline: view()) {
   @media screen and (prefers-reduced-motion: no-preference) {
-    :is([data-reveal], [data-reveal-group] > *) {
-      animation: reveal var(--ease-out) both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 55%;
-    }
-
-    [data-reveal-group] > :nth-child(2) {
-      animation-range: entry 8% entry 63%;
-    }
-
-    [data-reveal-group] > :nth-child(3) {
-      animation-range: entry 16% entry 71%;
-    }
-
-    [data-reveal-group] > :nth-child(n + 4) {
-      animation-range: entry 24% entry 79%;
-    }
-
-    [data-seat-dot]:not([data-enter] *) {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: seat-take var(--ease-out) both;
-      animation-timeline: view();
-      animation-range: entry 40% entry 100%;
-    }
-
-    [data-stamp-turn] {
-      animation: stamp-turn linear both;
-      animation-timeline: view();
-      animation-range: cover;
-    }
-
-    /* Depth, tied to the scroll and so at rest whenever the page rests. The opening
-       leaves in layers: its text goes ahead (never dimmed: it is still read), the photograph falls behind
-       and comes closer, the ring's point travels on. Further down an index number
-       trails its row, the poster word slides in from the side and Markus's ring
-       opens. Each sits on an element of its own, beside the one that arrives. */
-    [data-hero] {
-      view-timeline: --hero block;
-    }
-
-    :is([data-hero-text], [data-hero-photo], [data-hero-orbit]) {
-      animation: linear both;
-      animation-timeline: --hero;
-      animation-range: exit-crossing 0% exit-crossing 100%;
-    }
-
-    [data-hero-text] {
-      animation-name: hero-text-leave;
-    }
-
-    [data-hero-photo] {
-      transform-origin: 50% 100%;
-      animation-name: hero-photo-leave;
-    }
-
-    [data-hero-orbit] {
-      animation-name: hero-orbit-leave;
-    }
-
     /* The event page's dock under the bar follows the title: as the title passes
        under the bar the dock slides out from behind it, and back in as the title
        returns. The title's own view timeline drives it (`body` lifts the name to
@@ -335,24 +219,6 @@
         normal,
         entry 0% entry 20%;
       animation-composition: replace, add, add;
-    }
-
-    [data-index] {
-      animation: index-trail linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 40%;
-    }
-
-    [data-reveal-group] > [data-drift] {
-      animation: poster-drift var(--ease-out) both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 45%;
-    }
-
-    [data-ring-open] {
-      animation: ring-open var(--ease-out) both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 50%;
     }
   }
 }
@@ -406,81 +272,5 @@
   to {
     opacity: 1;
     translate: 0 0;
-  }
-}
-
-@keyframes hero-text-leave {
-  to {
-    translate: 0 -4rem;
-  }
-}
-
-/* The photograph grows from its lower edge and sinks only a little: the opening
-   clips what leaves it, and the seat ring hangs close to its bottom edge. */
-@keyframes hero-photo-leave {
-  to {
-    translate: 0 0.75rem;
-    scale: 1.06;
-  }
-}
-
-@keyframes hero-orbit-leave {
-  to {
-    rotate: 160deg;
-  }
-}
-
-@keyframes index-trail {
-  from {
-    translate: 0 3.5rem;
-  }
-}
-
-@keyframes poster-drift {
-  from {
-    opacity: 0;
-    translate: -14% 0;
-  }
-}
-
-@keyframes ring-open {
-  from {
-    opacity: 0;
-    scale: 0.6;
-  }
-}
-
-@keyframes reveal {
-  from {
-    opacity: 0;
-    translate: 0 2rem;
-  }
-}
-
-@keyframes stamp-turn {
-  from {
-    rotate: -50deg;
-  }
-
-  to {
-    rotate: 50deg;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  [data-glow] {
-    animation: glow-breathe 11s ease-in-out infinite;
-  }
-}
-
-/* Out of view the opening's loops pause (Hero.astro sets `data-offscreen`). */
-[data-hero][data-offscreen] :is([data-glow], .hero-orbit) {
-  animation-play-state: paused;
-}
-
-@keyframes glow-breathe {
-  50% {
-    scale: 1.08;
-    opacity: 0.75;
   }
 }

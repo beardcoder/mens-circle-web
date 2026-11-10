@@ -8,13 +8,10 @@ interface Props {
   html?: string;
   /** `measure` a line of running text (~62 characters); `column` the wider reading column of the legal pages. */
   width?: 'measure' | 'column';
-  /** Each paragraph, heading and list rises in as it enters the view (`data-reveal-group`), where no parent does. */
-  reveal?: boolean;
   class?: string;
 }
 
-const { html, width = 'measure', reveal = false, class: className }: Props = Astro.props;
-const hook = reveal ? { 'data-reveal-group': '' } : {};
+const { html, width = 'measure', class: className }: Props = Astro.props;
 
 const WIDTHS = { measure: 'max-w-measure', column: 'max-w-column' } as const;
 
@@ -33,9 +30,9 @@ const PROSE = [
 ---
 
 {html !== undefined ? (
-  <div {...hook} class:list={[PROSE, className]} set:html={html} />
+  <div class:list={[PROSE, className]} set:html={html} />
 ) : (
-  <div {...hook} class:list={[PROSE, className]}>
+  <div class:list={[PROSE, className]}>
     <slot />
   </div>
 )}

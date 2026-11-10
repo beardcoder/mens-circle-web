@@ -15,10 +15,10 @@ const { anchor, eyebrow } = Astro.props;
     The label stands in the margin, the four facts in a row of the content between lines. */}
 <Section id={anchor} space="none" labelledby="praktisches-title" class="pt-band">
   <div class:list={[margin.grid, 'gap-y-6']}>
-    <h2 id="praktisches-title" data-reveal class:list={[label, margin.side, 'lg:pt-5']}>
+    <h2 id="praktisches-title" class:list={[label, margin.side, 'lg:pt-5']}>
       {eyebrow}
     </h2>
-    <dl data-reveal-group class:list={[margin.content, 'grid grid-cols-2 gap-x-grid gap-y-8 lg:grid-cols-4']}>
+    <dl class:list={[margin.content, 'grid grid-cols-2 gap-x-grid gap-y-8 lg:grid-cols-4']}>
       <slot />
     </dl>
   </div>

@@ -7,7 +7,7 @@ import SectionHead from '../ui/SectionHead.astro';
 
 interface Props {
   anchor: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
 }
 
@@ -18,7 +18,7 @@ const { anchor, eyebrow, title } = Astro.props;
 <Section id={anchor} space="band">
   <div class:list={[margin.grid, 'gap-y-6']}>
     <SectionHead eyebrow={eyebrow} title={title} size="sub" class={margin.side} />
-    <Prose reveal class={margin.reading}>
+    <Prose class={margin.reading}>
       <slot />
     </Prose>
   </div>

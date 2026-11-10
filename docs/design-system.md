@@ -130,7 +130,8 @@ and stays upright.
 | `text-marginal` | 14px     | a note in the margin column (`Marginal`)         |
 
 Titles tighten their tracking as they grow (−1 % to −5 %). Labels are sentence
-case: `Eyebrow` in the accent after a small ember dot, data labels (`label`) in the
+case: `Eyebrow` in the accent, only where it says something the title does not
+(the place, the kind of page), never above every heading; data labels (`label`) in the
 secondary colour. Running text stays on `max-w-measure` (~62 characters).
 
 ## Space and grid
@@ -166,7 +167,7 @@ page stays alive and calm. The styleguide shows each with its rules.
    poster, as the title ("Dabei sein.") or quietly behind content (`tone="ghost"`,
    8 % of the text colour, hidden from assistive technology). At most one per screen.
 
-Never: staircases of offset blocks, rotation (only the stamp turns), shadows, boxes
+Never: staircases of offset blocks, rotation, shadows, boxes
 around content, text over a photograph.
 
 ## Shape and depth
@@ -188,89 +189,45 @@ participants without their explicit consent, no text on a photograph.
 
 ## Motion
 
-The page moves the way an evening starts, at the pace of an app: things arrive one
-after the other, quickly, and settle. Opacity fades in on a gentle curve
-(`--ease-fade`, 0.7 s below the opening, 0.9 s in it), focus comes from a light blur
-on titles, movement follows springs without overshoot (sampled into `linear()`:
-the opening's over 1.3 s, 1.9 s for the photo; scroll reveals follow the scroll),
-distances stay short (a word 0.3em, a piece 2rem) and things follow one another
-at 0.055 s (words) or 0.07 s (what arrives together). Calm, never playful: no
-bounce, no scale on text.
+The page stands still. Motion is kept for three things, and each has a reason:
 
-Performance comes first: smooth at 120fps, checked with Lighthouse and a frame
-trace on every motion change (see "Lighthouse" below). Only opacity and transforms
-move, so the compositor carries every frame. The one exception is the soft blur the
-opening's title words come into focus from (CSS, light and 0.6 s, at load); a blur
-is redrawn on the main thread every frame (about 16× a transform), so nothing that
-moves while scrolling blurs. Depth is tied to the scroll and listed below ("Depth"); nothing else drifts, and no height animates except the FAQ's native unfolding. Fades start gently
-(`--ease-fade`, `[0.33, 0, 0.2, 1]`), so they are seen; no script reads layout
-before the page has settled (state at a scroll position comes from an
+- **The opening, once.** On load the label, the title and the pieces after it rise a
+  little and fade in at their `--enter-delay` (`data-enter`, global.css, pure CSS from
+  the first paint, because the title is the largest paint); the photograph settles
+  from a little larger, the taken chairs of the opening's seat ring fill in one after
+  the other. Fades use `--ease-fade`, movement a spring without overshoot sampled
+  into `linear()` (`--ease-spring`, `--ease-spring-slow` in theme.css). The home
+  opening and every sub-page opening (`PageIntro`) work this way; on an event page
+  the date and the title rise in first, then the lead and the registration. Then the
+  opening rests: no loop, no glow, nothing that follows the pointer.
+- **Answering the hand.** A button rises 2px and settles as it is pressed, arrows
+  nudge, header links draw a line, the FAQ's `<details>` unfolds (where
+  `interpolate-size` exists its `::details-content` transitions from height 0 to
+  `auto` in 0.32 s, the marker turns; elsewhere and under reduced motion it toggles at
+  once), the phone menu opens as a circle from its button.
+- **Two bars whose place depends on the scroll.** On an event page a dock with title
+  and date slides out from behind the bar as the title passes under it, and back as
+  the title returns (`EventDock`: the title's view timeline, `--event-title`). On the
+  home page the phone's bottom bar (`ActionBar`) rises as the opening's action passes
+  under the bar, steps down while the dates are on screen and leaves for the footer
+  (three view timelines, `--hero-action`, `--dates`, `--page-footer`, whose
+  translations add up). `timeline-scope` on `body` lifts the names. Without scroll
+  timelines, and under reduced motion, one observer and a CSS transition show and
+  hide each; the observers also say whether the bottom bar can be reached (`inert`,
+  `aria-hidden`, the tab stop).
+
+Nothing else moves. No piece fades or rises in as it enters the view, nothing drifts,
+trails or turns with the scroll, and no ambient loop runs: a section that is on the
+page is there, readable, the moment it is scrolled to. A new animation needs one of
+the three reasons above; "it feels alive" is not one.
+
+Only opacity and transforms move, so the compositor carries every frame. No script
+reads layout before the page has settled (state at a scroll position comes from an
 `IntersectionObserver`, never from `scrollY`); state flags go on the element that
-needs them, never on `<html>` while the page moves (that restyles the whole page;
-the boot script's flags are set before the first frame); and the opening never
-waits for a script.
-
-- The opening (`data-enter`, global.css, pure CSS from the first paint, because the
-  title is the largest paint): the label, then the title word by word
-  (`data-enter="words"`; `lib/shared/words.ts` wraps the words on the server with their
-  index, so the lines break the same with and without motion), then the lead, the
-  action and the next date at their `--enter-delay` (`afterWords()`), the taken
-  chairs of the seat ring filling in one after the other. The photo settles from a little larger (`settle`), the
-  ring of the logo follows (`ring`). The springs are Motion's, sampled into
-  `linear()` (`--ease-spring`, `--ease-spring-slow` in theme.css). The home opening
-  and every sub-page opening (`PageIntro`) work this way. On an event page the date
-  line and the title rise in first, then the lead and the registration panel. As the
-  title passes under the bar, a dock with title and date slides out from behind the bar
-  and back as the title returns (`EventDock`): the title's view timeline drives it
-  (`--event-title`, lifted by `timeline-scope` on `main`), opacity and translation only;
-  without scroll timelines and under reduced motion one observer shows and hides it. The opening plays on every page load.
-- Below it, CSS scroll-driven animations (global.css, "Motion: scroll"): each piece
-  arrives as it comes into view, once, driven by the scroll itself
-  (`animation-timeline: view()`, `animation-range: entry`): an element
-  (`data-reveal`) or each child of a group (`data-reveal-group`: a section head's
-  label, title and lead; a list's rows; a text's paragraphs, `Prose reveal`). Later
-  children of a group start a little further into their entry, so what enters
-  together follows top to bottom. Nothing is hidden up front: what is in view at
-  load, or scrolled past, stands; a browser without scroll timelines, reduced motion
-  and print show everything at once. The taken chairs of a seat ring below the opening fill in once in view
-  (`data-seat-dot`); the stamp turns a little as it passes (`data-stamp-turn`, the one
-  element that turns, driven by the scroll, so it costs nothing out of view).
-  No script and no `motion` on this path.
-- Every text on a page arrives this way, never a heading beside text that already
-  stands: section heads, the intro's text and its questions, Markus's text and link,
-  the steps and their close, the agreements, the voices and their link, the FAQ and
-  its contact line, every date summary piece by piece, the newsletter, the event's
-  story, note and map, the legal pages paragraph by paragraph. The footer is the
-  frame and stands.
-- Depth (global.css, "Motion: scroll"; scroll-linked, so at rest whenever the page
-  rests, and each on an element of its own beside the one that arrives): the opening
-  leaves in layers (`--hero` view timeline: its text goes ahead, `data-hero-text`,
-  never dimmed; the photograph sinks a little and comes closer from its lower edge, never past the opening's own edge,
-  `data-hero-photo`; the ring's point travels on, `data-hero-orbit`); an index number
-  trails its row (`data-index`); the poster word of the dates slides in from the side
-  (`data-drift`); Markus's ring opens (`data-ring-open`). Transforms and opacity only.
-- A hovering pointer carries a soft firelight across the opening (`data-ember`,
-  Hero.astro): one `translate` per pointer event, eased by a CSS transition, no
-  layout read; not on touch, not under reduced motion.
-- Things arrive once and then stand; beyond the depth above only the stamp turns with
-  the scroll.
-- FAQ (`AccordionItem`): a native `<details>`; where `interpolate-size` exists its
-  `::details-content` transitions from height 0 to `auto` in 0.32 s (global.css,
-  "FAQ"), and the marker turns (`item-open:` variant). Keyboard, find-in-page and
-  screen readers work as with any `<details>`. Elsewhere, and under reduced motion,
-  it toggles at once. No script.
-- The bottom bar on phones (`ActionBar`) follows the scroll: it rises as the
-  opening's action passes under the bar, steps down while the dates are on screen
-  and leaves for the footer (three view timelines, `--hero-action`, `--dates`,
-  `--page-footer`, lifted by `timeline-scope` on `body`; their translations add
-  up). Without scroll timelines it glides on a CSS transition on `data-visible`, at
-  once under reduced motion. Its observers only say whether it can be reached
-  (`inert`, `aria-hidden`, the tab stop). There is no reading-progress bar,
-  and the back-to-top link shows on the desktop only. The registration form is in the page from the first frame; its answer
-  replaces the fields in place.
-- Loops that never change state stay in CSS: the glow breathes on the 11-second
-  cycle (`data-glow`), the ring turns; both pause once the opening is out of view
-  (`data-offscreen`, Hero.astro), since a running animation is serviced every frame.
+needs them, never on `<html>` while the page moves; the opening never waits for a
+script. The registration form is in the page from the first frame; its answer
+replaces the fields in place. There is no reading-progress bar, and the back-to-top
+link shows on the desktop only.
 
 ### Page transitions
 
@@ -288,19 +245,10 @@ Run it against a production build (`bun run build`, then the server on a disposa
 database) for the home page on mobile and desktop and for any page whose motion
 changed: `bunx lighthouse <url> --only-categories=performance,accessibility,best-practices,seo`
 (add `--preset=desktop`). Hold: CLS 0, no forced reflow ("Forced reflow" insight
-empty), no non-composited animations beyond the accepted blur on the opening's
-title words, the LCP element's render delay well under
+empty), no non-composited animations, the LCP element's render delay well under
 half a second. Locally the server does not compress (the proxy does in
 production), so the render-blocking stylesheet weighs more in the simulated
 mobile score than it does live.
-
-Short transitions answer interactions (a button rises 2px and settles as it is
-pressed, arrows slide and nudge on a press, the FAQ disc gives a little under the
-finger, header links draw a line). The hero's ring turns once every 90 seconds and rests off screen and under reduced
-motion. The phone menu opens as a circle
-and its links rise in (`rise`); the event dock follows the title under the bar. On phones the home page keeps the next date and its action in a bottom bar
-(`ActionBar`) once the opening's action has scrolled away; it steps back at the
-dates and the footer. Under reduced motion everything rests.
 
 ## Components
 
@@ -311,13 +259,13 @@ dates and the footer. Under reduced motion everything rests.
 | `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead; with `margin.cross` it crosses into the content            |
 | `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; a photograph bleeds right, without one the stamp stands there                  |
 | `Poster`, `Index`, `Marginal`                     | The poster word, the index number, the margin note                                                   |
-| `Eyebrow`                                         | The section label: ember dot, accent text                                                            |
+| `Eyebrow`                                         | A label above a title where it adds information: accent text                                         |
 | `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`                                             |
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                          |
 | `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                        |
 | `EventSummary`                                    | One date, open on its ground: the date, the facts as small columns, the seat ring, the action        |
 | `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in ember from the top; the number free in the middle; words beside |
-| `Stamp` (`turn`)                                  | The mark between two rings, the circle's name round it; turns with the scroll where `turn` is set    |
+| `Stamp`                                           | The mark between two rings, the circle's name round it; it stands still                              |
 | `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                  |
 | `Fact` (`layout`)                                 | Label, value in Fraunces, a note, under a rule; four in a row, or (`row`) lines with the label first |
 | `TestimonialList`                                 | One short voice large, the others as rows (author in the margin); every voice in full                |
@@ -344,7 +292,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   the margin; the course on sand, each step with its index number in the margin;
   the five agreements on the moss as rows across the page, numbers in the spark;
   taking part (`#termine`, sand, "Dabei sein." as a poster word beside the next
-  date); Markus, his quote crossing a large ring cut by the window; the voices on
+  date); Markus, one sentence of his under a rule, signed with his face; the voices on
   the moss; the FAQ with the contact line in the margin; staying in touch on the
   forest with the stamp cut by the right edge, running into the footer.
 - **`/event`.** `PageIntro` with the stamp, every coming date as `EventSummary`
@@ -356,7 +304,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   where the registration follows the title), the calendar; the evening's description
   (sand); the map; where next.
 - **Personal page.** `PageIntro` with the photograph in a circle cut by the right
-  edge, sections with their headings in the margin, values as rows with index numbers, the
+  edge, sections with their headings in the margin, values as rows, the
   FAQ, one closing invitation.
 - **Legal pages, testimonial form, 404.** `PageIntro` and one column.
 - **Admin.** The same tokens at night: forest grounds, rounded cards, ember for the
@@ -372,7 +320,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
 - Scripts find elements by `data-*` attributes and switch states with them
   (`data-state`, `data-tone`, `data-scrolled`, `data-running`); styles read the same
   attributes through `data-[…]:` and `group-data-[…]:` variants.
-- Arbitrary values are for one-off geometry (where the hero's ring and glow sit, the
+- Arbitrary values are for one-off geometry (where the hero's photograph sits, the
   points on a ring at 120°); anything used twice becomes a token or a recipe.
 - Allowed outside utilities, each with its reason in `theme.css`/`global.css`: font
   tokens, primitives, the surfaces, the reduced-motion floor, the scroll lock under a
@@ -390,7 +338,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   44–52px high; touch targets at least 44px.
 - The four moves are the only ways to break the grid, each at most once per
   section: margin column, overlap, bleed, poster word. No staircases of offset
-  blocks, no rotation (the stamp turns, nothing else), no boxes around content.
+  blocks, no rotation, no boxes around content.
 - A token that the styleguide should describe carries a trailing comment in
   `theme.css`; German notes for people live in `lib/brand/notes.ts`
   (`tests/brand-notes.test.ts` keeps their keys real).

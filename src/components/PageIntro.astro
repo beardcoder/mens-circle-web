@@ -10,7 +10,7 @@ import Eyebrow from './ui/Eyebrow.astro';
  * (slot `lead`) and any actions (default slot) on the reading line; a photograph
  * (slot `media`) beside them from `lg`, under them on phones. A long word in the
  * title ("Datenschutzerklärung") hyphenates rather than overflows. On load the
- * title's words rise in turn and the rest follows (global.css, "Motion: the opening").
+ * title rises in and the rest follows (global.css, "Motion: the opening").
  */
 interface Props {
   eyebrow?: string;
@@ -42,7 +42,7 @@ const hasMedia = Astro.slots.has('media');
       data-enter="ring"
       class="pointer-events-none absolute top-[calc(var(--spacing-header)+1rem)] right-0 hidden w-80 translate-x-1/4 text-line-strong lg:block xl:w-96"
     >
-      <Stamp turn />
+      <Stamp />
     </div>
   )}
   <Container class:list={['relative grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>

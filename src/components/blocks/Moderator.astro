@@ -8,7 +8,7 @@ import TextLink from '../ui/TextLink.astro';
 
 interface Props {
   anchor: string;
-  eyebrow: string;
+  eyebrow?: string;
   name: string;
   quote: string;
   /** A small square of his face, signing the quote. Pre-sized: the home page is SSR. */
@@ -23,32 +23,22 @@ interface Props {
 const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote, linkLabel, linkUrl } = Astro.props;
 ---
 
-{/* Markus introduces himself; beside him his quote stands in a large ring that the window
-    cuts on the right (the bleed), the quote crossing the ring's edge, his face a chair on it. */}
+{/* Markus introduces himself; beside him one sentence of his under a rule, signed with his face. */}
 <Section id={anchor} labelledby="person-title" innerClass="grid items-center gap-x-grid gap-y-16 lg:grid-cols-12">
   <div class="grid min-w-0 content-start justify-items-start gap-6 lg:col-span-6">
     <SectionHead eyebrow={eyebrow} title={name} titleId="person-title" />
-    <Prose reveal>
+    <Prose>
       <slot />
     </Prose>
-    {linkLabel && linkUrl && (
-      <TextLink href={linkUrl} data-reveal>
-        {linkLabel}
-      </TextLink>
-    )}
+    {linkLabel && linkUrl && <TextLink href={linkUrl}>{linkLabel}</TextLink>}
   </div>
 
   {quote && (
-    <figure data-reveal class="relative grid min-w-0 content-center py-12 lg:col-span-5 lg:col-start-8 lg:py-24">
-      <span
-        aria-hidden="true"
-        data-ring-open
-        class="absolute top-1/2 left-[14%] aspect-square w-[118%] -translate-y-1/2 rounded-full border border-line-strong lg:left-[22%] lg:w-[132%]"
-      ></span>
-      <blockquote class="relative max-w-[16em] font-display text-quote text-fg">
+    <figure class="grid min-w-0 content-center border-t border-line-strong pt-8 lg:col-span-5 lg:col-start-8">
+      <blockquote class="max-w-[16em] font-display text-quote text-fg">
         <p>„{quote}“</p>
       </blockquote>
-      <figcaption class="relative mt-8 flex items-center gap-4">
+      <figcaption class="mt-8 flex items-center gap-4">
         <img
           src={avatar.src}
           width={avatar.width}

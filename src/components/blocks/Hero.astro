@@ -41,28 +41,15 @@ const nextLine = next
      where the window is too short for it): the statement as large as a poster,
      its phrase in the spark; beside it the photograph in a circle, cut by the window's
      right edge (the bleed), and the next evening's seat ring overlapping it. On load the
-     title's words rise one after the other, the rest follows and the photo settles
-     (global.css, "Motion: the opening"). */}
+     title rises in, the rest follows and the photo settles (global.css, "Motion: the
+     opening"); after that the opening stands still. */}
 <section
   data-hero
   aria-labelledby="hero-title"
   class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section lg:grid lg:min-h-svh lg:content-center lg:pb-band"
 >
-  {/* Firelight: a warm glow where the circle sits, breathing slowly. */}
-  <div
-    aria-hidden="true"
-    data-glow
-    class="pointer-events-none absolute top-[38%] -right-[30%] aspect-square w-[110%] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-fill)_32%,transparent),transparent)] lg:top-[-14%] lg:-right-[12%] lg:w-[66%]"
-  ></div>
-  {/* Firelight under the pointer: a soft light that follows it with a little delay (script below). */}
-  <div
-    aria-hidden="true"
-    data-ember
-    class="pointer-events-none absolute top-0 left-0 -mt-80 -ml-80 hidden size-160 rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-spark)_13%,transparent),transparent)] opacity-0 transition-[translate,opacity] duration-700 ease-out hover-device:block data-on:opacity-100"
-  ></div>
-
   <Container class="relative grid items-start gap-x-grid gap-y-16 lg:grid-cols-12">
-    <div data-hero-text class="grid min-w-0 justify-items-start lg:col-span-9">
+    <div class="grid min-w-0 justify-items-start lg:col-span-9">
       {kicker && (
         <Eyebrow class="mb-6" data-enter>
           {kicker}
@@ -136,8 +123,7 @@ const nextLine = next
   {/* The photograph: under the text on phones; from `lg` beside the title, as large as
       a third of the window and cut by its right edge. */}
   <div class="relative mx-auto mt-16 w-[calc(100%-2*var(--spacing-gutter))] max-w-[22rem] sm:max-w-[28rem] lg:absolute lg:top-[calc(50%+var(--spacing-header)/2)] lg:right-0 lg:mt-0 lg:w-[min(36vw,54svh)] lg:max-w-[40rem] lg:translate-x-[16%] lg:-translate-y-1/2">
-    {/* Leaving, the photograph falls behind the text and comes a little closer (global.css, "Motion: scroll"). */}
-    <div data-hero-photo class="relative">
+    <div class="relative">
       <div data-enter="settle" class="relative">
         <img
           src={largest.src}
@@ -150,14 +136,6 @@ const nextLine = next
           decoding="async"
           class="aspect-square w-full rounded-full object-cover"
         />
-        {/* The circle of the logo: a thin ring with one warm point, turning slowly. */}
-        <div aria-hidden="true" data-enter="ring" class="pointer-events-none absolute -inset-[7%]">
-          <div data-hero-orbit class="absolute inset-0">
-            <div class="hero-orbit absolute inset-0 rounded-full border border-line-strong">
-              <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-spark"></span>
-            </div>
-          </div>
-        </div>
       </div>
       {next?.view.seats && (
         /* The next evening's chairs, on a disc of the forest, overlapping the circle's edge. */
@@ -172,30 +150,3 @@ const nextLine = next
     </div>
   </div>
 </section>
-
-<script>
-  // Out of view the opening's loops pause (global.css): a running animation is
-  // serviced every frame even where nobody sees it.
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-
-  if (hero) {
-    new IntersectionObserver(([entry]) => hero.toggleAttribute('data-offscreen', !entry.isIntersecting)).observe(hero);
-
-    // The firelight follows a hovering pointer. Only the event's own numbers are used:
-    // no layout is read, and the light moves by `translate` alone.
-    const ember = hero.querySelector<HTMLElement>('[data-ember]');
-    const follows = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
-
-    if (ember && follows.matches) {
-      hero.addEventListener(
-        'pointermove',
-        (event) => {
-          ember.style.translate = `${event.pageX}px ${event.pageY}px`;
-          ember.dataset.on = '';
-        },
-        { passive: true },
-      );
-      hero.addEventListener('pointerleave', () => delete ember.dataset.on);
-    }
-  }
-</script>

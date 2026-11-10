@@ -44,7 +44,7 @@ const canonical = new URL('/event', siteUrl).href;
   {/* The dates are what this page is for; the notification stands beside them, smaller. */}
   <EventList events={events} />
 
-  <Faq anchor="fragen-zum-termin" eyebrow="Vor dem Termin" title="Fragen zu Termin und Anmeldung">
+  <Faq anchor="fragen-zum-termin" title="Fragen zu Termin und Anmeldung">
     <AccordionItem question="Wann findet der nächste Männerkreis statt?">
       Die aktuellen Termine stehen oben auf dieser Seite. Sobald ein neuer Abend geplant ist, erfährst du es auch per
       E-Mail oder über die WhatsApp-Gruppe.
@@ -72,7 +72,6 @@ const canonical = new URL('/event', siteUrl).href;
   </Faq>
 
   <LinkBand
-    eyebrow="Mehr über den Kreis"
     title="Weiterlesen"
     titleId="mehr-title"
     items={[

@@ -92,7 +92,7 @@ anonymised again on the next run at 02:30.
 - Admin guard and default `Cache-Control`: `src/middleware.ts`, `src/lib/cache-policy.ts`
 - Public CSS: shared hashed stylesheets; the SSR home photo and avatar are pre-sized AVIF/WebP files (no `/_image` at runtime)
 - Design: forest, ember and linen; Fraunces 500 (static) and Figtree (variable), ~37 kB of fonts; see [design system](docs/design-system.md)
-- Motion and page transitions: the opening in CSS, scroll reveals as CSS scroll-driven animations, a native cross-fade between pages; see the design system's "Motion" and "Page transitions"
+- Motion and page transitions: the opening once in CSS, two scroll-linked bars on CSS view timelines, nothing that fades in on scroll, a native cross-fade between pages; see the design system's "Motion" and "Page transitions"
 - Prefetch through Speculation Rules (no script)
 - Server adapter: `@igloczek/astro-bun-adapter` (standalone, bundled), served by `server.ts` on `Bun.serve()`; see [runtime](docs/runtime.md)
 - Mail fonts: endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view

@@ -27,7 +27,6 @@ const { value, tone = 'accent', size = 'index', class: className } = Astro.props
 
 <span
   aria-hidden="true"
-  data-index
   class:list={['block font-display font-semibold tabular-nums', SIZES[size], TONES[tone], className]}
 >
   {String(value).padStart(2, '0')}

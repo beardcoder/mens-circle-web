@@ -10,7 +10,7 @@ import TestimonialList from './TestimonialList.astro';
 interface Props {
   items: TestimonialDTO[] | null;
   anchor: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   emptyText: string;
   errorText: string;
@@ -30,12 +30,10 @@ const { items, anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel 
       {items?.length ? (
         <TestimonialList items={items} />
       ) : (
-        <p data-reveal class:list={[margin.reading, 'text-md text-fg-soft']}>
-          {items ? emptyText : errorText}
-        </p>
+        <p class:list={[margin.reading, 'text-md text-fg-soft']}>{items ? emptyText : errorText}</p>
       )}
     </div>
-    <p data-reveal class={margin.content}>
+    <p class={margin.content}>
       <TextLink href={linkUrl}>{linkLabel}</TextLink>
     </p>
   </div>
