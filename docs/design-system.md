@@ -86,7 +86,7 @@ set before first paint. Never a hex value in markup.
 | Page            | `#F4EEE2` paper              | `#0F1410`             | `ground`                         | the page                                         |
 | Warm band       | `#E6DAC4` sand               | `#1D2019`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates      |
 | Raised          | `#FFFCF6` cream              | `#262B23`             | `raised`                         | fields, the QR square, the admin's cards         |
-| Moss            | `#2C3A30`                    | `#1A2A20`             | `surface-moss`                   | what is spoken in the circle: agreements, voices |
+| Moss            | `#2C3A30`                    | `#1A2A20`             | `surface-moss`                   | print and mail only; the site has three grounds  |
 | Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, registration, menu, last band, footer   |
 | Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                            |
 | Secondary text  | `#565E51` moss grey          | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text  |
@@ -105,10 +105,13 @@ least 3:1 (`tests/contrast.test.ts`, pair by pair). Check any new pair in both m
 
 ## Type
 
-`font-display` is Fraunces, variable in weight (500–700) and optical size (9–144),
-one file of ~60 kB in the repo (`src/assets/fonts/`). The optical size follows the
-size by itself, so a poster word gets the high-contrast cut and a date the sturdy
-one. Titles are 500, the hero, page titles, index numbers and poster words 600.
+`font-display` is Vollkorn (Friedrich Althausen), a sturdy book face made for
+everyday reading, variable in weight, one file of ~46 kB in the repo
+(`src/assets/fonts/`), declared from weight 500. It was chosen over the faces a
+generated page reaches for: it is plain, dark and a little rustic, which is what
+the circle is. Its figures are set lining (`lnum`), so dates and counts stand on
+the line. Titles are 500, the hero, page titles, index numbers and poster words 600.
+The face runs wide, so the home statement is 44–82px and stands on two lines.
 `font-sans` is Figtree (variable, 400–700): running text, navigation, forms, data.
 A highlighted phrase in a title (`<em>`) turns the accent (the spark on the forest)
 and stays upright.
@@ -116,7 +119,7 @@ and stays upright.
 | Token           | Size     | Use                                              |
 | --------------- | -------- | ------------------------------------------------ |
 | `text-poster`   | 72–216px | one poster word or number (`Poster`)             |
-| `text-hero`     | 48–104px | the home statement                               |
+| `text-hero`     | 44–82px  | the home statement                               |
 | `text-index`    | 48–104px | an index number in the margin (`Index`)          |
 | `text-page`     | 44–96px  | a sub-page's title, an event title               |
 | `text-section`  | 36–72px  | a section's title, the one featured voice        |
@@ -267,7 +270,7 @@ mobile score than it does live.
 | `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in ember from the top; the number free in the middle; words beside |
 | `Stamp`                                           | The mark between two rings, the circle's name round it; it stands still                              |
 | `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                  |
-| `Fact` (`layout`)                                 | Label, value in Fraunces, a note, under a rule; four in a row, or (`row`) lines with the label first |
+| `Fact` (`layout`)                                 | Label, value in Vollkorn, a note, under a rule; four in a row, or (`row`) lines with the label first |
 | `TestimonialList`                                 | One short voice large, the others as rows (author in the margin); every voice in full                |
 | `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                        |
 | `LinkList`, `Prose` (`width`)                     | Where-next rows; rich text (`measure` / `column`)                                                    |
@@ -290,10 +293,10 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   overlapping it. Then: the facts in the content column beside their label (paper);
   the intro, its title crossing into the content, the first round's questions in
   the margin; the course on sand, each step with its index number in the margin;
-  the five agreements on the moss as rows across the page, numbers in the spark;
+  the five agreements on the forest as rows across the page, numbers in the spark;
   taking part (`#termine`, sand, "Dabei sein." as a poster word beside the next
   date); Markus, one sentence of his under a rule, signed with his face; the voices on
-  the moss; the FAQ with the contact line in the margin; staying in touch on the
+  the forest; the FAQ with the contact line in the margin; staying in touch on the
   forest with the stamp cut by the right edge, running into the footer.
 - **`/event`.** `PageIntro` with the stamp, every coming date as `EventSummary`
   beside the e-mail notification; the FAQ; a where-next band.

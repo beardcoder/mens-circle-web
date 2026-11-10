@@ -105,17 +105,17 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
   fonts: [
-    // Fraunces for titles, quotes, dates and poster words; Figtree for everything that
-    // explains, mapped to font-display and font-sans in the shared theme. Fraunces is
-    // one variable file (weight 500–700, optical size 9–144, ~60 kB), kept in the repo:
-    // Fontsource would serve every axis (~120 kB). Figtree is one variable file
-    // (~20 kB) for 400–700. src/assets/fonts/README.md says how the file was made.
+    // Vollkorn for titles, quotes, dates and poster words; Figtree for everything that
+    // explains, mapped to font-display and font-sans in the shared theme. Vollkorn is
+    // one variable file (~46 kB, declared from 500: nothing is set lighter), in the repo; Figtree is one
+    // variable file (~20 kB) for 400–700. src/assets/fonts/README.md says where the
+    // file comes from.
     {
-      name: 'Fraunces',
-      cssVariable: '--font-fraunces',
+      name: 'Vollkorn',
+      cssVariable: '--font-vollkorn',
       provider: fontProviders.local(),
       options: {
-        variants: [{ src: ['./src/assets/fonts/fraunces-variable-latin.woff2'], weight: '500 700', style: 'normal' }],
+        variants: [{ src: ['./src/assets/fonts/vollkorn-variable-latin.woff2'], weight: '500 900', style: 'normal' }],
       },
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
     },

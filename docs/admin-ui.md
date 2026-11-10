@@ -15,7 +15,7 @@ in `components/admin/icons.tsx`, which AdminLayout also renders statically.
 
 Visual direction: the public design at night — the forest ground, bone text, muted
 moss, the ember accent and the semantic success/danger tokens from theme.css. Figtree
-for controls and data, Fraunces for page titles and the next evening. Controls are
+for controls and data, Vollkorn for page titles and the next evening. Controls are
 round, cards rounded (`rounded-xl`). Space actions away from destructive tools, and show feedback at the
 affected workspace. Native modal dialogs confirm deletion and sending.
 

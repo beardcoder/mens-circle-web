@@ -22,10 +22,10 @@ interface Props {
 const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props;
 ---
 
-{/* On the moss: what is said in the circle. The five agreements as lines across the
+{/* On the forest: what is said in the circle. The five agreements as lines across the
     page, each number in the spark, its name and what it means; the boundary (no
     therapy) under them, its title in the margin. */}
-<Section id={anchor} ground="moss" labelledby="rahmen-title">
+<Section id={anchor} ground="dark" labelledby="rahmen-title">
   <div class:list={[margin.grid, 'gap-y-group']}>
     <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} class={margin.cross} />
 

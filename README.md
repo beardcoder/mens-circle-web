@@ -91,7 +91,7 @@ anonymised again on the next run at 02:30.
 - Event details: SSR metadata, copy and a server-rendered registration form that works without JavaScript
 - Admin guard and default `Cache-Control`: `src/middleware.ts`, `src/lib/cache-policy.ts`
 - Public CSS: shared hashed stylesheets; the SSR home photo and avatar are pre-sized AVIF/WebP files (no `/_image` at runtime)
-- Design: forest, ember and linen; Fraunces 500 (static) and Figtree (variable), ~37 kB of fonts; see [design system](docs/design-system.md)
+- Design: forest, ember and linen; Vollkorn and Figtree (both variable), ~66 kB of fonts; see [design system](docs/design-system.md)
 - Motion and page transitions: the opening once in CSS, two scroll-linked bars on CSS view timelines, nothing that fades in on scroll, a native cross-fade between pages; see the design system's "Motion" and "Page transitions"
 - Prefetch through Speculation Rules (no script)
 - Server adapter: `@igloczek/astro-bun-adapter` (standalone, bundled), served by `server.ts` on `Bun.serve()`; see [runtime](docs/runtime.md)

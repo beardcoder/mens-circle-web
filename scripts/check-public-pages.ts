@@ -354,7 +354,13 @@ try {
     assert.equal(missing.headers.get('cache-control'), 'no-store');
     assert.equal((await fetch(`${origin}/api/public/events`)).status, 404);
 
-    for (const font of ['fraunces-500.woff2', 'figtree.woff2', 'dm-sans.woff2', 'playfair-display-400.woff2']) {
+    for (const font of [
+      'vollkorn-500.woff2',
+      'fraunces-500.woff2',
+      'figtree.woff2',
+      'dm-sans.woff2',
+      'playfair-display-400.woff2',
+    ]) {
       const response = await fetch(`${origin}/fonts/mail/${font}`, { headers: { Origin: 'https://listmonk.example' } });
 
       assert.equal(response.status, 200);

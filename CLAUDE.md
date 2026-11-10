@@ -245,12 +245,13 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   lines ≥ 3:1 (`tests/contrast.test.ts`); `line` never outlines a control alone; the
   spark is never text on paper or sand. Check new pairs in both modes.
 - Grounds: `Section ground` is `default` (paper), `alt` (sand: facts, course,
-  dates), `moss` (`surface-moss`, dark in both modes: agreements, voices) or `dark`
-  (`surface-dark`, forest: opening, registration, menu, last band, footer). Grounds
+  dates) or `dark`
+  (`surface-dark`, forest: opening, agreements, voices, registration, menu, last
+  band, footer). The site has these three grounds; `moss` stays for print. Grounds
   run from edge to edge; `Section` clips horizontally what bleeds.
-- Type: Fraunces variable (`font-display`, weight 500–700, optical size 9–144, one
-  ~60 kB file in `src/assets/fonts/`, local provider) for titles, dates, numbers,
-  poster words; Figtree (`font-sans`) for text, navigation, forms, data. Role tokens
+- Type: Vollkorn variable (`font-display`, one ~46 kB file in `src/assets/fonts/`,
+  local provider, declared from weight 500, figures lining via `lnum`) for titles,
+  dates, numbers, poster words; it runs wide, so the home statement is 44–82px; Figtree (`font-sans`) for text, navigation, forms, data. Role tokens
   `text-poster`, `text-hero`, `text-index`, `text-page`, `text-section`, `text-sub`,
   `text-quote`, `text-md` (body), `text-base` (controls), `text-marginal`. `<em>` in
   a title turns the accent (the spark on the forest), upright. Labels in sentence
@@ -290,8 +291,8 @@ experimental_install`, `.claude/skills/` is not committed) is a reviewer here, n
 - Home: the forest opening (statement at poster size, the one action, the next
   date; the photograph cut by the right edge, the seat ring overlapping it; the bar's
   action outlined over it), facts, intro (questions in the margin), course (sand,
-  index numbers), agreements (moss), taking part (`#termine`, "Dabei sein." as a
-  poster word), Markus (one sentence of his under a rule), voices (moss, every
+  index numbers), agreements (forest), taking part (`#termine`, "Dabei sein." as a
+  poster word), Markus (one sentence of his under a rule), voices (forest, every
   voice in full), FAQ, staying in touch (forest, the stamp), the footer.
 - Header 72px: links from `nav`, one action; over the home opening clear with light
   text until the page moves (`data-scrolled`), then 95 % paper; fixed bars blur only

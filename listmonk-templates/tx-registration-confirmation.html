@@ -14,7 +14,9 @@
   <!-- Webfonts from the site itself, never from a third party: no recipient IP leaves our server -->
   <!--[if !mso]><!-->
   <style>
-    @font-face { font-family:'Fraunces'; font-style:normal; font-weight:500; font-display:swap; src:url(https://mens-circle.de/fonts/mail/fraunces-500.woff2) format('woff2'); }
+    @font-face { font-family:'Vollkorn'; font-style:normal; font-weight:500; font-display:swap; src:url(https://mens-circle.de/fonts/mail/vollkorn-500.woff2) format('woff2'); }
+    /* Vollkorn's default figures are old-style; dates and counts stand on the line */
+    .em-serif, .em-event__date { font-feature-settings:'lnum'; font-variant-numeric:lining-nums; }
     @font-face { font-family:'Figtree'; font-style:normal; font-weight:300 900; font-display:swap; src:url(https://mens-circle.de/fonts/mail/figtree.woff2) format('woff2'); }
   </style>
   <!--<![endif]-->
@@ -48,7 +50,7 @@
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
           <td style="padding-right:12px;vertical-align:middle;"><a href="https://mens-circle.de" target="_blank"><img src="https://mens-circle.de/images/logo-mail.png" width="36" height="36" alt="" style="display:block;width:36px;height:36px;"></a></td>
           <td style="vertical-align:middle;">
-            <div class="em-serif" style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#F2EDE3;">Männerkreis</div>
+            <div class="em-serif" style="font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#F2EDE3;">Männerkreis</div>
           </td>
         </tr></table>
       </td></tr>
@@ -56,15 +58,15 @@
       <!-- Content -->
       <tr><td height="8" style="height:8px;font-size:0;line-height:0;">&nbsp;</td></tr>
       <tr><td class="em-pad" bgcolor="#FFFCF6" style="padding:40px 40px 36px;background-color:#FFFCF6;border-radius:28px;">
-<p class="em-sans" style="margin:0 0 14px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#9A421D;"><span style="display:inline-block;width:8px;height:8px;margin:0 10px 1px 0;border-radius:4px;background-color:#B4532A;vertical-align:middle;"></span>Anmeldung bestätigt</p>
-<h1 class="em-display em-serif" style="margin:0 0 18px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:40px;font-weight:500;line-height:1.12;letter-spacing:-0.015em;color:#1B241E;">Du bist dabei.</h1>
+<p class="em-sans" style="margin:0 0 14px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#9A421D;">Anmeldung bestätigt</p>
+<h1 class="em-display em-serif" style="margin:0 0 18px;font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:40px;font-weight:500;line-height:1.12;letter-spacing:-0.015em;color:#1B241E;">Du bist dabei.</h1>
 <p class="em-sans" style="margin:0 0 18px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#1B241E;">Hallo {{ .Tx.Data.firstName }}, dein Platz beim <strong style="font-weight:600;color:#1B241E;">{{ .Tx.Data.eventTitle }}</strong> ist reserviert. Schön, dass du kommst.</p>
 
 <!-- The date: a rounded sand card, the facts that belong together -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 30px;">
   <tr><td class="em-card" bgcolor="#e6dac4" style="padding:26px 28px 24px;background-color:#e6dac4;border-radius:20px;">
     <p class="em-sans" style="margin:0 0 10px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#565e51;">Dein Termin</p>
-    <p class="em-date em-serif" style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;color:#1B241E;">{{ if .Tx.Data.dateDay }}<span style="white-space:nowrap;">{{ .Tx.Data.dateWeekday }}</span> <span style="white-space:nowrap;">{{ .Tx.Data.dateDay }}</span>{{ else }}{{ .Tx.Data.dateLong }}{{ end }}</p>
+    <p class="em-date em-serif" style="margin:0;font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;color:#1B241E;">{{ if .Tx.Data.dateDay }}<span style="white-space:nowrap;">{{ .Tx.Data.dateWeekday }}</span> <span style="white-space:nowrap;">{{ .Tx.Data.dateDay }}</span>{{ else }}{{ .Tx.Data.dateLong }}{{ end }}</p>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
       <tr><td style="padding-top:12px;border-top:1px solid #c2b59c;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -110,20 +112,20 @@
     <a href="{{ .Tx.Data.icsUrl }}" target="_blank" class="em-sans" style="display:inline-block;padding:15px 28px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;line-height:1.1;color:#FFF8F0;text-decoration:none;border-radius:999px;">In den Kalender eintragen&nbsp;&nbsp;&rarr;</a>
   </td></tr>
 </table>
-{{ end }}{{ if .Tx.Data.description }}<h2 class="em-serif" style="margin:36px 0 12px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#1B241E;">Was dich erwartet</h2>
+{{ end }}{{ if .Tx.Data.description }}<h2 class="em-serif" style="margin:36px 0 12px;font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#1B241E;">Was dich erwartet</h2>
 <p class="em-sans" style="margin:0 0 18px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#1B241E;white-space:pre-line;">{{ .Tx.Data.description }}</p>
-{{ end }}<h2 class="em-serif" style="margin:36px 0 12px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#1B241E;">Gut zu wissen</h2>
+{{ end }}<h2 class="em-serif" style="margin:36px 0 12px;font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#1B241E;">Gut zu wissen</h2>
 <p class="em-sans" style="margin:0 0 18px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#1B241E;">Vorbereiten musst du nichts. Komm am besten ein paar Minuten früher, dann fangen wir gemeinsam an. Falls dir etwas dazwischenkommt, {{ if .Tx.Data.cancelUrl }}<a href="{{ .Tx.Data.cancelUrl }}" class="em-link" style="color:#9A421D;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">sag hier ab</a>{{ else }}schreib mir kurz an <a href="mailto:{{ .Tx.Data.contactEmail }}" class="em-link" style="color:#9A421D;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">{{ .Tx.Data.contactEmail }}</a>{{ end }}. Dann kann jemand von der Warteliste nachrücken.</p>
 {{ if .Tx.Data.eventUrl }}<p class="em-sans" style="margin:0 0 18px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#565e51;">Alle Infos zum Abend findest du jederzeit auf der <a href="{{ .Tx.Data.eventUrl }}" class="em-link" style="color:#9A421D;text-decoration:underline;text-underline-offset:3px;">Seite des Termins</a>.</p>
 {{ end }}
 <p class="em-sans" style="margin:32px 0 0;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5;color:#1B241E;">Bis bald und herzliche Grüße</p>
-<p class="em-serif" style="margin:4px 0 0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.2;color:#1B241E;">Markus</p>
+<p class="em-serif" style="margin:4px 0 0;font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.2;color:#1B241E;">Markus</p>
       </td></tr>
 
       <!-- Footer: a forest sheet again, compact, as on the site -->
       <tr><td height="8" style="height:8px;font-size:0;line-height:0;">&nbsp;</td></tr>
       <tr><td class="em-pad" bgcolor="#16221B" style="padding:32px 40px 34px;background-color:#16221B;border-radius:28px;">
-        <p class="em-serif" style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#F2EDE3;">Männerkreis Niederbayern</p>
+        <p class="em-serif" style="margin:0;font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#F2EDE3;">Männerkreis Niederbayern</p>
         <p class="em-sans" style="margin:10px 0 0;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.65;color:#B4BBAD;">Ein Männerkreis in Niederbayern, im Raum Straubing. Wir treffen uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.</p>
         <p class="em-sans" style="margin:16px 0 0;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.5;"><a href="https://mens-circle.de" target="_blank" style="color:#F2A56C;text-decoration:none;">mens-circle.de</a><span style="color:#B4BBAD;">&nbsp;&nbsp;·&nbsp;&nbsp;</span><a href="mailto:{{ .Tx.Data.contactEmail }}" target="_blank" style="color:#F2A56C;text-decoration:none;white-space:nowrap;">{{ .Tx.Data.contactEmail }}</a></p>
         <p class="em-sans" style="margin:20px 0 0;padding-top:16px;border-top:1px solid #353E37;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#B4BBAD;">Diese E-Mail ging an {{ .Tx.Data.recipientEmail }}, weil du dich für einen Abend des Männerkreises angemeldet hast.</p>

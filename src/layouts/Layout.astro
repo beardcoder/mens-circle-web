@@ -27,7 +27,7 @@ const { headerAction, overHero = false, ...props } = Astro.props;
     <SeoHead {...props} />
     <script is:inline set:html={bootScript} />
     {/* Both upright faces are in the first viewport; the italic loads when used. */}
-    <Font cssVariable="--font-fraunces" preload />
+    <Font cssVariable="--font-vollkorn" preload />
     <Font cssVariable="--font-figtree" preload={[{ weight: '300 900', style: 'normal' }]} />
     <script is:inline set:html={fontScript} />
     <script is:inline type="speculationrules" set:html={speculationRules} />

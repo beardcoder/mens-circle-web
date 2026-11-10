@@ -14,7 +14,9 @@
   <!-- Webfonts from the site itself, never from a third party: no recipient IP leaves our server -->
   <!--[if !mso]><!-->
   <style>
-    @font-face { font-family:'Fraunces'; font-style:normal; font-weight:500; font-display:swap; src:url(https://mens-circle.de/fonts/mail/fraunces-500.woff2) format('woff2'); }
+    @font-face { font-family:'Vollkorn'; font-style:normal; font-weight:500; font-display:swap; src:url(https://mens-circle.de/fonts/mail/vollkorn-500.woff2) format('woff2'); }
+    /* Vollkorn's default figures are old-style; dates and counts stand on the line */
+    .em-serif, .em-event__date { font-feature-settings:'lnum'; font-variant-numeric:lining-nums; }
     @font-face { font-family:'Figtree'; font-style:normal; font-weight:300 900; font-display:swap; src:url(https://mens-circle.de/fonts/mail/figtree.woff2) format('woff2'); }
   </style>
   <!--<![endif]-->
@@ -48,7 +50,7 @@
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
           <td style="padding-right:12px;vertical-align:middle;"><a href="https://mens-circle.de" target="_blank"><img src="https://mens-circle.de/images/logo-mail.png" width="36" height="36" alt="" style="display:block;width:36px;height:36px;"></a></td>
           <td style="vertical-align:middle;">
-            <div class="em-serif" style="font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#F2EDE3;">Männerkreis</div>
+            <div class="em-serif" style="font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#F2EDE3;">Männerkreis</div>
           </td>
         </tr></table>
       </td></tr>
@@ -56,8 +58,8 @@
       <!-- Content -->
       <tr><td height="8" style="height:8px;font-size:0;line-height:0;">&nbsp;</td></tr>
       <tr><td class="em-pad" bgcolor="#FFFCF6" style="padding:40px 40px 36px;background-color:#FFFCF6;border-radius:28px;">
-<p class="em-sans" style="margin:0 0 14px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#9A421D;"><span style="display:inline-block;width:8px;height:8px;margin:0 10px 1px 0;border-radius:4px;background-color:#B4532A;vertical-align:middle;"></span>Benachrichtigung</p>
-<h1 class="em-display em-serif" style="margin:0 0 18px;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:40px;font-weight:500;line-height:1.12;letter-spacing:-0.015em;color:#1B241E;">Neue Anmeldung.</h1>
+<p class="em-sans" style="margin:0 0 14px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#9A421D;">Benachrichtigung</p>
+<h1 class="em-display em-serif" style="margin:0 0 18px;font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:40px;font-weight:500;line-height:1.12;letter-spacing:-0.015em;color:#1B241E;">Neue Anmeldung.</h1>
 <p class="em-sans" style="margin:0 0 24px;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#1B241E;"><strong style="font-weight:600;color:#1B241E;">{{ .Tx.Data.eventTitle }}</strong></p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-bottom:1px solid #d8cdb8;">
       <tr>
@@ -100,7 +102,7 @@
 <!-- The count: a flat panel on the quiet secondary ground -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:2px 0 0;">
   <tr><td bgcolor="#e6dac4" style="padding:22px 26px;background-color:#e6dac4;border-radius:20px;">
-    <p class="em-serif" style="margin:0;font-family:'Fraunces',Georgia,'Times New Roman',serif;font-size:44px;font-weight:500;line-height:1;color:#1B241E;">{{ .Tx.Data.activeCount }}<span style="color:#565e51;font-size:24px;">&nbsp;von&nbsp;{{ .Tx.Data.maxParticipants }}</span></p>
+    <p class="em-serif" style="margin:0;font-family:'Vollkorn',Georgia,'Times New Roman',serif;font-size:44px;font-weight:500;line-height:1;color:#1B241E;">{{ .Tx.Data.activeCount }}<span style="color:#565e51;font-size:24px;">&nbsp;von&nbsp;{{ .Tx.Data.maxParticipants }}</span></p>
     <p class="em-sans" style="margin:10px 0 0;font-family:'Figtree','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#565e51;">Plätzen belegt</p>
   </td></tr>
 </table>
