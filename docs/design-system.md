@@ -219,9 +219,11 @@ waits for a script.
   ring of the logo follows (`ring`). The springs are Motion's, sampled into
   `linear()` (`--ease-spring`, `--ease-spring-slow` in theme.css). The home opening
   and every sub-page opening (`PageIntro`) work this way. On an event page the date
-  line and the title rise in first, then the lead and the registration panel. Once the
-  title has scrolled under the bar, a dock with title and date fades and slides in
-  below the bar (`EventDock`, one observer, opacity and translation). The opening plays on every page load.
+  line and the title rise in first, then the lead and the registration panel. As the
+  title passes under the bar, a dock with title and date slides out from behind the bar
+  and back as the title returns (`EventDock`): the title's view timeline drives it
+  (`--event-title`, lifted by `timeline-scope` on `main`), opacity and translation only;
+  without scroll timelines and under reduced motion one observer shows and hides it. The opening plays on every page load.
 - Below it, CSS scroll-driven animations (global.css, "Motion: scroll"): each piece
   arrives as it comes into view, once, driven by the scroll itself
   (`animation-timeline: view()`, `animation-range: entry`): an element
@@ -292,7 +294,7 @@ Short transitions answer interactions (a button rises 2px and settles as it is
 pressed, arrows slide and nudge on a press, the FAQ disc gives a little under the
 finger, header links draw a line). The hero's ring turns once every 90 seconds and rests off screen and under reduced
 motion. The phone menu opens as a circle
-and its links rise in (`rise`); the event dock fades in once the title is gone. On phones the home page keeps the next date and its action in a bottom bar
+and its links rise in (`rise`); the event dock follows the title under the bar. On phones the home page keeps the next date and its action in a bottom bar
 (`ActionBar`) once the opening's action has scrolled away; it steps back at the
 dates and the footer. Under reduced motion everything rests.
 

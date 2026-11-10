@@ -285,6 +285,26 @@
       animation-name: hero-orbit-leave;
     }
 
+    /* The event page's dock under the bar follows the title: as the title passes
+       under the bar the dock slides out from behind it, and back in as the title
+       returns. The title's own view timeline drives it (`main` lifts the name to
+       where the dock can see it; the inset is the bar), so the dock is always
+       exactly as far in as the title is out. */
+    main {
+      timeline-scope: --event-title;
+    }
+
+    [data-event-title] {
+      view-timeline: --event-title block;
+      view-timeline-inset: var(--spacing-header) 0px;
+    }
+
+    [data-event-dock] {
+      animation: dock-slide linear both;
+      animation-timeline: --event-title;
+      animation-range: exit 0% exit 100%;
+    }
+
     [data-index] {
       animation: index-trail linear both;
       animation-timeline: view();
@@ -302,6 +322,19 @@
       animation-timeline: view();
       animation-range: entry 0% cover 50%;
     }
+  }
+}
+
+/* Both ends are written out: the dock's own classes rest it hidden for the fallback. */
+@keyframes dock-slide {
+  from {
+    opacity: 0;
+    translate: 0 -100%;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
   }
 }
 

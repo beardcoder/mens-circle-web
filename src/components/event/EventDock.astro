@@ -48,19 +48,33 @@ const title = accentLastWord(event.title);
 </div>
 <script>
   /**
-   * The dock appears once the title has passed under the bar and leaves when it
-   * comes back: one observer on the title, an attribute on the dock, and CSS fades
-   * and slides it (opacity and translation only). No layout reads, no copies.
+   * The dock follows the title under the bar. Where the browser has scroll-driven
+   * animations the title's view timeline moves it (global.css, "Motion: scroll"): it
+   * slides in as the title leaves and out as it returns, with no script. Elsewhere,
+   * and under reduced motion, one observer on the title sets an attribute and CSS
+   * shows or hides the dock. No layout reads, no copies.
    */
   const dock = document.querySelector<HTMLElement>('[data-event-dock]');
   const title = document.querySelector<HTMLElement>('[data-event-title]');
 
   if (dock && title) {
     dock.hidden = false;
-    new IntersectionObserver(
-      ([entry]) => dock.toggleAttribute('data-visible', !entry.isIntersecting && entry.boundingClientRect.top < 0),
-      // The bar is 72px (--spacing-header): the title counts as gone once it is under it.
-      { rootMargin: '-72px 0px 0px 0px' },
-    ).observe(title);
+
+    const scrollDriven =
+      CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!scrollDriven) {
+      new IntersectionObserver(
+        // Gone upwards: the title is out of the band below the bar and its top lies above that band.
+        // A short title's top is still on screen when its bottom passes the bar, so compare with the band, not with 0.
+        ([entry]) =>
+          dock.toggleAttribute(
+            'data-visible',
+            !entry.isIntersecting && entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0),
+          ),
+        // The bar is 72px (--spacing-header): the title counts as gone once it is under it.
+        { rootMargin: '-72px 0px 0px 0px' },
+      ).observe(title);
+    }
   }
 </script>
