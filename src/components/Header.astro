@@ -167,7 +167,9 @@ const roundButton =
       'motion-reduce:opacity-0 motion-reduce:transition-[opacity,display,overlay] motion-reduce:transition-discrete motion-reduce:open:opacity-100 motion-reduce:starting:open:opacity-0',
     ]}
   >
-    <Container class="flex h-header items-center gap-4 border-b border-line">
+    {/* The line sits on a pseudo-element: a border would take a pixel from the bar's height
+        and lift the mark and the word mark by half of it as the menu opens. */}
+    <Container class="relative flex h-header items-center gap-4 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:border-b after:border-line">
       <a
         href="/"
         class="flex min-h-11 min-w-0 items-center gap-2 font-display text-[1.0625rem] tracking-[-0.01em] sm:gap-3 sm:text-[1.375rem]"
@@ -175,7 +177,7 @@ const roundButton =
       >
         {/* The bar's own sizes: the mark must not change as the menu opens over it. */}
         <Icon name="logo" aria-hidden="true" class="size-8 shrink-0 text-flame sm:size-9" />
-        <span>Männerkreis</span>
+        <span class={wordmark}>Männerkreis</span>
       </a>
       <button type="button" data-nav-close class:list={[roundButton, 'ml-auto']}>
         <Icon name="close" aria-hidden="true" class="size-5" />
