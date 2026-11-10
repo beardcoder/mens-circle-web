@@ -29,7 +29,11 @@ mark in Fraunces, a cream content sheet, a compact forest footer that links Impr
 and Datenschutz and carries no slogan. Fraunces 500 for titles and the date (no
 italic: an accent phrase turns ember, upright), Figtree for text, labels in sentence
 case (the first one an eyebrow with an ember dot). The date is a rounded sand card:
-the date over its facts as rows. What you press is round and ember. No shadows, no
+the date over its facts as rows; weekday and day each stay on one line (`dateWeekday`,
+`dateDay`; a payload without them falls back to `dateLong`), so a phone breaks after
+the weekday. A mail's title says what it is about: the campaign its subject, a message
+to the participants its subject over the evening it belongs to. One action per mail
+(the calendar, the registrations for the admin). What you press is round and ember. No shadows, no
 bulleted or numbered lists. Webfonts load where the client allows (Apple Mail, iOS),
 from `/fonts/mail/` on the site (`src/assets/mail`, stable names, CORS open; the
 older DM Sans and Playfair files stay for mails already sent), never from Google: a

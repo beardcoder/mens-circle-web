@@ -7,11 +7,11 @@ import { config } from '../config';
 import type { Event } from '../db/schema';
 
 // Opens after the campaign template's "Hallo,": hence the lower case.
-export const DEFAULT_EVENT_NEWSLETTER_INTRO = `der nächste Männerkreis steht fest. Ein Abend, an dem wir im Kreis sitzen, einander zuhören und über das sprechen, was gerade wirklich da ist\u00a0– ohne Bewertung und ohne Ratschläge.
+export const DEFAULT_EVENT_NEWSLETTER_INTRO = `der nächste Männerkreis steht fest. Wir sitzen im Kreis, hören einander zu und sprechen über das, was uns gerade beschäftigt. Niemand bewertet, und Ratschläge gibt es nur, wenn jemand darum bittet.
 
-Vorbereiten musst du nichts, und darstellen auch nicht. Je nach Abend kommen einfache Übungen mit Atem und Körperwahrnehmung dazu; du machst mit, soweit es für dich passt.
+Vorbereiten musst du nichts. Je nach Abend kommen einfache Übungen mit Atem und Körperwahrnehmung dazu; du machst mit, soweit es für dich passt.
 
-Die Runde bleibt bewusst klein. Wenn du dabei sein möchtest, melde dich auf der Seite des Termins an\u00a0– ich freue mich auf dich.`;
+Die Runde bleibt klein. Wenn du dabei sein möchtest, melde dich auf der Seite des Termins an. Ich freue mich auf dich.`;
 
 const introToProse = (text: string): string =>
   text
@@ -30,6 +30,15 @@ const NL = {
   onFill: BRAND.onEmber,
   ...MAIL_FONTS,
 };
+
+/** "Donnerstag," and "26. November 2026", each kept on one line: a narrow mail breaks after the weekday. */
+const dateLines = (dateLong: string): string =>
+  dateLong
+    .split(', ')
+    .map(
+      (part, i, all) => `<span style="white-space:nowrap;">${escapeHtml(part)}${i < all.length - 1 ? ',' : ''}</span>`,
+    )
+    .join(' ');
 
 const newsletterRow = ([label, value]: [string, string]): string =>
   `<tr><td width="88" style="width:88px;padding:4px 12px 4px 0;vertical-align:top;font-family:${NL.sans};font-size:14px;line-height:24px;color:${NL.muted};">${label}</td>` +
@@ -57,7 +66,7 @@ export const buildEventNewsletterHtml = (ev: Event, intro: string): string => {
     `<div class="em-event" style="margin:10px 0 30px;padding:26px 28px 24px;background-color:${NL.sand};border-radius:20px;">`,
     `<p style="margin:0 0 10px;font-family:${NL.sans};font-size:14px;font-weight:600;line-height:1.3;color:${NL.muted};">Nächster Termin</p>`,
     dateLong
-      ? `<p class="em-event__date" style="margin:0;font-family:${NL.serif};font-size:26px;font-weight:500;line-height:1.25;color:${NL.text};">${escapeHtml(dateLong)}</p>`
+      ? `<p class="em-event__date" style="margin:0;font-family:${NL.serif};font-size:26px;font-weight:500;line-height:1.25;color:${NL.text};">${dateLines(dateLong)}</p>`
       : '',
     `<h2 style="margin:4px 0 0;font-family:${NL.sans};font-size:16px;font-weight:600;line-height:1.5;letter-spacing:0;color:${NL.text};">${escapeHtml(ev.title)}</h2>`,
     rows.length

@@ -18,9 +18,17 @@ const participantCtx = (p: Participant) => ({
   contactEmail: config.CONTACT_EMAIL,
 });
 
+/** "Donnerstag," and "26. November 2026": the templates keep each on one line, so a narrow mail breaks after the weekday. */
+const dateParts = (eventDate: string): { dateWeekday: string; dateDay: string } => {
+  const [weekday, ...rest] = formatDateLong(eventDate).split(', ');
+
+  return rest.length ? { dateWeekday: `${weekday},`, dateDay: rest.join(', ') } : { dateWeekday: '', dateDay: '' };
+};
+
 const eventDetail = (ev: Event, opts: { includeAddress?: boolean } = {}) => ({
   eventUrl: eventUrlFor(ev.slug),
   dateLong: formatDateLong(ev.eventDate),
+  ...dateParts(ev.eventDate),
   dateShort: formatDateShort(ev.eventDate),
   timeRange: formatTimeRange(ev.startTime, ev.endTime),
   location: ev.location,
@@ -84,6 +92,7 @@ export const sendRegistrationEmails = async (
     activeCount,
     maxParticipants: ev.maxParticipants,
     statusLabel: status === 'waitlist' ? 'Warteliste' : 'Angemeldet',
+    adminUrl: `${config.APP_URL}/admin/events/${ev.id}`,
   });
 
   const [userSent] = await Promise.all([userSend, adminSend]);
@@ -135,5 +144,7 @@ export const sendEventMessage = async (
     ...participantCtx(participant),
     content: personalised,
     eventTitle: ev.title,
+    dateLong: formatDateLong(ev.eventDate),
+    timeRange: formatTimeRange(ev.startTime, ev.endTime),
   });
 };
