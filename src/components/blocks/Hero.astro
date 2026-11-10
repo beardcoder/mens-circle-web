@@ -53,9 +53,15 @@ const nextLine = next
     data-glow
     class="pointer-events-none absolute top-[38%] -right-[30%] aspect-square w-[110%] rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-fill)_32%,transparent),transparent)] lg:top-[-14%] lg:-right-[12%] lg:w-[66%]"
   ></div>
+  {/* Firelight under the pointer: a soft light that follows it with a little delay (script below). */}
+  <div
+    aria-hidden="true"
+    data-ember
+    class="pointer-events-none absolute top-0 left-0 -mt-80 -ml-80 hidden size-160 rounded-full bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-spark)_13%,transparent),transparent)] opacity-0 transition-[translate,opacity] duration-700 ease-out hover-device:block data-on:opacity-100"
+  ></div>
 
   <Container class="relative grid items-start gap-x-grid gap-y-16 lg:grid-cols-12">
-    <div class="grid min-w-0 justify-items-start lg:col-span-9">
+    <div data-hero-text class="grid min-w-0 justify-items-start lg:col-span-9">
       {kicker && (
         <Eyebrow class="mb-6" data-enter>
           {kicker}
@@ -126,44 +132,66 @@ const nextLine = next
   {/* The photograph: under the text on phones; from `lg` beside the title, as large as
       a third of the window and cut by its right edge. */}
   <div class="relative mx-auto mt-16 w-[calc(100%-2*var(--spacing-gutter))] max-w-[22rem] sm:max-w-[28rem] lg:absolute lg:top-[calc(var(--spacing-header)+var(--spacing-group)+2rem)] lg:right-0 lg:mt-0 lg:w-[36vw] lg:max-w-[40rem] lg:translate-x-[16%]">
-    <div data-enter="settle" class="relative">
-      <img
-        src={largest.src}
-        srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
-        sizes="(min-width: 64rem) min(36vw, 40rem), (min-width: 36rem) 28rem, 22rem"
-        width={largest.width}
-        height={largest.height}
-        alt={imageAlt}
-        fetchpriority="high"
-        decoding="async"
-        class="aspect-square w-full rounded-full object-cover"
-      />
-      {/* The circle of the logo: a thin ring with one warm point, turning slowly. */}
-      <div aria-hidden="true" data-enter="ring" class="pointer-events-none absolute -inset-[7%]">
-        <div class="hero-orbit absolute inset-0 rounded-full border border-line-strong">
-          <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-spark"></span>
+    {/* Leaving, the photograph falls behind the text and comes a little closer (global.css, "Motion: scroll"). */}
+    <div data-hero-photo class="relative">
+      <div data-enter="settle" class="relative">
+        <img
+          src={largest.src}
+          srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
+          sizes="(min-width: 64rem) min(36vw, 40rem), (min-width: 36rem) 28rem, 22rem"
+          width={largest.width}
+          height={largest.height}
+          alt={imageAlt}
+          fetchpriority="high"
+          decoding="async"
+          class="aspect-square w-full rounded-full object-cover"
+        />
+        {/* The circle of the logo: a thin ring with one warm point, turning slowly. */}
+        <div aria-hidden="true" data-enter="ring" class="pointer-events-none absolute -inset-[7%]">
+          <div data-hero-orbit class="absolute inset-0">
+            <div class="hero-orbit absolute inset-0 rounded-full border border-line-strong">
+              <span class="absolute top-0 left-1/2 size-3 -translate-1/2 rounded-full bg-spark"></span>
+            </div>
+          </div>
         </div>
       </div>
+      {next?.view.seats && (
+        /* The next evening's chairs, on a disc of the forest, overlapping the circle's edge. */
+        <div
+          data-enter
+          style={beat(2)}
+          class="absolute -bottom-6 -left-4 rounded-full bg-surface p-3 sm:-left-overlap lg:-bottom-overlap"
+        >
+          <SeatRing seats={next.view.seats} text={nextLine?.seats ?? ''} size="lg" layout="none" />
+        </div>
+      )}
     </div>
-    {next?.view.seats && (
-      /* The next evening's chairs, on a disc of the forest, overlapping the circle's edge. */
-      <div
-        data-enter
-        style={beat(2)}
-        class="absolute -bottom-6 -left-4 rounded-full bg-surface p-3 sm:-left-overlap lg:-bottom-overlap"
-      >
-        <SeatRing seats={next.view.seats} text={nextLine?.seats ?? ''} size="lg" layout="none" />
-      </div>
-    )}
   </div>
 </section>
 
 <script>
   // Out of view the opening's loops pause (global.css): a running animation is
   // serviced every frame even where nobody sees it.
-  const hero = document.querySelector('[data-hero]');
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
 
   if (hero) {
     new IntersectionObserver(([entry]) => hero.toggleAttribute('data-offscreen', !entry.isIntersecting)).observe(hero);
+
+    // The firelight follows a hovering pointer. Only the event's own numbers are used:
+    // no layout is read, and the light moves by `translate` alone.
+    const ember = hero.querySelector<HTMLElement>('[data-ember]');
+    const follows = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+
+    if (ember && follows.matches) {
+      hero.addEventListener(
+        'pointermove',
+        (event) => {
+          ember.style.translate = `${event.pageX}px ${event.pageY}px`;
+          ember.dataset.on = '';
+        },
+        { passive: true },
+      );
+      hero.addEventListener('pointerleave', () => delete ember.dataset.on);
+    }
   }
 </script>

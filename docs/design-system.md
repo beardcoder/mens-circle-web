@@ -192,7 +192,7 @@ after the other, quickly, and settle. Opacity fades in on a gentle curve
 (`--ease-fade`, 0.7 s below the opening, 0.9 s in it), focus comes from a light blur
 on titles, movement follows springs without overshoot (sampled into `linear()`:
 the opening's over 1.3 s, 1.9 s for the photo; scroll reveals follow the scroll),
-distances stay short (a word 0.3em, a piece 1.125rem) and things follow one another
+distances stay short (a word 0.3em, a piece 2rem) and things follow one another
 at 0.055 s (words) or 0.07 s (what arrives together). Calm, never playful: no
 bounce, no scale on text.
 
@@ -201,7 +201,7 @@ trace on every motion change (see "Lighthouse" below). Only opacity and transfor
 move, so the compositor carries every frame. The one exception is the soft blur the
 opening's title words come into focus from (CSS, light and 0.6 s, at load); a blur
 is redrawn on the main thread every frame (about 16× a transform), so nothing that
-moves while scrolling blurs. No parallax beyond the stamp's turn, and no animated height except the FAQ's native unfolding. Fades start gently
+moves while scrolling blurs. Depth is tied to the scroll and listed below ("Depth"); nothing else drifts, and no height animates except the FAQ's native unfolding. Fades start gently
 (`--ease-fade`, `[0.33, 0, 0.2, 1]`), so they are seen; no script reads layout
 before the page has settled (state at a scroll position comes from an
 `IntersectionObserver`, never from `scrollY`); state flags go on the element that
@@ -239,7 +239,18 @@ waits for a script.
   its contact line, every date summary piece by piece, the newsletter, the event's
   story, note and map, the legal pages paragraph by paragraph. The footer is the
   frame and stands.
-- Things arrive once and then stand; only the stamp turns with the scroll.
+- Depth (global.css, "Motion: scroll"; scroll-linked, so at rest whenever the page
+  rests, and each on an element of its own beside the one that arrives): the opening
+  leaves in layers (`--hero` view timeline: its text goes ahead, `data-hero-text`,
+  never dimmed; the photograph falls behind and comes a little closer,
+  `data-hero-photo`; the ring's point travels on, `data-hero-orbit`); an index number
+  trails its row (`data-index`); the poster word of the dates slides in from the side
+  (`data-drift`); Markus's ring opens (`data-ring-open`). Transforms and opacity only.
+- A hovering pointer carries a soft firelight across the opening (`data-ember`,
+  Hero.astro): one `translate` per pointer event, eased by a CSS transition, no
+  layout read; not on touch, not under reduced motion.
+- Things arrive once and then stand; beyond the depth above only the stamp turns with
+  the scroll.
 - FAQ (`AccordionItem`): a native `<details>`; where `interpolate-size` exists its
   `::details-content` transitions from height 0 to `auto` in 0.32 s (global.css,
   "FAQ"), and the marker turns (`item-open:` variant). Keyboard, find-in-page and

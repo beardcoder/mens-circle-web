@@ -257,13 +257,97 @@
       animation-timeline: view();
       animation-range: cover;
     }
+
+    /* Depth, tied to the scroll and so at rest whenever the page rests. The opening
+       leaves in layers: its text goes ahead (never dimmed: it is still read), the photograph falls behind
+       and comes closer, the ring's point travels on. Further down an index number
+       trails its row, the poster word slides in from the side and Markus's ring
+       opens. Each sits on an element of its own, beside the one that arrives. */
+    [data-hero] {
+      view-timeline: --hero block;
+    }
+
+    :is([data-hero-text], [data-hero-photo], [data-hero-orbit]) {
+      animation: linear both;
+      animation-timeline: --hero;
+      animation-range: exit-crossing 0% exit-crossing 100%;
+    }
+
+    [data-hero-text] {
+      animation-name: hero-text-leave;
+    }
+
+    [data-hero-photo] {
+      animation-name: hero-photo-leave;
+    }
+
+    [data-hero-orbit] {
+      animation-name: hero-orbit-leave;
+    }
+
+    [data-index] {
+      animation: index-trail linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+
+    [data-reveal-group] > [data-drift] {
+      animation: poster-drift var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+
+    [data-ring-open] {
+      animation: ring-open var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 50%;
+    }
+  }
+}
+
+@keyframes hero-text-leave {
+  to {
+    translate: 0 -4rem;
+  }
+}
+
+@keyframes hero-photo-leave {
+  to {
+    translate: 0 6rem;
+    scale: 1.08;
+  }
+}
+
+@keyframes hero-orbit-leave {
+  to {
+    rotate: 160deg;
+  }
+}
+
+@keyframes index-trail {
+  from {
+    translate: 0 3.5rem;
+  }
+}
+
+@keyframes poster-drift {
+  from {
+    opacity: 0;
+    translate: -14% 0;
+  }
+}
+
+@keyframes ring-open {
+  from {
+    opacity: 0;
+    scale: 0.6;
   }
 }
 
 @keyframes reveal {
   from {
     opacity: 0;
-    translate: 0 1.125rem;
+    translate: 0 2rem;
   }
 }
 

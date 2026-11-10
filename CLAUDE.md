@@ -291,7 +291,11 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   its ring follows, the seat ring's taken chairs fill in (`data-seat-dot`). Below it
   each piece arrives once as it comes into view (`animation-timeline: view()`:
   `data-reveal`, `data-reveal-group`); the stamp turns with the scroll
-  (`data-stamp-turn`, the one scroll-linked rotation). Nothing hidden up front; a
+  (`data-stamp-turn`). Depth is scroll-linked too (design-system.md, "Depth"): the
+  opening leaves in layers (`data-hero-text`, `-photo`, `-orbit`), index numbers trail
+  (`data-index`), the poster word drifts in (`data-drift`), Markus's ring opens
+  (`data-ring-open`); a hovering pointer carries a firelight over the opening
+  (`data-ember`). Nothing hidden up front; a
   browser without scroll timelines shows everything; under reduced motion
   everything rests. FAQ answers are native `<details>` (height transition where
   `interpolate-size` exists). The phone `ActionBar` glides in on a CSS transition.
