@@ -288,11 +288,11 @@
 
     /* The event page's dock under the bar follows the title: as the title passes
        under the bar the dock slides out from behind it, and back in as the title
-       returns. The title's own view timeline drives it (`main` lifts the name to
+       returns. The title's own view timeline drives it (`body` lifts the name to
        where the dock can see it; the inset is the bar), so the dock is always
        exactly as far in as the title is out. */
-    main {
-      timeline-scope: --event-title;
+    body {
+      timeline-scope: --event-title, --hero-action, --dates, --page-footer;
     }
 
     [data-event-title] {
@@ -304,6 +304,37 @@
       animation: dock-slide linear both;
       animation-timeline: --event-title;
       animation-range: exit 0% exit 100%;
+    }
+
+    /* The home page's bottom bar on phones is tied to the scroll the same way, by
+       three timelines whose movements add up: it rises as the opening's action
+       passes under the bar, steps down while the dates are on screen and comes
+       back after them, and leaves for the footer. Each is a share of its own
+       height, so the bar rests exactly below the window when it is away. */
+    [data-hero-action] {
+      view-timeline: --hero-action block;
+      view-timeline-inset: var(--spacing-header) 0px;
+    }
+
+    #termine {
+      view-timeline: --dates block;
+    }
+
+    #footer {
+      view-timeline: --page-footer block;
+    }
+
+    [data-action-bar] {
+      animation:
+        bar-rise linear both,
+        bar-step-down linear both,
+        bar-leave linear both;
+      animation-timeline: --hero-action, --dates, --page-footer;
+      animation-range:
+        exit 0% exit 100%,
+        normal,
+        entry 0% entry 20%;
+      animation-composition: replace, add, add;
     }
 
     [data-index] {
@@ -323,6 +354,45 @@
       animation-timeline: view();
       animation-range: entry 0% cover 50%;
     }
+  }
+}
+
+@keyframes bar-rise {
+  from {
+    translate: 0 100%;
+  }
+
+  to {
+    translate: 0 0;
+  }
+}
+
+/* Down within the first eighth of the dates' entry, up again in the last of their exit. */
+@keyframes bar-step-down {
+  entry 0% {
+    translate: 0 0;
+  }
+
+  entry 12% {
+    translate: 0 100%;
+  }
+
+  exit 88% {
+    translate: 0 100%;
+  }
+
+  exit 100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes bar-leave {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: 0 100%;
   }
 }
 

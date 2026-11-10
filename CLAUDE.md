@@ -305,7 +305,9 @@ experimental_install`, `.claude/skills/` is not committed) is a reviewer here, n
   (`data-ember`). Nothing hidden up front; a
   browser without scroll timelines shows everything; under reduced motion
   everything rests. FAQ answers are native `<details>` (height transition where
-  `interpolate-size` exists). The phone `ActionBar` glides in on a CSS transition.
+  `interpolate-size` exists). The phone `ActionBar` and the event page's
+  dock follow the scroll on view timelines (`timeline-scope` on `body`), with an
+  observer and a CSS transition where those are missing.
 - Lighthouse on every motion change (design-system.md): CLS 0, no forced reflow,
   only opacity and transforms move (the one exception: the opening's soft blur).
   Never set a state attribute on `<html>` while the page moves; never read layout

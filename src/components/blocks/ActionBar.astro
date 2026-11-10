@@ -16,7 +16,8 @@ const date = next?.view.title.join(' ').replace(/,$/, '');
 {
   /* On phones, like an app's bottom bar: once the opening's action has scrolled away,
      the next date and its action stay at hand. It steps back where the dates or the
-     footer are on screen, and never shows on the desktop or without a date. */
+     footer are on screen, and never shows on the desktop or without a date. Its
+     movement follows the scroll where the browser can (global.css, "Motion: scroll"). */
   action && date && (
     <div
       data-action-bar
@@ -45,23 +46,27 @@ const date = next?.view.title.join(' ').replace(/,$/, '');
 
 <script>
   /**
-   * Shows the bar while neither the opening's action nor the dates nor the footer is
-   * in view: one observer, one attribute; CSS glides it up and away (transform only,
-   * at once under reduced motion). On the desktop it is never shown.
+   * The bar is at hand while neither the opening's action nor the dates nor the
+   * footer is in view. Where the browser has scroll-driven animations the scroll
+   * itself moves it (global.css, "Motion: scroll"): it rises and sinks with the
+   * page. Elsewhere, and under reduced motion, CSS glides it on the attribute set
+   * here. In both cases this observer says whether it can be reached: `inert`,
+   * `aria-hidden` and the link's tab stop.
    */
   const bar = document.querySelector<HTMLElement>('[data-action-bar]');
-  const watched = document.querySelectorAll('[data-hero] a[data-umami-event-location="home-hero"], #termine, footer');
+  const action = document.querySelector('[data-hero-action]');
 
-  if (bar && watched.length > 0) {
-    const onScreen = new Set<Element>();
+  if (bar && action) {
+    /** What keeps the bar away: the dates and the footer while on screen, the opening's action until it has gone under the bar. */
+    const holding = new Set<Element>();
 
-    const observer = new IntersectionObserver((entries) => {
+    const update: IntersectionObserverCallback = (entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting) onScreen.add(entry.target);
-        else onScreen.delete(entry.target);
+        if (entry.isIntersecting) holding.add(entry.target);
+        else holding.delete(entry.target);
       }
 
-      const show = onScreen.size === 0;
+      const show = holding.size === 0;
 
       if (show === bar.hasAttribute('data-visible')) return;
 
@@ -70,8 +75,16 @@ const date = next?.view.title.join(' ').replace(/,$/, '');
       bar.setAttribute('aria-hidden', String(!show));
 
       for (const link of bar.querySelectorAll('a')) link.tabIndex = show ? 0 : -1;
-    });
+    };
 
-    for (const element of watched) observer.observe(element);
+    // The fixed bar is 72px (--spacing-header): what is under it is gone.
+    const below = new IntersectionObserver(update, { rootMargin: '-72px 0px 0px 0px' });
+
+    for (const element of document.querySelectorAll('#termine, #footer')) below.observe(element);
+
+    // The action holds the bar until it has been passed, wherever it is below the bar:
+    // the root reaches far past the window's lower edge, so an action under the fold
+    // (a short window) and a jump straight past it (an anchor link) both count.
+    new IntersectionObserver(update, { rootMargin: '-72px 0px 100000px 0px' }).observe(action);
   }
 </script>

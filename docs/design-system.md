@@ -259,9 +259,13 @@ waits for a script.
   "FAQ"), and the marker turns (`item-open:` variant). Keyboard, find-in-page and
   screen readers work as with any `<details>`. Elsewhere, and under reduced motion,
   it toggles at once. No script.
-- The bottom bar on phones (`ActionBar`) glides up on the spring curve once the
-  opening's action has gone and slips away again (a CSS transition on
-  `data-visible`, at once under reduced motion). There is no reading-progress bar,
+- The bottom bar on phones (`ActionBar`) follows the scroll: it rises as the
+  opening's action passes under the bar, steps down while the dates are on screen
+  and leaves for the footer (three view timelines, `--hero-action`, `--dates`,
+  `--page-footer`, lifted by `timeline-scope` on `body`; their translations add
+  up). Without scroll timelines it glides on a CSS transition on `data-visible`, at
+  once under reduced motion. Its observers only say whether it can be reached
+  (`inert`, `aria-hidden`, the tab stop). There is no reading-progress bar,
   and the back-to-top link shows on the desktop only. The registration form is in the page from the first frame; its answer
   replaces the fields in place.
 - Loops that never change state stay in CSS: the glow breathes on the 11-second
