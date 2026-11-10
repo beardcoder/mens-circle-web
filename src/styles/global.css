@@ -278,6 +278,7 @@
     }
 
     [data-hero-photo] {
+      transform-origin: 50% 100%;
       animation-name: hero-photo-leave;
     }
 
@@ -344,10 +345,12 @@
   }
 }
 
+/* The photograph grows from its lower edge and sinks only a little: the opening
+   clips what leaves it, and the seat ring hangs close to its bottom edge. */
 @keyframes hero-photo-leave {
   to {
-    translate: 0 6rem;
-    scale: 1.08;
+    translate: 0 0.75rem;
+    scale: 1.06;
   }
 }
 

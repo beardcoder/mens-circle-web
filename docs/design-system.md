@@ -245,7 +245,7 @@ waits for a script.
 - Depth (global.css, "Motion: scroll"; scroll-linked, so at rest whenever the page
   rests, and each on an element of its own beside the one that arrives): the opening
   leaves in layers (`--hero` view timeline: its text goes ahead, `data-hero-text`,
-  never dimmed; the photograph falls behind and comes a little closer,
+  never dimmed; the photograph sinks a little and comes closer from its lower edge, never past the opening's own edge,
   `data-hero-photo`; the ring's point travels on, `data-hero-orbit`); an index number
   trails its row (`data-index`); the poster word of the dates slides in from the side
   (`data-drift`); Markus's ring opens (`data-ring-open`). Transforms and opacity only.
