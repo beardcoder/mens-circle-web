@@ -35,10 +35,7 @@ const destination = hasMap ? `${lat},${lng}` : address || event.location;
 >
   <div
     data-reveal-group
-    class:list={[
-      'min-w-0 lg:pt-8',
-      hasMap ? 'lg:order-2 lg:col-span-4 lg:col-start-9' : 'lg:col-span-8 lg:col-start-2',
-    ]}
+    class:list={['min-w-0', hasMap ? 'lg:order-2 lg:col-span-4 lg:col-start-9 lg:pt-8' : 'lg:col-span-8']}
   >
     <h2 id="anfahrt-title" class="max-w-[10em] text-section text-fg">
       Hier treffen wir uns.

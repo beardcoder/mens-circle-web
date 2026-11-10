@@ -350,7 +350,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   where the registration follows the title), the calendar; the evening's description
   (sand); the map; where next.
 - **Personal page.** `PageIntro` with the photograph in a circle cut by the right
-  edge, sections with their headings in the margin, values with index numbers, the
+  edge, sections with their headings in the margin, values as rows with index numbers, the
   FAQ, one closing invitation.
 - **Legal pages, testimonial form, 404.** `PageIntro` and one column.
 - **Admin.** The same tokens at night: forest grounds, rounded cards, ember for the

@@ -29,7 +29,7 @@ const beat = (n: number) => afterWords(title.count, n);
 /** The next evening in one open line under the action: date, time and place, how full it is. */
 const nextLine = next
   ? {
-      date: next.view.title.join(' ').replace(/,$/, ''),
+      date: next.view.title,
       datetime: next.view.datetime,
       meta: [next.view.facts.time, next.view.facts.place].filter(Boolean).join(' · '),
       seats: next.view.facts.seats,
@@ -112,7 +112,9 @@ const nextLine = next
               datetime={nextLine.datetime}
               class="font-display text-sub text-fg transition-colors duration-180 group-hover/next:text-accent"
             >
-              {nextLine.date}
+              {nextLine.date.map((line) => (
+                <span class="max-sm:block">{line} </span>
+              ))}
             </time>
             <span class="text-sm text-fg-muted">{nextLine.meta}</span>
           </span>
