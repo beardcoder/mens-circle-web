@@ -11,7 +11,7 @@ list in `src/lib/brand/registry.ts`. The design itself is described in
 | Path                                     | What                                                                      | How it is made                   |
 | ---------------------------------------- | ------------------------------------------------------------------------- | -------------------------------- |
 | `brand/logo/logo.svg`                    | The master logo, the only logo file drawn by hand                         | by hand                          |
-| `brand/logo/logo-*.svg`                  | Ember, ember on linen, bone on forest, black, white                       | `bun run brand:logo`             |
+| `brand/logo/logo-*.svg`                  | Gold, deep gold on paper, bone on the dark ground, black, white           | `bun run brand:logo`             |
 | `public/favicon*`, `public/images/logo*` | Favicons, manifest icons, `favicon.ico`, the JSON-LD logo, the mail marks | `bun run brand:logo`             |
 | `brand/tokens.json`                      | W3C design tokens (colours with CMYK, type, space, sizes)                 | `bun run brand:export`           |
 | `brand/tokens.css`                       | The same as plain CSS custom properties                                   | `bun run brand:export`           |
@@ -71,7 +71,7 @@ which `global.css` and `admin.css` keep out. Add a template: an entry in
   have no crop marks: online printers take the bleed size as it is; ask the printer.
 - The PDFs are RGB. For offset print the printer converts to CMYK; ask for a proof.
   The CMYK values in `tokens.json` and on the styleguide are computed from sRGB and
-  only a starting point. Ember and spark print darker on uncoated paper; prefer
+  only a starting point. The gold prints darker on uncoated paper; prefer
   coated paper or agree the values with the printer.
 - The QR code always stands on a light square with its quiet zone, at least 20 mm
   wide on print.
@@ -80,7 +80,7 @@ which `global.css` and `admin.css` keep out. Add a template: an entry in
 
 ## Logo
 
-- The mark is four figures in a circle. Ember on paper, ember (or bone) on the
+- The mark is four figures in a circle. Deep gold on paper, gold (or bone) on the
   forest and the moss, black or white where only one colour prints.
 - Clear space all round: a quarter of the mark's height. Smallest size: 6 mm
   (24 px) for the mark with the word mark, 4 mm (16 px) for the mark alone.

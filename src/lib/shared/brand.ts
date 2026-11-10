@@ -14,10 +14,11 @@ export const BRAND = {
   line: '#ddd7ce',
   lineStrong: '#c8c0b6',
   control: '#7a7268',
-  ember: '#b4532a',
-  emberDeep: '#953f1c',
+  ember: '#d4a574',
+  emberDeep: '#c08f5c',
   emberText: '#85501f',
-  onEmber: '#fff8f0',
+  emberTextDeep: '#6b3f16',
+  onEmber: '#141312',
   emberLight: '#d4a574',
   emberTint: '#efe3d3',
   emberTintNight: '#2e241a',
@@ -39,6 +40,7 @@ export const BRAND = {
   mossNight: '#1c1a18',
   mossControl: '#8f867b',
   bone: '#e8e4df',
+  boneSoft: '#c8c0b6',
   boneMuted: '#b3aaa0',
 } as const;
 

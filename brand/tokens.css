@@ -9,10 +9,11 @@
   --p-line: #ddd7ce;
   --p-line-strong: #c8c0b6;
   --p-control: #7a7268;
-  --p-ember: #b4532a;
-  --p-ember-deep: #953f1c;
+  --p-ember: #d4a574;
+  --p-ember-deep: #c08f5c;
   --p-ember-text: #85501f;
-  --p-on-ember: #fff8f0;
+  --p-ember-text-deep: #6b3f16;
+  --p-on-ember: #141312;
   --p-ember-light: #d4a574;
   --p-ember-tint: #efe3d3;
   --p-ember-tint-night: #2e241a;
@@ -34,6 +35,7 @@
   --p-moss-night: #1c1a18;
   --p-moss-control: #8f867b;
   --p-bone: #e8e4df;
+  --p-bone-soft: #c8c0b6;
   --p-bone-muted: #b3aaa0;
 
   --color-ground-light: #f5f2ed;
@@ -47,23 +49,23 @@
   --color-fg-light: #141312;
   --color-fg-dark: #e8e4df;
   --color-fg-soft-light: #2a2622;
-  --color-fg-soft-dark: #e8e4df;
+  --color-fg-soft-dark: #c8c0b6;
   --color-fg-muted-light: #625a51;
   --color-fg-muted-dark: #a39a8f;
   --color-accent-light: #85501f;
   --color-accent-dark: #d4a574;
-  --color-accent-strong-light: #953f1c;
+  --color-accent-strong-light: #6b3f16;
   --color-accent-strong-dark: #e8e4df;
   --color-accent-soft-light: #efe3d3;
   --color-accent-soft-dark: #2e241a;
   --color-on-accent-light: #f5f2ed;
   --color-on-accent-dark: #141312;
-  --color-fill-light: #b4532a;
-  --color-fill-dark: #b4532a;
-  --color-fill-strong-light: #953f1c;
-  --color-fill-strong-dark: #953f1c;
-  --color-on-fill-light: #fff8f0;
-  --color-on-fill-dark: #fff8f0;
+  --color-fill-light: #85501f;
+  --color-fill-dark: #d4a574;
+  --color-fill-strong-light: #6b3f16;
+  --color-fill-strong-dark: #c08f5c;
+  --color-on-fill-light: #f5f2ed;
+  --color-on-fill-dark: #141312;
   --color-spark-light: #d4a574;
   --color-spark-dark: #d4a574;
   --color-line-light: #ddd7ce;
@@ -78,8 +80,8 @@
   --color-success-dark: #8fcb97;
   --color-danger-light: #a3261b;
   --color-danger-dark: #f0a197;
-  --color-flame-light: #b4532a;
-  --color-flame-dark: #b4532a;
+  --color-flame-light: #85501f;
+  --color-flame-dark: #d4a574;
   --color-bone-light: #e8e4df;
   --color-bone-dark: #e8e4df;
 

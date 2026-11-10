@@ -228,7 +228,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   it explains. The look follows the dark-botanical theme (ConardLi/garden-skills):
   at night a warm near-black with soft pools of light, bone text, a terracotta
   gold and Cormorant with its italic; by day the same family turned round (bone
-  paper, near-black text). Ember stays the logo's and the one action's. Open and
+  paper, near-black text). One accent, the theme's terracotta gold (mark, the one action, links, the italic phrase; its deep tone on paper). Open and
   full-bleed: grounds from edge to edge, content between lines, no rounded card.
   The circle is the one motif, in four
   forms: the mark, the seat ring, the stamp, the index number. Same function, same

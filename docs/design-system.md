@@ -9,8 +9,9 @@ ConardLi/garden-skills): a warm near-black with soft pools of light, bone text, 
 terracotta gold, an elegant serif whose accent phrase is set in italic. The night
 mode is that theme; the day mode is built from the same family turned round: bone
 becomes the paper, the near-black the text. The dark ground carries what draws you
-in and what is spoken in the circle, paper is for reading, the ember of the logo
-for the one thing to do. Everything is open and full-bleed: grounds run from edge
+in and what is spoken in the circle, paper is for reading. There is one accent, the theme's
+terracotta gold: the mark, the one thing to do, links and the italic phrase; on
+paper its deep tone. Everything is open and full-bleed: grounds run from edge
 to edge, content stands between lines, nothing sits in a rounded card.
 
 The grid is twelve columns and one edge. Four moves break it, and only these
@@ -101,12 +102,15 @@ set before first paint. Never a hex value in markup.
 | Spark           | `#D4A574` terracotta gold    | same                  | `spark`                          | the italic phrase and numbers on the dark ground  |
 
 The primitives keep the names of the roles they had (`--p-forest` is the dark
-ground, `--p-linen` the paper, `--p-sand` the band); the values are the theme's.
+ground, `--p-linen` the paper, `--p-sand` the band, `--p-ember` the accent: the
+gold on the dark grounds, `--p-ember-text` its deep tone on paper; a filled button
+is gold under a dark label there and deep under a light label here); the values are the theme's.
 The dark ground carries the theme's signature, three soft pools of light in its
 corners (a terracotta gold, a blush, a pale gold; `surface-dark` in theme.css),
 still and never animated.
 
-On the dark grounds the surfaces re-declare text (bone `#E8E4DF`, muted
+On the dark grounds the surfaces re-declare text (bone `#E8E4DF`, running text
+`#C8C0B6`, muted
 `#B3AAA0`), accent (`#D4A574`), lines (bone at 14–28 %) and the control outline
 (`#857C71`, on the second dark `#8F867B`). The spark is never text on paper or sand.
 `success` and `danger` are for real states only and always come with words. Every
@@ -267,28 +271,28 @@ mobile score than it does live.
 
 ## Components
 
-| Component                                         | Purpose                                                                                               |
-| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                                |
-| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `moss` / `dark`, edge to edge, clipping what bleeds                      |
-| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead; with `margin.cross` it crosses into the content             |
-| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; a photograph bleeds right, without one the stamp stands there                   |
-| `Poster`, `Index`, `Marginal`                     | The poster word, the index number, the margin note                                                    |
-| `Eyebrow`                                         | A label above a title where it adds information: accent text                                          |
-| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`                                              |
-| `TextLink`                                        | A quiet, underlined link with a small arrow                                                           |
-| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                         |
-| `EventSummary`                                    | One date, open on its ground: the date, the facts as small columns, the seat ring, the action         |
-| `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in ember from the top; the number free in the middle; words beside  |
-| `Stamp`                                           | The mark between two rings, the circle's name round it; it stands still                               |
-| `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                   |
-| `Fact` (`layout`)                                 | Label, value in Cormorant, a note, under a rule; four in a row, or (`row`) lines with the label first |
-| `TestimonialList`                                 | One short voice large, the others as rows (author in the margin); every voice in full                 |
-| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                         |
-| `LinkList`, `Prose` (`width`)                     | Where-next rows; rich text (`measure` / `column`)                                                     |
-| `ModeToggle`                                      | Auto · Hell · Dunkel, in the footer and the phone menu                                                |
+| Component                                         | Purpose                                                                                                   |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                                    |
+| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `moss` / `dark`, edge to edge, clipping what bleeds                          |
+| `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead; with `margin.cross` it crosses into the content                 |
+| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; a photograph bleeds right, without one the stamp stands there                       |
+| `Poster`, `Index`, `Marginal`                     | The poster word, the index number, the margin note                                                        |
+| `Eyebrow`                                         | A label above a title where it adds information: accent text                                              |
+| `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`                                                  |
+| `TextLink`                                        | A quiet, underlined link with a small arrow                                                               |
+| `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                             |
+| `EventSummary`                                    | One date, open on its ground: the date, the facts as small columns, the seat ring, the action             |
+| `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in the accent from the top; the number free in the middle; words beside |
+| `Stamp`                                           | The mark between two rings, the circle's name round it; it stands still                                   |
+| `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                       |
+| `Fact` (`layout`)                                 | Label, value in Cormorant, a note, under a rule; four in a row, or (`row`) lines with the label first     |
+| `TestimonialList`                                 | One short voice large, the others as rows (author in the margin); every voice in full                     |
+| `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                             |
+| `LinkList`, `Prose` (`width`)                     | Where-next rows; rich text (`measure` / `column`)                                                         |
+| `ModeToggle`                                      | Auto · Hell · Dunkel, in the footer and the phone menu                                                    |
 
-**Header.** 72px: the mark in ember and the word mark; from `nav` five links and one
+**Header.** 72px: the mark in the accent and the word mark; from `nav` five links and one
 action. Over the home opening the bar is clear with light text and its action is
 outlined (the opening's own action is the one filled button on that screen); once
 the page moves it is paper at 95 % and the action fills. The phone menu is a native
@@ -322,7 +326,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   edge, sections with their headings in the margin, values as rows, the
   FAQ, one closing invitation.
 - **Legal pages, testimonial form, 404.** `PageIntro` and one column.
-- **Admin.** The same tokens at night: forest grounds, rounded cards, ember for the
+- **Admin.** The same tokens at night: forest grounds, rounded cards, the gold for the
   one action.
 
 ## Rules

@@ -17,20 +17,21 @@ const MASTER = 'brand/logo/logo.svg';
 
 const EMBER: LogoOptions = { fill: BRAND.ember };
 /** Favicons in a tab: a hair of air so the ring does not touch the edge. */
-const TAB: LogoOptions = { fill: BRAND.ember, padding: 0.04 };
-/** Home screen, maskable and touch icons: on linen, inside the 80 % safe circle. */
-const TILE: LogoOptions = { fill: BRAND.ember, background: BRAND.linen, padding: 0.12 };
+const TAB: LogoOptions = { fill: BRAND.emberText, padding: 0.04 };
+/** Home screen, maskable and touch icons: the gold mark on the dark ground, inside the 80 % safe circle. */
+const TILE: LogoOptions = { fill: BRAND.ember, background: BRAND.forest, padding: 0.12 };
 
 /** The SVG files, path → options; `src/icons/logo.svg` is the master itself. */
 export const SVG_VARIANTS: Record<string, LogoOptions> = {
   'brand/logo/logo-ember.svg': EMBER,
-  'brand/logo/logo-ember-on-linen.svg': { ...EMBER, background: BRAND.linen, padding: 0.1 },
+  'brand/logo/logo-ember-on-linen.svg': { fill: BRAND.emberText, background: BRAND.linen, padding: 0.1 },
   'brand/logo/logo-bone-on-forest.svg': { fill: BRAND.bone, background: BRAND.forest, padding: 0.1 },
   'brand/logo/logo-black.svg': { fill: '#000000' },
   'brand/logo/logo-white.svg': { fill: '#ffffff' },
-  'public/favicon.svg': { ...TAB, darkFill: BRAND.emberLight },
-  'public/images/logo.svg': EMBER,
-  'public/images/logo-color.svg': EMBER,
+  'public/favicon.svg': { ...TAB, darkFill: BRAND.ember },
+  // Shown on other people's white grounds (search results): the accent's deep tone.
+  'public/images/logo.svg': { fill: BRAND.emberText },
+  'public/images/logo-color.svg': { fill: BRAND.emberText },
 };
 
 /** Every referenced PNG at its existing name and size. */

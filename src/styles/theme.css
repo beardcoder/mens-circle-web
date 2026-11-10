@@ -1,9 +1,8 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
  * utilities cannot express. After the dark-botanical theme: a warm near-black
- * with soft pools of light for what draws you in, bone paper for reading, a
- * terracotta gold for what is marked, ember from the logo for the one thing to
- * do. Titles in Cormorant (the accent phrase in italic) beside calm running text
+ * with soft pools of light for what draws you in, bone paper for reading, one
+ * accent, a terracotta gold, for the mark, the one thing to do and what is marked. Titles in Cormorant (the accent phrase in italic) beside calm running text
  * (IBM Plex Sans); open, full-bleed grounds, lines instead of boxes.
  * Shared by the three entry files: global.css (public site), admin.css (back
  * office) and print.css (brand templates). docs/design-system.md describes the
@@ -56,17 +55,18 @@
   --color-raised: light-dark(var(--p-cream), var(--p-night-raised)); /* cards */
   --color-surface: light-dark(var(--p-linen), var(--p-night)); /* the ground of the current block */
   --color-fg: light-dark(var(--p-ink), var(--p-night-text));
-  --color-fg-soft: light-dark(var(--p-ink-soft), var(--p-night-text)); /* running text */
+  --color-fg-soft: light-dark(var(--p-ink-soft), var(--p-bone-soft)); /* running text */
   --color-fg-muted: light-dark(var(--p-muted), var(--p-night-muted)); /* secondary information */
   /* Links, labels and highlighted words: ember dark enough to read on linen, light on the night. */
   --color-accent: light-dark(var(--p-ember-text), var(--p-ember-light));
-  --color-accent-strong: light-dark(var(--p-ember-deep), var(--p-night-text));
+  --color-accent-strong: light-dark(var(--p-ember-text-deep), var(--p-night-text));
   --color-accent-soft: light-dark(var(--p-ember-tint), var(--p-ember-tint-night));
   --color-on-accent: light-dark(var(--p-linen), var(--p-night));
-  /* The one thing to do: ember under a light label, in both modes. */
-  --color-fill: var(--p-ember);
-  --color-fill-strong: var(--p-ember-deep);
-  --color-on-fill: var(--p-on-ember);
+  /* The one thing to do, in the theme's one accent: the terracotta gold under a dark
+     label on the dark grounds and at night, its deep tone under a light label on paper. */
+  --color-fill: light-dark(var(--p-ember-text), var(--p-ember));
+  --color-fill-strong: light-dark(var(--p-ember-text-deep), var(--p-ember-deep));
+  --color-on-fill: light-dark(var(--p-linen), var(--p-on-ember));
   /* The spark: what stands large on the forest and the moss (a poster word, an index
      number, the stamp) and the warm point of the circle. Never text on paper. */
   --color-spark: var(--p-spark);
@@ -83,8 +83,8 @@
   /* States only: always with words, never a decorative colour. */
   --color-success: light-dark(#2f6b3a, #8fcb97);
   --color-danger: light-dark(#a3261b, #f0a197);
-  /* The ember of the logo and the admin's marks. */
-  --color-flame: var(--p-ember);
+  /* The mark of the logo and the admin's marks: the accent of the ground it stands on. */
+  --color-flame: light-dark(var(--p-ember-text), var(--p-ember));
   /* The light text over the forest, where the bar lies on the opening. */
   --color-bone: var(--p-bone);
 
@@ -281,8 +281,12 @@
   --color-surface: var(--p-moss);
   --color-raised: color-mix(in srgb, var(--p-bone) 7%, var(--p-moss));
   --color-fg: var(--p-bone);
-  --color-fg-soft: var(--p-bone);
+  --color-fg-soft: var(--p-bone-soft);
   --color-fg-muted: var(--p-bone-muted);
+  --color-fill: var(--p-ember);
+  --color-fill-strong: var(--p-ember-deep);
+  --color-on-fill: var(--p-on-ember);
+  --color-flame: var(--p-ember);
   --color-accent: var(--p-ember-light);
   --color-accent-strong: var(--p-bone);
   --color-accent-soft: color-mix(in srgb, var(--p-bone) 10%, var(--p-moss));
@@ -305,8 +309,12 @@
   --color-surface: var(--p-forest);
   --color-raised: var(--p-forest-raised);
   --color-fg: var(--p-bone);
-  --color-fg-soft: var(--p-bone);
+  --color-fg-soft: var(--p-bone-soft);
   --color-fg-muted: var(--p-bone-muted);
+  --color-fill: var(--p-ember);
+  --color-fill-strong: var(--p-ember-deep);
+  --color-on-fill: var(--p-on-ember);
+  --color-flame: var(--p-ember);
   --color-accent: var(--p-ember-light);
   --color-accent-strong: var(--p-bone);
   --color-accent-soft: var(--p-forest-raised);
@@ -320,9 +328,9 @@
   color: var(--color-fg);
   background-color: var(--color-surface);
   background-image:
-    radial-gradient(ellipse 60% 50% at 12% 22%, rgb(212 165 116 / 16%) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 45% at 88% 82%, rgb(232 180 184 / 11%) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 35% at 78% 18%, rgb(201 184 150 / 8%) 0%, transparent 60%);
+    radial-gradient(ellipse 60% 50% at 12% 22%, rgb(212 165 116 / 18%) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 88% 82%, rgb(232 180 184 / 14%) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 78% 18%, rgb(201 184 150 / 10%) 0%, transparent 60%);
 }
 
 /* ── The four moves ────────────────────────────────────────────────────────── */
@@ -354,8 +362,9 @@
     /* The primitives, after the dark-botanical theme: at night a warm near-black
        with bone text and a terracotta gold; by day the same family turned round:
        bone becomes the paper and its band, the near-black the text. The dark ground
-       (still called forest) is the night's own colour in both modes; ember stays
-       the logo's and the one action's. The names are the roles they had; the
+       (still called forest) is the night's own colour in both modes. There is one
+       accent, the theme's terracotta gold (still called ember): the mark, the one
+       action, links and the italic phrase; on paper its deep tone. The names are the roles they had; the
        values are what counts. Every text pair is ≥ 4.5:1, every control line ≥ 3:1
        (tests/contrast.test.ts). */
     --p-linen: #f5f2ed;
@@ -367,10 +376,11 @@
     --p-line: #ddd7ce;
     --p-line-strong: #c8c0b6;
     --p-control: #7a7268;
-    --p-ember: #b4532a;
-    --p-ember-deep: #953f1c;
+    --p-ember: #d4a574;
+    --p-ember-deep: #c08f5c;
     --p-ember-text: #85501f;
-    --p-on-ember: #fff8f0;
+    --p-ember-text-deep: #6b3f16;
+    --p-on-ember: #141312;
     --p-ember-light: #d4a574;
     --p-ember-tint: #efe3d3;
     --p-ember-tint-night: #2e241a;
@@ -389,6 +399,7 @@
     --p-moss: light-dark(#25221f, #1c1a18);
     --p-moss-control: #8f867b;
     --p-bone: #e8e4df;
+    --p-bone-soft: #c8c0b6;
     --p-bone-muted: #b3aaa0;
 
     /* Space per width. The content's edge sits 28 / 40 / 56px from the window in

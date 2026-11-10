@@ -11,10 +11,11 @@ Columns: 4
 221 215 206	line
 200 192 182	line-strong
 122 114 104	control
-180  83  42	ember
-149  63  28	ember-deep
+212 165 116	ember
+192 143  92	ember-deep
 133  80  31	ember-text
-255 248 240	on-ember
+107  63  22	ember-text-deep
+ 20  19  18	on-ember
 212 165 116	ember-light
 239 227 211	ember-tint
  46  36  26	ember-tint-night
@@ -36,4 +37,5 @@ Columns: 4
  28  26  24	moss-night
 143 134 123	moss-control
 232 228 223	bone
+200 192 182	bone-soft
 179 170 160	bone-muted

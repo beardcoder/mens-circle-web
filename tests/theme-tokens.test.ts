@@ -31,7 +31,7 @@ test('the colour roles resolve through the primitives; mixed ones are marked', (
 
   expect(role('ground').light).toEqual({ hex: '#f5f2ed', primitive: 'linen' });
   expect(role('ground').dark).toEqual({ hex: '#141312', primitive: 'night' });
-  expect(role('fill').light.hex).toBe('#b4532a');
+  expect(role('fill').light.hex).toBe('#85501f');
   expect(role('overlay').derived).toBe(true);
 
   for (const c of tokens.colours.filter((x) => !x.derived)) {
