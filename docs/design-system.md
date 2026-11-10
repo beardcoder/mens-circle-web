@@ -89,7 +89,7 @@ set before first paint. Never a hex value in markup.
 | Moss            | `#2C3A30`                    | `#1A2A20`             | `surface-moss`                   | what is spoken in the circle: agreements, voices |
 | Forest          | `#16221B` / raised `#213029` | `#0C130F` / `#18221C` | `surface-dark`                   | opening, registration, menu, last band, footer   |
 | Text            | `#1B241E` / soft `#2E372F`   | `#ECE7DC`             | `fg`, `fg-soft`                  | titles / running text                            |
-| Secondary text  | `#565E51` moss grey          | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions                          |
+| Secondary text  | `#565E51` moss grey          | `#A6AE9F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text  |
 | Lines           | `#D8CDB8` / `#C2B59C`        | `#2B3029` / `#3D4339` | `line`, `line-strong`            | quiet structure; never alone a control           |
 | Control outline | `#767C6E`                    | `#7E8878`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                |
 | Accent          | `#9A421D`                    | `#F2A56C`             | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers |
@@ -140,7 +140,8 @@ window (`gutter`, `Container`) in every section, and the header shares it. The
 grounds run from edge to edge. Space per width on `:root`: `py-section` 88 → 144px,
 `py-band` 56 → 80px, `group` 40 → 64px, `grid` 32 → 48px (column gap), `overlap`
 40 / 64 / 96px. Breakpoints: `sm` 36rem, `md` 48rem, `lg` 64rem, `nav` 68.75rem,
-`xl` 80rem. No section is forced to a screen's height.
+`xl` 80rem. Only the home opening takes a screen's height (from `lg`, `min-h-svh`, its
+content centred; a short window lets it grow); no other section is forced to one.
 
 ### The four moves
 
@@ -312,7 +313,7 @@ dates and the footer. Under reduced motion everything rests.
 | `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in ember from the top; the number free in the middle; words beside |
 | `Stamp` (`turn`)                                  | The mark between two rings, the circle's name round it; turns with the scroll where `turn` is set    |
 | `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                  |
-| `Fact`                                            | Label, value in Fraunces, a note, under a rule; four in a row in the content column                  |
+| `Fact` (`layout`)                                 | Label, value in Fraunces, a note, under a rule; four in a row, or (`row`) lines with the label first |
 | `TestimonialList`                                 | One short voice large, the others as rows (author in the margin); every voice in full                |
 | `Accordion`                                       | Questions as rows between lines; an accent disc whose plus turns into a minus                        |
 | `LinkList`, `Prose` (`width`)                     | Where-next rows; rich text (`measure` / `column`)                                                    |
@@ -342,8 +343,11 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   forest with the stamp cut by the right edge, running into the footer.
 - **`/event`.** `PageIntro` with the stamp, every coming date as `EventSummary`
   beside the e-mail notification; the FAQ; a where-next band.
-- **Event page.** The date line and the title, the place, the calendar and the
-  registration on the forest headed by the seat ring; the evening's description
+- **Event page.** The date at a subheading's size over the title (the date tells one
+  evening from the next); beside them, from the top of the page, the registration on
+  the forest headed by the seat ring. Under the title the lead, then time, place and
+  the evening's course as rows between lines (`Zeit` stands in the head on phones,
+  where the registration follows the title), the calendar; the evening's description
   (sand); the map; where next.
 - **Personal page.** `PageIntro` with the photograph in a circle cut by the right
   edge, sections with their headings in the margin, values with index numbers, the

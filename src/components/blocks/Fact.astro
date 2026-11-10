@@ -1,18 +1,35 @@
 ---
 interface Props {
   label: string;
+  /** `column`: one of a row of facts, label over value. `row`: one line of a list, the label in front. */
+  layout?: 'column' | 'row';
+  /** Shown from `lg` only: where a narrow page already says the fact elsewhere. */
+  wideOnly?: boolean;
 }
 
-const { label } = Astro.props;
+const { label, layout = 'column', wideOnly = false } = Astro.props;
+const row = layout === 'row';
+const hasNote = Astro.slots.has('default');
+
+const shape = row
+  ? 'grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 py-5 sm:grid-cols-[6rem_minmax(0,1fr)]'
+  : 'content-start pt-5';
 ---
 
 {/* A fact under a thin rule: its label, the value in Fraunces, a note. No icon and no box. */}
-<div class="grid min-w-0 content-start border-t border-line-strong pt-5">
-  <dt class="text-sm font-semibold text-fg-muted">{label}</dt>
-  <dd class="mt-2 font-display text-xl text-balance text-fg sm:text-sub lg:text-xl xl:text-sub">
+<div class:list={['min-w-0 border-t border-line-strong', shape, wideOnly ? 'hidden lg:grid' : 'grid']}>
+  <dt class:list={['text-sm font-semibold text-fg-muted', row && 'pt-1']}>{label}</dt>
+  <dd
+    class:list={[
+      'font-display text-xl text-balance text-fg',
+      row ? 'min-w-0' : 'mt-2 sm:text-sub lg:text-xl xl:text-sub',
+    ]}
+  >
     <slot name="value" />
   </dd>
-  <dd class="mt-2 text-sm text-fg-muted">
-    <slot />
-  </dd>
+  {hasNote && (
+    <dd class:list={['text-sm text-fg-muted', row ? 'col-start-2 mt-1 min-w-0' : 'mt-2']}>
+      <slot />
+    </dd>
+  )}
 </div>

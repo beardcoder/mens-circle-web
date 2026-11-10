@@ -25,7 +25,7 @@ const { events, anchor, title, lede } = Astro.props;
     <Poster as="h2" id="termine-title" data-drift class="max-w-[5em]">
       {title}
     </Poster>
-    <p class="mt-8 max-w-measure text-lg text-fg-muted">{lede}</p>
+    <p class="mt-8 max-w-measure text-lg text-fg-soft">{lede}</p>
   </div>
   <div class="min-w-0 lg:col-span-5 lg:col-start-8">
     <EventAvailability data={events} location="home-dates" />

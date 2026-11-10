@@ -3,10 +3,11 @@ import type { EventDTO } from '@lib/shared/dto';
 import { eventView } from '@lib/shared/event-status';
 import { formatTimeRange } from '@lib/shared/time';
 import { accentLastWord } from '@lib/shared/words';
-import { link } from '@lib/ui';
 
+import Fact from '../blocks/Fact.astro';
 import Button from '../ui/Button.astro';
 import Container from '../ui/Container.astro';
+import TextLink from '../ui/TextLink.astro';
 import CalendarButton from './CalendarButton.astro';
 import EventDock from './EventDock.astro';
 
@@ -20,6 +21,30 @@ const dateLabel = view.title.join(' ');
 const hours = formatTimeRange(event.start_time, event.end_time);
 const hasPlace = !!(event.location || event.street || event.city);
 const title = accentLastWord(event.title);
+const where = [event.location, event.city].filter(Boolean).join(', ');
+
+/** What a man needs before he decides, as rows between lines; the fee stands with the registration. */
+const facts = [
+  { label: 'Zeit', value: hours || 'Abends', href: '', linkLabel: '', lgOnly: !!hours },
+  ...(where
+    ? [
+        {
+          label: 'Ort',
+          value: where,
+          lgOnly: false,
+          href: hasPlace ? '#anfahrt' : '',
+          linkLabel: 'Adresse und Anfahrt',
+        },
+      ]
+    : []),
+  {
+    label: 'Ablauf',
+    value: 'Ankommen, erste Runde, teilen und zuhören, Abschlussrunde',
+    lgOnly: false,
+    href: '#ueber-den-abend',
+    linkLabel: 'Was dich erwartet',
+  },
+];
 ---
 
 {/* The date line and the title rise in first, then the rest (global.css, "Motion: the
@@ -29,74 +54,68 @@ const title = accentLastWord(event.title);
   class="@container pt-[calc(var(--spacing-header)+1.25rem)] pb-band lg:pt-[calc(var(--spacing-header)+2.75rem)]"
 >
   <Container>
-    <div
-      data-enter
-      class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-t border-line pt-3 text-sm lg:pt-4"
-    >
-      <time
-        data-event-date
-        datetime={view.datetime}
-        class="relative z-31 inline-block origin-top-left text-fg print:opacity-100!"
-      >
-        {dateLabel}
-      </time>
-      {hours && (
-        <p data-event-hours class="relative z-31 origin-top-left text-fg-muted print:opacity-100!">
-          {hours}
+    {/* From `lg` the date and the title stand beside the registration, which starts at the
+        top of the page; on phones the registration follows the title, then the facts. */}
+    <div class="grid items-start gap-x-grid gap-y-8 border-t border-line pt-4 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-y-12 lg:pt-5">
+      <div class="min-w-0 lg:col-span-7">
+        {/* The date is what tells one evening from the next, so it stands at a heading's size. */}
+        <p data-enter class="flex flex-wrap items-baseline gap-x-4 gap-y-1 font-display text-sub text-fg">
+          <time data-event-date datetime={view.datetime} class="relative z-31 print:opacity-100!">
+            {view.title.map((line) => (
+              <span class="max-sm:block">{line} </span>
+            ))}
+          </time>
+          {/* On phones the registration follows at once, so the hours stand here; from `lg` they are a row of the facts. */}
+          {hours && <span class="font-sans text-base text-fg-muted lg:hidden">{hours}</span>}
         </p>
-      )}
-    </div>
-    <h1
-      id="event-title"
-      data-event-title
-      data-enter
-      aria-label={event.title}
-      class:list={[
-        'relative z-31 mt-4 origin-top-left font-display tracking-[-0.045em] text-fg lg:mt-6 print:opacity-100!',
-        'max-w-[14em] text-page wrap-anywhere hyphens-auto lg:text-hero',
-      ]}
-    >
-      <span>
-        {title.lead}
-        {title.accent && <span class="text-accent">{` ${title.accent}`}</span>}
-      </span>
-    </h1>
+        <h1
+          id="event-title"
+          data-event-title
+          data-enter
+          aria-label={event.title}
+          class:list={[
+            'relative z-31 mt-4 origin-top-left font-display tracking-[-0.045em] text-fg lg:mt-6 print:opacity-100!',
+            'max-w-[14em] text-page wrap-anywhere hyphens-auto lg:text-hero',
+          ]}
+        >
+          <span>
+            {title.lead}
+            {title.accent && <span class="text-accent">{` ${title.accent}`}</span>}
+          </span>
+        </h1>
+      </div>
 
-    <div class="mt-8 grid items-start gap-x-grid gap-y-8 lg:mt-14 lg:grid-cols-12">
-      <div data-enter style="--enter-delay: 0.2s" class="min-w-0 lg:col-span-6">
-        {event.city && <p class="text-base text-fg-muted lg:text-xl">in {event.city}</p>}
-        <p class="mt-4 max-w-[25em] text-md text-fg-soft lg:mt-6 lg:text-lg">
+      <div data-enter style="--enter-delay: 0.2s" class="min-w-0 max-lg:order-2 lg:col-span-6">
+        <p class="max-w-[25em] text-md text-fg-soft lg:text-lg">
           {event.is_past
             ? 'Dieser Abend hat bereits stattgefunden. Bei den aktuellen Terminen findest du die nächsten Treffen.'
             : 'Ein Abend für das, was dich gerade beschäftigt. Mit Männern, die dir zuhören.'}
         </p>
-        <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm lg:mt-6 lg:text-base">
-          <a href="#ueber-den-abend" class={`${link} inline-flex min-h-9 items-center`}>
-            Was dich erwartet
-          </a>
-          {hasPlace && (
-            <a href="#anfahrt" class={`${link} inline-flex min-h-9 items-center`}>
-              Adresse &amp; Anfahrt
-            </a>
-          )}
-        </div>
         {event.is_past && (
-          <Button href="/event" class="mt-5">
+          <Button href="/event" class="mt-6">
             Aktuelle Termine ansehen
           </Button>
         )}
-        <div class="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 lg:mt-12">
-          {event.location && (
-            <p class="max-w-[22em] text-sm text-fg-muted">
-              Treffpunkt: <span class="text-fg">{event.location}</span>
-            </p>
-          )}
-          {!event.is_past && <CalendarButton event={event} />}
-        </div>
+        <dl class="mt-8 grid border-b border-line-strong lg:mt-12">
+          {facts.map((fact) => (
+            <Fact label={fact.label} layout="row" wideOnly={fact.lgOnly}>
+              <Fragment slot="value">{fact.value}</Fragment>
+              {fact.href && <TextLink href={fact.href}>{fact.linkLabel}</TextLink>}
+            </Fact>
+          ))}
+        </dl>
+        {!event.is_past && (
+          <div class="mt-8 lg:mt-10">
+            <CalendarButton event={event} />
+          </div>
+        )}
       </div>
 
-      {/* On phones the registration comes first, straight under the title; the invitation follows. */}
-      <div data-enter style="--enter-delay: 0.32s" class="min-w-0 max-lg:order-first lg:col-span-5 lg:col-start-8">
+      <div
+        data-enter
+        style="--enter-delay: 0.32s"
+        class="min-w-0 max-lg:order-1 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1"
+      >
         <slot />
       </div>
     </div>

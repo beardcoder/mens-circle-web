@@ -16,7 +16,7 @@ interface Props {
 const { eyebrow, title, titleId, lead, leadHtml = false, size = 'section', class: className }: Props = Astro.props;
 
 const leadClass =
-  'mt-6 max-w-measure text-lg text-fg-muted [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong';
+  'mt-6 max-w-measure text-lg text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong';
 
 const titleClass = ['max-w-[14.4em] text-fg wrap-anywhere hyphens-auto', size === 'sub' ? 'text-sub' : 'text-section'];
 ---

@@ -37,7 +37,8 @@ const nextLine = next
   : null;
 ---
 
-{/* The opening, from edge to edge on the forest: the statement as large as a poster,
+{/* The opening, from edge to edge on the forest, one screen tall from `lg` (taller only
+     where the window is too short for it): the statement as large as a poster,
      its phrase in the spark; beside it the photograph in a circle, cut by the window's
      right edge (the bleed), and the next evening's seat ring overlapping it. On load the
      title's words rise one after the other, the rest follows and the photo settles
@@ -45,7 +46,7 @@ const nextLine = next
 <section
   data-hero
   aria-labelledby="hero-title"
-  class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section"
+  class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section lg:grid lg:min-h-svh lg:content-center lg:pb-band"
 >
   {/* Firelight: a warm glow where the circle sits, breathing slowly. */}
   <div
@@ -73,7 +74,7 @@ const nextLine = next
         class="max-w-[8.5em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto [&_em]:text-spark"
         set:html={title.html}
       />
-      <p data-enter style={beat(0)} class="mt-7 max-w-measure text-lg text-fg-muted">
+      <p data-enter style={beat(0)} class="mt-7 max-w-measure text-lg text-fg-soft">
         <slot />
       </p>
       <div data-enter style={beat(1)} class="mt-10 flex w-full flex-wrap items-center gap-x-8 gap-y-3">
@@ -131,7 +132,7 @@ const nextLine = next
 
   {/* The photograph: under the text on phones; from `lg` beside the title, as large as
       a third of the window and cut by its right edge. */}
-  <div class="relative mx-auto mt-16 w-[calc(100%-2*var(--spacing-gutter))] max-w-[22rem] sm:max-w-[28rem] lg:absolute lg:top-[calc(var(--spacing-header)+var(--spacing-group)+2rem)] lg:right-0 lg:mt-0 lg:w-[36vw] lg:max-w-[40rem] lg:translate-x-[16%]">
+  <div class="relative mx-auto mt-16 w-[calc(100%-2*var(--spacing-gutter))] max-w-[22rem] sm:max-w-[28rem] lg:absolute lg:top-[calc(50%+var(--spacing-header)/2)] lg:right-0 lg:mt-0 lg:w-[min(36vw,58svh)] lg:max-w-[40rem] lg:translate-x-[16%] lg:-translate-y-1/2">
     {/* Leaving, the photograph falls behind the text and comes a little closer (global.css, "Motion: scroll"). */}
     <div data-hero-photo class="relative">
       <div data-enter="settle" class="relative">

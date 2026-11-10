@@ -30,7 +30,7 @@ const { items, anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel 
       {items?.length ? (
         <TestimonialList items={items} />
       ) : (
-        <p data-reveal class:list={[margin.reading, 'text-md text-fg-muted']}>
+        <p data-reveal class:list={[margin.reading, 'text-md text-fg-soft']}>
           {items ? emptyText : errorText}
         </p>
       )}

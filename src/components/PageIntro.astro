@@ -54,7 +54,7 @@ const hasMedia = Astro.slots.has('media');
       )}
       <h1 id={titleId} data-enter="words" class={titleClass} set:html={words.html} />
       {hasLead && (
-        <div data-enter style={afterWords(words.count, 0)} class="mt-6 max-w-measure text-lg text-fg-muted">
+        <div data-enter style={afterWords(words.count, 0)} class="mt-6 max-w-measure text-lg text-fg-soft">
           <slot name="lead" />
         </div>
       )}
