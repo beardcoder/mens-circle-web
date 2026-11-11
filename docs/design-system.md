@@ -10,7 +10,7 @@ terracotta gold, an elegant serif whose accent phrase is set in italic. The nigh
 mode is that theme; the day mode is built from the same family turned round: bone
 becomes the paper, the near-black the text. The dark ground carries what draws you
 in and what is spoken in the circle, paper is for reading. There is one accent, the theme's
-terracotta gold: the mark, the one thing to do, links and the italic phrase; on
+clay terracotta: the mark, the one thing to do, links and the italic phrase; on
 paper its deep tone. Everything is open and full-bleed: grounds run from edge
 to edge, content stands between lines, nothing sits in a rounded card.
 
@@ -88,31 +88,35 @@ set before first paint. Never a hex value in markup.
 
 | Role            | Light                        | Night                 | Token                            | Use                                               |
 | --------------- | ---------------------------- | --------------------- | -------------------------------- | ------------------------------------------------- |
-| Page            | `#F5F2ED` bone paper         | `#141312`             | `ground`                         | the page                                          |
-| Band            | `#E8E4DF` bone               | `#1C1A18`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates       |
-| Raised          | `#FCFBF8`                    | `#25221F`             | `raised`                         | fields, the QR square, the admin's cards          |
-| Dark ground     | `#141312` / raised `#1F1D1A` | `#0A0A0A` / `#151413` | `surface-dark`                   | opening, agreements, voices, registration, footer |
-| Second dark     | `#25221F`                    | `#1C1A18`             | `surface-moss`                   | print only; the site has three grounds            |
-| Text            | `#141312` / soft `#2A2622`   | `#E8E4DF`             | `fg`, `fg-soft`                  | titles / running text                             |
-| Secondary text  | `#625A51`                    | `#A39A8F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text   |
-| Lines           | `#DDD7CE` / `#C8C0B6`        | `#2A2622` / `#3A352F` | `line`, `line-strong`            | quiet structure; never alone a control            |
-| Control outline | `#7A7268`                    | `#857C71`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                 |
-| Accent          | `#85501F`                    | `#D4A574`             | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers  |
-| Primary action  | `#B4532A` ember / `#953F1C`  | same                  | `fill`, `fill-strong`, `on-fill` | the one action of a module, a taken chair         |
-| Spark           | `#D4A574` terracotta gold    | same                  | `spark`                          | the italic phrase and numbers on the dark ground  |
+| Page            | `#F4EDE2` warm paper         | `#17120E`             | `ground`                         | the page                                          |
+| Band            | `#E7DCCB`                    | `#201912`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates       |
+| Raised          | `#FBF7F0`                    | `#2A2119`             | `raised`                         | fields, the QR square, the admin's cards          |
+| Dark ground     | `#17120E` / raised `#221B14` | `#0E0A07` / `#18120D` | `surface-dark`                   | opening, agreements, voices, registration, footer |
+| Second dark     | `#2A2119`                    | `#201912`             | `surface-moss`                   | print only; the site has three grounds            |
+| Text            | `#1A140F` / soft `#2E251C`   | `#ECE3D5` / `#CFC1AD` | `fg`, `fg-soft`                  | titles / running text                             |
+| Secondary text  | `#66594A`                    | `#A8998A`             | `fg-muted`                       | labels, notes, captions; never a lead or a text   |
+| Lines           | `#DCCFBC` / `#C6B69F`        | `#2E251C` / `#40342A` | `line`, `line-strong`            | quiet structure; never alone a control            |
+| Control outline | `#7D6E5D`                    | `#8A7B6B`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                 |
+| Accent          | `#84481C`                    | `#C98A56` clay        | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers  |
+| Primary action  | `#84481C` / `#693815`        | `#C98A56` / `#B5773F` | `fill`, `fill-strong`, `on-fill` | the one action of a module, a taken chair         |
+| Spark           | `#C98A56`                    | same                  | `spark`                          | the italic phrase and numbers on the dark ground  |
+
+The palette starts from the dark-botanical theme and is turned earthier and warmer
+than it: the near-black is a brown-black like dark soil, the bone leans to linen,
+the accent is a clay terracotta where the theme has a paler gold, and the pools of
+light are a clay, a burnt rose and an ochre.
 
 The primitives keep the names of the roles they had (`--p-forest` is the dark
 ground, `--p-linen` the paper, `--p-sand` the band, `--p-ember` the accent: the
 gold on the dark grounds, `--p-ember-text` its deep tone on paper; a filled button
 is gold under a dark label there and deep under a light label here); the values are the theme's.
 The dark ground carries the theme's signature, three soft pools of light in its
-corners (a terracotta gold, a blush, a pale gold; `surface-dark` in theme.css),
+corners (`surface-dark` in theme.css),
 still and never animated.
 
-On the dark grounds the surfaces re-declare text (bone `#E8E4DF`, running text
-`#C8C0B6`, muted
-`#B3AAA0`), accent (`#D4A574`), lines (bone at 14–28 %) and the control outline
-(`#857C71`, on the second dark `#8F867B`). The spark is never text on paper or sand.
+On the dark grounds the surfaces re-declare text (bone `#ECE3D5`, running text
+`#CFC1AD`, muted `#B8A996`), accent (`#C98A56`), lines (bone at 14–28 %) and the
+control outline (`#8A7B6B`, on the second dark `#948573`). The spark is never text on paper or sand.
 `success` and `danger` are for real states only and always come with words. Every
 text pair holds at least 4.5:1 on every ground in both modes, every control line at
 least 3:1 (`tests/contrast.test.ts`, pair by pair). Check any new pair in both modes.
@@ -126,7 +130,7 @@ serif's would (`text-sub` 26–36px, `text-quote` 28–42px, the home statement
 `src/assets/fonts/`), declared from weight 500; figures lining (`lnum`). Titles are
 500, the hero, page titles, index numbers and poster words 600. A highlighted
 phrase in a title (`<em>`) is set in Cormorant's italic, in the accent (the
-terracotta gold on the dark ground). `font-sans` is IBM Plex Sans (the static
+clay terracotta on the dark ground). `font-sans` is IBM Plex Sans (the static
 regular and semibold, ~23 kB each; the regular also serves 500, the semibold 700): running text, navigation, forms, data.
 
 | Token           | Size     | Use                                              |

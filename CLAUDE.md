@@ -225,10 +225,11 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `theme.css` by `lib/brand/theme-tokens.ts`, real components; noindex, in the
   browser check). The idea: the circle of chairs. A centre, things turned towards
   each other, much air; poster-sized type where the site invites, calm reading where
-  it explains. The look follows the dark-botanical theme (ConardLi/garden-skills):
-  at night a warm near-black with soft pools of light, bone text, a terracotta
-  gold and Cormorant with its italic; by day the same family turned round (bone
-  paper, near-black text). One accent, the theme's terracotta gold (mark, the one action, links, the italic phrase; its deep tone on paper). Open and
+  it explains. The look starts from the dark-botanical theme (ConardLi/garden-skills)
+  and is earthier and warmer than it: at night a brown-black like dark soil with
+  soft pools of light, warm bone text, a clay terracotta and Cormorant with its
+  italic; by day the same family turned round (bone
+  paper, near-black text). One accent, a clay terracotta (mark, the one action, links, the italic phrase; its deep tone on paper). Open and
   full-bleed: grounds from edge to edge, content between lines, no rounded card.
   The circle is the one motif, in four
   forms: the mark, the seat ring, the stamp, the index number. Same function, same
@@ -260,7 +261,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   navigation, forms, data. Role tokens
   `text-poster`, `text-hero`, `text-index`, `text-page`, `text-section`, `text-sub`,
   `text-quote`, `text-md` (body), `text-base` (controls), `text-marginal`. `<em>` in
-  a title is Cormorant's italic in the accent (the terracotta gold on the dark ground). Labels in sentence
+  a title is Cormorant's italic in the accent (the clay terracotta on the dark ground). Labels in sentence
   case. Running text on `max-w-measure`. A dash in running copy is bound to the word
   before it (`\u00a0–`).
 - The four moves, the only ways to break the 12-column grid, each at most once per

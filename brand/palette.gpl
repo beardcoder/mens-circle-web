@@ -2,40 +2,40 @@ GIMP Palette
 Name: Männerkreis Niederbayern
 Columns: 4
 #
-245 242 237	linen
-232 228 223	sand
-252 251 248	cream
- 20  19  18	ink
- 42  38  34	ink-soft
- 98  90  81	muted
-221 215 206	line
-200 192 182	line-strong
-122 114 104	control
-212 165 116	ember
-192 143  92	ember-deep
-133  80  31	ember-text
-107  63  22	ember-text-deep
- 20  19  18	on-ember
-212 165 116	ember-light
-239 227 211	ember-tint
- 46  36  26	ember-tint-night
-212 165 116	spark
- 20  19  18	night
- 28  26  24	night-alt
- 37  34  31	night-raised
-232 228 223	night-text
-163 154 143	night-muted
- 42  38  34	night-line
- 58  53  47	night-line-strong
-133 124 113	night-control
- 20  19  18	forest
- 10  10  10	forest-night
- 31  29  26	forest-raised
- 21  20  19	forest-raised-night
-133 124 113	forest-control
- 37  34  31	moss
- 28  26  24	moss-night
-143 134 123	moss-control
-232 228 223	bone
-200 192 182	bone-soft
-179 170 160	bone-muted
+244 237 226	linen
+231 220 203	sand
+251 247 240	cream
+ 26  20  15	ink
+ 46  37  28	ink-soft
+102  89  74	muted
+220 207 188	line
+198 182 159	line-strong
+125 110  93	control
+201 138  86	ember
+181 119  63	ember-deep
+132  72  28	ember-text
+105  56  21	ember-text-deep
+ 23  18  14	on-ember
+201 138  86	ember-light
+240 224 203	ember-tint
+ 51  38  26	ember-tint-night
+201 138  86	spark
+ 23  18  14	night
+ 32  25  18	night-alt
+ 42  33  25	night-raised
+236 227 213	night-text
+168 153 138	night-muted
+ 46  37  28	night-line
+ 64  52  42	night-line-strong
+138 123 107	night-control
+ 23  18  14	forest
+ 14  10   7	forest-night
+ 34  27  20	forest-raised
+ 24  18  13	forest-raised-night
+138 123 107	forest-control
+ 42  33  25	moss
+ 32  25  18	moss-night
+148 133 115	moss-control
+236 227 213	bone
+207 193 173	bone-soft
+184 169 150	bone-muted
