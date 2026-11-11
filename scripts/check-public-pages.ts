@@ -288,6 +288,13 @@ try {
 
     assert.equal(queried.headers.get('X-Astro-Cache'), 'HIT', 'A query string must not bypass or fragment the cache');
     await queried.text();
+    const hot = await fetch(origin);
+
+    assert.equal(
+      hot.headers.get('content-length'),
+      String((await hot.arrayBuffer()).byteLength),
+      'A repeated hit is served as bytes, not as a stream (server.ts)',
+    );
     const home = await readPage(origin, '/');
     const overview = await readPage(origin, '/event');
 

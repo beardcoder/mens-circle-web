@@ -73,6 +73,16 @@ const finish = (response: Response, pathname: string): Response => {
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 };
 
+/**
+ * One second of route-cache hits, kept as bytes. A hit through the adapter still costs
+ * its file lookups and a streamed body; under a burst that is the whole capacity of
+ * the process. Keyed by path like the route cache (which ignores query and cookies),
+ * emptied by every request that can write, so a purge is at most one second late.
+ */
+const HIT_TTL_MS = 1000;
+const MAX_HITS = 64;
+const hits = new Map<string, { until: number; headers: Headers; body: ArrayBuffer }>();
+
 const hostname = process.env.HOST ?? 'localhost';
 
 const server = Bun.serve({
@@ -81,11 +91,27 @@ const server = Bun.serve({
   ...(options.idleTimeout !== undefined && { idleTimeout: options.idleTimeout }),
   ...(options.bodySizeLimit !== undefined && { maxRequestBodySize: options.bodySizeLimit }),
   async fetch(request, bun) {
+    const { pathname } = new URL(request.url);
+    const isGet = request.method === 'GET';
+    const hot = isGet ? hits.get(pathname) : undefined;
+
+    if (hot && hot.until > Date.now()) return new Response(hot.body, { headers: hot.headers });
+
     const clientAddress = bun.requestIP(request)?.address;
+    const response = finish(await handler(request, { clientAddress, serverPort: bun.port }), pathname);
 
-    const response = await handler(request, { clientAddress, serverPort: bun.port });
+    // An action may have purged the route cache.
+    if (!isGet && request.method !== 'HEAD') hits.clear();
 
-    return finish(response, new URL(request.url).pathname);
+    if (!isGet || response.status !== 200 || response.headers.get('x-astro-cache') !== 'HIT') return response;
+
+    const body = await response.arrayBuffer();
+
+    if (hits.size >= MAX_HITS) hits.clear();
+
+    hits.set(pathname, { until: Date.now() + HIT_TTL_MS, headers: response.headers, body });
+
+    return new Response(body, { headers: response.headers });
   },
   error(error) {
     console.error(error);

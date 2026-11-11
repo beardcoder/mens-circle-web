@@ -22,6 +22,10 @@ toolchain into the image (256 MB instead of 30 MB).
   sends no `Cache-Control` for the rest, so `server.ts` adds `public, max-age=0`
   (prerendered pages, `robots.txt`, `sw.js`, sitemaps are revalidated, as under the
   Node adapter). No middleware runs for them.
+- **Route-cache hits** are kept by `server.ts` as bytes for one second per path and
+  answered before the adapter (its file lookups and streamed body cost about seven
+  times the CPU). Any request that is not a GET or HEAD empties that store, so a purge
+  by an action is at most one second late.
 - **Unknown paths** get the prerendered 404 page from disk, also without middleware;
   retired URLs therefore redirect in `astro.config.mjs` (`redirects`).
 - **Rendered routes** pass through the route cache (see `docs/public-api.md`), then

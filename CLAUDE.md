@@ -129,7 +129,9 @@ prerendered.
 **Caching.** `lib/cache-policy.ts` is the default for rendered responses (middleware):
 admin, `/auth`, actions and server islands `private, no-store`; everything else
 `public, max-age=0, must-revalidate` unless the route sets its own. The route cache wraps
-the middleware: a hit is served with the headers stored on its miss. Static files keep
+the middleware: a hit is served with the headers stored on its miss. `server.ts` keeps
+such a hit as bytes for one second per path (emptied by every non-GET request) and
+answers it before the adapter. Static files keep
 the adapter's headers. No `s-maxage`: the purge cannot reach Cloudflare. Public API
 errors are `no-store`. `public/sw.js` only retires the old breathing app's service
 worker, is revalidated on every load and goes after 2027-04-26 (docs/runtime.md).
