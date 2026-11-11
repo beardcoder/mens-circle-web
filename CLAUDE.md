@@ -257,7 +257,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   menu, last band, footer). The site has these three grounds; `moss` stays for print. Grounds
   run from edge to edge; `Section` clips horizontally what bleeds.
 - Type: Cormorant variable, upright and italic (`font-display`, two files in
-  `src/assets/fonts/`, local provider, from weight 500, figures lining via `lnum`)
+  `src/assets/fonts/`, local provider, from weight 500, figures lining via `lnum`;
+  both faces `font-display: optional` with every file preloaded, never `swap` or
+  `block`: a font arriving after the first paint re-lays the page out and flickers)
   for titles, dates, numbers, poster words; a light, narrow face, so its sizes run
   a step larger; IBM Plex Sans (`font-sans`, static regular and semibold) for text,
   navigation, forms, data. Role tokens

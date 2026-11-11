@@ -88,18 +88,18 @@ set before first paint. Never a hex value in markup.
 
 | Role            | Light                        | Night                 | Token                            | Use                                               |
 | --------------- | ---------------------------- | --------------------- | -------------------------------- | ------------------------------------------------- |
-| Page            | `#F4EDE2` warm paper         | `#17120E`             | `ground`                         | the page                                          |
-| Band            | `#E7DCCB`                    | `#201912`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates       |
-| Raised          | `#FBF7F0`                    | `#2A2119`             | `raised`                         | fields, the QR square, the admin's cards          |
-| Dark ground     | `#17120E` / raised `#221B14` | `#0E0A07` / `#18120D` | `surface-dark`                   | opening, agreements, voices, registration, footer |
-| Second dark     | `#2A2119`                    | `#201912`             | `surface-moss`                   | print only; the site has three grounds            |
-| Text            | `#1A140F` / soft `#2E251C`   | `#ECE3D5` / `#CFC1AD` | `fg`, `fg-soft`                  | titles / running text                             |
-| Secondary text  | `#66594A`                    | `#A8998A`             | `fg-muted`                       | labels, notes, captions; never a lead or a text   |
-| Lines           | `#DCCFBC` / `#C6B69F`        | `#2E251C` / `#40342A` | `line`, `line-strong`            | quiet structure; never alone a control            |
-| Control outline | `#7D6E5D`                    | `#8A7B6B`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                 |
-| Accent          | `#84481C`                    | `#C98A56` clay        | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers  |
-| Primary action  | `#84481C` / `#693815`        | `#C98A56` / `#B5773F` | `fill`, `fill-strong`, `on-fill` | the one action of a module, a taken chair         |
-| Spark           | `#C98A56`                    | same                  | `spark`                          | the italic phrase and numbers on the dark ground  |
+| Page            | `#F1E8D9` warm paper         | `#130E0A`             | `ground`                         | the page                                          |
+| Band            | `#E2D4BE`                    | `#1C150F`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates       |
+| Raised          | `#F9F3E8`                    | `#261D15`             | `raised`                         | fields, the QR square, the admin's cards          |
+| Dark ground     | `#130E0A` / raised `#1E1610` | `#0B0705` / `#140E09` | `surface-dark`                   | opening, agreements, voices, registration, footer |
+| Second dark     | `#261D15`                    | `#1C150F`             | `surface-moss`                   | print only; the site has three grounds            |
+| Text            | `#18110B` / soft `#2B2117`   | `#EBDFCD` / `#CDBCA4` | `fg`, `fg-soft`                  | titles / running text                             |
+| Secondary text  | `#5F503D`                    | `#A8957F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text   |
+| Lines           | `#D6C6AD` / `#BFAB8E`        | `#2C2218` / `#3F3225` | `line`, `line-strong`            | quiet structure; never alone a control            |
+| Control outline | `#766550`                    | `#8A7862`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                 |
+| Accent          | `#7C4117`                    | `#C2804A` burnt clay  | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers  |
+| Primary action  | `#7C4117` / `#63330F`        | `#C2804A` / `#AD6C36` | `fill`, `fill-strong`, `on-fill` | the one action of a module, a taken chair         |
+| Spark           | `#C2804A`                    | same                  | `spark`                          | the italic phrase and numbers on the dark ground  |
 
 The palette starts from the dark-botanical theme and is turned earthier and warmer
 than it: the near-black is a brown-black like dark soil, the bone leans to linen,
@@ -114,9 +114,9 @@ The dark ground carries the theme's signature, three soft pools of light in its
 corners (`surface-dark` in theme.css),
 still and never animated.
 
-On the dark grounds the surfaces re-declare text (bone `#ECE3D5`, running text
-`#CFC1AD`, muted `#B8A996`), accent (`#C98A56`), lines (bone at 14–28 %) and the
-control outline (`#8A7B6B`, on the second dark `#948573`). The spark is never text on paper or sand.
+On the dark grounds the surfaces re-declare text (bone `#EBDFCD`, running text
+`#CDBCA4`, muted `#B6A48D`), accent (`#C2804A`), lines (bone at 14–28 %) and the
+control outline (`#8A7862`, on the second dark `#948169`). The spark is never text on paper or sand.
 `success` and `danger` are for real states only and always come with words. Every
 text pair holds at least 4.5:1 on every ground in both modes, every control line at
 least 3:1 (`tests/contrast.test.ts`, pair by pair). Check any new pair in both modes.
@@ -127,7 +127,12 @@ least 3:1 (`tests/contrast.test.ts`, pair by pair). Check any new pair in both m
 narrow, with a small x-height, so its sizes run a step larger than a sturdier
 serif's would (`text-sub` 26–36px, `text-quote` 28–42px, the home statement
 48–90px on two lines). Two variable files, upright and italic (~35 and ~38 kB,
-`src/assets/fonts/`), declared from weight 500; figures lining (`lnum`). Titles are
+`src/assets/fonts/`), declared from weight 500; figures lining (`lnum`). Every face is
+`font-display: optional` and every file is preloaded, so a page is painted once and
+never changes its faces afterwards: a font that arrives after the first paint
+would re-lay the page out (the fallback breaks lines differently), which reads as
+a flicker. A first visit on a slow line may stay in the fallback until the next
+page. Titles are
 500, the hero, page titles, index numbers and poster words 600. A highlighted
 phrase in a title (`<em>`) is set in Cormorant's italic, in the accent (the
 clay terracotta on the dark ground). `font-sans` is IBM Plex Sans (the static

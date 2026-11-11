@@ -29,8 +29,8 @@ test('the Adobe swatch file has a valid header and one block per colour plus the
 test('the DTCG file names every role in both modes, with CMYK', () => {
   const json = JSON.parse(files['tokens.json'] as string);
 
-  expect(json.color.role.fill.light.$value.hex).toBe('#84481c');
-  expect(json.color.role.ground.dark.$value.hex).toBe('#17120e');
+  expect(json.color.role.fill.light.$value.hex).toBe('#7c4117');
+  expect(json.color.role.ground.dark.$value.hex).toBe('#130e0a');
   expect(json.color.primitive.spark.$extensions['de.mens-circle'].cmyk).toHaveLength(4);
   expect(json.type.poster.$value.lineHeight).toBe('0.86');
 });

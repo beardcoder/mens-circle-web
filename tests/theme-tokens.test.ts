@@ -22,16 +22,16 @@ test('a declaration keeps its trailing comment as its note, and multi-line value
 
 test('the primitives resolve to hex in both modes', () => {
   expect(Object.keys(tokens.primitives).length).toBeGreaterThan(30);
-  expect(tokens.primitives.linen).toEqual({ light: '#f4ede2', dark: '#f4ede2' });
-  expect(tokens.primitives.moss).toEqual({ light: '#2a2119', dark: '#201912' });
+  expect(tokens.primitives.linen).toEqual({ light: '#f1e8d9', dark: '#f1e8d9' });
+  expect(tokens.primitives.moss).toEqual({ light: '#261d15', dark: '#1c150f' });
 });
 
 test('the colour roles resolve through the primitives; mixed ones are marked', () => {
   const role = (name: string) => tokens.colours.find((c) => c.name === name)!;
 
-  expect(role('ground').light).toEqual({ hex: '#f4ede2', primitive: 'linen' });
-  expect(role('ground').dark).toEqual({ hex: '#17120e', primitive: 'night' });
-  expect(role('fill').light.hex).toBe('#84481c');
+  expect(role('ground').light).toEqual({ hex: '#f1e8d9', primitive: 'linen' });
+  expect(role('ground').dark).toEqual({ hex: '#130e0a', primitive: 'night' });
+  expect(role('fill').light.hex).toBe('#7c4117');
   expect(role('overlay').derived).toBe(true);
 
   for (const c of tokens.colours.filter((x) => !x.derived)) {

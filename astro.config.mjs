@@ -112,6 +112,12 @@ export default defineConfig({
     // src/assets/fonts/README.md says where they come from.
     {
       name: 'Cormorant',
+      // `optional`, with every file preloaded: a page is painted once and never
+      // changes its faces afterwards. `swap` and `block` both re-laid the page out
+      // when a font arrived after the first paint (the fallback breaks lines
+      // differently), which read as a flicker. The price: a first visit on a slow
+      // line may stay in the fallback until the next page.
+      display: 'optional',
       cssVariable: '--font-cormorant',
       provider: fontProviders.local(),
       options: {
@@ -124,6 +130,12 @@ export default defineConfig({
     },
     {
       name: 'IBM Plex Sans',
+      // `optional`, with every file preloaded: a page is painted once and never
+      // changes its faces afterwards. `swap` and `block` both re-laid the page out
+      // when a font arrived after the first paint (the fallback breaks lines
+      // differently), which read as a flicker. The price: a first visit on a slow
+      // line may stay in the fallback until the next page.
+      display: 'optional',
       cssVariable: '--font-plex',
       provider: fontProviders.local(),
       options: {

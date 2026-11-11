@@ -328,9 +328,9 @@
   color: var(--color-fg);
   background-color: var(--color-surface);
   background-image:
-    radial-gradient(ellipse 60% 50% at 12% 22%, rgb(201 138 86 / 18%) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 45% at 88% 82%, rgb(196 120 92 / 13%) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 35% at 78% 18%, rgb(190 150 100 / 10%) 0%, transparent 60%);
+    radial-gradient(ellipse 60% 50% at 12% 22%, rgb(194 128 74 / 18%) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 88% 82%, rgb(176 98 66 / 13%) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 35% at 78% 18%, rgb(184 140 86 / 10%) 0%, transparent 60%);
 }
 
 /* ── The four moves ────────────────────────────────────────────────────────── */
@@ -368,40 +368,40 @@
        action, links and the italic phrase; on paper its deep tone. The names are the roles they had; the
        values are what counts. Every text pair is ≥ 4.5:1, every control line ≥ 3:1
        (tests/contrast.test.ts). */
-    --p-linen: #f4ede2;
-    --p-sand: #e7dccb;
-    --p-cream: #fbf7f0;
-    --p-ink: #1a140f;
-    --p-ink-soft: #2e251c;
-    --p-muted: #66594a;
-    --p-line: #dccfbc;
-    --p-line-strong: #c6b69f;
-    --p-control: #7d6e5d;
-    --p-ember: #c98a56;
-    --p-ember-deep: #b5773f;
-    --p-ember-text: #84481c;
-    --p-ember-text-deep: #693815;
-    --p-on-ember: #17120e;
-    --p-ember-light: #c98a56;
-    --p-ember-tint: #f0e0cb;
-    --p-ember-tint-night: #33261a;
-    --p-spark: #c98a56;
-    --p-night: #17120e;
-    --p-night-alt: #201912;
-    --p-night-raised: #2a2119;
-    --p-night-text: #ece3d5;
-    --p-night-muted: #a8998a;
-    --p-night-line: #2e251c;
-    --p-night-line-strong: #40342a;
-    --p-night-control: #8a7b6b;
-    --p-forest: light-dark(#17120e, #0e0a07);
-    --p-forest-raised: light-dark(#221b14, #18120d);
-    --p-forest-control: #8a7b6b;
-    --p-moss: light-dark(#2a2119, #201912);
-    --p-moss-control: #948573;
-    --p-bone: #ece3d5;
-    --p-bone-soft: #cfc1ad;
-    --p-bone-muted: #b8a996;
+    --p-linen: #f1e8d9;
+    --p-sand: #e2d4be;
+    --p-cream: #f9f3e8;
+    --p-ink: #18110b;
+    --p-ink-soft: #2b2117;
+    --p-muted: #5f503d;
+    --p-line: #d6c6ad;
+    --p-line-strong: #bfab8e;
+    --p-control: #766550;
+    --p-ember: #c2804a;
+    --p-ember-deep: #ad6c36;
+    --p-ember-text: #7c4117;
+    --p-ember-text-deep: #63330f;
+    --p-on-ember: #130e0a;
+    --p-ember-light: #c2804a;
+    --p-ember-tint: #edd9be;
+    --p-ember-tint-night: #33241a;
+    --p-spark: #c2804a;
+    --p-night: #130e0a;
+    --p-night-alt: #1c150f;
+    --p-night-raised: #261d15;
+    --p-night-text: #ebdfcd;
+    --p-night-muted: #a8957f;
+    --p-night-line: #2c2218;
+    --p-night-line-strong: #3f3225;
+    --p-night-control: #8a7862;
+    --p-forest: light-dark(#130e0a, #0b0705);
+    --p-forest-raised: light-dark(#1e1610, #140e09);
+    --p-forest-control: #8a7862;
+    --p-moss: light-dark(#261d15, #1c150f);
+    --p-moss-control: #948169;
+    --p-bone: #ebdfcd;
+    --p-bone-soft: #cdbca4;
+    --p-bone-muted: #b6a48d;
 
     /* Space per width. The content's edge sits 28 / 40 / 56px from the window in
        every section; grounds run from edge to edge. Sections 88px on phones, 144px
