@@ -70,7 +70,11 @@ const roundButton =
       aria-label={`${site.siteName} – Startseite`}
       class="group/logo flex min-h-11 min-w-0 items-center gap-2 font-display text-[1.25rem] font-semibold sm:gap-3 sm:text-[1.5rem]"
     >
-      <Icon name="logo" aria-hidden="true" class="size-8 shrink-0 text-flame sm:size-9" />
+      <Icon
+        name="logo"
+        aria-hidden="true"
+        class="size-8 shrink-0 text-flame transition-[rotate] duration-700 ease-(--ease-spring) sm:size-9 hover-device:group-hover/logo:rotate-90 motion-reduce:transition-none"
+      />
       <span class={wordmark}>Männerkreis</span>
     </a>
 

@@ -102,6 +102,51 @@
   }
 }
 
+/* ── Arriving ─────────────────────────────────────────────────────────────── */
+
+/* What lies below the first screen arrives once, the first time it is scrolled to
+   (Reveal.astro marks it `data-arrive="pending"` and then `done`): 14px up and in,
+   600ms, the children of a group 60ms apart. A poster word comes from the side.
+   Opacity and translate only. A seat ring that arrives fills its taken chairs.
+   On screens only: a printed page shows everything. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  /* The transition belongs to the arrival only: hiding a piece below the window is
+     instant, so a fast scroll never meets one that is still fading out. */
+  [data-arrive='done'] {
+    transition:
+      opacity 0.6s var(--ease-out),
+      translate 0.6s var(--ease-out);
+    transition-delay: calc(var(--reveal-i, 0) * 60ms);
+  }
+
+  [data-arrive='pending'] {
+    opacity: 0;
+    translate: 0 0.875rem;
+  }
+
+  [data-reveal='side'][data-arrive='pending'] {
+    translate: -8% 0;
+  }
+
+  [data-arrive='done'] [data-seat-dot]:not([data-seat-dot='taking']) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: seat-take 0.7s var(--ease-spring) backwards;
+    animation-delay: calc(0.25s + var(--i, 0) * 70ms);
+  }
+
+  /* The stamp's words turn once in two minutes: constant, so linear. */
+  [data-stamp] {
+    animation: stamp-turn 120s linear infinite;
+  }
+}
+
+@keyframes stamp-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
 /* Browsers without `linear()` (Safari before 17.2) would drop the whole animation
    for the spring token; they get the plain ease-out instead. */
 @supports not (animation-timing-function: linear(0, 1)) {
@@ -149,8 +194,8 @@
 
 /* ── Motion: scroll ───────────────────────────────────────────────────────── */
 
-/* Two bars follow the scroll, because their place depends on it; nothing else is
-   tied to it. No piece fades in as it enters the view: what is on the page stands. */
+/* Tied to the scroll itself: two bars whose place depends on it, and the opening's
+   photograph, which comes a little closer as the opening leaves. */
 @supports (animation-timeline: view()) {
   @media screen and (prefers-reduced-motion: no-preference) {
     /* The event page's dock under the bar follows the title: as the title passes
@@ -158,6 +203,20 @@
        returns. The title's own view timeline drives it (`body` lifts the name to
        where the dock can see it; the inset is the bar), so the dock is always
        exactly as far in as the title is out. */
+    /* Leaving, the opening's photograph comes a little closer, from its lower edge
+       and sinking only slightly: the opening clips what leaves it, and the seat ring
+       hangs close to its bottom edge (measured: it is never cut). */
+    [data-hero] {
+      view-timeline: --hero block;
+    }
+
+    [data-hero-photo] {
+      transform-origin: 50% 100%;
+      animation: hero-photo-leave linear both;
+      animation-timeline: --hero;
+      animation-range: exit-crossing 0% exit-crossing 100%;
+    }
+
     body {
       timeline-scope: --event-title, --hero-action, --dates, --page-footer;
     }
@@ -208,6 +267,13 @@
       animation-timeline: --page-footer;
       animation-range: entry 0% entry 20%;
     }
+  }
+}
+
+@keyframes hero-photo-leave {
+  to {
+    translate: 0 0.75rem;
+    scale: 1.06;
   }
 }
 

@@ -17,7 +17,7 @@ const shape = row
 ---
 
 {/* A fact under a thin rule: its label, the value in Vollkorn, a note. No icon and no box. */}
-<div class:list={['min-w-0 border-t border-line-strong', shape, wideOnly ? 'hidden lg:grid' : 'grid']}>
+<div data-reveal class:list={['min-w-0 border-t border-line-strong', shape, wideOnly ? 'hidden lg:grid' : 'grid']}>
   <dt class:list={['text-sm font-semibold text-fg-muted', row && 'pt-1']}>{label}</dt>
   <dd
     class:list={[

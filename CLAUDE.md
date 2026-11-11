@@ -210,7 +210,7 @@ docs, mail templates and tests never become utilities) and skip server-only code
 `global.css` keeps the admin and print sources out with `@source not`, `admin.css`
 the print and styleguide sources; `print.css` reads only the print, brand and ui
 components. Printing a page of the site (`@media print`) lives in `global.css`.
-Nothing fades in on scroll; the two scroll-linked bars use CSS view timelines (`animation-timeline`); the FAQ is
+What lies below the first screen arrives once (`Reveal.astro`); the two scroll-linked bars use CSS view timelines (`animation-timeline`); the FAQ is
 native `<details>`; no animation library ships to the browser. The opening, page transitions, loops and
 state transitions are the theme's own keyframes and `--animate-*` tokens (`rise`,
 `skeleton`); there is no animation plugin.
@@ -311,7 +311,12 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   transitions, `@view-transition`; the opening of the page that arrives does not
   rise or settle, it is there with the first paint and is the LCP; only the seat
   ring's taken chairs fill in); the pools of light on every dark ground, drifting
-  very slowly (`pool-drift` on `surface-dark::before`, one composited layer); what
+  very slowly (`pool-drift` on `surface-dark::before`, one composited layer); what lies
+  below the first screen, arriving once as it is first scrolled to (`Reveal.astro`:
+  `data-reveal` / `data-reveal-group` become `data-arrive`, 14px up and in, 600ms,
+  groups 60ms apart; never for what is on screen at load); the opening's photograph
+  coming a little closer as the opening leaves; the stamp's ring of words turning
+  once in two minutes; the mark turning a quarter when the logo is hovered; what
   answers the hand (buttons press to 0.97 in 150ms, links, the native `<details>`
   of the FAQ unfolding and fading, the phone menu, the calendar popover growing
   from 0.97); what answers a form (its result and a field's message arrive 4px up
@@ -323,9 +328,10 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   vendored skills (`animate`, `animation-performance`,
   `find-animation-opportunities`, refined for Astro and vanilla CSS/JS): transforms
   and opacity only, CSS first, then WAAPI, no animation library, UI under 300ms,
-  the theme's own curves. Never add: a rise or slide on arriving at a page, a fade
-  or rise on entering the view, parallax or anything that drifts, trails or turns
-  with the scroll, anything that follows the pointer. Under reduced motion
+  the theme's own curves. Never add: a rise or slide on arriving at a page, anything
+  that re-animates each time it is scrolled past, pinning or scroll-jacking,
+  anything that follows the pointer, anything that starts invisible on the first
+  screen. Under reduced motion
   everything rests.
 - Lighthouse on every motion change (design-system.md): CLS 0, no forced reflow,
   only opacity and transforms move.
@@ -350,7 +356,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   pass their content explicitly as props and rich-text slots. Load dynamic data in
   server code or through the public JSON endpoints; blocks only render their inputs. Component-specific
   browser behavior belongs in its own `<script>` (Header, ModeToggle,
-  BackToTop, ActionBar, EventDock, Hero), with no global client entry. Public form helpers stay
+  BackToTop, ActionBar, EventDock, Reveal), with no global client entry. Public form helpers stay
   in `lib/form.ts`; admin helpers live beside their Preact components. `Prose` accepts inline markup in its slot or
   an `html` prop for dynamic content. Static FAQ answers, journey steps and facts
   use slotted item components at their page location, rather than frontmatter arrays.

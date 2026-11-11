@@ -2,7 +2,8 @@
 /**
  * The stamp: the mark in the middle of two thin rings with the circle's name
  * running round between them, like a seal pressed on paper. Footer, the last band
- * of the home page, the back of a flyer, a sticker. It stands still.
+ * of the home page, the back of a flyer, a sticker. On screen its ring of words
+ * turns very slowly (global.css, `data-stamp`); in print it stands.
  */
 import { Icon } from 'astro-icon/components';
 
@@ -25,7 +26,7 @@ const words = once.repeat(Math.max(1, Math.floor(circumference / (once.length * 
 ---
 
 <span aria-hidden="true" class:list={['relative block aspect-square', className]}>
-  <svg viewBox="0 0 200 200" class="absolute inset-0 size-full">
+  <svg viewBox="0 0 200 200" data-stamp class="absolute inset-0 size-full">
     <defs>
       <path
         id={id}

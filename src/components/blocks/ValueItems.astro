@@ -26,7 +26,7 @@ const { anchor, eyebrow, title, intro, items } = Astro.props;
     <SectionHead eyebrow={eyebrow} title={title} lead={intro} size="sub" class={margin.cross} />
 
     {items.length > 0 && (
-      <ul role="list" class:list={[margin.content, 'grid border-b border-line-strong']}>
+      <ul role="list" data-reveal-group class:list={[margin.content, 'grid border-b border-line-strong']}>
         {items.map((item) => (
           <li class="grid items-baseline gap-y-2 border-t border-line-strong py-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:gap-x-grid">
             <h3 class="font-sans text-xl font-semibold text-fg">{item.title}</h3>

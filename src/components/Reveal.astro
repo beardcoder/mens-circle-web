@@ -1,0 +1,58 @@
+---
+/**
+ * The arrival of what lies below the first screen: a piece marked `data-reveal`, or
+ * each child of a `data-reveal-group`, rises a little and fades in the first time it
+ * is scrolled to, the children of a group one after the other. Once, and only for
+ * what was below the window when the page was read: whatever is on screen at load
+ * is never hidden, so nothing flashes and the largest paint is untouched. Without
+ * JavaScript and under reduced motion everything simply stands. No layout is read:
+ * the observer's own first report says what is below the window. Styles: global.css,
+ * "Arriving".
+ */
+---
+
+<script>
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pieces = still ? [] : [...document.querySelectorAll<HTMLElement>('[data-reveal], [data-reveal-group] > *')];
+
+  if (pieces.length > 0) {
+    // A group's children follow one another; a piece of its own comes at once.
+    for (const group of document.querySelectorAll<HTMLElement>('[data-reveal-group]')) {
+      [...group.children].forEach((child, i) =>
+        (child as HTMLElement).style.setProperty('--reveal-i', String(Math.min(i, 5))),
+      );
+    }
+
+    const seen = new WeakSet<Element>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const piece = entry.target as HTMLElement;
+
+          if (!seen.has(piece)) {
+            // The first report: hide only what lies below the window.
+            seen.add(piece);
+
+            if (!entry.isIntersecting && entry.boundingClientRect.top > (entry.rootBounds?.bottom ?? 0)) {
+              piece.dataset.arrive = 'pending';
+            } else {
+              observer.unobserve(piece);
+            }
+
+            continue;
+          }
+
+          if (entry.isIntersecting) {
+            piece.dataset.arrive = 'done';
+            observer.unobserve(piece);
+          }
+        }
+      },
+      // A piece arrives once a tenth of the window's height of it is in.
+      { rootMargin: '0px 0px -10% 0px' },
+    );
+
+    for (const piece of pieces) observer.observe(piece);
+  }
+</script>

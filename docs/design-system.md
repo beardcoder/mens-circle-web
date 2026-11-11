@@ -192,7 +192,8 @@ page stays alive and calm. The styleguide shows each with its rules.
    poster, as the title ("Dabei sein.") or quietly behind content (`tone="ghost"`,
    8 % of the text colour, hidden from assistive technology). At most one per screen.
 
-Never: staircases of offset blocks, rotation, shadows, boxes
+Never: staircases of offset blocks, rotation (the stamp's ring of words turns,
+nothing else stands at an angle), shadows, boxes
 around content, text over a photograph.
 
 ## Shape and depth
@@ -225,6 +226,20 @@ it for, does it stay under 300 ms, does it help what is being read):
   rises, slides or scales, on either page: an opening is there with the first
   paint and stands (it is also the LCP, so nothing in it starts invisible). The one
   thing an opening still does is fill in the taken chairs of its seat ring, once.
+- **Arriving.** What lies below the first screen arrives once, the first time it is
+  scrolled to: 14px up and in, 600 ms, the pieces of a group 60 ms apart (a section's
+  head, the facts, the steps, the agreements, the values, the voices, a date's
+  summary, Markus's sentence); the poster word of the dates comes from the side; a
+  seat ring that arrives fills its taken chairs. `Reveal.astro` marks only what is
+  below the window when the page is read (`data-reveal`, `data-reveal-group` →
+  `data-arrive`), so nothing on screen at load is ever hidden and the LCP is
+  untouched; it fires once per piece and never again. Without JavaScript, under
+  reduced motion and in print everything stands.
+- **The opening's photograph comes closer** as the opening leaves the window
+  (`hero-photo-leave` on the opening's view timeline: from its lower edge, sinking
+  12px, to 1.06), the one piece tied to the scroll besides the two bars.
+- **The stamp turns.** Its ring of words turns once in two minutes, linear.
+- **The mark turns a quarter** on the spring when the logo is hovered.
 - **The dark ground breathes.** The pools of light on every dark ground (opening,
   agreements, voices, registration, the last band, the footer, the phone menu)
   drift a few percent and come a little closer, there and back in about a minute
@@ -263,10 +278,9 @@ it for, does it stay under 300 ms, does it help what is being read):
   hide each; the observers also say whether the bottom bar can be reached (`inert`,
   `aria-hidden`, the tab stop).
 
-Nothing else moves. No piece fades or rises in as it enters the view and nothing
-drifts, trails or turns with the scroll: a section that is on the page is there,
-readable, the moment it is scrolled to. A new animation has to pass the gate
-above; "it looks good" on something seen all the time is not a reason.
+Nothing re-animates: a piece arrives once and then stands, however often it is
+scrolled past. Nothing follows the pointer and nothing is pinned or scroll-jacked.
+A new animation has to pass the gate above.
 
 Only opacity and transforms move, so the compositor carries every frame. No script
 reads layout before the page has settled (state at a scroll position comes from an

@@ -17,12 +17,12 @@ const rest = featured ? others : items;
 {/* One short voice large, as the opening line; the others under thin rules, each with
     its author in the margin and the words beside it. Every voice is read in full. */}
 {featured && (
-  <div class="mb-group max-w-5xl">
+  <div data-reveal class="mb-group max-w-5xl">
     <TestimonialQuote item={first} featured />
   </div>
 )}
 {rest.length > 0 && (
-  <ul role="list" class="grid">
+  <ul role="list" data-reveal-group class="grid">
     {rest.map((item) => (
       <li class:list={[margin.grid, 'gap-y-4 border-t border-line py-8 last:border-b']}>
         <TestimonialQuote item={item} />

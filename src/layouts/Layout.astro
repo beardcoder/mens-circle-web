@@ -7,6 +7,7 @@ import type { ComponentProps } from 'astro/types';
 import BackToTop from '../components/BackToTop.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import Reveal from '../components/Reveal.astro';
 import SeoHead from '../components/SeoHead.astro';
 import { bootScript, fontScript, speculationRules } from '../scripts/inline';
 
@@ -54,5 +55,6 @@ const { headerAction, overHero = false, ...props } = Astro.props;
     </main>
 
     <Footer />
+    <Reveal />
   </body>
 </html>

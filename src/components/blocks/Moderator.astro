@@ -34,7 +34,10 @@ const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote
   </div>
 
   {quote && (
-    <figure class="grid min-w-0 content-center border-t border-line-strong pt-8 lg:col-span-5 lg:col-start-8">
+    <figure
+      data-reveal
+      class="grid min-w-0 content-center border-t border-line-strong pt-8 lg:col-span-5 lg:col-start-8"
+    >
       <blockquote class="max-w-[16em] font-display text-quote text-fg">
         <p>„{quote}“</p>
       </blockquote>

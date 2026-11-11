@@ -23,7 +23,7 @@ const rows = [
 
 {/* Open on its ground, no card: the date, the facts as small columns, the seat ring
      (how full the circle is) and the fitting action. */}
-<div data-summary data-state={view.state} class="@container grid grid-cols-[minmax(0,1fr)] content-start">
+<div data-summary data-reveal data-state={view.state} class="@container grid grid-cols-[minmax(0,1fr)] content-start">
   <p class={label}>{view.kicker}</p>
   <p class="mt-3 min-w-0 font-display text-sub text-fg">
     <time datetime={view.datetime}>
