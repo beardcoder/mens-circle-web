@@ -33,11 +33,14 @@
 
 /* ── Page transitions ─────────────────────────────────────────────────────── */
 
-/* Native cross-document view transitions: the pages cross-fade, nothing slides and
-   no script names a direction. `plus-lighter` adds the two snapshots, which avoids
-   the grey sag of a plain cross-fade only while their opacities sum to 1, so both
-   halves share one duration and a linear curve. Only opacity moves, on the
-   compositor; no group animates. */
+/* A page change is a fade and nothing else, done with the View Transitions CSS API
+   (cross-document, `@view-transition`): the old page fades out while the new one
+   fades in. Nothing slides, rises or scales, on either page: the new page's
+   opening stands still as it appears (see "The opening" below). `plus-lighter` adds
+   the two snapshots, which avoids the grey sag of a plain cross-fade only while
+   their opacities sum to 1, so both halves share one duration and a linear curve.
+   Only opacity moves, on the compositor; no group animates. A browser without
+   cross-document view transitions simply loads the page. */
 @view-transition {
   navigation: auto;
 }
@@ -74,28 +77,15 @@
   }
 }
 
-/* ── Motion: the opening ───────────────────────────────────────────────────── */
+/* ── The opening ──────────────────────────────────────────────────────────── */
 
-/* The opening of every page moves once, in CSS, so it starts with the first paint
-   and never waits for a script (the title is the largest paint): the label, the
-   title and the pieces after it rise a little, each at its
-   `--enter-delay`; the photograph settles from a little larger; in a seat ring of
-   the opening the taken chairs fill in one after the other. Transforms only:
-   nothing here starts invisible, because the browser counts a text or a picture as
-   painted only once it is seen, and the largest of them is the page's LCP. Nothing
-   else on a page animates on its own. */
+/* The opening of a page stands still: it is there with the first paint, and when
+   it is reached from another page the fade above is the whole arrival. Nothing
+   rises and the photograph does not settle. The one thing left is the seat ring
+   of an opening, whose taken chairs fill in one after the other (how full the
+   evening is, shown once). */
 
 @media (prefers-reduced-motion: no-preference) {
-  [data-enter]:not([data-enter='settle']) {
-    animation: enter-rise 1.3s var(--ease-spring) backwards;
-    animation-delay: var(--enter-delay, 0s);
-  }
-
-  [data-enter='settle'] {
-    animation: enter-settle 1.9s var(--ease-spring-slow) backwards;
-    animation-delay: 0.1s;
-  }
-
   [data-enter] [data-seat-dot] {
     transform-box: fill-box;
     transform-origin: center;
@@ -110,18 +100,6 @@
   :root {
     --ease-spring: var(--ease-out);
     --ease-spring-slow: var(--ease-out);
-  }
-}
-
-@keyframes enter-rise {
-  from {
-    translate: 0 0.75rem;
-  }
-}
-
-@keyframes enter-settle {
-  from {
-    scale: 1.06;
   }
 }
 

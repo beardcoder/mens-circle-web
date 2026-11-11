@@ -307,14 +307,15 @@ experimental_install`, `.claude/skills/` is not committed) is a reviewer here, n
   from `lg` on a hovering pointer. The phone menu is a native modal `<dialog>` on
   the forest, opening as a circle.
 - Motion (design-system.md, "Motion"): the page stands still. Three things move, each
-  for a reason: the opening once on load (`data-enter`, pure CSS from the first paint,
-  transforms only and never from opacity 0: the title, the lead or the photo is the
-  LCP; the photo settles, the seat ring's taken chairs fill in),
+  for a reason: the change of page, which is a fade and nothing else (cross-document
+  view transitions, `@view-transition`; the opening of the page that arrives does not
+  rise or settle, it is there with the first paint and is the LCP; only the seat
+  ring's taken chairs fill in),
   what answers the hand (buttons, links, the native `<details>` of the FAQ, the phone
   menu), and two bars whose place depends on the scroll (the event page's dock, the
   phone `ActionBar` on the home page: view timelines lifted by `timeline-scope` on
   `body`, an observer and a CSS transition where those are missing). Never add: a
-  fade or rise on entering the view, parallax or anything that drifts, trails or
+  rise or slide on arriving at a page, a fade or rise on entering the view, parallax or anything that drifts, trails or
   turns with the scroll, an ambient loop, a glow, anything that follows the pointer.
   Under reduced motion everything rests.
 - Lighthouse on every motion change (design-system.md): CLS 0, no forced reflow,

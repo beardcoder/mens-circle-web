@@ -212,17 +212,12 @@ participants without their explicit consent, no text on a photograph.
 
 The page stands still. Motion is kept for three things, and each has a reason:
 
-- **The opening, once.** On load the label, the title and the pieces after it rise a
-  little, 0.08 s apart (`--enter-delay`; nothing starts invisible: the browser counts
-  a text or a picture as painted only once it is seen, so a fade from nothing would
-  hold back the LCP) (`data-enter`, global.css, pure CSS from
-  the first paint, because the title is the largest paint); the photograph settles
-  from a little larger, the taken chairs of the opening's seat ring fill in one after
-  the other. Movement is a spring without overshoot sampled
-  into `linear()` (`--ease-spring`, `--ease-spring-slow` in theme.css). The home
-  opening and every sub-page opening (`PageIntro`) work this way; on an event page
-  the date and the title rise in first, then the lead and the registration. Then the
-  opening rests: no loop, no glow, nothing that follows the pointer.
+- **The change of page: a fade.** Cross-document view transitions
+  (`@view-transition`, the View Transitions CSS API, global.css): the old page
+  fades out while the new one fades in, and that is the whole arrival. Nothing
+  rises, slides or scales, on either page: an opening is there with the first
+  paint and stands (it is also the LCP, so nothing in it starts invisible). The one
+  thing an opening still does is fill in the taken chairs of its seat ring, once.
 - **Answering the hand.** A button rises 2px and settles as it is pressed, arrows
   nudge, header links draw a line, the FAQ's `<details>` unfolds (where
   `interpolate-size` exists its `::details-content` transitions from height 0 to
@@ -257,10 +252,11 @@ link shows on the desktop only.
 Native cross-document view transitions (global.css, "Page transitions"): the two
 pages cross-fade (`plus-lighter`, 220 ms, linear, one duration for both halves, so
 their opacities always sum to 1 and nothing sags grey). Only opacity moves, on the
-compositor; no group animates and nothing is named. Every page plays its own opening
-when it arrives. A browser without cross-document transitions simply loads the
-page. The boot script in the head sets only the colour mode before the first paint.
-Third-party scripts load `async`, so nothing queues in front of the page's own.
+compositor; no group animates, nothing is named and no script takes part. The page
+that arrives does not move: no rise, no settle. A browser without cross-document
+transitions simply loads the page. The boot script in the head sets only the colour
+mode before the first paint. Third-party scripts load `async`, so nothing queues in
+front of the page's own.
 
 ### Lighthouse
 

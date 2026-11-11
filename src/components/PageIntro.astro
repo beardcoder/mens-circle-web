@@ -9,8 +9,8 @@ import Eyebrow from './ui/Eyebrow.astro';
  * The compact opening of a sub-page, on the page's paper: label, title, lead
  * (slot `lead`) and any actions (default slot) on the reading line; a photograph
  * (slot `media`) beside them from `lg`, under them on phones. A long word in the
- * title ("Datenschutzerklärung") hyphenates rather than overflows. On load the
- * title rises in and the rest follows (global.css, "Motion: the opening").
+ * title ("Datenschutzerklärung") hyphenates rather than overflows. It stands
+ * still: a page change is a fade (global.css, "Page transitions").
  */
 interface Props {
   eyebrow?: string;

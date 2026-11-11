@@ -1,10 +1,10 @@
 /**
- * The opening's beat (global.css, "Motion: the opening"). The title rises in as
- * one; the pieces after it follow closely, 0.08 s apart (`--enter-delay`), so the
- * largest paint of a phone (the lead under the title) is never held back. Titles
- * are still wrapped word by word on the server (each word a box with its index):
- * the lines break the same everywhere; it splits on ordinary white space only, so a
- * no-break space keeps a dash bound to its word, and tags pass through untouched.
+ * Titles are wrapped word by word on the server (each word a box with its index),
+ * so their lines break the same everywhere; it splits on ordinary white space only,
+ * so a no-break space keeps a dash bound to its word, and tags pass through
+ * untouched. `afterWords` gives the pieces of an opening their place in its order
+ * (`--enter-delay`), which today only times the seat ring's chairs: an opening
+ * itself stands still (global.css, "The opening").
  */
 export interface Words {
   html: string;
