@@ -107,7 +107,10 @@ const field = (name: string) => ({
       >
         <Honeypot />
         <input type="hidden" name="event_id" value={event.id} />
-        <div data-hide-on-success class="grid gap-6">
+        <div
+          data-hide-on-success
+          class="grid gap-6 transition-[opacity,display] transition-discrete duration-150 ease-out [&[hidden]]:opacity-0"
+        >
           <div class="grid gap-5 min-[22.5rem]:grid-cols-2 min-[22.5rem]:gap-4">
             <Field
               for={`${id}-first_name`}
@@ -187,4 +190,33 @@ const field = (name: string) => ({
   import { enhanceForms } from '@lib/form';
 
   enhanceForms('register', 'register');
+
+  /**
+   * The moment someone has joined: his chair is taken. The next free chair of the
+   * panel's seat ring fills in (the ring's own motion, global.css) and the count
+   * follows, so the ring shows the circle with him in it. Only for a seat, not for
+   * a place on the waiting list; the next page load shows the server's count anyway.
+   */
+  const panel = document.querySelector<HTMLElement>('#anmeldung');
+
+  panel?.addEventListener('form:success', (event) => {
+    const { message } = (event as CustomEvent<{ message: string }>).detail;
+    const ring = panel.querySelector<HTMLElement>('[data-seat-ring]');
+    const chair = ring?.querySelector<SVGCircleElement>('circle[data-seat-free]');
+    const count = ring?.querySelector<HTMLElement>('[data-seat-count]');
+
+    if (!ring || !chair || !count || /warteliste/i.test(message)) return;
+
+    const free = Number(count.textContent) - 1;
+    const line = ring.querySelector<HTMLElement>('[data-seat-text]');
+
+    chair.removeAttribute('data-seat-free');
+    chair.removeAttribute('stroke-width');
+    chair.setAttribute('r', String(Number(chair.getAttribute('r')) + 0.75));
+    chair.setAttribute('class', 'fill-fill');
+    chair.setAttribute('data-seat-dot', 'taking');
+    count.textContent = String(free);
+
+    if (line) line.textContent = line.textContent?.replace(/^\d+/, String(free)) ?? '';
+  });
 </script>

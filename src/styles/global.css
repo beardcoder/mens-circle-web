@@ -92,6 +92,14 @@
     animation: seat-take 0.7s var(--ease-spring) backwards;
     animation-delay: calc(var(--enter-delay, 0s) + 0.35s + var(--i, 0) * 70ms);
   }
+
+  /* A chair taken just now, by the registration that was sent (EventRegister): the
+     rare moment the delight budget is for, so it takes its time. */
+  [data-seat-dot='taking'] {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: seat-take 0.9s var(--ease-spring) 0.25s backwards;
+  }
 }
 
 /* Browsers without `linear()` (Safari before 17.2) would drop the whole animation
@@ -103,10 +111,11 @@
   }
 }
 
+/* A chair grows from half its size: nothing appears from nothing. */
 @keyframes seat-take {
   from {
     opacity: 0;
-    scale: 0;
+    scale: 0.5;
   }
 }
 

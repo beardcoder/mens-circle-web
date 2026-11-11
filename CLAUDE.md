@@ -315,7 +315,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   answers the hand (buttons press to 0.97 in 150ms, links, the native `<details>`
   of the FAQ unfolding and fading, the phone menu, the calendar popover growing
   from 0.97); what answers a form (its result and a field's message arrive 4px up
-  via `@starting-style`); the change of colour mode (a same-document view
+  via `@starting-style`; after a registration the next free chair of the seat ring
+  is taken, `form:success`); the change of colour mode (a same-document view
   transition); and two bars whose place depends on the scroll (the event page's
   dock, the phone `ActionBar`: view timelines lifted by `timeline-scope` on `body`,
   an observer and a CSS transition where those are missing). Build motion with the

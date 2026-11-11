@@ -4,7 +4,8 @@
  * ring, the taken ones in ember from the top, clockwise, the free ones open, and
  * in the middle how many are free. It repeats the seats line beside it in a shape
  * (decorative, `aria-hidden`); the line says it in words. In an opening the taken
- * chairs fill in one after the other (global.css, "Motion: the opening").
+ * chairs fill in one after the other, and after a registration the next free chair
+ * is taken (`data-seat-dot="taking"`, EventRegister; global.css, "The opening").
  */
 import { seatDots } from '@lib/shared/seats';
 
@@ -54,6 +55,7 @@ const { ring: ringSize, number, label } = SIZES[size];
             <circle data-seat-dot cx={dot.x} cy={dot.y} r={ring.r} class="fill-fill" style={`--i: ${i}`} />
           ) : (
             <circle
+              data-seat-free
               cx={dot.x}
               cy={dot.y}
               r={ring.r - 0.75}
@@ -65,10 +67,16 @@ const { ring: ringSize, number, label } = SIZES[size];
         )}
       </svg>
       <span class="relative grid justify-items-center leading-none">
-        <span class:list={['font-display font-semibold text-fg tabular-nums', number]}>{ring.free}</span>
+        <span data-seat-count class:list={['font-display font-semibold text-fg tabular-nums', number]}>
+          {ring.free}
+        </span>
         <span class:list={['mt-1 font-semibold text-fg-muted', label]}>frei</span>
       </span>
     </span>
   )}
-  {layout !== 'none' && <p class="text-sm text-fg-muted">{text}</p>}
+  {layout !== 'none' && (
+    <p data-seat-text class="text-sm text-fg-muted">
+      {text}
+    </p>
+  )}
 </div>

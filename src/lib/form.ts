@@ -127,6 +127,8 @@ function enhance(form: HTMLFormElement, action: FormAction): void {
     if ('message' in outcome) {
       say('success', outcome.message);
       trackEvent(`${track}-success`, context);
+      // For what a page wants to do with a success of its own (the seat ring's chair).
+      form.dispatchEvent(new CustomEvent('form:success', { bubbles: true, detail: { message: outcome.message } }));
 
       if (form.dataset.onSuccess === 'replace') {
         for (const part of form.querySelectorAll<HTMLElement>('[data-hide-on-success]')) part.hidden = true;

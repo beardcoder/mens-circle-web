@@ -78,7 +78,7 @@ const destination = hasMap ? `${lat},${lng}` : address || event.location;
           aria-label="Karte zum Veranstaltungsort"
           class="group/map relative isolate block h-full overflow-hidden bg-ground-alt [contain:paint]"
         >
-          <div class="relative size-full min-h-[280px] bg-ground-alt before:pointer-events-none before:absolute before:inset-0 before:z-1 before:animate-skeleton before:bg-[repeating-linear-gradient(135deg,color-mix(in_srgb,var(--color-line)_60%,transparent)_0_12px,transparent_12px_24px)] group-data-[state=failed]/map:hidden group-data-[state=ready]/map:before:hidden">
+          <div class="relative size-full min-h-[280px] bg-ground-alt before:pointer-events-none before:absolute before:inset-0 before:z-1 before:animate-skeleton before:bg-[repeating-linear-gradient(135deg,color-mix(in_srgb,var(--color-line)_60%,transparent)_0_12px,transparent_12px_24px)] before:transition-opacity before:duration-200 before:ease-out group-data-[state=failed]/map:hidden group-data-[state=ready]/map:before:animate-none group-data-[state=ready]/map:before:opacity-0">
             {/* Inert until the script defines it; reads its attributes once, on connect.
                 `c` is lon,lat (EPSG:4326). The map stays still until the reader
                 activates it, so it never swallows the page's scroll. */}

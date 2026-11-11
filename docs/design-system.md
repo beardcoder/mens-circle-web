@@ -237,11 +237,19 @@ it for, does it stay under 300 ms, does it help what is being read):
   fades in with the space it gets (where `interpolate-size` exists its
   `::details-content` goes from height 0 to `auto` in 0.26 s; elsewhere and under
   reduced motion it toggles at once), the phone menu opens as a circle from its
-  button, the calendar popover fades in growing from 0.97 (it is centred, so it
+  button, the round buttons of the bar and the mode options press to 0.97 too, the
+  calendar popover fades in growing from 0.97 (it is centred, so it
   grows from its middle).
 - **Answering a form.** The result under a form's button and a field's message
   arrive rather than appear: 4px up and in, 200 ms (`@starting-style` with
-  `transition-behavior: allow-discrete`, since they go from `hidden` to shown).
+  `transition-behavior: allow-discrete`, since they go from `hidden` to shown). The
+  fields of a form that is replaced by its answer fade out first (150 ms).
+- **A chair is taken.** After a registration the next free chair of the panel's
+  seat ring fills in and the count follows (`form:success`, EventRegister; the
+  ring's own `seat-take`, 0.9 s on the spring): the one rare, glad moment of the
+  site, so it may take its time. Not for a place on the waiting list.
+- **The map arrives.** Its striped placeholder fades away in 200 ms once the map
+  has drawn itself.
 - **Day and night.** Choosing a colour mode changes every colour at once; a
   same-document view transition cross-fades it (the page change's own fade).
 - **Two bars whose place depends on the scroll.** On an event page a dock with title

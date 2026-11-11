@@ -33,7 +33,7 @@ const OPTIONS = [
       data-mode-option={option.mode}
       aria-pressed={option.mode === 'auto' ? 'true' : 'false'}
       title={option.title}
-      class="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 text-fg-muted transition-colors duration-180 hover:text-fg aria-pressed:bg-raised aria-pressed:text-fg"
+      class="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 text-fg-muted transition-[color,background-color,scale] duration-150 ease-out hover:text-fg active:scale-[0.97] aria-pressed:bg-raised aria-pressed:text-fg motion-reduce:active:scale-100"
     >
       <Icon name={option.icon} aria-hidden="true" class="size-4" />
       {option.label}
