@@ -252,7 +252,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   spark is never text on paper or sand. Check new pairs in both modes.
 - Grounds: `Section ground` is `default` (paper), `alt` (sand: facts, course,
   dates) or `dark`
-  (`surface-dark`, the theme's near-black with its three still pools of light, its
+  (`surface-dark`, the theme's near-black with its three wandering pools of light, its
   primitive still called `--p-forest`: opening, agreements, voices, registration,
   menu, last band, footer). The site has these three grounds; `moss` stays for print. Grounds
   run from edge to edge; `Section` clips horizontally what bleeds.
@@ -310,8 +310,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   moves: the change of page, a fade and nothing else (cross-document view
   transitions, `@view-transition`; the opening of the page that arrives does not
   rise or settle, it is there with the first paint and is the LCP; only the seat
-  ring's taken chairs fill in); the pools of light on every dark ground, drifting
-  very slowly (`pool-drift` on `surface-dark::before`, one composited layer); what lies
+  ring's taken chairs fill in); the pools of light on every dark ground, wandering
+  plainly but slowly (`pool-wander-a` / `-b` on `surface-dark::before` and
+  `::after`, two composited layers on paths of their own); what lies
   below the first screen, arriving once as it is first scrolled to (`Reveal.astro`:
   `data-reveal` / `data-reveal-group` become `data-arrive`, 14px up and in, 600ms,
   groups 60ms apart; never for what is on screen at load); the opening's photograph

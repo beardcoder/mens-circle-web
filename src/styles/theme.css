@@ -255,16 +255,39 @@
 
 /* A short rise into place (`animate-rise`). `translate` and `opacity` only, which
    the compositor runs. Kept here, outside @theme, so it is always emitted. */
-/* The pools of light on the dark ground (`surface-dark`). */
-@keyframes pool-drift {
-  from {
-    translate: -2.5% -1.5%;
+/* The pools of light on the dark ground (`surface-dark`): two paths, each with a
+   turn in the middle so a pool does not simply swing on one line. */
+@keyframes pool-wander-a {
+  0% {
+    translate: -7% -4%;
     scale: 1;
   }
 
-  to {
-    translate: 2.5% 2%;
-    scale: 1.07;
+  50% {
+    translate: 3% 5%;
+    scale: 1.14;
+  }
+
+  100% {
+    translate: 9% -3%;
+    scale: 1.04;
+  }
+}
+
+@keyframes pool-wander-b {
+  0% {
+    translate: 6% 5%;
+    scale: 1.1;
+  }
+
+  50% {
+    translate: -4% -6%;
+    scale: 1;
+  }
+
+  100% {
+    translate: -10% 3%;
+    scale: 1.16;
   }
 }
 
@@ -317,7 +340,7 @@
 /* The dark ground (the theme's night, still called forest): the opening, the
    agreements, the voices, the registration, the menu and the footer, in both modes.
    Its signature is the theme's own, turned earthier: soft pools of light in its
-   corners, a clay, a burnt rose and an ochre, drifting very slowly. */
+   corners, a clay, a burnt rose and an ochre, wandering slowly. */
 @utility surface-dark {
   --color-surface: var(--p-forest);
   --color-raised: var(--p-forest-raised);
@@ -340,30 +363,44 @@
   --color-danger: #f0a197;
   color: var(--color-fg);
   background-color: var(--color-surface);
-  /* The pools lie on a layer of their own behind the content, a little larger than
-     the ground, so they can drift without being repainted: `contain: paint` makes
+  /* The pools lie on two layers of their own behind the content, each larger than
+     the ground, so they can move without being repainted: `contain: paint` makes
      the ground their containing block and their stacking context and clips them. */
   contain: paint;
 
-  &::before {
+  &::before,
+  &::after {
     content: '';
     position: absolute;
-    inset: -12%;
+    inset: -25%;
     z-index: -1;
     pointer-events: none;
-    background-image:
-      radial-gradient(ellipse 60% 50% at 14% 24%, rgb(194 128 74 / 18%) 0%, transparent 60%),
-      radial-gradient(ellipse 55% 45% at 86% 80%, rgb(176 98 66 / 13%) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 35% at 76% 20%, rgb(184 140 86 / 10%) 0%, transparent 60%);
   }
 
-  /* They drift slowly, like the light of a fire on a wall: a few percent of the
-     ground and a little closer, there and back in about a minute. Translate and
-     scale only, so the compositor moves one layer and nothing is painted again.
-     On screens only, and at rest under reduced motion. */
+  /* The clay and the ochre, upper left and upper right. */
+  &::before {
+    background-image:
+      radial-gradient(ellipse 44% 38% at 26% 34%, rgb(194 128 74 / 20%) 0%, transparent 62%),
+      radial-gradient(ellipse 30% 26% at 70% 30%, rgb(184 140 86 / 11%) 0%, transparent 62%);
+  }
+
+  /* The burnt rose, lower right. */
+  &::after {
+    background-image: radial-gradient(ellipse 42% 36% at 72% 68%, rgb(176 98 66 / 15%) 0%, transparent 62%);
+  }
+
+  /* They move like the light of a fire on a wall, plainly but slowly: the two
+     layers wander against each other on paths of their own (24 s and 31 s, so the
+     picture does not repeat for minutes), a tenth of the ground and back, growing
+     and shrinking a little. Translate and scale only: the compositor moves two
+     layers and nothing is painted again. Screens only; at rest under reduced motion. */
   @media screen and (prefers-reduced-motion: no-preference) {
     &::before {
-      animation: pool-drift 34s ease-in-out infinite alternate;
+      animation: pool-wander-a 24s ease-in-out infinite alternate;
+    }
+
+    &::after {
+      animation: pool-wander-b 31s ease-in-out infinite alternate;
     }
   }
 }

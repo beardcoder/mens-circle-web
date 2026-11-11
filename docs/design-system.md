@@ -240,13 +240,16 @@ it for, does it stay under 300 ms, does it help what is being read):
   12px, to 1.06), the one piece tied to the scroll besides the two bars.
 - **The stamp turns.** Its ring of words turns once in two minutes, linear.
 - **The mark turns a quarter** on the spring when the logo is hovered.
-- **The dark ground breathes.** The pools of light on every dark ground (opening,
+- **The dark ground moves.** The pools of light on every dark ground (opening,
   agreements, voices, registration, the last band, the footer, the phone menu)
-  drift a few percent and come a little closer, there and back in about a minute
-  (`pool-drift`, theme.css). They lie on a layer of their own (`surface-dark::before`,
-  larger than the ground, clipped by `contain: paint`), so the compositor moves one
-  layer by `translate` and `scale` and nothing is painted again. Screens only; at
-  rest under reduced motion.
+  wander plainly but slowly, like the light of a fire on a wall: two layers (the
+  clay with the ochre, and the burnt rose) on paths of their own, a tenth of the
+  ground and back, growing and shrinking a little, in 24 s and 31 s, so the picture
+  does not repeat for minutes (`pool-wander-a`, `pool-wander-b`, theme.css). The
+  layers are `surface-dark::before` and `::after`, larger than the ground and
+  clipped by `contain: paint`, so the compositor moves two layers by `translate`
+  and `scale` and nothing is painted again. Screens only; at rest under reduced
+  motion.
 - **Answering the hand.** A button rises 2px and presses to 0.97 in 150 ms, arrows
   nudge, header links draw a line, the FAQ's `<details>` unfolds and its answer
   fades in with the space it gets (where `interpolate-size` exists its
