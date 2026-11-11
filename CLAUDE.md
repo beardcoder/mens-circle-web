@@ -282,14 +282,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   cards on public pages: facts, steps, agreements, FAQ and voices are rows between
   lines. `shadow-overlay` only for what floats. Images: a person in a circle, a place
   in a rectangle cut by the edge; one form per section.
-- Skills are vendored in `.claude/skills/` (sources in `skills-lock.json`; only the
-  kit of `design-taste-frontend`, its `assets/`, is left out and comes back with
-  `bunx skills experimental_install`). The `design-taste-frontend` skill is a reviewer here, not
-  the system: run its `copy-lint.mjs` and `consistency.mjs` against the built server
-  and fix what this system agrees with (a hero that fits its screen, running text in
-  `fg-soft`, no half-empty column, focus and tap sizes). Its kit, dealt palettes,
-  one-section-per-screen rhythm and its ban on bleeds and overlaps do
-  not apply; never copy its `assets/` into the site or add stand-in photographs.
+- Skills are vendored in `.claude/skills/` (sources in `skills-lock.json`):
+  `web-design-engineer` and the three animation skills named under Motion.
 - Against the generated look (the `web-design-engineer` skill's failure patterns,
   `skills-lock.json`): no label above every heading (`Eyebrow` only where it adds the
   place or the kind of page), no decorative numbers (an index number only where

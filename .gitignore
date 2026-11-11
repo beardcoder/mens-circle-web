@@ -27,11 +27,8 @@ data/
 .playwright-cli/
 output/playwright/
 
-# Claude skills are vendored (.claude/skills/, their sources in skills-lock.json), so
-# every session has them. One exception: the kit of the design-taste-frontend skill
-# (38 MB of demo pages, photographs and effects), which this site never uses
-# (CLAUDE.md, "Design"); `bunx skills experimental_install` restores it.
-.claude/skills/design-taste-frontend/assets/
+# Claude skills are vendored in .claude/skills/ (their sources in skills-lock.json),
+# so every session has them.
 
 # brand templates, rendered (bun run brand:render)
 /brand/out/
