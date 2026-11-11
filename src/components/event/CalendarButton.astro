@@ -38,7 +38,7 @@ const icsHref = `/api/public/events/${encodeURIComponent(event.slug)}/ics`;
       id="calendar-modal"
       popover
       aria-labelledby="calendar-modal-title"
-      class="fixed inset-0 m-auto max-h-[calc(100dvh-3rem)] w-[min(380px,calc(100vw-2.5rem))] rounded-xl border border-line bg-raised p-0 shadow-overlay text-fg opacity-0 transition-[opacity,overlay,display] transition-discrete duration-200 backdrop:bg-transparent backdrop:transition-[background-color,overlay,display] backdrop:transition-discrete backdrop:duration-200 open:opacity-100 open:backdrop:bg-overlay starting:open:opacity-0 starting:open:backdrop:bg-transparent"
+      class="fixed inset-0 m-auto max-h-[calc(100dvh-3rem)] w-[min(380px,calc(100vw-2.5rem))] rounded-xl border border-line bg-raised p-0 shadow-overlay text-fg scale-[0.97] opacity-0 transition-[opacity,scale,overlay,display] transition-discrete duration-200 ease-out backdrop:bg-transparent backdrop:transition-[background-color,overlay,display] backdrop:transition-discrete backdrop:duration-200 open:scale-100 open:opacity-100 open:backdrop:bg-overlay starting:open:scale-[0.97] starting:open:opacity-0 starting:open:backdrop:bg-transparent motion-reduce:scale-100 motion-reduce:starting:open:scale-100"
     >
       <div class="relative p-card">
         <button

@@ -4,7 +4,7 @@
   "workspaces": {
     ".": {
       "entry": ["scripts/schedule.ts", "scripts/send-reminders.ts", "public/sw.js"],
-      "ignore": ["brand/**"]
+      "ignore": ["brand/**", ".claude/**"]
     }
   }
 }

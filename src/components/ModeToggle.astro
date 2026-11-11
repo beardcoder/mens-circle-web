@@ -54,7 +54,7 @@ const OPTIONS = [
   const STORAGE_KEY = 'mc-appearance';
 
   /** Mobile browser chrome colour per resolved mode (the page's ground). */
-  const THEME_COLOR: Record<Mode, string> = { light: '#f4eee2', dark: '#0f1410' };
+  const THEME_COLOR: Record<Mode, string> = { light: '#f1e8d9', dark: '#130e0a' };
 
   const darkQuery = matchMedia('(prefers-color-scheme: dark)');
 
@@ -113,7 +113,13 @@ const OPTIONS = [
       if (choice !== 'auto') document.documentElement.setAttribute('data-mode', choice);
     }
 
-    apply();
+    // Day to night is the whole page changing colour at once: a same-document view
+    // transition cross-fades it (the fade of a page change, global.css). Without the
+    // API, and under reduced motion, it changes at once.
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (document.startViewTransition && !still) document.startViewTransition(apply);
+    else apply();
   }
 
   function initTheme(): void {

@@ -255,6 +255,19 @@
 
 /* A short rise into place (`animate-rise`). `translate` and `opacity` only, which
    the compositor runs. Kept here, outside @theme, so it is always emitted. */
+/* The pools of light on the dark ground (`surface-dark`). */
+@keyframes pool-drift {
+  from {
+    translate: -2.5% -1.5%;
+    scale: 1;
+  }
+
+  to {
+    translate: 2.5% 2%;
+    scale: 1.07;
+  }
+}
+
 @keyframes rise {
   from {
     opacity: 0;
@@ -304,7 +317,7 @@
 /* The dark ground (the theme's night, still called forest): the opening, the
    agreements, the voices, the registration, the menu and the footer, in both modes.
    Its signature is the theme's own, turned earthier: soft pools of light in its
-   corners, a clay, a burnt rose and an ochre, still and never animated. */
+   corners, a clay, a burnt rose and an ochre, drifting very slowly. */
 @utility surface-dark {
   --color-surface: var(--p-forest);
   --color-raised: var(--p-forest-raised);
@@ -327,10 +340,32 @@
   --color-danger: #f0a197;
   color: var(--color-fg);
   background-color: var(--color-surface);
-  background-image:
-    radial-gradient(ellipse 60% 50% at 12% 22%, rgb(194 128 74 / 18%) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 45% at 88% 82%, rgb(176 98 66 / 13%) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 35% at 78% 18%, rgb(184 140 86 / 10%) 0%, transparent 60%);
+  /* The pools lie on a layer of their own behind the content, a little larger than
+     the ground, so they can drift without being repainted: `contain: paint` makes
+     the ground their containing block and their stacking context and clips them. */
+  contain: paint;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -12%;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(ellipse 60% 50% at 14% 24%, rgb(194 128 74 / 18%) 0%, transparent 60%),
+      radial-gradient(ellipse 55% 45% at 86% 80%, rgb(176 98 66 / 13%) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 35% at 76% 20%, rgb(184 140 86 / 10%) 0%, transparent 60%);
+  }
+
+  /* They drift slowly, like the light of a fire on a wall: a few percent of the
+     ground and a little closer, there and back in about a minute. Translate and
+     scale only, so the compositor moves one layer and nothing is painted again.
+     On screens only, and at rest under reduced motion. */
+  @media screen and (prefers-reduced-motion: no-preference) {
+    &::before {
+      animation: pool-drift 34s ease-in-out infinite alternate;
+    }
+  }
 }
 
 /* ── The four moves ────────────────────────────────────────────────────────── */

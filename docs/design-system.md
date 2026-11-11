@@ -215,7 +215,9 @@ participants without their explicit consent, no text on a photograph.
 
 ## Motion
 
-The page stands still. Motion is kept for three things, and each has a reason:
+The page is calm, and every piece of motion has a reason (the gate of the vendored
+`animate` and `find-animation-opportunities` skills: how often is it seen, what is
+it for, does it stay under 300 ms, does it help what is being read):
 
 - **The change of page: a fade.** Cross-document view transitions
   (`@view-transition`, the View Transitions CSS API, global.css): the old page
@@ -223,26 +225,40 @@ The page stands still. Motion is kept for three things, and each has a reason:
   rises, slides or scales, on either page: an opening is there with the first
   paint and stands (it is also the LCP, so nothing in it starts invisible). The one
   thing an opening still does is fill in the taken chairs of its seat ring, once.
-- **Answering the hand.** A button rises 2px and settles as it is pressed, arrows
-  nudge, header links draw a line, the FAQ's `<details>` unfolds (where
-  `interpolate-size` exists its `::details-content` transitions from height 0 to
-  `auto` in 0.32 s, the marker turns; elsewhere and under reduced motion it toggles at
-  once), the phone menu opens as a circle from its button.
+- **The dark ground breathes.** The pools of light on every dark ground (opening,
+  agreements, voices, registration, the last band, the footer, the phone menu)
+  drift a few percent and come a little closer, there and back in about a minute
+  (`pool-drift`, theme.css). They lie on a layer of their own (`surface-dark::before`,
+  larger than the ground, clipped by `contain: paint`), so the compositor moves one
+  layer by `translate` and `scale` and nothing is painted again. Screens only; at
+  rest under reduced motion.
+- **Answering the hand.** A button rises 2px and presses to 0.97 in 150 ms, arrows
+  nudge, header links draw a line, the FAQ's `<details>` unfolds and its answer
+  fades in with the space it gets (where `interpolate-size` exists its
+  `::details-content` goes from height 0 to `auto` in 0.26 s; elsewhere and under
+  reduced motion it toggles at once), the phone menu opens as a circle from its
+  button, the calendar popover fades in growing from 0.97 (it is centred, so it
+  grows from its middle).
+- **Answering a form.** The result under a form's button and a field's message
+  arrive rather than appear: 4px up and in, 200 ms (`@starting-style` with
+  `transition-behavior: allow-discrete`, since they go from `hidden` to shown).
+- **Day and night.** Choosing a colour mode changes every colour at once; a
+  same-document view transition cross-fades it (the page change's own fade).
 - **Two bars whose place depends on the scroll.** On an event page a dock with title
   and date slides out from behind the bar as the title passes under it, and back as
   the title returns (`EventDock`: the title's view timeline, `--event-title`). On the
   home page the phone's bottom bar (`ActionBar`) rises as the opening's action passes
   under the bar, steps down while the dates are on screen and leaves for the footer
-  (three view timelines, `--hero-action`, `--dates`, `--page-footer`, whose
-  translations add up). `timeline-scope` on `body` lifts the names. Without scroll
+  (three view timelines, `--hero-action`, `--dates`, `--page-footer`, each moving
+  a layer of its own so all three stay on the compositor). `timeline-scope` on `body` lifts the names. Without scroll
   timelines, and under reduced motion, one observer and a CSS transition show and
   hide each; the observers also say whether the bottom bar can be reached (`inert`,
   `aria-hidden`, the tab stop).
 
-Nothing else moves. No piece fades or rises in as it enters the view, nothing drifts,
-trails or turns with the scroll, and no ambient loop runs: a section that is on the
-page is there, readable, the moment it is scrolled to. A new animation needs one of
-the three reasons above; "it feels alive" is not one.
+Nothing else moves. No piece fades or rises in as it enters the view and nothing
+drifts, trails or turns with the scroll: a section that is on the page is there,
+readable, the moment it is scrolled to. A new animation has to pass the gate
+above; "it looks good" on something seen all the time is not a reason.
 
 Only opacity and transforms move, so the compositor carries every frame. No script
 reads layout before the page has settled (state at a scroll position comes from an

@@ -126,7 +126,7 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
   const day = formatDayMonthYear(event.event_date);
   const longDate = formatDateLong(event.event_date);
   // One static 1200×630 poster for every event — SeoHead's default image.
-  const image = new URL('/images/og-default.png?v=9', siteUrl).href;
+  const image = new URL('/images/og-default.png?v=10', siteUrl).href;
 
   // Only append the brand when the title does not already carry it — saying the
   // name twice eats the 60 chars a SERP shows.

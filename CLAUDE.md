@@ -282,8 +282,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   cards on public pages: facts, steps, agreements, FAQ and voices are rows between
   lines. `shadow-overlay` only for what floats. Images: a person in a circle, a place
   in a rectangle cut by the edge; one form per section.
-- The `design-taste-frontend` skill (`skills-lock.json`; restore with `bunx skills
-experimental_install`, `.claude/skills/` is not committed) is a reviewer here, not
+- Skills are vendored in `.claude/skills/` (sources in `skills-lock.json`; only the
+  kit of `design-taste-frontend`, its `assets/`, is left out and comes back with
+  `bunx skills experimental_install`). The `design-taste-frontend` skill is a reviewer here, not
   the system: run its `copy-lint.mjs` and `consistency.mjs` against the built server
   and fix what this system agrees with (a hero that fits its screen, running text in
   `fg-soft`, no half-empty column, focus and tap sizes). Its kit, dealt palettes,
@@ -293,7 +294,8 @@ experimental_install`, `.claude/skills/` is not committed) is a reviewer here, n
   `skills-lock.json`): no label above every heading (`Eyebrow` only where it adds the
   place or the kind of page), no decorative numbers (an index number only where
   there is a real order: the course, the agreements), no drawn shape standing in for
-  a picture (no empty rings, no glows), one label for one action, nothing invented.
+  a picture (no empty rings; the pools of light belong to the dark ground and are
+  its one decoration), one label for one action, nothing invented.
 - Shared components: `EventSummary` (every date: date, facts, `SeatRing`, action;
   fed by `lib/shared/event-status.ts`), `SeatRing` (`lib/shared/seats.ts`:
   `seatFill`, `seatDots`), `Stamp`, `Lockup`, `Qr` (`src/components/brand/`, shared
@@ -310,18 +312,26 @@ experimental_install`, `.claude/skills/` is not committed) is a reviewer here, n
   text until the page moves (`data-scrolled`), then 95 % paper; fixed bars blur only
   from `lg` on a hovering pointer. The phone menu is a native modal `<dialog>` on
   the forest, opening as a circle.
-- Motion (design-system.md, "Motion"): the page stands still. Three things move, each
-  for a reason: the change of page, which is a fade and nothing else (cross-document
-  view transitions, `@view-transition`; the opening of the page that arrives does not
+- Motion (design-system.md, "Motion"): calm, and every piece has a reason. What
+  moves: the change of page, a fade and nothing else (cross-document view
+  transitions, `@view-transition`; the opening of the page that arrives does not
   rise or settle, it is there with the first paint and is the LCP; only the seat
-  ring's taken chairs fill in),
-  what answers the hand (buttons, links, the native `<details>` of the FAQ, the phone
-  menu), and two bars whose place depends on the scroll (the event page's dock, the
-  phone `ActionBar` on the home page: view timelines lifted by `timeline-scope` on
-  `body`, an observer and a CSS transition where those are missing). Never add: a
-  rise or slide on arriving at a page, a fade or rise on entering the view, parallax or anything that drifts, trails or
-  turns with the scroll, an ambient loop, a glow, anything that follows the pointer.
-  Under reduced motion everything rests.
+  ring's taken chairs fill in); the pools of light on every dark ground, drifting
+  very slowly (`pool-drift` on `surface-dark::before`, one composited layer); what
+  answers the hand (buttons press to 0.97 in 150ms, links, the native `<details>`
+  of the FAQ unfolding and fading, the phone menu, the calendar popover growing
+  from 0.97); what answers a form (its result and a field's message arrive 4px up
+  via `@starting-style`); the change of colour mode (a same-document view
+  transition); and two bars whose place depends on the scroll (the event page's
+  dock, the phone `ActionBar`: view timelines lifted by `timeline-scope` on `body`,
+  an observer and a CSS transition where those are missing). Build motion with the
+  vendored skills (`animate`, `animation-performance`,
+  `find-animation-opportunities`, refined for Astro and vanilla CSS/JS): transforms
+  and opacity only, CSS first, then WAAPI, no animation library, UI under 300ms,
+  the theme's own curves. Never add: a rise or slide on arriving at a page, a fade
+  or rise on entering the view, parallax or anything that drifts, trails or turns
+  with the scroll, anything that follows the pointer. Under reduced motion
+  everything rests.
 - Lighthouse on every motion change (design-system.md): CLS 0, no forced reflow,
   only opacity and transforms move.
   Never set a state attribute on `<html>` while the page moves; never read layout
