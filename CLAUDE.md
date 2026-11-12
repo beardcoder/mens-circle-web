@@ -313,10 +313,13 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   ring's taken chairs fill in); the pools of light on every dark ground, wandering
   plainly but slowly (`pool-wander-a` / `-b` on `surface-dark::before` and
   `::after`, two composited layers on paths of their own); what lies
-  below the first screen, arriving once as it is first scrolled to (`Reveal.astro`:
-  `data-reveal` / `data-reveal-group` become `data-arrive`, 28px up and in, 800ms,
-  groups 90ms apart, starting a quarter of the window above its lower edge so it is
-  seen on a phone and clear of the bottom bar; never for what is on screen at load); the opening's photograph
+  below the first screen, every piece of it, sliding up and fading in once as it is
+  first scrolled to (`Reveal.astro` takes titles, paragraphs, rows, figures, forms
+  and lone links from the markup, plus `data-reveal` / `data-reveal-group`, and
+  marks them `data-arrive`: 40px up, 900ms, the fade 700ms on `--ease-fade`, pieces
+  that come together 80ms apart, starting a fifth of the window above its lower
+  edge so it is seen on a phone and clear of the bottom bar; never for what is on
+  screen at load); the opening's photograph
   coming a little closer as the opening leaves; the stamp's ring of words turning
   once in two minutes; the mark turning a quarter when the logo is hovered; what
   answers the hand (buttons press to 0.97 in 150ms, links, the native `<details>`

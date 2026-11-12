@@ -226,17 +226,23 @@ it for, does it stay under 300 ms, does it help what is being read):
   rises, slides or scales, on either page: an opening is there with the first
   paint and stands (it is also the LCP, so nothing in it starts invisible). The one
   thing an opening still does is fill in the taken chairs of its seat ring, once.
-- **Arriving.** What lies below the first screen arrives once, the first time it is
-  scrolled to: 28px up and in, 800 ms, the pieces of a group 90 ms apart, starting
-  when the piece's top is a quarter of the window above its lower edge (at the very
-  edge it played behind the phone's bottom bar and was over before it was seen) (a section's
-  head, the facts, the steps, the agreements, the values, the voices, a date's
-  summary, Markus's sentence); the poster word of the dates comes from the side; a
-  seat ring that arrives fills its taken chairs. `Reveal.astro` marks only what is
-  below the window when the page is read (`data-reveal`, `data-reveal-group` →
-  `data-arrive`), so nothing on screen at load is ever hidden (the window's last
-  quarter included) and the LCP is untouched; a piece that is not laid out at this
-  width is left alone; it fires once per piece and never again. Without JavaScript, under
+- **Arriving.** Everything below the first screen arrives once, the first time it
+  is scrolled to: it slides up 40px and fades in. The slide takes 900 ms and settles
+  early (`--ease-out`), the fade 700 ms on a curve that starts slowly (`--ease-fade`),
+  so a piece is seen coming. It starts when the piece's top is a fifth of the window
+  above its lower edge (at the very edge it played behind the phone's bottom bar);
+  pieces that come into view together follow one another 80 ms apart. `Reveal.astro`
+  takes the pieces from the markup itself (titles, paragraphs, list rows, figures,
+  questions, forms, links and buttons that stand alone, the footer's rows) plus
+  whatever a component marks with `data-reveal` or `data-reveal-group`; where pieces
+  nest, the outermost arrives as a whole, so a new component needs no hook. The
+  poster word of the dates comes from the side (`data-reveal="side"`); a seat ring
+  that arrives fills its taken chairs. Only what is below the window when the page
+  is read is marked (`data-arrive`: `pending`, `done`, then `there`, which gives the
+  piece its own transitions back), so nothing on screen at load is ever hidden and
+  the LCP is untouched; a piece that is not laid out at this width is left alone;
+  the page's end brings in what could not rise to the line; the fixed bars, the menu
+  and popovers are never pieces. It fires once per piece. Without JavaScript, under
   reduced motion and in print everything stands.
 - **The opening's photograph comes closer** as the opening leaves the window
   (`hero-photo-leave` on the opening's view timeline: from its lower edge, sinking
