@@ -210,10 +210,13 @@ docs, mail templates and tests never become utilities) and skip server-only code
 `global.css` keeps the admin and print sources out with `@source not`, `admin.css`
 the print and styleguide sources; `print.css` reads only the print, brand and ui
 components. Printing a page of the site (`@media print`) lives in `global.css`.
-What lies below the first screen arrives once (`Reveal.astro`); the two scroll-linked bars use CSS view timelines (`animation-timeline`); the FAQ is
-native `<details>`; no animation library ships to the browser. The opening, page transitions, loops and
+The pieces of a page fade in out of a blur as they are scrolled in, with the
+`tailwind-animations` utilities (a CSS-only Tailwind v4 package, imported in
+`global.css`; its skill is vendored); the two scroll-linked bars use CSS view
+timelines (`animation-timeline`); the FAQ is native `<details>`; no animation
+script ships to the browser. The opening, page transitions, loops and
 state transitions are the theme's own keyframes and `--animate-*` tokens (`rise`,
-`skeleton`); there is no animation plugin.
+`skeleton`).
 No `<style>` blocks and no component stylesheets: utilities in the
 markup, recipes in `lib/ui.ts`, components in `components/ui/`. `docs/design-system.md`
 is the reference. Class strings are complete and static; never add a class that sets a
@@ -283,7 +286,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   lines. `shadow-overlay` only for what floats. Images: a person in a circle, a place
   in a rectangle cut by the edge; one form per section.
 - Skills are vendored in `.claude/skills/` (sources in `skills-lock.json`):
-  `web-design-engineer` and the three animation skills named under Motion.
+  `web-design-engineer`, `tailwind-animations` and the three animation skills named
+  under Motion.
 - Against the generated look (the `web-design-engineer` skill's failure patterns,
   `skills-lock.json`): no label above every heading (`Eyebrow` only where it adds the
   place or the kind of page), no decorative numbers (an index number only where
@@ -313,13 +317,14 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   ring's taken chairs fill in); the pools of light on every dark ground, wandering
   plainly but slowly (`pool-wander-a` / `-b` on `surface-dark::before` and
   `::after`, two composited layers on paths of their own); what lies
-  below the first screen, every piece of it, sliding up and fading in once as it is
-  first scrolled to (`Reveal.astro` takes titles, paragraphs, rows, figures, forms
-  and lone links from the markup, plus `data-reveal` / `data-reveal-group`, and
-  marks them `data-arrive`: 40px up, 900ms, the fade 700ms on `--ease-fade`, pieces
-  that come together 80ms apart, starting a fifth of the window above its lower
-  edge so it is seen on a phone and clear of the bottom bar; never for what is on
-  screen at load); the opening's photograph
+  below a page's opening, every piece of it, fading in out of a blur as it is
+  scrolled into the window (`global.css`, "Arriving": `timeline-view
+animate-blurred-fade-in animate-range-[entry_10%_contain_30%]` from
+  `tailwind-animations`, applied in CSS to titles, paragraphs, rows, figures and
+  lone links plus `data-reveal` / `data-reveal-group`, the outermost piece only;
+  tied to the scroll, so it leaves the same way on the way back; no script; a
+  page's opening, the fixed bars and dialogs are left alone, footer rows finish at
+  `entry 100%`); the opening's photograph
   coming a little closer as the opening leaves; the stamp's ring of words turning
   once in two minutes; the mark turning a quarter when the logo is hovered; what
   answers the hand (buttons press to 0.97 in 150ms, links, the native `<details>`
@@ -331,15 +336,18 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   dock, the phone `ActionBar`: view timelines lifted by `timeline-scope` on `body`,
   an observer and a CSS transition where those are missing). Build motion with the
   vendored skills (`animate`, `animation-performance`,
-  `find-animation-opportunities`, refined for Astro and vanilla CSS/JS): transforms
-  and opacity only, CSS first, then WAAPI, no animation library, UI under 300ms,
-  the theme's own curves. Never add: a rise or slide on arriving at a page, anything
-  that re-animates each time it is scrolled past, pinning or scroll-jacking,
+  `find-animation-opportunities`, refined for Astro and vanilla CSS/JS, and
+  `tailwind-animations` for the package's classes): transforms and opacity (the
+  arrival's blur is the one filter), CSS first, then WAAPI, no animation script, UI
+  under 300ms,
+  the theme's own curves. Never add: a rise or slide on arriving at a page, a second
+  scroll-linked effect on the same piece, pinning or scroll-jacking,
   anything that follows the pointer, anything that starts invisible on the first
   screen. Under reduced motion
   everything rests.
 - Lighthouse on every motion change (design-system.md): CLS 0, no forced reflow,
-  only opacity and transforms move.
+  only opacity and transforms move (the arrival's blur is the known exception,
+  reported by Lighthouse as non-composited).
   Never set a state attribute on `<html>` while the page moves; never read layout
   or `scrollY` at load (use an `IntersectionObserver`); nothing that holds the LCP
   waits for a script. No `content-visibility`.
@@ -361,7 +369,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   pass their content explicitly as props and rich-text slots. Load dynamic data in
   server code or through the public JSON endpoints; blocks only render their inputs. Component-specific
   browser behavior belongs in its own `<script>` (Header, ModeToggle,
-  BackToTop, ActionBar, EventDock, Reveal), with no global client entry. Public form helpers stay
+  BackToTop, ActionBar, EventDock), with no global client entry. Public form helpers stay
   in `lib/form.ts`; admin helpers live beside their Preact components. `Prose` accepts inline markup in its slot or
   an `html` prop for dynamic content. Static FAQ answers, journey steps and facts
   use slotted item components at their page location, rather than frontmatter arrays.

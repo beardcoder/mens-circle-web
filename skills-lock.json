@@ -19,6 +19,12 @@
       "skillPath": "skills/find-animation-opportunities/SKILL.md",
       "computedHash": "6912a27a684feba9dd220349940d8a44e0d7b720cab71042f268a7ed93bf4bab"
     },
+    "tailwind-animations": {
+      "source": "midudev/tailwind-animations",
+      "sourceType": "github",
+      "skillPath": "skills/tailwind-animations/SKILL.md",
+      "computedHash": "7eedf15c53d1e3097fa88d235cb6cc7014c63da7dee83ef5c4760be5e4b3f30b"
+    },
     "web-design-engineer": {
       "source": "ConardLi/garden-skills",
       "sourceType": "github",

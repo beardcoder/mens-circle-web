@@ -2,6 +2,7 @@
  * Public site entry: Tailwind plus the shared design system (theme.css).
  */
 @import 'tailwindcss' source('..');
+@import 'tailwind-animations';
 @import './theme.css';
 
 /* Classes come from src/ only (`source('..')`): words in docs, mail templates or
@@ -104,40 +105,67 @@
 
 /* ── Arriving ─────────────────────────────────────────────────────────────── */
 
-/* What lies below the first screen arrives once, the first time it is scrolled to:
-   every piece of a page (Reveal.astro takes them from the markup and marks each
-   `data-arrive="pending"`, then `done`, a fifth of the window above its lower
-   edge, and `there` once it stands) slides up 40px and fades in. The slide takes
-   900ms and settles early; the fade runs 700ms on a curve that starts slowly, so
-   the piece is seen coming rather than popping in. Pieces that come into view
-   together follow one another 80ms apart (the script sets the delay). A poster
-   word comes from the side. Opacity and translate only. A seat ring that arrives
-   fills its taken chairs. On screens only: a printed page shows everything. */
+/* Every piece of a page fades in out of a blur as it is scrolled into the window,
+   tied to the scroll itself: the tailwind-animations utilities `timeline-view
+   animate-blurred-fade-in animate-range-[entry_10%_contain_30%]`, so a piece starts
+   to show once a tenth of it is in the window and stands clear when it has come
+   nearly a third of the way up. Scrolling back, it leaves the same way. No script:
+   the pieces are taken from the markup (titles, paragraphs, list rows, figures,
+   questions, links and buttons that stand alone) plus whatever a component marks
+   with `data-reveal` or `data-reveal-group`; where pieces nest, only the outermost
+   one moves (`:not(… *)`), so nothing fades twice. Left alone: a page's opening
+   (it is the first paint and the LCP), the fixed bars, the menu and popovers. The
+   footer's rows are done as soon as they are fully in: the page ends before they
+   could rise further. Pieces stay small (rows, not whole forms or open answers): a
+   tall piece is only clear near the window's top, so a list row that holds marked
+   pieces (a date's summary) is not one itself; its parts are. Browsers without
+   view timelines, reduced motion and print show everything as it is. */
+@supports (animation-timeline: view()) {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    :is(main, #footer)
+      :is(
+        [data-reveal],
+        [data-reveal-group] > *,
+        h2,
+        h3,
+        p,
+        li:not(:has([data-reveal], [data-reveal-group])),
+        dl > div,
+        summary,
+        figure,
+        blockquote,
+        a,
+        button
+      ):not(
+        :is(main, #footer)
+          :is(
+            [data-reveal],
+            [data-reveal-group] > *,
+            h2,
+            h3,
+            p,
+            li:not(:has([data-reveal], [data-reveal-group])),
+            dl > div,
+            summary,
+            figure,
+            blockquote,
+            a,
+            button
+          )
+          *,
+        :is([data-hero], [data-enter], [data-action-bar], [data-event-dock], [data-scroll-top], dialog, [popover]),
+        :is([data-hero], [data-enter], [data-action-bar], [data-event-dock], [data-scroll-top], dialog, [popover]) *
+      ) {
+      @apply timeline-view animate-blurred-fade-in animate-range-[entry_10%_contain_30%];
+
+      #footer & {
+        animation-range: entry 0% entry 100%;
+      }
+    }
+  }
+}
+
 @media screen and (prefers-reduced-motion: no-preference) {
-  /* The transition belongs to the arrival only: hiding a piece below the window is
-     instant, so a fast scroll never meets one that is still fading out. */
-  [data-arrive='done'] {
-    transition:
-      opacity 0.7s var(--ease-fade),
-      translate 0.9s var(--ease-out);
-  }
-
-  [data-arrive='pending'] {
-    opacity: 0;
-    translate: 0 2.5rem;
-  }
-
-  [data-reveal='side'][data-arrive='pending'] {
-    translate: -12% 0;
-  }
-
-  :is([data-arrive='done'], [data-arrive='there']) [data-seat-dot]:not([data-seat-dot='taking']) {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: seat-take 0.7s var(--ease-spring) backwards;
-    animation-delay: calc(0.25s + var(--i, 0) * 70ms);
-  }
-
   /* The stamp's words turn once in two minutes: constant, so linear. */
   [data-stamp] {
     animation: stamp-turn 120s linear infinite;

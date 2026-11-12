@@ -226,24 +226,24 @@ it for, does it stay under 300 ms, does it help what is being read):
   rises, slides or scales, on either page: an opening is there with the first
   paint and stands (it is also the LCP, so nothing in it starts invisible). The one
   thing an opening still does is fill in the taken chairs of its seat ring, once.
-- **Arriving.** Everything below the first screen arrives once, the first time it
-  is scrolled to: it slides up 40px and fades in. The slide takes 900 ms and settles
-  early (`--ease-out`), the fade 700 ms on a curve that starts slowly (`--ease-fade`),
-  so a piece is seen coming. It starts when the piece's top is a fifth of the window
-  above its lower edge (at the very edge it played behind the phone's bottom bar);
-  pieces that come into view together follow one another 80 ms apart. `Reveal.astro`
-  takes the pieces from the markup itself (titles, paragraphs, list rows, figures,
-  questions, forms, links and buttons that stand alone, the footer's rows) plus
-  whatever a component marks with `data-reveal` or `data-reveal-group`; where pieces
-  nest, the outermost arrives as a whole, so a new component needs no hook. The
-  poster word of the dates comes from the side (`data-reveal="side"`); a seat ring
-  that arrives fills its taken chairs. Only what is below the window when the page
-  is read is marked (`data-arrive`: `pending`, `done`, then `there`, which gives the
-  piece its own transitions back), so nothing on screen at load is ever hidden and
-  the LCP is untouched; a piece that is not laid out at this width is left alone;
-  the page's end brings in what could not rise to the line; the fixed bars, the menu
-  and popovers are never pieces. It fires once per piece. Without JavaScript, under
-  reduced motion and in print everything stands.
+- **Arriving.** Every piece below a page's opening fades in out of a blur as it is
+  scrolled into the window, tied to the scroll itself: the `tailwind-animations`
+  utilities `timeline-view animate-blurred-fade-in
+animate-range-[entry_10%_contain_30%]` (a CSS-only Tailwind v4 package, imported
+  in `global.css`). A piece starts to show once a tenth of it is in the window and
+  stands clear when it has come nearly a third of the way up; scrolling back, it
+  leaves the same way. There is no script: `global.css` ("Arriving") applies the
+  classes to titles, paragraphs, list rows, figures, questions and lone links and
+  buttons, plus whatever a component marks with `data-reveal` or
+  `data-reveal-group`; where pieces nest only the outermost moves, so a new
+  component needs no hook. Left alone: a page's opening (`data-hero`, `data-enter`:
+  the first paint and the LCP), the fixed bars, dialogs and popovers. Footer rows
+  are done once they are fully in (`entry 100%`): the page ends before they could
+  rise further. Keep pieces small: one taller than the window is only clear near
+  its top, so a list row that holds marked pieces (a date's summary) is not a
+  piece itself. What stands in the lower third of the window when a page loads is
+  still coming in. Browsers without view timelines, reduced motion and print show
+  everything as it is.
 - **The opening's photograph comes closer** as the opening leaves the window
   (`hero-photo-leave` on the opening's view timeline: from its lower edge, sinking
   12px, to 1.06), the one piece tied to the scroll besides the two bars.
@@ -290,11 +290,13 @@ it for, does it stay under 300 ms, does it help what is being read):
   hide each; the observers also say whether the bottom bar can be reached (`inert`,
   `aria-hidden`, the tab stop).
 
-Nothing re-animates: a piece arrives once and then stands, however often it is
-scrolled past. Nothing follows the pointer and nothing is pinned or scroll-jacked.
+The arrival is the one thing that follows the scroll both ways; nothing else
+re-animates. Nothing follows the pointer and nothing is pinned or scroll-jacked.
 A new animation has to pass the gate above.
 
-Only opacity and transforms move, so the compositor carries every frame. No script
+Only opacity and transforms move, so the compositor carries every frame; the one
+exception is the arrival's blur (`filter`), which Lighthouse lists as
+non-composited and which costs main-thread work while a piece is coming in. No script
 reads layout before the page has settled (state at a scroll position comes from an
 `IntersectionObserver`, never from `scrollY`); state flags go on the element that
 needs them, never on `<html>` while the page moves; the opening never waits for a
@@ -319,7 +321,7 @@ Run it against a production build (`bun run build`, then the server on a disposa
 database) for the home page on mobile and desktop and for any page whose motion
 changed: `bunx lighthouse <url> --only-categories=performance,accessibility,best-practices,seo`
 (add `--preset=desktop`). Hold: CLS 0, no forced reflow ("Forced reflow" insight
-empty), no non-composited animations, the LCP element's render delay well under
+empty), no non-composited animations beyond `blurred-fade-in`, the LCP element's render delay well under
 half a second. Locally the server does not compress (the proxy does in
 production), so the render-blocking stylesheet weighs more in the simulated
 mobile score than it does live.
