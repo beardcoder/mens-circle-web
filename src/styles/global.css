@@ -105,8 +105,9 @@
 /* ── Arriving ─────────────────────────────────────────────────────────────── */
 
 /* What lies below the first screen arrives once, the first time it is scrolled to
-   (Reveal.astro marks it `data-arrive="pending"` and then `done`): 14px up and in,
-   600ms, the children of a group 60ms apart. A poster word comes from the side.
+   (Reveal.astro marks it `data-arrive="pending"` and then `done`, a quarter of the
+   window above its lower edge): 28px up and in, 800ms, the children of a group
+   90ms apart, so it is seen on a phone too. A poster word comes from the side.
    Opacity and translate only. A seat ring that arrives fills its taken chairs.
    On screens only: a printed page shows everything. */
 @media screen and (prefers-reduced-motion: no-preference) {
@@ -114,18 +115,18 @@
      instant, so a fast scroll never meets one that is still fading out. */
   [data-arrive='done'] {
     transition:
-      opacity 0.6s var(--ease-out),
-      translate 0.6s var(--ease-out);
-    transition-delay: calc(var(--reveal-i, 0) * 60ms);
+      opacity 0.8s var(--ease-out),
+      translate 0.8s var(--ease-out);
+    transition-delay: calc(var(--reveal-i, 0) * 90ms);
   }
 
   [data-arrive='pending'] {
     opacity: 0;
-    translate: 0 0.875rem;
+    translate: 0 1.75rem;
   }
 
   [data-reveal='side'][data-arrive='pending'] {
-    translate: -8% 0;
+    translate: -12% 0;
   }
 
   [data-arrive='done'] [data-seat-dot]:not([data-seat-dot='taking']) {

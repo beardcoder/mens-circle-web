@@ -227,13 +227,16 @@ it for, does it stay under 300 ms, does it help what is being read):
   paint and stands (it is also the LCP, so nothing in it starts invisible). The one
   thing an opening still does is fill in the taken chairs of its seat ring, once.
 - **Arriving.** What lies below the first screen arrives once, the first time it is
-  scrolled to: 14px up and in, 600 ms, the pieces of a group 60 ms apart (a section's
+  scrolled to: 28px up and in, 800 ms, the pieces of a group 90 ms apart, starting
+  when the piece's top is a quarter of the window above its lower edge (at the very
+  edge it played behind the phone's bottom bar and was over before it was seen) (a section's
   head, the facts, the steps, the agreements, the values, the voices, a date's
   summary, Markus's sentence); the poster word of the dates comes from the side; a
   seat ring that arrives fills its taken chairs. `Reveal.astro` marks only what is
   below the window when the page is read (`data-reveal`, `data-reveal-group` →
-  `data-arrive`), so nothing on screen at load is ever hidden and the LCP is
-  untouched; it fires once per piece and never again. Without JavaScript, under
+  `data-arrive`), so nothing on screen at load is ever hidden (the window's last
+  quarter included) and the LCP is untouched; a piece that is not laid out at this
+  width is left alone; it fires once per piece and never again. Without JavaScript, under
   reduced motion and in print everything stands.
 - **The opening's photograph comes closer** as the opening leaves the window
   (`hero-photo-leave` on the opening's view timeline: from its lower edge, sinking

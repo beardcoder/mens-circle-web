@@ -12,6 +12,9 @@
 ---
 
 <script>
+  /** How far above the window's lower edge a piece's top is when it arrives, as a share of the window. */
+  const LEAD = 0.25;
+
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const pieces = still ? [] : [...document.querySelectorAll<HTMLElement>('[data-reveal], [data-reveal-group] > *')];
 
@@ -34,7 +37,15 @@
             // The first report: hide only what lies below the window.
             seen.add(piece);
 
-            if (!entry.isIntersecting && entry.boundingClientRect.top > (entry.rootBounds?.bottom ?? 0)) {
+            // The root ends a quarter above the window's lower edge (below); what stands
+            // in that last quarter at load is on screen and must not be hidden. A piece
+            // that is not laid out (`display: none` at this width) is left alone: it
+            // would never be seen arriving and would stay hidden if it showed up later.
+            const root = entry.rootBounds;
+            const box = entry.boundingClientRect;
+            const below = root !== null && box.height > 0 && box.top >= root.top + root.height / (1 - LEAD);
+
+            if (!entry.isIntersecting && below) {
               piece.dataset.arrive = 'pending';
             } else {
               observer.unobserve(piece);
@@ -49,8 +60,10 @@
           }
         }
       },
-      // A piece arrives once a tenth of the window's height of it is in.
-      { rootMargin: '0px 0px -10% 0px' },
+      // A piece arrives once its top is a quarter of the window's height above the
+      // lower edge: where the eye is, and clear of the phone's bottom bar, which
+      // covers the last tenth (an arrival at the very edge played behind it).
+      { rootMargin: `0px 0px -${LEAD * 100}% 0px` },
     );
 
     for (const piece of pieces) observer.observe(piece);
