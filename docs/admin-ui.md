@@ -13,8 +13,8 @@ right column. Shared pieces live in `components/admin/ui.tsx` (`PageHeader`, `St
 `Tabs`, `SearchField`, `StatusPill`, `Meter`, `Menu`, `EmptyState`) and the line icons
 in `components/admin/icons.tsx`, which AdminLayout also renders statically.
 
-Visual direction: the public design at night — the forest ground, bone text, muted
-moss, the ember accent and the semantic success/danger tokens from theme.css. IBM Plex Sans
+Visual direction: the public design at night — the forest ground, bone text, the
+ember accent and the semantic success/danger tokens from theme.css. IBM Plex Sans
 for controls and data, Cormorant for page titles and the next evening. Controls are
 round, cards rounded (`rounded-xl`). Space actions away from destructive tools, and show feedback at the
 affected workspace. Native modal dialogs confirm deletion and sending.

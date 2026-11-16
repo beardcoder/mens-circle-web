@@ -34,7 +34,7 @@ after a change to the master logo run `bun run brand:logo`.
 ## Logo
 
 - The mark is four figures in a circle. Deep gold on paper, gold (or bone) on the
-  forest and the moss, black or white where only one colour prints.
+  forest, black or white where only one colour prints.
 - Clear space all round: a quarter of the mark's height. Smallest size: 6 mm
   (24 px) for the mark with the word mark, 4 mm (16 px) for the mark alone.
 - Never: other colours, outlines, shadows, the mark rotated, the word mark in

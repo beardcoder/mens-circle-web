@@ -31,9 +31,6 @@
   --p-forest-raised: #1e1610;
   --p-forest-raised-night: #140e09;
   --p-forest-control: #8a7862;
-  --p-moss: #261d15;
-  --p-moss-night: #1c150f;
-  --p-moss-control: #948169;
   --p-bone: #ebdfcd;
   --p-bone-soft: #cdbca4;
   --p-bone-muted: #b6a48d;
@@ -85,7 +82,6 @@
   --color-bone-light: #ebdfcd;
   --color-bone-dark: #ebdfcd;
 
-  --text-marginal: 0.875rem;
   --text-xs: 0.8125rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;

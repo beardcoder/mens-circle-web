@@ -30,17 +30,6 @@ const MODES: Record<string, { grounds: Key[]; texts: Key[]; controls: Key[] }> =
     texts: ['bone', 'boneSoft', 'boneMuted', 'emberLight', 'spark'],
     controls: ['forestControl'],
   },
-  // The moss is dark in both modes; its fields and controls use their own outline.
-  'moss (light)': {
-    grounds: ['moss'],
-    texts: ['bone', 'boneSoft', 'boneMuted', 'emberLight', 'spark'],
-    controls: ['mossControl'],
-  },
-  'moss (dark)': {
-    grounds: ['mossNight'],
-    texts: ['bone', 'boneSoft', 'boneMuted', 'emberLight', 'spark'],
-    controls: ['mossControl'],
-  },
 };
 
 for (const [mode, { grounds, texts, controls }] of Object.entries(MODES)) {

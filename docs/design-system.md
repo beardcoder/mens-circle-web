@@ -64,7 +64,7 @@ facts and the FAQ, not in every section.
 
 | File                            | Role                                                                                                       |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `src/styles/theme.css`          | Tokens (`@theme`), primitives, variants, the surfaces, the bleed utilities, keyframes, base rules. Shared. |
+| `src/styles/theme.css`          | Tokens (`@theme`), primitives, variants, the surfaces, keyframes, base rules. Shared.                      |
 | `src/styles/global.css`         | Public entry: Tailwind, theme, print of a page, page transitions, the FAQ, opening and scroll motion.      |
 | `src/styles/admin.css`          | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                           |
 | `src/lib/ui.ts`                 | Class recipes: `button()`, `control()`, `link`, `label`, field and form states, `card`, `panel`, `margin`. |
@@ -86,7 +86,6 @@ set before first paint. Never a hex value in markup.
 | Band            | `#E2D4BE`                    | `#1C150F`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates       |
 | Raised          | `#F9F3E8`                    | `#261D15`             | `raised`                         | fields, the QR square, the admin's cards          |
 | Dark ground     | `#130E0A` / raised `#1E1610` | `#0B0705` / `#140E09` | `surface-dark`                   | opening, agreements, voices, registration, footer |
-| Second dark     | `#261D15`                    | `#1C150F`             | `surface-moss`                   | print only; the site has three grounds            |
 | Text            | `#18110B` / soft `#2B2117`   | `#EBDFCD` / `#CDBCA4` | `fg`, `fg-soft`                  | titles / running text                             |
 | Secondary text  | `#5F503D`                    | `#A8957F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text   |
 | Lines           | `#D6C6AD` / `#BFAB8E`        | `#2C2218` / `#3F3225` | `line`, `line-strong`            | quiet structure; never alone a control            |
@@ -132,21 +131,20 @@ phrase in a title (`<em>`) is set in Cormorant's italic, in the accent (the
 clay terracotta on the dark ground). `font-sans` is IBM Plex Sans (the static
 regular and semibold, ~23 kB each; the regular also serves 500, the semibold 700): running text, navigation, forms, data.
 
-| Token           | Size     | Use                                              |
-| --------------- | -------- | ------------------------------------------------ |
-| `text-poster`   | 72–216px | one poster word or number (`Poster`)             |
-| `text-hero`     | 48–90px  | the home statement                               |
-| `text-index`    | 48–104px | an index number in the margin (`Index`)          |
-| `text-page`     | 44–96px  | a sub-page's title, an event title               |
-| `text-section`  | 36–72px  | a section's title, the one featured voice        |
-| `text-sub`      | 26–36px  | subheadings, list titles, a fact's value, a date |
-| `text-quote`    | 28–42px  | one short quote                                  |
-| `text-xl`       | 18–22px  | FAQ questions, the questions of the first round  |
-| `text-lg`       | 18–21px  | a lead                                           |
-| `text-md`       | 17–19px  | running text (the body)                          |
-| `text-base`     | 16px     | controls, buttons, data                          |
-| `text-sm`/`xs`  | 14/13px  | labels, hints, captions / the small print        |
-| `text-marginal` | 14px     | a note in the margin column                      |
+| Token          | Size     | Use                                              |
+| -------------- | -------- | ------------------------------------------------ |
+| `text-poster`  | 72–216px | one poster word or number (`Poster`)             |
+| `text-hero`    | 48–90px  | the home statement                               |
+| `text-index`   | 48–104px | an index number in the margin (`Index`)          |
+| `text-page`    | 44–96px  | a sub-page's title, an event title               |
+| `text-section` | 36–72px  | a section's title, the one featured voice        |
+| `text-sub`     | 26–36px  | subheadings, list titles, a fact's value, a date |
+| `text-quote`   | 28–42px  | one short quote                                  |
+| `text-xl`      | 18–22px  | FAQ questions, the questions of the first round  |
+| `text-lg`      | 18–21px  | a lead                                           |
+| `text-md`      | 17–19px  | running text (the body)                          |
+| `text-base`    | 16px     | controls, buttons, data                          |
+| `text-sm`/`xs` | 14/13px  | labels, hints, captions / the small print        |
 
 Titles tighten their tracking as they grow (−1 % to −5 %). Labels are sentence
 case: `Eyebrow` in the accent, only where it says something the title does not
@@ -158,8 +156,7 @@ secondary colour. Running text stays on `max-w-measure` (~62 characters).
 One content width, 1200px, and one edge: the content sits 28 / 40 / 56px from the
 window (`gutter`, `Container`) in every section, and the header shares it. The
 grounds run from edge to edge. Space per width on `:root`: `py-section` 88 → 144px,
-`py-band` 56 → 80px, `group` 40 → 64px, `grid` 32 → 48px (column gap), `overlap`
-40 / 64 / 96px. Breakpoints: `sm` 36rem, `md` 48rem, `lg` 64rem, `nav` 68.75rem,
+`py-band` 56 → 80px, `group` 40 → 64px, `grid` 32 → 48px (column gap). Breakpoints: `sm` 36rem, `md` 48rem, `lg` 64rem, `nav` 68.75rem,
 `xl` 80rem. Only the home opening takes a screen's height (from `lg`, `min-h-svh`, its
 content centred; a short window lets it grow); no other section is forced to one.
 
@@ -172,23 +169,18 @@ page stays alive and calm.
    for index numbers, labels and notes, the content on 4–12 (`margin.reading` 4–10
    for running text). A title may start in the margin and cross into the content
    (`margin.cross`, 1–10). Always on the left; below `lg` it stacks, margin first.
-   Facts, intro, course, voices, FAQ, the personal page's sections.
-2. **Overlap** (`overlap` token: `-bottom-overlap`, `-left-overlap` …): an element
-   crosses an edge towards the centre, always on a ground of its own (a disc, a
-   panel). The seat ring over the hero's photograph, the quote crossing Markus's
-   ring.
-3. **Bleed** (`bleed-l`, `bleed-r`, `bleed-x`; `--spacing-bleed` is the way from the
-   content's edge to the window's): a photograph, a ring or the stamp runs out of
-   the window. The side changes down the page (the hero's photo right, Markus's
-   ring right after a left-hand intro, the stamp right at the end). Sections clip
-   horizontally (`Section`), so a bleed never scrolls.
+   Intro, course, voices, FAQ, the personal page's sections.
+2. **Overlap**: an opening's poster line runs across the foot of its photograph,
+   where the photograph has already run into the ground (the home page, the
+   personal page). Never over a face, the sky or a busy part of the picture.
+3. **Bleed**: a photograph, the stamp or a ground runs to the window's edge (the
+   opening's photograph, the stamp at the right, the registration's ground).
+   Sections clip horizontally (`Section`), so a bleed never scrolls.
 4. **Poster word** (`Poster`, `text-poster`): one word or number as large as a
-   poster, as the title ("Dabei sein.") or quietly behind content (`tone="ghost"`,
-   8 % of the text colour, hidden from assistive technology). At most one per screen.
+   poster, as the title ("Dabei sein."). At most one per screen.
 
 Never: staircases of offset blocks, rotation (the stamp's ring of words turns,
-nothing else stands at an angle), shadows, boxes
-around content, text over a photograph.
+nothing else stands at an angle), shadows, boxes or cards around content.
 
 ## Shape and depth
 
@@ -203,10 +195,10 @@ facts, questions, agreements, steps, FAQ and voices are rows between thin lines.
 
 ## Images
 
-Two forms only: a person in a circle, a place (forest, evening, the room) in a
-rectangle cut by the window or the sheet. One form per section; warm, natural
-light; captions as margin notes. No staged group shots, no stock, no recognisable
-participants without their explicit consent, no text on a photograph.
+A photograph has no frame: it runs to the window's edge and softly into the ground
+(a mask, `data-hero-frame`); a small portrait (the avatar) stands in a circle.
+Warm, natural light; no caption. No staged group shots, no stock, no recognisable
+participants without their explicit consent.
 
 ## Motion
 
@@ -330,9 +322,9 @@ mobile score than it does live.
 | Component                                         | Purpose                                                                                                   |
 | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `Container`                                       | The 1200px width and the page's one edge (`px-gutter`)                                                    |
-| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `moss` / `dark`, edge to edge, clipping what bleeds                          |
+| `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `dark`, edge to edge, clipping what bleeds                                   |
 | `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead; with `margin.cross` it crosses into the content                 |
-| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; a photograph bleeds right, without one the stamp stands there                       |
+| `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; with a photograph the poster opening, without one the stamp                         |
 | `Poster`, `Index`                                 | The poster word, the index number                                                                         |
 | `Eyebrow`                                         | A label above a title where it adds information: accent text                                              |
 | `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`                                                  |

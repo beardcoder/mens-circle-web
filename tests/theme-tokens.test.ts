@@ -23,7 +23,6 @@ test('a declaration keeps its trailing comment as its note, and multi-line value
 test('the primitives resolve to hex in both modes', () => {
   expect(Object.keys(tokens.primitives).length).toBeGreaterThan(30);
   expect(tokens.primitives.linen).toEqual({ light: '#f1e8d9', dark: '#f1e8d9' });
-  expect(tokens.primitives.moss).toEqual({ light: '#261d15', dark: '#1c150f' });
 });
 
 test('the colour roles resolve through the primitives; mixed ones are marked', () => {
@@ -51,6 +50,5 @@ test('type roles carry size, line height and tracking; space carries its steps',
     '48rem': '7rem',
     '64rem': '9rem',
   });
-  expect(tokens.space.find((s) => s.name === 'overlap')!.steps.base).toBe('2.5rem');
   expect(tokens.breakpoints.map((b) => b.name)).toContain('--breakpoint-nav');
 });

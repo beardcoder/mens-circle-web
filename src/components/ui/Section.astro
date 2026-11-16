@@ -4,13 +4,13 @@ import Container from './Container.astro';
 /**
  * A block of the page. Blocks are parted by space, and by their ground only
  * where it means something: the paper, or a band from edge to edge in warm sand
- * (`alt`: information that belongs together), moss (`moss`: what is spoken in the
- * circle, the agreements and the voices) or forest (`dark`: what draws you in).
+ * (`alt`: information that belongs together) or forest (`dark`: what draws you in
+ * and what is spoken in the circle).
  * Each ground re-declares the colour roles (`surface-*` in theme.css), so
  * everything inside follows it. A section clips what bleeds out of it.
  */
 
-type Ground = 'default' | 'alt' | 'moss' | 'dark';
+type Ground = 'default' | 'alt' | 'dark';
 type Space = 'default' | 'band' | 'none';
 
 interface Props {
@@ -27,7 +27,6 @@ interface Props {
 const GROUNDS: Record<Ground, string> = {
   default: '',
   alt: 'surface-alt',
-  moss: 'surface-moss',
   dark: 'surface-dark',
 };
 
