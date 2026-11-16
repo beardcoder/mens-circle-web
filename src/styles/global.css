@@ -157,7 +157,8 @@
    tied to the scroll itself: the tailwind-animations utilities `timeline-view
    animate-blurred-fade-in animate-range-[entry_10%_contain_12%]`, so a piece starts
    to show once a tenth of it is in the window and stands clear when it has come
-   about an eighth of the way up. Scrolling back, it leaves the same way. No script:
+   about an eighth of the way up; on a phone it arrives later, in the lower middle
+   of the window (`cover 10% cover 38%`). Scrolling back, it leaves the same way. No script:
    the pieces are taken from the markup (titles, paragraphs, list rows, figures,
    questions, links and buttons that stand alone) plus whatever a component marks
    with `data-reveal` or `data-reveal-group`; where pieces nest, only the outermost
@@ -224,6 +225,13 @@
           *
       ) {
       @apply timeline-view animate-blurred-fade-in animate-range-[entry_10%_contain_12%];
+
+      /* On a phone the thumb scrolls fast and the lowest quarter of the window is
+         passed in a moment: there a piece arrives in the lower middle instead
+         (from about 88 % of the window's height down to about 55 %). */
+      @media (width < 48rem) {
+        animation-range: cover 10% cover 38%;
+      }
 
       #footer & {
         animation-range: entry 0% entry 100%;
