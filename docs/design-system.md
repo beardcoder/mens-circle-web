@@ -236,7 +236,8 @@ animate-range-[entry_10%_contain_12%]` (a CSS-only Tailwind v4 package, imported
   title's words rise, then the lead, the actions and the next date fade up, and a
   photograph settles from 1.05 (it is never hidden: it is the LCP). CSS only
   (global.css, "The opening").
-- **The statement turns to ink** word by word as it crosses the window, its strong
+- **The statement turns to ink** word by word as it crosses the window, from half
+  the ink (≥ 3:1, large text) to full, its strong
   word to the accent, and back on the way up (`data-statement`: one view timeline,
   each word a slice of it by its index). The page's one scroll-led moment; whole
   and in full ink without view timelines or under reduced motion.
