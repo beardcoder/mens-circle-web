@@ -229,9 +229,9 @@ it for, does it stay under 300 ms, does it help what is being read):
 - **Arriving.** Every piece below a page's opening fades in out of a blur as it is
   scrolled into the window, tied to the scroll itself: the `tailwind-animations`
   utilities `timeline-view animate-blurred-fade-in
-animate-range-[entry_10%_contain_30%]` (a CSS-only Tailwind v4 package, imported
+animate-range-[entry_10%_contain_12%]` (a CSS-only Tailwind v4 package, imported
   in `global.css`). A piece starts to show once a tenth of it is in the window and
-  stands clear when it has come nearly a third of the way up; scrolling back, it
+  stands clear when it has come about an eighth of the way up; scrolling back, it
   leaves the same way. There is no script: `global.css` ("Arriving") applies the
   classes to titles, paragraphs, list rows, figures, questions and lone links and
   buttons, plus whatever a component marks with `data-reveal` or

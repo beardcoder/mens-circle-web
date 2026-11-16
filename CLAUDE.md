@@ -319,7 +319,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `::after`, two composited layers on paths of their own); what lies
   below a page's opening, every piece of it, fading in out of a blur as it is
   scrolled into the window (`global.css`, "Arriving": `timeline-view
-animate-blurred-fade-in animate-range-[entry_10%_contain_30%]` from
+animate-blurred-fade-in animate-range-[entry_10%_contain_12%]` from
   `tailwind-animations`, applied in CSS to titles, paragraphs, rows, figures and
   lone links plus `data-reveal` / `data-reveal-group`, the outermost piece only;
   tied to the scroll, so it leaves the same way on the way back; no script; a
