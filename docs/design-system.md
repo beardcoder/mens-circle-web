@@ -376,9 +376,10 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   the evening's course as rows between lines (`Zeit` stands in the head on phones,
   where the registration follows the title), the calendar; the evening's description
   (sand); the map; where next.
-- **Personal page.** `PageIntro` with the photograph in a circle cut by the right
-  edge, sections with their headings in the margin, values as rows, the
-  FAQ, one closing invitation.
+- **Personal page.** `PageIntro` with the photograph (the poster opening), then
+  sections set like the home page's: the title at section size crossing from the
+  margin, the text on the reading line; the values as rows on sand; the FAQ; one
+  closing invitation on sand.
 - **Legal pages, testimonial form, 404.** `PageIntro` and one column.
 - **Admin.** The same tokens at night: forest grounds, rounded cards, the gold for the
   one action.
