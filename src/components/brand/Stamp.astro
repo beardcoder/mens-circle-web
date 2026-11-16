@@ -20,9 +20,10 @@ const { text = `${site.siteName} · Raum ${site.geo.locality} · `, class: class
 const id = `stamp-${crypto.randomUUID().slice(0, 8)}`;
 const radius = 78;
 const circumference = 2 * Math.PI * radius;
-/** As often as the words fit round the ring at a readable spacing (about 7.4 units a letter). */
+/** As often as the words fit round the ring at a readable spacing (about 7.4 units a letter).
+ *  A no-break space closes the ring, so the last dot has the same gap on both sides. */
 const once = text.toUpperCase();
-const words = once.repeat(Math.max(1, Math.floor(circumference / (once.length * 7.4)))).trim();
+const words = `${once.repeat(Math.max(1, Math.floor(circumference / (once.length * 7.4)))).trim()}\u00a0`;
 ---
 
 <span aria-hidden="true" class:list={['relative block aspect-square', className]}>
