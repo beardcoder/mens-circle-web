@@ -33,3 +33,4 @@ output/playwright/
 # brand templates, rendered (bun run brand:render)
 /brand/out/
 /brand/.dist/
+.taste-skill/

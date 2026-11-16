@@ -6,11 +6,14 @@ import Container from './ui/Container.astro';
 import Eyebrow from './ui/Eyebrow.astro';
 
 /**
- * The compact opening of a sub-page, on the page's paper: label, title, lead
- * (slot `lead`) and any actions (default slot) on the reading line; a photograph
- * (slot `media`) beside them from `lg`, under them on phones. A long word in the
- * title ("Datenschutzerklärung") hyphenates rather than overflows. It stands
- * still: a page change is a fade (global.css, "Page transitions").
+ * The opening of a sub-page. Without a photograph: on the page's paper, label,
+ * title, lead (slot `lead`) and any actions (default slot) on the reading line,
+ * the stamp cut by the window's right edge. With a photograph (slot `media`, an
+ * image that fills its parent): the home page's poster opening, on the forest and
+ * one screen tall, the photograph without a frame in the upper right and the
+ * title at poster size across its foot; the page then sets `overHero` on its
+ * layout. A long word in the title hyphenates rather than overflows. It arrives
+ * once on load (global.css, "The opening").
  */
 interface Props {
   eyebrow?: string;
@@ -23,19 +26,34 @@ const { eyebrow, title, id, titleId } = Astro.props;
 
 const words = splitText(title);
 
-const titleClass = 'max-w-[11em] text-page font-semibold text-fg wrap-anywhere hyphens-auto';
-
 const hasLead = Astro.slots.has('lead');
 const hasAction = Astro.slots.has('default');
 const hasMedia = Astro.slots.has('media');
+
+const titleClass = hasMedia
+  ? 'max-w-[10.4em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto lg:text-[clamp(5.625rem,8.6vw,9.5rem)]'
+  : 'max-w-[11em] text-page font-semibold text-fg wrap-anywhere hyphens-auto';
 ---
 
 <section
   id={id}
+  data-opening
   aria-labelledby={titleId}
-  class="relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group"
+  class:list={[
+    'relative overflow-clip',
+    hasMedia
+      ? 'surface-dark flex min-h-[78svh] flex-col justify-end lg:min-h-svh pt-[calc(var(--spacing-header)+10rem)] pb-8 lg:pb-14'
+      : 'pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group',
+  ]}
 >
-  {!hasMedia && (
+  {hasMedia ? (
+    <div
+      data-hero-frame
+      class="absolute inset-x-0 top-0 h-[60svh] overflow-clip lg:inset-y-0 lg:left-auto lg:h-auto lg:w-[62vw]"
+    >
+      <slot name="media" />
+    </div>
+  ) : (
     /* The stamp, where a photograph would stand: cut by the window's right edge. */
     <div
       aria-hidden="true"
@@ -45,8 +63,8 @@ const hasMedia = Astro.slots.has('media');
       <Stamp />
     </div>
   )}
-  <Container class:list={['relative grid', hasMedia && 'items-center gap-x-grid gap-y-10 lg:grid-cols-12']}>
-    <div class:list={['grid justify-items-start', hasMedia && 'lg:col-span-7']}>
+  <Container class="relative grid">
+    <div class="grid justify-items-start">
       {eyebrow && (
         <Eyebrow class="mb-4" data-enter>
           {eyebrow}
@@ -64,10 +82,5 @@ const hasMedia = Astro.slots.has('media');
         </div>
       )}
     </div>
-    {hasMedia && (
-      <div data-enter="settle" class="lg:col-span-4 lg:col-start-9 lg:bleed-r lg:translate-x-[8%]">
-        <slot name="media" />
-      </div>
-    )}
   </Container>
 </section>

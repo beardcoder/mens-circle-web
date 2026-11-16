@@ -29,6 +29,7 @@ const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
   ogImageWidth={1200}
   ogImageHeight={630}
   ogImageAlt="Markus Sommer, der den Männerkreis in Straubing leitet"
+  overHero
   publishedTime="2026-06-20"
   modifiedTime="2026-10-21"
   schemas={[
@@ -58,22 +59,18 @@ const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
       Arbeit, Familie und Verantwortung nehmen viel Zeit ein. Für Gespräche darüber, wie es einem damit geht, bleibt oft
       wenig Gelegenheit. Im Männerkreis können wir uns diese Zeit nehmen.
     </Fragment>
-    <figure slot="media">
-      <Image
-        src={photo}
-        alt="Markus Sommer sitzt auf einem Felsen und blickt im Abendlicht über eine bewaldete Hügellandschaft."
-        layout="constrained"
-        width={800}
-        height={800}
-        position="left"
-        loading="eager"
-        fetchpriority="high"
-        class="block aspect-square w-full rounded-full object-cover"
-      />
-      <figcaption class="mt-4 text-marginal font-medium text-fg-muted">
-        Markus Sommer begleitet den Männerkreis in Straubing.
-      </figcaption>
-    </figure>
+    <Image
+      slot="media"
+      data-hero-photo
+      src={photo}
+      alt="Markus Sommer sitzt auf einem Felsen und blickt im Abendlicht über eine bewaldete Hügellandschaft."
+      layout="constrained"
+      width={1024}
+      height={1024}
+      loading="eager"
+      fetchpriority="high"
+      class="absolute inset-0 size-full object-cover object-[35%_20%] lg:object-[40%_30%]"
+    />
   </PageIntro>
   <TextSection anchor="warum-mir-diese-gespr-che-wichtig-sind" title="Warum mir diese Gespräche wichtig sind">
     <p>

@@ -1,5 +1,5 @@
 ---
-import { margin } from '@lib/ui';
+import { label, margin } from '@lib/ui';
 
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
@@ -11,14 +11,16 @@ interface Props {
   title: string;
   questionsLabel: string;
   questions: string[];
-  close: string;
+  /** The label of the facts in the `facts` slot (`Fact` items), the section's last row. */
+  factsLabel: string;
 }
 
-const { anchor, eyebrow, title, questionsLabel, questions, close } = Astro.props;
+const { anchor, eyebrow, title, questionsLabel, questions, factsLabel } = Astro.props;
 ---
 
 {/* The title starts in the margin and runs into the content; the questions of the
-    first round stand in the margin as quiet notes, the text beside them. */}
+    first round stand in the margin as quiet notes, the text beside them. The facts
+    of an evening close the section as one row: too short for a section of their own. */}
 <Section id={anchor} labelledby="ueber-title">
   <div class:list={[margin.grid, 'gap-y-10']}>
     <SectionHead eyebrow={eyebrow} title={title} titleId="ueber-title" class={margin.cross} />
@@ -41,7 +43,11 @@ const { anchor, eyebrow, title, questionsLabel, questions, close } = Astro.props
       <Prose>
         <slot />
       </Prose>
-      {close && <p class="mt-8 max-w-measure font-display text-sub text-accent">{close}</p>}
     </div>
+
+    <h3 class:list={[label, margin.side, 'mt-6 max-lg:order-last lg:mt-16 lg:pt-5']}>{factsLabel}</h3>
+    <dl class:list={[margin.content, 'grid grid-cols-2 gap-x-grid gap-y-8 max-lg:order-last lg:mt-16 lg:grid-cols-4']}>
+      <slot name="facts" />
+    </dl>
   </div>
 </Section>

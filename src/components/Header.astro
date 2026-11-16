@@ -11,7 +11,7 @@ import Container from './ui/Container.astro';
 /**
  * The bar, 72px: the mark on the left; from `nav` (1100px) the five content links
  * and the one filled action on the right, below that the action and a menu
- * button. Over the home opening (`over-hero:`) it starts clear with light text
+ * button. Over a forest opening (the home page, the personal page; `over-hero:`) it starts clear with light text
  * and turns to the page's opaque paper once the page moves (`data-scrolled`, set
  * by its script); elsewhere it is paper from the start. The phone menu is
  * a native modal `<dialog>`: Escape closes it, the focus returns to the button.
@@ -43,7 +43,7 @@ const isCurrentPage = (url: string): boolean => {
 
 // A line slides in under a link from its start edge on hover and focus.
 const linkClass =
-  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-[current=page]:text-accent aria-[current=page]:after:scale-x-100';
+  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-[current=page]:text-accent aria-[current=page]:after:scale-x-100 [[data-over-hero]:not([data-scrolled])_&]:aria-[current=page]:text-spark';
 
 /** What you press is round. */
 const roundButton =

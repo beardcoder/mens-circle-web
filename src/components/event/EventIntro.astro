@@ -47,9 +47,10 @@ const facts = [
 ];
 ---
 
-{/* The opening stands still; once the title has scrolled under the bar, the dock
+{/* The opening arrives once on load (global.css, "The opening"); once the title has scrolled under the bar, the dock
      shows it (EventDock). */}
 <section
+  data-opening
   aria-labelledby="event-title"
   class="@container pt-[calc(var(--spacing-header)+1.25rem)] pb-band lg:pt-[calc(var(--spacing-header)+2.75rem)]"
 >
@@ -114,7 +115,7 @@ const facts = [
       <div
         data-enter
         style="--enter-delay: 0.32s"
-        class="min-w-0 max-lg:order-1 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1"
+        class="min-w-0 max-lg:order-1 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:-mt-[calc(4rem+1px)] lg:-mb-band lg:grid lg:self-stretch"
       >
         <slot />
       </div>

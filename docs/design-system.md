@@ -244,9 +244,14 @@ animate-range-[entry_10%_contain_12%]` (a CSS-only Tailwind v4 package, imported
   piece itself. What stands in the lower third of the window when a page loads is
   still coming in. Browsers without view timelines, reduced motion and print show
   everything as it is.
-- **The opening's photograph comes closer** as the opening leaves the window
-  (`hero-photo-leave` on the opening's view timeline: from its lower edge, sinking
-  12px, to 1.06), the one piece tied to the scroll besides the two bars.
+- **Every opening arrives** once on load, in about a second (`data-opening`): the
+  title's words rise, then the lead, the actions and the next date fade up, and a
+  photograph settles from 1.05 (it is never hidden: it is the LCP). CSS only
+  (global.css, "The opening").
+- **The statement turns to ink** word by word as it crosses the window, its strong
+  word to the accent, and back on the way up (`data-statement`: one view timeline,
+  each word a slice of it by its index). The page's one scroll-led moment; whole
+  and in full ink without view timelines or under reduced motion.
 - **The stamp turns.** Its ring of words turns once in two minutes, linear.
 - **The mark turns a quarter** on the spring when the logo is hovered.
 - **The dark ground moves.** The pools of light on every dark ground (opening,
@@ -310,7 +315,7 @@ Native cross-document view transitions (global.css, "Page transitions"): the two
 pages cross-fade (`plus-lighter`, 220 ms, linear, one duration for both halves, so
 their opacities always sum to 1 and nothing sags grey). Only opacity moves, on the
 compositor; no group animates, nothing is named and no script takes part. The page
-that arrives does not move: no rise, no settle. A browser without cross-document
+that arrives does not move beyond its opening's one arrival. A browser without cross-document
 transitions simply loads the page. The boot script in the head sets only the colour
 mode before the first paint. Third-party scripts load `async`, so nothing queues in
 front of the page's own.
@@ -360,17 +365,23 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
 
 ## Compositions
 
-- **Home.** The opening on the forest: the statement at poster size (its phrase in
-  the spark), the explanation, the one action and the next date; the photograph in
-  its ring cut by the window's right edge, the next evening's seat ring on a disc
-  overlapping it. Then: the facts in the content column beside their label (paper);
-  the intro, its title crossing into the content, the first round's questions in
-  the margin; the course on sand, each step with its index number in the margin;
-  the five agreements on the forest as rows across the page, numbers in the spark;
-  taking part (`#termine`, sand, "Dabei sein." as a poster word beside the next
-  date); Markus, one sentence of his under a rule, signed with his face; the voices on
-  the forest; the FAQ with the contact line in the margin; staying in touch on the
-  forest with the stamp cut by the right edge, running into the footer.
+- **Home.** The opening on the forest, set like a poster: the photograph without a
+  frame in the upper right, up to the window's edges, running softly into the
+  ground towards the left and its foot (a mask, `data-hero-frame`); the statement
+  at poster size (its phrase in the spark) across the whole width and over the
+  photograph's foot, the one overlap here; under it one row on the grid, the
+  explanation and the one action on the left, the next date as open lines on the
+  right. On a phone the photograph fills the top and the statement crosses its
+  foot. Then: the intro,
+  its title crossing into the content, the first round's questions in the margin,
+  the four facts as its last row; the statement on a screen of its own (`Statement`);
+  the course on sand, each step with its index number in the margin; the five
+  agreements on the forest as rows across the page, numbers in the spark; Markus,
+  one sentence of his under a rule, signed with his face; the voices on the forest;
+  the FAQ with the contact line in the margin; taking part (`#termine`, sand,
+  "Dabei sein." as a poster word beside the next date); staying in touch on the
+  forest with the stamp cut by the right edge, running into the footer. Open and
+  wide throughout: no box or card.
 - **`/event`.** `PageIntro` with the stamp, every coming date as `EventSummary`
   beside the e-mail notification; the FAQ; a where-next band.
 - **Event page.** The date at a subheading's size over the title (the date tells one

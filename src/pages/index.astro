@@ -10,7 +10,6 @@ import circle960 from '../assets/images/markus-kreis-960.avif';
 import ActionBar from '../components/blocks/ActionBar.astro';
 import Dates from '../components/blocks/Dates.astro';
 import Fact from '../components/blocks/Fact.astro';
-import Facts from '../components/blocks/Facts.astro';
 import Faq from '../components/blocks/Faq.astro';
 import Frame from '../components/blocks/Frame.astro';
 import Hero from '../components/blocks/Hero.astro';
@@ -19,6 +18,7 @@ import JourneyStep from '../components/blocks/JourneyStep.astro';
 import JourneySteps from '../components/blocks/JourneySteps.astro';
 import Moderator from '../components/blocks/Moderator.astro';
 import Newsletter from '../components/blocks/Newsletter.astro';
+import Statement from '../components/blocks/Statement.astro';
 import Testimonials from '../components/blocks/Testimonials.astro';
 import AccordionItem from '../components/ui/AccordionItem.astro';
 import Layout from '../layouts/Layout.astro';
@@ -53,28 +53,8 @@ if (events && testimonials) {
     <Fragment slot="title">
       Ein Abend, an dem du <em>nichts darstellen</em> musst.
     </Fragment>
-    Wir sitzen im Kreis und sprechen über das, was uns gerade beschäftigt. Die anderen hören zu, ohne zu bewerten oder
-    Ratschläge zu geben. Je nach Abend kommen einfache Atem- und Körperübungen dazu. Du entscheidest, ob du mitmachst.
+    Wir sitzen im Kreis und sprechen über das, was uns gerade beschäftigt. Die anderen hören zu, ohne zu bewerten.
   </Hero>
-
-  <Facts anchor="praktisches" eyebrow="Auf einen Blick">
-    <Fact label="Wo">
-      <Fragment slot="value">{events?.next?.place || site.geo.locality}</Fragment>
-      Adresse und Anfahrt stehen beim jeweiligen Termin
-    </Fact>
-    <Fact label="Wie oft">
-      <Fragment slot="value">{'Alle 2–\u20604\u00a0Wochen'}</Fragment>
-      Ohne Mitgliedschaft. Du kommst, wann es dir passt.
-    </Fact>
-    <Fact label="Dauer">
-      <Fragment slot="value">2–3 Stunden</Fragment>
-      {events?.next?.timeRange ? `z.\u00a0B. ${events.next.timeRange}` : 'Ein Abend, kein Seminar'}
-    </Fact>
-    <Fact label="Beitrag">
-      <Fragment slot="value">{events?.fee.main || 'Spendenbasis'}</Fragment>
-      {events?.fee.note ?? 'Du gibst, was für dich machbar ist'}
-    </Fact>
-  </Facts>
 
   <Intro
     anchor="ueber"
@@ -86,7 +66,7 @@ if (events && testimonials) {
       'Was läuft gut, was kostet dich Kraft?',
       'Was schiebst du schon länger vor dir her?',
     ]}
-    close="Einen besonderen Grund zu kommen brauchst du nicht. Manchmal reicht Neugier."
+    factsLabel="Auf einen Blick"
   >
     <p>
       Arbeit, Familie, Beziehung und Verantwortung beschäftigen uns im Alltag. Vieles machen wir mit uns selbst aus.
@@ -96,7 +76,29 @@ if (events && testimonials) {
       Im Kreis geht es auch um das, was sonst keinen Platz hat. Fertige Antworten brauchst du dafür nicht. Es reicht,
       den anderen zuzuhören und ehrlich zu erzählen, wenn du dran bist.
     </p>
+    <Fragment slot="facts">
+      <Fact label="Wo">
+        <Fragment slot="value">{events?.next?.place || site.geo.locality}</Fragment>
+        Adresse und Anfahrt stehen beim jeweiligen Termin
+      </Fact>
+      <Fact label="Wie oft">
+        <Fragment slot="value">{'Alle 2–\u20604\u00a0Wochen'}</Fragment>
+        Ohne Mitgliedschaft. Du kommst, wann es dir passt.
+      </Fact>
+      <Fact label="Dauer">
+        <Fragment slot="value">2–3 Stunden</Fragment>
+        {events?.next?.timeRange ? `z.\u00a0B. ${events.next.timeRange}` : 'Ein Abend, kein Seminar'}
+      </Fact>
+      <Fact label="Beitrag">
+        <Fragment slot="value">{events?.fee.main || 'Spendenbasis'}</Fragment>
+        {events?.fee.note ?? 'Du gibst, was für dich machbar ist'}
+      </Fact>
+    </Fragment>
   </Intro>
+
+  <Statement>
+    Einen besonderen Grund zu kommen brauchst du nicht. Manchmal reicht <em>Neugier.</em>
+  </Statement>
 
   <JourneySteps
     anchor="reise"
@@ -159,13 +161,6 @@ if (events && testimonials) {
     boundaryText={
       'Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Es gibt im Kreis keine Lehre und kein festes Bild davon, wie ein Mann zu sein hat.'
     }
-  />
-
-  <Dates
-    events={events}
-    anchor="termine"
-    lede={'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin.'}
-    title="Dabei sein."
   />
 
   <Moderator
@@ -244,6 +239,13 @@ if (events && testimonials) {
       unter den Anwesenden, keine Garantie. Wie viel du erzählst, entscheidest deshalb immer du.
     </AccordionItem>
   </Faq>
+
+  <Dates
+    events={events}
+    anchor="termine"
+    lede={'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin.'}
+    title="Dabei sein."
+  />
 
   <Newsletter
     title="Termine per E‑Mail erhalten"

@@ -37,34 +37,60 @@ const nextLine = next
   : null;
 ---
 
-{/* The opening, from edge to edge on the forest, one screen tall from `lg` (taller only
-     where the window is too short for it): the statement as large as a poster,
-     its phrase in the spark; beside it the photograph in a circle, cut by the window's
-     right edge (the bleed), and the next evening's seat ring overlapping it. The
-     opening stands still; only the seat ring's taken chairs fill in (global.css,
-     "The opening"). */}
+{/* The opening, on the forest and one screen tall (taller only where the window is
+     too short for it), set like a poster: the photograph without a frame in the upper
+     right, up to the window's edges and running softly into the ground towards the
+     left and the foot (global.css, "The opening"); across the whole width and over
+     the photograph's foot the statement at poster size, the one move that breaks the
+     grid here; under it one row on the grid, the explanation and the action on the
+     left, the next evening as open lines on the right. On a phone the photograph
+     fills the top, the statement crosses its foot, the rest follows. The opening
+     arrives once on load. */}
 <section
   data-hero
+  data-opening
   aria-labelledby="hero-title"
-  class="surface-dark relative overflow-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-section lg:grid lg:min-h-svh lg:content-center lg:pb-band"
+  class="surface-dark relative flex min-h-svh flex-col justify-end overflow-clip pt-[calc(var(--spacing-header)+10rem)] pb-8 lg:pb-14"
 >
-  <Container class="relative grid items-start gap-x-grid gap-y-16 lg:grid-cols-12">
-    <div class="grid min-w-0 justify-items-start lg:col-span-9">
+  {/* The photograph: it settles once on load and is never hidden. */}
+  <div
+    data-hero-frame
+    class="absolute inset-x-0 top-0 h-[60svh] overflow-clip lg:inset-y-0 lg:left-auto lg:h-auto lg:w-[62vw]"
+  >
+    <img
+      data-hero-photo
+      src={largest.src}
+      srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
+      sizes="(min-width: 64rem) 62vw, 100vw"
+      width={largest.width}
+      height={largest.height}
+      alt={imageAlt}
+      fetchpriority="high"
+      decoding="async"
+      class="absolute inset-0 size-full object-cover object-[35%_20%] lg:object-[40%_30%]"
+    />
+  </div>
+
+  <Container class="relative grid gap-x-grid lg:grid-cols-12">
+    <div class="min-w-0 lg:col-span-12">
       {kicker && (
-        <Eyebrow class="mb-6" data-enter>
+        <Eyebrow class="mb-4 lg:mb-6" data-enter>
           {kicker}
         </Eyebrow>
       )}
       <h1
         id="hero-title"
         data-enter="words"
-        class="max-w-[11em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto [&_em]:text-spark"
+        class="max-w-[10.4em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto lg:text-[clamp(5.625rem,8.6vw,9.5rem)] [&_em]:text-spark"
         set:html={title.html}
       />
-      <p data-enter style={beat(0)} class="mt-7 max-w-measure text-lg text-fg-soft">
+    </div>
+
+    <div class="mt-6 grid min-w-0 content-start justify-items-start lg:col-span-6 lg:mt-10">
+      <p data-enter style={beat(0)} class="max-w-[30rem] text-lg text-fg-soft">
         <slot />
       </p>
-      <div data-enter style={beat(1)} class="mt-10 flex w-full flex-wrap items-center gap-x-8 gap-y-3">
+      <div data-enter style={beat(1)} class="mt-6 flex w-full flex-wrap items-center gap-x-8 gap-y-1 lg:mt-8">
         <a
           href={action.href}
           class:list={[button({ size: 'lg' }), 'max-sm:w-full sm:min-w-56']}
@@ -84,69 +110,45 @@ const nextLine = next
           </span>
         </a>
       </div>
+    </div>
 
-      {nextLine && (
-        <a
-          href={action.href}
-          data-enter
-          style={beat(2)}
-          class="group/next mt-14 grid w-full max-w-md gap-3"
-          data-umami-event="cta-click"
-          data-umami-event-location="home-hero-date"
+    {nextLine && (
+      /* The next evening, open under a thin rule: the whole block is the link. */
+      <a
+        href={action.href}
+        data-enter
+        style={beat(2)}
+        class="group/next mt-5 grid min-w-0 content-start gap-1 self-end border-t border-line-strong pt-4 lg:col-span-4 lg:col-start-9 lg:mt-10 lg:pt-5"
+        data-umami-event="cta-click"
+        data-umami-event-location="home-hero-date"
+      >
+        <span class={label}>Nächster Termin</span>
+        <time
+          datetime={nextLine.datetime}
+          class="font-display text-sub text-fg transition-colors duration-180 group-hover/next:text-accent"
         >
-          <span class={label}>Nächster Termin</span>
-          <span class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <time
-              datetime={nextLine.datetime}
-              class="font-display text-sub text-fg transition-colors duration-180 group-hover/next:text-accent"
-            >
-              {nextLine.date.map((line) => (
-                <span class="max-sm:block">{line} </span>
-              ))}
-            </time>
-            <span class="text-sm text-fg-muted">{nextLine.meta}</span>
-          </span>
-          <span class="text-sm text-fg-muted">{nextLine.seats}</span>
+          {nextLine.date.join(' ')}
+        </time>
+        <span class="text-sm text-fg-muted">
+          {nextLine.meta}
+          <span class="xl:hidden"> · {nextLine.seats}</span>
+        </span>
+        {next?.view.seats && (
+          <SeatRing seats={next.view.seats} text={nextLine.seats} size="sm" class="mt-2 max-xl:hidden" />
+        )}
+      </a>
+    )}
+    {events && !next && (
+      <p
+        data-enter
+        style={beat(2)}
+        class="mt-5 min-w-0 self-end border-t border-line-strong pt-4 text-base text-fg-muted lg:col-span-4 lg:col-start-9 lg:mt-10 lg:pt-5"
+      >
+        Der nächste Abend ist in Planung.{' '}
+        <a href="/event#benachrichtigung" class="font-semibold text-accent underline underline-offset-4">
+          Über neue Termine informieren
         </a>
-      )}
-      {events && !next && (
-        <p data-enter style={beat(2)} class="mt-14 max-w-md text-base text-fg-muted">
-          Der nächste Abend ist in Planung.{' '}
-          <a href="/event#benachrichtigung" class="font-semibold text-accent underline underline-offset-4">
-            Über neue Termine informieren
-          </a>
-        </p>
-      )}
-    </div>
+      </p>
+    )}
   </Container>
-
-  {/* The photograph: under the text on phones; from `lg` beside the title, as large as
-      a third of the window and cut by its right edge. */}
-  <div class="relative mx-auto mt-16 w-[calc(100%-2*var(--spacing-gutter))] max-w-[22rem] sm:max-w-[28rem] lg:absolute lg:top-[calc(50%+var(--spacing-header)/2)] lg:right-0 lg:mt-0 lg:w-[min(36vw,54svh)] lg:max-w-[40rem] lg:translate-x-[16%] lg:-translate-y-1/2">
-    <div data-hero-photo class="relative">
-      <div data-enter="settle" class="relative">
-        <img
-          src={largest.src}
-          srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
-          sizes="(min-width: 64rem) min(36vw, 40rem), (min-width: 36rem) 28rem, 22rem"
-          width={largest.width}
-          height={largest.height}
-          alt={imageAlt}
-          fetchpriority="high"
-          decoding="async"
-          class="aspect-square w-full rounded-full object-cover"
-        />
-      </div>
-      {next?.view.seats && (
-        /* The next evening's chairs, on a disc of the forest, overlapping the circle's edge. */
-        <div
-          data-enter
-          style={beat(2)}
-          class="absolute -bottom-6 -left-4 rounded-full bg-surface p-3 sm:-left-overlap lg:-bottom-overlap"
-        >
-          <SeatRing seats={next.view.seats} text={nextLine?.seats ?? ''} size="lg" layout="none" />
-        </div>
-      )}
-    </div>
-  </div>
 </section>

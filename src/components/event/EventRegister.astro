@@ -48,9 +48,10 @@ const field = (name: string) => ({
 <div
   id="anmeldung"
   class:list={[
-    // Square and open: below lg a dark band from edge to edge; beside the intro it runs out to the
-    // window's right edge (the section is the container that 100cqw measures).
-    'surface-dark min-w-0 scroll-mt-14 scheme-dark p-panel max-lg:-mx-gutter max-lg:px-gutter lg:-mr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))] lg:pr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))]',
+    // Open, a ground and not a box: below lg a dark band from edge to edge; beside the intro it runs
+    // from under the bar to the opening's foot and out to the window's right edge (EventIntro lets it
+    // out of the grid; the section is the container that 100cqw measures).
+    'surface-dark min-w-0 scroll-mt-14 scheme-dark p-panel max-lg:-mx-gutter max-lg:px-gutter lg:pt-[calc(var(--spacing-panel)+4rem)] lg:-mr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))] lg:pr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))]',
   ]}
 >
   {event.isPast ? (

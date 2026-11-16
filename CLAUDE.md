@@ -300,21 +300,34 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   with the print templates), `PageIntro`, `SectionHead`, `Poster`, `Index`,
   `Marginal`, `Eyebrow`, `Fact`, `Button`, `Field` + `FormStatus`,
   `TestimonialList`, `Accordion`. Use them; do not restyle a copy.
-- Home: the forest opening (statement at poster size, the one action, the next
-  date; the photograph cut by the right edge, the seat ring overlapping it; the bar's
-  action outlined over it), facts, intro (questions in the margin), course (sand,
-  index numbers), agreements (forest), taking part (`#termine`, "Dabei sein." as a
-  poster word), Markus (one sentence of his under a rule), voices (forest, every
-  voice in full), FAQ, staying in touch (forest, the stamp), the footer.
+- Home: the forest opening, one screen tall, set like a poster and without a frame
+  (the photograph in the upper right up to the window's edges, running softly into
+  the ground towards the left and its foot, `data-hero-frame`; the statement at
+  poster size across the whole width and over the photograph's foot, the one
+  overlap here; under it one row on the grid: explanation and the one action on
+  the left, the next date as open lines on the right; on a phone the photograph
+  fills the top and the statement crosses its foot; the bar's action outlined
+  over it), intro
+  (questions in the margin, the four facts as its last row), the statement on a
+  screen of its own (`Statement`, the page's one scroll-led moment), course (sand,
+  index numbers), agreements (forest), Markus (one sentence of his under a rule),
+  voices (forest, every voice in full), FAQ, taking part (`#termine`, "Dabei
+  sein." as a poster word), staying in touch (forest, the stamp), the footer.
+  Open and wide: no box or card on a public page, the opening included.
+- Sub-pages open with `PageIntro`: on paper with the stamp, or, given a photograph
+  (the personal page), as the home page's poster opening on the forest (`overHero`
+  on the layout). Section titles are `text-section` everywhere on the home page.
 - Header 72px: links from `nav`, one action; over the home opening clear with light
   text until the page moves (`data-scrolled`), then 95 % paper; fixed bars blur only
   from `lg` on a hovering pointer. The phone menu is a native modal `<dialog>` on
   the forest, opening as a circle.
 - Motion (design-system.md, "Motion"): calm, and every piece has a reason. What
   moves: the change of page, a fade and nothing else (cross-document view
-  transitions, `@view-transition`; the opening of the page that arrives does not
-  rise or settle, it is there with the first paint and is the LCP; only the seat
-  ring's taken chairs fill in); the pools of light on every dark ground, wandering
+  transitions, `@view-transition`); every page's opening arriving once on load, in about a
+  second (`data-opening`: the title's words rise, the lead, actions and date fade
+  up, a photograph settles from 1.05 and is never hidden: it is the LCP; CSS
+  only, `global.css`, "The opening"; the seat ring's taken chairs fill in); the home statement turning to ink word by word as it crosses
+  the window (`data-statement`, one view timeline, each word a slice of it); the pools of light on every dark ground, wandering
   plainly but slowly (`pool-wander-a` / `-b` on `surface-dark::before` and
   `::after`, two composited layers on paths of their own); what lies
   below a page's opening, every piece of it, fading in out of a blur as it is
@@ -324,8 +337,7 @@ animate-blurred-fade-in animate-range-[entry_10%_contain_12%]` from
   lone links plus `data-reveal` / `data-reveal-group`, the outermost piece only;
   tied to the scroll, so it leaves the same way on the way back; no script; a
   page's opening, the fixed bars and dialogs are left alone, footer rows finish at
-  `entry 100%`); the opening's photograph
-  coming a little closer as the opening leaves; the stamp's ring of words turning
+  `entry 100%`); the stamp's ring of words turning
   once in two minutes; the mark turning a quarter when the logo is hovered; what
   answers the hand (buttons press to 0.97 in 150ms, links, the native `<details>`
   of the FAQ unfolding and fading, the phone menu, the calendar popover growing
@@ -340,7 +352,7 @@ animate-blurred-fade-in animate-range-[entry_10%_contain_12%]` from
   `tailwind-animations` for the package's classes): transforms and opacity (the
   arrival's blur is the one filter), CSS first, then WAAPI, no animation script, UI
   under 300ms,
-  the theme's own curves. Never add: a rise or slide on arriving at a page, a second
+  the theme's own curves. Never add: a rise or slide on arriving at a page other than its opening's one arrival, a second
   scroll-linked effect on the same piece, pinning or scroll-jacking,
   anything that follows the pointer, anything that starts invisible on the first
   screen. Under reduced motion
