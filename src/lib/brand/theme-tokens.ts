@@ -2,8 +2,8 @@
  * Reads the design tokens out of `src/styles/theme.css`, the one source of truth:
  * the primitives (`--p-*`), the colour roles with their light and dark values, the
  * type scale, space, sizes, radii, shadows and curves of the `@theme` block, and the
- * space per breakpoint on `:root`. The styleguide page and the token export
- * (`scripts/brand-export.ts`) use it, so neither keeps a copy that could drift.
+ * space per breakpoint on `:root`. The token export (`scripts/brand-export.ts`)
+ * and the brand tests use it, so neither keeps a copy that could drift.
  * Pure: give it the file's text. A declaration's trailing comment is its note.
  */
 
@@ -20,7 +20,7 @@ interface ColourValue {
   primitive: string | null;
 }
 
-export interface Colour {
+interface Colour {
   name: string;
   light: ColourValue;
   dark: ColourValue;
@@ -29,7 +29,7 @@ export interface Colour {
   note: string;
 }
 
-export interface TypeRole {
+interface TypeRole {
   name: string;
   size: string;
   lineHeight: string;

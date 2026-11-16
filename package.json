@@ -23,8 +23,7 @@
     "test:browser": "bun run build && bun --no-env-file scripts/check-browser.ts",
     "brand:export": "bun scripts/brand-export.ts",
     "brand:logo": "bun scripts/brand-logo.ts",
-    "brand:render": "bun scripts/brand-render.ts",
-    "brand": "bun run brand:export && bun run brand:logo && bun run brand:render"
+    "brand": "bun run brand:export && bun run brand:logo"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
@@ -59,7 +58,6 @@
     "tailwind-animations": "^1.0.2",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.0",
-    "uqr": "0.1.2"
+    "typescript-eslint": "^8.72.0"
   }
 }

@@ -1,4 +1,4 @@
-/** Colour arithmetic for the styleguide, the token export and the contrast test. Pure. */
+/** Colour arithmetic for the token export and the contrast test. Pure. */
 
 export const hexToRgb = (hex: string): [number, number, number] => [
   Number.parseInt(hex.slice(1, 3), 16),

@@ -22,7 +22,6 @@ bun run db:generate    # after editing src/lib/server/db/schema.ts
 bun run knip           # unused files, exports and dependencies
 bun run brand:export   # after editing theme.css: brand/tokens.json, tokens.css, palette.ase/.gpl
 bun run brand:logo     # after editing brand/logo/logo.svg: logo variants, favicons, mail marks
-bun run brand:render   # flyers, poster, card, posts, preview images → brand/out (docs/brand)
 ```
 
 Verify with `check` + `lint` + `format:check` + `test`; CI (`.github/workflows/ci.yml`)
@@ -141,12 +140,11 @@ worker, is revalidated on every load and goes after 2027-04-26 (docs/runtime.md)
 No live-site fetching, Markdown export or post-build patching is needed. The brand
 files are generated and committed (docs/brand/README.md): `brand/tokens.*` and
 `brand/palette.*` from `theme.css` (`brand:export`), every logo, favicon and mail
-mark from `brand/logo/logo.svg` (`brand:logo`), the preview images
-`public/images/og-*.png` from their templates (`brand:render --install`, then bump
-their `?v=`). Never hand-edit them; `tests/brand-export.test.ts` and
-`tests/brand-logo.test.ts` fail on drift. `brand/out/` and `brand/.dist/` are not
-committed. The template pages (`src/pages/brand/[template].astro`) exist only in a
-brand build (`BRAND_TEMPLATES=1`); a normal build has no `/brand/*`.
+mark from `brand/logo/logo.svg` (`brand:logo`). Never hand-edit them;
+`tests/brand-export.test.ts` and `tests/brand-logo.test.ts` fail on drift. The
+preview images `public/images/og-*.png` are plain committed files: the templates
+that rendered them are gone (as are the print templates and the styleguide);
+replace one by hand and bump its `?v=`.
 
 **Images.** On prerendered pages, Astro's `<Image />` straight from `astro:assets`, no
 wrapper component: `layout="constrained"` with `width`/`height` (Astro writes `srcset`
@@ -204,12 +202,10 @@ Keep the attribution line under the map.
 
 **Styling.** Tailwind v4 (`@tailwindcss/vite`), CSS-first. `styles/theme.css` holds the
 tokens, variants, surfaces, the bleed utilities and keyframes; `global.css` (public,
-one shared hashed file), `admin.css` and `print.css` (brand templates) are the three
-entries. The first two read classes from `src/` only (`source('..')`, so words in
-docs, mail templates and tests never become utilities) and skip server-only code;
-`global.css` keeps the admin and print sources out with `@source not`, `admin.css`
-the print and styleguide sources; `print.css` reads only the print, brand and ui
-components. Printing a page of the site (`@media print`) lives in `global.css`.
+one shared hashed file) and `admin.css` are the two entries. Both read classes
+from `src/` only (`source('..')`, so words in docs, mail templates and tests never
+become utilities) and skip server-only code; `global.css` keeps the admin sources
+out with `@source not`. Printing a page of the site (`@media print`) lives in `global.css`.
 The pieces of a page fade in out of a blur as they are scrolled in, with the
 `tailwind-animations` utilities (a CSS-only Tailwind v4 package, imported in
 `global.css`; its skill is vendored); the two scroll-linked bars use CSS view
@@ -226,9 +222,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 ## Design
 
-- `docs/design-system.md` is the reference, `/styleguide` the living one (read from
-  `theme.css` by `lib/brand/theme-tokens.ts`, real components; noindex, in the
-  browser check). The idea: the circle of chairs. A centre, things turned towards
+- `docs/design-system.md` is the reference. The idea: the circle of chairs. A centre, things turned towards
   each other, much air; poster-sized type where the site invites, calm reading where
   it explains. The look starts from the dark-botanical theme (ConardLi/garden-skills)
   and is earthier and warmer than it: at night a brown-black like dark soil with
@@ -257,7 +251,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   dates) or `dark`
   (`surface-dark`, the theme's near-black with its three wandering pools of light, its
   primitive still called `--p-forest`: opening, agreements, voices, registration,
-  menu, last band, footer). The site has these three grounds; `moss` stays for print. Grounds
+  menu, last band, footer). The site has these three grounds; `moss` is unused on the site. Grounds
   run from edge to edge; `Section` clips horizontally what bleeds.
 - Type: Cormorant variable, upright and italic (`font-display`, two files in
   `src/assets/fonts/`, local provider, from weight 500, figures lining via `lnum`;
@@ -296,9 +290,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   its one decoration), one label for one action, nothing invented.
 - Shared components: `EventSummary` (every date: date, facts, `SeatRing`, action;
   fed by `lib/shared/event-status.ts`), `SeatRing` (`lib/shared/seats.ts`:
-  `seatFill`, `seatDots`), `Stamp`, `Lockup`, `Qr` (`src/components/brand/`, shared
-  with the print templates), `PageIntro`, `SectionHead`, `Poster`, `Index`,
-  `Marginal`, `Eyebrow`, `Fact`, `Button`, `Field` + `FormStatus`,
+  `seatFill`, `seatDots`), `Stamp`, `Lockup` (`src/components/brand/`), `PageIntro`,
+  `SectionHead`, `Poster`, `Index`, `Eyebrow`, `Fact`, `Button`, `Field` + `FormStatus`,
   `TestimonialList`, `Accordion`. Use them; do not restyle a copy.
 - Home: the forest opening, one screen tall, set like a poster and without a frame
   (the photograph in the upper right up to the window's edges, running softly into
@@ -368,10 +361,8 @@ animate-blurred-fade-in animate-range-[entry_10%_contain_12%]` from
 - Page transitions are a native cross-document cross-fade (`@view-transition`,
   `plus-lighter`, one duration, linear). No `:has()` on `body` or `html`.
 - Styles live in the component's markup as utilities. `global.css` is one stylesheet
-  for every public page, so keep one-off arbitrary values few; the print templates
-  size everything in `cqw` of their sheet and may use arbitrary values freely.
-- A token the styleguide describes carries a trailing comment in `theme.css`; German
-  notes live in `lib/brand/notes.ts`.
+  for every public page, so keep one-off arbitrary values few.
+- A token carries a trailing comment in `theme.css` (the token export reads it).
 
 ## Conventions
 
@@ -393,8 +384,8 @@ animate-blurred-fade-in animate-range-[entry_10%_contain_12%]` from
   or press (Chromium), never `/admin`, `/auth` or `/api`. No Astro prefetch script and
   no per-link attributes.
 - Search: every public page is indexed and in the sitemap, the legal pages and
-  `/teile-deine-erfahrung` included; only `/admin`, `/auth/*` (redirect endpoints),
-  `/styleguide` (`noindex, follow`) and the 404 stay out (`noindex` on the admin and
+  `/teile-deine-erfahrung` included; only `/admin`, `/auth/*` (redirect endpoints)
+  and the 404 stay out (`noindex` on the admin and
   the 404). llms.txt lists the
   three content pages. An event held outside Straubing names its
   place in the `<title>` (≤ 60 chars, brand dropped first). Structured data states only

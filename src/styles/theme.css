@@ -4,10 +4,8 @@
  * with soft pools of light for what draws you in, bone paper for reading, one
  * accent, a terracotta gold, for the mark, the one thing to do and what is marked. Titles in Cormorant (the accent phrase in italic) beside calm running text
  * (IBM Plex Sans); open, full-bleed grounds, lines instead of boxes.
- * Shared by the three entry files: global.css (public site), admin.css (back
- * office) and print.css (brand templates). docs/design-system.md describes the
- * system; /styleguide shows it, read from this file: a token's trailing comment
- * is its description there.
+ * Shared by the two entry files: global.css (public site) and admin.css (back
+ * office). docs/design-system.md describes the system.
  */
 
 /* ── Variants ─────────────────────────────────────────────────────────────── */

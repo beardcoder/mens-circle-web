@@ -30,7 +30,4 @@ output/playwright/
 # Claude skills are vendored in .claude/skills/ (their sources in skills-lock.json),
 # so every session has them.
 
-# brand templates, rendered (bun run brand:render)
-/brand/out/
-/brand/.dist/
 .taste-skill/

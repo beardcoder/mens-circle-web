@@ -19,10 +19,7 @@ The grid is twelve columns and one edge. Four moves break it, and only these
 word. The circle is the one motif, in four forms: the mark, the seat ring (every
 chair of an evening on a ring), the stamp and the index number.
 
-The living reference is `/styleguide` (noindex): it reads `theme.css` through
-`lib/brand/theme-tokens.ts` and shows the real components, so it cannot drift.
-Everything that leaves the site (flyers, posts, preview images, logo files, token
-exports) is in [docs/brand/README.md](brand/README.md).
+Everything that leaves the site (logo files, token exports) is in [docs/brand/README.md](brand/README.md).
 
 ## Stance — hold the space, don't perform
 
@@ -70,14 +67,11 @@ facts and the FAQ, not in every section.
 | `src/styles/theme.css`          | Tokens (`@theme`), primitives, variants, the surfaces, the bleed utilities, keyframes, base rules. Shared. |
 | `src/styles/global.css`         | Public entry: Tailwind, theme, print of a page, page transitions, the FAQ, opening and scroll motion.      |
 | `src/styles/admin.css`          | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                           |
-| `src/styles/print.css`          | Brand templates entry (`src/components/print`, `src/pages/brand`), container units, no page margin.        |
 | `src/lib/ui.ts`                 | Class recipes: `button()`, `control()`, `link`, `label`, field and form states, `card`, `panel`, `margin`. |
-| `src/lib/brand/theme-tokens.ts` | Parses `theme.css` into tokens for the styleguide and the export.                                          |
-| `src/lib/brand/notes.ts`        | German notes per token for the styleguide.                                                                 |
+| `src/lib/brand/theme-tokens.ts` | Parses `theme.css` into tokens for the token export.                                                       |
 | `src/lib/shared/seats.ts`       | How full a circle is (`seatFill`) and where its chairs sit on the ring (`seatDots`).                       |
-| `src/components/ui/`            | Components on the recipes (`Section`, `SectionHead`, `Poster`, `Index`, `Marginal`, `Button`, `Field` …).  |
-| `src/components/brand/`         | The motifs, shared by site and print: `SeatRing`, `Stamp`, `Lockup`, `Qr`.                                 |
-| `src/components/styleguide/`    | What only the styleguide needs: `Swatch`, `TypeSpecimen`, `Example`, `DoDont`.                             |
+| `src/components/ui/`            | Components on the recipes (`Section`, `SectionHead`, `Poster`, `Index`, `Button`, `Field` …).              |
+| `src/components/brand/`         | The motifs: `SeatRing`, `Stamp`, `Lockup`.                                                                 |
 
 ## Colour
 
@@ -152,7 +146,7 @@ regular and semibold, ~23 kB each; the regular also serves 500, the semibold 700
 | `text-md`       | 17–19px  | running text (the body)                          |
 | `text-base`     | 16px     | controls, buttons, data                          |
 | `text-sm`/`xs`  | 14/13px  | labels, hints, captions / the small print        |
-| `text-marginal` | 14px     | a note in the margin column (`Marginal`)         |
+| `text-marginal` | 14px     | a note in the margin column                      |
 
 Titles tighten their tracking as they grow (−1 % to −5 %). Labels are sentence
 case: `Eyebrow` in the accent, only where it says something the title does not
@@ -172,7 +166,7 @@ content centred; a short window lets it grow); no other section is forced to one
 ### The four moves
 
 The grid breaks in these four ways only, each at most once per section, so the
-page stays alive and calm. The styleguide shows each with its rules.
+page stays alive and calm.
 
 1. **Margin column** (`margin` in `lib/ui.ts`): from `lg` a margin on columns 1–3
    for index numbers, labels and notes, the content on 4–12 (`margin.reading` 4–10
@@ -339,7 +333,7 @@ mobile score than it does live.
 | `Section` (`ground`, `space`)                     | A block: `default` / `alt` / `moss` / `dark`, edge to edge, clipping what bleeds                          |
 | `SectionHead` (`size`)                            | Eyebrow, title (`section` / `sub`), lead; with `margin.cross` it crosses into the content                 |
 | `PageIntro` (`lead`, `media` slots)               | A sub-page's opening; a photograph bleeds right, without one the stamp stands there                       |
-| `Poster`, `Index`, `Marginal`                     | The poster word, the index number, the margin note                                                        |
+| `Poster`, `Index`                                 | The poster word, the index number                                                                         |
 | `Eyebrow`                                         | A label above a title where it adds information: accent text                                              |
 | `Button` (`variant`, `size`, `block`, `decorate`) | Round: `primary` (one per module), `secondary`, `danger`                                                  |
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                               |
@@ -426,6 +420,4 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
 - The four moves are the only ways to break the grid, each at most once per
   section: margin column, overlap, bleed, poster word. No staircases of offset
   blocks, no rotation, no boxes around content.
-- A token that the styleguide should describe carries a trailing comment in
-  `theme.css`; German notes for people live in `lib/brand/notes.ts`
-  (`tests/brand-notes.test.ts` keeps their keys real).
+- A token carries a trailing comment in `theme.css`; the token export reads it.

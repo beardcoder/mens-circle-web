@@ -6,7 +6,6 @@ rel=${f#"$CLAUDE_PROJECT_DIR"/}
 case "$rel" in
   brand/tokens.* | brand/palette.*) how='bun run brand:export (source: src/styles/theme.css)' ;;
   brand/logo/logo-*.svg | public/images/logo* | public/favicon*) how='bun run brand:logo (source: brand/logo/logo.svg)' ;;
-  public/images/og-*.png) how='bun run brand:render --install' ;;
   drizzle/meta/*) how='bun run db:generate (source: src/lib/server/db/schema.ts)' ;;
   bun.lock) how='bun install' ;;
   *) exit 0 ;;

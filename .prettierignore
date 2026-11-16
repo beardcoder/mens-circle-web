@@ -20,5 +20,3 @@ listmonk-templates/
 /brand/tokens.json
 /brand/tokens.css
 /brand/palette.gpl
-/brand/out/
-/brand/.dist/
