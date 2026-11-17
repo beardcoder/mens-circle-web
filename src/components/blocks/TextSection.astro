@@ -14,10 +14,10 @@ interface Props {
 const { anchor, eyebrow, title } = Astro.props;
 ---
 
-{/* A heading in the margin, the text beside it on the reading line. */}
+{/* As on the home page: the title crosses from the margin into the content, the text stands on the reading line. */}
 <Section id={anchor} space="band">
-  <div class:list={[margin.grid, 'gap-y-6']}>
-    <SectionHead eyebrow={eyebrow} title={title} size="sub" class={margin.side} />
+  <div class:list={[margin.grid, 'gap-y-8']}>
+    <SectionHead eyebrow={eyebrow} title={title} class={margin.cross} />
     <Prose class={margin.reading}>
       <slot />
     </Prose>

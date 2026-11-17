@@ -20,10 +20,10 @@ interface Props {
 const { anchor, eyebrow, title, intro, items } = Astro.props;
 ---
 
-{/* The values as rows in the content column: the value and what it means. */}
-<Section id={anchor} space="band">
+{/* The values as rows in the content column, on the sand like the course: the value and what it means. */}
+<Section id={anchor} ground="alt">
   <div class:list={[margin.grid, 'gap-y-10']}>
-    <SectionHead eyebrow={eyebrow} title={title} lead={intro} size="sub" class={margin.cross} />
+    <SectionHead eyebrow={eyebrow} title={title} lead={intro} class={margin.cross} />
 
     {items.length > 0 && (
       <ul role="list" data-reveal-group class:list={[margin.content, 'grid border-b border-line-strong']}>

@@ -40,10 +40,11 @@ const titleClass = hasMedia
   data-opening
   aria-labelledby={titleId}
   class:list={[
-    'relative overflow-clip',
+    // Without a photograph only the sides clip: a short opening (the legal pages) lets the stamp run on below it.
+    'relative',
     hasMedia
-      ? 'surface-dark flex min-h-[78svh] flex-col justify-end lg:min-h-svh pt-[calc(var(--spacing-header)+10rem)] pb-8 lg:pb-14'
-      : 'pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group',
+      ? 'overflow-clip surface-dark flex min-h-[78svh] flex-col justify-end lg:min-h-svh pt-[calc(var(--spacing-header)+10rem)] pb-8 lg:pb-14'
+      : 'overflow-x-clip pt-[calc(var(--spacing-header)+var(--spacing-group))] pb-group',
   ]}
 >
   {hasMedia ? (

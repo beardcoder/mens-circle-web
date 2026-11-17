@@ -65,7 +65,7 @@
   --color-fill: light-dark(var(--p-ember-text), var(--p-ember));
   --color-fill-strong: light-dark(var(--p-ember-text-deep), var(--p-ember-deep));
   --color-on-fill: light-dark(var(--p-linen), var(--p-on-ember));
-  /* The spark: what stands large on the forest and the moss (a poster word, an index
+  /* The spark: what stands large on the forest (a poster word, an index
      number, the stamp) and the warm point of the circle. Never text on paper. */
   --color-spark: var(--p-spark);
   /* Lines: `line` parts things quietly and never alone outlines a control;
@@ -97,9 +97,6 @@
      number, as on a poster). Titles are Cormorant 500, the hero and the poster word
      600; it is a light, narrow face with a small x-height, so its sizes run a step
      larger than a sturdier serif's would. Figures lining (`lnum`). */
-  --text-marginal: 0.875rem; /* 14px: a note in the margin column */
-  --text-marginal--line-height: 1.5;
-  --text-marginal--letter-spacing: 0.01em;
   --text-xs: 0.8125rem; /* 13px: the small print */
   --text-xs--line-height: 1.45;
   --text-sm: 0.875rem; /* 14px: labels, hints, captions */
@@ -146,8 +143,6 @@
   --spacing-gutter: var(--space-gutter);
   --spacing-card: var(--space-card);
   --spacing-panel: var(--space-panel);
-  --spacing-overlap: var(--space-overlap); /* how far an element crosses an edge: 40 / 64 / 96px */
-  --spacing-bleed: var(--space-bleed); /* from the content's edge to the window's */
   --spacing-header: 4.5rem; /* the fixed bar, 72px */
   --spacing-clearance: 6rem; /* the bar plus air, for anchors and sticky columns */
 
@@ -309,32 +304,6 @@
   background-color: var(--color-surface);
 }
 
-/* The moss: a second dark ground for what is spoken in the circle (the agreements,
-   the voices). Dark in both modes, set apart from the forest by its green. */
-@utility surface-moss {
-  --color-surface: var(--p-moss);
-  --color-raised: color-mix(in srgb, var(--p-bone) 7%, var(--p-moss));
-  --color-fg: var(--p-bone);
-  --color-fg-soft: var(--p-bone-soft);
-  --color-fg-muted: var(--p-bone-muted);
-  --color-fill: var(--p-ember);
-  --color-fill-strong: var(--p-ember-deep);
-  --color-on-fill: var(--p-on-ember);
-  --color-flame: var(--p-ember);
-  --color-accent: var(--p-ember-light);
-  --color-accent-strong: var(--p-bone);
-  --color-accent-soft: color-mix(in srgb, var(--p-bone) 10%, var(--p-moss));
-  --color-on-accent: var(--p-moss);
-  --color-line: color-mix(in srgb, var(--p-bone) 16%, transparent);
-  --color-line-strong: color-mix(in srgb, var(--p-bone) 28%, transparent);
-  --color-line-bold: var(--p-moss-control);
-  --color-field: color-mix(in srgb, var(--p-bone) 7%, var(--p-moss));
-  --color-success: #8fcb97;
-  --color-danger: #f0a197;
-  color: var(--color-fg);
-  background-color: var(--color-surface);
-}
-
 /* The dark ground (the theme's night, still called forest): the opening, the
    agreements, the voices, the registration, the menu and the footer, in both modes.
    Its signature is the theme's own, turned earthier: soft pools of light in its
@@ -403,25 +372,6 @@
   }
 }
 
-/* ── The four moves ────────────────────────────────────────────────────────── */
-
-/* The grid is 12 columns and one edge; four moves break it, each at most once per
-   section (docs/design-system.md, "The four moves"): the margin column (`lib/ui.ts`,
-   `margin`), the overlap (`-mt-overlap`, `-ml-overlap` …), the bleed (below) and the
-   poster word (`Poster.astro`). A bleed runs an element from the content's edge out
-   to the window's, on one side or both; the section or the page clips it. */
-@utility bleed-r {
-  margin-inline-end: calc(-1 * var(--space-bleed));
-}
-
-@utility bleed-l {
-  margin-inline-start: calc(-1 * var(--space-bleed));
-}
-
-@utility bleed-x {
-  margin-inline: calc(-1 * var(--space-bleed));
-}
-
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 
 @layer base {
@@ -467,8 +417,6 @@
     --p-forest: light-dark(#130e0a, #0b0705);
     --p-forest-raised: light-dark(#1e1610, #140e09);
     --p-forest-control: #8a7862;
-    --p-moss: light-dark(#261d15, #1c150f);
-    --p-moss-control: #948169;
     --p-bone: #ebdfcd;
     --p-bone-soft: #cdbca4;
     --p-bone-muted: #b6a48d;
@@ -476,11 +424,8 @@
     /* Space per width. The content's edge sits 28 / 40 / 56px from the window in
        every section; grounds run from edge to edge. Sections 88px on phones, 144px
        on the desktop: room to breathe. Cards 24 → 32px inside, the registration
-       panel 28 → 48px. An overlap crosses an edge by 40 / 64 / 96px; the bleed
-       is the way from the content's edge to the window's. */
+       panel 28 → 48px. */
     --space-gutter: 1.75rem;
-    --space-overlap: 2.5rem;
-    --space-bleed: max(var(--space-gutter), calc((100vw - 75rem) / 2));
     --space-section: 5.5rem;
     --space-band: 3.5rem;
     --space-group: 2.5rem;
@@ -493,7 +438,6 @@
       --space-section: 7rem;
       --space-band: 4rem;
       --space-group: 3rem;
-      --space-overlap: 4rem;
       --space-card: 1.75rem;
       --space-panel: 2.5rem;
     }
@@ -502,7 +446,6 @@
       --space-section: 9rem;
       --space-band: 5rem;
       --space-group: 4rem;
-      --space-overlap: 6rem;
       --space-card: 2rem;
       --space-panel: 3rem;
     }

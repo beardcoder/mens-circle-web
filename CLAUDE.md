@@ -152,10 +152,10 @@ and `sizes`), `position` for the crop, Tailwind for the box (`image.responsiveSt
 stays off). Photos live in `src/assets/images/`. SSR pages never use `<Image />`: it
 would run sharp per request through `/_image`, which the middleware answers with 404 in
 production. The home page uses pre-sized files beside the original with a written
-`srcset`: the photo in its ring (`markus-kreis-{480,720,960}.avif`, square, AVIF q52)
+`srcset`: the opening's photograph (`markus-kreis-{480,720,960}.avif`, square, AVIF q52)
 and Markus's avatar (`markus-avatar-192.webp`); regenerate them when the photo
 changes. Sharp is a build-time dev
-dependency. All events use `/images/og-default.png`, rendered from its template.
+dependency. All events use `/images/og-default.png`.
 
 **Cron.** Host-driven: Coolify runs `bun run scripts/schedule.ts` every minute. It
 decides what is due first and imports a task's module only then (`dueTasks()`):
@@ -201,7 +201,7 @@ once, on connect, and takes commands (`addMarker`) only after `baLoad`. `c` is l
 Keep the attribution line under the map.
 
 **Styling.** Tailwind v4 (`@tailwindcss/vite`), CSS-first. `styles/theme.css` holds the
-tokens, variants, surfaces, the bleed utilities and keyframes; `global.css` (public,
+tokens, variants, surfaces and keyframes; `global.css` (public,
 one shared hashed file) and `admin.css` are the two entries. Both read classes
 from `src/` only (`source('..')`, so words in docs, mail templates and tests never
 become utilities) and skip server-only code; `global.css` keeps the admin sources
@@ -251,7 +251,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   dates) or `dark`
   (`surface-dark`, the theme's near-black with its three wandering pools of light, its
   primitive still called `--p-forest`: opening, agreements, voices, registration,
-  menu, last band, footer). The site has these three grounds; `moss` is unused on the site. Grounds
+  menu, last band, footer). The site has these three grounds. Grounds
   run from edge to edge; `Section` clips horizontally what bleeds.
 - Type: Cormorant variable, upright and italic (`font-display`, two files in
   `src/assets/fonts/`, local provider, from weight 500, figures lining via `lnum`;
@@ -261,24 +261,26 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   a step larger; IBM Plex Sans (`font-sans`, static regular and semibold) for text,
   navigation, forms, data. Role tokens
   `text-poster`, `text-hero`, `text-index`, `text-page`, `text-section`, `text-sub`,
-  `text-quote`, `text-md` (body), `text-base` (controls), `text-marginal`. `<em>` in
+  `text-quote`, `text-md` (body), `text-base` (controls). `<em>` in
   a title is Cormorant's italic in the accent (the clay terracotta on the dark ground). Labels in sentence
   case. Running text on `max-w-measure`. A dash in running copy is bound to the word
   before it (`\u00a0–`).
 - The four moves, the only ways to break the 12-column grid, each at most once per
   section: the margin column (`margin` recipes in `lib/ui.ts`: side 1–3, content
-  4–12, reading 4–10, a crossing title 1–10), the overlap (`overlap` token, always on
-  a ground of its own, towards the centre), the bleed (`bleed-l`/`-r`/`-x`, the side
-  changes down the page) and the poster word (`Poster`, one per screen). Never:
-  staircases, rotation, shadows, boxes around content, text
-  over a photograph.
+  4–12, reading 4–10, a crossing title 1–10), the overlap (an opening's poster line
+  across the foot of its photograph, where the photograph has run into the
+  ground), the bleed (a photograph, the stamp or a ground runs to the window's
+  edge) and the poster word (`Poster`, one per screen). Never: staircases,
+  rotation, shadows, boxes or cards around content, text over a face, the sky or a
+  busy part of a photograph.
 - Shapes: open and square. Grounds, bands, the registration and the map have no
   radius. `rounded-full` for what you press and for circles (people's photographs,
   seat ring, stamp, avatar); fields `rounded-md` (8px) with the buttons' heights;
   only what floats (a dialog) and the admin's cards take `rounded-xl`. No rounded
   cards on public pages: facts, steps, agreements, FAQ and voices are rows between
-  lines. `shadow-overlay` only for what floats. Images: a person in a circle, a place
-  in a rectangle cut by the edge; one form per section.
+  lines. `shadow-overlay` only for what floats. Images: a photograph has no
+  frame, it runs to the window's edge and softly into the ground
+  (`data-hero-frame`); a small portrait stands in a circle; no caption.
 - Skills are vendored in `.claude/skills/` (sources in `skills-lock.json`):
   `web-design-engineer`, `tailwind-animations` and the three animation skills named
   under Motion.
@@ -325,7 +327,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `::after`, two composited layers on paths of their own); what lies
   below a page's opening, every piece of it, fading in out of a blur as it is
   scrolled into the window (`global.css`, "Arriving": `timeline-view
-animate-blurred-fade-in animate-range-[entry_10%_contain_12%]` from
+animate-blurred-fade-in animate-range-[entry_10%_contain_12%]`, on a phone later,
+  `cover 10% cover 38%`, from
   `tailwind-animations`, applied in CSS to titles, paragraphs, rows, figures and
   lone links plus `data-reveal` / `data-reveal-group`, the outermost piece only;
   tied to the scroll, so it leaves the same way on the way back; no script; a
