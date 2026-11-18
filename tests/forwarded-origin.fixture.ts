@@ -27,6 +27,8 @@ function rejects(
     headers['x-forwarded-host'],
     undefined,
     domains,
+    // What the server would use without the forwarded headers (Astro 7.4.11+).
+    { protocol: url.protocol.slice(0, -1), host: url.hostname },
   );
 
   if (forwarded.protocol) url.protocol = `${forwarded.protocol}:`;
