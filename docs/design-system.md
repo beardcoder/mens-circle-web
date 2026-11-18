@@ -128,8 +128,8 @@ a flicker. A first visit on a slow line may stay in the fallback until the next
 page. Titles are
 500, the hero, page titles, index numbers and poster words 600. A highlighted
 phrase in a title (`<em>`) is set in Cormorant's italic, in the accent (the
-clay terracotta on the dark ground). `font-sans` is IBM Plex Sans (the static
-regular and semibold, ~23 kB each; the regular also serves 500, the semibold 700): running text, navigation, forms, data.
+clay terracotta on the dark ground). `font-sans` is Geist (the static
+regular and semibold, ~13 kB each; the regular also serves 500, the semibold 700): running text, navigation, forms, data.
 
 | Token          | Size     | Use                                              |
 | -------------- | -------- | ------------------------------------------------ |

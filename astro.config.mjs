@@ -106,9 +106,9 @@ export default defineConfig({
   },
   fonts: [
     // Cormorant for titles, quotes, dates and poster words (upright and italic: the
-    // accent phrase of a title is set in italic); IBM Plex Sans for everything that
+    // accent phrase of a title is set in italic); Geist for everything that
     // explains, mapped to font-display and font-sans in the shared theme. Latin
-    // files in the repo (Cormorant variable ~35 and ~38 kB, Plex static ~23 kB each);
+    // files in the repo (Cormorant variable ~35 and ~38 kB, Geist static ~13 kB each);
     // src/assets/fonts/README.md says where they come from.
     {
       name: 'Cormorant',
@@ -129,22 +129,22 @@ export default defineConfig({
       fallbacks: ['Georgia', 'Times New Roman', 'serif'],
     },
     {
-      name: 'IBM Plex Sans',
+      name: 'Geist',
       // `optional`, with every file preloaded: a page is painted once and never
       // changes its faces afterwards. `swap` and `block` both re-laid the page out
       // when a font arrived after the first paint (the fallback breaks lines
       // differently), which read as a flicker. The price: a first visit on a slow
       // line may stay in the fallback until the next page.
       display: 'optional',
-      cssVariable: '--font-plex',
+      cssVariable: '--font-geist',
       provider: fontProviders.local(),
       options: {
-        // Two static cuts instead of the variable file (46 kB): the regular carries
+        // Two static cuts instead of the variable file (29 kB): the regular carries
         // 400–500, the semibold 600–700. All four files of a page are preloaded: a late
         // swap of the italic phrase or of a button label would shift the layout.
         variants: [
-          { src: ['./src/assets/fonts/ibm-plex-sans-400-latin.woff2'], weight: '400 500', style: 'normal' },
-          { src: ['./src/assets/fonts/ibm-plex-sans-600-latin.woff2'], weight: '600 700', style: 'normal' },
+          { src: ['./src/assets/fonts/geist-400-latin.woff2'], weight: '400 500', style: 'normal' },
+          { src: ['./src/assets/fonts/geist-600-latin.woff2'], weight: '600 700', style: 'normal' },
         ],
       },
       fallbacks: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],

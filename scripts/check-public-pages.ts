@@ -363,6 +363,7 @@ try {
 
     for (const font of [
       'cormorant-500.woff2',
+      'geist.woff2',
       'ibm-plex-sans.woff2',
       'vollkorn-500.woff2',
       'fraunces-500.woff2',

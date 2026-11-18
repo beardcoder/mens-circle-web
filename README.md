@@ -91,7 +91,7 @@ anonymised again on the next run at 02:30.
 - Event details: SSR metadata, copy and a server-rendered registration form that works without JavaScript
 - Admin guard and default `Cache-Control`: `src/middleware.ts`, `src/lib/cache-policy.ts`
 - Public CSS: shared hashed stylesheets; the SSR home photo and avatar are pre-sized AVIF/WebP files (no `/_image` at runtime)
-- Design: from the dark-botanical theme, earthier and warmer (brown-black, warm bone, one accent, a clay terracotta); Cormorant (variable) and IBM Plex Sans (two static cuts), ~120 kB of fonts; see [design system](docs/design-system.md)
+- Design: from the dark-botanical theme, earthier and warmer (brown-black, warm bone, one accent, a clay terracotta); Cormorant (variable) and Geist (two static cuts), ~100 kB of fonts; see [design system](docs/design-system.md)
 - Motion and page transitions: a page change is a native cross-fade (View Transitions CSS API) and nothing else, two scroll-linked bars on CSS view timelines, nothing that fades in on scroll; see the design system's "Motion" and "Page transitions"
 - Prefetch through Speculation Rules (no script)
 - Server adapter: `@igloczek/astro-bun-adapter` (standalone, bundled), served by `server.ts` on `Bun.serve()`; see [runtime](docs/runtime.md)

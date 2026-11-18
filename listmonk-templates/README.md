@@ -28,7 +28,7 @@ A dark opening, as on the site: the gold mark (`/images/logo-mail.png`, loaded b
 URL; mails already sent still load `/images/logo-flame.png`) and the word mark in
 Cormorant, under them the mail's label in the spark and its title at poster size
 (50px, 36px on a phone) in bone; then the content on paper, a dark footer that links Impressum and Datenschutz and
-carries no slogan. Cormorant 500 for titles and the date, IBM Plex Sans for text,
+carries no slogan. Cormorant 500 for titles and the date, Geist for text,
 labels in sentence case. The date stands
 open between two rules, the date over its facts as rows; weekday and day each stay
 on one line (`dateWeekday`, `dateDay`; a payload without them falls back to

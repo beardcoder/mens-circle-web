@@ -258,7 +258,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   both faces `font-display: optional` with every file preloaded, never `swap` or
   `block`: a font arriving after the first paint re-lays the page out and flickers)
   for titles, dates, numbers, poster words; a light, narrow face, so its sizes run
-  a step larger; IBM Plex Sans (`font-sans`, static regular and semibold) for text,
+  a step larger; Geist (`font-sans`, static regular and semibold) for text,
   navigation, forms, data. Role tokens
   `text-poster`, `text-hero`, `text-index`, `text-page`, `text-section`, `text-sub`,
   `text-quote`, `text-md` (body), `text-base` (controls). `<em>` in

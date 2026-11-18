@@ -49,5 +49,5 @@ export const MAIL = {
 /** The mail font stacks: the site's faces where the client loads them, then system faces. */
 export const MAIL_FONTS = {
   serif: "'Cormorant',Georgia,'Times New Roman',serif",
-  sans: "'IBM Plex Sans','Helvetica Neue',Helvetica,Arial,sans-serif",
+  sans: "'Geist','Helvetica Neue',Helvetica,Arial,sans-serif",
 } as const;

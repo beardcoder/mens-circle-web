@@ -3,7 +3,7 @@
  * utilities cannot express. After the dark-botanical theme: a warm near-black
  * with soft pools of light for what draws you in, bone paper for reading, one
  * accent, a terracotta gold, for the mark, the one thing to do and what is marked. Titles in Cormorant (the accent phrase in italic) beside calm running text
- * (IBM Plex Sans); open, full-bleed grounds, lines instead of boxes.
+ * (Geist); open, full-bleed grounds, lines instead of boxes.
  * Shared by the two entry files: global.css (public site) and admin.css (back
  * office). docs/design-system.md describes the system.
  */
@@ -87,7 +87,7 @@
   --color-bone: var(--p-bone);
 
   /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). */
-  --font-sans: var(--font-plex);
+  --font-sans: var(--font-geist);
   --font-display: var(--font-cormorant); /* Cormorant, variable: weight 500–700, upright and italic, lining figures */
   --font-display--font-feature-settings: 'lnum';
 

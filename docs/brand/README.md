@@ -28,7 +28,7 @@ after a change to the master logo run `bun run brand:logo`.
 - The CMYK values in `tokens.json` are computed from sRGB and only a starting
   point. The gold prints darker on uncoated paper; prefer coated paper or agree the
   values with the printer, and ask for a proof.
-- Fonts: Cormorant and IBM Plex Sans, both under the SIL Open Font License; see
+- Fonts: Cormorant and Geist, both under the SIL Open Font License; see
   `src/assets/fonts/README.md`. Other tools: install them from Google Fonts.
 
 ## Logo
