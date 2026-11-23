@@ -9,8 +9,9 @@ const words = splitWords(await Astro.slots.render('default'));
 
 {/* One statement on a screen of its own, the page's one scroll-led moment: its words
     turn to ink one after the other as it crosses the window (global.css, "Motion:
-    scroll"). Whole and in full ink without motion or view timelines. */}
-<Section class="grid min-h-svh content-center">
+    scroll"). Whole and in full ink without motion or view timelines, and then in
+    an ordinary section: a screen of its own would only be an empty band. */}
+<Section class="grid content-center motion-safe:supports-[animation-timeline:view()]:min-h-svh">
   <p
     data-statement
     class="max-w-[12em] font-display text-page font-medium text-fg [&_em]:text-accent"

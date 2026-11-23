@@ -363,7 +363,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   right. On a phone the photograph fills the top and the statement crosses its
   foot. Then: the intro,
   its title crossing into the content, the first round's questions in the margin,
-  the four facts as its last row; the statement on a screen of its own (`Statement`);
+  the four facts as its last row; the statement on a screen of its own (`Statement`; an ordinary section under reduced motion);
   the course on sand, each step with its index number in the margin; the five
   agreements on the forest as rows across the page, numbers in the spark; Markus,
   one sentence of his under a rule, signed with his face; the voices on the forest;

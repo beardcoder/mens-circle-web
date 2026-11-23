@@ -81,16 +81,16 @@ if (events && testimonials) {
         <Fragment slot="value">{events?.next?.place || site.geo.locality}</Fragment>
         Adresse und Anfahrt stehen beim jeweiligen Termin
       </Fact>
-      <Fact label="Wie oft">
-        <Fragment slot="value">{'Alle 2–\u20604\u00a0Wochen'}</Fragment>
-        Ohne Mitgliedschaft. Du kommst, wann es dir passt.
+      <Fact label="Rhythmus">
+        <Fragment slot="value">{'2–\u20604\u00a0Wochen'}</Fragment>
+        Du kommst, wann es dir passt, ohne Mitgliedschaft
       </Fact>
       <Fact label="Dauer">
         <Fragment slot="value">2–3 Stunden</Fragment>
         {events?.next?.timeRange ? `z.\u00a0B. ${events.next.timeRange}` : 'Ein Abend, kein Seminar'}
       </Fact>
       <Fact label="Beitrag">
-        <Fragment slot="value">{events?.fee.main || 'Spendenbasis'}</Fragment>
+        <Fragment slot="value">{events?.fee.main.replace(/^Auf /, '') || 'Spendenbasis'}</Fragment>
         {events?.fee.note ?? 'Du gibst, was für dich machbar ist'}
       </Fact>
     </Fragment>
@@ -107,8 +107,7 @@ if (events && testimonials) {
   >
     <Fragment slot="steps">
       <JourneyStep number={1} title="Ankommen">
-        Wir kommen an, oft mit ein paar ruhigen Atemzügen. Dann erkläre ich die Absprachen und frage, ob alle damit
-        einverstanden sind.
+        Wir kommen an, oft mit ein paar ruhigen Atemzügen, und gehen die Absprachen für den Abend durch.
       </JourneyStep>
       <JourneyStep number={2} title="Die erste Runde">
         Reihum sagt jeder kurz, wie es ihm gerade geht und was er mitbringt. So kommt jeder einmal zu Wort, bevor wir
@@ -124,8 +123,8 @@ if (events && testimonials) {
       </JourneyStep>
     </Fragment>
     <p slot="close">
-      Zu Beginn nehmen wir uns Zeit, aus dem Kopf in den Körper zu kommen: ruhig atmen, die Füße auf dem Boden spüren.
-      Vorerfahrung mit Männerkreisen, Meditation oder Atemarbeit brauchst du nicht, und vorbereiten musst du nichts.
+      Am Anfang nehmen wir uns Zeit für den Körper: ruhig atmen, die Füße auf dem Boden spüren. Vorerfahrung mit
+      Männerkreisen, Meditation oder Atemarbeit brauchst du nicht, und vorbereiten musst du nichts.
     </p>
   </JourneySteps>
 
@@ -133,7 +132,7 @@ if (events && testimonials) {
     anchor="rahmen"
     title="Was wir vereinbaren"
     intro={
-      'Zu Beginn jedes Abends gehen wir fünf Absprachen durch und fragen, ob alle sie mittragen. Sie machen es leichter, offen zu sprechen.'
+      'Fünf Absprachen gelten an jedem Abend. Wir gehen sie gemeinsam durch, und jeder sagt, ob er sie mitträgt. Mit ihnen fällt es leichter, offen zu sprechen.'
     }
     agreements={[
       {
@@ -181,10 +180,7 @@ if (events && testimonials) {
     <p>
       Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit.
     </p>
-    <p>
-      Ich sitze mit im Kreis. Zu Beginn erkläre ich die Absprachen, frage, ob alle sie mittragen, und achte darauf, dass
-      sie gelten. Jeder kann zu Wort kommen, keiner muss.
-    </p>
+    <p>Ich sitze mit im Kreis und achte darauf, dass die Absprachen gelten. Jeder kann zu Wort kommen, keiner muss.</p>
     <p>
       Übungen mit Atem oder Körperwahrnehmung leite ich als Angebot an. Bevor wir etwas gemeinsam machen, frage ich, ob
       es für dich passt. Nein ist dabei immer eine gute Antwort.
@@ -204,8 +200,8 @@ if (events && testimonials) {
   <Faq anchor="faq" title="Was Männer vorher wissen wollen">
     <AccordionItem question="Was ist ein Männerkreis?">
       Ein Männerkreis ist eine feste Runde von Männern, die sich regelmäßig trifft, im Kreis sitzt und offen über das
-      spricht, was gerade da ist. Einer spricht, die anderen hören zu, ohne zu bewerten oder Ratschläge zu geben. In
-      Straubing treffen wir uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne
+      spricht, was sie gerade beschäftigt. Einer spricht, die anderen hören zu, ohne zu bewerten oder Ratschläge zu
+      geben. In Straubing treffen wir uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne
       Vorerfahrung.
     </AccordionItem>
     <AccordionItem question="Für wen ist der Männerkreis?">
