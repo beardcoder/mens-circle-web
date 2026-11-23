@@ -25,6 +25,13 @@
       "skillPath": "skills/tailwind-animations/SKILL.md",
       "computedHash": "7eedf15c53d1e3097fa88d235cb6cc7014c63da7dee83ef5c4760be5e4b3f30b"
     },
+    "unslop": {
+      "source": "heydamir/unslop",
+      "commit": "620163eedb3529d9cd23a3994ed8d287d06f760d",
+      "sourceType": "github",
+      "skillPath": "skills/unslop/SKILL.md",
+      "computedHash": "34b16270083f9892424a0b41dec4d5f25a73709c9cffa7702e57c723000e6df5"
+    },
     "web-design-engineer": {
       "source": "ConardLi/garden-skills",
       "sourceType": "github",
