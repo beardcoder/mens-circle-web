@@ -27,30 +27,30 @@
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
-    "openid-client": "^6.8.9"
+    "openid-client": "^6.9.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
-    "@astrojs/preact": "^6.1.5",
-    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/preact": "^6.1.6",
+    "@astrojs/sitemap": "^3.7.6",
     "@eslint/js": "^10.0.1",
     "@igloczek/astro-bun-adapter": "^1.2.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@tailwindcss/vite": "^4.3.5",
-    "@types/bun": "^1.4.4",
+    "@types/bun": "^1.4.5",
     "@types/node": "^26.6.6",
     "astro": "7.4.11",
     "astro-icon": "^1.2.0",
-    "axe-core": "^4.14.0",
+    "axe-core": "^4.14.1",
     "drizzle-kit": "^0.31.11",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-astro": "^3.2.1",
     "eslint-plugin-simple-import-sort": "^14.0.0",
     "globals": "^17.14.0",
     "jiti": "^2.7.0",
-    "knip": "^6.45.1",
-    "playwright": "1.65.0",
+    "knip": "^6.46.1",
+    "playwright": "1.65.1",
     "preact": "^11.2.0",
     "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
@@ -58,7 +58,7 @@
     "tailwind-animations": "^1.0.2",
     "tailwindcss": "^4.3.5",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.2"
+    "typescript-eslint": "^8.73.0"
   },
   "overrides": {
     "@emnapi/runtime": "1.11.3"
