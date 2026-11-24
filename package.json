@@ -29,7 +29,7 @@
     "@astrojs/sitemap": "^3.7.4",
     "@eslint/js": "^10.0.1",
     "@igloczek/astro-bun-adapter": "^1.2.0",
-    "@stylistic/eslint-plugin": "^5.10.0",
+    "@stylistic/eslint-plugin": "^6.0.1",
     "@tailwindcss/vite": "^4.3.5",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
