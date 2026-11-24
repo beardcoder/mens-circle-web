@@ -16,8 +16,9 @@ ARG PUBLIC_UMAMI_ID
 ARG PUBLIC_UMAMI_ENDPOINT
 ENV PUBLIC_UMAMI_ID=$PUBLIC_UMAMI_ID PUBLIC_UMAMI_ENDPOINT=$PUBLIC_UMAMI_ENDPOINT
 # EmDash bakes the database location (and the admin sessions beside it) into the build.
+# Prerendering opens it too: the directory must exist (the file stays in this stage).
 ENV DATABASE_PATH=/data/emdash.db
-RUN bun run build
+RUN mkdir -p /data && bun run build
 
 FROM ${BUN_IMAGE} AS production-deps
 WORKDIR /app
