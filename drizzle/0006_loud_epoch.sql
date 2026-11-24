@@ -1,1 +1,0 @@
-ALTER TABLE `registrations` ADD `note` text DEFAULT '' NOT NULL;

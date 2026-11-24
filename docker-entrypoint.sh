@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-export DATABASE_PATH="${DATABASE_PATH:-/data/mens-circle.db}"
+export DATABASE_PATH="${DATABASE_PATH:-/data/emdash.db}"
 data_dir="$(dirname "$DATABASE_PATH")"
 
 # The container starts as root only to hand the data volume to `bun` (uid 1000): a

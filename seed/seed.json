@@ -1,0 +1,88 @@
+{
+  "$schema": "https://emdashcms.com/seed.schema.json",
+  "version": "1",
+  "defaultLocale": "de",
+  "meta": {
+    "name": "Männerkreis",
+    "description": "Termine, Anmeldungen und Stimmen des Männerkreises."
+  },
+  "settings": {
+    "title": "Männerkreis Niederbayern",
+    "timezone": "Europe/Berlin"
+  },
+  "collections": [
+    {
+      "slug": "events",
+      "label": "Termine",
+      "labelSingular": "Termin",
+      "icon": "calendar-blank",
+      "sortOrder": 1,
+      "supports": ["drafts", "revisions"],
+      "urlPattern": "/event/{slug}",
+      "titleField": "title",
+      "dateField": "starts_at",
+      "admin": { "listColumns": ["starts_at", "location", "max_participants"] },
+      "fields": [
+        { "slug": "title", "label": "Titel", "type": "string", "required": true },
+        { "slug": "starts_at", "label": "Beginn", "type": "datetime", "required": true, "indexed": true },
+        { "slug": "ends_at", "label": "Ende", "type": "datetime" },
+        { "slug": "description", "label": "Beschreibung", "type": "portableText" },
+        {
+          "slug": "max_participants",
+          "label": "Plätze",
+          "type": "integer",
+          "required": true,
+          "defaultValue": 8,
+          "validation": { "min": 1, "max": 100 }
+        },
+        { "slug": "cost_basis", "label": "Beitrag", "type": "string" },
+        { "slug": "location", "label": "Ort", "type": "string" },
+        { "slug": "street", "label": "Straße", "type": "string" },
+        { "slug": "postal_code", "label": "PLZ", "type": "string" },
+        { "slug": "city", "label": "Stadt", "type": "string" },
+        { "slug": "location_details", "label": "Treffpunkt", "type": "text" },
+        { "slug": "latitude", "label": "Breitengrad", "type": "number" },
+        { "slug": "longitude", "label": "Längengrad", "type": "number" }
+      ]
+    },
+    {
+      "slug": "registrations",
+      "label": "Anmeldungen",
+      "labelSingular": "Anmeldung",
+      "description": "Wer abgesagt hat, trägt ein Absagedatum und zählt nicht mehr als belegter Platz.",
+      "icon": "users",
+      "sortOrder": 2,
+      "routable": false,
+      "titleField": "last_name",
+      "dateField": "createdAt",
+      "admin": { "listColumns": ["first_name", "email", "event", "cancelled_at"], "quickCreate": false },
+      "fields": [
+        { "slug": "first_name", "label": "Vorname", "type": "string", "required": true },
+        { "slug": "last_name", "label": "Nachname", "type": "string", "required": true },
+        { "slug": "email", "label": "E-Mail", "type": "string", "required": true, "indexed": true },
+        { "slug": "phone", "label": "Telefon", "type": "string" },
+        { "slug": "event", "label": "Termin (ID)", "type": "reference", "required": true, "indexed": true },
+        { "slug": "cancelled_at", "label": "Abgesagt am", "type": "datetime" },
+        { "slug": "reminder_sent_at", "label": "Erinnerung gesendet", "type": "datetime" }
+      ]
+    },
+    {
+      "slug": "testimonials",
+      "label": "Stimmen",
+      "labelSingular": "Stimme",
+      "description": "Eingereichte Stimmen kommen als Entwurf an; veröffentlichen gibt sie frei.",
+      "icon": "quotes",
+      "sortOrder": 3,
+      "routable": false,
+      "supports": ["drafts"],
+      "titleField": "name",
+      "dateField": "publishedAt",
+      "admin": { "listColumns": ["quote"], "quickCreate": false },
+      "fields": [
+        { "slug": "name", "label": "Name", "type": "string" },
+        { "slug": "role", "label": "Rolle", "type": "string" },
+        { "slug": "quote", "label": "Text", "type": "text", "required": true, "validation": { "maxLength": 1000 } }
+      ]
+    }
+  ]
+}

@@ -3,48 +3,48 @@
  * loads in Chromium without console errors (CSP included), axe finds nothing serious
  * or critical in light and dark, and the interactive pieces work: phone menu, mode
  * toggle, calendar popover, registration with and without JavaScript, newsletter,
- * testimonial and the admin guard. listmonk is a local fake; the database is
- * disposable. Screenshots land in `dist/browser-shots/` (a CI artifact).
+ * testimonial and EmDash's admin setup. listmonk is a local fake; the site is a
+ * disposable EmDash sandbox. Screenshots land in `dist/browser-shots/` (a CI artifact).
  */
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { mkdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { type Browser, type BrowserContext, chromium, devices, type Page } from 'playwright';
 
-const sandbox = await mkdtemp(join(tmpdir(), 'mens-circle-browser-'));
+import { block, createSandbox, evening, root } from './emdash-sandbox';
+
+const sandbox = await createSandbox('browser');
 const shots = new URL('../dist/browser-shots/', import.meta.url).pathname;
-
-process.env.DATABASE_PATH = join(sandbox, 'browser.sqlite');
-process.env.ADMIN_SESSION_SECRET = 'browser-check-secret-of-at-least-32-characters';
-process.env.ADMIN_EMAIL = 'admin@example.invalid';
-
-const { db } = await import('../src/lib/server/db');
-const { events, testimonials } = await import('../src/lib/server/db/schema');
-const { createSession, SESSION_COOKIE } = await import('../src/lib/server/auth');
 const axeSource = await readFile(new URL('../node_modules/axe-core/axe.min.js', import.meta.url), 'utf8');
 
-await db.insert(events).values([
-  {
-    id: 'open',
-    title: 'Männerkreis',
-    slug: 'testabend',
-    eventDate: '2099-01-01',
-    startTime: '19:00',
-    endTime: '21:30',
-    location: 'Gemeindehaus',
-    street: 'Teststraße 1',
-    postalCode: '94315',
-    city: 'Straubing',
-    isPublished: true,
-  },
-  { id: 'full', title: 'Männerkreis', slug: 'voll', eventDate: '2099-02-01', maxParticipants: 1, isPublished: true },
-  { id: 'past', title: 'Männerkreis', slug: 'vorbei', eventDate: '2020-02-01', isPublished: true },
-]);
-await db
-  .insert(testimonials)
-  .values([{ quote: 'Ein ruhiger, ehrlicher Abend.', authorName: 'Tom', isPublished: true }]);
+await sandbox.seed({
+  events: [
+    {
+      id: 'open',
+      slug: 'testabend',
+      data: {
+        title: 'Männerkreis',
+        ...evening('2099-01-01'),
+        max_participants: 8,
+        location: 'Gemeindehaus',
+        street: 'Teststraße 1',
+        postal_code: '94315',
+        city: 'Straubing',
+        description: block('Ein Abend im Kreis.'),
+      },
+    },
+    { id: 'full', slug: 'voll', data: { title: 'Männerkreis', ...evening('2099-02-01'), max_participants: 1 } },
+    { id: 'past', slug: 'vorbei', data: { title: 'Männerkreis', ...evening('2020-02-01'), max_participants: 8 } },
+  ],
+  registrations: [
+    {
+      id: 'seated',
+      data: { first_name: 'Sitz', last_name: 'Test', email: 'seat@example.invalid', event: '$ref:full' },
+    },
+  ],
+  testimonials: [{ id: 'tom', data: { quote: 'Ein ruhiger, ehrlicher Abend.', name: 'Tom' } }],
+});
 
 /** listmonk, faked: every call succeeds. */
 const listmonk = Bun.serve({
@@ -59,20 +59,18 @@ const port = reservation.port!;
 
 await reservation.stop(true);
 
-const server = Bun.spawn([process.execPath, '--no-env-file', 'server.ts'], {
+const server = Bun.spawn([process.execPath, '--no-env-file', join(root, 'server.ts')], {
+  cwd: sandbox.dir,
   env: {
     PATH: process.env.PATH,
     NODE_ENV: 'test',
     HOST: '127.0.0.1',
     PORT: String(port),
-    DATABASE_PATH: process.env.DATABASE_PATH,
-    ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
-    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+    CANCEL_LINK_SECRET: 'browser-check-secret-of-at-least-32-characters',
     LISTMONK_URL: `http://127.0.0.1:${listmonk.port}`,
     LISTMONK_API_USER: 'test',
     LISTMONK_API_TOKEN: 'test',
     LISTMONK_LIST_IDS: '1',
-    LISTMONK_TX_REGISTRATION_CONFIRMATION: '1',
   },
   stdout: 'ignore',
   stderr: 'pipe',
@@ -119,7 +117,6 @@ const PAGES = [
   '/impressum',
   '/datenschutz',
   '/gibt-es-nicht',
-  '/admin/login',
 ];
 
 async function pages(browser: Browser): Promise<void> {
@@ -186,7 +183,6 @@ async function interactions(browser: Browser): Promise<void> {
   await page.waitForSelector('[data-form-status][data-tone="success"]');
   await page.goto(`${origin}/teile-deine-erfahrung`, { waitUntil: 'networkidle' });
   await page.fill('#quote', 'Ein Abend, an dem ich einfach zuhören durfte.');
-  await page.fill('#testimonial_email', 'voice@example.invalid');
   await page.check('#testimonial input[name="privacy"]');
   await page.click('#testimonial button[type="submit"]');
   await page.waitForSelector('#testimonial-status[data-tone="success"]');
@@ -205,20 +201,15 @@ async function interactions(browser: Browser): Promise<void> {
   assert.match(await plain.content(), /Vielen Dank für deine Anmeldung/);
   await noScript.close();
 
-  // The admin: a guard without a session, an accessible workspace with one.
+  // The old back office leads to EmDash's admin, which renders under its own policy.
   const admin = await browser.newContext();
   const adminPage = await admin.newPage();
 
   watch(adminPage, 'admin');
-  await adminPage.goto(`${origin}/admin`);
-  assert.match(adminPage.url(), /\/admin\/login/);
-  await admin.addCookies([{ name: SESSION_COOKIE, value: await createSession('admin@example.invalid'), url: origin }]);
-
-  for (const path of ['/admin', '/admin/events', '/admin/events/open', '/admin/events/open/registrations']) {
-    await adminPage.goto(`${origin}${path}`, { waitUntil: 'networkidle' });
-    await axe(adminPage, `admin ${path}`);
-  }
-
+  await adminPage.goto(`${origin}/admin`, { waitUntil: 'networkidle' });
+  assert.match(adminPage.url(), /\/_emdash\/admin\/(setup|login)/);
+  await adminPage.getByText('Set up your site').or(adminPage.getByRole('heading')).first().waitFor();
+  await adminPage.screenshot({ path: join(shots, 'admin-setup.png'), fullPage: true });
   await admin.close();
 }
 
@@ -252,6 +243,5 @@ try {
   server.kill();
   await server.exited;
   await listmonk.stop(true);
-  db.$client.close();
-  await rm(sandbox, { recursive: true, force: true });
+  await sandbox.remove();
 }

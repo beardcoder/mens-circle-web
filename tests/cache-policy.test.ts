@@ -6,26 +6,21 @@ import { cacheControlForRoute } from '../src/lib/cache-policy';
 
 test('nothing that carries live or signed-in state may be stored', () => {
   for (const pathname of [
-    '/admin',
-    '/admin/',
-    '/admin/login',
-    '/admin/testimonials',
-    '/admin/events/abc/registrations',
-    '/_server-islands/HomeEventStatus',
+    '/_emdash/admin',
+    '/_emdash/admin/content/registrations',
+    '/_emdash/api/plugins/mens-circle/register',
     '/_server-islands/Testimonials',
     '/_actions/register',
-    '/_actions/setRegistrationStatus',
     '/anmeldung/absagen',
   ]) {
     expect(cacheControlForRoute(pathname)).toBe('private, no-store');
   }
 });
 
-test('a path that merely starts with the same letters is not back-office', () => {
-  // `/administration` would otherwise inherit the admin policy — harmless here,
-  // but the prefix test has to mean the segment, not the substring.
-  expect(cacheControlForRoute('/administration')).toBe('public, max-age=0, must-revalidate');
-  expect(cacheControlForRoute('/adminfoo')).toBe('public, max-age=0, must-revalidate');
+test('a path that merely starts with the same letters is not private', () => {
+  // The prefix test has to mean the segment, not the substring.
+  expect(cacheControlForRoute('/_emdashfoo')).toBe('public, max-age=0, must-revalidate');
+  expect(cacheControlForRoute('/anmeldungen')).toBe('public, max-age=0, must-revalidate');
 });
 
 test('public HTML is stored but revalidated, never served stale', () => {
@@ -36,11 +31,5 @@ test('public HTML is stored but revalidated, never served stale', () => {
     // The seat count on an event page must never come out of a shared cache.
     expect(value).toContain('max-age=0');
     expect(value).toContain('must-revalidate');
-  }
-});
-
-test('sign-in routes are private', () => {
-  for (const pathname of ['/auth/login', '/auth/callback', '/auth/logout']) {
-    expect(cacheControlForRoute(pathname)).toBe('private, no-store');
   }
 });

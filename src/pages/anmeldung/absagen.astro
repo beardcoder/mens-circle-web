@@ -1,10 +1,13 @@
 ---
+import { getEmDashEntry } from 'emdash';
+
 import site from '@data/site.json';
 import { readCancelToken } from '@lib/server/cancel-token';
 import { config } from '@lib/server/config';
+import { callPlugin, PluginRefusal } from '@lib/server/plugin-route';
 import { purgePublicCache } from '@lib/server/public-data';
 import { clientIp, peerAddress, rateLimit } from '@lib/server/ratelimit';
-import { cancelOwnRegistration, readRegistrationForCancel } from '@lib/server/registrations';
+import { eventFromEntry } from '@lib/shared/event-entry';
 import { formatDateLong } from '@lib/shared/time';
 import { link } from '@lib/ui';
 
@@ -31,21 +34,39 @@ if (isPost) {
   token = String(form?.get('token') ?? '');
 }
 
-const registrationId = await readCancelToken(token);
-const found = registrationId ? await readRegistrationForCancel(registrationId) : null;
-let state: State = found ? 'confirm' : 'invalid';
+/** The registration the token names, with its event; null when either is gone. */
+const readRegistration = async (id: string | null) => {
+  const { entry } = id ? await getEmDashEntry('registrations', id) : { entry: null };
+  const eventId = entry ? String(entry.data.event ?? '') : '';
+  const { entry: eventEntry } = eventId ? await getEmDashEntry('events', eventId) : { entry: null };
 
-if (found && found.status !== 'registered' && found.status !== 'waitlist') state = 'already';
+  return entry && eventEntry
+    ? {
+        firstName: String(entry.data.first_name ?? ''),
+        cancelled: !!entry.data.cancelled_at,
+        event: eventFromEntry(eventId, String(eventEntry.data.slug ?? eventEntry.id), eventEntry.data, 0),
+      }
+    : null;
+};
 
-if (isPost && state === 'confirm' && registrationId) {
+const found = await readRegistration(await readCancelToken(token));
+let state: State = found ? (found.cancelled ? 'already' : 'confirm') : 'invalid';
+
+if (isPost && state === 'confirm') {
   if (!rateLimit('cancel', clientIp(Astro.request, peerAddress(Astro), config.TRUSTED_PROXY), 10, 3600)) {
     state = 'limited';
   } else {
-    const result = await cancelOwnRegistration(registrationId);
+    try {
+      const { result } = await callPlugin<{ result: 'cancelled' | 'already' }>(Astro.locals, 'cancel', { token });
 
-    state = result === 'cancelled' ? 'done' : result === 'already' ? 'already' : 'invalid';
+      state = result === 'cancelled' ? 'done' : 'already';
 
-    if (result === 'cancelled') await purgePublicCache(Astro);
+      if (result === 'cancelled') await purgePublicCache(Astro);
+    } catch (err) {
+      if (!(err instanceof PluginRefusal)) throw err;
+
+      state = 'invalid';
+    }
   }
 }
 
@@ -54,12 +75,11 @@ if (state === 'invalid') Astro.response.status = 404;
 if (state === 'limited') Astro.response.status = 429;
 
 const event = found?.event;
-const when = event ? formatDateLong(event.eventDate) : '';
-const onWaitlist = found?.status === 'waitlist';
+const when = event ? formatDateLong(event.event_date) : '';
 
 const titles: Record<State, string> = {
-  confirm: onWaitlist ? 'Von der Warteliste austragen?' : 'Anmeldung absagen?',
-  done: onWaitlist ? 'Du bist ausgetragen' : 'Du hast abgesagt',
+  confirm: 'Anmeldung absagen?',
+  done: 'Du hast abgesagt',
   already: 'Schon abgesagt',
   invalid: 'Dieser Link gilt nicht mehr',
   limited: 'Gerade zu viele Anfragen',
@@ -71,16 +91,14 @@ const titles: Record<State, string> = {
     <Fragment slot="lead">
       {state === 'confirm' && event && (
         <>
-          Hallo {found?.firstName || 'du'}, du bist für den Abend „{event.title}“ am {when}
-          {onWaitlist ? ' auf der Warteliste' : ' angemeldet'}. Wenn du nicht kommen kannst, sag hier ab.
-          {!onWaitlist && ' Dein Platz geht dann an die nächste Person auf der Warteliste.'}
+          Hallo {found?.firstName || 'du'}, du bist für den Abend „{event.title}“ am {when} angemeldet. Wenn du nicht
+          kommen kannst, sag hier ab. Dein Platz wird dann wieder frei.
         </>
       )}
       {state === 'done' && (
         <>
-          Danke, dass du Bescheid gibst.{' '}
-          {onWaitlist ? 'Du stehst nicht mehr auf der Warteliste.' : 'Dein Platz ist wieder frei.'} Wenn es ein anderes
-          Mal passt, freue ich mich auf dich.
+          Danke, dass du Bescheid gibst. Dein Platz ist wieder frei. Wenn es ein anderes Mal passt, freue ich mich auf
+          dich.
         </>
       )}
       {state === 'already' && <>Diese Anmeldung ist bereits abgesagt. Du musst nichts weiter tun.</>}
@@ -99,7 +117,7 @@ const titles: Record<State, string> = {
       <form method="post" action="/anmeldung/absagen" class="contents">
         <input type="hidden" name="token" value={token} />
         <Button type="submit" size="lg" class="max-sm:w-full">
-          {onWaitlist ? 'Ja, austragen' : 'Ja, ich sage ab'}
+          Ja, ich sage ab
         </Button>
         {event && (
           <Button href={`/event/${event.slug}`} variant="secondary" size="lg" class="max-sm:w-full">

@@ -1,10 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
 
 import { cacheControlForRoute } from '@lib/cache-policy';
-import { readSession, SESSION_COOKIE } from '@lib/server/auth';
-
-const isAdminPage = (pathname: string): boolean =>
-  (pathname === '/admin' || pathname.startsWith('/admin/')) && pathname !== '/admin/login';
 
 /** Adds the policy unless the route set its own; copies immutable (redirect) responses. */
 const withCacheControl = (response: Response, value: string): Response => {
@@ -23,10 +19,30 @@ const withCacheControl = (response: Response, value: string): Response => {
   }
 };
 
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
 /**
- * The admin guard and the cache policy of rendered responses. Runs inside the route
- * cache (a hit is served with the headers it stored) and only for matched routes:
- * unknown paths render the 404 page without it.
+ * Astro's own origin check, which EmDash switches off for the whole site (it guards
+ * only its routes under /_emdash): a write from another site is refused before any
+ * action or page sees it. Like EmDash's check it accepts the public origin
+ * (`context.url`, from `siteUrl`) and the host the request was sent to.
+ */
+const crossSiteWrite = (request: Request, url: URL): boolean => {
+  if (SAFE_METHODS.has(request.method) || url.pathname.startsWith('/_emdash/')) return false;
+
+  const origin = request.headers.get('origin');
+
+  if (!origin) return true;
+
+  if (origin === url.origin) return false;
+
+  return URL.canParse(origin) ? new URL(origin).host !== request.headers.get('host') : true;
+};
+
+/**
+ * The CSRF guard and the cache policy of rendered responses. Runs inside the route cache (a hit is
+ * served with the headers it stored) and only for matched routes: unknown paths
+ * render the 404 page without it. EmDash guards its own admin (/_emdash).
  */
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
@@ -34,17 +50,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Images are optimised at build time; the server never runs sharp on request.
   if (import.meta.env.PROD && pathname === '/_image') return new Response(null, { status: 404 });
 
-  const policy = cacheControlForRoute(pathname);
-
-  if (isAdminPage(pathname)) {
-    const admin = await readSession(context.cookies.get(SESSION_COOKIE)?.value);
-
-    if (!admin) {
-      return withCacheControl(context.redirect(`/admin/login?redirect=${encodeURIComponent(pathname)}`, 302), policy);
-    }
-
-    context.locals.admin = admin;
+  if (crossSiteWrite(context.request, context.url)) {
+    return new Response('Cross-site POST form submissions are forbidden', {
+      status: 403,
+      headers: { 'Cache-Control': 'private, no-store' },
+    });
   }
 
-  return withCacheControl(await next(), policy);
+  return withCacheControl(await next(), cacheControlForRoute(pathname));
 });

@@ -1,28 +1,18 @@
-# listmonk templates
+# Mail templates
 
-listmonk runs outside this repo; these are the versioned copies of its templates.
-Edit here, then paste the file into listmonk (Campaigns → Templates). The template
-IDs in the environment stay as they are.
+listmonk runs outside this repo and keeps only the newsletter now; its campaign template
+is versioned here (`campaign-mens-circle.html`). Edit it here, then paste it into listmonk
+(Campaigns → Templates).
 
-| File | listmonk type | Environment variable |
-| --- | --- | --- |
-| `tx-registration-confirmation.html` | transactional | `LISTMONK_TX_REGISTRATION_CONFIRMATION` |
-| `tx-waitlist-confirmation.html` | transactional | `LISTMONK_TX_WAITLIST_CONFIRMATION` |
-| `tx-waitlist-promotion.html` | transactional | `LISTMONK_TX_WAITLIST_PROMOTION` |
-| `tx-event-reminder.html` | transactional | `LISTMONK_TX_EVENT_REMINDER` |
-| `tx-event-message.html` | transactional | `LISTMONK_TX_EVENT_MESSAGE` |
-| `tx-admin-notification.html` | transactional | `LISTMONK_TX_ADMIN_NOTIFICATION` |
-| `campaign-mens-circle.html` | campaign | `LISTMONK_CAMPAIGN_TEMPLATE_ID` |
-
-The data each transactional template reads (`{{ .Tx.Data.* }}`) is the payload built
-in `src/lib/server/email.ts`; `tests/email-backend` (scenario `template-contract`)
-fails when a template reads a field the payload does not send. The campaign template
-wraps the body built by `buildEventNewsletterHtml` in `src/lib/server/mail/newsletter.ts` and
-adds the greeting, signature, footer and unsubscribe link.
+The participant mails (confirmation, reminder) and the admin's note of a registration
+leave the site itself, through EmDash's email pipeline: their HTML is in
+`src/lib/server/mail/` (TypeScript functions, one per mail, built from the former
+listmonk templates) and their payload in `src/lib/server/mail/index.ts`. The rules
+below apply to both.
 
 Colours come from `src/lib/shared/brand.ts` (the `--p-*` primitives of `theme.css` by
-name, plus the mail-only footer rule); `tests/brand.test.ts` fails when a template
-uses a hex value that is not there. Design as on the site (`docs/design-system.md`), open and full-bleed: three bands
+name, plus the mail-only footer rule); `tests/brand.test.ts` fails when a template here
+or in `src/lib/server/mail/` uses a hex value that is not there. Design as on the site (`docs/design-system.md`), open and full-bleed: three bands
 whose grounds run from edge to edge while their content stands on a 600px column.
 A dark opening, as on the site: the gold mark (`/images/logo-mail.png`, loaded by
 URL; mails already sent still load `/images/logo-flame.png`) and the word mark in

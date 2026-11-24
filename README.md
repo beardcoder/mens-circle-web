@@ -1,26 +1,32 @@
 # Männerkreis Niederbayern / Straubing
 
-Website for the Männerkreis. Astro 7 (Preact islands in the admin only) on the Bun runtime, Drizzle on `bun:sqlite`,
-email via an external listmonk, admin sign-in via Pocket ID. One Bun process serves
-everything through `@igloczek/astro-bun-adapter` on Bun's native HTTP server (`server.ts`): static files, SSR pages, actions and the admin UI; one Docker image, deployed with Coolify.
+Website for the Männerkreis. Astro 7 on the Bun runtime with [EmDash](https://github.com/emdash-cms/emdash)
+as the CMS: events, registrations and voices are EmDash collections on SQLite, the admin is
+EmDash's (`/_emdash/admin`, passkeys), and one native plugin (`src/plugin`) handles public
+sign-ups, the seat limit, the participant mails, cancel links, reminders and deletion.
+The newsletter list lives in an external listmonk. One Bun process serves everything through
+`@igloczek/astro-bun-adapter` on Bun's native HTTP server (`server.ts`); one Docker image,
+deployed with Coolify.
 
 ## Development
 
 ```bash
 bun install
-cp .env.example .env   # set OIDC_*, OIDC_ADMIN_GROUP or ADMIN_EMAIL, ADMIN_SESSION_SECRET
-bun run dev            # http://localhost:4321 (daemon: bunx astro dev status|logs|stop)
+cp .env.example .env   # CANCEL_LINK_SECRET; SMTP and listmonk if you want mails
+bun run dev            # http://localhost:4321, admin at /_emdash/admin
 ```
 
 ```bash
 bun run check && bun run lint && bun test   # types, lint, tests
-bun run test:pages                          # production HTML, disposable DB; builds first
+bun run test:pages                          # production HTML on a disposable EmDash site; builds first
+bun run test:browser                        # Chromium, axe and forms; builds first
 bun run format                              # prettier
 bun run build                               # runs Astro on Bun; Sharp sizes images at build time
-bun run db:generate                         # migration after editing db/schema.ts
 ```
 
-Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-circle.db`.
+The collections come from `seed/seed.json`, applied on first start. The database is
+`./data/emdash.db` (`DATABASE_PATH`, baked into the build); the admin sessions live beside
+it in `sessions/`. In `astro dev` mails go to the terminal (EmDash's console provider).
 
 ## Deployment (Coolify)
 
@@ -30,98 +36,66 @@ Migrations in `drizzle/` run on boot. The SQLite file defaults to `./data/mens-c
    volume (from an older image) to it on start.
 3. Runtime variables:
 
-| Variable                                                  | Purpose                                                      |
-| --------------------------------------------------------- | ------------------------------------------------------------ |
-| `APP_URL`                                                 | public URL for mail links, .ics, OIDC callback               |
-| `TRUSTED_PROXY`                                           | `cloudflare` or `none`: source of the rate-limit IP          |
-| `RETENTION_DAYS`                                          | anonymise participants N days after the event (≤ 30)         |
-| `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`     | Pocket ID client, callback `${APP_URL}/auth/callback`        |
-| `OIDC_ADMIN_GROUP`, `ADMIN_EMAIL`                         | who may enter `/admin` (group and/or comma-separated emails) |
-| `ADMIN_SESSION_SECRET`                                    | ≥ 32 random characters                                       |
-| `LISTMONK_URL`, `LISTMONK_API_USER`, `LISTMONK_API_TOKEN` | listmonk API (URL without `/api`)                            |
-| `LISTMONK_LIST_IDS`                                       | numeric newsletter list IDs, comma-separated                 |
-| `LISTMONK_CAMPAIGN_TEMPLATE_ID`                           | optional campaign template                                   |
-| `LISTMONK_TX_*`                                           | six transactional template IDs (below)                       |
-| `MAIL_FROM_*`, `MAIL_ADMIN_*`, `MAIL_CONTACT_ADDRESS`     | sender, admin notifications, contact                         |
-| `BACKUP_S3_*`, `BACKUP_RETENTION_DAYS`                    | optional SQLite → S3 backup                                  |
-| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                | analytics at build time; none unless both are set            |
+| Variable                                                  | Purpose                                                        |
+| --------------------------------------------------------- | -------------------------------------------------------------- |
+| `APP_URL`                                                 | public URL for mail links and .ics                             |
+| `TRUSTED_PROXY`                                           | `cloudflare` or `none`: source of the form rate-limit IP       |
+| `EMDASH_TRUSTED_PROXY_HEADERS`                            | e.g. `cf-connecting-ip`, for EmDash's sign-in rate limits      |
+| `RETENTION_DAYS`                                          | delete registrations N days after the event (≤ 30)             |
+| `CANCEL_LINK_SECRET`                                      | ≥ 32 random characters; signs the cancel links                 |
+| `EMDASH_ENCRYPTION_KEY`                                   | `bunx emdash secrets generate`; for secrets saved in the admin |
+| `EMAIL_SMTP_*`                                            | SMTP for the participant mails (or Settings → Email)           |
+| `MAIL_ADMIN_ADDRESS`, `MAIL_CONTACT_ADDRESS`              | who hears of registrations; the address mails name             |
+| `LISTMONK_URL`, `LISTMONK_API_USER`, `LISTMONK_API_TOKEN` | listmonk API (URL without `/api`), newsletter only             |
+| `LISTMONK_LIST_IDS`                                       | numeric newsletter list IDs, comma-separated                   |
+| `PUBLIC_UMAMI_ID`, `PUBLIC_UMAMI_ENDPOINT`                | analytics at build time; none unless both are set              |
 
-4. Scheduled task: `bun run scripts/schedule.ts` every minute (reminder pass every 15 min,
-   backup daily at 03:00 UTC when configured). Reminders reach participants at a fixed
-   Berlin time: from 18:00 the evening before (until 22:00), or, for later
-   registrations, from 10:00 on the day until the start. Never at night. At 02:30 UTC
-   the retention pass anonymises participants `RETENTION_DAYS` after their last event,
-   deletes the event's listmonk list and clears published testimonials' addresses.
+4. Open `/_emdash/admin` once and create the first admin with a passkey (the setup wizard).
+   Invite further people under Users.
+5. No scheduled task: the plugin's cron runs inside the server.
+
+### Moving from the old database
+
+The previous backend kept its data in `/data/mens-circle.db`. Once, after the first
+deploy of this version:
+
+```bash
+docker exec -u bun <container> bun scripts/migrate-to-emdash.ts /data/mens-circle.db /data/migration.json
+docker exec -u bun -w /data <container> bunx --bun emdash seed /data/migration.json --database /data/emdash.db --skip-media
+```
+
+It brings over every event (descriptions become Portable Text), the registrations of
+upcoming events under their old ids (cancel links in mails already sent keep working)
+and the voices without their addresses. Waitlisted, cancelled and past registrations stay
+behind. Restart the application afterwards (the route cache still holds the empty pages).
+Keep `mens-circle.db` until the site looks right, then delete it.
 
 ## Operations
 
 | When (UTC)   | What                                                                                           |
 | ------------ | ---------------------------------------------------------------------------------------------- |
 | every 15 min | reminder pass; mails leave only 18:00–22:00 Berlin the evening before or from 10:00 on the day |
-| 02:30 daily  | retention: participants anonymised `RETENTION_DAYS` (≤ 30) after their last event              |
-| 03:00 daily  | SQLite → S3 backup when `BACKUP_S3_*` is set; copies older than `BACKUP_RETENTION_DAYS` go     |
+| 02:30 daily  | retention: registrations `RETENTION_DAYS` (≤ 30) after their event anonymised and trashed      |
 
-The Coolify scheduled task runs `bun run scripts/schedule.ts` every minute in the
-container; `bun run scripts/send-reminders.ts` runs one reminder pass by hand.
-
-**Restoring a backup.** Backups are gzipped SQLite snapshots
-(`<BACKUP_S3_PREFIX>/mens-circle-<timestamp>.db.gz`, taken with `VACUUM INTO`, so
-they are consistent without the WAL files).
-
-1. Download the snapshot you want (S3 console, `aws s3 cp`, `rclone`) and unpack it:
-   `gunzip mens-circle-<timestamp>.db.gz`.
-2. Check it: `sqlite3 mens-circle-<timestamp>.db 'pragma integrity_check; select count(*) from events;'`.
-3. Stop the application in Coolify (the volume stays).
-4. Replace the database on the `/data` volume and remove the old WAL files, e.g. with a
-   helper container: `docker run --rm -v <volume>:/data -v "$PWD":/in alpine sh -c
-'rm -f /data/mens-circle.db-wal /data/mens-circle.db-shm && cp /in/mens-circle-<timestamp>.db /data/mens-circle.db && chown 1000:1000 /data/mens-circle.db'`.
-5. Start the application. Migrations newer than the snapshot run on boot; `/health`
-   answers 200 once SQLite is readable.
-
-A restore brings back data the retention pass had already anonymised; it is
-anonymised again on the next run at 02:30.
+Trashed registrations hold no personal data; empty the trash in the admin to remove them.
+Back up `/data` (the database and `sessions/`) with Coolify's volume backups.
 
 ## Content
 
+- Events, registrations, voices: `/_emdash/admin`. A sign-up arrives as a published
+  registration; a cancellation sets "Abgesagt am" and frees the seat. A full evening takes
+  no sign-ups (no waiting list). A submitted voice arrives as a draft; publishing shows it.
 - Page content and section order: directly in `src/pages/*.astro`
 - Section markup: `src/components/blocks/`; content arrives as explicit props and slots at its page location
-- Static FAQ answers, journey steps and facts use slotted items; FAQ/journey microdata comes from the visible HTML
-- Home, `/event` and event pages: server-rendered dates, seats and approved testimonials; no content hydration
-- Route cache: Astro's `memoryCache()` (path-keyed, 64 entries), 5 minutes + 5 minutes stale-while-revalidate; every action that changes public data purges it (`purgePublicCache`)
-- Event details: SSR metadata, copy and a server-rendered registration form that works without JavaScript
-- Admin guard and default `Cache-Control`: `src/middleware.ts`, `src/lib/cache-policy.ts`
-- Public CSS: shared hashed stylesheets; the SSR home photo and avatar are pre-sized AVIF/WebP files (no `/_image` at runtime)
-- Design: from the dark-botanical theme, earthier and warmer (brown-black, warm bone, one accent, a clay terracotta); Cormorant (variable) and Geist (two static cuts), ~100 kB of fonts; see [design system](docs/design-system.md)
-- Motion and page transitions: a page change is a native cross-fade (View Transitions CSS API) and nothing else, two scroll-linked bars on CSS view timelines, nothing that fades in on scroll; see the design system's "Motion" and "Page transitions"
-- Prefetch through Speculation Rules (no script)
-- Server adapter: `@igloczek/astro-bun-adapter` (standalone, bundled), served by `server.ts` on `Bun.serve()`; see [runtime](docs/runtime.md)
-- Mail fonts: endpoint `/fonts/mail/[font]`, source files in `src/assets/mail`, with the CORS header required by the external listmonk view
+- Home, `/event` and event pages: server-rendered dates, seats and approved voices from EmDash
+  (`src/lib/server/content.ts`); no content hydration
+- Route cache: Astro's `memoryCache()` (path-keyed, 64 entries), 5 minutes + 5 minutes
+  stale-while-revalidate, tagged with the collection names, so EmDash purges it on every
+  publish; the forms purge it after a sign-up
+- Default `Cache-Control` and the CSRF origin check: `src/middleware.ts`, `src/lib/cache-policy.ts`
+- Participant mails: `src/lib/server/mail/`, sent through EmDash's email pipeline
+- Design: see [design system](docs/design-system.md); runtime: [runtime](docs/runtime.md)
 - Live-seat JSON, cache lifetimes and privacy boundary: `docs/public-api.md`
 - Legal pages: `src/pages/impressum.astro`, `src/pages/datenschutz.astro` (prerendered)
-- Public component behavior: `<script>` in the owning Astro component; shared public form helpers stay in `src/lib/`
-- Admin: Preact TSX workspaces with local state, protected Astro Actions and native page navigation; see [admin UI](docs/admin-ui.md)
-- Shared layouts: `src/layouts/`; reusable UI, forms and event components: `src/components/`
-- Crawler index: `src/pages/llms.txt.ts` (prerendered)
 - Site settings, navigation: `src/data/site.json`, `src/data/navigation.json`
-- Events, registrations, testimonials: `/admin`
-- Event form validation and defaults: `src/lib/event-input.ts`; the action accepts `FormData` directly
-- Newsletter: listmonk admin
-
-## Email (listmonk)
-
-The app does not render mail. It calls `POST /api/tx` with a template ID and data;
-templates live in listmonk. Newsletter lists need double opt-in. Each transactional
-template uses `{{ .Tx.Data.subject }}` as its subject; a missing ID skips that mail.
-
-| Variable                                | Mail                           |
-| --------------------------------------- | ------------------------------ |
-| `LISTMONK_TX_REGISTRATION_CONFIRMATION` | registration confirmed         |
-| `LISTMONK_TX_WAITLIST_CONFIRMATION`     | put on the waitlist            |
-| `LISTMONK_TX_ADMIN_NOTIFICATION`        | admin notice per registration  |
-| `LISTMONK_TX_WAITLIST_PROMOTION`        | moved up from the waitlist     |
-| `LISTMONK_TX_EVENT_REMINDER`            | reminder, event today/tomorrow |
-| `LISTMONK_TX_EVENT_MESSAGE`             | message sent from the admin UI |
-
-The payload fields per template are defined in `src/lib/server/email.ts`.
-Per-event lists are created automatically and stored in `events.listmonk_list_id`;
-keep list and template IDs stable when moving listmonk instances.
+- Newsletter: listmonk admin; its campaign template is in `listmonk-templates/`

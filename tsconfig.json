@@ -1,16 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [
-    ".astro/types.d.ts",
-    "src",
-    "scripts",
-    "tests",
-    "server.ts",
-    "astro.config.mjs",
-    "eslint.config.ts",
-    "drizzle.config.ts"
-  ],
-  "exclude": ["dist", "drizzle"],
+  "include": [".astro/types.d.ts", "src", "scripts", "tests", "server.ts", "astro.config.mjs", "eslint.config.ts"],
+  "exclude": ["dist"],
   "compilerOptions": {
     "strictNullChecks": true,
     "allowJs": true,
@@ -22,7 +13,6 @@
       "@components/*": ["src/components/*"],
       "@data/*": ["src/data/*"]
     },
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsx": "react-jsx"
   }
 }

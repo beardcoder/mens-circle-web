@@ -1,6 +1,6 @@
 # 0004: No double opt-in for registrations; a cancel link instead
 
-**Status:** accepted (2026-11).
+**Status:** accepted (2026-11); the waiting list and the participant record went with 0005.
 
 **Context.** Anyone can register with any address. Before, a sign-up could also
 overwrite the stored name and phone of that address, and nobody could cancel on

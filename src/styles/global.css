@@ -6,12 +6,10 @@
 @import './theme.css';
 
 /* Classes come from src/ only (`source('..')`): words in docs, mail templates or
-   tests never become utilities. The back office has its own entry (admin.css), and
+   tests never become utilities. The back office is EmDash's own app, and
    server-only code holds no markup. */
-@source not '../layouts/AdminLayout.astro';
-@source not '../components/admin';
-@source not '../pages/admin';
 @source not '../pages/api';
+@source not '../plugin';
 @source not '../actions';
 @source not '../lib/server';
 

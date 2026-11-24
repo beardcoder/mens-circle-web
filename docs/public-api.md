@@ -16,9 +16,9 @@ Failures return `{ message: string }` with `Cache-Control: no-store`: 404 for an
 unknown or unpublished event, 503 when the database cannot be read. A failed read is
 never stored. Successes are `public, max-age=0, must-revalidate`.
 
-The registration form shows the snapshot the page was rendered with. The registration
-action checks availability in its own database transaction; a displayed count never
-reserves a seat. Posted without JavaScript, the form gets its answer from the event
+The registration form shows the snapshot the page was rendered with. The plugin's
+`register` route counts the seats again before it stores the registration; a displayed
+count never reserves a seat. Posted without JavaScript, the form gets its answer from the event
 page itself, marked `private, no-store` and kept out of the route cache.
 
 `/api/public/events/{slug}/ics` is the calendar file, linked from the event page's
@@ -40,18 +40,20 @@ and an LRU bound of 64 entries caps it at a few megabytes. `X-Astro-Cache: MISS`
 or `STALE` names the outcome.
 
 Routes opt in with `PUBLIC_CACHE` from `src/lib/server/public-data.ts`: five minutes
-fresh, five more served while one background render replaces it, tag `public`. They opt
+fresh, five more served while one background render replaces it, tagged with the
+collection names (`events`, `registrations`, `testimonials`). They opt
 in only after complete reads. A failed event read is a 503 with `no-store`; a
 testimonial-only failure still renders the home page but does not store it.
 
-Every action that changes events, registrations or testimonials awaits
-`purgePublicCache(context)` before it answers, so the next request renders current
-data. The lifetime therefore only bounds what changes with the clock (an evening
-becoming past, the upcoming list moving at midnight). Direct database edits outside the
-actions wait for expiry; a restart empties the cache. The cache is process-local: more
+EmDash purges those tags itself whenever an entry is published, changed, unpublished or
+trashed in the admin; the sign-up and the cancel page await `purgePublicCache(context)`
+before they answer. The next request therefore renders current data, and the lifetime
+only bounds what changes with the clock (an evening becoming past, the upcoming list
+moving at midnight). Writes outside both (`emdash seed`, the plugin's cron) wait for
+expiry; a restart empties the cache. The cache is process-local: more
 than one replica would need shared invalidation.
 
 The cache wraps the middleware, so a hit is served with the headers stored on its miss
-and skips the admin guard, which only concerns `/admin` (never cached). Browsers and
+(EmDash keeps pages rendered for a signed-in editor out of it). Browsers and
 Cloudflare revalidate public HTML; there is no shared-cache lifetime, because the purge
 cannot reach them.

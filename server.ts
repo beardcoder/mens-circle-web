@@ -28,37 +28,24 @@ const REVALIDATE = 'public, max-age=0';
 /**
  * Headers every response gets unless it set its own. The page CSP (script and style
  * hashes, allowed hosts) comes from Astro (astro.config.mjs): a header on rendered
- * pages, a <meta> on prerendered ones. A <meta> cannot forbid framing, so that part
- * travels here as a second policy. Back office and sign-in get a
- * complete, stricter policy without third-party hosts; a browser enforces both.
+ * pages, a <meta> on prerendered ones; EmDash sends its own complete policy for its
+ * admin. A <meta> cannot forbid framing, so that part travels here as a second
+ * policy; a browser enforces both.
  */
 const BASE_CSP = "frame-ancestors 'none'; object-src 'none'; base-uri 'self'";
 
-const ADMIN_CSP = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
-  "connect-src 'self'",
-  "frame-src 'none'",
-  "form-action 'self'",
-  BASE_CSP,
-].join('; ');
-
-const PRIVATE_PATH = /^\/(?:admin|auth)(?:\/|$)/;
-
-const securityHeaders = (pathname: string): Record<string, string> => ({
-  'content-security-policy': PRIVATE_PATH.test(pathname) ? ADMIN_CSP : BASE_CSP,
+const securityHeaders: Record<string, string> = {
+  'content-security-policy': BASE_CSP,
   'x-content-type-options': 'nosniff',
   'x-frame-options': 'DENY',
   'referrer-policy': 'strict-origin-when-cross-origin',
   'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
-});
+};
 
-const finish = (response: Response, pathname: string): Response => {
+const finish = (response: Response): Response => {
   const headers = new Headers(response.headers);
 
-  for (const [name, value] of Object.entries(securityHeaders(pathname))) {
+  for (const [name, value] of Object.entries(securityHeaders)) {
     // A second CSP header is a second policy: the browser enforces both, so Astro's
     // own (rendered pages) keeps its hashes and gains these restrictions.
     if (name === 'content-security-policy') headers.append(name, value);
@@ -98,7 +85,7 @@ const server = Bun.serve({
     if (hot && hot.until > Date.now()) return new Response(hot.body, { headers: hot.headers });
 
     const clientAddress = bun.requestIP(request)?.address;
-    const response = finish(await handler(request, { clientAddress, serverPort: bun.port }), pathname);
+    const response = finish(await handler(request, { clientAddress, serverPort: bun.port }));
 
     // An action may have purged the route cache.
     if (!isGet && request.method !== 'HEAD') hits.clear();

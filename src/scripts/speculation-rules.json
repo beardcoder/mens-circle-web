@@ -2,7 +2,7 @@
   "prefetch": [
     {
       "where": {
-        "and": [{ "href_matches": "/*" }, { "not": { "href_matches": ["/admin{/*}?", "/auth/*", "/api/*"] } }]
+        "and": [{ "href_matches": "/*" }, { "not": { "href_matches": ["/admin", "/_emdash/*", "/api/*"] } }]
       },
       "eagerness": "moderate"
     }

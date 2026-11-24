@@ -1,15 +1,13 @@
+/** HMAC-signed tokens (`<base64url JSON>.<base64url HMAC>`), as the cancel links use them. */
 import { config } from './config';
-
-export const SESSION_COOKIE = 'mc_admin';
-export const SESSION_TTL_S = 7 * 24 * 60 * 60;
 
 const encoder = new TextEncoder();
 
 const base64url = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64url');
 const fromBase64url = (s: string): Uint8Array<ArrayBuffer> => Uint8Array.from(Buffer.from(s, 'base64url'));
 
-/** Sessions need a secret of ≥ 32 characters; without one nothing is signed or trusted. */
-export const sessionSecretConfigured = (): boolean => config.ADMIN_SESSION_SECRET.length >= 32;
+/** Signing needs a secret of ≥ 32 characters; without one nothing is signed or trusted. */
+const signingSecretConfigured = (): boolean => config.CANCEL_LINK_SECRET.length >= 32;
 
 const getHmacKey = (() => {
   let cached: Promise<CryptoKey> | null = null;
@@ -17,16 +15,16 @@ const getHmacKey = (() => {
   return () =>
     (cached ??= crypto.subtle.importKey(
       'raw',
-      encoder.encode(config.ADMIN_SESSION_SECRET),
+      encoder.encode(config.CANCEL_LINK_SECRET),
       { name: 'HMAC', hash: 'SHA-256' },
       false,
       ['sign', 'verify'],
     ));
 })();
 
-/** `<base64url JSON>.<base64url HMAC>`, expiring `ttlS` seconds from now. */
+/** A token carrying `data`, expiring `ttlS` seconds from now. */
 export const signToken = async (data: Record<string, unknown>, ttlS: number): Promise<string> => {
-  if (!sessionSecretConfigured()) throw new Error('ADMIN_SESSION_SECRET is missing or shorter than 32 characters');
+  if (!signingSecretConfigured()) throw new Error('CANCEL_LINK_SECRET is missing or shorter than 32 characters');
 
   const payload = base64url(encoder.encode(JSON.stringify({ ...data, exp: Date.now() + ttlS * 1000 })));
   const sig = await crypto.subtle.sign('HMAC', await getHmacKey(), encoder.encode(payload));
@@ -37,7 +35,7 @@ export const signToken = async (data: Record<string, unknown>, ttlS: number): Pr
 /** The token's data if the signature holds and it has not expired, else null.
  *  `subtle.verify` compares in constant time, so no hand-rolled comparison. */
 export const verifyToken = async <T extends Record<string, unknown>>(token: string | undefined): Promise<T | null> => {
-  if (!sessionSecretConfigured()) return null;
+  if (!signingSecretConfigured()) return null;
 
   const [payload, sig] = token?.split('.') ?? [];
 
@@ -54,29 +52,4 @@ export const verifyToken = async <T extends Record<string, unknown>>(token: stri
   } catch {
     return null;
   }
-};
-
-/** How a sign-in was admitted: by the Pocket ID group, or by a listed, verified address. */
-export type Admission = { via: 'group'; group: string } | { via: 'email' };
-
-export const createSession = (email: string, admission: Admission = { via: 'email' }): Promise<string> =>
-  signToken({ email, ...admission }, SESSION_TTL_S);
-
-/** Whether a session's admission still holds under today's configuration. */
-const stillAdmitted = (email: string, data: { via?: unknown; group?: unknown }): boolean =>
-  data.via === 'group'
-    ? !!config.ADMIN_GROUP && data.group === config.ADMIN_GROUP
-    : config.ADMIN_EMAILS.includes(email);
-
-/**
- * The signed-in admin's address, or null. Besides the signature, the admission is
- * checked against the current `ADMIN_EMAIL` / `OIDC_ADMIN_GROUP`: removing an address
- * or changing the group ends its sessions at once, not after the 7-day lifetime.
- */
-export const readSession = async (token: string | undefined): Promise<string | null> => {
-  const data = await verifyToken<{ email?: unknown; via?: unknown; group?: unknown }>(token);
-
-  if (typeof data?.email !== 'string') return null;
-
-  return stillAdmitted(data.email, data) ? data.email : null;
 };

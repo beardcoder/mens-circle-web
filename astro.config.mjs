@@ -2,13 +2,18 @@
 
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
-import preact from '@astrojs/preact';
+import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import bun from '@igloczek/astro-bun-adapter';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig, fontProviders, memoryCache } from 'astro/config';
+import { defineConfig, fontProviders, memoryCache, sessionDrivers } from 'astro/config';
 import icon from 'astro-icon';
+import emdash from 'emdash/astro';
+import { sqlite } from 'emdash/db';
+
+import { mensCircle } from './src/plugin/index.ts';
 
 const siteUrl = process.env.PUBLIC_SITE_URL || 'https://mens-circle.de';
 const { hostname: siteHostname, protocol: siteProtocol } = new URL(siteUrl);
@@ -20,6 +25,9 @@ const umamiOrigin =
     : '';
 
 const ATLAS = 'https://atlas.bayern.de';
+
+// EmDash bakes the database location into the build: set DATABASE_PATH where `astro build` runs.
+const databasePath = process.env.DATABASE_PATH || './data/emdash.db';
 
 /** Hashes of the head's inline scripts (src/scripts/inline.ts), exactly as rendered. */
 /** @param {string} file */
@@ -70,15 +78,15 @@ export default defineConfig({
     provider: memoryCache({ max: 64, query: { include: [] } }),
   },
   output: 'server',
-  session: false,
+  // EmDash keeps the signed-in admin in Astro's session: files beside the database.
+  session: { driver: sessionDrivers.fsLite({ base: join(dirname(databasePath), 'sessions') }) },
   adapter: bun({ mode: 'standalone', bodySizeLimit: 1_048_576 }),
   vite: {
     // Tailwind v4: the theme lives in src/styles/theme.css (CSS-first).
     plugins: [tailwindcss()],
     // Bundle everything for the build only; in dev, CommonJS deps break Vite's module runner.
     // Sharp stays external: it only runs at build time (the server answers /_image with 404).
-    ssr: { noExternal: process.argv.includes('build') || undefined, external: ['bun:sqlite', 'sharp'] },
-    optimizeDeps: { exclude: ['bun:sqlite'] },
+    ssr: { noExternal: process.argv.includes('build') || undefined, external: ['sharp'] },
     css: {
       transformer: 'lightningcss',
     },
@@ -94,7 +102,8 @@ export default defineConfig({
     '/events': '/event',
     '/events/[slug]': '/event/[slug]',
     '/ueber-uns': '/#ueber',
-    '/sitemap.xml': '/sitemap-index.xml',
+    // The CMS took over the back office.
+    '/admin': '/_emdash/admin',
     // The breathing exercise and its app are gone; the home page is the closest.
     '/home': '/',
     '/atemuebung': '/',
@@ -151,16 +160,28 @@ export default defineConfig({
     },
   ],
   integrations: [
-    preact(),
+    react(),
+    // The CMS: admin at /_emdash/admin (passkeys), events, registrations and voices as
+    // collections (seed/seed.json), the registration logic and its mails in the plugin.
+    emdash({
+      database: sqlite({ url: `file:${databasePath}` }),
+      siteUrl,
+      plugins: [mensCircle()],
+      admin: {
+        siteName: 'Männerkreis',
+        favicon: '/favicon.svg',
+        locales: ['de'],
+        hiddenNavItems: ['comments', 'menus', 'redirects', 'widgets', 'sections', 'bylines', 'import'],
+      },
+    }),
     icon(),
     sitemap({
       // These public entry pages now render current data on demand.
       customPages: [new URL('/', siteUrl).href, new URL('/event', siteUrl).href],
-      // The event pages are SSR; their sitemap is a route, listed in the index here.
+      // The event pages are SSR; EmDash serves their sitemap (`/sitemap-[collection].xml`).
       customSitemaps: [new URL('/sitemap-events.xml', siteUrl).href],
-      // Every public page is indexed; only the back office and sign-in stay out.
-      // The back office and the sign-in stay out.
-      filter: (page) => !['/admin', '/auth'].some((p) => page.includes(p)),
+      // Every public page is indexed; the CMS stays out.
+      filter: (page) => !page.includes('/_emdash'),
       // Slash-less, matching the canonicals.
       serialize(item) {
         const url = new URL(item.url);

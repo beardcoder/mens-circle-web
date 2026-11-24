@@ -1,18 +1,18 @@
 ---
+import { PortableText } from 'emdash/ui';
+
 import site from '@data/site.json';
-import type { EventDTO } from '@lib/shared/dto';
-import { plainTextToHtml } from '@lib/shared/html';
+import type { EventRecord } from '@lib/shared/event-entry';
 import { link } from '@lib/ui';
 
 import Prose from '../ui/Prose.astro';
 import Section from '../ui/Section.astro';
 
 interface Props {
-  event: EventDTO;
+  event: EventRecord;
 }
 
 const { event } = Astro.props;
-const description = event.description?.trim() ?? '';
 ---
 
 <Section ground="alt" labelledby="ueber-den-abend" innerClass="grid items-start gap-x-grid gap-y-8 lg:grid-cols-12">
@@ -30,8 +30,10 @@ const description = event.description?.trim() ?? '';
     </p>
   </div>
   <div class="min-w-0 lg:col-span-6 lg:col-start-7">
-    {description ? (
-      <Prose html={plainTextToHtml(description)} />
+    {event.description ? (
+      <Prose>
+        <PortableText value={event.body} />
+      </Prose>
     ) : (
       <Prose>
         <p>

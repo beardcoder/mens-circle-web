@@ -56,8 +56,7 @@ export const eventWhenWhere = (event: EventDTO): string => {
 function statusSentence(event: EventDTO): string {
   if (event.is_past) return 'Dieser Abend hat bereits stattgefunden.';
 
-  if (event.is_full)
-    return 'Der Abend ist ausgebucht – über die Warteliste rückst du nach, sobald ein Platz frei wird.';
+  if (event.is_full) return 'Der Abend ist ausgebucht.';
 
   if (event.max_participants > 0 && event.available_spots > 0) {
     return `Noch ${event.available_spots} von ${event.max_participants} Plätzen frei.`;

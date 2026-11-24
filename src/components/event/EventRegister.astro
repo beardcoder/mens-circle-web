@@ -13,7 +13,7 @@ import type { PublicEvent } from './types';
  * The registration: a server-rendered form that posts to the `register` action.
  * Without JavaScript the page answers the POST itself (`result`, `values`); with it,
  * lib/form.ts sends the same form and answers in place. Seats are the rendered
- * snapshot; the action checks capacity again in its transaction.
+ * snapshot; the plugin checks capacity again. A full evening takes no sign-ups.
  */
 interface Props {
   event: PublicEvent;
@@ -64,6 +64,17 @@ const field = (name: string) => ({
         Termine per E-Mail erhalten
       </a>
     </>
+  ) : full ? (
+    <>
+      <h2 id="anmeldung-title" class="text-sub text-fg">
+        Dieser Abend ist voll
+      </h2>
+      <SeatRing class="mt-4" seats={event.view.seats} text="Alle Plätze sind belegt" />
+      <p class="mt-6 max-w-measure text-md text-fg-soft">Eine Anmeldung ist nicht mehr möglich.</p>
+      <a class:list={[button(), 'mt-6']} href="/event">
+        Andere Termine ansehen
+      </a>
+    </>
   ) : result && 'message' in result ? (
     <div role="status">
       <h2 id="anmeldung-title" class="text-sub text-fg">
@@ -74,17 +85,15 @@ const field = (name: string) => ({
   ) : (
     <>
       <h2 id="anmeldung-title" class="text-sub text-fg">
-        {full ? 'Dein Platz auf der Warteliste' : 'Dein Platz im Kreis'}
+        Dein Platz im Kreis
       </h2>
       <SeatRing
         class="mt-4"
         seats={event.view.seats}
-        text={full ? 'Alle Plätze sind belegt' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`}
+        text={`${event.availableSpots} von ${event.maxParticipants} Plätzen frei`}
       />
       <p class="mt-6 mb-6 max-w-measure text-md text-fg-soft">
-        {full
-          ? 'Dieser Abend ist voll. Du kannst dich auf die Warteliste setzen lassen. Sobald du nachrückst, bekommst du eine E-Mail.'
-          : 'Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.'}
+        Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.
       </p>
       <dl class="mb-8 text-sm">
         <div class="flex items-baseline justify-between gap-4">
@@ -170,7 +179,7 @@ const field = (name: string) => ({
           </div>
           <div class="mt-2 grid gap-3">
             <button type="submit" class={button({ size: 'lg', block: true })}>
-              <span data-label>{full ? 'Auf die Warteliste' : 'Anmelden'}</span>
+              <span data-label>Anmelden</span>
             </button>
             <p class="text-sm text-fg-muted">Du bekommst eine Bestätigung mit einem Link zum Absagen.</p>
           </div>
@@ -195,18 +204,17 @@ const field = (name: string) => ({
   /**
    * The moment someone has joined: his chair is taken. The next free chair of the
    * panel's seat ring fills in (the ring's own motion, global.css) and the count
-   * follows, so the ring shows the circle with him in it. Only for a seat, not for
-   * a place on the waiting list; the next page load shows the server's count anyway.
+   * follows, so the ring shows the circle with him in it; the next page load shows
+   * the server's count anyway.
    */
   const panel = document.querySelector<HTMLElement>('#anmeldung');
 
-  panel?.addEventListener('form:success', (event) => {
-    const { message } = (event as CustomEvent<{ message: string }>).detail;
+  panel?.addEventListener('form:success', () => {
     const ring = panel.querySelector<HTMLElement>('[data-seat-ring]');
     const chair = ring?.querySelector<SVGCircleElement>('circle[data-seat-free]');
     const count = ring?.querySelector<HTMLElement>('[data-seat-count]');
 
-    if (!ring || !chair || !count || /warteliste/i.test(message)) return;
+    if (!ring || !chair || !count) return;
 
     const free = Number(count.textContent) - 1;
     const line = ring.querySelector<HTMLElement>('[data-seat-text]');

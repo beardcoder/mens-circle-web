@@ -1,8 +1,7 @@
 /**
  * The signed link in every participant mail that lets them cancel their own
- * registration: HMAC like the admin session (auth.ts), bound to one registration and
- * a purpose, valid until the end of the event's day. A session token never passes
- * as a cancel token and the other way round (different fields).
+ * registration: an HMAC token (auth.ts), bound to one registration and a purpose,
+ * valid until the end of the event's day.
  */
 import { addDays, eventDay } from '../shared/time';
 import { signToken, verifyToken } from './auth';
@@ -19,7 +18,7 @@ const expiresAt = (eventDate: string): number => {
   return day ? Date.parse(`${addDays(day, 1)}T00:00:00Z`) + GRACE_MS : 0;
 };
 
-export const createCancelToken = async (registrationId: string, eventDate: string): Promise<string | null> => {
+const createCancelToken = async (registrationId: string, eventDate: string): Promise<string | null> => {
   const ttlS = Math.floor((expiresAt(eventDate) - Date.now()) / 1000);
 
   if (ttlS <= 0) return null;
@@ -27,7 +26,7 @@ export const createCancelToken = async (registrationId: string, eventDate: strin
   try {
     return await signToken({ p: PURPOSE, r: registrationId }, ttlS);
   } catch {
-    // No session secret configured: the mails fall back to "write to us".
+    // No CANCEL_LINK_SECRET: the mails fall back to "write to us".
     return null;
   }
 };

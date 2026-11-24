@@ -66,26 +66,6 @@ const { class: className } = Astro.props;
     />
   </Field>
 
-  <Field
-    for="testimonial_email"
-    label="E-Mail-Adresse"
-    hint="Wird nicht veröffentlicht. Nur für Rückfragen."
-    hintId="testimonial-email-hint"
-    errorId="testimonial-email-error"
-  >
-    <input
-      type="email"
-      id="testimonial_email"
-      name="email"
-      placeholder="deine@email.de"
-      required
-      maxlength="255"
-      autocomplete="email"
-      aria-describedby="testimonial-email-error testimonial-email-hint"
-      class={control()}
-    />
-  </Field>
-
   <div>
     <label class="flex cursor-pointer items-start gap-3">
       <input type="checkbox" name="privacy" required aria-describedby="testimonial-privacy-error" class={checkbox} />

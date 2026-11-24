@@ -66,7 +66,6 @@ facts and the FAQ, not in every section.
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `src/styles/theme.css`          | Tokens (`@theme`), primitives, variants, the surfaces, keyframes, base rules. Shared.                      |
 | `src/styles/global.css`         | Public entry: Tailwind, theme, print of a page, page transitions, the FAQ, opening and scroll motion.      |
-| `src/styles/admin.css`          | Admin entry: Tailwind and theme; AdminLayout pins the dark mode.                                           |
 | `src/lib/ui.ts`                 | Class recipes: `button()`, `control()`, `link`, `label`, field and form states, `card`, `panel`, `margin`. |
 | `src/lib/brand/theme-tokens.ts` | Parses `theme.css` into tokens for the token export.                                                       |
 | `src/lib/shared/seats.ts`       | How full a circle is (`seatFill`) and where its chairs sit on the ring (`seatDots`).                       |
@@ -84,7 +83,7 @@ set before first paint. Never a hex value in markup.
 | --------------- | ---------------------------- | --------------------- | -------------------------------- | ------------------------------------------------- |
 | Page            | `#F1E8D9` warm paper         | `#130E0A`             | `ground`                         | the page                                          |
 | Band            | `#E2D4BE`                    | `#1C150F`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates       |
-| Raised          | `#F9F3E8`                    | `#261D15`             | `raised`                         | fields, the QR square, the admin's cards          |
+| Raised          | `#F9F3E8`                    | `#261D15`             | `raised`                         | fields, the QR square                             |
 | Dark ground     | `#130E0A` / raised `#1E1610` | `#0B0705` / `#140E09` | `surface-dark`                   | opening, agreements, voices, registration, footer |
 | Text            | `#18110B` / soft `#2B2117`   | `#EBDFCD` / `#CDBCA4` | `fg`, `fg-soft`                  | titles / running text                             |
 | Secondary text  | `#5F503D`                    | `#A8957F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text   |
@@ -188,8 +187,7 @@ Open and square. Grounds, bands, the registration and the map have no radius and
 run from edge to edge or out to the window. `rounded-full` is what you press
 (buttons, chips, icon buttons, the FAQ disc) and the circle (photographs of people,
 the seat ring, the stamp, the avatar). Fields take `rounded-md` (8px) with the
-buttons' heights (48 / 44 / 36px); what floats (a dialog) and the admin's cards
-take `rounded-xl`. On public pages nothing is boxed and nothing is a rounded card:
+buttons' heights (48 / 44 / 36px); what floats (a dialog) takes `rounded-xl`. On public pages nothing is boxed and nothing is a rounded card:
 facts, questions, agreements, steps, FAQ and voices are rows between thin lines.
 `shadow-overlay` is for what floats; nothing else casts a shadow.
 
@@ -384,8 +382,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   margin, the text on the reading line; the values as rows on sand; the FAQ; one
   closing invitation on sand.
 - **Legal pages, testimonial form, 404.** `PageIntro` and one column.
-- **Admin.** The same tokens at night: forest grounds, rounded cards, the gold for the
-  one action.
+- **Admin.** EmDash's own (`/_emdash/admin`); the site's design stops at the public pages.
 
 ## Rules
 

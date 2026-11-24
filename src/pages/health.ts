@@ -1,23 +1,22 @@
 /** Readiness probe: `GET /health`, polled every 30 s by the Docker HEALTHCHECK. */
 import type { APIRoute } from 'astro';
+import { getEmDashCollection } from 'emdash';
 
 export const prerender = false;
 
 // Never let a proxy or the browser serve a stale answer.
 const headers = { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' };
 
-/** `ok` only while SQLite answers a query; a broken volume or file is a 503. */
+/** `ok` only while the CMS database answers a query; a broken volume or file is a 503. */
 const probe = async (): Promise<boolean> => {
-  try {
-    const { db } = await import('@lib/server/db');
+  const { error } = await getEmDashCollection('events', { limit: 1 });
 
-    return db.$client.query('select 1 as ok').get() !== null;
-  } catch (err) {
+  if (error) {
     // eslint-disable-next-line no-console
-    console.error('[health] database unavailable', String(err));
-
-    return false;
+    console.error('[health] database unavailable', String(error));
   }
+
+  return !error;
 };
 
 export const GET: APIRoute = async () =>

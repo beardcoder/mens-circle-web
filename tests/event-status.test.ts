@@ -60,8 +60,8 @@ test('eventView: open, full and past', () => {
 
   expect(full.state).toBe('full');
   expect(full.kicker).toBe('Termin · ausgebucht');
-  expect(full.facts.seats).toBe('Ausgebucht · Warteliste');
-  expect(full.action?.label).toBe('Auf die Warteliste');
+  expect(full.facts.seats).toBe('Ausgebucht');
+  expect(full.action?.label).toBe('Zum Termin');
 
   const past = eventView(event({ is_past: true }), 'Termin');
 

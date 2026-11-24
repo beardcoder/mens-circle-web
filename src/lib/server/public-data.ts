@@ -4,22 +4,24 @@ import type { PublicEvent, PublicEvents } from '@components/event/types';
 import type { EventDTO, TestimonialDTO } from '@lib/shared/dto';
 import { dateStatus, eventView, splitFee } from '@lib/shared/event-status';
 
-import { fetchUpcomingEventsState } from './events';
-import { fetchTestimonialsState } from './testimonials';
+import { fetchTestimonialsState, fetchUpcomingEventsState } from './content';
 
-/** Every cached public response shows database content, so one tag covers them all. */
-const PUBLIC_TAG = 'public';
+/**
+ * Every cached public response shows CMS content, tagged with the collection names:
+ * EmDash purges those tags itself when an entry is published, changed or trashed.
+ */
+const PUBLIC_TAGS = ['events', 'registrations', 'testimonials'];
 
 /**
  * Route-cache lifetime of public pages and JSON: five minutes fresh, five more served
- * while a re-render runs. Every mutation purges the tag at once, so the lifetime only
+ * while a re-render runs. Every change purges the tags at once, so the lifetime only
  * bounds what changes with the clock (an evening passing).
  */
-export const PUBLIC_CACHE = { maxAge: 300, swr: 300, tags: [PUBLIC_TAG] };
+export const PUBLIC_CACHE = { maxAge: 300, swr: 300, tags: PUBLIC_TAGS };
 
-/** Called by every action that changes events, registrations or testimonials. */
+/** Called by the public forms after a registration took a seat. */
 export const purgePublicCache = ({ cache }: Pick<APIContext, 'cache'>): Promise<void> =>
-  cache.invalidate({ tags: [PUBLIC_TAG] });
+  cache.invalidate({ tags: PUBLIC_TAGS });
 
 export const publicEvent = (event: EventDTO): PublicEvent => ({
   id: event.id,

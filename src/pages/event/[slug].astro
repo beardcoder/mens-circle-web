@@ -1,7 +1,7 @@
 ---
 import { actions, isInputError } from 'astro:actions';
 
-import { fetchEventState } from '@lib/server/events';
+import { fetchEventState } from '@lib/server/content';
 import { PUBLIC_CACHE, publicEvent } from '@lib/server/public-data';
 import { buildEventMeta } from '@lib/shared/event-meta';
 import { breadcrumbSchema, buildEventSchema } from '@lib/shared/event-schema';
@@ -94,7 +94,7 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
   ogImageAlt={meta.imageAlt}
   socialDetails={meta.details}
   schemas={[eventSchema, breadcrumbs]}
-  headerAction={event.is_past ? undefined : { href: '#anmeldung', label: event.is_full ? 'Warteliste' : 'Anmelden' }}
+  headerAction={event.is_past || event.is_full ? undefined : { href: '#anmeldung', label: 'Anmelden' }}
 >
   {/* Invitation and date, the conversation beside the signup, then the meeting place. */}
   <EventIntro event={event}>

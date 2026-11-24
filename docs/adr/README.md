@@ -9,3 +9,4 @@ what would make us revisit it.
 | [0002](0002-route-cache.md)               | Astro's route cache, purged by every mutation     |
 | [0003](0003-sqlite-single-replica.md)     | SQLite with exactly one replica                   |
 | [0004](0004-registration-confirmation.md) | No double opt-in for registrations; a cancel link |
+| [0005](0005-emdash.md)                    | EmDash instead of the custom back office          |

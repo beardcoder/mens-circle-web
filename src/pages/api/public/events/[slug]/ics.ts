@@ -7,14 +7,14 @@
  */
 import type { APIRoute } from 'astro';
 
-import { getPublishedEventBySlug } from '@lib/server/events';
+import { fetchEventState } from '@lib/server/content';
 import { buildIcs, calendarEventFrom } from '@lib/shared/ics';
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ params, site }) => {
   const slug = params.slug;
-  const event = slug ? await getPublishedEventBySlug(slug) : null;
+  const { event } = slug ? await fetchEventState(slug) : { event: null };
   const ics = event ? buildIcs(calendarEventFrom(event, site ?? 'https://mens-circle.de')) : '';
 
   if (!ics) return new Response('Not found', { status: 404, headers: { 'cache-control': 'no-store' } });

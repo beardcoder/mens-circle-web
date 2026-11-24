@@ -5,6 +5,6 @@ Allow: /
 
 # Server-internal routes — no indexable content
 Disallow: /api/
-Disallow: /admin/
+Disallow: /_emdash/
 
 Sitemap: https://mens-circle.de/sitemap-index.xml

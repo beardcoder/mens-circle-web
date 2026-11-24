@@ -14,7 +14,7 @@ type Size = 'sm' | 'md' | 'lg' | 'fill';
 
 interface Props {
   seats: { total: number; free: number } | null;
-  /** "3 von 7 Plätzen frei", "Ausgebucht · Warteliste". */
+  /** "3 von 7 Plätzen frei", "Ausgebucht". */
   text: string;
   size?: Size;
   /** `row`: the words beside the ring; `stack`: under it; `none`: only the ring (the words stand elsewhere). */

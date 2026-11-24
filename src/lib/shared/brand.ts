@@ -45,9 +45,3 @@ export const BRAND = {
 export const MAIL = {
   footerLine: '#2c2218',
 } as const;
-
-/** The mail font stacks: the site's faces where the client loads them, then system faces. */
-export const MAIL_FONTS = {
-  serif: "'Cormorant',Georgia,'Times New Roman',serif",
-  sans: "'Geist','Helvetica Neue',Helvetica,Arial,sans-serif",
-} as const;

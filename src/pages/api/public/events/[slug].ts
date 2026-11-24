@@ -1,7 +1,7 @@
 /** Live seats for the registration island; the page renders the same snapshot first. */
 import type { APIRoute } from 'astro';
 
-import { fetchEventState } from '@lib/server/events';
+import { fetchEventState } from '@lib/server/content';
 import { PUBLIC_CACHE, publicEvent } from '@lib/server/public-data';
 
 const failure = (status: number, message: string): Response =>

@@ -10,7 +10,6 @@ test('the privacy policy names the retention the job applies', () => {
 
   expect(policy).toContain("import { DEFAULT_RETENTION_DAYS as DAYS } from '@lib/shared/retention';");
   expect(policy).toContain('{DAYS} Tage nach dem Termin');
-  expect(policy).toContain('{DAYS} Tage nach der Veröffentlichung');
   // No hard-coded period that could drift from the constant.
   expect(policy).not.toMatch(new RegExp(`\\b${DEFAULT_RETENTION_DAYS} Tage nach`));
 });

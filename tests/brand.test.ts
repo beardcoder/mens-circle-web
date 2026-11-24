@@ -20,15 +20,27 @@ test('brand.ts and the --p-* primitives in theme.css name the same colours', () 
   expect({ ...BRAND } as Record<string, string>).toEqual(fromTheme);
 });
 
-test('every colour in the listmonk templates is a brand colour', () => {
+test('every colour in the mail templates is a brand colour', () => {
   const known = new Set<string>([...Object.values(BRAND), ...Object.values(MAIL)]);
-  const dir = new URL('../listmonk-templates/', import.meta.url);
 
-  for (const file of readdirSync(dir).filter((name) => name.endsWith('.html'))) {
-    const html = readFileSync(new URL(file, dir), 'utf8');
+  const dirs = [
+    { dir: new URL('../listmonk-templates/', import.meta.url), ext: '.html' },
+    { dir: new URL('../src/lib/server/mail/', import.meta.url), ext: '.ts' },
+  ];
 
-    for (const hex of html.match(/#[0-9a-f]{6}\b/gi) ?? []) {
-      expect(known.has(hex.toLowerCase()), `${file}: ${hex} is not in src/lib/shared/brand.ts`).toBe(true);
+  let files = 0;
+
+  for (const { dir, ext } of dirs) {
+    for (const file of readdirSync(dir).filter((name) => name.endsWith(ext))) {
+      const html = readFileSync(new URL(file, dir), 'utf8');
+
+      files++;
+
+      for (const hex of html.match(/#[0-9a-f]{6}\b/gi) ?? []) {
+        expect(known.has(hex.toLowerCase()), `${file}: ${hex} is not in src/lib/shared/brand.ts`).toBe(true);
+      }
     }
   }
+
+  expect(files).toBeGreaterThanOrEqual(4);
 });

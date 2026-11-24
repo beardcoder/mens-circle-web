@@ -4,10 +4,10 @@ import { z } from 'astro/zod';
 import { config } from '@lib/server/config';
 import { accepted, type FormResult, rejected } from '@lib/server/form-submission';
 import { subscribeToNewsletter } from '@lib/server/listmonk';
+import { callPlugin, PluginRefusal } from '@lib/server/plugin-route';
 import { purgePublicCache } from '@lib/server/public-data';
 import { clientIp, peerAddress, rateLimit } from '@lib/server/ratelimit';
-import { confirmationMessage, register } from '@lib/server/registrations';
-import { submitTestimonial, SUCCESS_MESSAGE as TESTIMONIAL_SUCCESS } from '@lib/server/testimonials';
+import { confirmationMessage } from '@lib/server/registration';
 
 /**
  * The public forms: rate-limited per IP, answered in the visitor's language, and never
@@ -18,7 +18,7 @@ const publicForm =
   <T>(
     key: string,
     maxPerHour: number,
-    handler: (input: T) => Promise<FormResult>,
+    handler: (input: T, context: ActionAPIContext) => Promise<FormResult>,
     fakeSuccess: (input: T) => string,
     onSuccess?: (context: ActionAPIContext) => Promise<void>,
   ) =>
@@ -35,8 +35,11 @@ const publicForm =
     let result: FormResult;
 
     try {
-      result = await handler(input);
+      result = await handler(input, context);
     } catch (err) {
+      if (err instanceof PluginRefusal)
+        throw new ActionError({ code: ActionError.statusToCode(err.status), message: err.message });
+
       // eslint-disable-next-line no-console
       console.error(`[actions] ${key} failed`, String(err));
       throw new ActionError({
@@ -81,6 +84,27 @@ const subscribe = async (input: { email: string }): Promise<FormResult> => {
   return accepted(NEWSLETTER_SUCCESS);
 };
 
+const TESTIMONIAL_SUCCESS =
+  'Vielen Dank! Deine Erfahrung ist angekommen und erscheint, sobald ich sie freigegeben habe.';
+
+/** Through the plugin, which writes the entry (and for a sign-up sends the mails). */
+const viaPlugin =
+  <T>(route: string, payload: (input: T) => Record<string, unknown>, message?: (input: T) => string) =>
+  async (input: T, context: ActionAPIContext): Promise<FormResult> => {
+    const data = await callPlugin<{ message?: string }>(context.locals, route, payload(input));
+
+    return accepted(data.message ?? message?.(input) ?? '');
+  };
+
+type Registration = {
+  event_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number?: string | null;
+};
+type Testimonial = { quote: string; author_name?: string | null; role?: string | null };
+
 export const forms = {
   register: defineAction({
     accept: 'form',
@@ -96,7 +120,13 @@ export const forms = {
     handler: publicForm(
       'event-register',
       5,
-      register,
+      viaPlugin<Registration>('register', (input) => ({
+        event_id: input.event_id,
+        first_name: input.first_name,
+        last_name: input.last_name,
+        email: input.email,
+        phone: input.phone_number ?? undefined,
+      })),
       (input) => confirmationMessage(input.first_name),
       purgePublicCache,
     ),
@@ -116,10 +146,18 @@ export const forms = {
         .max(1000, { error: 'Bitte kürze deinen Text auf maximal 1000 Zeichen.' }),
       author_name: optional,
       role: optional,
-      email,
       privacy,
       website,
     }),
-    handler: publicForm('testimonial', 3, submitTestimonial, () => TESTIMONIAL_SUCCESS),
+    handler: publicForm(
+      'testimonial',
+      3,
+      viaPlugin<Testimonial>(
+        'testimonial',
+        (input) => ({ quote: input.quote, name: input.author_name ?? undefined, role: input.role ?? undefined }),
+        () => TESTIMONIAL_SUCCESS,
+      ),
+      () => TESTIMONIAL_SUCCESS,
+    ),
   }),
 };

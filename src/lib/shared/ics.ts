@@ -68,6 +68,7 @@ type EventSource =
       cost_basis: string;
       latitude: number | null;
       longitude: number | null;
+      updated_at?: string;
     };
 
 export const calendarEventFrom = (ev: EventSource, siteUrl: string | URL): CalendarEvent => {
@@ -82,7 +83,7 @@ export const calendarEventFrom = (ev: EventSource, siteUrl: string | URL): Calen
           locationDetails: ev.location_details,
           postalCode: ev.postal_code,
           costBasis: ev.cost_basis,
-          updatedAt: undefined,
+          updatedAt: ev.updated_at || undefined,
         };
 
   return {

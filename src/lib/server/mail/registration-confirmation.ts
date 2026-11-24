@@ -1,0 +1,196 @@
+/** The participant's confirmation. Generated from the former listmonk template; edit freely. */
+import { escapeHtml as e } from '../../shared/html';
+
+export interface RegistrationConfirmationHtmlData {
+  address: string | number;
+  cancelUrl: string | number;
+  contactEmail: string | number;
+  costBasis: string | number;
+  dateDay: string | number;
+  dateLong: string | number;
+  dateWeekday: string | number;
+  description: string | number;
+  eventTitle: string | number;
+  eventUrl: string | number;
+  firstName: string | number;
+  icsUrl: string | number;
+  location: string | number;
+  locationDetails: string | number;
+  recipientEmail: string | number;
+  subject: string | number;
+  timeRange: string | number;
+}
+
+export const registrationConfirmationHtml = (d: RegistrationConfirmationHtmlData): string => `<!doctype html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
+  <title>${e(d.subject)}</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <style>.em-serif { font-family: Georgia, serif !important; } .em-sans { font-family: Arial, sans-serif !important; }</style>
+  <![endif]-->
+  <!-- Webfonts from the site itself, never from a third party: no recipient IP leaves our server -->
+  <!--[if !mso]><!-->
+  <style>
+    @font-face { font-family:'Cormorant'; font-style:normal; font-weight:500; font-display:swap; src:url(https://mens-circle.de/fonts/mail/cormorant-500.woff2) format('woff2'); }
+    /* Dates and counts stand on the line */
+    .em-serif, .em-event__date { font-feature-settings:'lnum'; font-variant-numeric:lining-nums; }
+    @font-face { font-family:'Geist'; font-style:normal; font-weight:100 900; font-display:swap; src:url(https://mens-circle.de/fonts/mail/geist.woff2) format('woff2'); }
+  </style>
+  <!--<![endif]-->
+  <style>
+    body { margin:0 !important; padding:0 !important; width:100% !important; -webkit-text-size-adjust:100%; }
+    table { border-collapse:collapse !important; }
+    img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+    a { color:#7C4117; }
+    a[x-apple-data-detectors] { color:inherit !important; text-decoration:none !important; font-size:inherit !important; font-family:inherit !important; font-weight:inherit !important; line-height:inherit !important; }
+    .em-link { color:#7C4117 !important; text-decoration:underline; text-underline-offset:3px; }
+    @media only screen and (max-width:620px) {
+      .em-sheet { width:100% !important; }
+      .em-pad { padding-left:24px !important; padding-right:24px !important; }
+      .em-display { font-size:36px !important; }
+      .em-date { font-size:23px !important; }
+      .em-key { width:84px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#f9f3e8;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#ebdfcd;opacity:0;">Dein Platz ist reserviert. Hier ist alles, was du für den Abend brauchst.&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9f3e8;">
+  <!-- A dark band: its ground runs from edge to edge, its content stands on the 600px column -->
+  <tr><td align="center" bgcolor="#130e0a" style="background-color:#130e0a;">
+    <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+    <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;"><tr><td class="em-pad" style="padding:22px 40px 44px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td style="padding-right:12px;vertical-align:middle;"><a href="https://mens-circle.de" target="_blank"><img src="https://mens-circle.de/images/logo-mail.png" width="36" height="36" alt="" style="display:block;width:36px;height:36px;"></a></td>
+          <td style="vertical-align:middle;">
+            <div class="em-serif" style="font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#EBDFCD;">Männerkreis</div>
+          </td>
+        </tr></table>
+        <!-- The opening, as on the site: label and title at poster size on the dark ground -->
+        <p class="em-sans" style="margin:44px 0 12px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#C2804A;">Anmeldung bestätigt</p>
+        <h1 class="em-display em-serif" style="margin:0;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:50px;font-weight:500;line-height:1.02;letter-spacing:-0.02em;color:#EBDFCD;">Du bist dabei.</h1>
+    </td></tr></table>
+    <!--[if mso]></td></tr></table><![endif]-->
+  </td></tr>
+  <!-- A paper band: its ground runs from edge to edge, its content stands on the 600px column -->
+  <tr><td align="center" bgcolor="#F9F3E8" style="background-color:#F9F3E8;">
+    <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+    <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;"><tr><td class="em-pad" style="padding:40px 40px 36px;">
+<p class="em-sans" style="margin:0 0 18px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#130e0a;">Hallo ${e(d.firstName)}, dein Platz beim <strong style="font-weight:600;color:#130e0a;">${e(d.eventTitle)}</strong> ist reserviert. Schön, dass du kommst.</p>
+
+<!-- The date: open between two rules, the facts that belong together -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 30px;">
+  <tr><td class="em-card" style="padding:22px 0 20px;border-top:1px solid #bfab8e;border-bottom:1px solid #bfab8e;">
+    <p class="em-sans" style="margin:0 0 10px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#5f503d;">Dein Termin</p>
+    <p class="em-date em-serif" style="margin:0;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;color:#130e0a;">${d.dateDay ? `<span style="white-space:nowrap;">${e(d.dateWeekday)}</span> <span style="white-space:nowrap;">${e(d.dateDay)}</span>` : `${e(d.dateLong)}`}</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
+      <tr><td style="padding-top:12px;border-top:1px solid #bfab8e;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+${
+  d.timeRange
+    ? `
+<tr>
+  <td width="96" class="em-key em-sans" style="width:96px;padding:4px 12px 4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Zeit</td>
+  <td class="em-sans" style="padding:4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.timeRange)}</td>
+</tr>
+`
+    : ''
+}
+${
+  d.location
+    ? `
+<tr>
+  <td width="96" class="em-key em-sans" style="width:96px;padding:4px 12px 4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Ort</td>
+  <td class="em-sans" style="padding:4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.location)}</td>
+</tr>
+`
+    : ''
+}
+${
+  d.address
+    ? `
+<tr>
+  <td width="96" class="em-key em-sans" style="width:96px;padding:4px 12px 4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Adresse</td>
+  <td class="em-sans" style="padding:4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.address)}</td>
+</tr>
+`
+    : ''
+}
+${
+  d.locationDetails
+    ? `
+<tr>
+  <td width="96" class="em-key em-sans" style="width:96px;padding:4px 12px 4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Treffpunkt</td>
+  <td class="em-sans" style="padding:4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;white-space:pre-line;">${e(d.locationDetails)}</td>
+</tr>
+`
+    : ''
+}
+${
+  d.costBasis
+    ? `
+<tr>
+  <td width="96" class="em-key em-sans" style="width:96px;padding:4px 12px 4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Beitrag</td>
+  <td class="em-sans" style="padding:4px 0;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.costBasis)}</td>
+</tr>
+`
+    : ''
+}
+        </table>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+${
+  d.icsUrl
+    ? `
+<!-- The one action: round, as everything you press on the site -->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 30px;">
+  <tr><td bgcolor="#C2804A" style="background-color:#C2804A;border-radius:999px;">
+    <a href="${e(d.icsUrl)}" target="_blank" class="em-sans" style="display:inline-block;padding:15px 28px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;line-height:1.1;color:#130e0a;text-decoration:none;border-radius:999px;">In den Kalender eintragen&nbsp;&nbsp;&rarr;</a>
+  </td></tr>
+</table>
+`
+    : ''
+}${
+  d.description
+    ? `<h2 class="em-serif" style="margin:36px 0 12px;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#130e0a;">Was dich erwartet</h2>
+<p class="em-sans" style="margin:0 0 18px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#130e0a;white-space:pre-line;">${e(d.description)}</p>
+`
+    : ''
+}<h2 class="em-serif" style="margin:36px 0 12px;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#130e0a;">Gut zu wissen</h2>
+<p class="em-sans" style="margin:0 0 18px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#130e0a;">Vorbereiten musst du nichts. Komm am besten ein paar Minuten früher, dann fangen wir gemeinsam an. Falls dir etwas dazwischenkommt, ${d.cancelUrl ? `<a href="${e(d.cancelUrl)}" class="em-link" style="color:#7C4117;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">sag hier ab</a>` : `schreib mir kurz an <a href="mailto:${e(d.contactEmail)}" class="em-link" style="color:#7C4117;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">${e(d.contactEmail)}</a>`}. Dann wird dein Platz wieder frei.</p>
+${
+  d.eventUrl
+    ? `<p class="em-sans" style="margin:0 0 18px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#5f503d;">Alle Infos zum Abend findest du jederzeit auf der <a href="${e(d.eventUrl)}" class="em-link" style="color:#7C4117;text-decoration:underline;text-underline-offset:3px;">Seite des Termins</a>.</p>
+`
+    : ''
+}
+<p class="em-sans" style="margin:32px 0 0;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.5;color:#130e0a;">Bis bald und herzliche Grüße</p>
+<p class="em-serif" style="margin:4px 0 0;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:26px;font-weight:500;line-height:1.2;color:#130e0a;">Markus</p>
+    </td></tr></table>
+    <!--[if mso]></td></tr></table><![endif]-->
+  </td></tr>
+  <!-- A dark band: its ground runs from edge to edge, its content stands on the 600px column -->
+  <tr><td align="center" bgcolor="#130e0a" style="background-color:#130e0a;">
+    <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+    <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;"><tr><td class="em-pad" style="padding:32px 40px 34px;">
+        <p class="em-serif" style="margin:0;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;color:#EBDFCD;">Männerkreis Niederbayern</p>
+        <p class="em-sans" style="margin:10px 0 0;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.65;color:#B6A48D;">Ein Männerkreis in Niederbayern, im Raum Straubing. Wir treffen uns alle zwei bis vier Wochen für zwei bis drei Stunden, auf Spendenbasis und ohne Vorerfahrung.</p>
+        <p class="em-sans" style="margin:16px 0 0;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.5;"><a href="https://mens-circle.de" target="_blank" style="color:#C2804A;text-decoration:none;">mens-circle.de</a><span style="color:#B6A48D;">&nbsp;&nbsp;·&nbsp;&nbsp;</span><a href="mailto:${e(d.contactEmail)}" target="_blank" style="color:#C2804A;text-decoration:none;white-space:nowrap;">${e(d.contactEmail)}</a></p>
+        <p class="em-sans" style="margin:20px 0 0;padding-top:16px;border-top:1px solid #2C2218;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#B6A48D;">Diese E-Mail ging an ${e(d.recipientEmail)}, weil du dich für einen Abend des Männerkreises angemeldet hast.</p>
+        <p class="em-sans" style="margin:10px 0 0;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#B6A48D;"><a href="https://mens-circle.de/impressum" target="_blank" style="color:#EBDFCD;text-decoration:underline;">Impressum</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://mens-circle.de/datenschutz" target="_blank" style="color:#EBDFCD;text-decoration:underline;">Datenschutz</a></p>
+    </td></tr></table>
+    <!--[if mso]></td></tr></table><![endif]-->
+  </td></tr>
+</table>
+</body>
+</html>
+`;

@@ -6,13 +6,14 @@ web-standard `Request`/`Response`, with no Node HTTP bridge. `server.ts` at the 
 is the process Bun runs (`bun server.ts`, `HOST` and `PORT` work): it imports the
 adapter's handler from `dist/server/entry.mjs` with the adapter's autostart off,
 serves it with `Bun.serve()` as the adapter would, drains in-flight requests on
-SIGTERM/SIGINT, and adds one header (below). Bun is also required by Drizzle's
-`bun:sqlite` backend and the scheduler. The build bundles everything except
-`bun:sqlite`, the adapter included, so the production `dependencies` are only what
-the scheduled scripts import (`drizzle-orm`, plus `openid-client` for the server lib);
-Astro, the adapter, Preact and Sharp are build-time dev dependencies. Keep the adapter
+SIGTERM/SIGINT, and adds one header (below). EmDash runs inside the same process: its
+admin, API and the site's plugin (`src/plugin`, with its in-process cron) are part of
+the Astro build, and it reads SQLite through `node:sqlite`, which Bun provides. The
+build bundles everything, the adapter included; the production `dependencies` are
+EmDash (its CLI runs the one-off migration in the image) and React, which its admin
+needs. Astro, the adapter and Sharp are build-time dev dependencies. Keep the adapter
 a dev dependency: in `dependencies` its `astro` peer would pull the whole build
-toolchain into the image (256 MB instead of 30 MB).
+toolchain into the image.
 
 ## Requests
 
@@ -29,9 +30,9 @@ toolchain into the image (256 MB instead of 30 MB).
 - **Unknown paths** get the prerendered 404 page from disk, also without middleware;
   retired URLs therefore redirect in `astro.config.mjs` (`redirects`).
 - **Rendered routes** pass through the route cache (see `docs/public-api.md`), then
-  `src/middleware.ts`: the `/admin` session guard (redirect to `/admin/login`, sets
-  `locals.admin`) and the default `Cache-Control` from `src/lib/cache-policy.ts`.
-  Actions additionally call `requireAdmin` themselves.
+  EmDash's middleware (runtime, its admin session) and `src/middleware.ts`: the CSRF
+  origin check (EmDash turns Astro's `checkOrigin` off and guards only `/_emdash`) and
+  the default `Cache-Control` from `src/lib/cache-policy.ts`.
 - **`/_image`** answers 404 in production. Prerendered pages get their image variants
   at build time; the SSR home page uses pre-sized AVIF and WebP files. Sharp never loads in the
   server process, and nobody can make it transform arbitrary sizes.
@@ -52,8 +53,7 @@ base-uri 'self'`. A route may set its own `Referrer-Policy` (the cancel link sen
 `astro.config.mjs`): `default-src 'self'`, scripts by hash plus BayernAtlas and the
 analytics host when configured, the map's iframe, fonts and images from the site.
 On rendered pages Astro sends it as a header, on prerendered ones as a `<meta>`; the
-browser enforces both policies. `/admin` and `/auth` get a complete policy without
-any third-party host on top.
+browser enforces both policies. EmDash sends its own complete policy for `/_emdash`.
 
 HSTS belongs at the edge, not in the app: set
 `Strict-Transport-Security: max-age=31536000; includeSubDomains` in Cloudflare
@@ -65,9 +65,9 @@ Mail templates load three self-hosted fonts from another origin. Their URLs rema
 (rare) and sets `Access-Control-Allow-Origin: *`, without cookies or authentication.
 Docker copies these files explicitly.
 
-Astro sessions are disabled: authentication uses signed cookies and OIDC, so the
-adapter's filesystem session driver is unnecessary. The adapter body limit is 1 MiB.
-Origin checks and the configured trusted forwarded host stay enabled.
+Astro sessions hold EmDash's signed-in admin: a file driver beside the database
+(`sessions/` next to `DATABASE_PATH`). The adapter body limit is 1 MiB. The configured
+trusted forwarded host stays enabled; the origin check lives in `src/middleware.ts`.
 
 ## Memory
 
@@ -97,7 +97,7 @@ the same build with each adapter:
 | RSS after the load          | 141–146 MB             | 85–87 MB                  |
 | Boot to `/health`           | 110–126 ms             | 70–93 ms                  |
 
-Headers, redirects, the 404 page, the admin guard, CSRF origin checks and the
+Headers, redirects, the 404 page, CSRF origin checks and the
 canonical URL behind the proxy are identical (checked side by side).
 
 ## Deployment
@@ -105,17 +105,16 @@ canonical URL behind the proxy are identical (checked side by side).
 The image is built on `oven/bun:1.4-slim` (a minor version, so a rebuild picks up
 patches but never a new minor; raise it on purpose). The entrypoint starts as root only
 to hand the `/data` volume to the unprivileged `bun` user (uid 1000; a volume created
-by an older image belongs to root), then runs the server as `bun` (`setpriv`). Scripts
-started with `docker exec` (the scheduled task runs as root) switch to `bun` themselves
-(`RUN_AS`, `src/lib/server/run-as.ts`), so the database and its WAL files always
+by an older image belongs to root), then runs the server as `bun` (`setpriv`). Run
+anything by hand with `docker exec -u bun`, so the database and its WAL files always
 belong to one user. No `ASTRO_KEY`: the site has no
-server islands. `/health` runs `select 1` against SQLite and answers 503 when the
-database cannot be opened or read, so the Docker HEALTHCHECK sees a broken volume.
+server islands. `/health` reads the events collection and answers 503 when the
+database cannot be read, so the Docker HEALTHCHECK sees a broken volume.
 
-The persistent `/data` volume keeps the database; migrations run
-on boot. `server.ts` drains in-flight requests on SIGTERM (Coolify) and exits within
-the adapter's shutdown timeout (60 s). Take the usual SQLite backup before a rollout; the previous image
-remains a rollback option while the schema is unchanged.
+The persistent `/data` volume keeps the database (`emdash.db`, baked into the build as
+`DATABASE_PATH`) and the admin sessions; EmDash runs its migrations on the first request. `server.ts` drains in-flight requests on SIGTERM (Coolify) and exits within
+the adapter's shutdown timeout (60 s). Back up `/data` before a rollout; the previous image remains a rollback option while
+the schema is unchanged.
 
 References: [`@igloczek/astro-bun-adapter`](https://github.com/Igloczek/astro-bun-adapter),
 [Astro with Bun](https://docs.astro.build/en/recipes/bun/).

@@ -79,7 +79,7 @@ interface SummaryFacts {
   place: string;
   /** The fee's main value (`splitFee`). */
   fee: string;
-  /** "5 von 12 Plätzen frei", "Ausgebucht · Warteliste" or "Hat stattgefunden". */
+  /** "5 von 12 Plätzen frei", "Ausgebucht" or "Hat stattgefunden". */
   seats: string;
 }
 
@@ -111,7 +111,7 @@ const dateLines = (dateLabel: string): [string, string] => {
 };
 
 const seatsText = (event: NextEventSummary): string =>
-  event.isFull ? 'Ausgebucht · Warteliste' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`;
+  event.isFull ? 'Ausgebucht' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`;
 
 /** Time, place, fee and seats of a dated summary. */
 const dateFacts = (next: NextEventSummary, seats = seatsText(next)): SummaryFacts => ({
@@ -137,7 +137,7 @@ export const eventView = (event: EventDTO, kicker: string, withAction = true): S
       : { total: next.maxParticipants, free: event.is_full ? 0 : Math.max(0, next.availableSpots) },
     action:
       withAction && !event.is_past
-        ? { label: event.is_full ? 'Auf die Warteliste' : 'Zur Anmeldung', href: `/event/${event.slug}` }
+        ? { label: event.is_full ? 'Zum Termin' : 'Zur Anmeldung', href: `/event/${event.slug}` }
         : null,
   };
 };

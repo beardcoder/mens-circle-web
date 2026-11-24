@@ -1,20 +1,18 @@
-/** Production HTML regression checks. Run after build; all data lives in a disposable database. */
+/**
+ * Production HTML regression checks. Run after build; all data lives in a disposable
+ * EmDash site (emdash-sandbox.ts).
+ */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const sandbox = await mkdtemp(join(tmpdir(), 'mens-circle-pages-'));
+import { block, createSandbox, evening, root } from './emdash-sandbox';
 
-process.env.DATABASE_PATH = join(sandbox, 'pages.sqlite');
-process.env.ADMIN_SESSION_SECRET = 'pages-check-secret-of-at-least-32-characters';
-process.env.ADMIN_EMAIL = 'admin@example.invalid';
+const sandbox = await createSandbox('pages');
 
-const { db } = await import('../src/lib/server/db');
-const { events, participants, registrations, testimonials } = await import('../src/lib/server/db/schema');
+process.env.CANCEL_LINK_SECRET = 'pages-check-secret-of-at-least-32-characters';
+
 const { cancelUrlFor } = await import('../src/lib/server/cancel-token');
-const { createSession, SESSION_COOKIE } = await import('../src/lib/server/auth');
 
 /** The signed cancel link: GET shows, POST cancels once, anything else is refused privately. */
 async function checkCancelLink(origin: string): Promise<void> {
@@ -26,7 +24,7 @@ async function checkCancelLink(origin: string): Promise<void> {
   assert.match(bogusHtml, /noindex/);
   assert.match(bogusHtml, /Dieser Link gilt nicht mehr/);
 
-  const link = new URL(await cancelUrlFor('cancel-me', '2099-01-01T12:00:00.000Z'));
+  const link = new URL(await cancelUrlFor('cancel-me', '2099-01-01'));
   const page = await fetch(`${origin}${link.pathname}${link.search}`);
 
   assert.equal(page.status, 200);
@@ -50,15 +48,14 @@ async function withServer(check: (origin: string) => Promise<void>): Promise<voi
 
   await reservation.stop(true);
 
-  const child = Bun.spawn([process.execPath, '--no-env-file', 'server.ts'], {
+  const child = Bun.spawn([process.execPath, '--no-env-file', join(root, 'server.ts')], {
+    cwd: sandbox.dir,
     env: {
       PATH: process.env.PATH,
       NODE_ENV: 'test',
       HOST: '127.0.0.1',
       PORT: String(port),
-      DATABASE_PATH: process.env.DATABASE_PATH,
-      ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
-      ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+      CANCEL_LINK_SECRET: process.env.CANCEL_LINK_SECRET,
     },
     stdout: 'ignore',
     stderr: 'pipe',
@@ -113,7 +110,7 @@ async function readPage(origin: string, path: string, status = 200): Promise<str
   return html;
 }
 
-/** Headers every response carries; admin and sign-in add a complete, host-free policy. */
+/** Headers every response carries; EmDash's admin brings its own complete policy. */
 function checkHeaders(path: string, headers: Headers): string {
   const csp = headers.get('content-security-policy') ?? '';
 
@@ -122,13 +119,7 @@ function checkHeaders(path: string, headers: Headers): string {
   assert.match(headers.get('permissions-policy') ?? '', /camera=\(\)/, path);
   assert.match(csp, /frame-ancestors 'none'/, path);
 
-  if (/^\/(admin|auth)/.test(path)) {
-    // The browser enforces every policy; ours is the last one and names no other host.
-    const own = csp.split(/,\s*/).at(-1) ?? '';
-
-    assert.match(own, /default-src 'self'/, `${path}: a complete admin policy`);
-    assert(!/https?:\/\//.test(own), `${path}: no third-party host in the admin policy`);
-  }
+  if (path.startsWith('/_emdash')) assert.match(csp, /default-src 'self'/, `${path}: a complete admin policy`);
 
   return csp;
 }
@@ -137,15 +128,13 @@ function checkHeaders(path: string, headers: Headers): string {
  * The page CSP: a <meta> on prerendered pages, a header on rendered ones, whose
  * script-src holds the hash of every inline script and never 'unsafe-inline'.
  */
-async function checkSecurity(origin: string, path: string, cookie = ''): Promise<void> {
-  const response = await fetch(`${origin}${path}`, { redirect: 'manual', headers: cookie ? { Cookie: cookie } : {} });
+async function checkSecurity(origin: string, path: string): Promise<void> {
+  const response = await fetch(`${origin}${path}`, { redirect: 'manual' });
   const html = await response.text();
-
-  if (cookie) assert.equal(response.status, 200, `${path}: signed in`);
-
   const csp = checkHeaders(path, response.headers);
 
-  if (!html.includes('<html')) return;
+  // EmDash's admin is its own app under its own policy.
+  if (!html.includes('<html') || path.startsWith('/_emdash')) return;
 
   const meta = /<meta http-equiv="content-security-policy" content="([^"]*)"/.exec(html)?.[1];
   const policy = meta ?? csp.split(/,\s*(?=default-src)/).find((p) => /script-src/.test(p) && /sha256/.test(p));
@@ -164,7 +153,7 @@ async function checkSecurity(origin: string, path: string, cookie = ''): Promise
 }
 
 /** The registration is a server-rendered form that also works without JavaScript. */
-async function checkRegistration(origin: string): Promise<void> {
+async function checkRegistration(origin: string, eventId: string): Promise<void> {
   const page = await readPage(origin, '/event/testabend');
 
   assert.match(page, /<form id="register" method="post" action="\?_action=register"/);
@@ -177,7 +166,7 @@ async function checkRegistration(origin: string): Promise<void> {
       body: new URLSearchParams(body),
     });
 
-  const invalid = await post({ event_id: 'open', first_name: 'Ohne', last_name: '', email: 'kaputt' });
+  const invalid = await post({ event_id: eventId, first_name: 'Ohne', last_name: '', email: 'kaputt' });
   const invalidHtml = await invalid.text();
 
   assert.equal(invalid.status, 400);
@@ -186,7 +175,7 @@ async function checkRegistration(origin: string): Promise<void> {
   assert.match(invalidHtml, /value="Ohne"/, 'what was typed stays');
 
   const valid = await post({
-    event_id: 'open',
+    event_id: eventId,
     first_name: 'Ohne',
     last_name: 'Skript',
     email: 'noscript@example.invalid',
@@ -225,6 +214,8 @@ async function checkAssets(origin: string, home: string): Promise<void> {
 }
 
 try {
+  // The collections without entries: an empty schedule.
+  await sandbox.seed();
   await withServer(async (origin) => {
     for (const path of ['/', '/event']) {
       const html = await readPage(origin, path);
@@ -234,42 +225,45 @@ try {
     }
   });
 
-  await db.insert(events).values([
-    {
-      id: 'open',
-      title: 'Männerkreis',
-      slug: 'testabend',
-      eventDate: '2099-01-01T12:00:00.000Z',
-      startTime: '19:00',
-      endTime: '21:30',
-      city: 'Straubing',
-      isPublished: true,
-    },
-    {
-      id: 'full',
-      title: 'Männerkreis',
-      slug: 'voll',
-      eventDate: '2099-02-01T12:00:00.000Z',
-      maxParticipants: 0,
-      isPublished: true,
-    },
-    { id: 'draft', title: 'PRIVATE EVENT', slug: 'private', eventDate: '2099-03-01T12:00:00.000Z' },
-  ]);
-  await db.insert(testimonials).values([
-    {
-      id: 'approved',
-      quote: 'Eine freigegebene Erfahrung.',
-      authorName: 'Testteilnehmer',
-      email: 'PRIVATE EMAIL',
-      isPublished: true,
-    },
-    { id: 'long', quote: 'Eine längere Erfahrung. '.repeat(25), isPublished: true },
-    { id: 'hidden', quote: 'PRIVATE QUOTE' },
-  ]);
-  await db.insert(participants).values({ id: 'guest', email: 'guest@example.invalid', firstName: 'Gast' });
-  await db
-    .insert(registrations)
-    .values({ id: 'cancel-me', eventId: 'open', participantId: 'guest', status: 'registered', registeredAt: '1' });
+  await sandbox.seed({
+    events: [
+      {
+        id: 'open',
+        slug: 'testabend',
+        data: {
+          title: 'Männerkreis',
+          ...evening('2099-01-01'),
+          city: 'Straubing',
+          max_participants: 8,
+          description: block('Ein Abend.'),
+        },
+      },
+      { id: 'full', slug: 'voll', data: { title: 'Männerkreis', ...evening('2099-02-01'), max_participants: 1 } },
+      {
+        id: 'draft',
+        slug: 'private',
+        status: 'draft',
+        data: { title: 'PRIVATE EVENT', ...evening('2099-03-01'), max_participants: 8 },
+      },
+    ],
+    registrations: [
+      {
+        id: 'cancel-me',
+        data: { first_name: 'Gast', last_name: 'Test', email: 'guest@example.invalid', event: '$ref:open' },
+      },
+      {
+        id: 'seated',
+        data: { first_name: 'Sitz', last_name: 'Test', email: 'seat@example.invalid', event: '$ref:full' },
+      },
+    ],
+    testimonials: [
+      { id: 'approved', data: { quote: 'Eine freigegebene Erfahrung.', name: 'Testteilnehmer' } },
+      { id: 'long', data: { quote: 'Eine längere Erfahrung. '.repeat(25) } },
+      { id: 'hidden', status: 'draft', data: { quote: 'PRIVATE QUOTE' } },
+    ],
+  });
+
+  const openId = sandbox.eventId('testabend');
 
   await withServer(async (origin) => {
     const first = await fetch(origin);
@@ -304,38 +298,17 @@ try {
     assert.match(home, /(Eine längere Erfahrung\. ){25}/);
     assert.doesNotMatch(home, /<details class="group\/quote"/);
     assert.match(overview, /data-state="full"/);
-    assert.match(overview, /Auf die Warteliste/);
+    assert.match(overview, /Ausgebucht/);
     assert.match(overview, /href="\/event\/testabend"/);
 
     await checkAssets(origin, home);
 
-    for (const path of ['/', '/event', '/event/testabend', '/impressum', '/admin/login', '/admin', '/favicon.svg']) {
+    for (const path of ['/', '/event', '/event/testabend', '/impressum', '/_emdash/admin/setup', '/favicon.svg']) {
       await checkSecurity(origin, path);
     }
 
-    // The signed-in workspace hydrates Preact islands under the same policies.
-    const session = `${SESSION_COOKIE}=${await createSession('admin@example.invalid')}`;
-
-    for (const path of ['/admin', '/admin/events/open/registrations', '/admin/testimonials']) {
-      await checkSecurity(origin, path, session);
-    }
-
-    // The attendance list: only signed in, private, formulas defused.
-    assert.equal((await fetch(`${origin}/admin/events/open/registrations.csv`, { redirect: 'manual' })).status, 302);
-    const csv = await fetch(`${origin}/admin/events/open/registrations.csv`, { headers: { Cookie: session } });
-
-    assert.equal(csv.status, 200);
-    assert.equal(csv.headers.get('cache-control'), 'private, no-store');
-    const bytes = new Uint8Array(await csv.arrayBuffer());
-
-    assert.deepEqual([...bytes.slice(0, 3)], [0xef, 0xbb, 0xbf], 'a BOM, so spreadsheets read UTF-8');
-    assert.match(
-      new TextDecoder().decode(bytes),
-      /^Name;Telefon;E-Mail;Status;Notiz\r\nGast;;guest@example\.invalid;Angemeldet;/,
-    );
-
     await checkCancelLink(origin);
-    await checkRegistration(origin);
+    await checkRegistration(origin, openId);
 
     // The calendar file iOS opens: a real URL, text/calendar, inline, linked from the page.
     const eventHtml = await fetch(`${origin}/event/testabend`).then((r) => r.text());
@@ -381,18 +354,17 @@ try {
 
     assert.equal((await fetch(`${origin}/fonts/mail/not-a-font.woff2`)).status, 404);
     assert.equal((await fetch(`${origin}/health`, { method: 'HEAD' })).status, 200);
+    // The old back office points at EmDash's admin, which wants a sign-in (or its setup).
     const admin = await fetch(`${origin}/admin`, { redirect: 'manual' });
 
-    assert.equal(admin.status, 302);
-    assert.match(admin.headers.get('location') ?? '', /admin\/login/);
-    assert.equal(admin.headers.get('cache-control'), 'private, no-store');
+    assert.equal(new URL(admin.headers.get('location') ?? '', origin).pathname, '/_emdash/admin');
+    const cms = await fetch(`${origin}/_emdash/admin`, { redirect: 'manual' });
 
-    for (const path of ['/admin/events', '/admin/events/open/registrations', '/admin/testimonials']) {
-      const page = await fetch(`${origin}${path}`, { redirect: 'manual' });
+    assert.equal(cms.status, 302);
+    assert.match(cms.headers.get('location') ?? '', /\/_emdash\/admin\/(setup|login)/);
+    const registrationsApi = await fetch(`${origin}/_emdash/api/content/registrations`);
 
-      assert.equal(page.status, 302, `${path} must require a session`);
-      assert.match(page.headers.get('location') ?? '', /admin\/login/);
-    }
+    assert.equal(registrationsApi.status, 401, 'registrations never leave the CMS without a sign-in');
 
     const retired = await fetch(`${origin}/atemuebung`, { redirect: 'manual' });
 
@@ -432,7 +404,12 @@ try {
       assert(paths.includes(path), `${path} is public and belongs in the sitemap`);
     }
 
-    assert(!paths.some((path) => path.startsWith('/admin') || path.startsWith('/auth')));
+    assert(!paths.some((path) => path.startsWith('/_emdash')));
+
+    const events = await fetch(`${origin}/sitemap-events.xml`).then((r) => r.text());
+
+    assert.match(events, /\/event\/testabend</);
+    assert.doesNotMatch(events, /\/event\/private</);
 
     console.info(
       `Public HTML: home ${Buffer.byteLength(home)} bytes, overview ${Buffer.byteLength(overview)} bytes; zero hydrated islands.`,
@@ -440,7 +417,7 @@ try {
   });
 
   // A malformed disposable database exercises unavailable-data states on a fresh server/cache.
-  db.$client.run('DROP TABLE testimonials');
+  sandbox.breakTable('ec_testimonials');
 
   await withServer(async (origin) => {
     const response = await fetch(origin);
@@ -452,7 +429,7 @@ try {
     assert.match(html, /Die Erfahrungen lassen sich gerade nicht laden/);
   });
 
-  db.$client.run('ALTER TABLE events RENAME TO unavailable_events');
+  sandbox.breakTable('ec_events');
 
   await withServer(async (origin) => {
     for (const path of ['/', '/event']) {
@@ -464,10 +441,7 @@ try {
     }
   });
 
-  // A database the server cannot open fails the health probe instead of reporting ok.
-  const workingDb = process.env.DATABASE_PATH;
-
-  process.env.DATABASE_PATH = sandbox;
+  // A database the server cannot read fails the health probe instead of reporting ok.
   await withServer(async (origin) => {
     for (const method of ['GET', 'HEAD']) {
       const health = await fetch(`${origin}/health`, { method });
@@ -476,12 +450,10 @@ try {
       assert.equal(health.headers.get('cache-control'), 'no-store');
     }
   });
-  process.env.DATABASE_PATH = workingDb;
 
   console.info(
     'Public page checks passed: empty, scheduled, full, private, unavailable, images, sitemap, security and health.',
   );
 } finally {
-  db.$client.close();
-  await rm(sandbox, { recursive: true, force: true });
+  await sandbox.remove();
 }
