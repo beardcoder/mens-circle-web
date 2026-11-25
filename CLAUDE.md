@@ -294,7 +294,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   busy part of a photograph.
 - Shapes: open and square. Grounds, bands, the registration and the map have no
   radius. `rounded-full` for what you press and for circles (people's photographs,
-  seat ring, stamp, avatar); fields `rounded-md` (8px) with the buttons' heights;
+  seat ring, stamp, avatar); single-line fields are pills at the buttons' heights; textareas use `rounded-xl`;
   only what floats (a dialog) takes `rounded-xl`. No rounded
   cards on public pages: facts, steps, agreements, FAQ and voices are rows between
   lines. No shadow anywhere; what floats has a line and the dimmed page behind it. Images: a photograph has no
@@ -331,8 +331,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   (the personal page), as the home page's poster opening on the dark ground (`overHero`
   on the layout). Section titles are `text-section` everywhere on the home page.
 - Header 72px: links from `nav`, one action; over the home opening clear with light
-  text until the page moves (`data-scrolled`), then 95 % paper; fixed bars blur only
-  from `lg` on a hovering pointer. The phone menu is a native modal `<dialog>` on
+  text until the page moves (`data-scrolled`), then the opaque page ground. The phone menu is a native modal `<dialog>` on
   the dark ground, opening as a circle.
 - Motion (design-system.md, "Motion"): calm, and every piece has a reason. What
   moves: the change of page, a fade and nothing else (cross-document view
@@ -364,7 +363,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   Never set a state attribute on `<html>` while the page moves; never read layout
   or `scrollY` at load (use an `IntersectionObserver`); nothing that holds the LCP
   waits for a script. No `content-visibility`.
-- No layout shift: summary lines are one line (`truncate`); a title's measure is in
+- No layout shift: summary dates wrap on narrow screens; a title's measure is in
   `em`, never `ch`.
 - Page transitions are a native cross-document cross-fade (`@view-transition`,
   `plus-lighter`, one duration, linear). No `:has()` on `body` or `html`.

@@ -194,8 +194,8 @@ nothing else stands at an angle), shadows, boxes or cards around content.
 Open and square. Grounds, bands, the registration and the map have no radius and
 run from edge to edge or out to the window. `rounded-full` is what you press
 (buttons, chips, icon buttons, the FAQ disc) and the circle (photographs of people,
-the seat ring, the stamp, the avatar). Fields take `rounded-md` (8px) with the
-buttons' heights (48 / 44 / 36px); what floats (a dialog) takes `rounded-xl`. On public pages nothing is boxed and nothing is a rounded card:
+the seat ring, the stamp, the avatar). Single-line fields use the same pill shape and heights as buttons (48 / 44 / 36px).
+Textareas and dialogs use the fixed 28px radius (`rounded-xl`). On public pages nothing is boxed and nothing is a rounded card:
 facts, questions, agreements, steps, FAQ and voices are rows between thin lines.
 Nothing casts a shadow; what floats has a line (`line-strong`) and the dimmed page behind it.
 
@@ -321,10 +321,10 @@ mobile score than it does live.
 | `LinkList`, `Prose` (`width`)                     | Where-next rows; rich text (`measure` / `column`)                                                         |
 | `ModeToggle`                                      | Auto · Hell · Dunkel, in the footer and the phone menu                                                    |
 
-**Header.** 72px: the mark in the accent and the word mark; from `nav` five links and one
+**Header.** 72px: the mark in the accent and the word mark; from `nav` four links and one
 action. Over the home opening the bar is clear with light text and its action is
 outlined (the opening's own action is the one filled button on that screen); once
-the page moves it is paper at 95 % and the action fills. The phone menu is a native
+the page moves it uses the opaque page ground and the action fills. The phone menu is a native
 modal `<dialog>` on the dark ground, opening as a circle from its button.
 
 **Footer.** The dark ground on every page, a line at its top: the lockup and one line

@@ -37,9 +37,8 @@ const { class: className } = Astro.props;
       minlength="10"
       maxlength="1000"
       aria-describedby="testimonial-quote-error testimonial-quote-hint"
-      class:list={[control(), 'min-h-40 resize-y']}
-    >
-    </textarea>
+      class:list={[control('md', 'multiline'), 'min-h-40 resize-y py-4']}
+    ></textarea>
     {/* The rule and the live count on one line under the field. */}
     <span class="mt-2 flex justify-between gap-4 text-sm text-fg-muted">
       <span id="testimonial-quote-hint">Mindestens 10, höchstens 1000 Zeichen.</span>

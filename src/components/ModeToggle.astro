@@ -25,7 +25,7 @@ const OPTIONS = [
   aria-label="Darstellung"
   data-mode-picker
   hidden
-  class:list={['flex w-fit items-center gap-1 rounded-full border border-line p-1 text-sm', className]}
+  class:list={['flex w-fit items-center gap-1 rounded-full border border-line-strong p-1 text-sm', className]}
 >
   {OPTIONS.map((option) => (
     <button
@@ -33,7 +33,7 @@ const OPTIONS = [
       data-mode-option={option.mode}
       aria-pressed={option.mode === 'auto' ? 'true' : 'false'}
       title={option.title}
-      class="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 text-fg-muted transition-[color,background-color,scale] duration-150 ease-out hover:text-fg active:scale-[0.97] aria-pressed:bg-fg/10 aria-pressed:text-fg motion-reduce:active:scale-100"
+      class="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 text-fg-muted transition-[color,background-color,scale] duration-150 ease-out hover:bg-fg/6 hover:text-fg active:scale-[0.97] aria-pressed:bg-fg aria-pressed:text-surface motion-reduce:active:scale-100"
     >
       <Icon
         name={option.icon}
@@ -46,6 +46,8 @@ const OPTIONS = [
 </div>
 
 <script>
+  import site from '@data/site.json'
+
   /**
    * Day and night: `data-mode` on <html> is "light" | "dark" when pinned, absent for
    * Auto (the OS decides, live). Layout.astro applies it before first paint; this
@@ -58,7 +60,7 @@ const OPTIONS = [
   const STORAGE_KEY = 'mc-appearance'
 
   /** Mobile browser chrome colour per resolved mode (the page's ground). */
-  const THEME_COLOR: Record<Mode, string> = { light: '#f1e8d9', dark: '#130e0a' }
+  const THEME_COLOR: Record<Mode, string> = { light: site.themeColor, dark: site.themeColorDark }
 
   const darkQuery = matchMedia('(prefers-color-scheme: dark)')
 

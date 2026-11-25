@@ -138,9 +138,9 @@ const field = (name: string) => ({
         />
         <div
           data-hide-on-success
-          class="grid gap-6 transition-[opacity,display] transition-discrete duration-150 ease-out [&[hidden]]:opacity-0"
+          class="@container grid gap-6 transition-[opacity,display] transition-discrete duration-150 ease-out [&[hidden]]:opacity-0"
         >
-          <div class="grid gap-5 min-[22.5rem]:grid-cols-2 min-[22.5rem]:gap-4">
+          <div class="grid gap-6 @min-[24rem]:grid-cols-2 @min-[24rem]:gap-4">
             <Field
               for={`${id}-first_name`}
               label="Vorname"

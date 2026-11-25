@@ -160,8 +160,8 @@
   --container-measure: 38rem; /* a line of running text, ~62 characters */
 
   /* Open and square: grounds, bands, the registration and the map have no radius.
-     `full` is what you press (buttons, chips, toggles) and the circle; fields take
-     `md`; what floats (a dialog) `xl`. No rounded card on a
+     `full` is what you press (buttons, chips, toggles) and the circle; single-line fields are pills too.
+     Multiline fields and dialogs use `xl`. No rounded card on a
      public page. */
   --radius-md: 0.5rem;
   --radius-xl: 1.75rem;

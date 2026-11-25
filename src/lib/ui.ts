@@ -43,24 +43,21 @@ export const link
 
 type ControlSize = 'md' | 'sm' | 'xs'
 
-/**
- * Fields share the buttons' heights, outline, focus and motion, in a softer shape:
- * rounded corners (`md`), so a textarea and an input look alike; the control
- * outline, the site's focus outline.
- */
+/** Shared input surface. The visible outline and keyboard focus follow the current ground. */
 const CONTROL_BASE
-  = 'rounded-md border border-line-bold bg-transparent font-sans text-fg placeholder:text-fg-muted transition-[border-color,background-color] duration-180 ease-out hover:not-focus:not-disabled:border-fg focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger'
+  = 'min-w-0 border border-line-bold bg-fg/3 font-sans text-fg placeholder:text-fg-muted transition-[border-color,background-color] duration-150 hover:not-focus:not-disabled:not-aria-invalid:border-fg focus-visible:border-accent focus-visible:bg-surface disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger'
 
 /** The buttons' heights and text sizes; 16px at least on the public forms, anything smaller makes iOS zoom on focus. */
 const CONTROL_SIZES: Record<ControlSize, string> = {
-  md: 'block min-h-12 w-full px-4 py-2.5 text-base leading-normal',
-  sm: 'block min-h-11 w-full px-3.5 py-2 text-[0.9375rem] leading-normal',
+  md: 'block min-h-12 w-full px-5 py-2.5 text-base leading-normal',
+  sm: 'block min-h-11 w-full px-4 py-2 text-[0.9375rem] leading-normal',
   /** A select inside a dense admin row. */
   xs: 'inline-block min-h-9 w-auto px-3 py-1.5 text-sm leading-normal',
 }
 
 /** Text inputs, textareas and selects: one family everywhere. `md` on the public forms, `sm` and `xs` in the admin. */
-export const control = (size: ControlSize = 'md'): string => `${CONTROL_BASE} ${CONTROL_SIZES[size]}`
+export const control = (size: ControlSize = 'md', shape: 'pill' | 'multiline' = 'pill'): string =>
+  [CONTROL_BASE, CONTROL_SIZES[size], shape === 'multiline' ? 'rounded-xl' : 'rounded-full'].join(' ')
 
 /** A field's label: always visible, above its control. */
 export const fieldLabel = 'mb-2 block text-sm font-semibold text-fg'
@@ -77,6 +74,9 @@ export const formStatus
   = 'flex items-start gap-2 text-base font-medium transition-[opacity,translate,display] transition-discrete duration-200 ease-out starting:translate-y-1 starting:opacity-0 motion-reduce:starting:translate-y-0 before:mt-0.5 before:grid before:size-5 before:shrink-0 before:place-items-center before:rounded-full before:text-xs before:leading-none before:font-bold before:text-surface data-[tone=error]:text-danger data-[tone=error]:before:bg-danger data-[tone=error]:before:content-["!"] data-[tone=success]:text-fg data-[tone=success]:before:bg-fg data-[tone=success]:before:content-["✓"]'
 
 export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer accent-accent'
+
+/** Decorative end mark on a whole clickable row. The row provides the focus and touch target. */
+export const rowDisc = 'grid size-9 shrink-0 place-items-center rounded-full border border-line-bold text-fg transition-colors duration-150 group-hover/row:border-fg group-focus-visible/row:border-fg'
 
 /** A short label over data or a group: sentence case in the secondary text colour. */
 export const label = 'font-sans text-sm font-semibold text-fg-muted'

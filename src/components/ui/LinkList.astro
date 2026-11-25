@@ -1,6 +1,8 @@
 ---
 import { Icon } from 'astro-icon/components'
 
+import { rowDisc } from '@lib/ui'
+
 /** Where to go next: whole rows between thin lines as links, a title, an optional line, a small arrow. */
 interface Item {
   href: string
@@ -27,11 +29,9 @@ const { items, class: className } = Astro.props
         class="group/row grid min-h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-1 py-4"
       >
         <span class="text-xl font-semibold text-fg transition-colors duration-180">{item.title}</span>
-        <Icon
-          name="arrow"
-          aria-hidden="true"
-          class="col-start-2 row-span-2 row-start-1 size-5 text-accent transition-transform duration-180 group-hover/row:translate-x-0.5 group-active/row:translate-x-1"
-        />
+        <span aria-hidden="true" class:list={[rowDisc, 'col-start-2 row-span-2 row-start-1']}>
+          <Icon name="arrow" class="size-4 motion-safe:transition-transform motion-safe:group-hover/row:translate-x-0.5" />
+        </span>
         {item.text && <span class="text-base text-fg-muted">{item.text}</span>}
       </a>
     </li>

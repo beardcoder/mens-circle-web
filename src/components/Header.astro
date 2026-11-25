@@ -9,7 +9,7 @@ import ModeToggle from './ModeToggle.astro'
 import Container from './ui/Container.astro'
 
 /**
- * The bar, 72px: the mark on the left; from `nav` (1100px) the five content links
+ * The bar, 72px: the mark on the left; from `nav` (1100px) the content links
  * and the one filled action on the right, below that the action and a menu
  * button. Over a dark opening (the home page, the personal page; `over-hero:`) it starts clear with light text
  * and turns to the page's opaque paper once the page moves (`data-scrolled`, set
@@ -29,7 +29,7 @@ const { action, overHero = false } = Astro.props
 const links = nav.header.links
 const cta = action ? { url: action.href, label: action.label, umamiTarget: 'event-registration' } : nav.header.cta
 /** The word mark gives way on narrow phones, a little earlier beside an event's longer action. */
-const wordmark = action ? 'max-[25.5rem]:sr-only' : 'max-[24rem]:sr-only'
+const wordmark = action ? 'max-[23.5rem]:sr-only' : 'max-[22rem]:sr-only'
 
 const isCurrentPage = (url: string): boolean => {
   const target = new URL(url, Astro.url)
@@ -43,7 +43,7 @@ const linkClass =
 
 /** What you press is round. */
 const roundButton =
-  'inline-flex min-h-11 items-center gap-2 rounded-full border border-current/25 px-4 text-base font-medium transition-[border-color,background-color,scale] duration-150 ease-out hover:border-current/60 hover:bg-current/6 active:scale-[0.97] motion-reduce:active:scale-100'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-current/50 px-4 text-base font-medium transition-[border-color,background-color,scale] duration-150 ease-out hover:border-current/60 hover:bg-current/6 active:scale-[0.97] motion-reduce:active:scale-100'
 ---
 
 {/* 24px down the page: once it has scrolled out of view, the bar turns to the paper. */}
@@ -57,9 +57,8 @@ const roundButton =
   data-over-hero={overHero || undefined}
   class:list={[
     'group/header fixed inset-x-0 top-0 z-40 h-header text-fg print:hidden',
-    // The bar's ground: the page's paper, a little translucent over a blur, with a
-    // thin line. It switches at once, ground and text together.
-    'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:border-b before:border-line before:bg-ground/95 lg:hover-device:before:bg-ground/88 lg:hover-device:before:backdrop-blur-xl',
+    // The opaque ground keeps scrolled titles from showing through the wordmark.
+    'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:border-b before:border-line before:bg-ground',
     // Over the dark opening: clear with light text until the page moves.
     'over-hero:text-paper over-hero:before:opacity-0 over-hero:data-[scrolled]:text-fg over-hero:data-[scrolled]:before:opacity-100',
   ]}
@@ -124,7 +123,7 @@ const roundButton =
       aria-controls="nav"
       aria-haspopup="dialog"
       aria-expanded="false"
-      class:list={[roundButton, 'nav:hidden max-sm:px-2.5']}
+      class:list={[roundButton, 'nav:hidden max-sm:size-11 max-sm:p-0']}
     >
       <Icon
         name="menu"
