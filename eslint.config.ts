@@ -5,11 +5,10 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 import astro from 'eslint-plugin-astro'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
-import eslintPluginAstro from 'eslint-plugin-astro'
 
 export default defineConfig([
   {
-    ignores: ['dist/**', '.astro/**', '.claude/**', 'public/**', '**/*.min.js'],
+    ignores: ['dist/**', '.astro/**', '.claude/**', '.emdash/**', 'public/**', '**/*.min.js'],
   },
   js.configs.recommended,
   tseslint.configs.recommended,
@@ -49,7 +48,6 @@ export default defineConfig([
     files: ['scripts/**', 'server.ts'],
     rules: { 'no-console': 'off' },
   },
-  eslintConfigPrettier,
   { ...stylistic.configs.recommended, ignores: ['**/*.astro'] },
-  { ...eslintPluginAstro.configs.recommended, rules: {} },
+  eslintConfigPrettier,
 ])

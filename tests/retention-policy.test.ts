@@ -1,17 +1,17 @@
 import { readFileSync } from 'node:fs'
 import { expect, test } from 'bun:test'
 
-import { DEFAULT_RETENTION_DAYS } from '../src/lib/shared/retention'
-
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8')
 
 test('the privacy policy names the retention the job applies', () => {
   const policy = read('../src/pages/datenschutz.astro')
+    .replace(/\{\s*['"] ['"]\s*\}/g, ' ')
+    .replace(/\s+/g, ' ')
 
-  expect(policy).toContain('import { DEFAULT_RETENTION_DAYS as DAYS } from \'@lib/shared/retention\';')
+  expect(policy).toMatch(/import \{\s*DEFAULT_RETENTION_DAYS as DAYS\s*\} from ['"]@lib\/shared\/retention['"]/)
   expect(policy).toContain('{DAYS} Tage nach dem Termin')
   // No hard-coded period that could drift from the constant.
-  expect(policy).not.toMatch(new RegExp(`\\b${DEFAULT_RETENTION_DAYS} Tage nach`))
+  expect(policy).not.toMatch(/\b\d+ Tage nach dem Termin/)
 })
 
 test('RETENTION_DAYS can shorten the period but never extend it beyond the policy', () => {
