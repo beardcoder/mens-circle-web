@@ -1,7 +1,7 @@
 ---
 /**
- * The mark and the word mark together: the logo in ember, "Männerkreis" in
- * Vollkorn and, in the `full` form, the region under it in small letters. The
+ * The mark and the word mark together: the logo in the accent, "Männerkreis" in
+ * Cormorant and, in the `full` form, the region under it in small letters. The
  * header, the footer, the print templates. Size it with `class` (font size); the
  * mark follows the type.
  */
@@ -22,7 +22,7 @@ const [name, ...region] = site.siteName.split(' ')
   <Icon
     name="logo"
     aria-hidden="true"
-    class="size-[1.6em] shrink-0 text-fill"
+    class="size-[1.6em] shrink-0 text-accent"
   />
   <span class="grid gap-[0.3em]">
     <span>{name}</span>

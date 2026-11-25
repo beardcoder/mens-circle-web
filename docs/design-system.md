@@ -4,14 +4,14 @@
 
 A men's circle meets in the evening, sits in a ring and listens. The site looks like
 that evening: a centre, things turned towards each other, much air between them.
-Its look follows the dark-botanical theme (the `web-video-presentation` skill of
-ConardLi/garden-skills): a warm near-black with soft pools of light, bone text, a
-terracotta gold, an elegant serif whose accent phrase is set in italic. The night
-mode is that theme; the day mode is built from the same family turned round: bone
-becomes the paper, the near-black the text. The dark ground carries what draws you
-in and what is spoken in the circle, paper is for reading. There is one accent, the theme's
-clay terracotta: the mark, the one thing to do, links and the italic phrase; on
-paper its deep tone. Everything is open and full-bleed: grounds run from edge
+Its look is three colours and nothing else: paper and ink, the two grounds, each
+the other's text, and one accent, the glow in the middle of the circle. Every
+other tone (a band, a line, quieter text) is paper and ink mixed; every ground is
+flat, with no gradient and no shadow. Titles stand in an elegant serif whose accent
+phrase is set in italic. Ink carries what draws you in and what is spoken in the
+circle, paper is for reading; at night the page itself turns to ink. The accent is
+the mark, the one thing to do, the italic phrase, an index number and a link's
+underline, the same on every ground. Everything is open and full-bleed: grounds run from edge
 to edge, content stands between lines, nothing sits in a rounded card.
 
 The grid is twelve columns and one edge. Four moves break it, and only these
@@ -31,7 +31,7 @@ then stepping back. Translated into design:
   to edge; content stands on them, not in boxes. Lists between lines rather than
   cards (the facts, the questions of the first round, the agreements, the FAQ, the
   voices). No cards on public pages, not even for a date; the registration is a
-  forest panel.
+  dark panel.
 - **Safe and clear.** The frame is visible before anyone comes: how an evening
   runs, what we agree on, that every exercise is an offer, that "no" is always a
   good answer, that it is no therapy. Nothing is hidden behind a click that a
@@ -74,44 +74,52 @@ facts and the FAQ, not in every section.
 
 ## Colour
 
-Primitives (`--p-*`) are plain hex values on `:root`; the roles pick them with
-`light-dark()`, so day and night keep the same roles. The page follows the system
-(Auto); `ModeToggle` offers Auto · Hell · Dunkel and pins a choice as `data-mode`,
-set before first paint. Never a hex value in markup.
+There are three primitives, plain hex values on `:root`, and no fourth:
 
-| Role            | Light                        | Night                 | Token                            | Use                                               |
-| --------------- | ---------------------------- | --------------------- | -------------------------------- | ------------------------------------------------- |
-| Page            | `#F1E8D9` warm paper         | `#130E0A`             | `ground`                         | the page                                          |
-| Band            | `#E2D4BE`                    | `#1C150F`             | `ground-alt` (`surface-alt`)     | what belongs together: facts, course, dates       |
-| Raised          | `#F9F3E8`                    | `#261D15`             | `raised`                         | fields, the QR square                             |
-| Dark ground     | `#130E0A` / raised `#1E1610` | `#0B0705` / `#140E09` | `surface-dark`                   | opening, agreements, voices, registration, footer |
-| Text            | `#18110B` / soft `#2B2117`   | `#EBDFCD` / `#CDBCA4` | `fg`, `fg-soft`                  | titles / running text                             |
-| Secondary text  | `#5F503D`                    | `#A8957F`             | `fg-muted`                       | labels, notes, captions; never a lead or a text   |
-| Lines           | `#D6C6AD` / `#BFAB8E`        | `#2C2218` / `#3F3225` | `line`, `line-strong`            | quiet structure; never alone a control            |
-| Control outline | `#766550`                    | `#8A7862`             | `line-bold`                      | inputs, secondary buttons (≥ 3:1)                 |
-| Accent          | `#7C4117`                    | `#C2804A` burnt clay  | `accent`, `accent-strong`        | links, labels, a highlighted word, index numbers  |
-| Primary action  | `#7C4117` / `#63330F`        | `#C2804A` / `#AD6C36` | `fill`, `fill-strong`, `on-fill` | the one action of a module, a taken chair         |
-| Spark           | `#C2804A`                    | same                  | `spark`                          | the italic phrase and numbers on the dark ground  |
+| Primitive    | Hex       | What it is                                          |
+| ------------ | --------- | --------------------------------------------------- |
+| `--p-paper`  | `#F4F1EA` | the light ground, and the text on ink               |
+| `--p-ink`    | `#141210` | the dark ground, and the text on paper              |
+| `--p-accent` | `#C8603A` | the glow: the mark, the one action, what is marked  |
 
-The palette starts from the dark-botanical theme and is turned earthier and warmer
-than it: the near-black is a brown-black like dark soil, the bone leans to linen,
-the accent is a clay terracotta where the theme has a paler gold, and the pools of
-light are a clay, a burnt rose and an ochre.
+Every role is one of them or paper and ink mixed (`color-mix`), picked per mode
+with `light-dark()`. The page follows the system (Auto); `ModeToggle` offers
+Auto · Hell · Dunkel and pins a choice as `data-mode`, set before first paint.
+Never a hex value in markup, and never a new hex in `theme.css`: a new tone is a
+new mix.
 
-The primitives keep the names of the roles they had (`--p-forest` is the dark
-ground, `--p-linen` the paper, `--p-sand` the band, `--p-ember` the accent: the
-gold on the dark grounds, `--p-ember-text` its deep tone on paper; a filled button
-is gold under a dark label there and deep under a light label here); the values are the theme's.
-The dark ground carries the theme's signature, three soft pools of light in its
-corners (`surface-dark` in theme.css),
-still and never animated.
+| Role            | Light                   | Night                     | Token                        | Use                                                |
+| --------------- | ----------------------- | ------------------------- | ---------------------------- | -------------------------------------------------- |
+| Page            | paper                   | ink + 4 % paper           | `ground`                     | the page                                           |
+| Band            | paper + 6 % ink         | ink + 9 % paper           | `ground-alt` (`surface-alt`) | what belongs together: facts, course, dates        |
+| Dark ground     | ink                     | ink                       | `surface-dark`               | opening, agreements, voices, registration, footer  |
+| Text            | ink / 84 % ink          | paper / 84 % paper        | `fg`, `fg-soft`              | titles / running text                              |
+| Secondary text  | 66 % ink                | 66 % paper                | `fg-muted`                   | labels, notes, captions; never a lead or a text    |
+| Lines           | ink at 13 % / 24 %      | paper at 14 % / 24 %      | `line`, `line-strong`        | quiet structure; never alone a control             |
+| Control outline | 50 % ink                | 50 % paper                | `line-bold`                  | inputs, secondary buttons (≥ 3:1)                  |
+| Accent          | accent                  | accent                    | `accent`                     | the mark, the italic phrase, index numbers, a taken chair, a link's underline, the focus ring |
+| Primary action  | accent under ink        | accent under ink          | `accent`, `accent-strong` (hover), `on-accent` | the one action of a module       |
+| Refusal         | accent + 30 % ink       | accent + 22 % paper       | `danger`                     | a field's or a form's error, with words and a mark |
 
-On the dark grounds the surfaces re-declare text (bone `#EBDFCD`, running text
-`#CDBCA4`, muted `#B6A48D`), accent (`#C2804A`), lines (bone at 14–28 %) and the
-control outline (`#8A7862`, on the second dark `#948169`). The spark is never text on paper or sand.
-`success` and `danger` are for real states only and always come with words. Every
-text pair holds at least 4.5:1 on every ground in both modes, every control line at
-least 3:1 (`tests/contrast.test.ts`, pair by pair). Check any new pair in both modes.
+The accent is one hex on every ground. It holds 3:1 everywhere and 4.5:1 only on
+ink, so it is large or drawn: a title's italic phrase, an index number, the mark,
+a fill, an underline. It is never the colour of small text. A link is the text's
+own colour on an accent underline (`link` in `lib/ui.ts`); a filled button is the
+accent under an ink label in both modes.
+
+The dark ground (`surface-dark`) is ink in both modes and re-declares the roles
+with their night values. No ground carries a gradient, a glow or a texture, and
+nothing casts a shadow: what floats (a dialog) has a line and the dimmed page
+behind it. There is one exception, the home opening: it has no picture, and
+four pale circles lie on its ink (`data-hero-glow`: three of the accent, a faint one of
+paper, each a radial gradient to nothing), high and to the right, so the
+statement stands on plain ink. On the personal page the opening's photograph
+still runs softly into the ground (`data-hero-frame`, a mask on the picture).
+
+A success is said in the text's own colour with a mark; `danger` is for a real
+refusal only and always comes with words. Every
+text pair holds at least 4.5:1 on every ground in both modes, every control line
+and the accent at least 3:1 (`tests/contrast.test.ts`, read from `theme.css`). Check any new pair in both modes.
 
 ## Type
 
@@ -127,7 +135,7 @@ a flicker. A first visit on a slow line may stay in the fallback until the next
 page. Titles are
 500, the hero, page titles, index numbers and poster words 600. A highlighted
 phrase in a title (`<em>`) is set in Cormorant's italic, in the accent (the
-clay terracotta on the dark ground). `font-sans` is Geist (the static
+accent). `font-sans` is Geist (the static
 regular and semibold, ~13 kB each; the regular also serves 500, the semibold 700): running text, navigation, forms, data.
 
 | Token          | Size     | Use                                              |
@@ -189,7 +197,7 @@ run from edge to edge or out to the window. `rounded-full` is what you press
 the seat ring, the stamp, the avatar). Fields take `rounded-md` (8px) with the
 buttons' heights (48 / 44 / 36px); what floats (a dialog) takes `rounded-xl`. On public pages nothing is boxed and nothing is a rounded card:
 facts, questions, agreements, steps, FAQ and voices are rows between thin lines.
-`shadow-overlay` is for what floats; nothing else casts a shadow.
+Nothing casts a shadow; what floats has a line (`line-strong`) and the dimmed page behind it.
 
 ## Images
 
@@ -239,18 +247,12 @@ animate-range-[entry_10%_contain_12%]` (a CSS-only Tailwind v4 package, imported
   word to the accent, and back on the way up (`data-statement`: one view timeline,
   each word a slice of it by its index). The page's one scroll-led moment; whole
   and in full ink without view timelines or under reduced motion.
+- **The home opening glows.** Its four pale circles drift on paths of their own, in
+  11 s, 14 s, 17 s and 23 s, so the picture does not repeat for minutes (`glow-a`
+  to `glow-d` in global.css). Each is a layer of its own and only
+  `translate` and `scale` move. Screens only; at rest under reduced motion.
 - **The stamp turns.** Its ring of words turns once in two minutes, linear.
 - **The mark turns a quarter** on the spring when the logo is hovered.
-- **The dark ground moves.** The pools of light on every dark ground (opening,
-  agreements, voices, registration, the last band, the footer, the phone menu)
-  wander plainly but slowly, like the light of a fire on a wall: two layers (the
-  clay with the ochre, and the burnt rose) on paths of their own, a tenth of the
-  ground and back, growing and shrinking a little, in 24 s and 31 s, so the picture
-  does not repeat for minutes (`pool-wander-a`, `pool-wander-b`, theme.css). The
-  layers are `surface-dark::before` and `::after`, larger than the ground and
-  clipped by `contain: paint`, so the compositor moves two layers by `translate`
-  and `scale` and nothing is painted again. Screens only; at rest under reduced
-  motion.
 - **Answering the hand.** A button rises 2px and presses to 0.97 in 150 ms, arrows
   nudge, header links draw a line, the FAQ's `<details>` unfolds and its answer
   fades in with the space it gets (where `interpolate-size` exists its
@@ -345,42 +347,40 @@ mobile score than it does live.
 action. Over the home opening the bar is clear with light text and its action is
 outlined (the opening's own action is the one filled button on that screen); once
 the page moves it is paper at 95 % and the action fills. The phone menu is a native
-modal `<dialog>` on the forest, opening as a circle from its button.
+modal `<dialog>` on the dark ground, opening as a circle from its button.
 
-**Footer.** The forest on every page, a line at its top: the lockup and one line
+**Footer.** The dark ground on every page, a line at its top: the lockup and one line
 about the circle, navigation, contact, legal links and `ModeToggle`.
 
 ## Compositions
 
-- **Home.** The opening on the forest, set like a poster: the photograph without a
-  frame in the upper right, up to the window's edges, running softly into the
-  ground towards the left and its foot (a mask, `data-hero-frame`); the statement
-  at poster size (its phrase in the spark) across the whole width and over the
-  photograph's foot, the one overlap here; under it one row on the grid, the
-  explanation and the one action on the left, the next date as open lines on the
-  right. On a phone the photograph fills the top and the statement crosses its
-  foot. Then: the intro,
+- **Home.** The opening on the dark ground, set like a poster and without a
+  picture: four pale circles of the accent drift over the ink behind it, high and to
+  the right; the statement at poster size (its phrase in the accent) across the
+  whole width; under it one row on the grid, the explanation and the one action
+  on the left, the next date as open lines on the
+  right. Then: the intro,
   its title crossing into the content, the first round's questions in the margin,
   the four facts as its last row; the statement on a screen of its own (`Statement`; an ordinary section under reduced motion);
-  the course on sand, each step with its index number in the margin; the five
-  agreements on the forest as rows across the page, numbers in the spark; Markus,
-  one sentence of his under a rule, signed with his face; the voices on the forest;
-  the FAQ with the contact line in the margin; taking part (`#termine`, sand,
+  the course on the band, each step with its index number in the margin; the five
+  agreements on the dark ground as rows across the page, numbers in the accent; Markus,
+  one sentence of his under a rule, signed with his face; the voices on the dark ground;
+  the FAQ with the contact line in the margin; taking part (`#termine`, the band,
   "Dabei sein." as a poster word beside the next date); staying in touch on the
-  forest with the stamp cut by the right edge, running into the footer. Open and
+  dark ground with the stamp cut by the right edge, running into the footer. Open and
   wide throughout: no box or card.
 - **`/event`.** `PageIntro` with the stamp, every coming date as `EventSummary`
   beside the e-mail notification; the FAQ; a where-next band.
 - **Event page.** The date at a subheading's size over the title (the date tells one
   evening from the next); beside them, from the top of the page, the registration on
-  the forest headed by the seat ring. Under the title the lead, then time, place and
+  the dark ground headed by the seat ring. Under the title the lead, then time, place and
   the evening's course as rows between lines (`Zeit` stands in the head on phones,
   where the registration follows the title), the calendar; the evening's description
-  (sand); the map; where next.
+  (the band); the map; where next.
 - **Personal page.** `PageIntro` with the photograph (the poster opening), then
   sections set like the home page's: the title at section size crossing from the
-  margin, the text on the reading line; the values as rows on sand; the FAQ; one
-  closing invitation on sand.
+  margin, the text on the reading line; the values as rows on the band; the FAQ; one
+  closing invitation on the band.
 - **Legal pages, testimonial form, 404.** `PageIntro` and one column.
 - **Admin.** EmDash's own (`/_emdash/admin`); the site's design stops at the public pages.
 
@@ -400,7 +400,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   tokens, primitives, the surfaces, the reduced-motion floor, the scroll lock under a
   modal, the focus ring default, view-transition pseudo-elements, keyframes.
 - Images on SSR pages are pre-sized files (`<img srcset>`); `<Image />` only on
-  prerendered pages. The hero photograph is AVIF, eager and `fetchpriority="high"`.
+  prerendered pages. The home opening has no image; its largest paint is the statement.
 - No layout shift: a date summary's lines are one line (`truncate`); titles measure
   in `em`, never `ch`.
 - The seat ring (`SeatRing`) is decorative (`aria-hidden`): the line beside it says the

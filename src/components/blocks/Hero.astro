@@ -1,6 +1,4 @@
 ---
-import type { ImageMetadata } from 'astro'
-
 import { afterWords, splitWords } from '@lib/shared/words'
 import { button, label } from '@lib/ui'
 
@@ -14,15 +12,11 @@ interface Props {
   kicker: string
   secondaryLabel: string
   secondaryLink: string
-  /** The photograph, square and ascending by width; the home page is SSR, so these are pre-sized files. */
-  images: ImageMetadata[]
-  imageAlt: string
 }
 
-const { events, kicker, secondaryLabel, secondaryLink, images, imageAlt } = Astro.props
+const { events, kicker, secondaryLabel, secondaryLink } = Astro.props
 const next = events?.events[0]
 const action = next?.view.action ?? { href: '/event', label: 'Termine ansehen' }
-const largest = images.at(-1)!
 const title = splitWords(await Astro.slots.render('title'))
 const beat = (n: number) => afterWords(title.count, n)
 
@@ -37,38 +31,28 @@ const nextLine = next
   : null
 ---
 
-{/* The opening, on the forest and one screen tall (taller only where the window is
-     too short for it), set like a poster: the photograph without a frame in the upper
-     right, up to the window's edges and running softly into the ground towards the
-     left and the foot (global.css, "The opening"); across the whole width and over
-     the photograph's foot the statement at poster size, the one move that breaks the
-     grid here; under it one row on the grid, the explanation and the action on the
-     left, the next evening as open lines on the right. On a phone the photograph
-     fills the top, the statement crosses its foot, the rest follows. The opening
-     arrives once on load. */}
+{/* The opening, on the dark ground and one screen tall (taller only where the window is
+     too short for it), set like a poster and without a picture: behind it four
+     pale circles of the accent drift over the ink (global.css, "The opening"),
+     high and to the right, so the statement below stands on plain ink; across the
+     whole width the statement at poster size; under it one row on the grid, the
+     explanation and the action on the left, the next evening as open lines on the
+     right. The opening arrives once on load. */}
 <section
   data-hero
   data-opening
   aria-labelledby="hero-title"
   class="surface-dark relative flex min-h-svh flex-col justify-end overflow-clip pt-[calc(var(--spacing-header)+10rem)] pb-8 lg:pb-14"
 >
-  {/* The photograph: it settles once on load and is never hidden. */}
   <div
-    data-hero-frame
-    class="absolute inset-x-0 top-0 h-[60svh] overflow-clip lg:inset-y-0 lg:left-auto lg:h-auto lg:w-[62vw]"
+    data-hero-glow
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 overflow-clip"
   >
-    <img
-      data-hero-photo
-      src={largest.src}
-      srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
-      sizes="(min-width: 64rem) 62vw, 100vw"
-      width={largest.width}
-      height={largest.height}
-      alt={imageAlt}
-      fetchpriority="high"
-      decoding="async"
-      class="absolute inset-0 size-full object-cover object-[35%_20%] lg:object-[40%_30%]"
-    />
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
 
   <Container class="relative grid gap-x-grid lg:grid-cols-12">
@@ -84,7 +68,7 @@ const nextLine = next
       <h1
         id="hero-title"
         data-enter="words"
-        class="max-w-[10.4em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto lg:text-[clamp(5.625rem,8.6vw,9.5rem)] [&_em]:text-spark"
+        class="max-w-[10.4em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto lg:text-[clamp(5.625rem,8.6vw,9.5rem)] [&_em]:text-accent"
         set:html={title.html}
       />
     </div>
@@ -113,7 +97,7 @@ const nextLine = next
         </a>
         <a
           href={secondaryLink}
-          class="group/link inline-flex min-h-11 items-center gap-2 text-base font-semibold text-accent hover:text-accent-strong"
+          class="group/link inline-flex min-h-11 items-center gap-2 text-base font-semibold text-fg underline decoration-accent decoration-2 underline-offset-4 hover:decoration-fg"
         >
           {secondaryLabel}
           <span
@@ -166,7 +150,7 @@ const nextLine = next
         Der nächste Abend ist in Planung.{' '}
         <a
           href="/event#benachrichtigung"
-          class="font-semibold text-accent underline underline-offset-4"
+          class="font-semibold text-fg underline decoration-accent decoration-2 underline-offset-4"
         >
           Über neue Termine informieren
         </a>

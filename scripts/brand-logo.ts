@@ -15,31 +15,30 @@ import { BRAND } from '../src/lib/shared/brand'
 const ROOT = resolve(import.meta.dir, '..')
 const MASTER = 'brand/logo/logo.svg'
 
-const EMBER: LogoOptions = { fill: BRAND.ember }
+const ACCENT: LogoOptions = { fill: BRAND.accent }
 /** Favicons in a tab: a hair of air so the ring does not touch the edge. */
-const TAB: LogoOptions = { fill: BRAND.emberText, padding: 0.04 }
-/** Home screen, maskable and touch icons: the gold mark on the dark ground, inside the 80 % safe circle. */
-const TILE: LogoOptions = { fill: BRAND.ember, background: BRAND.forest, padding: 0.12 }
+const TAB: LogoOptions = { fill: BRAND.accent, padding: 0.04 }
+/** Home screen, maskable and touch icons: the accent mark on ink, inside the 80 % safe circle. */
+const TILE: LogoOptions = { fill: BRAND.accent, background: BRAND.ink, padding: 0.12 }
 
 /** The SVG files, path → options; `src/icons/logo.svg` is the master itself. */
 export const SVG_VARIANTS: Record<string, LogoOptions> = {
-  'brand/logo/logo-ember.svg': EMBER,
-  'brand/logo/logo-ember-on-linen.svg': { fill: BRAND.emberText, background: BRAND.linen, padding: 0.1 },
-  'brand/logo/logo-bone-on-forest.svg': { fill: BRAND.bone, background: BRAND.forest, padding: 0.1 },
+  'brand/logo/logo-accent.svg': ACCENT,
+  'brand/logo/logo-accent-on-paper.svg': { fill: BRAND.accent, background: BRAND.paper, padding: 0.1 },
+  'brand/logo/logo-paper-on-ink.svg': { fill: BRAND.paper, background: BRAND.ink, padding: 0.1 },
   'brand/logo/logo-black.svg': { fill: '#000000' },
   'brand/logo/logo-white.svg': { fill: '#ffffff' },
-  'public/favicon.svg': { ...TAB, darkFill: BRAND.ember },
-  // Shown on other people's white grounds (search results): the accent's deep tone.
-  'public/images/logo.svg': { fill: BRAND.emberText },
-  'public/images/logo-color.svg': { fill: BRAND.emberText },
+  'public/favicon.svg': TAB,
+  'public/images/logo.svg': ACCENT,
+  'public/images/logo-color.svg': ACCENT,
 }
 
 /** Every referenced PNG at its existing name and size. */
 const PNG_VARIANTS: [path: string, size: number, opts: LogoOptions][] = [
-  ['public/images/logo.png', 395, EMBER],
-  ['public/images/logo-color.png', 512, EMBER], // JSON-LD logo (SeoHead)
-  ['public/images/logo-mail.png', 160, EMBER], // mail masthead, loaded by URL
-  ['public/images/logo-flame.png', 160, EMBER], // mails already sent
+  ['public/images/logo.png', 395, ACCENT],
+  ['public/images/logo-color.png', 512, ACCENT], // JSON-LD logo (SeoHead)
+  ['public/images/logo-mail.png', 160, ACCENT], // mail masthead, loaded by URL
+  ['public/images/logo-flame.png', 160, ACCENT], // mails already sent
   ['public/favicon-16x16.png', 16, TAB],
   ['public/favicon-32x32.png', 32, TAB],
   ['public/favicon-180x180.png', 180, TILE], // apple-touch-icon: iOS fills transparency black

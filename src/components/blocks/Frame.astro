@@ -22,8 +22,8 @@ interface Props {
 const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props
 ---
 
-{/* On the forest: what is said in the circle. The five agreements as lines across the
-    page, each number in the spark, its name and what it means; the boundary (no
+{/* On the dark ground: what is said in the circle. The five agreements as lines across the
+    page, each number in the accent, its name and what it means; the boundary (no
     therapy) under them, its title in the margin. */}
 <Section
   id={anchor}
@@ -49,7 +49,7 @@ const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText }
           <li class="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-line py-6 last:border-b sm:grid-cols-[4rem_minmax(0,1fr)] lg:grid-cols-12 lg:gap-x-grid lg:py-8">
             <span
               aria-hidden="true"
-              class="row-span-2 font-display text-sub font-semibold text-spark tabular-nums lg:col-span-1"
+              class="row-span-2 font-display text-sub font-semibold text-accent tabular-nums lg:col-span-1"
             >
               {String(i + 1).padStart(2, '0')}
             </span>

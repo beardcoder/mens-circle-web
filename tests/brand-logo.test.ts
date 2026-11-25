@@ -37,14 +37,14 @@ describe('logo files', () => {
 
 describe('logoVariant', () => {
   test('pads into a square viewBox around the mark', () => {
-    const svg = logoVariant(master, { fill: BRAND.ember, background: BRAND.linen, padding: 0.1 })
+    const svg = logoVariant(master, { fill: BRAND.accent, background: BRAND.paper, padding: 0.1 })
     const [x, y, w, h] = /viewBox="([^"]+)"/.exec(svg)![1]!.split(' ').map(Number)
 
     expect(w).toBe(h!)
     expect(w! * 0.8).toBeCloseTo(397, 2)
     expect(x! + w! / 2).toBeCloseTo(198, 2)
     expect(y! + h! / 2).toBeCloseTo(198.5, 2)
-    expect(svg).toContain(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${BRAND.linen}"/>`)
+    expect(svg).toContain(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${BRAND.paper}"/>`)
     expect(svg).not.toContain('currentColor')
   })
 })

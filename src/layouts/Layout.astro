@@ -12,7 +12,7 @@ import { bootScript, fontScript, speculationRules } from '../scripts/inline'
 
 type Props = ComponentProps<typeof SeoHead> & {
   headerAction?: ComponentProps<typeof Header>['action']
-  /** The page opens on the forest (the home opening): the bar starts clear over it. */
+  /** The page opens on the dark ground (the home opening): the bar starts clear over it. */
   overHero?: boolean
 }
 
@@ -39,7 +39,7 @@ const { headerAction, overHero = false, ...props } = Astro.props;
 
     <a
       href="#main"
-      class="fixed -top-full left-4 z-50 rounded-full bg-fill px-5 py-3 text-base font-semibold text-on-fill transition-[top] duration-180 focus:top-2 print:hidden"
+      class="fixed -top-full left-4 z-50 rounded-full bg-accent px-5 py-3 text-base font-semibold text-on-accent transition-[top] duration-180 focus:top-2 print:hidden"
     >
       Zum Inhalt springen
     </a>

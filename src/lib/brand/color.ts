@@ -6,6 +6,15 @@ export const hexToRgb = (hex: string): [number, number, number] => [
   Number.parseInt(hex.slice(5, 7), 16),
 ]
 
+/** `color-mix(in srgb, a share%, b)` as hex: how the theme derives a tone from two primitives. */
+export const mix = (a: string, b: string, share: number): string => {
+  const other = hexToRgb(b)
+
+  return `#${hexToRgb(a)
+    .map((c, i) => Math.round((c * share + other[i]! * (100 - share)) / 100).toString(16).padStart(2, '0'))
+    .join('')}`
+}
+
 /**
  * A naive CMYK from sRGB, in percent. Only a starting point for a printer: the
  * values that count come from a proof on the paper used (docs/brand/README.md).

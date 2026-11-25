@@ -1,11 +1,12 @@
 /**
  * The design system's tokens, variants, surfaces and the few rules Tailwind
- * utilities cannot express. After the dark-botanical theme: a warm near-black
- * with soft pools of light for what draws you in, bone paper for reading, one
- * accent, a terracotta gold, for the mark, the one thing to do and what is marked. Titles in Cormorant (the accent phrase in italic) beside calm running text
- * (Geist); open, full-bleed grounds, lines instead of boxes.
- * Shared by the two entry files: global.css (public site) and admin.css (back
- * office). docs/design-system.md describes the system.
+ * utilities cannot express. Three colours and nothing else: paper and ink, the two
+ * grounds, each the other's text, and one accent, the glow in the middle of the
+ * circle, for the mark, the one thing to do and what is marked. Every other tone
+ * (a band, a line, quieter text) is paper and ink mixed; every ground is flat:
+ * no gradient, no shadow. Titles in Cormorant (the accent phrase in italic)
+ * beside calm running text (Geist); open, full-bleed grounds, lines instead of
+ * boxes. docs/design-system.md describes the system.
  */
 
 /* ── Variants ─────────────────────────────────────────────────────────────── */
@@ -13,7 +14,7 @@
 /* The mode toggle picks its label from the mode the boot script resolved. */
 @custom-variant dark (&:where([data-mode-resolved='dark'], [data-mode-resolved='dark'] *));
 
-/* On a page that opens on the forest ground (`data-over-hero` on the bar, set by
+/* On a page that opens on the dark ground (`data-over-hero` on the bar, set by
    the page): the header starts clear with light text over it. An attribute, not
    `body:has([data-hero])`: that would restyle the whole page whenever nodes are
    added to it (the parser, an island, the event dock). */
@@ -45,46 +46,51 @@
   --breakpoint-nav: 68.75rem;
   --breakpoint-xl: 80rem;
 
-  /* Colour roles, built from the primitives on :root (base layer below).
-     `light-dark()` follows the page's color-scheme; the surfaces re-declare what
-     changes on their ground. */
-  --color-ground: light-dark(var(--p-linen), var(--p-night)); /* the page */
-  --color-ground-alt: light-dark(var(--p-sand), var(--p-night-alt)); /* a warm band */
-  --color-raised: light-dark(var(--p-cream), var(--p-night-raised)); /* cards */
-  --color-surface: light-dark(var(--p-linen), var(--p-night)); /* the ground of the current block */
-  --color-fg: light-dark(var(--p-ink), var(--p-night-text));
-  --color-fg-soft: light-dark(var(--p-ink-soft), var(--p-bone-soft)); /* running text */
-  --color-fg-muted: light-dark(var(--p-muted), var(--p-night-muted)); /* secondary information */
-  /* Links, labels and highlighted words: ember dark enough to read on linen, light on the night. */
-  --color-accent: light-dark(var(--p-ember-text), var(--p-ember-light));
-  --color-accent-strong: light-dark(var(--p-ember-text-deep), var(--p-night-text));
-  --color-accent-soft: light-dark(var(--p-ember-tint), var(--p-ember-tint-night));
-  --color-on-accent: light-dark(var(--p-linen), var(--p-night));
-  /* The one thing to do, in the theme's one accent: the terracotta gold under a dark
-     label on the dark grounds and at night, its deep tone under a light label on paper. */
-  --color-fill: light-dark(var(--p-ember-text), var(--p-ember));
-  --color-fill-strong: light-dark(var(--p-ember-text-deep), var(--p-ember-deep));
-  --color-on-fill: light-dark(var(--p-linen), var(--p-on-ember));
-  /* The spark: what stands large on the forest (a poster word, an index
-     number, the stamp) and the warm point of the circle. Never text on paper. */
-  --color-spark: var(--p-spark);
+  /* Colour roles, built from the three primitives on :root (base layer below):
+     a role is paper, ink, the accent, or paper and ink mixed. `light-dark()`
+     follows the page's color-scheme; the dark ground re-declares the roles. */
+  --color-ground: light-dark(var(--p-paper), color-mix(in srgb, var(--p-paper) 4%, var(--p-ink))); /* the page */
+  --color-ground-alt: light-dark(
+    color-mix(in srgb, var(--p-ink) 6%, var(--p-paper)),
+    color-mix(in srgb, var(--p-paper) 9%, var(--p-ink))
+  ); /* a quiet band */
+  --color-surface: light-dark(var(--p-paper), color-mix(in srgb, var(--p-paper) 4%, var(--p-ink))); /* the ground of the current block */
+  --color-fg: light-dark(var(--p-ink), var(--p-paper));
+  --color-fg-soft: light-dark(
+    color-mix(in srgb, var(--p-ink) 84%, var(--p-paper)),
+    color-mix(in srgb, var(--p-paper) 84%, var(--p-ink))
+  ); /* running text */
+  --color-fg-muted: light-dark(
+    color-mix(in srgb, var(--p-ink) 66%, var(--p-paper)),
+    color-mix(in srgb, var(--p-paper) 66%, var(--p-ink))
+  ); /* secondary information */
+  /* The one accent, the same on every ground: the mark, the one thing to do, the
+     italic phrase of a title, an index number, a link's underline, the focus ring.
+     Large or drawn only (3:1); never the colour of small text. */
+  --color-accent: var(--p-accent);
+  --color-accent-strong: color-mix(in srgb, var(--p-accent) 86%, var(--p-paper)); /* the filled button under the pointer */
+  --color-on-accent: var(--p-ink); /* the label on the accent */
   /* Lines: `line` parts things quietly and never alone outlines a control;
      `line-bold` outlines inputs and controls (3:1). */
-  --color-line: light-dark(var(--p-line), var(--p-night-line));
-  --color-line-strong: light-dark(var(--p-line-strong), var(--p-night-line-strong));
-  --color-line-bold: light-dark(var(--p-control), var(--p-night-control));
-  --color-field: light-dark(var(--p-cream), var(--p-night-alt));
-  --color-overlay: light-dark(
-    color-mix(in srgb, var(--p-ink) 55%, transparent),
-    color-mix(in srgb, black 70%, transparent)
+  --color-line: light-dark(
+    color-mix(in srgb, var(--p-ink) 13%, transparent),
+    color-mix(in srgb, var(--p-paper) 14%, transparent)
   );
-  /* States only: always with words, never a decorative colour. */
-  --color-success: light-dark(#2f6b3a, #8fcb97);
-  --color-danger: light-dark(#a3261b, #f0a197);
-  /* The mark of the logo and the admin's marks: the accent of the ground it stands on. */
-  --color-flame: light-dark(var(--p-ember-text), var(--p-ember));
-  /* The light text over the forest, where the bar lies on the opening. */
-  --color-bone: var(--p-bone);
+  --color-line-strong: light-dark(
+    color-mix(in srgb, var(--p-ink) 24%, transparent),
+    color-mix(in srgb, var(--p-paper) 24%, transparent)
+  );
+  --color-line-bold: light-dark(
+    color-mix(in srgb, var(--p-ink) 50%, var(--p-paper)),
+    color-mix(in srgb, var(--p-paper) 50%, var(--p-ink))
+  );
+  --color-overlay: color-mix(in srgb, var(--p-ink) 60%, transparent); /* behind a dialog */
+  /* A refusal, always with words and a mark: the accent, deepened until it reads as small text. */
+  --color-danger: light-dark(
+    color-mix(in srgb, var(--p-accent) 70%, var(--p-ink)),
+    color-mix(in srgb, var(--p-accent) 78%, var(--p-paper))
+  );
+  --color-paper: var(--p-paper); /* the light text over the dark opening, where the bar lies on it */
 
   /* Fonts — loaded by the Astro Fonts API (astro.config.mjs). */
   --font-sans: var(--font-geist);
@@ -155,19 +161,11 @@
 
   /* Open and square: grounds, bands, the registration and the map have no radius.
      `full` is what you press (buttons, chips, toggles) and the circle; fields take
-     `md`; what floats (a dialog) and the admin's cards `xl`. No rounded card on a
+     `md`; what floats (a dialog) `xl`. No rounded card on a
      public page. */
   --radius-md: 0.5rem;
   --radius-xl: 1.75rem;
   --radius-2xl: 2.5rem;
-
-  /* A card rests on the page with a soft shadow; an overlay floats above it. */
-  --shadow-card:
-    0 1px 2px light-dark(rgb(27 36 30 / 6%), rgb(0 0 0 / 30%)),
-    0 18px 40px -26px light-dark(rgb(27 36 30 / 30%), rgb(0 0 0 / 70%));
-  --shadow-overlay:
-    0 2px 6px light-dark(rgb(27 36 30 / 8%), rgb(0 0 0 / 35%)),
-    0 24px 48px -16px light-dark(rgb(27 36 30 / 28%), rgb(0 0 0 / 60%));
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   /* For what leaves: a slow start, then away (the page a transition leaves behind). */
@@ -248,42 +246,6 @@
 
 /* A short rise into place (`animate-rise`). `translate` and `opacity` only, which
    the compositor runs. Kept here, outside @theme, so it is always emitted. */
-/* The pools of light on the dark ground (`surface-dark`): two paths, each with a
-   turn in the middle so a pool does not simply swing on one line. */
-@keyframes pool-wander-a {
-  0% {
-    translate: -7% -4%;
-    scale: 1;
-  }
-
-  50% {
-    translate: 3% 5%;
-    scale: 1.14;
-  }
-
-  100% {
-    translate: 9% -3%;
-    scale: 1.04;
-  }
-}
-
-@keyframes pool-wander-b {
-  0% {
-    translate: 6% 5%;
-    scale: 1.1;
-  }
-
-  50% {
-    translate: -4% -6%;
-    scale: 1;
-  }
-
-  100% {
-    translate: -10% 3%;
-    scale: 1.16;
-  }
-}
-
 @keyframes rise {
   from {
     opacity: 0;
@@ -296,80 +258,29 @@
 /* A ground re-declares the colour roles, so text, lines, buttons, focus rings
    and form controls inside follow it. */
 
-/* The warm band: information that belongs together (the facts, the dates). */
+/* The quiet band: information that belongs together (the facts, the dates). */
 @utility surface-alt {
   --color-surface: var(--color-ground-alt);
-  --color-raised: light-dark(var(--p-cream), var(--p-night-raised));
   color: var(--color-fg);
   background-color: var(--color-surface);
 }
 
-/* The dark ground (the theme's night, still called forest): the opening, the
-   agreements, the voices, the registration, the menu and the footer, in both modes.
-   Its signature is the theme's own, turned earthier: soft pools of light in its
-   corners, a clay, a burnt rose and an ochre, wandering slowly. */
+/* The dark ground, ink in both modes: the opening, the agreements, the voices, the
+   registration, the menu and the footer. Flat. It re-declares the roles with
+   their dark values (a role on :root is resolved there, so `color-scheme` alone
+   would not turn it; tests/contrast.test.ts holds the two equal). */
 @utility surface-dark {
-  --color-surface: var(--p-forest);
-  --color-raised: var(--p-forest-raised);
-  --color-fg: var(--p-bone);
-  --color-fg-soft: var(--p-bone-soft);
-  --color-fg-muted: var(--p-bone-muted);
-  --color-fill: var(--p-ember);
-  --color-fill-strong: var(--p-ember-deep);
-  --color-on-fill: var(--p-on-ember);
-  --color-flame: var(--p-ember);
-  --color-accent: var(--p-ember-light);
-  --color-accent-strong: var(--p-bone);
-  --color-accent-soft: var(--p-forest-raised);
-  --color-on-accent: var(--p-forest);
-  --color-line: color-mix(in srgb, var(--p-bone) 14%, transparent);
-  --color-line-strong: color-mix(in srgb, var(--p-bone) 24%, transparent);
-  --color-line-bold: var(--p-forest-control);
-  --color-field: var(--p-forest-raised);
-  --color-success: #8fcb97;
-  --color-danger: #f0a197;
+  --color-surface: var(--p-ink);
+  --color-fg: var(--p-paper);
+  --color-fg-soft: color-mix(in srgb, var(--p-paper) 84%, var(--p-ink));
+  --color-fg-muted: color-mix(in srgb, var(--p-paper) 66%, var(--p-ink));
+  --color-line: color-mix(in srgb, var(--p-paper) 14%, transparent);
+  --color-line-strong: color-mix(in srgb, var(--p-paper) 24%, transparent);
+  --color-line-bold: color-mix(in srgb, var(--p-paper) 50%, var(--p-ink));
+  --color-danger: color-mix(in srgb, var(--p-accent) 78%, var(--p-paper));
+  color-scheme: dark;
   color: var(--color-fg);
   background-color: var(--color-surface);
-  /* The pools lie on two layers of their own behind the content, each larger than
-     the ground, so they can move without being repainted: `contain: paint` makes
-     the ground their containing block and their stacking context and clips them. */
-  contain: paint;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -25%;
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  /* The clay and the ochre, upper left and upper right. */
-  &::before {
-    background-image:
-      radial-gradient(ellipse 44% 38% at 26% 34%, rgb(194 128 74 / 20%) 0%, transparent 62%),
-      radial-gradient(ellipse 30% 26% at 70% 30%, rgb(184 140 86 / 11%) 0%, transparent 62%);
-  }
-
-  /* The burnt rose, lower right. */
-  &::after {
-    background-image: radial-gradient(ellipse 42% 36% at 72% 68%, rgb(176 98 66 / 15%) 0%, transparent 62%);
-  }
-
-  /* They move like the light of a fire on a wall, plainly but slowly: the two
-     layers wander against each other on paths of their own (24 s and 31 s, so the
-     picture does not repeat for minutes), a tenth of the ground and back, growing
-     and shrinking a little. Translate and scale only: the compositor moves two
-     layers and nothing is painted again. Screens only; at rest under reduced motion. */
-  @media screen and (prefers-reduced-motion: no-preference) {
-    &::before {
-      animation: pool-wander-a 24s ease-in-out infinite alternate;
-    }
-
-    &::after {
-      animation: pool-wander-b 31s ease-in-out infinite alternate;
-    }
-  }
 }
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
@@ -379,47 +290,14 @@
     /* `data-mode` absent follows the OS; "light"/"dark" pins it (Layout.astro). */
     color-scheme: light dark;
 
-    /* The primitives, after the dark-botanical theme and turned earthier and
-       warmer than it: at night a brown-black like dark soil with warm bone text and
-       a clay terracotta; by day the same family turned round:
-       bone becomes the paper and its band, the near-black the text. The dark ground
-       (still called forest) is the night's own colour in both modes. There is one
-       accent, the theme's terracotta gold (still called ember): the mark, the one
-       action, links and the italic phrase; on paper its deep tone. The names are the roles they had; the
-       values are what counts. Every text pair is ≥ 4.5:1, every control line ≥ 3:1
+    /* The primitives: three colours. Paper and ink are the two grounds and each
+       other's text; the accent is the glow in the middle of the circle. Nothing
+       else has a hex: every other tone is mixed from these (the roles in @theme).
+       Every text pair is ≥ 4.5:1, every control line and the accent ≥ 3:1
        (tests/contrast.test.ts). */
-    --p-linen: #f1e8d9;
-    --p-sand: #e2d4be;
-    --p-cream: #f9f3e8;
-    --p-ink: #18110b;
-    --p-ink-soft: #2b2117;
-    --p-muted: #5f503d;
-    --p-line: #d6c6ad;
-    --p-line-strong: #bfab8e;
-    --p-control: #766550;
-    --p-ember: #c2804a;
-    --p-ember-deep: #ad6c36;
-    --p-ember-text: #7c4117;
-    --p-ember-text-deep: #63330f;
-    --p-on-ember: #130e0a;
-    --p-ember-light: #c2804a;
-    --p-ember-tint: #edd9be;
-    --p-ember-tint-night: #33241a;
-    --p-spark: #c2804a;
-    --p-night: #130e0a;
-    --p-night-alt: #1c150f;
-    --p-night-raised: #261d15;
-    --p-night-text: #ebdfcd;
-    --p-night-muted: #a8957f;
-    --p-night-line: #2c2218;
-    --p-night-line-strong: #3f3225;
-    --p-night-control: #8a7862;
-    --p-forest: light-dark(#130e0a, #0b0705);
-    --p-forest-raised: light-dark(#1e1610, #140e09);
-    --p-forest-control: #8a7862;
-    --p-bone: #ebdfcd;
-    --p-bone-soft: #cdbca4;
-    --p-bone-muted: #b6a48d;
+    --p-paper: #f4f1ea;
+    --p-ink: #141210;
+    --p-accent: #c8603a;
 
     /* Space per width. The content's edge sits 28 / 40 / 56px from the window in
        every section; grounds run from edge to edge. Sections 88px on phones, 144px

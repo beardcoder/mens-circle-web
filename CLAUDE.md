@@ -239,11 +239,13 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
 
 - `docs/design-system.md` is the reference. The idea: the circle of chairs. A centre, things turned towards
   each other, much air; poster-sized type where the site invites, calm reading where
-  it explains. The look starts from the dark-botanical theme (ConardLi/garden-skills)
-  and is earthier and warmer than it: at night a brown-black like dark soil with
-  soft pools of light, warm bone text, a clay terracotta and Cormorant with its
-  italic; by day the same family turned round (bone
-  paper, near-black text). One accent, a clay terracotta (mark, the one action, links, the italic phrase; its deep tone on paper). Open and
+  it explains. The look is three colours and nothing else: paper (`#F4F1EA`) and
+  ink (`#141210`), the two grounds and each other's text, and one accent
+  (`#C8603A`, the glow in the middle of the circle: the mark, the one action, the
+  italic phrase, an index number, a link's underline). Every other tone is paper
+  and ink mixed (`color-mix`); every ground is flat, no gradient and no
+  shadow, with one exception: the home opening, where four pale circles of the accent
+  drift over the ink (`data-hero-glow`). Cormorant with its italic. Open and
   full-bleed: grounds from edge to edge, content between lines, no rounded card.
   The circle is the one motif, in four
   forms: the mark, the seat ring, the stamp, the index number. Same function, same
@@ -253,19 +255,23 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   agreements, consent, no therapy), grounded, open to every man. Copy: "du", plain
   German, no jargon, no "brother" tone, no promises of healing; no dashes for effect,
   slogan contrasts, triads or therapy phrases; each point once per page.
-- Colours are roles (`ground`, `ground-alt`, `raised`, `fg`, `fg-soft`, `fg-muted`,
-  `line`, `line-strong`, `line-bold`, `accent`, `accent-soft`,
-  `fill`/`fill-strong`/`on-fill`, `spark`, `success`/`danger` for states only); hex
-  primitives (`--p-*`) live on `:root` only, mirrored in `lib/shared/brand.ts`
-  (`tests/brand.test.ts`), never in markup. Day and night follow the system
+- Colours are roles (`ground`, `ground-alt`, `fg`, `fg-soft`, `fg-muted`,
+  `line`, `line-strong`, `line-bold`, `accent`, `accent-strong` (the filled
+  button under the pointer), `on-accent`, `danger` for a refusal only); the three
+  hex primitives (`--p-paper`, `--p-ink`, `--p-accent`) live on `:root` only,
+  mirrored in `lib/shared/brand.ts` (`tests/brand.test.ts`), never in markup.
+  Never add a fourth hex: a new tone is a mix of these. The accent is one hex on
+  every ground and holds 3:1, so it is large or drawn, never the colour of small
+  text: a link is the text's colour on an accent underline, a filled button the
+  accent under an ink label. Day and night follow the system
   (`light-dark()`); `ModeToggle` pins Auto · Hell · Dunkel as `data-mode`
   (`mc-appearance`). Every text pair ≥ 4.5:1 on every ground in both modes, control
-  lines ≥ 3:1 (`tests/contrast.test.ts`); `line` never outlines a control alone; the
-  spark is never text on paper or sand. Check new pairs in both modes.
-- Grounds: `Section ground` is `default` (paper), `alt` (sand: facts, course,
-  dates) or `dark`
-  (`surface-dark`, the theme's near-black with its three wandering pools of light, its
-  primitive still called `--p-forest`: opening, agreements, voices, registration,
+  lines and the accent ≥ 3:1 (`tests/contrast.test.ts`, read from `theme.css`);
+  `line` never outlines a control alone. Check new pairs in both modes.
+- Grounds: `Section ground` is `default` (paper), `alt` (the band, paper with a
+  little ink: facts, course, dates) or `dark`
+  (`surface-dark`, ink in both modes, flat; it re-declares the roles with their
+  night values: opening, agreements, voices, registration,
   menu, last band, footer). The site has these three grounds. Grounds
   run from edge to edge; `Section` clips horizontally what bleeds.
 - Type: Cormorant variable, upright and italic (`font-display`, two files in
@@ -277,7 +283,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   navigation, forms, data. Role tokens
   `text-poster`, `text-hero`, `text-index`, `text-page`, `text-section`, `text-sub`,
   `text-quote`, `text-md` (body), `text-base` (controls). `<em>` in
-  a title is Cormorant's italic in the accent (the clay terracotta on the dark ground). Labels in sentence
+  a title is Cormorant's italic in the accent. Labels in sentence
   case. Running text on `max-w-measure`. A dash in running copy is bound to the word
   before it (`\u00a0–`).
 - The four moves, the only ways to break the 12-column grid, each at most once per
@@ -293,7 +299,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   seat ring, stamp, avatar); fields `rounded-md` (8px) with the buttons' heights;
   only what floats (a dialog) takes `rounded-xl`. No rounded
   cards on public pages: facts, steps, agreements, FAQ and voices are rows between
-  lines. `shadow-overlay` only for what floats. Images: a photograph has no
+  lines. No shadow anywhere; what floats has a line and the dimmed page behind it. Images: a photograph has no
   frame, it runs to the window's edge and softly into the ground
   (`data-hero-frame`); a small portrait stands in a circle; no caption.
 - Skills are vendored in `.claude/skills/` (sources in `skills-lock.json`):
@@ -303,43 +309,40 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `skills-lock.json`): no label above every heading (`Eyebrow` only where it adds the
   place or the kind of page), no decorative numbers (an index number only where
   there is a real order: the course, the agreements), no drawn shape standing in for
-  a picture (no empty rings; the pools of light belong to the dark ground and are
-  its one decoration), one label for one action, nothing invented.
+  a picture (no empty rings), no gradient, glow or texture on a ground but the home opening's glows, one label for one action, nothing invented.
 - Shared components: `EventSummary` (every date: date, facts, `SeatRing`, action;
   fed by `lib/shared/event-status.ts`), `SeatRing` (`lib/shared/seats.ts`:
   `seatFill`, `seatDots`), `Stamp`, `Lockup` (`src/components/brand/`), `PageIntro`,
   `SectionHead`, `Poster`, `Index`, `Eyebrow`, `Fact`, `Button`, `Field` + `FormStatus`,
   `TestimonialList`, `Accordion`. Use them; do not restyle a copy.
-- Home: the forest opening, one screen tall, set like a poster and without a frame
-  (the photograph in the upper right up to the window's edges, running softly into
-  the ground towards the left and its foot, `data-hero-frame`; the statement at
-  poster size across the whole width and over the photograph's foot, the one
-  overlap here; under it one row on the grid: explanation and the one action on
-  the left, the next date as open lines on the right; on a phone the photograph
-  fills the top and the statement crosses its foot; the bar's action outlined
+- Home: the dark opening, one screen tall, set like a poster and without a picture
+  (four pale circles of the accent on the ink, high and to the right, drifting:
+  `data-hero-glow` in `Hero.astro`, its rules and keyframes `glow-a` to `glow-d` in
+  `global.css`, "The opening"; the statement at poster size across the whole
+  width, on plain ink, so keep the glows out of its lower left where the accent
+  phrase stands; under it one row on the grid: explanation and the one action on
+  the left, the next date as open lines on the right; the bar's action outlined
   over it), intro
   (questions in the margin, the four facts as its last row), the statement on a
-  screen of its own (`Statement`, the page's one scroll-led moment), course (sand,
-  index numbers), agreements (forest), Markus (one sentence of his under a rule),
-  voices (forest, every voice in full), FAQ, taking part (`#termine`, "Dabei
-  sein." as a poster word), staying in touch (forest, the stamp), the footer.
+  screen of its own (`Statement`, the page's one scroll-led moment), course (the band,
+  index numbers), agreements (dark), Markus (one sentence of his under a rule),
+  voices (dark, every voice in full), FAQ, taking part (`#termine`, "Dabei
+  sein." as a poster word), staying in touch (dark, the stamp), the footer.
   Open and wide: no box or card on a public page, the opening included.
 - Sub-pages open with `PageIntro`: on paper with the stamp, or, given a photograph
-  (the personal page), as the home page's poster opening on the forest (`overHero`
+  (the personal page), as the home page's poster opening on the dark ground (`overHero`
   on the layout). Section titles are `text-section` everywhere on the home page.
 - Header 72px: links from `nav`, one action; over the home opening clear with light
   text until the page moves (`data-scrolled`), then 95 % paper; fixed bars blur only
   from `lg` on a hovering pointer. The phone menu is a native modal `<dialog>` on
-  the forest, opening as a circle.
+  the dark ground, opening as a circle.
 - Motion (design-system.md, "Motion"): calm, and every piece has a reason. What
   moves: the change of page, a fade and nothing else (cross-document view
   transitions, `@view-transition`); every page's opening arriving once on load, in about a
   second (`data-opening`: the title's words rise, the lead, actions and date fade
   up, a photograph settles from 1.05 and is never hidden: it is the LCP; CSS
-  only, `global.css`, "The opening"; the seat ring's taken chairs fill in); the home statement turning to ink word by word as it crosses
-  the window (`data-statement`, one view timeline, each word a slice of it); the pools of light on every dark ground, wandering
-  plainly but slowly (`pool-wander-a` / `-b` on `surface-dark::before` and
-  `::after`, two composited layers on paths of their own); what lies
+  only, `global.css`, "The opening"; the seat ring's taken chairs fill in); the home opening's four pale circles drifting (`glow-a` to `glow-d`, translate and scale on layers of their own); the home statement turning to ink word by word as it crosses
+  the window (`data-statement`, one view timeline, each word a slice of it); what lies
   below a page's opening, every piece of it, fading in out of a blur as it is
   scrolled into the window (`global.css`, "Arriving": `timeline-view
 animate-blurred-fade-in animate-range-[entry_10%_contain_12%]`, on a phone later,

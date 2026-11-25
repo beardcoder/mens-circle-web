@@ -1,7 +1,7 @@
 ---
 /**
  * The seat ring, the circle's signature: every chair of an evening as a dot on a
- * ring, the taken ones in ember from the top, clockwise, the free ones open, and
+ * ring, the taken ones in the accent from the top, clockwise, the free ones open, and
  * in the middle how many are free. It repeats the seats line beside it in a shape
  * (decorative, `aria-hidden`); the line says it in words. In an opening the taken
  * chairs fill in one after the other, and after a registration the next free chair
@@ -63,7 +63,7 @@ const { ring: ringSize, number, label } = SIZES[size]
               cx={dot.x}
               cy={dot.y}
               r={ring.r}
-              class="fill-fill"
+              class="fill-accent"
               style={`--i: ${i}`}
             />
           ) : (

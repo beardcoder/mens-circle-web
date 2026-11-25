@@ -11,7 +11,7 @@ images `public/images/og-*.png` are plain committed files now.
 | Path                                     | What                                                                      | How it is made         |
 | ---------------------------------------- | ------------------------------------------------------------------------- | ---------------------- |
 | `brand/logo/logo.svg`                    | The master logo, the only logo file drawn by hand                         | by hand                |
-| `brand/logo/logo-*.svg`                  | Gold, deep gold on paper, bone on the dark ground, black, white           | `bun run brand:logo`   |
+| `brand/logo/logo-*.svg`                  | Accent, accent on paper, paper on ink, black, white             | `bun run brand:logo`   |
 | `public/favicon*`, `public/images/logo*` | Favicons, manifest icons, `favicon.ico`, the JSON-LD logo, the mail marks | `bun run brand:logo`   |
 | `brand/tokens.json`                      | W3C design tokens (colours with CMYK, type, space, sizes)                 | `bun run brand:export` |
 | `brand/tokens.css`                       | The same as plain CSS custom properties                                   | `bun run brand:export` |
@@ -26,15 +26,15 @@ after a change to the master logo run `bun run brand:logo`.
 ## Print
 
 - The CMYK values in `tokens.json` are computed from sRGB and only a starting
-  point. The gold prints darker on uncoated paper; prefer coated paper or agree the
+  point. The accent prints duller on uncoated paper; prefer coated paper or agree the
   values with the printer, and ask for a proof.
 - Fonts: Cormorant and Geist, both under the SIL Open Font License; see
   `src/assets/fonts/README.md`. Other tools: install them from Google Fonts.
 
 ## Logo
 
-- The mark is four figures in a circle. Deep gold on paper, gold (or bone) on the
-  forest, black or white where only one colour prints.
+- The mark is four figures in a circle. The accent on paper and on ink (or paper on
+  ink), black or white where only one colour prints.
 - Clear space all round: a quarter of the mark's height. Smallest size: 6 mm
   (24 px) for the mark with the word mark, 4 mm (16 px) for the mark alone.
 - Never: other colours, outlines, shadows, the mark rotated, the word mark in

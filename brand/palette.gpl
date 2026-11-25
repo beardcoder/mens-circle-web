@@ -2,37 +2,6 @@ GIMP Palette
 Name: Männerkreis Niederbayern
 Columns: 4
 #
-241 232 217	linen
-226 212 190	sand
-249 243 232	cream
- 24  17  11	ink
- 43  33  23	ink-soft
- 95  80  61	muted
-214 198 173	line
-191 171 142	line-strong
-118 101  80	control
-194 128  74	ember
-173 108  54	ember-deep
-124  65  23	ember-text
- 99  51  15	ember-text-deep
- 19  14  10	on-ember
-194 128  74	ember-light
-237 217 190	ember-tint
- 51  36  26	ember-tint-night
-194 128  74	spark
- 19  14  10	night
- 28  21  15	night-alt
- 38  29  21	night-raised
-235 223 205	night-text
-168 149 127	night-muted
- 44  34  24	night-line
- 63  50  37	night-line-strong
-138 120  98	night-control
- 19  14  10	forest
- 11   7   5	forest-night
- 30  22  16	forest-raised
- 20  14   9	forest-raised-night
-138 120  98	forest-control
-235 223 205	bone
-205 188 164	bone-soft
-182 164 141	bone-muted
+244 241 234	paper
+ 20  18  16	ink
+200  96  58	accent

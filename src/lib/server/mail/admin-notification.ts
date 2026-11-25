@@ -42,9 +42,9 @@ export const adminNotificationHtml = (d: AdminNotificationHtmlData): string => `
     body { margin:0 !important; padding:0 !important; width:100% !important; -webkit-text-size-adjust:100%; }
     table { border-collapse:collapse !important; }
     img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
-    a { color:#7C4117; }
+    a { color:#141210; }
     a[x-apple-data-detectors] { color:inherit !important; text-decoration:none !important; font-size:inherit !important; font-family:inherit !important; font-weight:inherit !important; line-height:inherit !important; }
-    .em-link { color:#7C4117 !important; text-decoration:underline; text-underline-offset:3px; }
+    .em-link { color:#141210 !important; text-decoration:underline; text-underline-offset:3px; }
     @media only screen and (max-width:620px) {
       .em-sheet { width:100% !important; }
       .em-pad { padding-left:24px !important; padding-right:24px !important; }
@@ -54,66 +54,66 @@ export const adminNotificationHtml = (d: AdminNotificationHtmlData): string => `
     }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#f9f3e8;">
-<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#ebdfcd;opacity:0;">Neue Anmeldung: ${e(d.participantName)}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
+<body style="margin:0;padding:0;background-color:#f4f1ea;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#f4f1ea;opacity:0;">Neue Anmeldung: ${e(d.participantName)}&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;</div>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9f3e8;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f1ea;">
   <!-- A dark band: its ground runs from edge to edge, its content stands on the 600px column -->
-  <tr><td align="center" bgcolor="#130e0a" style="background-color:#130e0a;">
+  <tr><td align="center" bgcolor="#141210" style="background-color:#141210;">
     <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
     <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;"><tr><td class="em-pad" style="padding:22px 40px 44px;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
           <td style="padding-right:12px;vertical-align:middle;"><a href="https://mens-circle.de" target="_blank"><img src="https://mens-circle.de/images/logo-mail.png" width="36" height="36" alt="" style="display:block;width:36px;height:36px;"></a></td>
           <td style="vertical-align:middle;">
-            <div class="em-serif" style="font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#EBDFCD;">Männerkreis</div>
+            <div class="em-serif" style="font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-0.01em;color:#f4f1ea;">Männerkreis</div>
           </td>
         </tr></table>
         <!-- The opening, as on the site: label and title at poster size on the dark ground -->
-        <p class="em-sans" style="margin:44px 0 12px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#C2804A;">Benachrichtigung</p>
-        <h1 class="em-display em-serif" style="margin:0;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:50px;font-weight:500;line-height:1.02;letter-spacing:-0.02em;color:#EBDFCD;">Neue Anmeldung.</h1>
+        <p class="em-sans" style="margin:44px 0 12px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#c8603a;">Benachrichtigung</p>
+        <h1 class="em-display em-serif" style="margin:0;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:50px;font-weight:500;line-height:1.02;letter-spacing:-0.02em;color:#f4f1ea;">Neue Anmeldung.</h1>
     </td></tr></table>
     <!--[if mso]></td></tr></table><![endif]-->
   </td></tr>
   <!-- A paper band: its ground runs from edge to edge, its content stands on the 600px column -->
-  <tr><td align="center" bgcolor="#F9F3E8" style="background-color:#F9F3E8;">
+  <tr><td align="center" bgcolor="#f4f1ea" style="background-color:#f4f1ea;">
     <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
     <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;"><tr><td class="em-pad" style="padding:40px 40px 36px;">
-<p class="em-sans" style="margin:0 0 24px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#130e0a;"><strong style="font-weight:600;color:#130e0a;">${e(d.eventTitle)}</strong></p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-bottom:1px solid #d6c6ad;">
+<p class="em-sans" style="margin:0 0 24px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.65;color:#141210;"><strong style="font-weight:600;color:#141210;">${e(d.eventTitle)}</strong></p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-bottom:1px solid #d7d4ce;">
       <tr>
-        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Name</td>
-        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.participantName)}</td>
+        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#605e5a;">Name</td>
+        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#141210;">${e(d.participantName)}</td>
       </tr>
       <tr>
-        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">E-Mail</td>
-        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;"><a href="mailto:${e(d.participantEmail)}" class="em-link" style="color:#7C4117;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">${e(d.participantEmail)}</a></td>
+        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#605e5a;">E-Mail</td>
+        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#141210;"><a href="mailto:${e(d.participantEmail)}" class="em-link" style="color:#141210;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">${e(d.participantEmail)}</a></td>
       </tr>
 ${
   d.participantPhone
     ? `
       <tr>
-        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Telefon</td>
-        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.participantPhone)}</td>
+        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#605e5a;">Telefon</td>
+        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#141210;">${e(d.participantPhone)}</td>
       </tr>
 `
     : ''
 }
       <tr>
-        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Status</td>
-        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.statusLabel)}</td>
+        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#605e5a;">Status</td>
+        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#141210;">${e(d.statusLabel)}</td>
       </tr>
 </table>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-bottom:1px solid #d6c6ad;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px;border-bottom:1px solid #d7d4ce;">
       <tr>
-        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Datum</td>
-        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.dateShort)}</td>
+        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#605e5a;">Datum</td>
+        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#141210;">${e(d.dateShort)}</td>
       </tr>
 ${
   d.timeRange
     ? `
       <tr>
-        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Uhrzeit</td>
-        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.timeRange)}</td>
+        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#605e5a;">Uhrzeit</td>
+        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#141210;">${e(d.timeRange)}</td>
       </tr>
 `
     : ''
@@ -122,8 +122,8 @@ ${
   d.location
     ? `
       <tr>
-        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#5f503d;">Ort</td>
-        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d6c6ad;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#130e0a;">${e(d.location)}</td>
+        <td width="110" class="em-key em-sans" style="width:110px;padding:11px 12px 11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:24px;color:#605e5a;">Ort</td>
+        <td class="em-sans" style="padding:11px 0;border-top:1px solid #d7d4ce;vertical-align:top;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:24px;color:#141210;">${e(d.location)}</td>
       </tr>
 `
     : ''
@@ -131,9 +131,9 @@ ${
 </table>
 <!-- The count: open between two rules -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:2px 0 0;">
-  <tr><td style="padding:22px 0;border-top:1px solid #bfab8e;border-bottom:1px solid #bfab8e;">
-    <p class="em-serif" style="margin:0;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:44px;font-weight:500;line-height:1;color:#130e0a;">${e(d.activeCount)}<span style="color:#5f503d;font-size:24px;">&nbsp;von&nbsp;${e(d.maxParticipants)}</span></p>
-    <p class="em-sans" style="margin:10px 0 0;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#5f503d;">Plätzen belegt</p>
+  <tr><td style="padding:22px 0;border-top:1px solid #bebbb6;border-bottom:1px solid #bebbb6;">
+    <p class="em-serif" style="margin:0;font-family:'Cormorant',Georgia,'Times New Roman',serif;font-size:44px;font-weight:500;line-height:1;color:#141210;">${e(d.activeCount)}<span style="color:#605e5a;font-size:24px;">&nbsp;von&nbsp;${e(d.maxParticipants)}</span></p>
+    <p class="em-sans" style="margin:10px 0 0;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;font-weight:600;line-height:1.3;color:#605e5a;">Plätzen belegt</p>
   </td></tr>
 </table>
 ${
@@ -141,8 +141,8 @@ ${
     ? `
 <!-- The one action: to the evening's registrations -->
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 0;">
-  <tr><td bgcolor="#C2804A" style="background-color:#C2804A;border-radius:999px;">
-    <a href="${e(d.adminUrl)}" target="_blank" class="em-sans" style="display:inline-block;padding:15px 28px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;line-height:1.1;color:#130e0a;text-decoration:none;border-radius:999px;">Anmeldungen ansehen&nbsp;&nbsp;&rarr;</a>
+  <tr><td bgcolor="#c8603a" style="background-color:#c8603a;border-radius:999px;">
+    <a href="${e(d.adminUrl)}" target="_blank" class="em-sans" style="display:inline-block;padding:15px 28px;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;font-weight:600;line-height:1.1;color:#141210;text-decoration:none;border-radius:999px;">Anmeldungen ansehen&nbsp;&nbsp;&rarr;</a>
   </td></tr>
 </table>
 `
@@ -152,10 +152,10 @@ ${
     <!--[if mso]></td></tr></table><![endif]-->
   </td></tr>
   <!-- A dark band: its ground runs from edge to edge, its content stands on the 600px column -->
-  <tr><td align="center" bgcolor="#130e0a" style="background-color:#130e0a;">
+  <tr><td align="center" bgcolor="#141210" style="background-color:#141210;">
     <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
     <table role="presentation" class="em-sheet" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;"><tr><td class="em-pad" style="padding:18px 40px 22px;">
-        <p class="em-sans" style="margin:0;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#B6A48D;">Automatische Benachrichtigung von <a href="https://mens-circle.de/admin" target="_blank" style="color:#C2804A;text-decoration:none;">mens-circle.de</a></p>
+        <p class="em-sans" style="margin:0;font-family:'Geist','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#a8a5a0;">Automatische Benachrichtigung von <a href="https://mens-circle.de/admin" target="_blank" style="color:#c8603a;text-decoration:none;">mens-circle.de</a></p>
     </td></tr></table>
     <!--[if mso]></td></tr></table><![endif]-->
   </td></tr>

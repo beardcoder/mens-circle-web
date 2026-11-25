@@ -4,9 +4,6 @@ import { PUBLIC_CACHE, readPublicEvents, readPublicTestimonials } from '@lib/ser
 import { eventSeriesSchema } from '@lib/shared/event-schema'
 
 import avatar from '../assets/images/markus-avatar-192.webp'
-import circle480 from '../assets/images/markus-kreis-480.avif'
-import circle720 from '../assets/images/markus-kreis-720.avif'
-import circle960 from '../assets/images/markus-kreis-960.avif'
 import ActionBar from '../components/blocks/ActionBar.astro'
 import Dates from '../components/blocks/Dates.astro'
 import Fact from '../components/blocks/Fact.astro'
@@ -48,8 +45,6 @@ else {
     kicker="Männerkreis in Straubing · Niederbayern"
     secondaryLabel="Wie ein Abend abläuft"
     secondaryLink="#reise"
-    images={[circle480, circle720, circle960]}
-    imageAlt="Markus Sommer sitzt auf einem Felsen und blickt in der Abendsonne über den Bayerischen Wald."
   >
     <Fragment slot="title">
       Ein Abend, an dem du

@@ -5,20 +5,19 @@
  * See docs/design-system.md.
  */
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger'
+export type ButtonVariant = 'primary' | 'secondary'
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg'
 
 /** One shape for every button: fully round, the label in normal case at weight 600. On hover it changes colour and rises 2px; pressed, it settles. */
 const BUTTON_BASE
-  = 'group/btn relative inline-flex items-center justify-center rounded-full border text-center font-sans font-semibold leading-tight no-underline transition-[background-color,color,border-color,box-shadow,translate,scale] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [@media(hover:hover)]:hover:-translate-y-0.5 motion-reduce:active:scale-100 motion-reduce:[@media(hover:hover)]:hover:translate-y-0'
+  = 'group/btn relative inline-flex items-center justify-center rounded-full border text-center font-sans font-semibold leading-tight no-underline transition-[background-color,color,border-color,translate,scale] duration-150 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [@media(hover:hover)]:hover:-translate-y-0.5 motion-reduce:active:scale-100 motion-reduce:[@media(hover:hover)]:hover:translate-y-0'
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
-  /** The one main action of a module: ember under a light label, glowing a little on hover. */
+  /** The one main action of a module: the accent under an ink label, a shade lighter under the pointer. */
   primary:
-    'border-transparent bg-fill text-on-fill hover:bg-fill-strong [@media(hover:hover)]:hover:shadow-[0_10px_24px_-12px_var(--color-fill)]',
+    'border-transparent bg-accent text-on-accent hover:bg-accent-strong',
   /** A further action beside it: outlined in the control colour. */
   secondary: 'border-line-bold bg-transparent text-fg hover:border-fg hover:bg-fg/6',
-  danger: 'border-danger bg-transparent text-danger hover:bg-danger hover:text-surface',
 }
 
 /** Heights and text sizes are shared with the fields (`CONTROL_SIZES`), so a field and its button stand as one row. */
@@ -38,9 +37,9 @@ export const button = ({
 }: { variant?: ButtonVariant, size?: ButtonSize, block?: boolean } = {}): string =>
   [BUTTON_BASE, BUTTON_VARIANTS[variant], BUTTON_SIZES[size], block ? 'w-full' : ''].filter(Boolean).join(' ')
 
-/** A link inside running text: the accent, underlined. */
+/** A link inside running text: the text's own colour on an accent underline. */
 export const link
-  = 'text-accent underline decoration-1 underline-offset-[3px] transition-colors duration-180 hover:text-accent-strong'
+  = 'text-fg underline decoration-accent decoration-2 underline-offset-4 transition-colors duration-180 hover:decoration-fg'
 
 type ControlSize = 'md' | 'sm' | 'xs'
 
@@ -50,7 +49,7 @@ type ControlSize = 'md' | 'sm' | 'xs'
  * outline, the site's focus outline.
  */
 const CONTROL_BASE
-  = 'rounded-md border border-line-bold bg-field font-sans text-fg placeholder:text-fg-muted transition-[border-color,background-color] duration-180 ease-out hover:not-focus:not-disabled:border-fg focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger'
+  = 'rounded-md border border-line-bold bg-transparent font-sans text-fg placeholder:text-fg-muted transition-[border-color,background-color] duration-180 ease-out hover:not-focus:not-disabled:border-fg focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger'
 
 /** The buttons' heights and text sizes; 16px at least on the public forms, anything smaller makes iOS zoom on focus. */
 const CONTROL_SIZES: Record<ControlSize, string> = {
@@ -75,9 +74,9 @@ export const fieldError
 
 /** A form's own answer under its button, written by lib/form.ts: what actually happened, in words, with a mark. */
 export const formStatus
-  = 'flex items-start gap-2 text-base font-medium transition-[opacity,translate,display] transition-discrete duration-200 ease-out starting:translate-y-1 starting:opacity-0 motion-reduce:starting:translate-y-0 before:mt-0.5 before:grid before:size-5 before:shrink-0 before:place-items-center before:rounded-full before:text-xs before:leading-none before:font-bold before:text-surface data-[tone=error]:text-danger data-[tone=error]:before:bg-danger data-[tone=error]:before:content-["!"] data-[tone=success]:text-success data-[tone=success]:before:bg-success data-[tone=success]:before:content-["✓"]'
+  = 'flex items-start gap-2 text-base font-medium transition-[opacity,translate,display] transition-discrete duration-200 ease-out starting:translate-y-1 starting:opacity-0 motion-reduce:starting:translate-y-0 before:mt-0.5 before:grid before:size-5 before:shrink-0 before:place-items-center before:rounded-full before:text-xs before:leading-none before:font-bold before:text-surface data-[tone=error]:text-danger data-[tone=error]:before:bg-danger data-[tone=error]:before:content-["!"] data-[tone=success]:text-fg data-[tone=success]:before:bg-fg data-[tone=success]:before:content-["✓"]'
 
-export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer accent-fill'
+export const checkbox = 'mt-0.5 size-5 shrink-0 cursor-pointer accent-accent'
 
 /** A short label over data or a group: sentence case in the secondary text colour. */
 export const label = 'font-sans text-sm font-semibold text-fg-muted'

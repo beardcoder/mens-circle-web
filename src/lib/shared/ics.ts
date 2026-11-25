@@ -278,8 +278,8 @@ export const buildIcs = (ev: CalendarEvent, now: Date = new Date()): string => {
     'TRANSP:OPAQUE',
     'CLASS:PUBLIC',
     `CATEGORIES:${icsEscape(site.siteName)}`,
-    // RFC 7986: a CSS colour name, close to the site's ember.
-    'COLOR:sienna',
+    // RFC 7986: a CSS colour name, close to the site's accent.
+    'COLOR:chocolate',
     ...(hasGeo(ev) ? ['X-APPLE-TRAVEL-ADVISORY-BEHAVIOR:AUTOMATIC'] : []),
     ...alarms(ev),
     'END:VEVENT',

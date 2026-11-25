@@ -48,7 +48,7 @@ export const toDtcg = (tokens: ThemeTokens): Record<string, unknown> => ({
     primitive: Object.fromEntries(swatches(tokens).map(s => [s.name, colourToken(s.hex)])),
     role: Object.fromEntries(
       tokens.colours
-        .filter(c => !c.derived && c.light.hex && c.dark.hex)
+        .filter(c => !c.derived)
         .map(c => [c.name, { light: colourToken(c.light.hex!, c.note), dark: colourToken(c.dark.hex!, c.note) }]),
     ),
   },
@@ -87,7 +87,7 @@ export const toCss = (tokens: ThemeTokens): string => {
     ...swatches(tokens).map(s => `  --p-${s.name}: ${s.hex};`),
     '',
     ...tokens.colours
-      .filter(c => !c.derived && c.light.hex && c.dark.hex)
+      .filter(c => !c.derived)
       .flatMap(c => [`  --color-${c.name}-light: ${c.light.hex};`, `  --color-${c.name}-dark: ${c.dark.hex};`]),
     '',
     ...tokens.type.map(t => `  --text-${t.name}: ${t.size};`),

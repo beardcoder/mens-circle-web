@@ -1,23 +1,26 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { expect, test } from 'bun:test'
 
+import { mix } from '../src/lib/brand/color'
 import { parseTheme } from '../src/lib/brand/theme-tokens'
 import { BRAND, MAIL } from '../src/lib/shared/brand'
 
-const theme = readFileSync(new URL('../src/styles/theme.css', import.meta.url), 'utf8')
-const camel = (name: string) => name.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())
+const tokens = parseTheme(readFileSync(new URL('../src/styles/theme.css', import.meta.url), 'utf8'))
+const role = (name: string) => tokens.colours.find(c => c.name === name)!
 
-test('brand.ts and the --p-* primitives in theme.css name the same colours', () => {
-  const fromTheme: Record<string, string> = {}
+test('brand.ts and the --p-* primitives in theme.css name the same three colours', () => {
+  const fromTheme = Object.fromEntries(Object.entries(tokens.primitives).map(([name, { light }]) => [name, light]))
 
-  for (const [name, { light, dark }] of Object.entries(parseTheme(theme).primitives)) {
-    fromTheme[camel(name)] = light
-
-    if (dark !== light) fromTheme[`${camel(name)}Night`] = dark
-  }
-
-  expect(Object.keys(fromTheme).length).toBeGreaterThan(30)
   expect({ ...BRAND } as Record<string, string>).toEqual(fromTheme)
+})
+
+test('the mixed tones of the mails are the theme\'s roles', () => {
+  expect<string>(MAIL.muted).toBe(role('fg-muted').light.hex!)
+  expect<string>(MAIL.mutedOnInk).toBe(role('fg-muted').dark.hex!)
+  // The theme's lines are mixed with `transparent`; a mail needs them solid on its ground.
+  expect<string>(MAIL.line).toBe(mix(BRAND.ink, BRAND.paper, 13))
+  expect<string>(MAIL.lineStrong).toBe(mix(BRAND.ink, BRAND.paper, 24))
+  expect<string>(MAIL.lineOnInk).toBe(mix(BRAND.paper, BRAND.ink, 14))
 })
 
 test('every colour in the mail templates is a brand colour', () => {

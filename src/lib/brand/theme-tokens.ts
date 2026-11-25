@@ -7,6 +7,8 @@
  * Pure: give it the file's text. A declaration's trailing comment is its note.
  */
 
+import { mix } from './color'
+
 export interface Declaration {
   name: string
   value: string
@@ -14,9 +16,9 @@ export interface Declaration {
 }
 
 interface ColourValue {
-  /** Resolved hex, or `null` when the value is mixed (`color-mix`) or not a colour. */
+  /** Resolved hex, or `null` when the value has none (a mix with `transparent`). */
   hex: string | null
-  /** The primitive it comes from (`linen`), if any. */
+  /** The primitive it is (`paper`), if it is one unmixed. */
   primitive: string | null
 }
 
@@ -24,7 +26,7 @@ interface Colour {
   name: string
   light: ColourValue
   dark: ColourValue
-  /** Mixed from other colours (`color-mix`): no single hex. */
+  /** No single hex in one of the modes. */
   derived: boolean
   note: string
 }
@@ -111,32 +113,45 @@ export const declarations = (body: string): Declaration[] => {
 
 const HEX = /#[0-9a-f]{6}\b/i
 
-/** `light-dark(#a, #b)` or `#a` into both modes. */
+/** `light-dark(a, b)` or one value into both modes; the comma that parts them is the one outside any bracket. */
 const splitModes = (value: string): { light: string, dark: string } => {
-  const pair = /^light-dark\(\s*([^,]+?)\s*,\s*(.+?)\s*\)$/.exec(value)
+  const inner = /^light-dark\((.*)\)$/.exec(value)?.[1]
 
-  return pair ? { light: pair[1], dark: pair[2] } : { light: value, dark: value }
+  if (!inner) return { light: value, dark: value }
+
+  let depth = 0
+
+  for (let i = 0; i < inner.length; i += 1) {
+    if (inner[i] === '(') depth += 1
+    else if (inner[i] === ')') depth -= 1
+    else if (inner[i] === ',' && depth === 0) return { light: inner.slice(0, i).trim(), dark: inner.slice(i + 1).trim() }
+  }
+
+  return { light: value, dark: value }
 }
 
+const MIX = /^color-mix\(in srgb, var\(--p-([\w-]+)\) ([\d.]+)%, var\(--p-([\w-]+)\)\)$/
+
+/** A primitive, two primitives mixed, or a hex; anything else (a mix with `transparent`) has no hex. */
 const resolve = (value: string, primitives: ThemeTokens['primitives'], mode: 'light' | 'dark'): ColourValue => {
   const ref = /^var\(--p-([\w-]+)\)$/.exec(value.trim())
 
   if (ref) return { hex: primitives[ref[1]]?.[mode] ?? null, primitive: ref[1] }
 
+  const mixed = MIX.exec(value.trim())
+  const [a, b] = mixed ? [primitives[mixed[1]]?.[mode], primitives[mixed[3]]?.[mode]] : []
+
+  if (mixed && a && b) return { hex: mix(a, b, Number(mixed[2])), primitive: null }
+
   return { hex: HEX.exec(value)?.[0].toLowerCase() ?? null, primitive: null }
 }
 
 const colour = (decl: Declaration, primitives: ThemeTokens['primitives']): Colour => {
-  const derived = decl.value.includes('color-mix')
   const modes = splitModes(decl.value)
+  const light = resolve(modes.light, primitives, 'light')
+  const dark = resolve(modes.dark, primitives, 'dark')
 
-  return {
-    name: decl.name.replace('--color-', ''),
-    light: derived ? { hex: null, primitive: null } : resolve(modes.light, primitives, 'light'),
-    dark: derived ? { hex: null, primitive: null } : resolve(modes.dark, primitives, 'dark'),
-    derived,
-    note: decl.note,
-  }
+  return { name: decl.name.replace('--color-', ''), light, dark, derived: !light.hex || !dark.hex, note: decl.note }
 }
 
 const typeRoles = (decls: Declaration[]): TypeRole[] => {

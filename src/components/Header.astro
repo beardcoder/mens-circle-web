@@ -11,7 +11,7 @@ import Container from './ui/Container.astro'
 /**
  * The bar, 72px: the mark on the left; from `nav` (1100px) the five content links
  * and the one filled action on the right, below that the action and a menu
- * button. Over a forest opening (the home page, the personal page; `over-hero:`) it starts clear with light text
+ * button. Over a dark opening (the home page, the personal page; `over-hero:`) it starts clear with light text
  * and turns to the page's opaque paper once the page moves (`data-scrolled`, set
  * by its script); elsewhere it is paper from the start. The phone menu is
  * a native modal `<dialog>`: Escape closes it, the focus returns to the button.
@@ -21,7 +21,7 @@ import Container from './ui/Container.astro'
 
 interface Props {
   action?: { href: string; label: string }
-  /** The page opens on the forest: the bar starts clear over it (`over-hero:`). */
+  /** The page opens on the dark ground: the bar starts clear over it (`over-hero:`). */
   overHero?: boolean
 }
 
@@ -39,7 +39,7 @@ const isCurrentPage = (url: string): boolean => {
 
 // A line slides in under a link from its start edge on hover and focus.
 const linkClass =
-  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-[current=page]:text-accent aria-[current=page]:after:scale-x-100 [[data-over-hero]:not([data-scrolled])_&]:aria-[current=page]:text-spark'
+  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-[current=page]:text-accent aria-[current=page]:after:scale-x-100 [[data-over-hero]:not([data-scrolled])_&]:aria-[current=page]:text-accent'
 
 /** What you press is round. */
 const roundButton =
@@ -57,11 +57,11 @@ const roundButton =
   data-over-hero={overHero || undefined}
   class:list={[
     'group/header fixed inset-x-0 top-0 z-40 h-header text-fg print:hidden',
-    // The bar's ground: the page's linen, a little translucent over a blur, with a
+    // The bar's ground: the page's paper, a little translucent over a blur, with a
     // thin line. It switches at once, ground and text together.
     'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:border-b before:border-line before:bg-ground/95 lg:hover-device:before:bg-ground/88 lg:hover-device:before:backdrop-blur-xl',
     // Over the dark opening: clear with light text until the page moves.
-    'over-hero:text-bone over-hero:before:opacity-0 over-hero:data-[scrolled]:text-fg over-hero:data-[scrolled]:before:opacity-100',
+    'over-hero:text-paper over-hero:before:opacity-0 over-hero:data-[scrolled]:text-fg over-hero:data-[scrolled]:before:opacity-100',
   ]}
 >
   <Container class="flex h-full items-center gap-2 sm:gap-4">
@@ -73,7 +73,7 @@ const roundButton =
       <Icon
         name="logo"
         aria-hidden="true"
-        class="size-8 shrink-0 text-flame transition-[rotate] duration-700 ease-(--ease-spring) sm:size-9 hover-device:group-hover/logo:rotate-90 motion-reduce:transition-none"
+        class="size-8 shrink-0 text-accent transition-[rotate] duration-700 ease-(--ease-spring) sm:size-9 hover-device:group-hover/logo:rotate-90 motion-reduce:transition-none"
       />
       <span class={wordmark}>Männerkreis</span>
     </a>
@@ -112,7 +112,7 @@ const roundButton =
       class:list={[
         button({ variant: 'primary', size: 'sm' }),
         // Over the opening, whose own action is the one filled button, the bar's action is outlined.
-        'max-nav:ml-auto [[data-over-hero]:not([data-scrolled])_&]:border-bone/45 [[data-over-hero]:not([data-scrolled])_&]:bg-transparent [[data-over-hero]:not([data-scrolled])_&]:text-bone [[data-over-hero]:not([data-scrolled])_&]:hover:border-bone [[data-over-hero]:not([data-scrolled])_&]:hover:shadow-none',
+        'max-nav:ml-auto [[data-over-hero]:not([data-scrolled])_&]:border-paper/45 [[data-over-hero]:not([data-scrolled])_&]:bg-transparent [[data-over-hero]:not([data-scrolled])_&]:text-paper [[data-over-hero]:not([data-scrolled])_&]:hover:border-paper',
       ]}
     >
       {cta.label}
@@ -202,7 +202,7 @@ const roundButton =
         <Icon
           name="logo"
           aria-hidden="true"
-          class="size-8 shrink-0 text-flame sm:size-9"
+          class="size-8 shrink-0 text-accent sm:size-9"
         />
         <span class={wordmark}>Männerkreis</span>
       </a>
