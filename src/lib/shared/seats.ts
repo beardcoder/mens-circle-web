@@ -3,6 +3,11 @@
  * registration panel. Shared by server and client markup, so it imports nothing.
  */
 
+export const freeSeatLabel = (free: number): string => {
+  if (free <= 0) return 'Ausgebucht'
+  return free === 1 ? 'Noch 1 Platz frei' : `Noch ${free} Plätze frei`
+}
+
 /** Taken seats as a share of all seats (0–1), or `null` when there is nothing to show (a past evening, no seats). */
 export const seatFill = (seats: { total: number, free: number } | null): number | null => {
   if (!seats || seats.total < 1) return null

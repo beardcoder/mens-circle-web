@@ -26,7 +26,7 @@ await sandbox.seed({
       data: {
         title: 'Männerkreis',
         ...evening('2099-01-01'),
-        max_participants: 8,
+        max_participants: 2,
         location: 'Gemeindehaus',
         street: 'Teststraße 1',
         postal_code: '94315',
@@ -161,18 +161,32 @@ async function interactions(browser: Browser): Promise<void> {
 
   // Calendar popover on an event page.
   await page.goto(`${origin}/event/testabend`, { waitUntil: 'networkidle' })
+  await page.setViewportSize({ width: 320, height: 680 })
+  const date = page.locator('#header time')
+  assert(!(await date.isVisible()))
+  await page.locator('#header a[href="#anmeldung"]:visible').click()
+  await date.waitFor()
+  assert.equal(await date.innerText(), '01.01.2099')
+  assert(!(await page.locator('[data-event-dock]').isVisible()))
+  assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
+  await page.screenshot({ path: join(shots, 'mobile-registration.png') })
+  await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }))
+  await date.waitFor({ state: 'hidden' })
   await page.locator('[popovertarget="calendar-modal"]').first().click()
   assert(await page.locator('#calendar-modal').isVisible(), 'the calendar popover opens')
   await axe(page, 'calendar popover')
   await page.keyboard.press('Escape')
 
   // Registration with JavaScript: answered in place.
+  assert.equal(await page.locator('#anmeldung [data-seat-text]').innerText(), 'Noch 2 Plätze frei')
   await page.fill('#register-first_name', 'Erik')
   await page.fill('#register-last_name', 'Browser')
   await page.fill('#register-email', 'erik@example.invalid')
   await page.check('#register input[name="privacy"]')
   await page.click('#register button[type="submit"]')
   await page.waitForSelector('#register-status[data-tone="success"]')
+
+  assert.equal(await page.locator('#anmeldung [data-seat-text]').innerText(), 'Noch 1 Platz frei')
 
   // Newsletter and testimonial.
   await page.goto(`${origin}/event`, { waitUntil: 'networkidle' })
@@ -199,6 +213,8 @@ async function interactions(browser: Browser): Promise<void> {
   await plain.check('#register input[name="privacy"]')
   await Promise.all([plain.waitForLoadState('load'), plain.click('#register button[type="submit"]')])
   assert.match(await plain.content(), /Vielen Dank für deine Anmeldung/)
+  await plain.goto(`${origin}/event/testabend`)
+  assert.equal(await plain.locator('#anmeldung [data-seat-text]').innerText(), 'Ausgebucht')
   await noScript.close()
 
   // The old back office leads to EmDash's admin, which renders under its own policy.

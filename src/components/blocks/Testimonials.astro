@@ -12,34 +12,26 @@ interface Props {
   anchor: string
   eyebrow?: string
   title: string
-  emptyText: string
   errorText: string
   linkUrl: string
   linkLabel: string
 }
 
-const { items, anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel } = Astro.props
+const { items, anchor, eyebrow, title, errorText, linkUrl, linkLabel } = Astro.props
 ---
 
-{/* On the dark ground, like the agreements: what men said after an evening. */}
-<Section
-  id={anchor}
-  ground="dark"
-  labelledby="testimonials-title"
->
-  <div class:list={[margin.grid, 'gap-y-group']}>
-    <SectionHead
-      eyebrow={eyebrow}
-      title={title}
-      titleId="testimonials-title"
-      class={margin.cross}
-    />
-
-    <div class="lg:col-span-12">
-      {items?.length ? <TestimonialList items={items} /> : <p class:list={[margin.reading, 'text-md text-fg-soft']}>{items ? emptyText : errorText}</p>}
+{items?.length ? (
+  <Section id={anchor} ground="dark" labelledby="testimonials-title">
+    <div class:list={[margin.grid, 'gap-y-group']}>
+      <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" class={margin.cross} />
+      <div class="lg:col-span-12"><TestimonialList items={items} /></div>
+      <p class={margin.content}><TextLink href={linkUrl}>{linkLabel}</TextLink></p>
     </div>
-    <p class={margin.content}>
-      <TextLink href={linkUrl}>{linkLabel}</TextLink>
-    </p>
-  </div>
-</Section>
+  </Section>
+) : (
+  <Section id={anchor} space="none" labelledby="testimonials-title" class="border-b border-line py-4">
+    <h2 id="testimonials-title" class="sr-only">{title}</h2>
+    {items === null && <p class="text-fg-muted">{errorText}</p>}
+    <TextLink href={linkUrl}>{linkLabel}</TextLink>
+  </Section>
+)}

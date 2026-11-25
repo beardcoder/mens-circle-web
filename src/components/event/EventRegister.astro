@@ -1,6 +1,7 @@
 ---
 import { actions } from 'astro:actions'
 
+import { freeSeatLabel } from '@lib/shared/seats'
 import { button, checkbox, control, fieldError, formStatus, link } from '@lib/ui'
 
 import SeatRing from '../brand/SeatRing.astro'
@@ -46,10 +47,20 @@ const field = (name: string) => ({
     // Open, a ground and not a box: below lg a dark band from edge to edge; beside the intro it runs
     // from under the bar to the opening's foot and out to the window's right edge (EventIntro lets it
     // out of the grid; the section is the container that 100cqw measures).
-    'surface-dark min-w-0 scroll-mt-14 scheme-dark p-panel max-lg:-mx-gutter max-lg:px-gutter lg:pt-[calc(var(--spacing-panel)+4rem)] lg:-mr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))] lg:pr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))]',
+    'surface-dark min-w-0 lg:scroll-mt-14 scheme-dark p-panel max-lg:-mx-gutter max-lg:px-gutter lg:pt-[calc(var(--spacing-panel)+4rem)] lg:-mr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))] lg:pr-[max(var(--spacing-gutter),calc((100cqw-75rem)/2))]',
   ]}
 >
-  {event.isPast ? (
+  {result && 'message' in result ? (
+    <div role="status">
+      <h2
+        id="anmeldung-title"
+        class="text-sub text-fg"
+      >
+        Vielen Dank für deine Anmeldung
+      </h2>
+      <p class="mt-4 text-md text-fg-soft">{result.message}</p>
+    </div>
+  ) : event.isPast ? (
     <>
       <h2
         id="anmeldung-title"
@@ -71,12 +82,13 @@ const field = (name: string) => ({
         id="anmeldung-title"
         class="text-sub text-fg"
       >
-        Dieser Abend ist voll
+        Dein Platz im Kreis
       </h2>
       <SeatRing
         class="mt-4"
         seats={event.view.seats}
-        text="Alle Plätze sind belegt"
+        countBeside
+        text={freeSeatLabel(0)}
       />
       <p class="mt-6 max-w-measure text-md text-fg-soft">Eine Anmeldung ist nicht mehr möglich.</p>
       <a
@@ -86,16 +98,6 @@ const field = (name: string) => ({
         Andere Termine ansehen
       </a>
     </>
-  ) : result && 'message' in result ? (
-    <div role="status">
-      <h2
-        id="anmeldung-title"
-        class="text-sub text-fg"
-      >
-        Vielen Dank für deine Anmeldung
-      </h2>
-      <p class="mt-4 text-md text-fg-soft">{result.message}</p>
-    </div>
   ) : (
     <>
       <h2
@@ -107,7 +109,8 @@ const field = (name: string) => ({
       <SeatRing
         class="mt-4"
         seats={event.view.seats}
-        text={`${event.availableSpots} von ${event.maxParticipants} Plätzen frei`}
+        countBeside
+        text={freeSeatLabel(event.availableSpots)}
       />
       <p class="mt-6 mb-6 max-w-measure text-md text-fg-soft">Deine Anmeldung gilt nur für diesen Abend.</p>
       <dl class="mb-8 text-sm">
@@ -263,6 +266,7 @@ const field = (name: string) => ({
 
 <script>
   import { enhanceForms } from '@lib/form'
+  import { freeSeatLabel, seatFill } from '@lib/shared/seats'
 
   enhanceForms('register', 'register')
 
@@ -276,21 +280,24 @@ const field = (name: string) => ({
 
   panel?.addEventListener('form:success', () => {
     const ring = panel.querySelector<HTMLElement>('[data-seat-ring]')
-    const chair = ring?.querySelector<SVGCircleElement>('circle[data-seat-free]')
-    const count = ring?.querySelector<HTMLElement>('[data-seat-count]')
+    const line = ring?.querySelector<HTMLElement>('[data-seat-text]')
+    if (!ring || !line) return
 
-    if (!ring || !chair || !count) return
+    const total = Number(ring.dataset.total)
+    const free = Math.max(0, Number(ring.dataset.free) - 1)
+    ring.dataset.free = String(free)
+    line.textContent = freeSeatLabel(free)
 
-    const free = Number(count.textContent) - 1
-    const line = ring.querySelector<HTMLElement>('[data-seat-text]')
+    // Above 48 seats each dot represents a share of the group.
+    const taken = ring.querySelectorAll('[data-seat-dot]').length
+    const nextTaken = Math.round((seatFill({ total, free }) ?? 0) * Math.min(total, 48))
+    const chair = ring.querySelector<SVGCircleElement>('circle[data-seat-free]')
+    if (!chair || nextTaken <= taken) return
 
     chair.removeAttribute('data-seat-free')
     chair.removeAttribute('stroke-width')
     chair.setAttribute('r', String(Number(chair.getAttribute('r')) + 0.75))
     chair.setAttribute('class', 'fill-accent')
     chair.setAttribute('data-seat-dot', 'taking')
-    count.textContent = String(free)
-
-    if (line) line.textContent = line.textContent?.replace(/^\d+/, String(free)) ?? ''
   })
 </script>

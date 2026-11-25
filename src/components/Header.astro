@@ -20,12 +20,13 @@ import Container from './ui/Container.astro'
  */
 
 interface Props {
+  eventTime?: { day: string; date: string; hours: string }
   action?: { href: string; label: string }
   /** The page opens on the dark ground: the bar starts clear over it (`over-hero:`). */
   overHero?: boolean
 }
 
-const { action, overHero = false } = Astro.props
+const { action, eventTime, overHero = false } = Astro.props
 const links = nav.header.links
 const cta = action ? { url: action.href, label: action.label, umamiTarget: 'event-registration' } : nav.header.cta
 /** The word mark gives way on narrow phones, a little earlier beside an event's longer action. */
@@ -63,7 +64,7 @@ const roundButton =
     'over-hero:text-paper over-hero:before:opacity-0 over-hero:data-[scrolled]:text-fg over-hero:data-[scrolled]:before:opacity-100',
   ]}
 >
-  <Container class="flex h-full items-center gap-2 sm:gap-4">
+  <Container class="flex h-full items-center gap-2 sm:gap-4 max-sm:group-data-[event-visible]/header:px-3">
     <a
       href="/"
       aria-label={`${site.siteName} – Startseite`}
@@ -74,8 +75,15 @@ const roundButton =
         aria-hidden="true"
         class="size-8 shrink-0 text-accent transition-[rotate] duration-700 ease-(--ease-spring) sm:size-9 hover-device:group-hover/logo:rotate-90 motion-reduce:transition-none"
       />
-      <span class={wordmark}>Männerkreis</span>
+      <span class:list={[wordmark, 'max-lg:group-data-[event-visible]/header:hidden']}>Männerkreis</span>
     </a>
+
+    {eventTime && (
+      <div class="hidden min-w-0 text-xs leading-tight max-lg:group-data-[event-visible]/header:grid">
+        <time datetime={eventTime.day} class="font-semibold tabular-nums">{eventTime.date}</time>
+        {eventTime.hours && <span class="text-fg-muted tabular-nums">{eventTime.hours}</span>}
+      </div>
+    )}
 
     <nav
       aria-label="Hauptnavigation"

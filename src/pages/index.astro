@@ -14,7 +14,6 @@ import JourneyStep from '../components/blocks/JourneyStep.astro'
 import JourneySteps from '../components/blocks/JourneySteps.astro'
 import Moderator from '../components/blocks/Moderator.astro'
 import Newsletter from '../components/blocks/Newsletter.astro'
-import Statement from '../components/blocks/Statement.astro'
 import Testimonials from '../components/blocks/Testimonials.astro'
 import AccordionItem from '../components/ui/AccordionItem.astro'
 import Layout from '../layouts/Layout.astro'
@@ -94,13 +93,8 @@ else {
         {events?.fee.note ?? 'Du gibst, was für dich machbar ist'}
       </Fact>
     </Fragment>
+    <Fragment slot="close">Manchmal reicht <em>Neugier.</em></Fragment>
   </Intro>
-
-  <Statement>
-    Einen besonderen Grund zu kommen brauchst du nicht. Manchmal reicht
-    {' '}
-    <em>Neugier.</em>
-  </Statement>
 
   <JourneySteps
     anchor="reise"
@@ -164,7 +158,6 @@ else {
     title="Was Teilnehmer geschrieben haben"
     linkUrl="/teile-deine-erfahrung"
     linkLabel="Du warst dabei? Teile deine Erfahrung"
-    emptyText="Erfahrungen von Teilnehmern erscheinen hier, sobald sie freigegeben sind."
     errorText="Die Erfahrungen lassen sich gerade nicht laden. Bitte schau später noch einmal vorbei."
   />
 
@@ -208,8 +201,7 @@ else {
   <Dates
     events={events}
     anchor="termine"
-    lede="Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin."
-    title="Dabei sein."
+    title="Der nächste Männerkreis"
   />
 
   <Newsletter

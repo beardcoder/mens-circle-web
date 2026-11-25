@@ -67,4 +67,7 @@ const { anchor, eyebrow, title, questionsLabel, questions, factsLabel } = Astro.
       <slot name="facts" />
     </dl>
   </div>
+  {Astro.slots.has('close') && <p class="mt-group border-t border-line pt-6 font-display text-section text-fg [&_em]:text-accent">
+    <slot name="close" />
+  </p>}
 </Section>

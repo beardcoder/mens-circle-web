@@ -221,6 +221,10 @@ try {
     for (const path of ['/', '/event']) {
       const html = await readPage(origin, path)
 
+      if (path === '/') {
+        assert.doesNotMatch(html, /Alle Termine ansehen/)
+        assert.match(html, /Du warst dabei\? Teile deine Erfahrung/)
+      }
       assert.match(html, /Der nächste Abend ist in Planung/)
       assert.match(html, /Über neue Termine informieren/)
     }
@@ -294,6 +298,7 @@ try {
     const overview = await readPage(origin, '/event')
 
     assert.match(home, /1\. Januar 2099/)
+    assert.match(home, /Alle Termine ansehen/)
     assert.match(home, /Eine freigegebene Erfahrung/)
     // Every voice is read in full; nothing folds behind a click.
     assert.match(home, /(Eine längere Erfahrung\. ){25}/)

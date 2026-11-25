@@ -321,11 +321,9 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   phrase stands; under it one row on the grid: explanation and the one action on
   the left, the next date as open lines on the right; the bar's action outlined
   over it; on phones date, time and place precede the action), Markus with a short introduction and portrait, intro
-  (questions in the margin, the four facts as its last row), the statement on a
-  screen of its own (`Statement`, the page's one scroll-led moment), course (the band,
+  (questions in the margin, four facts and a short closing line), course (the band,
   index numbers), agreements (dark),
-  voices (dark, every voice in full), FAQ, taking part (`#termine`, "Dabei
-  sein." as a poster word), staying in touch (dark, the stamp), the footer.
+  voices (published quotes in full, a compact link while empty), FAQ, the next evening (`#termine`), staying in touch (dark, the stamp), the footer.
   Open and wide: no box or card on a public page, the opening included.
 - Sub-pages open with `PageIntro`: on paper with the stamp, or, given a photograph
   (the personal page), as the home page's poster opening on the dark ground (`overHero`
@@ -338,8 +336,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   transitions, `@view-transition`); every page's opening arriving once on load, in about a
   second (`data-opening`: the title's words rise, the lead, actions and date fade
   up, a photograph settles from 1.05 and is never hidden: it is the LCP; CSS
-  only, `global.css`, "The opening"; the seat ring's taken chairs fill in); the home opening's four pale circles drifting (`glow-a` to `glow-d`, translate and scale on layers of their own); the home statement turning to ink word by word as it crosses
-  the window (`data-statement`, one view timeline, each word a slice of it); the stamp's ring of words turning
+  only, `global.css`, "The opening"; the seat ring's taken chairs fill in); the home opening's four pale circles drifting (`glow-a` to `glow-d`, translate and scale on layers of their own); the stamp's ring of words turning
   once in two minutes; the mark turning a quarter when the logo is hovered; what
   answers the hand (buttons press to 0.97 in 150ms, links, the native `<details>`
   of the FAQ unfolding and fading, the phone menu, the calendar popover growing

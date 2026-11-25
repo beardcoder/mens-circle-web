@@ -335,8 +335,7 @@
 
 /* ── Motion: scroll ───────────────────────────────────────────────────────── */
 
-/* Tied to the scroll itself: two bars whose place depends on it, and the home
-   page's statement, which turns to ink word by word. */
+/* The desktop event dock and the mobile home action bar follow the scroll. */
 @supports (animation-timeline: view()) {
   @media screen and (prefers-reduced-motion: no-preference) {
     /* The event page's dock under the bar follows the title: as the title passes
@@ -344,24 +343,6 @@
        returns. The title's own view timeline drives it (`body` lifts the name to
        where the dock can see it; the inset is the bar), so the dock is always
        exactly as far in as the title is out. */
-    /* The statement: its words rest at half the ink and turn to full ink one
-       after the other as the statement crosses the middle of the window, its
-       strong word to the accent; it runs back on the way up. One timeline (the
-       statement's own), each word a slice of it by its index. */
-    [data-statement] {
-      view-timeline: --statement block;
-    }
-
-    [data-statement] [data-word] {
-      animation: word-ink linear both;
-      animation-timeline: --statement;
-      animation-range: cover calc(26% + var(--i, 0) * 2.2%) cover calc(30% + var(--i, 0) * 2.2%);
-    }
-
-    [data-statement] em [data-word] {
-      animation-name: word-accent;
-    }
-
     body {
       timeline-scope: --event-title, --hero-action, --dates, --page-footer;
     }
@@ -412,20 +393,6 @@
       animation-timeline: --page-footer;
       animation-range: entry 0% entry 20%;
     }
-  }
-}
-
-/* A word waits at half the ink, faint but readable at its size (≥ 3:1 for large
-   text in both modes), so the turn to full ink is plainly seen. */
-@keyframes word-ink {
-  from {
-    color: color-mix(in srgb, var(--color-fg) 48%, var(--color-surface));
-  }
-}
-
-@keyframes word-accent {
-  from {
-    color: color-mix(in srgb, var(--color-fg) 48%, var(--color-surface));
   }
 }
 

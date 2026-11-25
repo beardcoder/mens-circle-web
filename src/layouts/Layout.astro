@@ -11,12 +11,13 @@ import SeoHead from '../components/SeoHead.astro'
 import { bootScript, fontScript, speculationRules } from '../scripts/inline'
 
 type Props = ComponentProps<typeof SeoHead> & {
+  headerEventTime?: ComponentProps<typeof Header>['eventTime']
   headerAction?: ComponentProps<typeof Header>['action']
   /** The page opens on the dark ground (the home opening): the bar starts clear over it. */
   overHero?: boolean
 }
 
-const { headerAction, overHero = false, ...props } = Astro.props;
+const { headerAction, headerEventTime, overHero = false, ...props } = Astro.props;
 ---
 
 <!doctype html>
@@ -44,7 +45,7 @@ const { headerAction, overHero = false, ...props } = Astro.props;
       Zum Inhalt springen
     </a>
 
-    <Header action={headerAction} overHero={overHero} />
+    <Header eventTime={headerEventTime} action={headerAction} overHero={overHero} />
 
     <main id="main" tabindex="-1">
       <slot />

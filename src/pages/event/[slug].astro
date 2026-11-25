@@ -6,6 +6,7 @@ import { PUBLIC_CACHE, publicEvent } from '@lib/server/public-data'
 import { buildEventMeta } from '@lib/shared/event-meta'
 import { breadcrumbSchema, buildEventSchema } from '@lib/shared/event-schema'
 import { splitFee } from '@lib/shared/event-status'
+import { eventDay, formatDateShort, formatTimeRange } from '@lib/shared/time'
 
 import LinkBand from '../../components/blocks/LinkBand.astro'
 import EventIntro from '../../components/event/EventIntro.astro'
@@ -95,6 +96,11 @@ const breadcrumbs = breadcrumbSchema(siteUrl, [
   ogImageAlt={meta.imageAlt}
   socialDetails={meta.details}
   schemas={[eventSchema, breadcrumbs]}
+  headerEventTime={{
+    day: eventDay(event.event_date),
+    date: formatDateShort(event.event_date),
+    hours: formatTimeRange(event.start_time, event.end_time),
+  }}
   headerAction={event.is_past || event.is_full ? undefined : { href: '#anmeldung', label: 'Anmelden' }}
 >
   {/* Invitation and date, the conversation beside the signup, then the meeting place. */}

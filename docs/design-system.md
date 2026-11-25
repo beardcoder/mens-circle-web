@@ -184,7 +184,7 @@ page stays alive and calm.
    opening's photograph, the stamp at the right, the registration's ground).
    Sections clip horizontally (`Section`), so a bleed never scrolls.
 4. **Poster word** (`Poster`, `text-poster`): one word or number as large as a
-   poster, as the title ("Dabei sein."). At most one per screen.
+   poster when a composition calls for it. At most one per screen.
 
 Never: staircases of offset blocks, rotation (the stamp's ring of words turns,
 nothing else stands at an angle), shadows, boxes or cards around content.
@@ -223,11 +223,6 @@ it for, does it stay under 300 ms, does it help what is being read):
   title's words rise, then the lead, the actions and the next date fade up, and a
   photograph settles from 1.05 (it is never hidden: it is the LCP). CSS only
   (global.css, "The opening").
-- **The statement turns to ink** word by word as it crosses the window, from half
-  the ink (≥ 3:1, large text) to full, its strong
-  word to the accent, and back on the way up (`data-statement`: one view timeline,
-  each word a slice of it by its index). The page's one scroll-led moment; whole
-  and in full ink without view timelines or under reduced motion.
 - **The home opening glows.** Its four pale circles drift on paths of their own, in
   11 s, 14 s, 17 s and 23 s, so the picture does not repeat for minutes (`glow-a`
   to `glow-d` in global.css). Each is a layer of its own and only
@@ -254,7 +249,7 @@ it for, does it stay under 300 ms, does it help what is being read):
   has drawn itself.
 - **Day and night.** Choosing a colour mode changes every colour at once; a
   same-document view transition cross-fades it (the page change's own fade).
-- **Two bars whose place depends on the scroll.** On an event page a dock with title
+- **Two bars whose place depends on the scroll.** On phones the event date and hours replace the wordmark after the event title scrolls away. On desktop a dock with title
   and date slides out from behind the bar as the title passes under it, and back as
   the title returns (`EventDock`: the title's view timeline, `--event-title`). On the
   home page the phone's bottom bar (`ActionBar`) rises as the opening's action passes
@@ -312,7 +307,7 @@ mobile score than it does live.
 | `TextLink`                                        | A quiet, underlined link with a small arrow                                                               |
 | `Field`, `control()`, `FormStatus`                | Label, a rounded field, hint, field error; the form's result under its button                             |
 | `EventSummary`                                    | One date, open on its ground: the date, the facts as small columns, the seat ring, the action             |
-| `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in the accent from the top; the number free in the middle; words beside |
+| `SeatRing` (`size`, `layout`)                     | Every chair on a ring, taken ones in the accent from the top; the free count inside, or as one adjacent label in the registration form |
 | `Stamp`                                           | The mark between two rings, the circle's name round it; it stands still                                   |
 | `Lockup` (`variant`)                              | The mark and the word mark (`full` adds the region)                                                       |
 | `Fact` (`layout`)                                 | Label, value in Cormorant, a note, under a rule; four in a row, or (`row`) lines with the label first     |
@@ -339,11 +334,11 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   on the left, the next date as open lines on the
   right. On phones the date, time and place precede the action. Markus introduces himself with his portrait immediately after the opening. Then: the intro,
   its title crossing into the content, the first round's questions in the margin,
-  the four facts as its last row; the statement on a screen of its own (`Statement`; an ordinary section under reduced motion);
+  the four facts and a short closing line about curiosity;
   the course on the band, each step with its index number in the margin; the five
-  agreements on the dark ground as rows across the page, numbers in the accent; the voices on the dark ground;
+  agreements on the dark ground as rows across the page, numbers in the accent; published voices on the dark ground, or a compact invitation to contribute;
   the FAQ with the contact line in the margin; taking part (`#termine`, the band,
-  "Dabei sein." as a poster word beside the next date); staying in touch on the
+  the next date and a link to the schedule when further dates exist); staying in touch on the
   dark ground with the stamp cut by the right edge, running into the footer. Open and
   wide throughout: no box or card.
 - **`/event`.** `PageIntro` with the stamp, every coming date as `EventSummary`

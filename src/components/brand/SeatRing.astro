@@ -16,6 +16,8 @@ interface Props {
   seats: { total: number; free: number } | null
   /** "3 von 7 Plätzen frei", "Ausgebucht". */
   text: string
+  /** Registration puts the count in one readable line beside the dots. */
+  countBeside?: boolean
   size?: Size
   /** `row`: the words beside the ring; `stack`: under it; `none`: only the ring (the words stand elsewhere). */
   layout?: 'row' | 'stack' | 'none'
@@ -29,13 +31,15 @@ const SIZES: Record<Size, { ring: string; number: string; label: string }> = {
   fill: { ring: '@container size-full', number: 'text-[34cqw]', label: 'text-[9cqw]' },
 }
 
-const { seats, text, size = 'md', layout = 'row', class: className } = Astro.props
+const { seats, text, size = 'md', layout = 'row', countBeside = false, class: className } = Astro.props
 const ring = seatDots(seats)
 const { ring: ringSize, number, label } = SIZES[size]
 ---
 
 <div
   data-seat-ring
+  data-free={countBeside ? seats?.free : undefined}
+  data-total={countBeside ? seats?.total : undefined}
   class:list={['flex gap-x-5 gap-y-3', layout === 'stack' ? 'flex-col items-start' : 'items-center', className]}
 >
   {ring && (
@@ -79,7 +83,7 @@ const { ring: ringSize, number, label } = SIZES[size]
           ),
         )}
       </svg>
-      <span class="relative grid justify-items-center leading-none">
+      {!countBeside && <span class="relative grid justify-items-center leading-none">
         <span
           data-seat-count
           class:list={['font-display font-semibold text-fg tabular-nums', number]}
@@ -87,13 +91,13 @@ const { ring: ringSize, number, label } = SIZES[size]
           {ring.free}
         </span>
         <span class:list={['mt-1 font-semibold text-fg-muted', label]}>frei</span>
-      </span>
+      </span>}
     </span>
   )}
   {layout !== 'none' && (
     <p
       data-seat-text
-      class="text-sm text-fg-muted"
+      class={countBeside ? 'text-base font-semibold text-fg' : 'text-sm text-fg-muted'}
     >
       {text}
     </p>

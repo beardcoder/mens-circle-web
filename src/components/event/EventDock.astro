@@ -21,7 +21,7 @@ const title = accentLastWord(event.title)
   data-event-dock
   hidden
   aria-hidden="true"
-  class="pointer-events-none fixed inset-x-0 top-header z-30 -translate-y-2 overflow-clip text-fg opacity-0 transition-[opacity,translate] duration-300 ease-out print:hidden data-visible:translate-y-0 data-visible:opacity-100 motion-reduce:transition-none"
+  class="pointer-events-none fixed inset-x-0 top-header z-30 -translate-y-2 overflow-clip text-fg opacity-0 transition-[opacity,translate] duration-300 ease-out max-lg:hidden print:hidden data-visible:translate-y-0 data-visible:opacity-100 motion-reduce:transition-none"
 >
   <div
     data-event-dock-ground
@@ -70,16 +70,12 @@ const title = accentLastWord(event.title)
   if (dock && title) {
     dock.hidden = false
 
-    const scrollDriven = CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (!scrollDriven) {
-      new IntersectionObserver(
-        // Gone upwards: the title is out of the band below the bar and its top lies above that band.
-        // A short title's top is still on screen when its bottom passes the bar, so compare with the band, not with 0.
-        ([entry]) => dock.toggleAttribute('data-visible', !entry.isIntersecting && entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0)),
-        // The bar is 72px (--spacing-header): the title counts as gone once it is under it.
-        { rootMargin: '-72px 0px 0px 0px' },
-      ).observe(title)
-    }
+    const header = document.getElementById('header')
+    // The same threshold drives the mobile header and the desktop dock's CSS fallback.
+    new IntersectionObserver(([entry]) => {
+      const passed = !entry.isIntersecting && entry.boundingClientRect.bottom <= (entry.rootBounds?.top ?? 0)
+      header?.toggleAttribute('data-event-visible', passed)
+      dock.toggleAttribute('data-visible', passed)
+    }, { rootMargin: '-72px 0px 0px 0px' }).observe(title)
   }
 </script>
