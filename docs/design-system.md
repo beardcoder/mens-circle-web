@@ -218,26 +218,7 @@ it for, does it stay under 300 ms, does it help what is being read):
   rises, slides or scales, on either page: an opening is there with the first
   paint and stands (it is also the LCP, so nothing in it starts invisible). The one
   thing an opening still does is fill in the taken chairs of its seat ring, once.
-- **Arriving.** Every piece below a page's opening fades in out of a blur as it is
-  scrolled into the window, tied to the scroll itself: the `tailwind-animations`
-  utilities `timeline-view animate-blurred-fade-in
-animate-range-[entry_10%_contain_12%]` (a CSS-only Tailwind v4 package, imported
-  in `global.css`). A piece starts to show once a tenth of it is in the window and
-  stands clear when it has come about an eighth of the way up (on a phone, where the
-  thumb passes the lowest quarter in a moment, later: `cover 10% cover 38%`, so a
-  piece arrives in the lower middle of the window); scrolling back, it
-  leaves the same way. There is no script: `global.css` ("Arriving") applies the
-  classes to titles, paragraphs, list rows, figures, questions and lone links and
-  buttons, plus whatever a component marks with `data-reveal` or
-  `data-reveal-group`; where pieces nest only the outermost moves, so a new
-  component needs no hook. Left alone: a page's opening (`data-hero`, `data-enter`:
-  the first paint and the LCP), the fixed bars, dialogs and popovers. Footer rows
-  are done once they are fully in (`entry 100%`): the page ends before they could
-  rise further. Keep pieces small: one taller than the window is only clear near
-  its top, so a list row that holds marked pieces (a date's summary) is not a
-  piece itself. What stands in the lower third of the window when a page loads is
-  still coming in. Browsers without view timelines, reduced motion and print show
-  everything as it is.
+- Text, links and form controls stay sharp and readable at every scroll position.
 - **Every opening arrives** once on load, in about a second (`data-opening`): the
   title's words rise, then the lead, the actions and the next date fade up, and a
   photograph settles from 1.05 (it is never hidden: it is the LCP). CSS only
@@ -284,13 +265,10 @@ animate-range-[entry_10%_contain_12%]` (a CSS-only Tailwind v4 package, imported
   hide each; the observers also say whether the bottom bar can be reached (`inert`,
   `aria-hidden`, the tab stop).
 
-The arrival is the one thing that follows the scroll both ways; nothing else
-re-animates. Nothing follows the pointer and nothing is pinned or scroll-jacked.
+Nothing follows the pointer and nothing is pinned or scroll-jacked.
 A new animation has to pass the gate above.
 
-Only opacity and transforms move, so the compositor carries every frame; the one
-exception is the arrival's blur (`filter`), which Lighthouse lists as
-non-composited and which costs main-thread work while a piece is coming in. No script
+Motion uses opacity and transforms. No script
 reads layout before the page has settled (state at a scroll position comes from an
 `IntersectionObserver`, never from `scrollY`); state flags go on the element that
 needs them, never on `<html>` while the page moves; the opening never waits for a
@@ -315,7 +293,7 @@ Run it against a production build (`bun run build`, then the server on a disposa
 database) for the home page on mobile and desktop and for any page whose motion
 changed: `bunx lighthouse <url> --only-categories=performance,accessibility,best-practices,seo`
 (add `--preset=desktop`). Hold: CLS 0, no forced reflow ("Forced reflow" insight
-empty), no non-composited animations beyond `blurred-fade-in`, the LCP element's render delay well under
+empty), no non-composited animations on scrolling text, the LCP element's render delay well under
 half a second. Locally the server does not compress (the proxy does in
 production), so the render-blocking stylesheet weighs more in the simulated
 mobile score than it does live.
@@ -359,12 +337,11 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   the right; the statement at poster size (its phrase in the accent) across the
   whole width; under it one row on the grid, the explanation and the one action
   on the left, the next date as open lines on the
-  right. Then: the intro,
+  right. On phones the date, time and place precede the action. Markus introduces himself with his portrait immediately after the opening. Then: the intro,
   its title crossing into the content, the first round's questions in the margin,
   the four facts as its last row; the statement on a screen of its own (`Statement`; an ordinary section under reduced motion);
   the course on the band, each step with its index number in the margin; the five
-  agreements on the dark ground as rows across the page, numbers in the accent; Markus,
-  one sentence of his under a rule, signed with his face; the voices on the dark ground;
+  agreements on the dark ground as rows across the page, numbers in the accent; the voices on the dark ground;
   the FAQ with the contact line in the margin; taking part (`#termine`, the band,
   "Dabei sein." as a poster word beside the next date); staying in touch on the
   dark ground with the stamp cut by the right edge, running into the footer. Open and
@@ -374,7 +351,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
 - **Event page.** The date at a subheading's size over the title (the date tells one
   evening from the next); beside them, from the top of the page, the registration on
   the dark ground headed by the seat ring. Under the title the lead, then time, place and
-  the evening's course as rows between lines (`Zeit` stands in the head on phones,
+  the evening's course as rows between lines (time and meeting place stand in the head on phones,
   where the registration follows the title), the calendar; the evening's description
   (the band); the map; where next.
 - **Personal page.** `PageIntro` with the photograph (the poster opening), then

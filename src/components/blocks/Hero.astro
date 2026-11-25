@@ -1,4 +1,5 @@
 ---
+import { formatDateCompact } from '@lib/shared/time'
 import { afterWords, splitWords } from '@lib/shared/words'
 import { button, label } from '@lib/ui'
 
@@ -24,6 +25,8 @@ const beat = (n: number) => afterWords(title.count, n)
 const nextLine = next
   ? {
       date: next.view.title,
+      time: next.view.facts.time,
+      place: next.view.facts.place,
       datetime: next.view.datetime,
       meta: [next.view.facts.time, next.view.facts.place].filter(Boolean).join(' · '),
       seats: next.view.facts.seats,
@@ -31,7 +34,7 @@ const nextLine = next
   : null
 ---
 
-{/* The opening, on the dark ground and one screen tall (taller only where the window is
+{/* The desktop opening, on the dark ground and one screen tall (taller only where the window is
      too short for it), set like a poster and without a picture: behind it four
      pale circles of the accent drift over the ink (global.css, "The opening"),
      high and to the right, so the statement below stands on plain ink; across the
@@ -42,7 +45,7 @@ const nextLine = next
   data-hero
   data-opening
   aria-labelledby="hero-title"
-  class="surface-dark relative flex min-h-svh flex-col justify-end overflow-clip pt-[calc(var(--spacing-header)+10rem)] pb-8 lg:pb-14"
+  class="surface-dark relative flex flex-col justify-end overflow-clip pt-[calc(var(--spacing-header)+2.5rem)] pb-8 lg:min-h-svh lg:pt-[calc(var(--spacing-header)+10rem)] lg:pb-14"
 >
   <div
     data-hero-glow
@@ -81,6 +84,16 @@ const nextLine = next
       >
         <slot />
       </p>
+      {nextLine && (
+        <p class="mt-5 w-full border-t border-line-strong pt-4 text-base text-fg lg:hidden">
+          <span class="block text-sm text-fg-muted">Nächster Termin</span>
+          <span class="flex flex-wrap items-baseline gap-x-2">
+            <time datetime={nextLine.datetime} class="font-semibold">{formatDateCompact(nextLine.datetime)}</time>
+            <span>{nextLine.time}</span>
+          </span>
+          <span class="block text-sm text-fg-soft">{nextLine.place} · {nextLine.seats}</span>
+        </p>
+      )}
       <div
         data-enter
         style={beat(1)}
@@ -116,7 +129,7 @@ const nextLine = next
         href={action.href}
         data-enter
         style={beat(2)}
-        class="group/next mt-5 grid min-w-0 content-start gap-1 self-end border-t border-line-strong pt-4 lg:col-span-4 lg:col-start-9 lg:mt-10 lg:pt-5"
+        class="group/next mt-5 hidden min-w-0 lg:grid content-start gap-1 self-end border-t border-line-strong pt-4 lg:col-span-4 lg:col-start-9 lg:mt-10 lg:pt-5"
         data-umami-event="cta-click"
         data-umami-event-location="home-hero-date"
       >
@@ -129,7 +142,7 @@ const nextLine = next
         </time>
         <span class="text-sm text-fg-muted">
           {nextLine.meta}
-          <span class="xl:hidden"> ·{nextLine.seats}</span>
+          <span class="xl:hidden">{' · '}{nextLine.seats}</span>
         </span>
         {next?.view.seats && (
           <SeatRing

@@ -19,9 +19,8 @@ const { event } = Astro.props
 const view = eventView(event, 'Dieser Abend', false)
 const dateLabel = view.title.join(' ')
 const hours = formatTimeRange(event.start_time, event.end_time)
-const hasPlace = !!(event.location || event.street || event.city)
 const title = accentLastWord(event.title)
-const where = [event.location, event.city].filter(Boolean).join(', ')
+const where = [event.location || event.street, event.city].filter(Boolean).join(', ')
 
 /** What a man needs before he decides, as rows between lines; the fee stands with the registration. */
 const facts = [
@@ -31,8 +30,8 @@ const facts = [
         {
           label: 'Ort',
           value: where,
-          lgOnly: false,
-          href: hasPlace ? '#anfahrt' : '',
+          lgOnly: true,
+          href: '#anfahrt',
           linkLabel: 'Adresse und Anfahrt',
         },
       ]
@@ -76,6 +75,11 @@ const facts = [
           {/* On phones the registration follows at once, so the hours stand here; from `lg` they are a row of the facts. */}
           {hours && <span class="font-sans text-base text-fg-muted lg:hidden">{hours}</span>}
         </p>
+        {where && (
+          <p class="mt-2 text-base text-fg lg:hidden">
+            <a href="#anfahrt" class="underline decoration-accent underline-offset-4">{where}</a>
+          </p>
+        )}
         <h1
           id="event-title"
           data-event-title
@@ -101,7 +105,7 @@ const facts = [
         <p class="max-w-[25em] text-md text-fg-soft lg:text-lg">
           {event.is_past
             ? 'Dieser Abend hat bereits stattgefunden. Bei den aktuellen Terminen findest du die nächsten Treffen.'
-            : 'Ein Abend für das, was dich gerade beschäftigt. Mit Männern, die dir zuhören.'}
+            : 'Wir sitzen im Kreis. Du kannst erzählen, was dich gerade beschäftigt, oder erst einmal zuhören.'}
         </p>
         {event.is_past && (
           <Button

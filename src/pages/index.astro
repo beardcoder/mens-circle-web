@@ -3,7 +3,6 @@ import site from '@data/site.json'
 import { PUBLIC_CACHE, readPublicEvents, readPublicTestimonials } from '@lib/server/public-data'
 import { eventSeriesSchema } from '@lib/shared/event-schema'
 
-import avatar from '../assets/images/markus-avatar-192.webp'
 import ActionBar from '../components/blocks/ActionBar.astro'
 import Dates from '../components/blocks/Dates.astro'
 import Fact from '../components/blocks/Fact.astro'
@@ -56,6 +55,8 @@ else {
     Wir sitzen im Kreis und sprechen über das, was uns gerade beschäftigt. Die anderen hören zu, ohne zu bewerten.
   </Hero>
 
+  <Moderator />
+
   <Intro
     anchor="ueber"
     title="Worum es an so einem Abend geht"
@@ -69,12 +70,11 @@ else {
     factsLabel="Auf einen Blick"
   >
     <p>
-      Arbeit, Familie, Beziehung und Verantwortung beschäftigen uns im Alltag. Vieles machen wir mit uns selbst aus.
-      Gespräche unter Männern landen oft schnell bei Job, Sport oder dem nächsten Ratschlag.
+      Über die Arbeit oder den Sport kommen wir leicht ins Gespräch. Wie es gerade in der Familie oder in der
+      Beziehung läuft, behalten viele von uns eher für sich.
     </p>
     <p>
-      Im Kreis geht es auch um das, was sonst keinen Platz hat. Fertige Antworten brauchst du dafür nicht. Es reicht,
-      den anderen zuzuhören und ehrlich zu erzählen, wenn du dran bist.
+      Im Kreis nehmen wir uns Zeit dafür. Du kannst auch etwas ansprechen, auf das du selbst noch keine Antwort hast.
     </p>
     <Fragment slot="facts">
       <Fact label="Wo">
@@ -105,23 +105,21 @@ else {
   <JourneySteps
     anchor="reise"
     title="Wie ein Abend abläuft"
-    subtitle="Die Abende laufen ähnlich ab, aber nicht nach Minutenplan. Wir sitzen im Kreis, und jeder hat das gleiche Recht, zu sprechen und gehört zu werden."
+    subtitle="Wir beginnen und enden mit einer Runde. Wie viel Zeit wir uns dazwischen für ein Thema nehmen, ergibt sich im Gespräch."
   >
     <Fragment slot="steps">
       <JourneyStep number={1} title="Ankommen">
         Wir kommen an, oft mit ein paar ruhigen Atemzügen, und gehen die Absprachen für den Abend durch.
       </JourneyStep>
       <JourneyStep number={2} title="Die erste Runde">
-        Reihum sagt jeder kurz, wie es ihm gerade geht und was er mitbringt. So kommt jeder einmal zu Wort, bevor wir
-        ins Gespräch gehen.
+        Wir gehen reihum. Wer mag, erzählt kurz, wie es ihm geht. Du kannst die Runde auch weitergeben.
       </JourneyStep>
       <JourneyStep number={3} title="Teilen und zuhören">
         Wer spricht, hat die ganze Aufmerksamkeit der anderen. Wir lassen ausreden, bewerten nicht und geben keine
         ungefragten Ratschläge. Du erzählst so viel, wie du möchtest. Nur zuzuhören ist auch in Ordnung.
       </JourneyStep>
       <JourneyStep number={4} title="Abschlussrunde">
-        Zum Schluss sagt jeder in ein, zwei Worten, was er mitnimmt. Oft ist es ein Gedanke oder eine andere Sicht auf
-        etwas, manchmal einfach das Gefühl, mit etwas nicht allein zu sein.
+        Zum Schluss geht die Runde noch einmal herum. Wer möchte, sagt kurz, was ihm vom Gespräch geblieben ist.
       </JourneyStep>
     </Fragment>
     <p slot="close">
@@ -133,7 +131,7 @@ else {
   <Frame
     anchor="rahmen"
     title="Was wir vereinbaren"
-    intro="Fünf Absprachen gelten an jedem Abend. Wir gehen sie gemeinsam durch, und jeder sagt, ob er sie mitträgt. Mit ihnen fällt es leichter, offen zu sprechen."
+    intro="Zu Beginn gehen wir diese fünf Absprachen durch. Jeder sagt, ob er sie mitträgt."
     agreements={[
       {
         title: 'Vertraulichkeit',
@@ -145,7 +143,7 @@ else {
       },
       {
         title: 'Annehmen statt bewerten',
-        text: 'Wir hören zu, auch wenn Erfahrungen weit auseinandergehen, und versuchen nicht, einander zu reparieren. Ratschläge gibt es nur, wenn jemand darum bittet.',
+        text: 'Wir hören auch dann zu, wenn wir etwas anders erlebt haben. Einen Rat geben wir nur, wenn jemand darum bittet.',
       },
       {
         title: 'Von sich sprechen',
@@ -159,31 +157,6 @@ else {
     boundaryTitle="Gut zu wissen"
     boundaryText="Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Es gibt im Kreis keine Lehre und kein festes Bild davon, wie ein Mann zu sein hat."
   />
-
-  <Moderator
-    anchor="moderator"
-    name="Ich bin Markus."
-    quote="Ich sorge dafür, dass jeder in Ruhe sprechen kann und die anderen zuhören. Mit Ratschlägen halte ich mich zurück."
-    avatar={avatar}
-    imageAlt="Markus Sommer"
-    signature="Markus Sommer"
-    signatureNote="hat den Kreis gegründet und leitet ihn"
-    linkLabel="Warum ich den Männerkreis leite"
-    linkUrl="/warum-ich-den-maennerkreis-leite"
-  >
-    <p>
-      Ich bin gebürtiger Niederbayer und habe den Männerkreis in Straubing gegründet, weil mir selbst ein Ort gefehlt
-      hat, an dem Männer über das sprechen können, was sie sonst mit sich allein ausmachen.
-    </p>
-    <p>
-      Natur, Atem und Körperwahrnehmung helfen mir, aus dem Kopf zu kommen. Davon bringe ich etwas in den Kreis mit.
-    </p>
-    <p>Ich sitze mit im Kreis und achte darauf, dass die Absprachen gelten. Jeder kann zu Wort kommen, keiner muss.</p>
-    <p>
-      Übungen mit Atem oder Körperwahrnehmung leite ich als Angebot an. Bevor wir etwas gemeinsam machen, frage ich, ob
-      es für dich passt. Nein ist dabei immer eine gute Antwort.
-    </p>
-  </Moderator>
 
   <Testimonials
     items={testimonials}
@@ -208,16 +181,14 @@ else {
       respektvoll zu behandeln.
     </AccordionItem>
     <AccordionItem question="Muss ich etwas erzählen?">
-      Nein. Du entscheidest, was und wie viel du teilst. Niemand wird gedrängt, und zuhören ist genauso Teil des Kreises
-      wie sprechen.
+      Nein. Wenn du in der Runde nichts sagen möchtest, ist der Nächste dran. Du kannst den ganzen Abend zuhören.
     </AccordionItem>
     <AccordionItem question="Muss ich bei den Atem- und Körperübungen mitmachen?">
       Nein. Die Übungen sind einfach und ein Angebot. Du machst mit, soweit es für dich passt, oder bleibst einfach
       sitzen.
     </AccordionItem>
     <AccordionItem question="Ich war noch nie in einem Männerkreis. Ist das ein Problem?">
-      Nein. Du brauchst keine Vorerfahrung und musst nichts vorbereiten. Der Rahmen wird zu Beginn erklärt, damit du
-      weißt, worauf du dich einlässt. Ungewohnt ist der erste Abend für fast jeden.
+      Nein. Du musst nichts vorbereiten. Ich erkläre zu Beginn, wie der Abend abläuft. Wenn dir etwas unklar ist, frag mich gern.
     </AccordionItem>
     <AccordionItem question="Ist das spirituell?">
       Nein, eher bodenständig. Wir sitzen zusammen, atmen, sprechen und hören zu, manchmal halten wir auch einen Moment

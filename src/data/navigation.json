@@ -2,6 +2,11 @@
   "header": {
     "links": [
       {
+        "label": "Markus",
+        "url": "/#moderator",
+        "umamiTarget": "markus"
+      },
+      {
         "label": "Der Kreis",
         "url": "/#ueber",
         "umamiTarget": "ueber"
@@ -10,16 +15,6 @@
         "label": "Ablauf",
         "url": "/#reise",
         "umamiTarget": "ablauf"
-      },
-      {
-        "label": "Markus",
-        "url": "/#moderator",
-        "umamiTarget": "markus"
-      },
-      {
-        "label": "Warum ich den Kreis leite",
-        "url": "/warum-ich-den-maennerkreis-leite",
-        "umamiTarget": "warum-ich-den-maennerkreis-leite"
       },
       {
         "label": "Fragen",
@@ -35,6 +30,10 @@
   },
   "footerPrimary": [
     {
+      "label": "Markus",
+      "url": "/#moderator"
+    },
+    {
       "label": "Der Kreis",
       "url": "/#ueber"
     },
@@ -43,16 +42,8 @@
       "url": "/#reise"
     },
     {
-      "label": "Markus",
-      "url": "/#moderator"
-    },
-    {
       "label": "Häufige Fragen",
       "url": "/#faq"
-    },
-    {
-      "label": "Warum ich den Kreis leite",
-      "url": "/warum-ich-den-maennerkreis-leite"
     },
     {
       "label": "Termine",

@@ -221,9 +221,7 @@ tokens, variants, surfaces and keyframes; `global.css` (public, one shared hashe
 is the entry. It reads classes from `src/` only (`source('..')`, so words in docs, mail
 templates and tests never become utilities) and skips server-only code and the plugin
 with `@source not`; EmDash's admin brings its own styles. Printing a page of the site (`@media print`) lives in `global.css`.
-The pieces of a page fade in out of a blur as they are scrolled in, with the
-`tailwind-animations` utilities (a CSS-only Tailwind v4 package, imported in
-`global.css`; its skill is vendored); the two scroll-linked bars use CSS view
+Reading text stays sharp as the page scrolls. The two scroll-linked bars use CSS view
 timelines (`animation-timeline`); the FAQ is native `<details>`; no animation
 script ships to the browser. The opening, page transitions, loops and
 state transitions are the theme's own keyframes and `--animate-*` tokens (`rise`,
@@ -315,17 +313,17 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   `seatFill`, `seatDots`), `Stamp`, `Lockup` (`src/components/brand/`), `PageIntro`,
   `SectionHead`, `Poster`, `Index`, `Eyebrow`, `Fact`, `Button`, `Field` + `FormStatus`,
   `TestimonialList`, `Accordion`. Use them; do not restyle a copy.
-- Home: the dark opening, one screen tall, set like a poster and without a picture
+- Home: the dark opening, one screen tall on desktop, set like a poster and without a picture
   (four pale circles of the accent on the ink, high and to the right, drifting:
   `data-hero-glow` in `Hero.astro`, its rules and keyframes `glow-a` to `glow-d` in
   `global.css`, "The opening"; the statement at poster size across the whole
   width, on plain ink, so keep the glows out of its lower left where the accent
   phrase stands; under it one row on the grid: explanation and the one action on
   the left, the next date as open lines on the right; the bar's action outlined
-  over it), intro
+  over it; on phones date, time and place precede the action), Markus with a short introduction and portrait, intro
   (questions in the margin, the four facts as its last row), the statement on a
   screen of its own (`Statement`, the page's one scroll-led moment), course (the band,
-  index numbers), agreements (dark), Markus (one sentence of his under a rule),
+  index numbers), agreements (dark),
   voices (dark, every voice in full), FAQ, taking part (`#termine`, "Dabei
   sein." as a poster word), staying in touch (dark, the stamp), the footer.
   Open and wide: no box or card on a public page, the opening included.
@@ -342,16 +340,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   second (`data-opening`: the title's words rise, the lead, actions and date fade
   up, a photograph settles from 1.05 and is never hidden: it is the LCP; CSS
   only, `global.css`, "The opening"; the seat ring's taken chairs fill in); the home opening's four pale circles drifting (`glow-a` to `glow-d`, translate and scale on layers of their own); the home statement turning to ink word by word as it crosses
-  the window (`data-statement`, one view timeline, each word a slice of it); what lies
-  below a page's opening, every piece of it, fading in out of a blur as it is
-  scrolled into the window (`global.css`, "Arriving": `timeline-view
-animate-blurred-fade-in animate-range-[entry_10%_contain_12%]`, on a phone later,
-  `cover 10% cover 38%`, from
-  `tailwind-animations`, applied in CSS to titles, paragraphs, rows, figures and
-  lone links plus `data-reveal` / `data-reveal-group`, the outermost piece only;
-  tied to the scroll, so it leaves the same way on the way back; no script; a
-  page's opening, the fixed bars and dialogs are left alone, footer rows finish at
-  `entry 100%`); the stamp's ring of words turning
+  the window (`data-statement`, one view timeline, each word a slice of it); the stamp's ring of words turning
   once in two minutes; the mark turning a quarter when the logo is hovered; what
   answers the hand (buttons press to 0.97 in 150ms, links, the native `<details>`
   of the FAQ unfolding and fading, the phone menu, the calendar popover growing
@@ -363,8 +352,7 @@ animate-blurred-fade-in animate-range-[entry_10%_contain_12%]`, on a phone later
   an observer and a CSS transition where those are missing). Build motion with the
   vendored skills (`animate`, `animation-performance`,
   `find-animation-opportunities`, refined for Astro and vanilla CSS/JS, and
-  `tailwind-animations` for the package's classes): transforms and opacity (the
-  arrival's blur is the one filter), CSS first, then WAAPI, no animation script, UI
+  `tailwind-animations` for the package's classes): transforms and opacity, CSS first, then WAAPI, no animation script, UI
   under 300ms,
   the theme's own curves. Never add: a rise or slide on arriving at a page other than its opening's one arrival, a second
   scroll-linked effect on the same piece, pinning or scroll-jacking,
@@ -372,8 +360,7 @@ animate-blurred-fade-in animate-range-[entry_10%_contain_12%]`, on a phone later
   screen. Under reduced motion
   everything rests.
 - Lighthouse on every motion change (design-system.md): CLS 0, no forced reflow,
-  only opacity and transforms move (the arrival's blur is the known exception,
-  reported by Lighthouse as non-composited).
+  only opacity and transforms move.
   Never set a state attribute on `<html>` while the page moves; never read layout
   or `scrollY` at load (use an `IntersectionObserver`); nothing that holds the LCP
   waits for a script. No `content-visibility`.

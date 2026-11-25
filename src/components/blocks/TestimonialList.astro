@@ -18,7 +18,6 @@ const rest = featured ? others : items
     its author in the margin and the words beside it. Every voice is read in full. */}
 {featured && (
   <div
-    data-reveal
     class="mb-group max-w-5xl"
   >
     <TestimonialQuote
@@ -30,7 +29,6 @@ const rest = featured ? others : items
 {rest.length > 0 && (
   <ul
     role="list"
-    data-reveal-group
     class="grid"
   >
     {rest.map((item) => (

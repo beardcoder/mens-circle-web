@@ -83,6 +83,10 @@ export const formatDateLong = (day: string): string =>
 export const formatDayMonthYear = (day: string): string =>
   formatDay(day, { day: 'numeric', month: 'long', year: 'numeric' })
 
+/** A weekday and date for narrow screens, e.g. "Fr., 18. Sept. 2026". */
+export const formatDateCompact = (day: string): string =>
+  formatDay(day, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+
 /** "18.09.2026". */
 export const formatDateShort = (day: string): string =>
   formatDay(day, { day: '2-digit', month: '2-digit', year: 'numeric' })

@@ -109,7 +109,7 @@ const field = (name: string) => ({
         seats={event.view.seats}
         text={`${event.availableSpots} von ${event.maxParticipants} Plätzen frei`}
       />
-      <p class="mt-6 mb-6 max-w-measure text-md text-fg-soft">Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.</p>
+      <p class="mt-6 mb-6 max-w-measure text-md text-fg-soft">Deine Anmeldung gilt nur für diesen Abend.</p>
       <dl class="mb-8 text-sm">
         <div class="flex items-baseline justify-between gap-4">
           <dt class="text-fg-muted">Beitrag</dt>
@@ -187,7 +187,7 @@ const field = (name: string) => ({
             for={`${id}-phone_number`}
             label="Handynummer"
             optional
-            hint="Falls wir dich am Tag des Abends kurzfristig erreichen müssen."
+            hint="Damit ich dich am Tag des Treffens kurzfristig erreichen kann."
             hintId={`${id}-phone_number-hint`}
           >
             <input
@@ -240,7 +240,7 @@ const field = (name: string) => ({
             >
               <span data-label>Anmelden</span>
             </button>
-            <p class="text-sm text-fg-muted">Du bekommst eine Bestätigung mit einem Link zum Absagen.</p>
+            <p class="text-sm text-fg-muted">Die Bestätigung kommt per E-Mail. Darin findest du auch den Link zum Absagen.</p>
           </div>
         </div>
         {failed ? (

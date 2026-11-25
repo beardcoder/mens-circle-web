@@ -158,7 +158,7 @@ async function checkRegistration(origin: string, eventId: string): Promise<void>
   const page = await readPage(origin, '/event/testabend')
 
   assert.match(page, /<form id="register" method="post" action="\?_action=register"/)
-  assert.match(page, /Du bekommst eine Bestätigung mit einem Link zum Absagen\./)
+  assert.match(page, /Die Bestätigung kommt per E-Mail\. Darin findest du auch den Link zum Absagen\./)
 
   const post = (body: Record<string, string>) =>
     fetch(`${origin}/event/testabend?_action=register`, {

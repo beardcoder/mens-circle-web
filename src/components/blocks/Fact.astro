@@ -16,7 +16,6 @@ const shape = row ? 'grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 py-5 sm:grid-cols-
 
 {/* A fact under a thin rule: its label, the value in Cormorant, a note. No icon and no box. */}
 <div
-  data-reveal
   class:list={['min-w-0 border-t border-line-strong', shape, wideOnly ? 'hidden lg:grid' : 'grid']}
 >
   <dt class:list={['text-sm font-semibold text-fg-muted', row && 'pt-1']}>{label}</dt>

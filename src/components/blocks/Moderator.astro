@@ -1,69 +1,27 @@
 ---
-import type { ImageMetadata } from 'astro'
-
-import Prose from '../ui/Prose.astro'
+import avatar from '../../assets/images/markus-avatar-192.webp'
 import Section from '../ui/Section.astro'
-import SectionHead from '../ui/SectionHead.astro'
 import TextLink from '../ui/TextLink.astro'
-
-interface Props {
-  anchor: string
-  eyebrow?: string
-  name: string
-  quote: string
-  /** A small square of his face, signing the quote. Pre-sized: the home page is SSR. */
-  avatar: ImageMetadata
-  imageAlt: string
-  signature: string
-  signatureNote: string
-  linkLabel: string
-  linkUrl: string
-}
-
-const { anchor, eyebrow, name, quote, avatar, imageAlt, signature, signatureNote, linkLabel, linkUrl } = Astro.props
 ---
 
-{/* Markus introduces himself; beside him one sentence of his under a rule, signed with his face. */}
-<Section
-  id={anchor}
-  labelledby="person-title"
-  innerClass="grid items-center gap-x-grid gap-y-16 lg:grid-cols-12"
->
-  <div class="grid min-w-0 content-start justify-items-start gap-6 lg:col-span-6">
-    <SectionHead
-      eyebrow={eyebrow}
-      title={name}
-      titleId="person-title"
+<Section id="moderator" labelledby="person-title" space="band" class="border-b border-line">
+  <div class="mx-auto grid max-w-3xl grid-cols-[auto_1fr] items-center gap-x-5 gap-y-4 sm:gap-x-8">
+    <img
+      src={avatar.src}
+      width={avatar.width}
+      height={avatar.height}
+      alt="Markus Sommer"
+      loading="lazy"
+      decoding="async"
+      class="size-16 rounded-full object-cover sm:row-span-2 sm:size-24 sm:self-start"
     />
-    <Prose>
-      <slot />
-    </Prose>
-    {linkLabel && linkUrl && <TextLink href={linkUrl}>{linkLabel}</TextLink>}
+    <h2 id="person-title" class="text-sub text-fg">Ich bin Markus.</h2>
+    <div class="col-span-full max-w-measure sm:col-span-1">
+      <p class="text-md text-fg-soft">
+        Ich habe den Männerkreis in Straubing gegründet und leite die Abende. Wenn du zum ersten Mal kommst,
+        kannst du auch einfach zuhören.
+      </p>
+      <TextLink href="/warum-ich-den-maennerkreis-leite" class="mt-2">Warum ich den Männerkreis leite</TextLink>
+    </div>
   </div>
-
-  {quote && (
-    <figure
-      data-reveal
-      class="grid min-w-0 content-center border-t border-line-strong pt-8 lg:col-span-5 lg:col-start-8"
-    >
-      <blockquote class="max-w-[16em] font-display text-quote text-fg">
-        <p>„{quote}“</p>
-      </blockquote>
-      <figcaption class="mt-8 flex items-center gap-4">
-        <img
-          src={avatar.src}
-          width={avatar.width}
-          height={avatar.height}
-          alt={imageAlt}
-          loading="lazy"
-          decoding="async"
-          class="size-16 shrink-0 rounded-full object-cover ring-4 ring-surface"
-        />
-        <span class="grid">
-          <span class="font-semibold text-fg">{signature}</span>
-          <span class="text-sm text-fg-muted">{signatureNote}</span>
-        </span>
-      </figcaption>
-    </figure>
-  )}
 </Section>

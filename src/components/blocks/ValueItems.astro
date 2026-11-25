@@ -36,7 +36,6 @@ const { anchor, eyebrow, title, intro, items } = Astro.props
     {items.length > 0 && (
       <ul
         role="list"
-        data-reveal-group
         class:list={[margin.content, 'grid border-b border-line-strong']}
       >
         {items.map((item) => (
