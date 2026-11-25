@@ -45,7 +45,7 @@ const nextLine = next
   data-hero
   data-opening
   aria-labelledby="hero-title"
-  class="surface-dark relative flex flex-col justify-end overflow-clip pt-[calc(var(--spacing-header)+2.5rem)] pb-8 lg:min-h-svh lg:pt-[calc(var(--spacing-header)+10rem)] lg:pb-14"
+  class="surface-dark relative flex flex-col justify-center overflow-clip pt-[calc(var(--spacing-header)+2.5rem)] pb-12 sm:pb-16 lg:min-h-svh lg:pt-[calc(var(--spacing-header)+3rem)]"
 >
   <div
     data-hero-glow
@@ -58,11 +58,11 @@ const nextLine = next
     <span></span>
   </div>
 
-  <Container class="relative grid gap-x-grid lg:grid-cols-12">
+  <Container class="relative grid gap-x-grid gap-y-8 sm:gap-y-12 lg:grid-cols-12 lg:gap-y-[clamp(3rem,6vh,5rem)]">
     <div class="min-w-0 lg:col-span-12">
       {kicker && (
         <Eyebrow
-          class="mb-4 lg:mb-6"
+          class="mb-6 lg:mb-8"
           data-enter
         >
           {kicker}
@@ -71,12 +71,12 @@ const nextLine = next
       <h1
         id="hero-title"
         data-enter="words"
-        class="max-w-[10.4em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto lg:text-[clamp(5.625rem,8.6vw,9.5rem)] [&_em]:text-accent"
+        class="max-w-[10.4em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto leading-[1.08] lg:text-[clamp(5rem,7.8vw,8.5rem)] [&_em]:text-accent"
         set:html={title.html}
       />
     </div>
 
-    <div class="mt-6 grid min-w-0 content-start justify-items-start lg:col-span-6 lg:mt-10">
+    <div class="grid min-w-0 content-start justify-items-start gap-y-7 sm:gap-y-9 lg:col-span-6">
       <p
         data-enter
         style={beat(0)}
@@ -85,9 +85,9 @@ const nextLine = next
         <slot />
       </p>
       {nextLine && (
-        <p class="mt-5 w-full border-t border-line-strong pt-4 text-base text-fg lg:hidden">
+        <p class="grid w-full gap-y-1.5 border-t border-line-strong pt-5 text-base text-fg lg:hidden">
           <span class="block text-sm text-fg-muted">Nächster Termin</span>
-          <span class="flex flex-wrap items-baseline gap-x-2">
+          <span class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
             <time datetime={nextLine.datetime} class="font-semibold">{formatDateCompact(nextLine.datetime)}</time>
             <span>{nextLine.time}</span>
           </span>
@@ -97,11 +97,11 @@ const nextLine = next
       <div
         data-enter
         style={beat(1)}
-        class="mt-6 flex w-full flex-wrap items-center gap-x-8 gap-y-1 lg:mt-8"
+        class="flex w-full flex-wrap items-center gap-x-8 gap-y-3"
       >
         <a
           href={action.href}
-          class:list={[button({ size: 'lg' }), 'max-sm:w-full sm:min-w-56']}
+          class:list={[button({ size: 'lg' }), 'min-w-44 sm:min-w-52']}
           data-hero-action
           data-umami-event="cta-click"
           data-umami-event-location="home-hero"
@@ -129,7 +129,7 @@ const nextLine = next
         href={action.href}
         data-enter
         style={beat(2)}
-        class="group/next mt-5 hidden min-w-0 lg:grid content-start gap-1 self-end border-t border-line-strong pt-4 lg:col-span-4 lg:col-start-9 lg:mt-10 lg:pt-5"
+        class="group/next hidden min-w-0 content-start gap-2 self-start border-t border-line-strong pt-5 lg:col-span-5 lg:col-start-8 lg:grid"
         data-umami-event="cta-click"
         data-umami-event-location="home-hero-date"
       >
@@ -158,7 +158,7 @@ const nextLine = next
       <p
         data-enter
         style={beat(2)}
-        class="mt-5 min-w-0 self-end border-t border-line-strong pt-4 text-base text-fg-muted lg:col-span-4 lg:col-start-9 lg:mt-10 lg:pt-5"
+        class="min-w-0 self-start border-t border-line-strong pt-5 text-base text-fg-muted lg:col-span-5 lg:col-start-8"
       >
         Der nächste Abend ist in Planung.{' '}
         <a
