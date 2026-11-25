@@ -1,53 +1,54 @@
 ---
-import { actions, isInputError } from 'astro:actions';
+import { actions, isInputError } from 'astro:actions'
 
-import { fetchEventState } from '@lib/server/content';
-import { PUBLIC_CACHE, publicEvent } from '@lib/server/public-data';
-import { buildEventMeta } from '@lib/shared/event-meta';
-import { breadcrumbSchema, buildEventSchema } from '@lib/shared/event-schema';
-import { splitFee } from '@lib/shared/event-status';
+import { fetchEventState } from '@lib/server/content'
+import { PUBLIC_CACHE, publicEvent } from '@lib/server/public-data'
+import { buildEventMeta } from '@lib/shared/event-meta'
+import { breadcrumbSchema, buildEventSchema } from '@lib/shared/event-schema'
+import { splitFee } from '@lib/shared/event-status'
 
-import LinkBand from '../../components/blocks/LinkBand.astro';
-import EventIntro from '../../components/event/EventIntro.astro';
-import EventMapSection from '../../components/event/EventMapSection.astro';
-import EventRegister from '../../components/event/EventRegister.astro';
-import EventStory from '../../components/event/EventStory.astro';
-import Layout from '../../layouts/Layout.astro';
+import LinkBand from '../../components/blocks/LinkBand.astro'
+import EventIntro from '../../components/event/EventIntro.astro'
+import EventMapSection from '../../components/event/EventMapSection.astro'
+import EventRegister from '../../components/event/EventRegister.astro'
+import EventStory from '../../components/event/EventStory.astro'
+import Layout from '../../layouts/Layout.astro'
 
 // One SSR page per event, read on a route-cache miss, so a new or edited event is live with no rebuild.
-const { status, event } = await fetchEventState(Astro.params.slug ?? '');
+const { status, event } = await fetchEventState(Astro.params.slug ?? '')
 
-if (status === 'not-found') return Astro.redirect('/event', 302);
+if (status === 'not-found') return Astro.redirect('/event', 302)
 
 if (!event) {
   return new Response('Der Termin ist gerade nicht abrufbar. Bitte versuche es später erneut.', {
     status: 503,
     headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'Retry-After': '30' },
-  });
+  })
 }
 
 // The registration posted without JavaScript: answer on this page, never from or into the cache.
-const posted = Astro.getActionResult(actions.register);
-let values: Record<string, string> = {};
+const posted = Astro.getActionResult(actions.register)
+let values: Record<string, string> = {}
 
 if (posted) {
-  Astro.response.headers.set('Cache-Control', 'private, no-store');
+  Astro.response.headers.set('Cache-Control', 'private, no-store')
 
   if (posted.error) {
     const form = await Astro.request
       .clone()
       .formData()
-      .catch(() => null);
+      .catch(() => null)
 
     values = Object.fromEntries(
-      ['first_name', 'last_name', 'email', 'phone_number', 'privacy'].map((name) => [
+      ['first_name', 'last_name', 'email', 'phone_number', 'privacy'].map(name => [
         name,
         String(form?.get(name) ?? ''),
       ]),
-    );
+    )
   }
-} else {
-  Astro.cache.set(PUBLIC_CACHE);
+}
+else {
+  Astro.cache.set(PUBLIC_CACHE)
 }
 
 const registration = posted?.data
@@ -59,25 +60,25 @@ const registration = posted?.data
           ? Object.fromEntries(Object.entries(posted.error.fields).map(([key, list]) => [key, list?.[0] ?? '']))
           : {},
       }
-    : null;
+    : null
 
-const siteUrl = Astro.site!;
+const siteUrl = Astro.site!
 
 const hasPlace = !!(
-  event.location ||
-  event.street ||
-  event.city ||
-  (event.latitude !== null && event.longitude !== null)
-);
+  event.location
+  || event.street
+  || event.city
+  || (event.latitude !== null && event.longitude !== null)
+)
 
 // This is the page people forward, so the preview answers "when, where, still a
 // seat?" without anyone opening the link.
-const meta = buildEventMeta(event, siteUrl);
+const meta = buildEventMeta(event, siteUrl)
 
 // No `ogType="event"`: Open Graph never registered that type, so every scraper
 // falls back to "website". The Event JSON-LD below carries the event-ness.
 
-const eventSchema = buildEventSchema(event, siteUrl, meta);
+const eventSchema = buildEventSchema(event, siteUrl, meta)
 
 // /event carries the first two levels; without this the individual date sits
 // outside the site's hierarchy.

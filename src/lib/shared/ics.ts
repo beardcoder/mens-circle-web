@@ -5,75 +5,75 @@
  * `X-APPLE-TRAVEL-ADVISORY-BEHAVIOR` for "time to leave") are written the way Apple
  * Calendar exports them; other calendars ignore them.
  */
-import site from '../../data/site.json';
-import { fullAddress } from './format';
-import { zonedTime } from './time';
+import site from '../../data/site.json'
+import { fullAddress } from './format'
+import { zonedTime } from './time'
 
 /** What a calendar entry needs; built from an event by `calendarEventFrom`. */
 export interface CalendarEvent {
-  id: string;
-  title: string;
-  description: string;
-  eventDate: string;
-  startTime: string;
-  endTime: string;
+  id: string
+  title: string
+  description: string
+  eventDate: string
+  startTime: string
+  endTime: string
   /** The venue's name ("Gemeindehaus"). */
-  location: string;
+  location: string
   /** Street, postal code and city, or ''. */
-  address: string;
+  address: string
   /** How to find the room, from the admin ("Eingang über den Hof"). */
-  locationDetails: string;
-  costBasis: string;
-  latitude: number | null;
-  longitude: number | null;
+  locationDetails: string
+  costBasis: string
+  latitude: number | null
+  longitude: number | null
   /** The event page, absolute. */
-  url: string;
+  url: string
   /** ISO timestamp of the last edit; the calendar replaces an older copy by it. */
-  updatedAt?: string;
+  updatedAt?: string
 }
 
 /** Both shapes the site holds an event in: the database row and the public DTO. */
 type EventSource =
   | {
-      id: string;
-      title: string;
-      slug: string;
-      description: string;
-      eventDate: string;
-      startTime: string;
-      endTime: string;
-      location: string;
-      locationDetails: string;
-      street: string;
-      postalCode: string;
-      city: string;
-      costBasis: string;
-      latitude: number | null;
-      longitude: number | null;
-      updatedAt?: string;
-    }
+    id: string
+    title: string
+    slug: string
+    description: string
+    eventDate: string
+    startTime: string
+    endTime: string
+    location: string
+    locationDetails: string
+    street: string
+    postalCode: string
+    city: string
+    costBasis: string
+    latitude: number | null
+    longitude: number | null
+    updatedAt?: string
+  }
   | {
-      id: string;
-      title: string;
-      slug: string;
-      description: string;
-      event_date: string;
-      start_time: string;
-      end_time: string;
-      location: string;
-      location_details: string;
-      street: string;
-      postal_code: string;
-      city: string;
-      cost_basis: string;
-      latitude: number | null;
-      longitude: number | null;
-      updated_at?: string;
-    };
+    id: string
+    title: string
+    slug: string
+    description: string
+    event_date: string
+    start_time: string
+    end_time: string
+    location: string
+    location_details: string
+    street: string
+    postal_code: string
+    city: string
+    cost_basis: string
+    latitude: number | null
+    longitude: number | null
+    updated_at?: string
+  }
 
 export const calendarEventFrom = (ev: EventSource, siteUrl: string | URL): CalendarEvent => {
-  const row =
-    'eventDate' in ev
+  const row
+    = 'eventDate' in ev
       ? ev
       : {
           ...ev,
@@ -84,7 +84,7 @@ export const calendarEventFrom = (ev: EventSource, siteUrl: string | URL): Calen
           postalCode: ev.postal_code,
           costBasis: ev.cost_basis,
           updatedAt: ev.updated_at || undefined,
-        };
+        }
 
   return {
     id: row.id,
@@ -101,8 +101,8 @@ export const calendarEventFrom = (ev: EventSource, siteUrl: string | URL): Calen
     longitude: row.longitude,
     url: new URL(`/event/${row.slug}`, siteUrl).href,
     updatedAt: row.updatedAt,
-  };
-};
+  }
+}
 
 /** TEXT escaping (RFC 5545 3.3.11): backslash, semicolon, comma and line breaks. */
 const icsEscape = (text: unknown): string =>
@@ -110,47 +110,47 @@ const icsEscape = (text: unknown): string =>
     .replace(/\\/g, '\\\\')
     .replace(/;/g, '\\;')
     .replace(/,/g, '\\,')
-    .replace(/\r\n|\r|\n/g, '\\n');
+    .replace(/\r\n|\r|\n/g, '\\n')
 
 /** A quoted parameter value: no double quotes allowed inside, so they become single ones. */
-const param = (text: string): string => `"${text.replace(/"/g, "'").replace(/\r\n|\r|\n/g, ' ')}"`;
+const param = (text: string): string => `"${text.replace(/"/g, '\'').replace(/\r\n|\r|\n/g, ' ')}"`
 
-const encoder = new TextEncoder();
+const encoder = new TextEncoder()
 
 /**
  * Folds a content line at 75 octets (RFC 5545 3.1): CRLF and one space, never inside
  * a UTF-8 sequence ("ä" is two octets).
  */
 const fold = (line: string): string => {
-  const parts: string[] = [];
-  let current = '';
-  let octets = 0;
+  const parts: string[] = []
+  let current = ''
+  let octets = 0
 
   for (const char of line) {
-    const size = encoder.encode(char).length;
-    const limit = parts.length === 0 ? 75 : 74;
+    const size = encoder.encode(char).length
+    const limit = parts.length === 0 ? 75 : 74
 
     if (octets + size > limit) {
-      parts.push(current);
-      current = '';
-      octets = 0;
+      parts.push(current)
+      current = ''
+      octets = 0
     }
 
-    current += char;
-    octets += size;
+    current += char
+    octets += size
   }
 
-  parts.push(current);
+  parts.push(current)
 
-  return parts.join('\r\n ');
-};
+  return parts.join('\r\n ')
+}
 
-const pad = (n: number) => String(n).padStart(2, '0');
+const pad = (n: number) => String(n).padStart(2, '0')
 
 /** An instant in UTC as "20260918T170000Z". */
 const icsUtc = (d: Date): string =>
-  `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}` +
-  `T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+  `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}`
+  + `T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`
 
 /** A Berlin wall-clock stamp ("20260918T190000") plus `minutes`, still wall-clock. */
 const wallPlus = (wall: string, minutes: number): string => {
@@ -160,24 +160,24 @@ const wallPlus = (wall: string, minutes: number): string => {
     +wall.slice(6, 8),
     +wall.slice(9, 11),
     +wall.slice(11, 13),
-  );
+  )
 
-  return icsUtc(new Date(at + minutes * 60_000)).slice(0, 15);
-};
+  return icsUtc(new Date(at + minutes * 60_000)).slice(0, 15)
+}
 
 /** Start and end in Berlin wall-clock time; without an end, 90 minutes; without a start, no entry. */
-const eventSpan = (ev: CalendarEvent): { start: string; end: string } | null => {
-  const start = zonedTime(ev.eventDate, ev.startTime);
+const eventSpan = (ev: CalendarEvent): { start: string, end: string } | null => {
+  const start = zonedTime(ev.eventDate, ev.startTime)
 
-  if (!start) return null;
+  if (!start) return null
 
-  const end = zonedTime(ev.eventDate, ev.endTime);
+  const end = zonedTime(ev.eventDate, ev.endTime)
 
-  return { start: start.wall, end: end && end.date > start.date ? end.wall : wallPlus(start.wall, 90) };
-};
+  return { start: start.wall, end: end && end.date > start.date ? end.wall : wallPlus(start.wall, 90) }
+}
 
 /** The venue as one line: "Gemeindehaus, Teststraße 1, 94315 Straubing". */
-const place = (ev: CalendarEvent): string => [ev.location, ev.address].filter(Boolean).join(', ');
+const place = (ev: CalendarEvent): string => [ev.location, ev.address].filter(Boolean).join(', ')
 
 /** The notes of the entry: the evening, how to find the room, the fee, the page. */
 const notes = (ev: CalendarEvent): string =>
@@ -189,10 +189,10 @@ const notes = (ev: CalendarEvent): string =>
     `Fragen: ${site.contactEmail}`,
   ]
     .filter(Boolean)
-    .join('\n\n');
+    .join('\n\n')
 
-const hasGeo = (ev: CalendarEvent): ev is CalendarEvent & { latitude: number; longitude: number } =>
-  ev.latitude !== null && ev.longitude !== null;
+const hasGeo = (ev: CalendarEvent): ev is CalendarEvent & { latitude: number, longitude: number } =>
+  ev.latitude !== null && ev.longitude !== null
 
 const VTIMEZONE = [
   'BEGIN:VTIMEZONE',
@@ -213,23 +213,23 @@ const VTIMEZONE = [
   'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
   'END:STANDARD',
   'END:VTIMEZONE',
-];
+]
 
 /** Where and how far: the plain location, the coordinates and Apple's map pin. */
 const locationLines = (ev: CalendarEvent): string[] => {
-  const where = place(ev);
-  const lines = where ? [`LOCATION:${icsEscape(where)}`] : [];
+  const where = place(ev)
+  const lines = where ? [`LOCATION:${icsEscape(where)}`] : []
 
-  if (!hasGeo(ev)) return lines;
+  if (!hasGeo(ev)) return lines
 
   return [
     ...lines,
     `GEO:${ev.latitude};${ev.longitude}`,
     // Apple Calendar shows a map and computes travel time from this.
-    `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-ADDRESS=${param(ev.address || where)};X-APPLE-RADIUS=70;` +
-      `X-TITLE=${param(ev.location || ev.address || site.siteName)}:geo:${ev.latitude},${ev.longitude}`,
-  ];
-};
+    `X-APPLE-STRUCTURED-LOCATION;VALUE=URI;X-ADDRESS=${param(ev.address || where)};X-APPLE-RADIUS=70;`
+    + `X-TITLE=${param(ev.location || ev.address || site.siteName)}:geo:${ev.latitude},${ev.longitude}`,
+  ]
+}
 
 /** One reminder the evening before and one an hour before the start. */
 const alarms = (ev: CalendarEvent): string[] =>
@@ -242,15 +242,15 @@ const alarms = (ev: CalendarEvent): string[] =>
     `TRIGGER:${trigger}`,
     `DESCRIPTION:${icsEscape(text)}`,
     'END:VALARM',
-  ]);
+  ])
 
 export const buildIcs = (ev: CalendarEvent, now: Date = new Date()): string => {
-  const span = eventSpan(ev);
+  const span = eventSpan(ev)
 
-  if (!span) return '';
+  if (!span) return ''
 
-  const modified = ev.updatedAt ? new Date(ev.updatedAt) : null;
-  const stamp = icsUtc(now);
+  const modified = ev.updatedAt ? new Date(ev.updatedAt) : null
+  const stamp = icsUtc(now)
 
   const lines = [
     'BEGIN:VCALENDAR',
@@ -284,16 +284,16 @@ export const buildIcs = (ev: CalendarEvent, now: Date = new Date()): string => {
     ...alarms(ev),
     'END:VEVENT',
     'END:VCALENDAR',
-  ];
+  ]
 
-  return `${lines.map(fold).join('\r\n')}\r\n`;
-};
+  return `${lines.map(fold).join('\r\n')}\r\n`
+}
 
 /** The same entry as a Google Calendar template link, or empty without a date. */
 export const googleCalendarUrl = (ev: CalendarEvent): string => {
-  const span = eventSpan(ev);
+  const span = eventSpan(ev)
 
-  if (!span) return '';
+  if (!span) return ''
 
   const params = new URLSearchParams({
     action: 'TEMPLATE',
@@ -302,7 +302,7 @@ export const googleCalendarUrl = (ev: CalendarEvent): string => {
     details: notes(ev),
     location: place(ev),
     ctz: 'Europe/Berlin',
-  });
+  })
 
-  return `https://calendar.google.com/calendar/render?${params}`;
-};
+  return `https://calendar.google.com/calendar/render?${params}`
+}

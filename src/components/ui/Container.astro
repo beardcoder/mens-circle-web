@@ -1,10 +1,10 @@
 ---
 /** The page's width: up to 1200px of content, 28 / 40 / 56px from the window. Header, sections and footer share these edges. */
 interface Props {
-  class?: string;
+  class?: string
 }
 
-const { class: className } = Astro.props;
+const { class: className } = Astro.props
 ---
 
 <div class:list={['mx-auto w-full max-w-page px-gutter', className]}>

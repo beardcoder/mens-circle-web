@@ -1,27 +1,27 @@
 ---
-import type { EventDTO } from '@lib/shared/dto';
-import { eventView } from '@lib/shared/event-status';
-import { formatTimeRange } from '@lib/shared/time';
-import { accentLastWord } from '@lib/shared/words';
+import type { EventDTO } from '@lib/shared/dto'
+import { eventView } from '@lib/shared/event-status'
+import { formatTimeRange } from '@lib/shared/time'
+import { accentLastWord } from '@lib/shared/words'
 
-import Fact from '../blocks/Fact.astro';
-import Button from '../ui/Button.astro';
-import Container from '../ui/Container.astro';
-import TextLink from '../ui/TextLink.astro';
-import CalendarButton from './CalendarButton.astro';
-import EventDock from './EventDock.astro';
+import Fact from '../blocks/Fact.astro'
+import Button from '../ui/Button.astro'
+import Container from '../ui/Container.astro'
+import TextLink from '../ui/TextLink.astro'
+import CalendarButton from './CalendarButton.astro'
+import EventDock from './EventDock.astro'
 
 interface Props {
-  event: EventDTO;
+  event: EventDTO
 }
 
-const { event } = Astro.props;
-const view = eventView(event, 'Dieser Abend', false);
-const dateLabel = view.title.join(' ');
-const hours = formatTimeRange(event.start_time, event.end_time);
-const hasPlace = !!(event.location || event.street || event.city);
-const title = accentLastWord(event.title);
-const where = [event.location, event.city].filter(Boolean).join(', ');
+const { event } = Astro.props
+const view = eventView(event, 'Dieser Abend', false)
+const dateLabel = view.title.join(' ')
+const hours = formatTimeRange(event.start_time, event.end_time)
+const hasPlace = !!(event.location || event.street || event.city)
+const title = accentLastWord(event.title)
+const where = [event.location, event.city].filter(Boolean).join(', ')
 
 /** What a man needs before he decides, as rows between lines; the fee stands with the registration. */
 const facts = [
@@ -44,7 +44,7 @@ const facts = [
     href: '#ueber-den-abend',
     linkLabel: 'Was dich erwartet',
   },
-];
+]
 ---
 
 {/* The opening arrives once on load (global.css, "The opening"); once the title has scrolled under the bar, the dock
@@ -60,8 +60,15 @@ const facts = [
     <div class="grid items-start gap-x-grid gap-y-8 border-t border-line pt-4 lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-y-12 lg:pt-5">
       <div class="min-w-0 lg:col-span-7">
         {/* The date is what tells one evening from the next, so it stands at a heading's size. */}
-        <p data-enter class="flex flex-wrap items-baseline gap-x-4 gap-y-1 font-display text-sub text-fg">
-          <time data-event-date datetime={view.datetime} class="relative z-31 print:opacity-100!">
+        <p
+          data-enter
+          class="flex flex-wrap items-baseline gap-x-4 gap-y-1 font-display text-sub text-fg"
+        >
+          <time
+            data-event-date
+            datetime={view.datetime}
+            class="relative z-31 print:opacity-100!"
+          >
             {view.title.map((line) => (
               <span class="max-sm:block">{line} </span>
             ))}
@@ -86,20 +93,31 @@ const facts = [
         </h1>
       </div>
 
-      <div data-enter style="--enter-delay: 0.2s" class="min-w-0 max-lg:order-2 lg:col-span-6">
+      <div
+        data-enter
+        style="--enter-delay: 0.2s"
+        class="min-w-0 max-lg:order-2 lg:col-span-6"
+      >
         <p class="max-w-[25em] text-md text-fg-soft lg:text-lg">
           {event.is_past
             ? 'Dieser Abend hat bereits stattgefunden. Bei den aktuellen Terminen findest du die nächsten Treffen.'
             : 'Ein Abend für das, was dich gerade beschäftigt. Mit Männern, die dir zuhören.'}
         </p>
         {event.is_past && (
-          <Button href="/event" class="mt-6">
+          <Button
+            href="/event"
+            class="mt-6"
+          >
             Aktuelle Termine ansehen
           </Button>
         )}
         <dl class="mt-8 grid border-b border-line-strong lg:mt-12">
           {facts.map((fact) => (
-            <Fact label={fact.label} layout="row" wideOnly={fact.lgOnly}>
+            <Fact
+              label={fact.label}
+              layout="row"
+              wideOnly={fact.lgOnly}
+            >
               <Fragment slot="value">{fact.value}</Fragment>
               {fact.href && <TextLink href={fact.href}>{fact.linkLabel}</TextLink>}
             </Fact>
@@ -123,4 +141,8 @@ const facts = [
   </Container>
 </section>
 
-<EventDock event={event} dateLabel={dateLabel} hours={hours} />
+<EventDock
+  event={event}
+  dateLabel={dateLabel}
+  hours={hours}
+/>

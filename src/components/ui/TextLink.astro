@@ -1,14 +1,14 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from 'astro-icon/components'
 
 /** A quiet link beside a primary action or under a block: the accent, underlined, with a small arrow. */
 interface Props {
-  href: string;
-  class?: string;
-  [attribute: string]: unknown;
+  href: string
+  class?: string
+  [attribute: string]: unknown
 }
 
-const { href, class: className, ...attributes } = Astro.props;
+const { href, class: className, ...attributes } = Astro.props
 ---
 
 <a

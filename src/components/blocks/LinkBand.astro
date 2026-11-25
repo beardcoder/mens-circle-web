@@ -1,26 +1,36 @@
 ---
-import type { ComponentProps } from 'astro/types';
+import type { ComponentProps } from 'astro/types'
 
-import { margin } from '@lib/ui';
+import { margin } from '@lib/ui'
 
-import LinkList from '../ui/LinkList.astro';
-import Section from '../ui/Section.astro';
-import SectionHead from '../ui/SectionHead.astro';
+import LinkList from '../ui/LinkList.astro'
+import Section from '../ui/Section.astro'
+import SectionHead from '../ui/SectionHead.astro'
 
 /** A page's exit, as a compact band: where someone who has read it goes next. Head in the margin, the links beside it. */
 interface Props {
-  eyebrow?: string;
-  title: string;
-  titleId: string;
-  items: ComponentProps<typeof LinkList>['items'];
+  eyebrow?: string
+  title: string
+  titleId: string
+  items: ComponentProps<typeof LinkList>['items']
 }
 
-const { eyebrow, title, titleId, items } = Astro.props;
+const { eyebrow, title, titleId, items } = Astro.props
 ---
 
-<Section ground="alt" space="band" labelledby={titleId}>
+<Section
+  ground="alt"
+  space="band"
+  labelledby={titleId}
+>
   <div class:list={[margin.grid, 'gap-y-8']}>
-    <SectionHead eyebrow={eyebrow} title={title} titleId={titleId} size="sub" class={margin.side} />
+    <SectionHead
+      eyebrow={eyebrow}
+      title={title}
+      titleId={titleId}
+      size="sub"
+      class={margin.side}
+    />
     <div class={margin.content}>
       <LinkList items={items} />
     </div>

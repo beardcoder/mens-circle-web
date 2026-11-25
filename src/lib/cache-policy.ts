@@ -5,10 +5,10 @@
  */
 
 /** The CMS, the signed cancel links, actions and server islands: never stored anywhere. */
-const PRIVATE = /^\/(?:_emdash|anmeldung|_actions|_server-islands)(?:\/|$)/;
+const PRIVATE = /^\/(?:_emdash|anmeldung|_actions|_server-islands)(?:\/|$)/
 
 /** Public HTML and JSON may be stored, but are revalidated before reuse. */
-const REVALIDATE = 'public, max-age=0, must-revalidate';
+const REVALIDATE = 'public, max-age=0, must-revalidate'
 
 export const cacheControlForRoute = (pathname: string): string =>
-  PRIVATE.test(pathname) ? 'private, no-store' : REVALIDATE;
+  PRIVATE.test(pathname) ? 'private, no-store' : REVALIDATE

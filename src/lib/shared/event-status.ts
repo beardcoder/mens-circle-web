@@ -3,28 +3,28 @@
  * never read as "no date planned".
  */
 
-import type { EventDTO } from './dto';
-import { eventPlace } from './event-meta';
-import { eventDay, formatDateLong, formatTimeRange } from './time';
+import type { EventDTO } from './dto'
+import { eventPlace } from './event-meta'
+import { eventDay, formatDateLong, formatTimeRange } from './time'
 
-export type NextEventStatus = 'scheduled' | 'none' | 'unavailable';
+export type NextEventStatus = 'scheduled' | 'none' | 'unavailable'
 
 /** The upcoming event reduced to the strings the pages show. */
 interface NextEventSummary {
-  slug: string;
+  slug: string
   /** ISO day for `<time>`. */
-  day: string;
+  day: string
   /** "Donnerstag, 18. September 2026" */
-  dateLabel: string;
+  dateLabel: string
   /** "19:00–21:30 Uhr", or empty when no time is set. */
-  timeRange: string;
+  timeRange: string
   /** City, then venue name, then the site's own locality. */
-  place: string;
+  place: string
   /** Free-text participation fee, empty when not set. */
-  costBasis: string;
-  isFull: boolean;
-  availableSpots: number;
-  maxParticipants: number;
+  costBasis: string
+  isFull: boolean
+  availableSpots: number
+  maxParticipants: number
 }
 
 const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
@@ -38,49 +38,49 @@ const summarizeNextEvent = (event: EventDTO | null): NextEventSummary | null =>
     isFull: event.is_full,
     availableSpots: event.available_spots,
     maxParticipants: event.max_participants,
-  };
+  }
 
 export interface DateStatus {
-  status: NextEventStatus;
-  next: NextEventSummary | null;
+  status: NextEventStatus
+  next: NextEventSummary | null
 }
 
 export const dateStatus = (status: NextEventStatus, event: EventDTO | null): DateStatus => {
-  const next = status === 'scheduled' ? summarizeNextEvent(event) : null;
+  const next = status === 'scheduled' ? summarizeNextEvent(event) : null
 
-  return { status, next };
-};
+  return { status, next }
+}
 
 /**
  * A fee as a short main value and a note: "Auf Spendenbasis (Empfehlung 15–25 €)"
  * becomes "Auf Spendenbasis" and "Empfehlung 15–25 €", so a long fee never blows
  * up a row of facts. Without a fee: the circle's standing rule.
  */
-export const splitFee = (costBasis = ''): { main: string; note: string } => {
-  const fee = costBasis.trim();
+export const splitFee = (costBasis = ''): { main: string, note: string } => {
+  const fee = costBasis.trim()
 
-  if (!fee) return { main: 'Spendenbasis', note: 'Du gibst, was für dich machbar ist' };
+  if (!fee) return { main: 'Spendenbasis', note: 'Du gibst, was für dich machbar ist' }
 
-  const bracketed = /^(.+?)\s*\((.+)\)\s*$/.exec(fee);
+  const bracketed = /^(.+?)\s*\((.+)\)\s*$/.exec(fee)
 
-  if (bracketed) return { main: bracketed[1].trim(), note: bracketed[2].trim() };
+  if (bracketed) return { main: bracketed[1].trim(), note: bracketed[2].trim() }
 
-  const parted = /^(.{4,28}?)\s*[,;–]\s+(.+)$/.exec(fee);
+  const parted = /^(.{4,28}?)\s*[,;–]\s+(.+)$/.exec(fee)
 
-  if (parted) return { main: parted[1].trim(), note: parted[2].trim() };
+  if (parted) return { main: parted[1].trim(), note: parted[2].trim() }
 
-  return { main: fee, note: '' };
-};
+  return { main: fee, note: '' }
+}
 
 /** The facts of a dated summary, as data: components choose labels and layout. */
 interface SummaryFacts {
   /** "19:00–21:30 Uhr", or "Abends" when no time is set. */
-  time: string;
-  place: string;
+  time: string
+  place: string
   /** The fee's main value (`splitFee`). */
-  fee: string;
+  fee: string
   /** "5 von 12 Plätzen frei", "Ausgebucht" or "Hat stattgefunden". */
-  seats: string;
+  seats: string
 }
 
 /**
@@ -89,29 +89,29 @@ interface SummaryFacts {
  * are rendered separately by EventAvailability.
  */
 export interface SummaryView {
-  state: 'open' | 'full' | 'past';
+  state: 'open' | 'full' | 'past'
   /** The label above the date: "Nächster Termin", "Termin", … */
-  kicker: string;
+  kicker: string
   /** Two fixed lines: the weekday and the date ("Freitag," / "16. Oktober 2026"), or the state in words. */
-  title: [string, string];
+  title: [string, string]
   /** ISO day for `<time>`, when the title is a date. */
-  datetime: string;
-  facts: SummaryFacts;
+  datetime: string
+  facts: SummaryFacts
   /** The circle's seats, drawn around the date; `null` once the evening is past. */
-  seats: { total: number; free: number } | null;
+  seats: { total: number, free: number } | null
   /** The situational action; `null` where the page already offers it. */
-  action: { label: string; href: string } | null;
+  action: { label: string, href: string } | null
 }
 
 /** "Freitag, 16. Oktober 2026" → ["Freitag,", "16. Oktober 2026"]. */
 const dateLines = (dateLabel: string): [string, string] => {
-  const [weekday, ...rest] = dateLabel.split(', ');
+  const [weekday, ...rest] = dateLabel.split(', ')
 
-  return rest.length ? [`${weekday},`, rest.join(', ')] : [dateLabel, ''];
-};
+  return rest.length ? [`${weekday},`, rest.join(', ')] : [dateLabel, '']
+}
 
 const seatsText = (event: NextEventSummary): string =>
-  event.isFull ? 'Ausgebucht' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`;
+  event.isFull ? 'Ausgebucht' : `${event.availableSpots} von ${event.maxParticipants} Plätzen frei`
 
 /** Time, place, fee and seats of a dated summary. */
 const dateFacts = (next: NextEventSummary, seats = seatsText(next)): SummaryFacts => ({
@@ -119,12 +119,12 @@ const dateFacts = (next: NextEventSummary, seats = seatsText(next)): SummaryFact
   place: next.place,
   fee: splitFee(next.costBasis).main,
   seats,
-});
+})
 
 /** The summary of one event, as listed on /event or opening its own page. */
 export const eventView = (event: EventDTO, kicker: string, withAction = true): SummaryView => {
-  const next = summarizeNextEvent(event)!;
-  const state = event.is_past ? 'past' : event.is_full ? 'full' : 'open';
+  const next = summarizeNextEvent(event)!
+  const state = event.is_past ? 'past' : event.is_full ? 'full' : 'open'
 
   return {
     state,
@@ -139,5 +139,5 @@ export const eventView = (event: EventDTO, kicker: string, withAction = true): S
       withAction && !event.is_past
         ? { label: event.is_full ? 'Zum Termin' : 'Zur Anmeldung', href: `/event/${event.slug}` }
         : null,
-  };
-};
+  }
+}

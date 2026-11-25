@@ -1,13 +1,13 @@
 ---
-import { actions } from 'astro:actions';
+import { actions } from 'astro:actions'
 
-import { button, checkbox, control, fieldError, formStatus, link } from '@lib/ui';
+import { button, checkbox, control, fieldError, formStatus, link } from '@lib/ui'
 
-import SeatRing from '../brand/SeatRing.astro';
-import FormStatus from '../forms/FormStatus.astro';
-import Honeypot from '../forms/Honeypot.astro';
-import Field from '../ui/Field.astro';
-import type { PublicEvent } from './types';
+import SeatRing from '../brand/SeatRing.astro'
+import FormStatus from '../forms/FormStatus.astro'
+import Honeypot from '../forms/Honeypot.astro'
+import Field from '../ui/Field.astro'
+import type { PublicEvent } from './types'
 
 /**
  * The registration: a server-rendered form that posts to the `register` action.
@@ -16,25 +16,20 @@ import type { PublicEvent } from './types';
  * snapshot; the plugin checks capacity again. A full evening takes no sign-ups.
  */
 interface Props {
-  event: PublicEvent;
-  contribution: { main: string; note: string };
+  event: PublicEvent
+  contribution: { main: string; note: string }
   /** The action's answer when the form was posted without JavaScript. */
-  result?: { message: string } | { error: string; fields: Record<string, string> } | null;
+  result?: { message: string } | { error: string; fields: Record<string, string> } | null
   /** What was typed, kept after an error. */
-  values?: Record<string, string>;
+  values?: Record<string, string>
 }
 
-const { event, contribution, result = null, values = {} } = Astro.props;
-const full = event.view.state === 'full';
-const id = 'register';
-const errors = result && 'fields' in result ? result.fields : {};
+const { event, contribution, result = null, values = {} } = Astro.props
+const full = event.view.state === 'full'
+const id = 'register'
+const errors = result && 'fields' in result ? result.fields : {}
 
-const failed =
-  result && 'error' in result
-    ? Object.values(errors).some(Boolean)
-      ? 'Bitte prüfe die markierten Angaben.'
-      : result.error
-    : '';
+const failed = result && 'error' in result ? (Object.values(errors).some(Boolean) ? 'Bitte prüfe die markierten Angaben.' : result.error) : ''
 
 const field = (name: string) => ({
   id: `${id}-${name}`,
@@ -42,7 +37,7 @@ const field = (name: string) => ({
   value: values[name] ?? '',
   'aria-invalid': errors[name] ? ('true' as const) : undefined,
   'aria-describedby': `${id}-${name}-error`,
-});
+})
 ---
 
 <div
@@ -56,35 +51,57 @@ const field = (name: string) => ({
 >
   {event.isPast ? (
     <>
-      <h2 id="anmeldung-title" class="text-sub text-fg">
+      <h2
+        id="anmeldung-title"
+        class="text-sub text-fg"
+      >
         Dieser Abend hat stattgefunden
       </h2>
       <p class="mt-3 text-md text-fg-soft">Eine Anmeldung ist nicht mehr möglich.</p>
-      <a class:list={[button(), 'mt-6']} href="/event#benachrichtigung">
+      <a
+        class:list={[button(), 'mt-6']}
+        href="/event#benachrichtigung"
+      >
         Termine per E-Mail erhalten
       </a>
     </>
   ) : full ? (
     <>
-      <h2 id="anmeldung-title" class="text-sub text-fg">
+      <h2
+        id="anmeldung-title"
+        class="text-sub text-fg"
+      >
         Dieser Abend ist voll
       </h2>
-      <SeatRing class="mt-4" seats={event.view.seats} text="Alle Plätze sind belegt" />
+      <SeatRing
+        class="mt-4"
+        seats={event.view.seats}
+        text="Alle Plätze sind belegt"
+      />
       <p class="mt-6 max-w-measure text-md text-fg-soft">Eine Anmeldung ist nicht mehr möglich.</p>
-      <a class:list={[button(), 'mt-6']} href="/event">
+      <a
+        class:list={[button(), 'mt-6']}
+        href="/event"
+      >
         Andere Termine ansehen
       </a>
     </>
   ) : result && 'message' in result ? (
     <div role="status">
-      <h2 id="anmeldung-title" class="text-sub text-fg">
+      <h2
+        id="anmeldung-title"
+        class="text-sub text-fg"
+      >
         Vielen Dank für deine Anmeldung
       </h2>
       <p class="mt-4 text-md text-fg-soft">{result.message}</p>
     </div>
   ) : (
     <>
-      <h2 id="anmeldung-title" class="text-sub text-fg">
+      <h2
+        id="anmeldung-title"
+        class="text-sub text-fg"
+      >
         Dein Platz im Kreis
       </h2>
       <SeatRing
@@ -92,9 +109,7 @@ const field = (name: string) => ({
         seats={event.view.seats}
         text={`${event.availableSpots} von ${event.maxParticipants} Plätzen frei`}
       />
-      <p class="mt-6 mb-6 max-w-measure text-md text-fg-soft">
-        Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.
-      </p>
+      <p class="mt-6 mb-6 max-w-measure text-md text-fg-soft">Du meldest dich für diesen einzelnen Abend an. Die Bestätigung kommt per E-Mail.</p>
       <dl class="mb-8 text-sm">
         <div class="flex items-baseline justify-between gap-4">
           <dt class="text-fg-muted">Beitrag</dt>
@@ -116,7 +131,11 @@ const field = (name: string) => ({
         class="grid gap-6"
       >
         <Honeypot />
-        <input type="hidden" name="event_id" value={event.id} />
+        <input
+          type="hidden"
+          name="event_id"
+          value={event.id}
+        />
         <div
           data-hide-on-success
           class="grid gap-6 transition-[opacity,display] transition-discrete duration-150 ease-out [&[hidden]]:opacity-0"
@@ -128,14 +147,41 @@ const field = (name: string) => ({
               errorId={`${id}-first_name-error`}
               error={errors.first_name}
             >
-              <input {...field('first_name')} autocomplete="given-name" required class={control()} />
+              <input
+                {...field('first_name')}
+                autocomplete="given-name"
+                required
+                class={control()}
+              />
             </Field>
-            <Field for={`${id}-last_name`} label="Nachname" errorId={`${id}-last_name-error`} error={errors.last_name}>
-              <input {...field('last_name')} autocomplete="family-name" required class={control()} />
+            <Field
+              for={`${id}-last_name`}
+              label="Nachname"
+              errorId={`${id}-last_name-error`}
+              error={errors.last_name}
+            >
+              <input
+                {...field('last_name')}
+                autocomplete="family-name"
+                required
+                class={control()}
+              />
             </Field>
           </div>
-          <Field for={`${id}-email`} label="E-Mail" errorId={`${id}-email-error`} error={errors.email}>
-            <input {...field('email')} type="email" autocomplete="email" inputmode="email" required class={control()} />
+          <Field
+            for={`${id}-email`}
+            label="E-Mail"
+            errorId={`${id}-email-error`}
+            error={errors.email}
+          >
+            <input
+              {...field('email')}
+              type="email"
+              autocomplete="email"
+              inputmode="email"
+              required
+              class={control()}
+            />
           </Field>
           <Field
             for={`${id}-phone_number`}
@@ -167,25 +213,44 @@ const field = (name: string) => ({
               />
               <span class="text-base text-fg">
                 Ich habe die{' '}
-                <a href="/datenschutz" target="_blank" rel="noopener" class={link}>
-                  Datenschutzerklärung<span class="sr-only"> (öffnet in neuem Tab)</span>
+                <a
+                  href="/datenschutz"
+                  target="_blank"
+                  rel="noopener"
+                  class={link}
+                >
+                  Datenschutzerklärung
+                  <span class="sr-only"> (öffnet in neuem Tab)</span>
                 </a>{' '}
                 gelesen und stimme der Verarbeitung meiner Daten zu.
               </span>
             </label>
-            <span id={`${id}-privacy-error`} class={fieldError} hidden={!errors.privacy}>
+            <span
+              id={`${id}-privacy-error`}
+              class={fieldError}
+              hidden={!errors.privacy}
+            >
               {errors.privacy}
             </span>
           </div>
           <div class="mt-2 grid gap-3">
-            <button type="submit" class={button({ size: 'lg', block: true })}>
+            <button
+              type="submit"
+              class={button({ size: 'lg', block: true })}
+            >
               <span data-label>Anmelden</span>
             </button>
             <p class="text-sm text-fg-muted">Du bekommst eine Bestätigung mit einem Link zum Absagen.</p>
           </div>
         </div>
         {failed ? (
-          <p id={`${id}-status`} data-form-status role="alert" data-tone="error" class={formStatus}>
+          <p
+            id={`${id}-status`}
+            data-form-status
+            role="alert"
+            data-tone="error"
+            class={formStatus}
+          >
             {failed}
           </p>
         ) : (
@@ -197,9 +262,9 @@ const field = (name: string) => ({
 </div>
 
 <script>
-  import { enhanceForms } from '@lib/form';
+  import { enhanceForms } from '@lib/form'
 
-  enhanceForms('register', 'register');
+  enhanceForms('register', 'register')
 
   /**
    * The moment someone has joined: his chair is taken. The next free chair of the
@@ -207,25 +272,25 @@ const field = (name: string) => ({
    * follows, so the ring shows the circle with him in it; the next page load shows
    * the server's count anyway.
    */
-  const panel = document.querySelector<HTMLElement>('#anmeldung');
+  const panel = document.querySelector<HTMLElement>('#anmeldung')
 
   panel?.addEventListener('form:success', () => {
-    const ring = panel.querySelector<HTMLElement>('[data-seat-ring]');
-    const chair = ring?.querySelector<SVGCircleElement>('circle[data-seat-free]');
-    const count = ring?.querySelector<HTMLElement>('[data-seat-count]');
+    const ring = panel.querySelector<HTMLElement>('[data-seat-ring]')
+    const chair = ring?.querySelector<SVGCircleElement>('circle[data-seat-free]')
+    const count = ring?.querySelector<HTMLElement>('[data-seat-count]')
 
-    if (!ring || !chair || !count) return;
+    if (!ring || !chair || !count) return
 
-    const free = Number(count.textContent) - 1;
-    const line = ring.querySelector<HTMLElement>('[data-seat-text]');
+    const free = Number(count.textContent) - 1
+    const line = ring.querySelector<HTMLElement>('[data-seat-text]')
 
-    chair.removeAttribute('data-seat-free');
-    chair.removeAttribute('stroke-width');
-    chair.setAttribute('r', String(Number(chair.getAttribute('r')) + 0.75));
-    chair.setAttribute('class', 'fill-fill');
-    chair.setAttribute('data-seat-dot', 'taking');
-    count.textContent = String(free);
+    chair.removeAttribute('data-seat-free')
+    chair.removeAttribute('stroke-width')
+    chair.setAttribute('r', String(Number(chair.getAttribute('r')) + 0.75))
+    chair.setAttribute('class', 'fill-fill')
+    chair.setAttribute('data-seat-dot', 'taking')
+    count.textContent = String(free)
 
-    if (line) line.textContent = line.textContent?.replace(/^\d+/, String(free)) ?? '';
-  });
+    if (line) line.textContent = line.textContent?.replace(/^\d+/, String(free)) ?? ''
+  })
 </script>

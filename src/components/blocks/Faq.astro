@@ -1,16 +1,16 @@
 ---
-import site from '@data/site.json';
-import { link, margin } from '@lib/ui';
+import site from '@data/site.json'
+import { link, margin } from '@lib/ui'
 
-import Accordion from '../ui/Accordion.astro';
-import Section from '../ui/Section.astro';
-import SectionHead from '../ui/SectionHead.astro';
+import Accordion from '../ui/Accordion.astro'
+import Section from '../ui/Section.astro'
+import SectionHead from '../ui/SectionHead.astro'
 
 interface Props {
-  anchor: string;
-  eyebrow?: string;
-  title: string;
-  intro?: string;
+  anchor: string
+  eyebrow?: string
+  title: string
+  intro?: string
 }
 
 /**
@@ -18,11 +18,18 @@ interface Props {
  * ask what is not there in the margin, the questions as one Accordion beside it.
  */
 
-const { anchor, eyebrow, title, intro } = Astro.props;
+const { anchor, eyebrow, title, intro } = Astro.props
 ---
 
-<Section id={anchor} labelledby={`${anchor}-title`}>
-  <div itemscope itemtype="https://schema.org/FAQPage" class:list={[margin.grid, 'gap-y-10']}>
+<Section
+  id={anchor}
+  labelledby={`${anchor}-title`}
+>
+  <div
+    itemscope
+    itemtype="https://schema.org/FAQPage"
+    class:list={[margin.grid, 'gap-y-10']}
+  >
     <SectionHead
       eyebrow={eyebrow}
       title={title}
@@ -32,14 +39,12 @@ const { anchor, eyebrow, title, intro } = Astro.props;
       class={margin.cross}
     />
     {site.contactEmail && (
-      <p
-        class:list={[
-          margin.side,
-          'text-base text-fg-muted max-lg:order-last lg:sticky lg:top-(--spacing-clearance) lg:self-start',
-        ]}
-      >
+      <p class:list={[margin.side, 'text-base text-fg-muted max-lg:order-last lg:sticky lg:top-(--spacing-clearance) lg:self-start']}>
         Deine Frage ist nicht dabei? Schreib mir an{' '}
-        <a class={link} href={`mailto:${site.contactEmail}`}>
+        <a
+          class={link}
+          href={`mailto:${site.contactEmail}`}
+        >
           {site.contactEmail}
         </a>
         .

@@ -1,16 +1,16 @@
 ---
-import { button } from '@lib/ui';
+import { button } from '@lib/ui'
 
-import type { PublicEvents } from '../event/types';
+import type { PublicEvents } from '../event/types'
 
 interface Props {
-  events: PublicEvents | null;
+  events: PublicEvents | null
 }
 
-const { events } = Astro.props;
-const next = events?.events[0];
-const action = next?.view.action;
-const date = next?.view.title.join(' ').replace(/,$/, '');
+const { events } = Astro.props
+const next = events?.events[0]
+const action = next?.view.action
+const date = next?.view.title.join(' ').replace(/,$/, '')
 ---
 
 {
@@ -62,38 +62,38 @@ const date = next?.view.title.join(' ').replace(/,$/, '');
    * here. In both cases this observer says whether it can be reached: `inert`,
    * `aria-hidden` and the link's tab stop.
    */
-  const bar = document.querySelector<HTMLElement>('[data-action-bar]');
-  const action = document.querySelector('[data-hero-action]');
+  const bar = document.querySelector<HTMLElement>('[data-action-bar]')
+  const action = document.querySelector('[data-hero-action]')
 
   if (bar && action) {
     /** What keeps the bar away: the dates and the footer while on screen, the opening's action until it has gone under the bar. */
-    const holding = new Set<Element>();
+    const holding = new Set<Element>()
 
     const update: IntersectionObserverCallback = (entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting) holding.add(entry.target);
-        else holding.delete(entry.target);
+        if (entry.isIntersecting) holding.add(entry.target)
+        else holding.delete(entry.target)
       }
 
-      const show = holding.size === 0;
+      const show = holding.size === 0
 
-      if (show === bar.hasAttribute('data-visible')) return;
+      if (show === bar.hasAttribute('data-visible')) return
 
-      bar.toggleAttribute('data-visible', show);
-      bar.toggleAttribute('inert', !show);
-      bar.setAttribute('aria-hidden', String(!show));
+      bar.toggleAttribute('data-visible', show)
+      bar.toggleAttribute('inert', !show)
+      bar.setAttribute('aria-hidden', String(!show))
 
-      for (const link of bar.querySelectorAll('a')) link.tabIndex = show ? 0 : -1;
-    };
+      for (const link of bar.querySelectorAll('a')) link.tabIndex = show ? 0 : -1
+    }
 
     // The fixed bar is 72px (--spacing-header): what is under it is gone.
-    const below = new IntersectionObserver(update, { rootMargin: '-72px 0px 0px 0px' });
+    const below = new IntersectionObserver(update, { rootMargin: '-72px 0px 0px 0px' })
 
-    for (const element of document.querySelectorAll('#termine, #footer')) below.observe(element);
+    for (const element of document.querySelectorAll('#termine, #footer')) below.observe(element)
 
     // The action holds the bar until it has been passed, wherever it is below the bar:
     // the root reaches far past the window's lower edge, so an action under the fold
     // (a short window) and a jump straight past it (an anchor link) both count.
-    new IntersectionObserver(update, { rootMargin: '-72px 0px 100000px 0px' }).observe(action);
+    new IntersectionObserver(update, { rootMargin: '-72px 0px 100000px 0px' }).observe(action)
   }
 </script>

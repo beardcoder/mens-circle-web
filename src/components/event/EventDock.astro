@@ -1,19 +1,19 @@
 ---
-import type { EventDTO } from '@lib/shared/dto';
-import { eventDay } from '@lib/shared/time';
-import { accentLastWord } from '@lib/shared/words';
+import type { EventDTO } from '@lib/shared/dto'
+import { eventDay } from '@lib/shared/time'
+import { accentLastWord } from '@lib/shared/words'
 
-import Container from '../ui/Container.astro';
+import Container from '../ui/Container.astro'
 
 interface Props {
-  event: EventDTO;
+  event: EventDTO
   /** The intro's date line and hours, word for word. */
-  dateLabel: string;
-  hours: string;
+  dateLabel: string
+  hours: string
 }
 
-const { event, dateLabel, hours } = Astro.props;
-const title = accentLastWord(event.title);
+const { event, dateLabel, hours } = Astro.props
+const title = accentLastWord(event.title)
 ---
 
 {/* A visual continuation of the existing heading, never a second heading or focus target. */}
@@ -28,18 +28,28 @@ const title = accentLastWord(event.title);
     class="absolute inset-0 border-b border-line bg-ground/95 lg:hover-device:bg-ground/88 lg:hover-device:backdrop-blur-xl"
   ></div>
   <Container class="relative flex min-h-14 items-center justify-between gap-4 py-2">
-    <p data-event-dock-title class="min-w-0 truncate font-display text-sub leading-[1.02] tracking-[-0.045em]">
+    <p
+      data-event-dock-title
+      class="min-w-0 truncate font-display text-sub leading-[1.02] tracking-[-0.045em]"
+    >
       <span>
         {title.lead}
         {title.accent && <span class="text-accent">{` ${title.accent}`}</span>}
       </span>
     </p>
     <p class="shrink-0 text-right text-xs leading-snug sm:text-sm">
-      <time data-event-dock-date datetime={eventDay(event.event_date)} class="inline-block text-fg">
+      <time
+        data-event-dock-date
+        datetime={eventDay(event.event_date)}
+        class="inline-block text-fg"
+      >
         {dateLabel}
       </time>
       {hours && (
-        <span data-event-dock-hours class="mt-0.5 block text-fg-muted sm:mt-0 sm:ml-5 sm:inline-block">
+        <span
+          data-event-dock-hours
+          class="mt-0.5 block text-fg-muted sm:mt-0 sm:ml-5 sm:inline-block"
+        >
           {hours}
         </span>
       )}
@@ -54,27 +64,22 @@ const title = accentLastWord(event.title);
    * and under reduced motion, one observer on the title sets an attribute and CSS
    * shows or hides the dock. No layout reads, no copies.
    */
-  const dock = document.querySelector<HTMLElement>('[data-event-dock]');
-  const title = document.querySelector<HTMLElement>('[data-event-title]');
+  const dock = document.querySelector<HTMLElement>('[data-event-dock]')
+  const title = document.querySelector<HTMLElement>('[data-event-title]')
 
   if (dock && title) {
-    dock.hidden = false;
+    dock.hidden = false
 
-    const scrollDriven =
-      CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scrollDriven = CSS.supports('animation-timeline: view()') && !matchMedia('(prefers-reduced-motion: reduce)').matches
 
     if (!scrollDriven) {
       new IntersectionObserver(
         // Gone upwards: the title is out of the band below the bar and its top lies above that band.
         // A short title's top is still on screen when its bottom passes the bar, so compare with the band, not with 0.
-        ([entry]) =>
-          dock.toggleAttribute(
-            'data-visible',
-            !entry.isIntersecting && entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0),
-          ),
+        ([entry]) => dock.toggleAttribute('data-visible', !entry.isIntersecting && entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0)),
         // The bar is 72px (--spacing-header): the title counts as gone once it is under it.
         { rootMargin: '-72px 0px 0px 0px' },
-      ).observe(title);
+      ).observe(title)
     }
   }
 </script>

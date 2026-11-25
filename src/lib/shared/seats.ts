@@ -4,19 +4,19 @@
  */
 
 /** Taken seats as a share of all seats (0–1), or `null` when there is nothing to show (a past evening, no seats). */
-export const seatFill = (seats: { total: number; free: number } | null): number | null => {
-  if (!seats || seats.total < 1) return null;
+export const seatFill = (seats: { total: number, free: number } | null): number | null => {
+  if (!seats || seats.total < 1) return null
 
-  const free = Math.min(Math.max(seats.free, 0), seats.total);
+  const free = Math.min(Math.max(seats.free, 0), seats.total)
 
-  return (seats.total - free) / seats.total;
-};
+  return (seats.total - free) / seats.total
+}
 
 /** One chair on the ring: its centre in a 100 × 100 box and whether someone sits there. */
 export interface SeatDot {
-  x: number;
-  y: number;
-  taken: boolean;
+  x: number
+  y: number
+  taken: boolean
 }
 
 /**
@@ -26,24 +26,24 @@ export interface SeatDot {
  * the ring. `null` when there is nothing to show.
  */
 export const seatDots = (
-  seats: { total: number; free: number } | null,
+  seats: { total: number, free: number } | null,
   radius = 40,
-): { dots: SeatDot[]; r: number; free: number } | null => {
-  const fill = seatFill(seats);
+): { dots: SeatDot[], r: number, free: number } | null => {
+  const fill = seatFill(seats)
 
-  if (fill === null || !seats) return null;
+  if (fill === null || !seats) return null
 
-  const total = Math.min(seats.total, 48);
-  const taken = Math.round(fill * total);
-  const round = (n: number) => Math.round(n * 100) / 100;
+  const total = Math.min(seats.total, 48)
+  const taken = Math.round(fill * total)
+  const round = (n: number) => Math.round(n * 100) / 100
 
   const dots = Array.from({ length: total }, (_, i) => {
-    const angle = (i / total) * 2 * Math.PI - Math.PI / 2;
+    const angle = (i / total) * 2 * Math.PI - Math.PI / 2
 
-    return { x: round(50 + radius * Math.cos(angle)), y: round(50 + radius * Math.sin(angle)), taken: i < taken };
-  });
+    return { x: round(50 + radius * Math.cos(angle)), y: round(50 + radius * Math.sin(angle)), taken: i < taken }
+  })
 
-  const spacing = (2 * Math.PI * radius) / total;
+  const spacing = (2 * Math.PI * radius) / total
 
-  return { dots, r: round(Math.min(6.5, spacing * 0.3)), free: seats.total - Math.round(fill * seats.total) };
-};
+  return { dots, r: round(Math.min(6.5, spacing * 0.3)), free: seats.total - Math.round(fill * seats.total) }
+}

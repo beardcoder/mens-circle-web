@@ -39,9 +39,9 @@ export const BRAND = {
   bone: '#ebdfcd',
   boneSoft: '#cdbca4',
   boneMuted: '#b6a48d',
-} as const;
+} as const
 
 /** Shades only the mails use (the footer's rule on the forest). */
 export const MAIL = {
   footerLine: '#2c2218',
-} as const;
+} as const

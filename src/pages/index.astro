@@ -1,38 +1,39 @@
 ---
-import site from '@data/site.json';
-import { PUBLIC_CACHE, readPublicEvents, readPublicTestimonials } from '@lib/server/public-data';
-import { eventSeriesSchema } from '@lib/shared/event-schema';
+import site from '@data/site.json'
+import { PUBLIC_CACHE, readPublicEvents, readPublicTestimonials } from '@lib/server/public-data'
+import { eventSeriesSchema } from '@lib/shared/event-schema'
 
-import avatar from '../assets/images/markus-avatar-192.webp';
-import circle480 from '../assets/images/markus-kreis-480.avif';
-import circle720 from '../assets/images/markus-kreis-720.avif';
-import circle960 from '../assets/images/markus-kreis-960.avif';
-import ActionBar from '../components/blocks/ActionBar.astro';
-import Dates from '../components/blocks/Dates.astro';
-import Fact from '../components/blocks/Fact.astro';
-import Faq from '../components/blocks/Faq.astro';
-import Frame from '../components/blocks/Frame.astro';
-import Hero from '../components/blocks/Hero.astro';
-import Intro from '../components/blocks/Intro.astro';
-import JourneyStep from '../components/blocks/JourneyStep.astro';
-import JourneySteps from '../components/blocks/JourneySteps.astro';
-import Moderator from '../components/blocks/Moderator.astro';
-import Newsletter from '../components/blocks/Newsletter.astro';
-import Statement from '../components/blocks/Statement.astro';
-import Testimonials from '../components/blocks/Testimonials.astro';
-import AccordionItem from '../components/ui/AccordionItem.astro';
-import Layout from '../layouts/Layout.astro';
+import avatar from '../assets/images/markus-avatar-192.webp'
+import circle480 from '../assets/images/markus-kreis-480.avif'
+import circle720 from '../assets/images/markus-kreis-720.avif'
+import circle960 from '../assets/images/markus-kreis-960.avif'
+import ActionBar from '../components/blocks/ActionBar.astro'
+import Dates from '../components/blocks/Dates.astro'
+import Fact from '../components/blocks/Fact.astro'
+import Faq from '../components/blocks/Faq.astro'
+import Frame from '../components/blocks/Frame.astro'
+import Hero from '../components/blocks/Hero.astro'
+import Intro from '../components/blocks/Intro.astro'
+import JourneyStep from '../components/blocks/JourneyStep.astro'
+import JourneySteps from '../components/blocks/JourneySteps.astro'
+import Moderator from '../components/blocks/Moderator.astro'
+import Newsletter from '../components/blocks/Newsletter.astro'
+import Statement from '../components/blocks/Statement.astro'
+import Testimonials from '../components/blocks/Testimonials.astro'
+import AccordionItem from '../components/ui/AccordionItem.astro'
+import Layout from '../layouts/Layout.astro'
 
 // Rendered on a route-cache miss; actions purge the cache when the data changes.
-const [events, testimonials] = await Promise.all([readPublicEvents(), readPublicTestimonials()]);
+const [events, testimonials] = await Promise.all([readPublicEvents(), readPublicTestimonials()])
 
-if (!events) Astro.response.status = 503;
+if (!events) Astro.response.status = 503
 
 // A partial page is shown, but never stored.
 if (events && testimonials) {
-  Astro.cache.set(PUBLIC_CACHE);
-} else {
-  Astro.response.headers.set('Cache-Control', 'no-store');
+  Astro.cache.set(PUBLIC_CACHE)
+}
+else {
+  Astro.response.headers.set('Cache-Control', 'no-store')
 }
 ---
 
@@ -51,7 +52,11 @@ if (events && testimonials) {
     imageAlt="Markus Sommer sitzt auf einem Felsen und blickt in der Abendsonne über den Bayerischen Wald."
   >
     <Fragment slot="title">
-      Ein Abend, an dem du <em>nichts darstellen</em> musst.
+      Ein Abend, an dem du
+      {' '}
+      <em>nichts darstellen</em>
+      {' '}
+      musst.
     </Fragment>
     Wir sitzen im Kreis und sprechen über das, was uns gerade beschäftigt. Die anderen hören zu, ohne zu bewerten.
   </Hero>
@@ -97,7 +102,9 @@ if (events && testimonials) {
   </Intro>
 
   <Statement>
-    Einen besonderen Grund zu kommen brauchst du nicht. Manchmal reicht <em>Neugier.</em>
+    Einen besonderen Grund zu kommen brauchst du nicht. Manchmal reicht
+    {' '}
+    <em>Neugier.</em>
   </Statement>
 
   <JourneySteps
@@ -131,9 +138,7 @@ if (events && testimonials) {
   <Frame
     anchor="rahmen"
     title="Was wir vereinbaren"
-    intro={
-      'Fünf Absprachen gelten an jedem Abend. Wir gehen sie gemeinsam durch, und jeder sagt, ob er sie mitträgt. Mit ihnen fällt es leichter, offen zu sprechen.'
-    }
+    intro="Fünf Absprachen gelten an jedem Abend. Wir gehen sie gemeinsam durch, und jeder sagt, ob er sie mitträgt. Mit ihnen fällt es leichter, offen zu sprechen."
     agreements={[
       {
         title: 'Vertraulichkeit',
@@ -157,9 +162,7 @@ if (events && testimonials) {
       },
     ]}
     boundaryTitle="Gut zu wissen"
-    boundaryText={
-      'Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Es gibt im Kreis keine Lehre und kein festes Bild davon, wie ein Mann zu sein hat.'
-    }
+    boundaryText="Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Es gibt im Kreis keine Lehre und kein festes Bild davon, wie ein Mann zu sein hat."
   />
 
   <Moderator
@@ -239,7 +242,7 @@ if (events && testimonials) {
   <Dates
     events={events}
     anchor="termine"
-    lede={'Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin.'}
+    lede="Wähle einen Abend, der für dich passt. Treffpunkt, Beitrag und Anmeldung findest du beim jeweiligen Termin."
     title="Dabei sein."
   />
 

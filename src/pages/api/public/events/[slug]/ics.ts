@@ -5,19 +5,19 @@
  * the Calendar app ("Hinzufügen"), but cannot open a `data:` link or honour
  * `download`. It carries the venue's full address, which the event page shows too.
  */
-import type { APIRoute } from 'astro';
+import type { APIRoute } from 'astro'
 
-import { fetchEventState } from '@lib/server/content';
-import { buildIcs, calendarEventFrom } from '@lib/shared/ics';
+import { fetchEventState } from '@lib/server/content'
+import { buildIcs, calendarEventFrom } from '@lib/shared/ics'
 
-export const prerender = false;
+export const prerender = false
 
 export const GET: APIRoute = async ({ params, site }) => {
-  const slug = params.slug;
-  const { event } = slug ? await fetchEventState(slug) : { event: null };
-  const ics = event ? buildIcs(calendarEventFrom(event, site ?? 'https://mens-circle.de')) : '';
+  const slug = params.slug
+  const { event } = slug ? await fetchEventState(slug) : { event: null }
+  const ics = event ? buildIcs(calendarEventFrom(event, site ?? 'https://mens-circle.de')) : ''
 
-  if (!ics) return new Response('Not found', { status: 404, headers: { 'cache-control': 'no-store' } });
+  if (!ics) return new Response('Not found', { status: 404, headers: { 'cache-control': 'no-store' } })
 
   return new Response(ics, {
     status: 200,
@@ -25,5 +25,5 @@ export const GET: APIRoute = async ({ params, site }) => {
       'content-type': 'text/calendar; charset=utf-8',
       'content-disposition': `inline; filename="maennerkreis-${slug}.ics"`,
     },
-  });
-};
+  })
+}

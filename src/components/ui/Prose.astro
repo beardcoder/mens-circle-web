@@ -5,15 +5,15 @@
  * descendant variants, for both slotted markup and HTML strings.
  */
 interface Props {
-  html?: string;
+  html?: string
   /** `measure` a line of running text (~62 characters); `column` the wider reading column of the legal pages. */
-  width?: 'measure' | 'column';
-  class?: string;
+  width?: 'measure' | 'column'
+  class?: string
 }
 
-const { html, width = 'measure', class: className }: Props = Astro.props;
+const { html, width = 'measure', class: className }: Props = Astro.props
 
-const WIDTHS = { measure: 'max-w-measure', column: 'max-w-column' } as const;
+const WIDTHS = { measure: 'max-w-measure', column: 'max-w-column' } as const
 
 const PROSE = [
   WIDTHS[width],
@@ -26,11 +26,14 @@ const PROSE = [
   '[&_ul]:mb-[1.15em] [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mb-[1.15em] [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-2 [&_li]:pl-1 [&_li::marker]:text-fg-muted',
   '[&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-fill [&_blockquote]:pl-6 [&_blockquote]:font-display [&_blockquote]:text-quote [&_blockquote]:text-fg',
   '[&_table]:my-6 [&_table]:w-full [&_td]:border-b [&_td]:border-line [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm [&_th]:border-b [&_th]:border-line [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&_th]:text-fg',
-];
+]
 ---
 
 {html !== undefined ? (
-  <div class:list={[PROSE, className]} set:html={html} />
+  <div
+    class:list={[PROSE, className]}
+    set:html={html}
+  />
 ) : (
   <div class:list={[PROSE, className]}>
     <slot />

@@ -5,24 +5,24 @@
  * title or a step that already says its place; hidden from assistive technology.
  */
 interface Props {
-  value: number;
-  tone?: 'accent' | 'spark';
+  value: number
+  tone?: 'accent' | 'spark'
   /** `index` in the margin; `sub` above a short item in a list. */
-  size?: 'index' | 'sub';
-  class?: string;
+  size?: 'index' | 'sub'
+  class?: string
 }
 
 const SIZES = {
   index: 'text-index',
   sub: 'text-sub',
-} as const;
+} as const
 
 const TONES = {
   accent: 'text-accent',
   spark: 'text-spark',
-} as const;
+} as const
 
-const { value, tone = 'accent', size = 'index', class: className } = Astro.props;
+const { value, tone = 'accent', size = 'index', class: className } = Astro.props
 ---
 
 <span

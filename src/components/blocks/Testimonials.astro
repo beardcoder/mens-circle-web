@@ -1,37 +1,42 @@
 ---
-import type { TestimonialDTO } from '@lib/shared/dto';
-import { margin } from '@lib/ui';
+import type { TestimonialDTO } from '@lib/shared/dto'
+import { margin } from '@lib/ui'
 
-import Section from '../ui/Section.astro';
-import SectionHead from '../ui/SectionHead.astro';
-import TextLink from '../ui/TextLink.astro';
-import TestimonialList from './TestimonialList.astro';
+import Section from '../ui/Section.astro'
+import SectionHead from '../ui/SectionHead.astro'
+import TextLink from '../ui/TextLink.astro'
+import TestimonialList from './TestimonialList.astro'
 
 interface Props {
-  items: TestimonialDTO[] | null;
-  anchor: string;
-  eyebrow?: string;
-  title: string;
-  emptyText: string;
-  errorText: string;
-  linkUrl: string;
-  linkLabel: string;
+  items: TestimonialDTO[] | null
+  anchor: string
+  eyebrow?: string
+  title: string
+  emptyText: string
+  errorText: string
+  linkUrl: string
+  linkLabel: string
 }
 
-const { items, anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel } = Astro.props;
+const { items, anchor, eyebrow, title, emptyText, errorText, linkUrl, linkLabel } = Astro.props
 ---
 
 {/* On the forest, like the agreements: what men said after an evening. */}
-<Section id={anchor} ground="dark" labelledby="testimonials-title">
+<Section
+  id={anchor}
+  ground="dark"
+  labelledby="testimonials-title"
+>
   <div class:list={[margin.grid, 'gap-y-group']}>
-    <SectionHead eyebrow={eyebrow} title={title} titleId="testimonials-title" class={margin.cross} />
+    <SectionHead
+      eyebrow={eyebrow}
+      title={title}
+      titleId="testimonials-title"
+      class={margin.cross}
+    />
 
     <div class="lg:col-span-12">
-      {items?.length ? (
-        <TestimonialList items={items} />
-      ) : (
-        <p class:list={[margin.reading, 'text-md text-fg-soft']}>{items ? emptyText : errorText}</p>
-      )}
+      {items?.length ? <TestimonialList items={items} /> : <p class:list={[margin.reading, 'text-md text-fg-soft']}>{items ? emptyText : errorText}</p>}
     </div>
     <p class={margin.content}>
       <TextLink href={linkUrl}>{linkLabel}</TextLink>

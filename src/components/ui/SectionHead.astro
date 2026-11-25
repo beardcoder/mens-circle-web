@@ -1,32 +1,45 @@
 ---
-import Eyebrow from './Eyebrow.astro';
+import Eyebrow from './Eyebrow.astro'
 
 /** A section heading, with an optional label and lead. Page titles use PageIntro. */
 interface Props {
-  eyebrow?: string;
-  title?: string;
-  titleId?: string;
-  lead?: string;
+  eyebrow?: string
+  title?: string
+  titleId?: string
+  lead?: string
   /** The lead holds trusted HTML from the content files (e.g. a link). */
-  leadHtml?: boolean;
-  size?: 'section' | 'sub';
-  class?: string;
+  leadHtml?: boolean
+  size?: 'section' | 'sub'
+  class?: string
 }
 
-const { eyebrow, title, titleId, lead, leadHtml = false, size = 'section', class: className }: Props = Astro.props;
+const { eyebrow, title, titleId, lead, leadHtml = false, size = 'section', class: className }: Props = Astro.props
 
-const leadClass =
-  'mt-6 max-w-measure text-lg text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong';
+const leadClass = 'mt-6 max-w-measure text-lg text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px] [&_a:hover]:text-accent-strong'
 
-const titleClass = ['max-w-[14.4em] text-fg wrap-anywhere hyphens-auto', size === 'sub' ? 'text-sub' : 'text-section'];
+const titleClass = ['max-w-[14.4em] text-fg wrap-anywhere hyphens-auto', size === 'sub' ? 'text-sub' : 'text-section']
 ---
 
-<div data-reveal-group class:list={['grid content-start justify-items-start', className]}>
+<div
+  data-reveal-group
+  class:list={['grid content-start justify-items-start', className]}
+>
   {eyebrow && <Eyebrow class="mb-4">{eyebrow}</Eyebrow>}
   {title && (
-    <h2 id={titleId} class:list={titleClass}>
+    <h2
+      id={titleId}
+      class:list={titleClass}
+    >
       {title}
     </h2>
   )}
-  {lead && (leadHtml ? <p class:list={leadClass} set:html={lead} /> : <p class:list={leadClass}>{lead}</p>)}
+  {lead &&
+    (leadHtml ? (
+      <p
+        class:list={leadClass}
+        set:html={lead}
+      />
+    ) : (
+      <p class:list={leadClass}>{lead}</p>
+    ))}
 </div>

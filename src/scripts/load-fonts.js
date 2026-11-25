@@ -4,5 +4,5 @@
 // swap in a frame later and the whole page is styled and laid out again, during
 // a page transition while the page slides in.
 document.fonts.forEach((face) => {
-  if (face.style === 'normal' && face.status === 'unloaded') face.load().catch(() => {});
-});
+  if (face.style === 'normal' && face.status === 'unloaded') face.load().catch(() => {})
+})

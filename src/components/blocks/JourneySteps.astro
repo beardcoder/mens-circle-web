@@ -1,29 +1,52 @@
 ---
-import { margin } from '@lib/ui';
+import { margin } from '@lib/ui'
 
-import Prose from '../ui/Prose.astro';
-import Section from '../ui/Section.astro';
-import SectionHead from '../ui/SectionHead.astro';
+import Prose from '../ui/Prose.astro'
+import Section from '../ui/Section.astro'
+import SectionHead from '../ui/SectionHead.astro'
 
 interface Props {
-  anchor: string;
-  eyebrow?: string;
-  title: string;
-  subtitle: string;
+  anchor: string
+  eyebrow?: string
+  title: string
+  subtitle: string
 }
 
-const { anchor, eyebrow, title, subtitle } = Astro.props;
+const { anchor, eyebrow, title, subtitle } = Astro.props
 ---
 
 {/* The evening from beginning to end on the sand: the steps one under the other, each
     with its index number in the margin, read like a short text. */}
-<Section id={anchor} ground="alt" labelledby="ablauf-title">
-  <div itemscope itemtype="https://schema.org/ItemList" class:list={[margin.grid, 'gap-y-group']}>
-    <meta itemprop="name" content={title} />
-    <meta itemprop="description" content={subtitle} />
-    <SectionHead eyebrow={eyebrow} title={title} titleId="ablauf-title" lead={subtitle} class={margin.cross} />
+<Section
+  id={anchor}
+  ground="alt"
+  labelledby="ablauf-title"
+>
+  <div
+    itemscope
+    itemtype="https://schema.org/ItemList"
+    class:list={[margin.grid, 'gap-y-group']}
+  >
+    <meta
+      itemprop="name"
+      content={title}
+    />
+    <meta
+      itemprop="description"
+      content={subtitle}
+    />
+    <SectionHead
+      eyebrow={eyebrow}
+      title={title}
+      titleId="ablauf-title"
+      lead={subtitle}
+      class={margin.cross}
+    />
 
-    <ol role="list" class="grid lg:col-span-12">
+    <ol
+      role="list"
+      class="grid lg:col-span-12"
+    >
       <slot name="steps" />
     </ol>
 

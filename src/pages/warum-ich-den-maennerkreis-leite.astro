@@ -1,21 +1,21 @@
 ---
-import { Image } from 'astro:assets';
+import { Image } from 'astro:assets'
 
-import { canonicalUrl } from '@lib/canonical';
-import { breadcrumbSchema } from '@lib/shared/event-schema';
+import { canonicalUrl } from '@lib/canonical'
+import { breadcrumbSchema } from '@lib/shared/event-schema'
 
-import photo from '../assets/images/markus-sommer.jpg';
-import Cta from '../components/blocks/Cta.astro';
-import Faq from '../components/blocks/Faq.astro';
-import TextSection from '../components/blocks/TextSection.astro';
-import ValueItems from '../components/blocks/ValueItems.astro';
-import PageIntro from '../components/PageIntro.astro';
-import AccordionItem from '../components/ui/AccordionItem.astro';
-import Layout from '../layouts/Layout.astro';
+import photo from '../assets/images/markus-sommer.jpg'
+import Cta from '../components/blocks/Cta.astro'
+import Faq from '../components/blocks/Faq.astro'
+import TextSection from '../components/blocks/TextSection.astro'
+import ValueItems from '../components/blocks/ValueItems.astro'
+import PageIntro from '../components/PageIntro.astro'
+import AccordionItem from '../components/ui/AccordionItem.astro'
+import Layout from '../layouts/Layout.astro'
 
-export const prerender = true;
+export const prerender = true
 
-const siteUrl = Astro.site!;
+const siteUrl = Astro.site!
 const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
 ---
 
@@ -38,19 +38,19 @@ const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
       '@context': 'https://schema.org',
       '@type': 'Article',
       '@id': `${canonical}#article`,
-      url: canonical,
-      mainEntityOfPage: canonical,
-      headline: 'Warum ich den Männerkreis leite',
-      description:
+      'url': canonical,
+      'mainEntityOfPage': canonical,
+      'headline': 'Warum ich den Männerkreis leite',
+      'description':
         'Markus Sommer erzählt, warum er den Männerkreis in Straubing gegründet hat und wie er die Abende leitet.',
-      image: new URL('/images/og-markus.png?v=11', siteUrl).href,
-      inLanguage: 'de-DE',
-      datePublished: '2026-06-20',
-      dateModified: '2026-10-21',
-      author: { '@id': `${siteUrl.origin}/#markus` },
-      publisher: { '@id': `${siteUrl.origin}/#organization` },
-      isPartOf: { '@id': `${siteUrl.origin}/#website` },
-      about: { '@id': `${siteUrl.origin}/#organization` },
+      'image': new URL('/images/og-markus.png?v=11', siteUrl).href,
+      'inLanguage': 'de-DE',
+      'datePublished': '2026-06-20',
+      'dateModified': '2026-10-21',
+      'author': { '@id': `${siteUrl.origin}/#markus` },
+      'publisher': { '@id': `${siteUrl.origin}/#organization` },
+      'isPartOf': { '@id': `${siteUrl.origin}/#website` },
+      'about': { '@id': `${siteUrl.origin}/#organization` },
     },
   ]}
 >

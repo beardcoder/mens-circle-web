@@ -1,20 +1,20 @@
 ---
-import '../styles/global.css';
+import '../styles/global.css'
 
-import { Font } from 'astro:assets';
-import type { ComponentProps } from 'astro/types';
+import { Font } from 'astro:assets'
+import type { ComponentProps } from 'astro/types'
 
-import BackToTop from '../components/BackToTop.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import SeoHead from '../components/SeoHead.astro';
-import { bootScript, fontScript, speculationRules } from '../scripts/inline';
+import BackToTop from '../components/BackToTop.astro'
+import Footer from '../components/Footer.astro'
+import Header from '../components/Header.astro'
+import SeoHead from '../components/SeoHead.astro'
+import { bootScript, fontScript, speculationRules } from '../scripts/inline'
 
 type Props = ComponentProps<typeof SeoHead> & {
-  headerAction?: ComponentProps<typeof Header>['action'];
+  headerAction?: ComponentProps<typeof Header>['action']
   /** The page opens on the forest (the home opening): the bar starts clear over it. */
-  overHero?: boolean;
-};
+  overHero?: boolean
+}
 
 const { headerAction, overHero = false, ...props } = Astro.props;
 ---

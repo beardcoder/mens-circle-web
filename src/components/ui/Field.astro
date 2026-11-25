@@ -1,5 +1,5 @@
 ---
-import { fieldError, fieldHint, fieldLabel } from '@lib/ui';
+import { fieldError, fieldHint, fieldLabel } from '@lib/ui'
 
 /**
  * A form field: the visible label, the control (slot), an optional hint and the
@@ -8,33 +8,43 @@ import { fieldError, fieldHint, fieldLabel } from '@lib/ui';
  */
 interface Props {
   /** The control's id. */
-  for: string;
-  label: string;
-  optional?: boolean;
-  hint?: string;
-  hintId?: string;
-  errorId?: string;
+  for: string
+  label: string
+  optional?: boolean
+  hint?: string
+  hintId?: string
+  errorId?: string
   /** A message the server already knows (a form posted without JavaScript). */
-  error?: string;
-  class?: string;
+  error?: string
+  class?: string
 }
 
-const { for: htmlFor, label, optional = false, hint, hintId, errorId, error = '', class: className } = Astro.props;
+const { for: htmlFor, label, optional = false, hint, hintId, errorId, error = '', class: className } = Astro.props
 ---
 
 <div class={className}>
-  <label for={htmlFor} class={fieldLabel}>
+  <label
+    for={htmlFor}
+    class={fieldLabel}
+  >
     {label}
     {optional && <span class="font-normal text-fg-muted"> (optional)</span>}
   </label>
   <slot />
   {hint && (
-    <span id={hintId} class={fieldHint}>
+    <span
+      id={hintId}
+      class={fieldHint}
+    >
       {hint}
     </span>
   )}
   {errorId && (
-    <span id={errorId} class={fieldError} hidden={!error}>
+    <span
+      id={errorId}
+      class={fieldError}
+      hidden={!error}
+    >
       {error}
     </span>
   )}

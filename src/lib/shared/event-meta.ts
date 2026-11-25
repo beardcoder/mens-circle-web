@@ -1,141 +1,142 @@
 /** Share and search metadata for one event. */
-import site from '../../data/site.json';
-import type { EventDTO } from './dto';
-import { formatDateLong, formatDayMonthYear, formatTimeRange } from './time';
+import site from '../../data/site.json'
+import type { EventDTO } from './dto'
+import { formatDateLong, formatDayMonthYear, formatTimeRange } from './time'
 
 /** Chat previews show more than a SERP's ~160 chars, so budget for the preview. */
-const DESCRIPTION_LIMIT = 200;
+const DESCRIPTION_LIMIT = 200
 /** What a SERP shows of a <title>. */
-const TITLE_LIMIT = 60;
+const TITLE_LIMIT = 60
 
 /** Strip inline HTML so a value is safe as plain text. */
 export function stripHtml(value = ''): string {
-  let previous: string;
-  let out = value;
+  let previous: string
+  let out = value
 
   do {
-    previous = out;
-    out = out.replace(/<[^>]*>/g, '');
-  } while (out !== previous);
+    previous = out
+    out = out.replace(/<[^>]*>/g, '')
+  } while (out !== previous)
 
   // ASCII whitespace only: a no-break space binds a dash to its word on purpose.
-  return out.replace(/[ \t\r\n]+/g, ' ').trim();
+  return out.replace(/[ \t\r\n]+/g, ' ').trim()
 }
 
 /** Cut to `limit` on a word boundary. */
 function truncate(text: string, limit = DESCRIPTION_LIMIT): string {
-  if (text.length <= limit) return text;
+  if (text.length <= limit) return text
 
-  const cut = text.slice(0, limit - 1);
-  const space = cut.lastIndexOf(' ');
-  const kept = space > limit / 2 ? cut.slice(0, space) : cut;
+  const cut = text.slice(0, limit - 1)
+  const space = cut.lastIndexOf(' ')
+  const kept = space > limit / 2 ? cut.slice(0, space) : cut
 
-  return `${kept.replace(/[\s.,;:–-]+$/, '')}…`;
+  return `${kept.replace(/[\s.,;:–-]+$/, '')}…`
 }
 
 /** The event's own title, or the circle's name when it was left empty. */
-export const eventName = (event: EventDTO): string => stripHtml(event.title) || site.siteName;
+export const eventName = (event: EventDTO): string => stripHtml(event.title) || site.siteName
 
 /** City, then venue name, then home town. */
 export const eventPlace = (event: EventDTO): string =>
-  event.city?.trim() || event.location?.trim() || site.geo.locality;
+  event.city?.trim() || event.location?.trim() || site.geo.locality
 
 /** "Freitag, 16. Oktober 2026, 19:00–21:30 Uhr", or empty without a date and time. */
 const eventWhen = (event: EventDTO): string =>
-  [formatDateLong(event.event_date), formatTimeRange(event.start_time, event.end_time)].filter(Boolean).join(', ');
+  [formatDateLong(event.event_date), formatTimeRange(event.start_time, event.end_time)].filter(Boolean).join(', ')
 
 /** The single line answering "when and where" for a forwarded link. */
 export const eventWhenWhere = (event: EventDTO): string => {
-  const when = eventWhen(event);
-  const place = eventPlace(event);
+  const when = eventWhen(event)
+  const place = eventPlace(event)
 
-  return when ? `${when} in ${place}` : `Männerkreis in ${place}`;
-};
+  return when ? `${when} in ${place}` : `Männerkreis in ${place}`
+}
 
 /** The seat situation, in the words the registration section uses. */
 function statusSentence(event: EventDTO): string {
-  if (event.is_past) return 'Dieser Abend hat bereits stattgefunden.';
+  if (event.is_past) return 'Dieser Abend hat bereits stattgefunden.'
 
-  if (event.is_full) return 'Der Abend ist ausgebucht.';
+  if (event.is_full) return 'Der Abend ist ausgebucht.'
 
   if (event.max_participants > 0 && event.available_spots > 0) {
-    return `Noch ${event.available_spots} von ${event.max_participants} Plätzen frei.`;
+    return `Noch ${event.available_spots} von ${event.max_participants} Plätzen frei.`
   }
 
-  return 'Anmeldung online, ohne Vorerfahrung.';
+  return 'Anmeldung online, ohne Vorerfahrung.'
 }
 
 /** Terminate a fragment: the description parts are joined with a plain space,
  *  so a missing full stop would run two facts together. */
-const asSentence = (text: string): string => (/[.!?…]$/.test(text) ? text : `${text}.`);
+const asSentence = (text: string): string => (/[.!?…]$/.test(text) ? text : `${text}.`)
 
 /** Closing clause: the event's own text, else its fee, else the evergreen line. */
 function tailSentence(event: EventDTO): string {
   const own = stripHtml(event.description)
     .split(/(?<=[.!?])\s/)[0]
-    ?.trim();
+    ?.trim()
 
-  if (own) return asSentence(own);
+  if (own) return asSentence(own)
 
-  const fee = event.cost_basis?.trim();
+  const fee = event.cost_basis?.trim()
 
-  return fee ? asSentence(fee) : 'Auf Spendenbasis und ohne Vorerfahrung.';
+  return fee ? asSentence(fee) : 'Auf Spendenbasis und ohne Vorerfahrung.'
 }
 
 /** Two facts a card can render as labelled fields (Slack and X both do). */
-function shareDetails(event: EventDTO): { label: string; value: string }[] {
+function shareDetails(event: EventDTO): { label: string, value: string }[] {
   return [
     { label: event.is_past ? 'Termin (vorbei)' : 'Termin', value: eventWhen(event) || 'Termin folgt' },
     { label: 'Ort', value: eventPlace(event) },
-  ];
+  ]
 }
 
 /** Optional admin-supplied image, added to the JSON-LD only. */
 function adminImage(event: EventDTO, siteUrl: URL): string | null {
-  const raw = event.image_url?.trim();
+  const raw = event.image_url?.trim()
 
-  if (!raw) return null;
+  if (!raw) return null
 
   try {
-    const resolved = new URL(raw, siteUrl);
+    const resolved = new URL(raw, siteUrl)
 
-    return resolved.protocol === 'https:' || resolved.protocol === 'http:' ? resolved.href : null;
-  } catch {
-    return null;
+    return resolved.protocol === 'https:' || resolved.protocol === 'http:' ? resolved.href : null
+  }
+  catch {
+    return null
   }
 }
 
 export interface EventMeta {
-  title: string;
+  title: string
   /** No SERP length pressure, so this carries the weekday and place too. */
-  ogTitle: string;
+  ogTitle: string
   /** Shared by `<meta name="description">`, `og:description` and the JSON-LD. */
-  description: string;
-  image: string;
-  imageAlt: string;
+  description: string
+  image: string
+  imageAlt: string
   /** Structured data only, never the share card. */
-  extraImage: string | null;
+  extraImage: string | null
   /** Fields for `twitter:label1/data1` and `label2/data2`. */
-  details: { label: string; value: string }[];
+  details: { label: string, value: string }[]
 }
 
 export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
-  const name = eventName(event);
-  const place = eventPlace(event);
-  const day = formatDayMonthYear(event.event_date);
-  const longDate = formatDateLong(event.event_date);
+  const name = eventName(event)
+  const place = eventPlace(event)
+  const day = formatDayMonthYear(event.event_date)
+  const longDate = formatDateLong(event.event_date)
   // One static 1200×630 poster for every event — SeoHead's default image.
-  const image = new URL('/images/og-default.png?v=12', siteUrl).href;
+  const image = new URL('/images/og-default.png?v=12', siteUrl).href
 
   // Only append the brand when the title does not already carry it — saying the
   // name twice eats the 60 chars a SERP shows.
-  const brand = name.toLowerCase().includes(site.siteName.toLowerCase()) ? '' : ` – ${site.siteName}`;
+  const brand = name.toLowerCase().includes(site.siteName.toLowerCase()) ? '' : ` – ${site.siteName}`
 
   // Held outside the home town, the place is what a local search asks for: it goes
   // into the title, and the brand stays only while both fit (WebSite names the site).
-  const elsewhere = place.toLowerCase() !== site.geo.locality.toLowerCase();
-  const base = day ? `${name} am ${day}${elsewhere ? ` in ${place}` : ''}` : name;
-  const title = !elsewhere || `${base}${brand}`.length <= TITLE_LIMIT ? `${base}${brand}` : base;
+  const elsewhere = place.toLowerCase() !== site.geo.locality.toLowerCase()
+  const base = day ? `${name} am ${day}${elsewhere ? ` in ${place}` : ''}` : name
+  const title = !elsewhere || `${base}${brand}`.length <= TITLE_LIMIT ? `${base}${brand}` : base
 
   return {
     title,
@@ -147,5 +148,5 @@ export function buildEventMeta(event: EventDTO, siteUrl: URL): EventMeta {
     imageAlt: site.siteName,
     extraImage: adminImage(event, siteUrl),
     details: shareDetails(event),
-  };
+  }
 }

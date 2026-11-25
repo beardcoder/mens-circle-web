@@ -1,30 +1,26 @@
 ---
 interface Props {
-  label: string;
+  label: string
   /** `column`: one of a row of facts, label over value. `row`: one line of a list, the label in front. */
-  layout?: 'column' | 'row';
+  layout?: 'column' | 'row'
   /** Shown from `lg` only: where a narrow page already says the fact elsewhere. */
-  wideOnly?: boolean;
+  wideOnly?: boolean
 }
 
-const { label, layout = 'column', wideOnly = false } = Astro.props;
-const row = layout === 'row';
-const hasNote = Astro.slots.has('default');
+const { label, layout = 'column', wideOnly = false } = Astro.props
+const row = layout === 'row'
+const hasNote = Astro.slots.has('default')
 
-const shape = row
-  ? 'grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 py-5 sm:grid-cols-[6rem_minmax(0,1fr)]'
-  : 'content-start pt-5';
+const shape = row ? 'grid-cols-[4.5rem_minmax(0,1fr)] gap-x-4 py-5 sm:grid-cols-[6rem_minmax(0,1fr)]' : 'content-start pt-5'
 ---
 
 {/* A fact under a thin rule: its label, the value in Vollkorn, a note. No icon and no box. */}
-<div data-reveal class:list={['min-w-0 border-t border-line-strong', shape, wideOnly ? 'hidden lg:grid' : 'grid']}>
+<div
+  data-reveal
+  class:list={['min-w-0 border-t border-line-strong', shape, wideOnly ? 'hidden lg:grid' : 'grid']}
+>
   <dt class:list={['text-sm font-semibold text-fg-muted', row && 'pt-1']}>{label}</dt>
-  <dd
-    class:list={[
-      'font-display text-xl text-balance text-fg',
-      row ? 'min-w-0' : 'mt-2 sm:text-sub lg:text-xl xl:text-sub',
-    ]}
-  >
+  <dd class:list={['font-display text-xl text-balance text-fg', row ? 'min-w-0' : 'mt-2 sm:text-sub lg:text-xl xl:text-sub']}>
     <slot name="value" />
   </dd>
   {hasNote && (

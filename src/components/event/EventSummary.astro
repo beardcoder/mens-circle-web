@@ -1,16 +1,16 @@
 ---
-import type { SummaryView } from '@lib/shared/event-status';
-import { button, label } from '@lib/ui';
+import type { SummaryView } from '@lib/shared/event-status'
+import { button, label } from '@lib/ui'
 
-import SeatRing from '../brand/SeatRing.astro';
+import SeatRing from '../brand/SeatRing.astro'
 
 interface Props {
-  view: SummaryView;
-  showAction?: boolean;
-  location?: string;
+  view: SummaryView
+  showAction?: boolean
+  location?: string
 }
 
-const { view, showAction = true, location } = Astro.props;
+const { view, showAction = true, location } = Astro.props
 
 /** With seats to show, the seats become the ring; a past evening keeps them in words. */
 const rows = [
@@ -18,7 +18,7 @@ const rows = [
   { label: 'Ort', value: view.facts.place },
   { label: 'Beitrag', value: view.facts.fee },
   ...(view.seats ? [] : [{ label: 'Plätze', value: view.facts.seats }]),
-];
+]
 ---
 
 {/* Open on its ground, no card: the date, the facts as small columns, the seat ring
@@ -45,14 +45,17 @@ const rows = [
       </div>
     ))}
   </dl>
-  {view.seats && <SeatRing seats={view.seats} text={view.facts.seats} class="mt-6" />}
+  {view.seats && (
+    <SeatRing
+      seats={view.seats}
+      text={view.facts.seats}
+      class="mt-6"
+    />
+  )}
   {showAction && view.action && (
     <a
       href={view.action.href}
-      class:list={[
-        button({ variant: view.state === 'full' ? 'secondary' : 'primary', size: 'lg' }),
-        'mt-8 w-fit max-sm:w-full',
-      ]}
+      class:list={[button({ variant: view.state === 'full' ? 'secondary' : 'primary', size: 'lg' }), 'mt-8 w-fit max-sm:w-full']}
       data-umami-event="cta-click"
       data-umami-event-location={location}
       data-umami-event-state={view.state}

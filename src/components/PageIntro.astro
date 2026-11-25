@@ -1,9 +1,9 @@
 ---
-import { afterWords, splitText } from '@lib/shared/words';
+import { afterWords, splitText } from '@lib/shared/words'
 
-import Stamp from './brand/Stamp.astro';
-import Container from './ui/Container.astro';
-import Eyebrow from './ui/Eyebrow.astro';
+import Stamp from './brand/Stamp.astro'
+import Container from './ui/Container.astro'
+import Eyebrow from './ui/Eyebrow.astro'
 
 /**
  * The opening of a sub-page. Without a photograph: on the page's paper, label,
@@ -16,23 +16,23 @@ import Eyebrow from './ui/Eyebrow.astro';
  * once on load (global.css, "The opening").
  */
 interface Props {
-  eyebrow?: string;
-  title: string;
-  id?: string;
-  titleId?: string;
+  eyebrow?: string
+  title: string
+  id?: string
+  titleId?: string
 }
 
-const { eyebrow, title, id, titleId } = Astro.props;
+const { eyebrow, title, id, titleId } = Astro.props
 
-const words = splitText(title);
+const words = splitText(title)
 
-const hasLead = Astro.slots.has('lead');
-const hasAction = Astro.slots.has('default');
-const hasMedia = Astro.slots.has('media');
+const hasLead = Astro.slots.has('lead')
+const hasAction = Astro.slots.has('default')
+const hasMedia = Astro.slots.has('media')
 
 const titleClass = hasMedia
   ? 'max-w-[10.4em] text-hero font-semibold text-fg wrap-anywhere hyphens-auto lg:text-[clamp(5.625rem,8.6vw,9.5rem)]'
-  : 'max-w-[11em] text-page font-semibold text-fg wrap-anywhere hyphens-auto';
+  : 'max-w-[11em] text-page font-semibold text-fg wrap-anywhere hyphens-auto'
 ---
 
 <section
@@ -67,18 +67,34 @@ const titleClass = hasMedia
   <Container class="relative grid">
     <div class="grid justify-items-start">
       {eyebrow && (
-        <Eyebrow class="mb-4" data-enter>
+        <Eyebrow
+          class="mb-4"
+          data-enter
+        >
           {eyebrow}
         </Eyebrow>
       )}
-      <h1 id={titleId} data-enter="words" class={titleClass} set:html={words.html} />
+      <h1
+        id={titleId}
+        data-enter="words"
+        class={titleClass}
+        set:html={words.html}
+      />
       {hasLead && (
-        <div data-enter style={afterWords(words.count, 0)} class="mt-6 max-w-measure text-lg text-fg-soft">
+        <div
+          data-enter
+          style={afterWords(words.count, 0)}
+          class="mt-6 max-w-measure text-lg text-fg-soft"
+        >
           <slot name="lead" />
         </div>
       )}
       {hasAction && (
-        <div data-enter style={afterWords(words.count, 1)} class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div
+          data-enter
+          style={afterWords(words.count, 1)}
+          class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3"
+        >
           <slot />
         </div>
       )}

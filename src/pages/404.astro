@@ -1,10 +1,10 @@
 ---
-import { link } from '@lib/ui';
+import { link } from '@lib/ui'
 
-import PageIntro from '../components/PageIntro.astro';
-import Button from '../components/ui/Button.astro';
-import site from '../data/site.json';
-import Layout from '../layouts/Layout.astro';
+import PageIntro from '../components/PageIntro.astro'
+import Button from '../components/ui/Button.astro'
+import site from '../data/site.json'
+import Layout from '../layouts/Layout.astro'
 
 export const prerender = true;
 ---
@@ -16,7 +16,8 @@ export const prerender = true;
       {site.contactEmail && (
         <>
           {' '}
-          Du vermisst hier etwas?{' '}
+          Du vermisst hier etwas?
+          {' '}
           <a class={link} href={`mailto:${site.contactEmail}`}>
             Schreib mir kurz.
           </a>

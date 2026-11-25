@@ -6,10 +6,10 @@
  * and under reduced motion, it toggles at once.
  */
 interface Props {
-  question: string;
+  question: string
 }
 
-const { question } = Astro.props;
+const { question } = Astro.props
 ---
 
 <details
@@ -36,7 +36,11 @@ const { question } = Astro.props;
       class="relative grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent transition-[background-color,color,rotate,scale] duration-200 ease-out group-active/q:scale-90 item-open:rotate-180 item-open:bg-fill item-open:text-on-fill before:absolute before:h-[1.5px] before:w-3 before:bg-current after:absolute after:h-3 after:w-[1.5px] after:bg-current after:transition-[scale] after:duration-180 item-open:after:scale-y-0"
     />
   </summary>
-  <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
+  <div
+    itemprop="acceptedAnswer"
+    itemscope
+    itemtype="https://schema.org/Answer"
+  >
     <div
       itemprop="text"
       class="max-w-measure pb-7 text-md text-fg-soft [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-[3px]"

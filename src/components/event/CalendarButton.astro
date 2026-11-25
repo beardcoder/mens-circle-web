@@ -1,24 +1,24 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from 'astro-icon/components'
 
-import type { EventDTO } from '@lib/shared/dto';
-import { calendarEventFrom, googleCalendarUrl } from '@lib/shared/ics';
+import type { EventDTO } from '@lib/shared/dto'
+import { calendarEventFrom, googleCalendarUrl } from '@lib/shared/ics'
 
-import Button from '../ui/Button.astro';
+import Button from '../ui/Button.astro'
 
 interface Props {
-  event: EventDTO;
+  event: EventDTO
 }
 
 /** "In Kalender speichern": a secondary button that opens a native popover with the two ways into a calendar. */
 
-const { event } = Astro.props;
+const { event } = Astro.props
 
-const calendarEvent = calendarEventFrom(event, Astro.site!);
-const googleHref = googleCalendarUrl(calendarEvent);
+const calendarEvent = calendarEventFrom(event, Astro.site!)
+const googleHref = googleCalendarUrl(calendarEvent)
 // A real URL, not a data: link: iOS Safari opens text/calendar from a URL in the
 // Calendar app, but does nothing with a data: link or the download attribute.
-const icsHref = `/api/public/events/${encodeURIComponent(event.slug)}/ics`;
+const icsHref = `/api/public/events/${encodeURIComponent(event.slug)}/ics`
 ---
 
 {googleHref && (
@@ -48,10 +48,17 @@ const icsHref = `/api/public/events/${encodeURIComponent(event.slug)}/ics`;
           popovertargetaction="hide"
           class="absolute top-2 right-2 grid size-11 place-items-center rounded-full text-fg-muted transition-colors duration-180 hover:bg-fg/6 hover:text-fg"
         >
-          <Icon name="close" aria-hidden="true" class="size-5" />
+          <Icon
+            name="close"
+            aria-hidden="true"
+            class="size-5"
+          />
         </button>
 
-        <h2 id="calendar-modal-title" class="pr-10 text-sub text-fg">
+        <h2
+          id="calendar-modal-title"
+          class="pr-10 text-sub text-fg"
+        >
           In Kalender speichern
         </h2>
         <p class="mt-2 mb-6 text-base text-fg-soft">Wähle deinen Kalender:</p>
@@ -65,7 +72,11 @@ const icsHref = `/api/public/events/${encodeURIComponent(event.slug)}/ics`;
           >
             Google Calendar
           </Button>
-          <Button href={icsHref} variant="secondary" data-umami-event="calendar-download-ics">
+          <Button
+            href={icsHref}
+            variant="secondary"
+            data-umami-event="calendar-download-ics"
+          >
             Apple Kalender, Outlook (.ics)
           </Button>
         </div>

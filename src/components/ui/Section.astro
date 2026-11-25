@@ -1,5 +1,5 @@
 ---
-import Container from './Container.astro';
+import Container from './Container.astro'
 
 /**
  * A block of the page. Blocks are parted by space, and by their ground only
@@ -10,33 +10,33 @@ import Container from './Container.astro';
  * everything inside follows it. A section clips what bleeds out of it.
  */
 
-type Ground = 'default' | 'alt' | 'dark';
-type Space = 'default' | 'band' | 'none';
+type Ground = 'default' | 'alt' | 'dark'
+type Space = 'default' | 'band' | 'none'
 
 interface Props {
-  id?: string;
-  ground?: Ground;
+  id?: string
+  ground?: Ground
   /** `default` is a section's space (88 → 144px); `band` the compact space of a band (56 → 80px). */
-  space?: Space;
-  labelledby?: string;
-  class?: string;
+  space?: Space
+  labelledby?: string
+  class?: string
   /** Classes for the inner container (grid, etc.). */
-  innerClass?: string;
+  innerClass?: string
 }
 
 const GROUNDS: Record<Ground, string> = {
   default: '',
   alt: 'surface-alt',
   dark: 'surface-dark',
-};
+}
 
 const SPACES: Record<Space, string> = {
   default: 'py-section',
   band: 'py-band',
   none: '',
-};
+}
 
-const { id, ground = 'default', space = 'default', labelledby, class: className, innerClass } = Astro.props;
+const { id, ground = 'default', space = 'default', labelledby, class: className, innerClass } = Astro.props
 ---
 
 <section

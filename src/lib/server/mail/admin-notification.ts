@@ -1,19 +1,19 @@
 /** The admin's note of a new registration. Generated from the former listmonk template; edit freely. */
-import { escapeHtml as e } from '../../shared/html';
+import { escapeHtml as e } from '../../shared/html'
 
 export interface AdminNotificationHtmlData {
-  activeCount: string | number;
-  adminUrl: string | number;
-  dateShort: string | number;
-  eventTitle: string | number;
-  location: string | number;
-  maxParticipants: string | number;
-  participantEmail: string | number;
-  participantName: string | number;
-  participantPhone: string | number;
-  statusLabel: string | number;
-  subject: string | number;
-  timeRange: string | number;
+  activeCount: string | number
+  adminUrl: string | number
+  dateShort: string | number
+  eventTitle: string | number
+  location: string | number
+  maxParticipants: string | number
+  participantEmail: string | number
+  participantName: string | number
+  participantPhone: string | number
+  statusLabel: string | number
+  subject: string | number
+  timeRange: string | number
 }
 
 export const adminNotificationHtml = (d: AdminNotificationHtmlData): string => `<!doctype html>
@@ -162,4 +162,4 @@ ${
 </table>
 </body>
 </html>
-`;
+`

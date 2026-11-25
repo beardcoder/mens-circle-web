@@ -1,13 +1,13 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from 'astro-icon/components'
 
-import { label } from '@lib/ui';
+import { label } from '@lib/ui'
 
-import nav from '../data/navigation.json';
-import site from '../data/site.json';
-import Lockup from './brand/Lockup.astro';
-import ModeToggle from './ModeToggle.astro';
-import Container from './ui/Container.astro';
+import nav from '../data/navigation.json'
+import site from '../data/site.json'
+import Lockup from './brand/Lockup.astro'
+import ModeToggle from './ModeToggle.astro'
+import Container from './ui/Container.astro'
 
 /**
  * The compact footer on the forest, the same on every page: the mark and word
@@ -20,34 +20,49 @@ import Container from './ui/Container.astro';
 // `mailto:` and `tel:` stay in place; external profiles open in a new tab,
 // announced as part of the accessible name. Icons: src/icons/social-<type>.svg.
 const socialLinks = site.socialLinks.map((link) => {
-  const internal = link.type === 'email' || link.type === 'phone';
-  const scheme = link.type === 'email' ? 'mailto:' : link.type === 'phone' ? 'tel:' : '';
-  const text = link.type === 'email' ? site.contactEmail : link.type === 'phone' ? site.contactPhone : link.label;
+  const internal = link.type === 'email' || link.type === 'phone'
+  const scheme = link.type === 'email' ? 'mailto:' : link.type === 'phone' ? 'tel:' : ''
+  const text = link.type === 'email' ? site.contactEmail : link.type === 'phone' ? site.contactPhone : link.label
 
-  return { ...link, href: `${scheme}${link.value}`, internal, text };
-});
+  return { ...link, href: `${scheme}${link.value}`, internal, text }
+})
 
-const footerLink =
-  'inline-flex min-h-11 items-center gap-3 text-base text-fg transition-colors duration-180 hover:text-accent sm:min-h-10';
+const footerLink = 'inline-flex min-h-11 items-center gap-3 text-base text-fg transition-colors duration-180 hover:text-accent sm:min-h-10'
 ---
 
 {/* Bottom space keeps the last row clear of the fixed back-to-top button. */}
-<footer id="footer" class="surface-dark relative overflow-clip pt-band pb-24 print:hidden">
+<footer
+  id="footer"
+  class="surface-dark relative overflow-clip pt-band pb-24 print:hidden"
+>
   <Container class="relative">
     <div class="grid gap-x-grid gap-y-10 border-t border-line pt-group pb-group sm:grid-cols-2 lg:grid-cols-12">
       <div class="max-w-[38ch] sm:col-span-2 lg:col-span-5">
-        <a href="/" class="mb-6 inline-flex min-h-11 items-center text-sub">
+        <a
+          href="/"
+          class="mb-6 inline-flex min-h-11 items-center text-sub"
+        >
           <Lockup variant="full" />
         </a>
         <p class="text-base text-fg-muted">{site.footerDescription}</p>
       </div>
 
-      <nav aria-label="Fußnavigation" class="lg:col-span-3 lg:col-start-7">
+      <nav
+        aria-label="Fußnavigation"
+        class="lg:col-span-3 lg:col-start-7"
+      >
         <h2 class:list={[label, 'mb-3']}>Navigation</h2>
-        <ul role="list" class="grid grid-cols-2 gap-x-5 sm:grid-cols-1">
+        <ul
+          role="list"
+          class="grid grid-cols-2 gap-x-5 sm:grid-cols-1"
+        >
           {nav.footerPrimary.map((item) => (
             <li>
-              <a href={item.url} class={footerLink} data-umami-event="footer-link">
+              <a
+                href={item.url}
+                class={footerLink}
+                data-umami-event="footer-link"
+              >
                 {item.label}
               </a>
             </li>
@@ -68,7 +83,11 @@ const footerLink =
                 data-umami-event-platform={link.type}
                 class={footerLink}
               >
-                <Icon name={`social-${link.type}`} aria-hidden="true" class="size-4.5 shrink-0 text-fg-muted" />
+                <Icon
+                  name={`social-${link.type}`}
+                  aria-hidden="true"
+                  class="size-4.5 shrink-0 text-fg-muted"
+                />
                 <span>
                   {link.text}
                   {!link.internal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
@@ -78,7 +97,11 @@ const footerLink =
           ))}
           {nav.footerContact.map((item) => (
             <li>
-              <a href={item.url} class={footerLink} data-umami-event="footer-link">
+              <a
+                href={item.url}
+                class={footerLink}
+                data-umami-event="footer-link"
+              >
                 {item.label}
               </a>
             </li>
@@ -90,7 +113,10 @@ const footerLink =
     <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-line pt-6">
       <p class="text-sm text-fg-muted">{site.footerText}</p>
       <div class="flex flex-wrap items-center gap-x-6">
-        <nav aria-label="Rechtliches" class="flex flex-wrap gap-x-6">
+        <nav
+          aria-label="Rechtliches"
+          class="flex flex-wrap gap-x-6"
+        >
           {nav.footerLegal.map((item) => (
             <a
               href={item.url}

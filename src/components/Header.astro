@@ -1,12 +1,12 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from 'astro-icon/components'
 
-import { button } from '@lib/ui';
+import { button } from '@lib/ui'
 
-import nav from '../data/navigation.json';
-import site from '../data/site.json';
-import ModeToggle from './ModeToggle.astro';
-import Container from './ui/Container.astro';
+import nav from '../data/navigation.json'
+import site from '../data/site.json'
+import ModeToggle from './ModeToggle.astro'
+import Container from './ui/Container.astro'
 
 /**
  * The bar, 72px: the mark on the left; from `nav` (1100px) the five content links
@@ -20,38 +20,38 @@ import Container from './ui/Container.astro';
  */
 
 interface Props {
-  action?: { href: string; label: string };
+  action?: { href: string; label: string }
   /** The page opens on the forest: the bar starts clear over it (`over-hero:`). */
-  overHero?: boolean;
+  overHero?: boolean
 }
 
-const { action, overHero = false } = Astro.props;
-const links = nav.header.links;
-const cta = action ? { url: action.href, label: action.label, umamiTarget: 'event-registration' } : nav.header.cta;
+const { action, overHero = false } = Astro.props
+const links = nav.header.links
+const cta = action ? { url: action.href, label: action.label, umamiTarget: 'event-registration' } : nav.header.cta
 /** The word mark gives way on narrow phones, a little earlier beside an event's longer action. */
-const wordmark = action ? 'max-[25.5rem]:sr-only' : 'max-[24rem]:sr-only';
+const wordmark = action ? 'max-[25.5rem]:sr-only' : 'max-[24rem]:sr-only'
 
 const isCurrentPage = (url: string): boolean => {
-  const target = new URL(url, Astro.url);
+  const target = new URL(url, Astro.url)
 
-  return (
-    !target.hash &&
-    (Astro.url.pathname === target.pathname ||
-      (target.pathname === '/event' && Astro.url.pathname.startsWith('/event/')))
-  );
-};
+  return !target.hash && (Astro.url.pathname === target.pathname || (target.pathname === '/event' && Astro.url.pathname.startsWith('/event/')))
+}
 
 // A line slides in under a link from its start edge on hover and focus.
 const linkClass =
-  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-[current=page]:text-accent aria-[current=page]:after:scale-x-100 [[data-over-hero]:not([data-scrolled])_&]:aria-[current=page]:text-spark';
+  'relative inline-flex min-h-11 items-center px-3 text-base font-medium after:absolute after:inset-x-3 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100 focus-visible:after:scale-x-100 aria-[current=page]:text-accent aria-[current=page]:after:scale-x-100 [[data-over-hero]:not([data-scrolled])_&]:aria-[current=page]:text-spark'
 
 /** What you press is round. */
 const roundButton =
-  'inline-flex min-h-11 items-center gap-2 rounded-full border border-current/25 px-4 text-base font-medium transition-[border-color,background-color,scale] duration-150 ease-out hover:border-current/60 hover:bg-current/6 active:scale-[0.97] motion-reduce:active:scale-100';
+  'inline-flex min-h-11 items-center gap-2 rounded-full border border-current/25 px-4 text-base font-medium transition-[border-color,background-color,scale] duration-150 ease-out hover:border-current/60 hover:bg-current/6 active:scale-[0.97] motion-reduce:active:scale-100'
 ---
 
 {/* 24px down the page: once it has scrolled out of view, the bar turns to the paper. */}
-<span data-scroll-sentinel aria-hidden="true" class="pointer-events-none absolute top-6 left-0 size-px"></span>
+<span
+  data-scroll-sentinel
+  aria-hidden="true"
+  class="pointer-events-none absolute top-6 left-0 size-px"
+></span>
 <header
   id="header"
   data-over-hero={overHero || undefined}
@@ -78,8 +78,14 @@ const roundButton =
       <span class={wordmark}>Männerkreis</span>
     </a>
 
-    <nav aria-label="Hauptnavigation" class="ml-auto max-nav:hidden">
-      <ul role="list" class="flex items-center gap-1">
+    <nav
+      aria-label="Hauptnavigation"
+      class="ml-auto max-nav:hidden"
+    >
+      <ul
+        role="list"
+        class="flex items-center gap-1"
+      >
         {links.map((link) => (
           <li>
             <a
@@ -120,7 +126,11 @@ const roundButton =
       aria-expanded="false"
       class:list={[roundButton, 'nav:hidden max-sm:px-2.5']}
     >
-      <Icon name="menu" aria-hidden="true" class="size-5" />
+      <Icon
+        name="menu"
+        aria-hidden="true"
+        class="size-5"
+      />
       <span class="max-sm:sr-only">Menü</span>
     </button>
   </Container>
@@ -143,11 +153,20 @@ const roundButton =
         }
       }
     </style>
-    <nav aria-label="Seitennavigation" class="border-b border-line bg-ground px-gutter py-2 text-fg nav:hidden">
-      <ul role="list" class="flex gap-4 overflow-x-auto">
+    <nav
+      aria-label="Seitennavigation"
+      class="border-b border-line bg-ground px-gutter py-2 text-fg nav:hidden"
+    >
+      <ul
+        role="list"
+        class="flex gap-4 overflow-x-auto"
+      >
         {links.map((link) => (
           <li class="shrink-0">
-            <a href={link.url} class="inline-flex min-h-11 items-center text-base underline underline-offset-4">
+            <a
+              href={link.url}
+              class="inline-flex min-h-11 items-center text-base underline underline-offset-4"
+            >
               {link.label}
             </a>
           </li>
@@ -180,19 +199,37 @@ const roundButton =
         data-nav-link
       >
         {/* The bar's own sizes: the mark must not change as the menu opens over it. */}
-        <Icon name="logo" aria-hidden="true" class="size-8 shrink-0 text-flame sm:size-9" />
+        <Icon
+          name="logo"
+          aria-hidden="true"
+          class="size-8 shrink-0 text-flame sm:size-9"
+        />
         <span class={wordmark}>Männerkreis</span>
       </a>
-      <button type="button" data-nav-close class:list={[roundButton, 'ml-auto']}>
-        <Icon name="close" aria-hidden="true" class="size-5" />
+      <button
+        type="button"
+        data-nav-close
+        class:list={[roundButton, 'ml-auto']}
+      >
+        <Icon
+          name="close"
+          aria-hidden="true"
+          class="size-5"
+        />
         <span>Schließen</span>
       </button>
     </Container>
     <Container class="grid gap-8 py-8">
       <nav aria-label="Hauptnavigation">
-        <ul role="list" class="grid border-t border-line">
+        <ul
+          role="list"
+          class="grid border-t border-line"
+        >
           {links.map((link, i) => (
-            <li class="border-b border-line" style={`--i: ${i}`}>
+            <li
+              class="border-b border-line"
+              style={`--i: ${i}`}
+            >
               <a
                 href={link.url}
                 aria-current={isCurrentPage(link.url) ? 'page' : undefined}
@@ -231,16 +268,15 @@ const roundButton =
   /** Site header — its tone over the home opening, the phone menu (a modal `<dialog>`) and the way back to the top. */
 
   /** Smooth scrolling, unless the reader asked for reduced motion. */
-  const scrollBehavior = (): ScrollBehavior =>
-    matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+  const scrollBehavior = (): ScrollBehavior => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth')
 
   /** A link's fragment when it targets the current page, else `null`. */
   const samePageHash = (link: HTMLAnchorElement): string | null => {
-    const url = new URL(link.href, location.href);
-    const samePage = url.origin === location.origin && url.pathname === location.pathname;
+    const url = new URL(link.href, location.href)
+    const samePage = url.origin === location.origin && url.pathname === location.pathname
 
-    return samePage && url.hash.length > 1 ? url.hash : null;
-  };
+    return samePage && url.hash.length > 1 ? url.hash : null
+  }
 
   /**
    * Over the home opening (`[data-hero]`) the bar starts clear with light text and
@@ -250,14 +286,14 @@ const roundButton =
    * so it never forces a layout.
    */
   const initHeaderTone = (header: HTMLElement): void => {
-    const sentinel = document.querySelector('[data-scroll-sentinel]');
+    const sentinel = document.querySelector('[data-scroll-sentinel]')
 
-    if (!sentinel) return;
+    if (!sentinel) return
 
     new IntersectionObserver(([entry]) => {
-      header.toggleAttribute('data-scrolled', !entry.isIntersecting);
-    }).observe(sentinel);
-  };
+      header.toggleAttribute('data-scrolled', !entry.isIntersecting)
+    }).observe(sentinel)
+  }
 
   /**
    * The phone menu. `showModal()` gives the focus trap, Escape and the return of
@@ -266,66 +302,66 @@ const roundButton =
    * and closes as a circle from the menu button.
    */
   const initMenu = (menu: HTMLDialogElement): void => {
-    const openers = document.querySelectorAll<HTMLButtonElement>('[data-nav-open]');
+    const openers = document.querySelectorAll<HTMLButtonElement>('[data-nav-open]')
 
     menu.addEventListener('close', () => {
-      document.documentElement.removeAttribute('data-menu-open');
-      openers.forEach((opener) => opener.setAttribute('aria-expanded', 'false'));
-    });
+      document.documentElement.removeAttribute('data-menu-open')
+      openers.forEach((opener) => opener.setAttribute('aria-expanded', 'false'))
+    })
 
     // A hidden modal still makes the document inert; close it when desktop navigation takes over.
     matchMedia('(min-width: 68.75rem)').addEventListener('change', (event) => {
-      if (event.matches && menu.open) menu.close();
-    });
+      if (event.matches && menu.open) menu.close()
+    })
 
     for (const opener of openers) {
       opener.addEventListener('click', () => {
         // The menu opens as a circle from the button's centre (`--nav-origin` in Header.astro).
-        const { left, top, width, height } = opener.getBoundingClientRect();
+        const { left, top, width, height } = opener.getBoundingClientRect()
 
-        menu.style.setProperty('--nav-origin', `${left + width / 2}px ${top + height / 2}px`);
-        menu.showModal();
-        document.documentElement.setAttribute('data-menu-open', '');
-        opener.setAttribute('aria-expanded', 'true');
+        menu.style.setProperty('--nav-origin', `${left + width / 2}px ${top + height / 2}px`)
+        menu.showModal()
+        document.documentElement.setAttribute('data-menu-open', '')
+        opener.setAttribute('aria-expanded', 'true')
         // `showModal()` focuses the first link, the mark, and Safari rings it even
         // after a tap: the dialog itself takes the focus, Tab moves on from there.
-        menu.focus();
-      });
+        menu.focus()
+      })
     }
 
-    menu.querySelector('[data-nav-close]')?.addEventListener('click', () => menu.close());
+    menu.querySelector('[data-nav-close]')?.addEventListener('click', () => menu.close())
 
     for (const link of menu.querySelectorAll<HTMLAnchorElement>('a[data-nav-link]')) {
       link.addEventListener('click', (event) => {
-        const hash = samePageHash(link);
+        const hash = samePageHash(link)
 
-        if (hash === null) return;
+        if (hash === null) return
 
-        event.preventDefault();
-        menu.close();
-        const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+        event.preventDefault()
+        menu.close()
+        const target = document.getElementById(decodeURIComponent(hash.slice(1)))
 
         if (target) {
-          if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+          if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1')
 
-          target.focus({ preventScroll: true });
+          target.focus({ preventScroll: true })
         }
 
-        target?.scrollIntoView({ behavior: scrollBehavior() });
-        history.pushState(null, '', hash);
-      });
+        target?.scrollIntoView({ behavior: scrollBehavior() })
+        history.pushState(null, '', hash)
+      })
     }
-  };
-
-  function initSiteHeader(): void {
-    const header = document.getElementById('header');
-
-    if (header) initHeaderTone(header);
-
-    const menu = document.getElementById('nav');
-
-    if (menu instanceof HTMLDialogElement) initMenu(menu);
   }
 
-  initSiteHeader();
+  function initSiteHeader(): void {
+    const header = document.getElementById('header')
+
+    if (header) initHeaderTone(header)
+
+    const menu = document.getElementById('nav')
+
+    if (menu instanceof HTMLDialogElement) initMenu(menu)
+  }
+
+  initSiteHeader()
 </script>

@@ -1,12 +1,15 @@
 ---
 /** A short label above a title, where it says something the title does not (the place, the kind of page): sentence case in the accent. */
-import type { HTMLAttributes } from 'astro/types';
+import type { HTMLAttributes } from 'astro/types'
 
-type Props = HTMLAttributes<'p'>;
+type Props = HTMLAttributes<'p'>
 
-const { class: className, ...rest }: Props = Astro.props;
+const { class: className, ...rest }: Props = Astro.props
 ---
 
-<p {...rest} class:list={['font-sans text-sm font-semibold text-accent', className]}>
+<p
+  {...rest}
+  class:list={['font-sans text-sm font-semibold text-accent', className]}
+>
   <slot />
 </p>

@@ -1,26 +1,27 @@
 ---
-import site from '@data/site.json';
-import { PUBLIC_CACHE, readPublicEvents } from '@lib/server/public-data';
-import { breadcrumbSchema, eventSeriesSchema } from '@lib/shared/event-schema';
-import { link } from '@lib/ui';
+import site from '@data/site.json'
+import { PUBLIC_CACHE, readPublicEvents } from '@lib/server/public-data'
+import { breadcrumbSchema, eventSeriesSchema } from '@lib/shared/event-schema'
+import { link } from '@lib/ui'
 
-import Faq from '../components/blocks/Faq.astro';
-import LinkBand from '../components/blocks/LinkBand.astro';
-import EventList from '../components/event/EventList.astro';
-import PageIntro from '../components/PageIntro.astro';
-import AccordionItem from '../components/ui/AccordionItem.astro';
-import Layout from '../layouts/Layout.astro';
+import Faq from '../components/blocks/Faq.astro'
+import LinkBand from '../components/blocks/LinkBand.astro'
+import EventList from '../components/event/EventList.astro'
+import PageIntro from '../components/PageIntro.astro'
+import AccordionItem from '../components/ui/AccordionItem.astro'
+import Layout from '../layouts/Layout.astro'
 
-const events = await readPublicEvents();
+const events = await readPublicEvents()
 
 if (events) {
-  Astro.cache.set(PUBLIC_CACHE);
-} else {
-  Astro.response.status = 503;
-  Astro.response.headers.set('Cache-Control', 'no-store');
+  Astro.cache.set(PUBLIC_CACHE)
+}
+else {
+  Astro.response.status = 503
+  Astro.response.headers.set('Cache-Control', 'no-store')
 }
 
-const siteUrl = Astro.site!;
+const siteUrl = Astro.site!
 const canonical = new URL('/event', siteUrl).href;
 ---
 
@@ -31,13 +32,19 @@ const canonical = new URL('/event', siteUrl).href;
 >
   <PageIntro eyebrow="Männerkreis · Straubing / Niederbayern" title="Termine und Anmeldung">
     <Fragment slot="lead">
-      Wir treffen uns alle zwei bis vier Wochen im Raum {site.geo.locality} in Niederbayern. Ein Abend dauert zwei bis
+      Wir treffen uns alle zwei bis vier Wochen im Raum
+      {' '}
+      {site.geo.locality}
+      {' '}
+      in Niederbayern. Ein Abend dauert zwei bis
       drei Stunden, läuft auf Spendenbasis und setzt keine Vorerfahrung voraus. Wenn du noch nicht weißt, was dich
-      erwartet, lies zuerst, {/* The period follows the link directly: on its own line Astro sets a space before it. */}
+      erwartet, lies zuerst,
+      {' '}
+      {/* The period follows the link directly: on its own line Astro sets a space before it. */}
       <a class={link} href="/#ueber">
         worum es an so einem Abend geht
       </a>
-      {'.'}
+      .
     </Fragment>
   </PageIntro>
 
@@ -59,7 +66,11 @@ const canonical = new URL('/event', siteUrl).href;
       keinen festen Preis und keine Mitgliedschaft. Die Angaben zum jeweiligen Abend stehen beim Termin.
     </AccordionItem>
     <AccordionItem question="Wo genau findet der Männerkreis statt?">
-      Wir treffen uns im Raum {site.geo.locality} in Niederbayern. Den Veranstaltungsort mit Adresse und Anfahrt findest
+      Wir treffen uns im Raum
+      {' '}
+      {site.geo.locality}
+      {' '}
+      in Niederbayern. Den Veranstaltungsort mit Adresse und Anfahrt findest
       du auf der Seite des jeweiligen Termins. So kannst du schon vor der Anmeldung schauen, ob der Weg für dich passt.
     </AccordionItem>
     <AccordionItem question="Kann ich alleine kommen?">

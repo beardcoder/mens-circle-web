@@ -1,10 +1,10 @@
 ---
-import { splitWords } from '@lib/shared/words';
+import { splitWords } from '@lib/shared/words'
 
-import Section from '../ui/Section.astro';
+import Section from '../ui/Section.astro'
 
 /** The statement, as the slot's inline markup; an `<em>` is its strong word. */
-const words = splitWords(await Astro.slots.render('default'));
+const words = splitWords(await Astro.slots.render('default'))
 ---
 
 {/* One statement on a screen of its own, the page's one scroll-led moment: its words

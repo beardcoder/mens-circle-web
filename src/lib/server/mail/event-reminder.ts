@@ -1,25 +1,25 @@
 /** The reminder the evening before or on the day. Generated from the former listmonk template; edit freely. */
-import { escapeHtml as e } from '../../shared/html';
+import { escapeHtml as e } from '../../shared/html'
 
 export interface EventReminderHtmlData {
-  address: string | number;
-  cancelUrl: string | number;
-  closingWord: string | number;
-  contactEmail: string | number;
-  costBasis: string | number;
-  dateDay: string | number;
-  dateLong: string | number;
-  dateWeekday: string | number;
-  eventTitle: string | number;
-  eventUrl: string | number;
-  firstName: string | number;
-  location: string | number;
-  locationDetails: string | number;
-  recipientEmail: string | number;
-  subject: string | number;
-  timeRange: string | number;
-  whenWord: string | number;
-  whenWordCap: string | number;
+  address: string | number
+  cancelUrl: string | number
+  closingWord: string | number
+  contactEmail: string | number
+  costBasis: string | number
+  dateDay: string | number
+  dateLong: string | number
+  dateWeekday: string | number
+  eventTitle: string | number
+  eventUrl: string | number
+  firstName: string | number
+  location: string | number
+  locationDetails: string | number
+  recipientEmail: string | number
+  subject: string | number
+  timeRange: string | number
+  whenWord: string | number
+  whenWordCap: string | number
 }
 
 export const eventReminderHtml = (d: EventReminderHtmlData): string => `<!doctype html>
@@ -176,4 +176,4 @@ ${
 </table>
 </body>
 </html>
-`;
+`

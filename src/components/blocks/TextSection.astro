@@ -1,23 +1,30 @@
 ---
-import { margin } from '@lib/ui';
+import { margin } from '@lib/ui'
 
-import Prose from '../ui/Prose.astro';
-import Section from '../ui/Section.astro';
-import SectionHead from '../ui/SectionHead.astro';
+import Prose from '../ui/Prose.astro'
+import Section from '../ui/Section.astro'
+import SectionHead from '../ui/SectionHead.astro'
 
 interface Props {
-  anchor: string;
-  eyebrow?: string;
-  title: string;
+  anchor: string
+  eyebrow?: string
+  title: string
 }
 
-const { anchor, eyebrow, title } = Astro.props;
+const { anchor, eyebrow, title } = Astro.props
 ---
 
 {/* As on the home page: the title crosses from the margin into the content, the text stands on the reading line. */}
-<Section id={anchor} space="band">
+<Section
+  id={anchor}
+  space="band"
+>
   <div class:list={[margin.grid, 'gap-y-8']}>
-    <SectionHead eyebrow={eyebrow} title={title} class={margin.cross} />
+    <SectionHead
+      eyebrow={eyebrow}
+      title={title}
+      class={margin.cross}
+    />
     <Prose class={margin.reading}>
       <slot />
     </Prose>

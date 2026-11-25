@@ -1,37 +1,28 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from 'astro-icon/components'
 
-import { button, type ButtonSize, type ButtonVariant } from '@lib/ui';
+import { button, type ButtonSize, type ButtonVariant } from '@lib/ui'
 
 /**
  * A link styled as a button when it has an `href`, a real `<button>` otherwise.
  * `decorate` adds an arrow after the label.
  */
 interface Props {
-  href?: string;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+  href?: string
+  variant?: ButtonVariant
+  size?: ButtonSize
   /** Full width. */
-  block?: boolean;
+  block?: boolean
   /** An arrow after the label. */
-  decorate?: boolean;
-  type?: 'button' | 'submit';
-  class?: string;
-  [attribute: string]: unknown;
+  decorate?: boolean
+  type?: 'button' | 'submit'
+  class?: string
+  [attribute: string]: unknown
 }
 
-const {
-  href,
-  variant = 'primary',
-  size = 'md',
-  block = false,
-  decorate = false,
-  type = 'button',
-  class: className,
-  ...attributes
-} = Astro.props;
+const { href, variant = 'primary', size = 'md', block = false, decorate = false, type = 'button', class: className, ...attributes } = Astro.props
 
-const Tag = href ? 'a' : 'button';
+const Tag = href ? 'a' : 'button'
 ---
 
 <Tag

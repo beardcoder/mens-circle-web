@@ -7,19 +7,19 @@
  * chairs fill in one after the other, and after a registration the next free chair
  * is taken (`data-seat-dot="taking"`, EventRegister; global.css, "The opening").
  */
-import { seatDots } from '@lib/shared/seats';
+import { seatDots } from '@lib/shared/seats'
 
 /** `fill` takes the size of its parent (print templates set it); the number scales with it. */
-type Size = 'sm' | 'md' | 'lg' | 'fill';
+type Size = 'sm' | 'md' | 'lg' | 'fill'
 
 interface Props {
-  seats: { total: number; free: number } | null;
+  seats: { total: number; free: number } | null
   /** "3 von 7 Plätzen frei", "Ausgebucht". */
-  text: string;
-  size?: Size;
+  text: string
+  size?: Size
   /** `row`: the words beside the ring; `stack`: under it; `none`: only the ring (the words stand elsewhere). */
-  layout?: 'row' | 'stack' | 'none';
-  class?: string;
+  layout?: 'row' | 'stack' | 'none'
+  class?: string
 }
 
 const SIZES: Record<Size, { ring: string; number: string; label: string }> = {
@@ -27,11 +27,11 @@ const SIZES: Record<Size, { ring: string; number: string; label: string }> = {
   md: { ring: 'size-28', number: 'text-sub', label: 'text-xs' },
   lg: { ring: 'size-40 sm:size-44', number: 'text-section', label: 'text-sm' },
   fill: { ring: '@container size-full', number: 'text-[34cqw]', label: 'text-[9cqw]' },
-};
+}
 
-const { seats, text, size = 'md', layout = 'row', class: className } = Astro.props;
-const ring = seatDots(seats);
-const { ring: ringSize, number, label } = SIZES[size];
+const { seats, text, size = 'md', layout = 'row', class: className } = Astro.props
+const ring = seatDots(seats)
+const { ring: ringSize, number, label } = SIZES[size]
 ---
 
 <div
@@ -39,8 +39,14 @@ const { ring: ringSize, number, label } = SIZES[size];
   class:list={['flex gap-x-5 gap-y-3', layout === 'stack' ? 'flex-col items-start' : 'items-center', className]}
 >
   {ring && (
-    <span aria-hidden="true" class:list={['relative grid shrink-0 place-items-center', ringSize]}>
-      <svg viewBox="0 0 100 100" class="absolute inset-0 size-full overflow-visible">
+    <span
+      aria-hidden="true"
+      class:list={['relative grid shrink-0 place-items-center', ringSize]}
+    >
+      <svg
+        viewBox="0 0 100 100"
+        class="absolute inset-0 size-full overflow-visible"
+      >
         <circle
           cx="50"
           cy="50"
@@ -52,7 +58,14 @@ const { ring: ringSize, number, label } = SIZES[size];
         />
         {ring.dots.map((dot, i) =>
           dot.taken ? (
-            <circle data-seat-dot cx={dot.x} cy={dot.y} r={ring.r} class="fill-fill" style={`--i: ${i}`} />
+            <circle
+              data-seat-dot
+              cx={dot.x}
+              cy={dot.y}
+              r={ring.r}
+              class="fill-fill"
+              style={`--i: ${i}`}
+            />
           ) : (
             <circle
               data-seat-free
@@ -67,7 +80,10 @@ const { ring: ringSize, number, label } = SIZES[size];
         )}
       </svg>
       <span class="relative grid justify-items-center leading-none">
-        <span data-seat-count class:list={['font-display font-semibold text-fg tabular-nums', number]}>
+        <span
+          data-seat-count
+          class:list={['font-display font-semibold text-fg tabular-nums', number]}
+        >
           {ring.free}
         </span>
         <span class:list={['mt-1 font-semibold text-fg-muted', label]}>frei</span>
@@ -75,7 +91,10 @@ const { ring: ringSize, number, label } = SIZES[size];
     </span>
   )}
   {layout !== 'none' && (
-    <p data-seat-text class="text-sm text-fg-muted">
+    <p
+      data-seat-text
+      class="text-sm text-fg-muted"
+    >
       {text}
     </p>
   )}

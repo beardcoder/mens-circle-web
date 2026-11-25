@@ -1,11 +1,15 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from 'astro-icon/components'
 ---
 
 {/* Four fifths of a screen down the page: once it has scrolled past, the link shows.
     Desktop only: on phones the bottom bar is enough, and a tap on the status bar
     scrolls to the top. */}
-<span data-top-sentinel aria-hidden="true" class="pointer-events-none absolute top-[80svh] left-0 size-px"></span>
+<span
+  data-top-sentinel
+  aria-hidden="true"
+  class="pointer-events-none absolute top-[80svh] left-0 size-px"
+></span>
 <a
   href="#top"
   data-scroll-top
@@ -13,28 +17,32 @@ import { Icon } from 'astro-icon/components';
   title="Nach oben"
   class="invisible fixed right-4 bottom-4 z-30 grid size-12 place-items-center rounded-full bg-fill text-on-fill opacity-0 transition-[background-color,translate,scale,opacity,visibility] duration-180 data-[visible]:visible data-[visible]:opacity-100 hover:-translate-y-0.5 hover:bg-fill-strong active:scale-95 motion-reduce:hover:translate-y-0 print:hidden max-lg:hidden lg:right-6 lg:bottom-6"
 >
-  <Icon name="chevron-up" aria-hidden="true" class="size-4.5" />
+  <Icon
+    name="chevron-up"
+    aria-hidden="true"
+    class="size-4.5"
+  />
 </a>
 
 <script>
-  const link = document.querySelector<HTMLAnchorElement>('[data-scroll-top]');
+  const link = document.querySelector<HTMLAnchorElement>('[data-scroll-top]')
 
   if (link) {
     link.addEventListener('click', (event) => {
-      event.preventDefault();
-      const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+      event.preventDefault()
+      const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
 
-      window.scrollTo({ top: 0, behavior });
-      document.getElementById('top')?.focus({ preventScroll: true });
-    });
+      window.scrollTo({ top: 0, behavior })
+      document.getElementById('top')?.focus({ preventScroll: true })
+    })
 
     // Watched, not measured: reading the scroll position could force a layout.
-    const sentinel = document.querySelector('[data-top-sentinel]');
+    const sentinel = document.querySelector('[data-top-sentinel]')
 
     if (sentinel) {
       new IntersectionObserver(([entry]) => {
-        link.toggleAttribute('data-visible', !entry.isIntersecting && entry.boundingClientRect.top < 0);
-      }).observe(sentinel);
+        link.toggleAttribute('data-visible', !entry.isIntersecting && entry.boundingClientRect.top < 0)
+      }).observe(sentinel)
     }
   }
 </script>

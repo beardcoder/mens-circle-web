@@ -3,21 +3,18 @@
  * The poster word: one word or number as large as a poster sets it (`text-poster`,
  * Cormorant 600), read as a title. At most one per screen.
  */
-import type { HTMLAttributes } from 'astro/types';
+import type { HTMLAttributes } from 'astro/types'
 
-type Element = 'h1' | 'h2' | 'p' | 'span';
+type Element = 'h1' | 'h2' | 'p' | 'span'
 
-type Props = HTMLAttributes<'p'> & { as?: Element };
+type Props = HTMLAttributes<'p'> & { as?: Element }
 
-const { as: Tag = 'p', class: className, ...rest } = Astro.props;
+const { as: Tag = 'p', class: className, ...rest } = Astro.props
 ---
 
 <Tag
   {...rest}
-  class:list={[
-    'block font-display text-poster font-semibold wrap-normal hyphens-manual text-fg [text-wrap:balance]',
-    className,
-  ]}
+  class:list={['block font-display text-poster font-semibold wrap-normal hyphens-manual text-fg [text-wrap:balance]', className]}
 >
   <slot />
 </Tag>

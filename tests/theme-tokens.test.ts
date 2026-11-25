@@ -1,9 +1,9 @@
-import { readFileSync } from 'node:fs';
-import { expect, test } from 'bun:test';
+import { readFileSync } from 'node:fs'
+import { expect, test } from 'bun:test'
 
-import { declarations, parseTheme } from '../src/lib/brand/theme-tokens';
+import { declarations, parseTheme } from '../src/lib/brand/theme-tokens'
 
-const tokens = parseTheme(readFileSync(new URL('../src/styles/theme.css', import.meta.url), 'utf8'));
+const tokens = parseTheme(readFileSync(new URL('../src/styles/theme.css', import.meta.url), 'utf8'))
 
 test('a declaration keeps its trailing comment as its note, and multi-line values whole', () => {
   const found = declarations(`
@@ -12,43 +12,43 @@ test('a declaration keeps its trailing comment as its note, and multi-line value
       0,
       1
     );
-  `);
+  `)
 
   expect(found).toEqual([
     { name: '--a', value: '1rem', note: 'the note' },
     { name: '--b', value: 'linear( 0, 1 )', note: '' },
-  ]);
-});
+  ])
+})
 
 test('the primitives resolve to hex in both modes', () => {
-  expect(Object.keys(tokens.primitives).length).toBeGreaterThan(30);
-  expect(tokens.primitives.linen).toEqual({ light: '#f1e8d9', dark: '#f1e8d9' });
-});
+  expect(Object.keys(tokens.primitives).length).toBeGreaterThan(30)
+  expect(tokens.primitives.linen).toEqual({ light: '#f1e8d9', dark: '#f1e8d9' })
+})
 
 test('the colour roles resolve through the primitives; mixed ones are marked', () => {
-  const role = (name: string) => tokens.colours.find((c) => c.name === name)!;
+  const role = (name: string) => tokens.colours.find(c => c.name === name)!
 
-  expect(role('ground').light).toEqual({ hex: '#f1e8d9', primitive: 'linen' });
-  expect(role('ground').dark).toEqual({ hex: '#130e0a', primitive: 'night' });
-  expect(role('fill').light.hex).toBe('#7c4117');
-  expect(role('overlay').derived).toBe(true);
+  expect(role('ground').light).toEqual({ hex: '#f1e8d9', primitive: 'linen' })
+  expect(role('ground').dark).toEqual({ hex: '#130e0a', primitive: 'night' })
+  expect(role('fill').light.hex).toBe('#7c4117')
+  expect(role('overlay').derived).toBe(true)
 
-  for (const c of tokens.colours.filter((x) => !x.derived)) {
-    expect(c.light.hex, c.name).toMatch(/^#[0-9a-f]{6}$/);
-    expect(c.dark.hex, c.name).toMatch(/^#[0-9a-f]{6}$/);
+  for (const c of tokens.colours.filter(x => !x.derived)) {
+    expect(c.light.hex, c.name).toMatch(/^#[0-9a-f]{6}$/)
+    expect(c.dark.hex, c.name).toMatch(/^#[0-9a-f]{6}$/)
   }
-});
+})
 
 test('type roles carry size, line height and tracking; space carries its steps', () => {
-  const poster = tokens.type.find((t) => t.name === 'poster')!;
+  const poster = tokens.type.find(t => t.name === 'poster')!
 
-  expect(poster.size).toStartWith('clamp(');
-  expect(poster.lineHeight).toBe('0.86');
-  expect(poster.note).toContain('poster');
-  expect(tokens.space.find((s) => s.name === 'section')!.steps).toEqual({
-    base: '5.5rem',
+  expect(poster.size).toStartWith('clamp(')
+  expect(poster.lineHeight).toBe('0.86')
+  expect(poster.note).toContain('poster')
+  expect(tokens.space.find(s => s.name === 'section')!.steps).toEqual({
+    'base': '5.5rem',
     '48rem': '7rem',
     '64rem': '9rem',
-  });
-  expect(tokens.breakpoints.map((b) => b.name)).toContain('--breakpoint-nav');
-});
+  })
+  expect(tokens.breakpoints.map(b => b.name)).toContain('--breakpoint-nav')
+})

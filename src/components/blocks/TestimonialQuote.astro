@@ -1,15 +1,15 @@
 ---
-import type { TestimonialDTO } from '@lib/shared/dto';
-import { margin } from '@lib/ui';
+import type { TestimonialDTO } from '@lib/shared/dto'
+import { margin } from '@lib/ui'
 
 interface Props {
-  item: TestimonialDTO;
+  item: TestimonialDTO
   /** The one short voice set large. Otherwise a row: the author in the margin, the words beside. */
-  featured?: boolean;
+  featured?: boolean
 }
 
-const { item, featured = false } = Astro.props;
-const byline = [item.author, item.role].filter(Boolean).join(' · ');
+const { item, featured = false } = Astro.props
+const byline = [item.author, item.role].filter(Boolean).join(' · ')
 ---
 
 {featured ? (
@@ -23,11 +23,7 @@ const byline = [item.author, item.role].filter(Boolean).join(' · ');
   </figure>
 ) : (
   <figure class="contents">
-    <figcaption class:list={[margin.side, 'lg:pt-1']}>
-      {byline && <cite class="text-sm font-semibold text-fg not-italic">{byline}</cite>}
-    </figcaption>
-    <blockquote class:list={[margin.reading, 'max-w-measure text-lg whitespace-pre-line text-fg-soft wrap-anywhere']}>
-      „{item.quote}“
-    </blockquote>
+    <figcaption class:list={[margin.side, 'lg:pt-1']}>{byline && <cite class="text-sm font-semibold text-fg not-italic">{byline}</cite>}</figcaption>
+    <blockquote class:list={[margin.reading, 'max-w-measure text-lg whitespace-pre-line text-fg-soft wrap-anywhere']}>„{item.quote}“</blockquote>
   </figure>
 )}

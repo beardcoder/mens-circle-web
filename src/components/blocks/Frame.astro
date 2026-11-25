@@ -1,36 +1,50 @@
 ---
-import { margin } from '@lib/ui';
+import { margin } from '@lib/ui'
 
-import Section from '../ui/Section.astro';
-import SectionHead from '../ui/SectionHead.astro';
+import Section from '../ui/Section.astro'
+import SectionHead from '../ui/SectionHead.astro'
 
 interface Agreement {
-  title: string;
-  text?: string;
+  title: string
+  text?: string
 }
 
 interface Props {
-  anchor: string;
-  eyebrow?: string;
-  title: string;
-  intro: string;
-  agreements: Agreement[];
-  boundaryTitle: string;
-  boundaryText: string;
+  anchor: string
+  eyebrow?: string
+  title: string
+  intro: string
+  agreements: Agreement[]
+  boundaryTitle: string
+  boundaryText: string
 }
 
-const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props;
+const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props
 ---
 
 {/* On the forest: what is said in the circle. The five agreements as lines across the
     page, each number in the spark, its name and what it means; the boundary (no
     therapy) under them, its title in the margin. */}
-<Section id={anchor} ground="dark" labelledby="rahmen-title">
+<Section
+  id={anchor}
+  ground="dark"
+  labelledby="rahmen-title"
+>
   <div class:list={[margin.grid, 'gap-y-group']}>
-    <SectionHead eyebrow={eyebrow} title={title} titleId="rahmen-title" lead={intro} class={margin.cross} />
+    <SectionHead
+      eyebrow={eyebrow}
+      title={title}
+      titleId="rahmen-title"
+      lead={intro}
+      class={margin.cross}
+    />
 
     {agreements.length > 0 && (
-      <ol role="list" data-reveal-group class="grid lg:col-span-12">
+      <ol
+        role="list"
+        data-reveal-group
+        class="grid lg:col-span-12"
+      >
         {agreements.map((rule, i) => (
           <li class="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-line py-6 last:border-b sm:grid-cols-[4rem_minmax(0,1fr)] lg:grid-cols-12 lg:gap-x-grid lg:py-8">
             <span
@@ -40,17 +54,21 @@ const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText }
               {String(i + 1).padStart(2, '0')}
             </span>
             <h3 class="text-sub text-fg hyphens-auto lg:col-span-4 lg:col-start-2">{rule.title}</h3>
-            {rule.text && (
-              <p class="max-w-measure text-md text-fg-soft lg:col-span-6 lg:col-start-7 lg:row-start-1">{rule.text}</p>
-            )}
+            {rule.text && <p class="max-w-measure text-md text-fg-soft lg:col-span-6 lg:col-start-7 lg:row-start-1">{rule.text}</p>}
           </li>
         ))}
       </ol>
     )}
 
     {boundaryText && (
-      <aside aria-labelledby="rahmen-boundary-title" class:list={[margin.grid, 'gap-y-3 lg:col-span-12']}>
-        <h3 id="rahmen-boundary-title" class:list={[margin.side, 'font-sans text-base font-semibold text-fg']}>
+      <aside
+        aria-labelledby="rahmen-boundary-title"
+        class:list={[margin.grid, 'gap-y-3 lg:col-span-12']}
+      >
+        <h3
+          id="rahmen-boundary-title"
+          class:list={[margin.side, 'font-sans text-base font-semibold text-fg']}
+        >
           {boundaryTitle}
         </h3>
         <p class:list={[margin.reading, 'max-w-measure text-md text-fg-soft']}>{boundaryText}</p>

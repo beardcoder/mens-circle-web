@@ -1,5 +1,5 @@
 ---
-import { Icon } from 'astro-icon/components';
+import { Icon } from 'astro-icon/components'
 
 /**
  * The one display option: Auto (the system's setting), Hell or Dunkel, as three
@@ -8,16 +8,16 @@ import { Icon } from 'astro-icon/components';
  * so nothing without it looks clickable.
  */
 interface Props {
-  class?: string;
+  class?: string
 }
 
-const { class: className } = Astro.props;
+const { class: className } = Astro.props
 
 const OPTIONS = [
   { mode: 'auto', label: 'Auto', icon: 'theme-auto', title: 'Wie das System' },
   { mode: 'light', label: 'Hell', icon: 'theme-light', title: 'Immer hell' },
   { mode: 'dark', label: 'Dunkel', icon: 'theme-dark', title: 'Immer dunkel' },
-] as const;
+] as const
 ---
 
 <div
@@ -35,7 +35,11 @@ const OPTIONS = [
       title={option.title}
       class="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3.5 text-fg-muted transition-[color,background-color,scale] duration-150 ease-out hover:text-fg active:scale-[0.97] aria-pressed:bg-raised aria-pressed:text-fg motion-reduce:active:scale-100"
     >
-      <Icon name={option.icon} aria-hidden="true" class="size-4" />
+      <Icon
+        name={option.icon}
+        aria-hidden="true"
+        class="size-4"
+      />
       {option.label}
     </button>
   ))}
@@ -48,94 +52,94 @@ const OPTIONS = [
    * keeps the pickers and the browser chrome colour in sync.
    */
 
-  type Mode = 'light' | 'dark';
-  type Choice = Mode | 'auto';
+  type Mode = 'light' | 'dark'
+  type Choice = Mode | 'auto'
 
-  const STORAGE_KEY = 'mc-appearance';
+  const STORAGE_KEY = 'mc-appearance'
 
   /** Mobile browser chrome colour per resolved mode (the page's ground). */
-  const THEME_COLOR: Record<Mode, string> = { light: '#f1e8d9', dark: '#130e0a' };
+  const THEME_COLOR: Record<Mode, string> = { light: '#f1e8d9', dark: '#130e0a' }
 
-  const darkQuery = matchMedia('(prefers-color-scheme: dark)');
+  const darkQuery = matchMedia('(prefers-color-scheme: dark)')
 
   /** The mode the visitor pinned, or `null` for Auto. */
   const storedMode = (): Mode | null => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(STORAGE_KEY)
 
-      return raw === 'light' || raw === 'dark' ? raw : null;
+      return raw === 'light' || raw === 'dark' ? raw : null
     } catch {
-      return null;
+      return null
     }
-  };
+  }
 
-  const resolvedMode = (): Mode => storedMode() ?? (darkQuery.matches ? 'dark' : 'light');
+  const resolvedMode = (): Mode => storedMode() ?? (darkQuery.matches ? 'dark' : 'light')
 
   /** Set an attribute on <html> only when it changes: every write restyles the whole page. */
   const mark = (name: string, value: string | null): void => {
-    const root = document.documentElement;
+    const root = document.documentElement
 
-    if (root.getAttribute(name) === value) return;
+    if (root.getAttribute(name) === value) return
 
-    if (value === null) root.removeAttribute(name);
-    else root.setAttribute(name, value);
-  };
+    if (value === null) root.removeAttribute(name)
+    else root.setAttribute(name, value)
+  }
 
   /**
    * Push the current mode onto <html>, the theme-color tags and the pickers. At load
    * the boot script has set the same mode already, so <html> stays untouched.
    */
   function apply(): void {
-    const stored = storedMode();
-    const choice: Choice = stored ?? 'auto';
+    const stored = storedMode()
+    const choice: Choice = stored ?? 'auto'
 
-    mark('data-mode-resolved', resolvedMode());
-    mark('data-mode', stored);
+    mark('data-mode-resolved', resolvedMode())
+    mark('data-mode', stored)
 
     // One tag per system scheme; pinned, both show the pinned ground.
     for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
-      const scheme: Mode = meta.media.includes('dark') ? 'dark' : 'light';
+      const scheme: Mode = meta.media.includes('dark') ? 'dark' : 'light'
 
-      meta.content = THEME_COLOR[stored ?? scheme];
+      meta.content = THEME_COLOR[stored ?? scheme]
     }
 
     for (const option of document.querySelectorAll<HTMLButtonElement>('[data-mode-option]')) {
-      option.setAttribute('aria-pressed', String(option.dataset.modeOption === choice));
+      option.setAttribute('aria-pressed', String(option.dataset.modeOption === choice))
     }
   }
 
   function choose(choice: Choice): void {
     try {
-      if (choice === 'auto') localStorage.removeItem(STORAGE_KEY);
-      else localStorage.setItem(STORAGE_KEY, choice);
+      if (choice === 'auto') localStorage.removeItem(STORAGE_KEY)
+      else localStorage.setItem(STORAGE_KEY, choice)
     } catch {
       // Storage unavailable (private mode): the choice holds for this page only.
-      if (choice !== 'auto') document.documentElement.setAttribute('data-mode', choice);
+      if (choice !== 'auto') document.documentElement.setAttribute('data-mode', choice)
     }
 
     // Day to night is the whole page changing colour at once: a same-document view
     // transition cross-fades it (the fade of a page change, global.css). Without the
     // API, and under reduced motion, it changes at once.
-    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    if (document.startViewTransition && !still) document.startViewTransition(apply);
-    else apply();
+    if (document.startViewTransition && !still) document.startViewTransition(apply)
+    else apply()
   }
 
   function initTheme(): void {
-    apply();
+    apply()
 
-    for (const picker of document.querySelectorAll<HTMLElement>('[data-mode-picker]')) picker.hidden = false;
+    for (const picker of document.querySelectorAll<HTMLElement>('[data-mode-picker]')) picker.hidden = false
 
     for (const option of document.querySelectorAll<HTMLButtonElement>('[data-mode-option]')) {
-      option.addEventListener('click', () => choose(option.dataset.modeOption as Choice));
+      option.addEventListener('click', () => choose(option.dataset.modeOption as Choice))
     }
 
     // Auto follows the system live, e.g. when it switches at sunset.
     darkQuery.addEventListener('change', () => {
-      if (storedMode() === null) apply();
-    });
+      if (storedMode() === null) apply()
+    })
   }
 
-  initTheme();
+  initTheme()
 </script>

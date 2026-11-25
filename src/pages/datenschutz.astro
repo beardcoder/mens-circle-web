@@ -1,10 +1,10 @@
 ---
-import { DEFAULT_RETENTION_DAYS as DAYS } from '@lib/shared/retention';
+import { DEFAULT_RETENTION_DAYS as DAYS } from '@lib/shared/retention'
 
-import PageIntro from '../components/PageIntro.astro';
-import Container from '../components/ui/Container.astro';
-import Prose from '../components/ui/Prose.astro';
-import Layout from '../layouts/Layout.astro';
+import PageIntro from '../components/PageIntro.astro'
+import Container from '../components/ui/Container.astro'
+import Prose from '../components/ui/Prose.astro'
+import Layout from '../layouts/Layout.astro'
 
 export const prerender = true;
 ---
@@ -149,7 +149,9 @@ export const prerender = true;
         absagen kannst.
       </p>
       <p>
-        {DAYS} Tage nach dem Termin werden dein Name, deine E-Mail-Adresse und deine Telefonnummer gelöscht. Die
+        {DAYS}
+        {' '}
+        Tage nach dem Termin werden dein Name, deine E-Mail-Adresse und deine Telefonnummer gelöscht. Die
         Datensicherungen der Datenbank werden nach höchstens 30 Tagen überschrieben, sodass gelöschte Angaben spätestens
         dann auch dort verschwinden.
       </p>
@@ -232,7 +234,11 @@ export const prerender = true;
         Interessen an einer weiteren Speicherung bestehen.
       </p>
       <p>
-        Anmeldedaten lösche ich {DAYS} Tage nach dem Termin. Kontaktanfragen lösche ich nach Abschluss der
+        Anmeldedaten lösche ich
+        {' '}
+        {DAYS}
+        {' '}
+        Tage nach dem Termin. Kontaktanfragen lösche ich nach Abschluss der
         Kommunikation. Die Adresse im Verteiler für Termin-Informationen bleibt gespeichert, bis du dich abmeldest oder
         deine Einwilligung widerrufst. Datensicherungen werden nach höchstens 30 Tagen überschrieben.
       </p>
@@ -240,25 +246,39 @@ export const prerender = true;
       <p>Du hast nach der DSGVO insbesondere folgende Rechte:</p>
       <ul>
         <li>
-          <strong>Auskunft</strong> über die zu deiner Person gespeicherten Daten (Art. 15 DSGVO)
+          <strong>Auskunft</strong>
+          {' '}
+          über die zu deiner Person gespeicherten Daten (Art. 15 DSGVO)
         </li>
         <li>
-          <strong>Berichtigung</strong> unrichtiger Daten (Art. 16 DSGVO)
+          <strong>Berichtigung</strong>
+          {' '}
+          unrichtiger Daten (Art. 16 DSGVO)
         </li>
         <li>
-          <strong>Löschung</strong> deiner Daten (Art. 17 DSGVO)
+          <strong>Löschung</strong>
+          {' '}
+          deiner Daten (Art. 17 DSGVO)
         </li>
         <li>
-          <strong>Einschränkung der Verarbeitung</strong> (Art. 18 DSGVO)
+          <strong>Einschränkung der Verarbeitung</strong>
+          {' '}
+          (Art. 18 DSGVO)
         </li>
         <li>
-          <strong>Datenübertragbarkeit</strong> (Art. 20 DSGVO)
+          <strong>Datenübertragbarkeit</strong>
+          {' '}
+          (Art. 20 DSGVO)
         </li>
         <li>
-          <strong>Widerspruch</strong> gegen bestimmte Verarbeitungen (Art. 21 DSGVO)
+          <strong>Widerspruch</strong>
+          {' '}
+          gegen bestimmte Verarbeitungen (Art. 21 DSGVO)
         </li>
         <li>
-          <strong>Widerruf einer Einwilligung</strong> mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)
+          <strong>Widerruf einer Einwilligung</strong>
+          {' '}
+          mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)
         </li>
       </ul>
       <p>Zur Ausübung deiner Rechte kannst du dich jederzeit an mich wenden: hallo@mens-circle.de.</p>

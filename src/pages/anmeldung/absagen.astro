@@ -1,44 +1,44 @@
 ---
-import { getEmDashEntry } from 'emdash';
+import { getEmDashEntry } from 'emdash'
 
-import site from '@data/site.json';
-import { readCancelToken } from '@lib/server/cancel-token';
-import { config } from '@lib/server/config';
-import { callPlugin, PluginRefusal } from '@lib/server/plugin-route';
-import { purgePublicCache } from '@lib/server/public-data';
-import { clientIp, peerAddress, rateLimit } from '@lib/server/ratelimit';
-import { eventFromEntry } from '@lib/shared/event-entry';
-import { formatDateLong } from '@lib/shared/time';
-import { link } from '@lib/ui';
+import site from '@data/site.json'
+import { readCancelToken } from '@lib/server/cancel-token'
+import { config } from '@lib/server/config'
+import { callPlugin, PluginRefusal } from '@lib/server/plugin-route'
+import { purgePublicCache } from '@lib/server/public-data'
+import { clientIp, peerAddress, rateLimit } from '@lib/server/ratelimit'
+import { eventFromEntry } from '@lib/shared/event-entry'
+import { formatDateLong } from '@lib/shared/time'
+import { link } from '@lib/ui'
 
-import PageIntro from '../../components/PageIntro.astro';
-import Button from '../../components/ui/Button.astro';
-import Layout from '../../layouts/Layout.astro';
+import PageIntro from '../../components/PageIntro.astro'
+import Button from '../../components/ui/Button.astro'
+import Layout from '../../layouts/Layout.astro'
 
 /**
  * The signed cancel link from the participant mails. GET only shows what would be
  * cancelled (mail scanners open links); the button POSTs the token back. Private:
  * never cached, never indexed, and the token is not sent on as a referrer.
  */
-type State = 'confirm' | 'done' | 'already' | 'invalid' | 'limited';
+type State = 'confirm' | 'done' | 'already' | 'invalid' | 'limited'
 
-Astro.response.headers.set('Cache-Control', 'private, no-store');
-Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+Astro.response.headers.set('Cache-Control', 'private, no-store')
+Astro.response.headers.set('Referrer-Policy', 'no-referrer')
 
-const isPost = Astro.request.method === 'POST';
-let token = Astro.url.searchParams.get('token') ?? '';
+const isPost = Astro.request.method === 'POST'
+let token = Astro.url.searchParams.get('token') ?? ''
 
 if (isPost) {
-  const form = await Astro.request.formData().catch(() => null);
+  const form = await Astro.request.formData().catch(() => null)
 
-  token = String(form?.get('token') ?? '');
+  token = String(form?.get('token') ?? '')
 }
 
 /** The registration the token names, with its event; null when either is gone. */
 const readRegistration = async (id: string | null) => {
-  const { entry } = id ? await getEmDashEntry('registrations', id) : { entry: null };
-  const eventId = entry ? String(entry.data.event ?? '') : '';
-  const { entry: eventEntry } = eventId ? await getEmDashEntry('events', eventId) : { entry: null };
+  const { entry } = id ? await getEmDashEntry('registrations', id) : { entry: null }
+  const eventId = entry ? String(entry.data.event ?? '') : ''
+  const { entry: eventEntry } = eventId ? await getEmDashEntry('events', eventId) : { entry: null }
 
   return entry && eventEntry
     ? {
@@ -46,36 +46,38 @@ const readRegistration = async (id: string | null) => {
         cancelled: !!entry.data.cancelled_at,
         event: eventFromEntry(eventId, String(eventEntry.data.slug ?? eventEntry.id), eventEntry.data, 0),
       }
-    : null;
-};
+    : null
+}
 
-const found = await readRegistration(await readCancelToken(token));
-let state: State = found ? (found.cancelled ? 'already' : 'confirm') : 'invalid';
+const found = await readRegistration(await readCancelToken(token))
+let state: State = found ? (found.cancelled ? 'already' : 'confirm') : 'invalid'
 
 if (isPost && state === 'confirm') {
   if (!rateLimit('cancel', clientIp(Astro.request, peerAddress(Astro), config.TRUSTED_PROXY), 10, 3600)) {
-    state = 'limited';
-  } else {
+    state = 'limited'
+  }
+  else {
     try {
-      const { result } = await callPlugin<{ result: 'cancelled' | 'already' }>(Astro.locals, 'cancel', { token });
+      const { result } = await callPlugin<{ result: 'cancelled' | 'already' }>(Astro.locals, 'cancel', { token })
 
-      state = result === 'cancelled' ? 'done' : 'already';
+      state = result === 'cancelled' ? 'done' : 'already'
 
-      if (result === 'cancelled') await purgePublicCache(Astro);
-    } catch (err) {
-      if (!(err instanceof PluginRefusal)) throw err;
+      if (result === 'cancelled') await purgePublicCache(Astro)
+    }
+    catch (err) {
+      if (!(err instanceof PluginRefusal)) throw err
 
-      state = 'invalid';
+      state = 'invalid'
     }
   }
 }
 
-if (state === 'invalid') Astro.response.status = 404;
+if (state === 'invalid') Astro.response.status = 404
 
-if (state === 'limited') Astro.response.status = 429;
+if (state === 'limited') Astro.response.status = 429
 
-const event = found?.event;
-const when = event ? formatDateLong(event.event_date) : '';
+const event = found?.event
+const when = event ? formatDateLong(event.event_date) : ''
 
 const titles: Record<State, string> = {
   confirm: 'Anmeldung absagen?',
@@ -91,7 +93,16 @@ const titles: Record<State, string> = {
     <Fragment slot="lead">
       {state === 'confirm' && event && (
         <>
-          Hallo {found?.firstName || 'du'}, du bist für den Abend „{event.title}“ am {when} angemeldet. Wenn du nicht
+          Hallo
+          {' '}
+          {found?.firstName || 'du'}
+          , du bist für den Abend „
+          {event.title}
+          “ am
+          {' '}
+          {when}
+          {' '}
+          angemeldet. Wenn du nicht
           kommen kannst, sag hier ab. Dein Platz wird dann wieder frei.
         </>
       )}
@@ -104,7 +115,8 @@ const titles: Record<State, string> = {
       {state === 'already' && <>Diese Anmeldung ist bereits abgesagt. Du musst nichts weiter tun.</>}
       {state === 'invalid' && (
         <>
-          Der Link ist abgelaufen oder unvollständig. Wenn du absagen möchtest, schreib mir kurz an{' '}
+          Der Link ist abgelaufen oder unvollständig. Wenn du absagen möchtest, schreib mir kurz an
+          {' '}
           <a class={link} href={`mailto:${site.contactEmail}`}>
             {site.contactEmail}
           </a>
@@ -113,23 +125,25 @@ const titles: Record<State, string> = {
       )}
       {state === 'limited' && <>Bitte versuche es in einer Stunde noch einmal.</>}
     </Fragment>
-    {state === 'confirm' ? (
-      <form method="post" action="/anmeldung/absagen" class="contents">
-        <input type="hidden" name="token" value={token} />
-        <Button type="submit" size="lg" class="max-sm:w-full">
-          Ja, ich sage ab
-        </Button>
-        {event && (
-          <Button href={`/event/${event.slug}`} variant="secondary" size="lg" class="max-sm:w-full">
-            Zum Termin
+    {state === 'confirm'
+      ? (
+          <form method="post" action="/anmeldung/absagen" class="contents">
+            <input type="hidden" name="token" value={token} />
+            <Button type="submit" size="lg" class="max-sm:w-full">
+              Ja, ich sage ab
+            </Button>
+            {event && (
+              <Button href={`/event/${event.slug}`} variant="secondary" size="lg" class="max-sm:w-full">
+                Zum Termin
+              </Button>
+            )}
+          </form>
+        )
+      : (
+          <Button href="/event" variant="secondary" size="lg" class="max-sm:w-full">
+            Termine ansehen
           </Button>
         )}
-      </form>
-    ) : (
-      <Button href="/event" variant="secondary" size="lg" class="max-sm:w-full">
-        Termine ansehen
-      </Button>
-    )}
   </PageIntro>
   <div class="pb-section"></div>
 </Layout>

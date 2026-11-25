@@ -1,24 +1,24 @@
 /** The participant's confirmation. Generated from the former listmonk template; edit freely. */
-import { escapeHtml as e } from '../../shared/html';
+import { escapeHtml as e } from '../../shared/html'
 
 export interface RegistrationConfirmationHtmlData {
-  address: string | number;
-  cancelUrl: string | number;
-  contactEmail: string | number;
-  costBasis: string | number;
-  dateDay: string | number;
-  dateLong: string | number;
-  dateWeekday: string | number;
-  description: string | number;
-  eventTitle: string | number;
-  eventUrl: string | number;
-  firstName: string | number;
-  icsUrl: string | number;
-  location: string | number;
-  locationDetails: string | number;
-  recipientEmail: string | number;
-  subject: string | number;
-  timeRange: string | number;
+  address: string | number
+  cancelUrl: string | number
+  contactEmail: string | number
+  costBasis: string | number
+  dateDay: string | number
+  dateLong: string | number
+  dateWeekday: string | number
+  description: string | number
+  eventTitle: string | number
+  eventUrl: string | number
+  firstName: string | number
+  icsUrl: string | number
+  location: string | number
+  locationDetails: string | number
+  recipientEmail: string | number
+  subject: string | number
+  timeRange: string | number
 }
 
 export const registrationConfirmationHtml = (d: RegistrationConfirmationHtmlData): string => `<!doctype html>
@@ -193,4 +193,4 @@ ${
 </table>
 </body>
 </html>
-`;
+`
