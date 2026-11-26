@@ -296,7 +296,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   radius. `rounded-full` for what you press and for circles (people's photographs,
   seat ring, stamp, avatar); single-line fields are pills at the buttons' heights; textareas use `rounded-xl`;
   only what floats (a dialog) takes `rounded-xl`. No rounded
-  cards on public pages: facts, steps, agreements, FAQ and voices are rows between
+  cards on public pages: facts, FAQ and voices are rows between
   lines. No shadow anywhere; what floats has a line and the dimmed page behind it. Images: a photograph has no
   frame, it runs to the window's edge and softly into the ground
   (`data-hero-frame`); a small portrait stands in a circle; no caption.
@@ -305,8 +305,7 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   under Motion.
 - Against the generated look (the `web-design-engineer` skill's failure patterns,
   `skills-lock.json`): no label above every heading (`Eyebrow` only where it adds the
-  place or the kind of page), no decorative numbers (an index number only where
-  there is a real order: the course, the agreements), no drawn shape standing in for
+  place or the kind of page), no decorative numbers, no drawn shape standing in for
   a picture (no empty rings), no gradient, glow or texture on a ground but the home opening's glows, one label for one action, nothing invented.
 - Shared components: `EventSummary` (every date: date, facts, `SeatRing`, action;
   fed by `lib/shared/event-status.ts`), `SeatRing` (`lib/shared/seats.ts`:
@@ -321,8 +320,8 @@ attributes, never onto styling classes; states are `data-*` too (`data-open`,
   phrase stands; under it one row on the grid: explanation and the one action on
   the left, the next date as open lines on the right; the bar's action outlined
   over it; on phones date, time and place precede the action), Markus with a short introduction and portrait, intro
-  (questions in the margin, four facts and a short closing line), course (the band,
-  index numbers), agreements (dark),
+  (one opening question in the margin, four facts and a short closing line), course (four stages along
+  a vertical line on the band), agreements (the confidentiality pledge and short paragraphs on dark),
   voices (published quotes in full, a compact link while empty), FAQ, the next evening (`#termine`), staying in touch (dark, the stamp), the footer.
   Open and wide: no box or card on a public page, the opening included.
 - Sub-pages open with `PageIntro`: on paper with the stamp, or, given a photograph

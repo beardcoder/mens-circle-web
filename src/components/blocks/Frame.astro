@@ -1,30 +1,23 @@
 ---
 import { margin } from '@lib/ui'
 
+import Prose from '../ui/Prose.astro'
 import Section from '../ui/Section.astro'
 import SectionHead from '../ui/SectionHead.astro'
-
-interface Agreement {
-  title: string
-  text?: string
-}
 
 interface Props {
   anchor: string
   eyebrow?: string
   title: string
   intro: string
-  agreements: Agreement[]
+  pledge: string
   boundaryTitle: string
   boundaryText: string
 }
 
-const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText } = Astro.props
+const { anchor, eyebrow, title, intro, pledge, boundaryTitle, boundaryText } = Astro.props
 ---
 
-{/* On the dark ground: what is said in the circle. The five agreements as lines across the
-    page, each number in the accent, its name and what it means; the boundary (no
-    therapy) under them, its title in the margin. */}
 <Section
   id={anchor}
   ground="dark"
@@ -39,25 +32,12 @@ const { anchor, eyebrow, title, intro, agreements, boundaryTitle, boundaryText }
       class={margin.cross}
     />
 
-    {agreements.length > 0 && (
-      <ol
-        role="list"
-        class="grid lg:col-span-12"
-      >
-        {agreements.map((rule, i) => (
-          <li class="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-line py-6 last:border-b sm:grid-cols-[4rem_minmax(0,1fr)] lg:grid-cols-12 lg:gap-x-grid lg:py-8">
-            <span
-              aria-hidden="true"
-              class="row-span-2 font-display text-sub font-semibold text-accent tabular-nums lg:col-span-1"
-            >
-              {String(i + 1).padStart(2, '0')}
-            </span>
-            <h3 class="text-sub text-fg hyphens-auto lg:col-span-4 lg:col-start-2">{rule.title}</h3>
-            {rule.text && <p class="max-w-measure text-md text-fg-soft lg:col-span-6 lg:col-start-7 lg:row-start-1">{rule.text}</p>}
-          </li>
-        ))}
-      </ol>
-    )}
+    <div class:list={[margin.grid, 'items-start gap-y-6 border-y border-line py-8 lg:col-span-12 lg:py-12']}>
+      <p class="max-w-[18em] text-pretty font-display text-sub text-fg lg:col-span-5">{pledge}</p>
+      <Prose class="lg:col-span-6 lg:col-start-7">
+        <slot />
+      </Prose>
+    </div>
 
     {boundaryText && (
       <aside

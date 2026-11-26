@@ -8,7 +8,6 @@ import photo from '../assets/images/markus-sommer.jpg'
 import Cta from '../components/blocks/Cta.astro'
 import Faq from '../components/blocks/Faq.astro'
 import TextSection from '../components/blocks/TextSection.astro'
-import ValueItems from '../components/blocks/ValueItems.astro'
 import PageIntro from '../components/PageIntro.astro'
 import AccordionItem from '../components/ui/AccordionItem.astro'
 import Layout from '../layouts/Layout.astro'
@@ -91,33 +90,16 @@ const canonical = canonicalUrl(siteUrl, Astro.url.pathname);
     </p>
     <blockquote>Du kannst erst einmal zuhören. Wie viel du von dir erzählst, entscheidest du selbst.</blockquote>
   </TextSection>
-  <ValueItems
-    anchor="haltung"
-    title="Was mir im Kreis wichtig ist"
-    intro="Ich möchte, dass wir offen miteinander sprechen und einander zuhören können."
-    items={[
-      {
-        title: 'Ehrlich sprechen',
-        description: 'Du kannst sagen, wie es dir geht, auch wenn du gerade etwas nicht im Griff hast.',
-      },
-      {
-        title: 'Sich austauschen',
-        description: 'Was du sonst mit dir allein ausmachst, kannst du hier mit anderen Männern besprechen.',
-      },
-      {
-        title: 'Den Körper wahrnehmen',
-        description: 'Mit einfachen Atemübungen nehmen wir uns Zeit, zu spüren, wie es uns gerade geht.',
-      },
-      {
-        title: 'Verantwortung übernehmen',
-        description: 'Jeder spricht von seiner eigenen Erfahrung und bleibt für seine Entscheidungen verantwortlich.',
-      },
-      {
-        title: 'Einander respektieren',
-        description: 'Wir nehmen einander ernst, ohne etwas vorspielen zu müssen oder andere abzuwerten.',
-      },
-    ]}
-  />
+  <TextSection anchor="haltung" title="Was mir im Kreis wichtig ist" ground="alt">
+    <p>
+      Wenn ein Mann erzählt, dass ihm gerade etwas über den Kopf wächst, möchte ich erst einmal hören, wie es ihm damit
+      geht. Vielleicht kennt ein anderer in der Runde etwas Ähnliches. Dann kann er von sich erzählen. Jeder entscheidet selbst, was er aus dem Gespräch mitnimmt.
+    </p>
+    <p>
+      Manchmal fehlen einem mitten im Erzählen die Worte. Für mich gehört auch diese Pause zum Gespräch.
+      Wir können einen Atemzug lang still sein und warten, bis der andere weitersprechen möchte.
+    </p>
+  </TextSection>
   <TextSection anchor="der-kreis-bleibt-einfach" title="Der Kreis bleibt einfach">
     <p>
       Bei Begriffen wie Männerarbeit oder Atemarbeit sind manche Männer skeptisch. Das verstehe ich. Bei uns beginnt ein

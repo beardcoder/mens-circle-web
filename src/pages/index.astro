@@ -59,13 +59,8 @@ else {
   <Intro
     anchor="ueber"
     title="Worum es an so einem Abend geht"
-    questionsLabel="Fragen aus der ersten Runde"
-    questions={[
-      'Wie geht es dir gerade wirklich?',
-      'Was spürst du, und wo im Körper?',
-      'Was läuft gut, was kostet dich Kraft?',
-      'Was schiebst du schon länger vor dir her?',
-    ]}
+    promptLabel="Eine Frage aus der ersten Runde"
+    prompt="Wie geht es dir gerade wirklich?"
     factsLabel="Auf einen Blick"
   >
     <p>
@@ -99,58 +94,41 @@ else {
   <JourneySteps
     anchor="reise"
     title="Wie ein Abend abläuft"
-    subtitle="Wir beginnen und enden mit einer Runde. Wie viel Zeit wir uns dazwischen für ein Thema nehmen, ergibt sich im Gespräch."
+    subtitle="Wir beginnen und enden mit einer Runde. Was dazwischen zur Sprache kommt, entscheiden wir an dem Abend. Du kannst ohne Vorerfahrung kommen und musst nichts vorbereiten."
   >
     <Fragment slot="steps">
       <JourneyStep number={1} title="Ankommen">
-        Wir kommen an, oft mit ein paar ruhigen Atemzügen, und gehen die Absprachen für den Abend durch.
+        Wir setzen uns zusammen und gehen unsere Absprachen durch. Oft nehmen wir uns dann einen Moment, um ruhig zu atmen und die Füße auf dem Boden zu spüren.
       </JourneyStep>
       <JourneyStep number={2} title="Die erste Runde">
         Wir gehen reihum. Wer mag, erzählt kurz, wie es ihm geht. Du kannst die Runde auch weitergeben.
       </JourneyStep>
       <JourneyStep number={3} title="Teilen und zuhören">
-        Wer spricht, hat die ganze Aufmerksamkeit der anderen. Wir lassen ausreden, bewerten nicht und geben keine
-        ungefragten Ratschläge. Du erzählst so viel, wie du möchtest. Nur zuzuhören ist auch in Ordnung.
+        Manchmal beschäftigt einen Mann etwas aus der ersten Runde noch länger. Dann nehmen wir uns Zeit dafür. Wer erzählt, kann ausreden.
       </JourneyStep>
       <JourneyStep number={4} title="Abschlussrunde">
         Zum Schluss geht die Runde noch einmal herum. Wer möchte, sagt kurz, was ihm vom Gespräch geblieben ist.
       </JourneyStep>
     </Fragment>
-    <p slot="close">
-      Am Anfang nehmen wir uns Zeit für den Körper: ruhig atmen, die Füße auf dem Boden spüren. Vorerfahrung mit
-      Männerkreisen, Meditation oder Atemarbeit brauchst du nicht, und vorbereiten musst du nichts.
-    </p>
   </JourneySteps>
 
   <Frame
     anchor="rahmen"
     title="Was wir vereinbaren"
-    intro="Zu Beginn gehen wir diese fünf Absprachen durch. Jeder sagt, ob er sie mitträgt."
-    agreements={[
-      {
-        title: 'Vertraulichkeit',
-        text: 'Was im Kreis erzählt wird, bleibt im Kreis. Das sagen wir uns zu Beginn gegenseitig zu.',
-      },
-      {
-        title: 'Ehrlichkeit',
-        text: 'Du erzählst, wie es dir wirklich geht. Auch „Ich möchte heute nichts sagen“ ist eine ehrliche Antwort.',
-      },
-      {
-        title: 'Annehmen statt bewerten',
-        text: 'Wir hören auch dann zu, wenn wir etwas anders erlebt haben. Einen Rat geben wir nur, wenn jemand darum bittet.',
-      },
-      {
-        title: 'Von sich sprechen',
-        text: 'Jeder spricht von sich: „ich“ statt „man“. Was du erzählst und wobei du mitmachst, entscheidest du selbst.',
-      },
-      {
-        title: 'Respekt',
-        text: 'Wir nehmen ernst, was jemand erzählt. Niemand wird belächelt, unterbrochen oder kommentiert.',
-      },
-    ]}
+    intro="Bevor jemand etwas Persönliches erzählt, sprechen wir darüber, wie wir miteinander umgehen wollen. Jeder sagt, ob er die Absprachen mitträgt."
+    pledge="Was im Kreis erzählt wird, bleibt im Kreis."
     boundaryTitle="Gut zu wissen"
-    boundaryText="Der Männerkreis ist weder Therapie noch Coaching und ersetzt beides nicht. Wenn du gerade therapeutische Unterstützung brauchst, ist professionelle Hilfe der richtige Weg. Es gibt im Kreis keine Lehre und kein festes Bild davon, wie ein Mann zu sein hat."
-  />
+    boundaryText="Der Männerkreis ersetzt weder Therapie noch Coaching. Wenn du therapeutische Unterstützung brauchst, wende dich an eine Fachperson. Im Kreis gibt es keine Lehre und kein festes Bild davon, wie ein Mann zu sein hat."
+  >
+    <p>
+      Wir sprechen von dem, was wir selbst erlebt haben. Du kannst ehrlich sagen, wie es dir geht.
+      Auch „Heute möchte ich nur zuhören“ hat Platz. Bei jeder Übung entscheidest du selbst, ob du mitmachst.
+    </p>
+    <p>
+      Wenn einer erzählt, lassen wir ihn ausreden. Wir nehmen ernst, was er sagt, auch wenn wir die Dinge anders sehen.
+      Einen Rat geben wir nur, wenn er darum bittet.
+    </p>
+  </Frame>
 
   <Testimonials
     items={testimonials}

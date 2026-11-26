@@ -29,7 +29,7 @@ then stepping back. Translated into design:
 
 - **Quiet.** Few effects, much air, one action per module. Grounds run from edge
   to edge; content stands on them, not in boxes. Lists between lines rather than
-  cards (the facts, the questions of the first round, the agreements, the FAQ, the
+  cards (the facts, the FAQ, the
   voices). No cards on public pages, not even for a date; the registration is a
   dark panel.
 - **Safe and clear.** The frame is visible before anyone comes: how an evening
@@ -147,7 +147,7 @@ regular and semibold, ~13 kB each; the regular also serves 500, the semibold 700
 | `text-section` | 36–72px  | a section's title, the one featured voice        |
 | `text-sub`     | 26–36px  | subheadings, list titles, a fact's value, a date |
 | `text-quote`   | 28–42px  | one short quote                                  |
-| `text-xl`      | 18–22px  | FAQ questions, the questions of the first round  |
+| `text-xl`      | 18–22px  | FAQ questions and fact values  |
 | `text-lg`      | 18–21px  | a lead                                           |
 | `text-md`      | 17–19px  | running text (the body)                          |
 | `text-base`    | 16px     | controls, buttons, data                          |
@@ -196,7 +196,7 @@ run from edge to edge or out to the window. `rounded-full` is what you press
 (buttons, chips, icon buttons, the FAQ disc) and the circle (photographs of people,
 the seat ring, the stamp, the avatar). Single-line fields use the same pill shape and heights as buttons (48 / 44 / 36px).
 Textareas and dialogs use the fixed 28px radius (`rounded-xl`). On public pages nothing is boxed and nothing is a rounded card:
-facts, questions, agreements, steps, FAQ and voices are rows between thin lines.
+facts, FAQ and voices use rows between thin lines. A fine vertical line connects the stages of the evening.
 Nothing casts a shadow; what floats has a line (`line-strong`) and the dimmed page behind it.
 
 ## Images
@@ -333,10 +333,10 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   whole width; under it one row on the grid, the explanation and the one action
   on the left, the next date as open lines on the
   right. On phones the date, time and place precede the action. Markus introduces himself with his portrait immediately after the opening. Then: the intro,
-  its title crossing into the content, the first round's questions in the margin,
+  its title crossing into the content, one opening question in the margin,
   the four facts and a short closing line about curiosity;
-  the course on the band, each step with its index number in the margin; the five
-  agreements on the dark ground as rows across the page, numbers in the accent; published voices on the dark ground, or a compact invitation to contribute;
+  the course on the band, four stages along a vertical line; the pledge of confidentiality and short paragraphs
+  on the agreements on the dark ground; published voices on the dark ground, or a compact invitation to contribute;
   the FAQ with the contact line in the margin; taking part (`#termine`, the band,
   the next date and a link to the schedule when further dates exist); staying in touch on the
   dark ground with the stamp cut by the right edge, running into the footer. Open and
@@ -351,7 +351,7 @@ about the circle, navigation, contact, legal links and `ModeToggle`.
   (the band); the map; where next.
 - **Personal page.** `PageIntro` with the photograph (the poster opening), then
   sections set like the home page's: the title at section size crossing from the
-  margin, the text on the reading line; the values as rows on the band; the FAQ; one
+  margin, the text on the reading line; a personal account of listening on the band; the FAQ; one
   closing invitation on the band.
 - **Legal pages, testimonial form, 404.** `PageIntro` and one column.
 - **Admin.** EmDash's own (`/_emdash/admin`); the site's design stops at the public pages.

@@ -1,7 +1,6 @@
 ---
 import { margin } from '@lib/ui'
 
-import Prose from '../ui/Prose.astro'
 import Section from '../ui/Section.astro'
 import SectionHead from '../ui/SectionHead.astro'
 
@@ -15,8 +14,6 @@ interface Props {
 const { anchor, eyebrow, title, subtitle } = Astro.props
 ---
 
-{/* The evening from beginning to end on the quiet band: the steps one under the other, each
-    with its index number in the margin, read like a short text. */}
 <Section
   id={anchor}
   ground="alt"
@@ -40,18 +37,14 @@ const { anchor, eyebrow, title, subtitle } = Astro.props
       title={title}
       titleId="ablauf-title"
       lead={subtitle}
-      class={margin.cross}
+      class="lg:col-span-5"
     />
 
     <ol
       role="list"
-      class="grid lg:col-span-12"
+      class="min-w-0 lg:col-span-6 lg:col-start-7"
     >
       <slot name="steps" />
     </ol>
-
-    <Prose class:list={[margin.reading, 'border-t border-line-strong pt-8']}>
-      <slot name="close" />
-    </Prose>
   </div>
 </Section>

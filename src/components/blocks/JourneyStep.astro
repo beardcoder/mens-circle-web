@@ -1,8 +1,4 @@
 ---
-import { margin } from '@lib/ui'
-
-import Index from '../ui/Index.astro'
-
 interface Props {
   title: string
   number: number
@@ -11,33 +7,26 @@ interface Props {
 const { title, number } = Astro.props
 ---
 
-{/* One step: its number in the margin, its title and text beside it, under a thin rule. */}
 <li
   itemprop="itemListElement"
   itemscope
   itemtype="https://schema.org/ListItem"
-  class:list={[margin.grid, 'gap-y-3 border-t border-line-strong py-8 last:border-b lg:py-10']}
+  class="relative pb-8 pl-7 last:pb-0 sm:pl-9 before:absolute before:top-[0.75em] before:left-0 before:size-2 before:rounded-full before:bg-accent after:absolute after:top-[calc(0.75em+0.5rem)] after:-bottom-[0.75em] after:left-[3.5px] after:w-px after:bg-line-strong last:after:hidden"
 >
   <meta
     itemprop="position"
     content={String(number)}
   />
-  <Index
-    value={number}
-    class={margin.side}
-  />
-  <div class:list={[margin.reading, 'grid content-start gap-3 lg:pt-2']}>
-    <h3
-      itemprop="name"
-      class="text-sub text-fg"
-    >
-      {title}
-    </h3>
-    <p
-      itemprop="description"
-      class="max-w-measure text-md text-fg-soft"
-    >
-      <slot />
-    </p>
-  </div>
+  <h3
+    itemprop="name"
+    class="text-sub text-fg"
+  >
+    {title}
+  </h3>
+  <p
+    itemprop="description"
+    class="mt-2 max-w-measure text-md text-fg-soft"
+  >
+    <slot />
+  </p>
 </li>

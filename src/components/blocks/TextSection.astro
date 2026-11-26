@@ -6,18 +6,20 @@ import Section from '../ui/Section.astro'
 import SectionHead from '../ui/SectionHead.astro'
 
 interface Props {
+  ground?: 'default' | 'alt'
   anchor: string
   eyebrow?: string
   title: string
 }
 
-const { anchor, eyebrow, title } = Astro.props
+const { anchor, eyebrow, title, ground } = Astro.props
 ---
 
 {/* As on the home page: the title crosses from the margin into the content, the text stands on the reading line. */}
 <Section
   id={anchor}
   space="band"
+  ground={ground}
 >
   <div class:list={[margin.grid, 'gap-y-8']}>
     <SectionHead
